@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Optional;
 import java.util.Set;
 
 public class FieldTypeMappingsService {
@@ -46,21 +45,17 @@ public class FieldTypeMappingsService {
         this.mongoIndexSetService = mongoIndexSetService;
     }
 
-
     public void changeFieldType(final CustomFieldMapping customMapping,
                                 final Set<String> indexSetsIds,
                                 final boolean rotateImmediately) {
         for (String indexSetId : indexSetsIds) {
             try {
-                final Optional<IndexSetConfig> indexSetConfigOpt = indexSetService.get(indexSetId);
-                if (indexSetConfigOpt.isPresent()) {
-                    final IndexSetConfig indexSetConfig = indexSetConfigOpt.get();
+                indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
                     final IndexSetConfig updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
-
                     if (rotateImmediately) {
                         cycleIndexSet(updatedIndexSetConfig);
                     }
-                }
+                });
             } catch (Exception ex) {
                 LOG.error("Failed to update field type in index set : " + indexSetId, ex);
             }
@@ -69,14 +64,15 @@ public class FieldTypeMappingsService {
 
     private IndexSetConfig storeMapping(final CustomFieldMapping customMapping,
                                         final IndexSetConfig indexSetConfig) {
-        final IndexSetConfig.Builder builder = indexSetConfig.toBuilder();
         final CustomFieldMappings previousCustomFieldMappings = indexSetConfig.customFieldMappings();
-        builder.customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping));
-
-        return mongoIndexSetService.save(builder.build());
+        return mongoIndexSetService.save(
+                indexSetConfig.toBuilder()
+                        .customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping))
+                        .build()
+        );
     }
 
-    private void cycleIndexSet(IndexSetConfig indexSetConfig) {
+    private void cycleIndexSet(final IndexSetConfig indexSetConfig) {
         final MongoIndexSet mongoIndexSet = mongoIndexSetFactory.create(indexSetConfig);
         mongoIndexSet.cycle();
     }
