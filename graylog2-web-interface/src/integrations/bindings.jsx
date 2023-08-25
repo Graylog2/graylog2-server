@@ -14,10 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import './webpack-entry';
-
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-
 import Routes from 'aws/common/Routes';
 
 import AWSInputConfiguration from './aws/AWSInputConfiguration';
@@ -38,9 +34,7 @@ import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocume
 import GreyNoiseCommunityIpLookupAdapterDocumentation
   from './dataadapters/GreyNoiseCommunityIpLookupAdapterDocumentation';
 
-import packageJson from '../../package.json';
-
-const manifest = new PluginManifest(packageJson, {
+const bindings = {
   routes: [
     { path: Routes.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
   ],
@@ -93,6 +87,6 @@ const manifest = new PluginManifest(packageJson, {
       documentationComponent: GreyNoiseCommunityIpLookupAdapterDocumentation,
     },
   ],
-});
+};
 
-PluginStore.register(manifest);
+export default bindings;
