@@ -52,7 +52,7 @@ public class IntegrationsMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return Version.fromPluginProperties(getClass(), PLUGIN_PROPERTIES, "version", Version.from(0, 0, 0, "unknown"));
+        return Version.CURRENT_CLASSPATH;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class IntegrationsMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return Version.fromPluginProperties(getClass(), PLUGIN_PROPERTIES, "graylog.version", Version.from(0, 0, 0, "unknown"));
+        return Version.CURRENT_CLASSPATH;
     }
 
     @Override
