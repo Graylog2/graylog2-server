@@ -56,6 +56,10 @@ public class CertutilCert implements CliCommand {
 
     private final CommandLineConsole console;
 
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CA_PASSWORD = CommandLineConsole.prompt("Enter CA password: ");
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CERT_ALTERNATIVE_NAMES = CommandLineConsole.prompt("Enter alternative names (addresses) of this node [comma separated]: ");
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_CERTIFICATE_PASSWORD = CommandLineConsole.prompt("Enter datanode certificate password: ");
+
     public CertutilCert() {
         this.console = new SystemConsole();
     }
@@ -75,7 +79,7 @@ public class CertutilCert implements CliCommand {
         console.printLine("Using certificate authority " + caKeystorePath.toAbsolutePath());
 
         try {
-            char[] password = console.readPassword("Enter CA password: ");
+            char[] password = console.readPassword(PROMPT_ENTER_CA_PASSWORD);
             KeyStore caKeystore = KeyStore.getInstance(PKCS12);
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
@@ -98,7 +102,7 @@ public class CertutilCert implements CliCommand {
                     .withSubjectAlternativeName("ip6-localhost")
                     .validity(Duration.ofDays(10 * 365));
 
-            final String alternativeNames = console.readLine("Enter alternative names (addresses) of this node [comma separated]: ");
+            final String alternativeNames = console.readLine(PROMPT_ENTER_CERT_ALTERNATIVE_NAMES);
             Arrays.stream(alternativeNames.split(","))
                     .filter(Strings::isNotBlank)
                     .forEach(req::withSubjectAlternativeName);
@@ -108,7 +112,7 @@ public class CertutilCert implements CliCommand {
             KeyStore nodeKeystore = KeyStore.getInstance(PKCS12);
             nodeKeystore.load(null, null);
 
-            char[] nodeKeystorePassword = console.readPassword("Enter datanode certificate password: ");
+            char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_CERTIFICATE_PASSWORD);
 
             nodeKeystore.setKeyEntry(DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
                     new X509Certificate[]{nodePair.certificate(), intermediateCA.certificate(), rootCertificate});
