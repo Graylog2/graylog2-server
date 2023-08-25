@@ -48,6 +48,10 @@ import static org.mockito.Mockito.when;
 class FieldTypeMappingsServiceTest {
 
     private final CustomFieldMapping newCustomMapping = new CustomFieldMapping("new_field", FieldTypes.Type.builder().type("long").build());
+    private final CustomFieldMapping existingCustomFieldMapping = new CustomFieldMapping("existing_field", FieldTypes.Type.builder().type("text").build());
+
+    private FieldTypeMappingsService toTest;
+
     @Mock
     private IndexSetService indexSetService;
     @Mock
@@ -57,25 +61,7 @@ class FieldTypeMappingsServiceTest {
     @Mock
     private MongoIndexSet existingMongoIndexSet;
 
-    private FieldTypeMappingsService toTest;
-
-    private final CustomFieldMapping existingCustomFieldMapping = new CustomFieldMapping("existing_field", FieldTypes.Type.builder().type("text").build());
-    private IndexSetConfig existingIndexSet = IndexSetConfig.builder()
-            .id("existing_index_set")
-            .title("title")
-            .indexWildcard("ex*")
-            .shards(1)
-            .replicas(1)
-            .rotationStrategy(SizeBasedRotationStrategyConfig.create(42))
-            .indexPrefix("ex")
-            .retentionStrategy(NoopRetentionStrategyConfig.create(13))
-            .creationDate(ZonedDateTime.now())
-            .indexAnalyzer("korean")
-            .indexTemplateName("test_template")
-            .indexOptimizationDisabled(true)
-            .indexOptimizationMaxNumSegments(77)
-            .customFieldMappings(new CustomFieldMappings(Set.of(existingCustomFieldMapping)))
-            .build();
+    private final IndexSetConfig existingIndexSet = buildSampleIndexSetConfig();
 
     @BeforeEach
     void setUp() {
@@ -97,13 +83,13 @@ class FieldTypeMappingsServiceTest {
                 existingIndexSet.toBuilder()
                         .customFieldMappings(new CustomFieldMappings(Set.of(existingCustomFieldMapping, newCustomMapping)))
                         .build());
-
         verifyNoInteractions(existingMongoIndexSet);
     }
 
     @Test
     void testCyclesIndexSet() {
         doReturn(existingMongoIndexSet).when(mongoIndexSetFactory).create(any());
+
         toTest.changeFieldType(newCustomMapping,
                 new LinkedHashSet<>(List.of("existing_index_set", "wrong_index_set")),
                 true);
@@ -113,9 +99,26 @@ class FieldTypeMappingsServiceTest {
                 .build();
 
         verify(mongoIndexSetService).save(expectedUpdatedConfig);
-
         verify(existingMongoIndexSet).cycle();
-
         verifyNoMoreInteractions(mongoIndexSetService);
+    }
+
+    private IndexSetConfig buildSampleIndexSetConfig() {
+        return IndexSetConfig.builder()
+                .id("existing_index_set")
+                .title("title")
+                .indexWildcard("ex*")
+                .shards(1)
+                .replicas(1)
+                .rotationStrategy(SizeBasedRotationStrategyConfig.create(42))
+                .indexPrefix("ex")
+                .retentionStrategy(NoopRetentionStrategyConfig.create(13))
+                .creationDate(ZonedDateTime.now())
+                .indexAnalyzer("korean")
+                .indexTemplateName("test_template")
+                .indexOptimizationDisabled(true)
+                .indexOptimizationMaxNumSegments(77)
+                .customFieldMappings(new CustomFieldMappings(Set.of(existingCustomFieldMapping)))
+                .build();
     }
 }
