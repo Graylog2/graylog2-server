@@ -299,6 +299,21 @@
     "@babel/helper-split-export-declaration" "^7.22.6"
     semver "^6.3.1"
 
+"@babel/helper-create-class-features-plugin@^7.22.11":
+  version "7.22.11"
+  resolved "https://registry.yarnpkg.com/@babel/helper-create-class-features-plugin/-/helper-create-class-features-plugin-7.22.11.tgz#4078686740459eeb4af3494a273ac09148dfb213"
+  integrity sha512-y1grdYL4WzmUDBRGK0pDbIoFd7UZKoDurDzWEoNMYoj1EL+foGRQNyPWDcC+YyegN5y1DUsFFmzjGijB3nSVAQ==
+  dependencies:
+    "@babel/helper-annotate-as-pure" "^7.22.5"
+    "@babel/helper-environment-visitor" "^7.22.5"
+    "@babel/helper-function-name" "^7.22.5"
+    "@babel/helper-member-expression-to-functions" "^7.22.5"
+    "@babel/helper-optimise-call-expression" "^7.22.5"
+    "@babel/helper-replace-supers" "^7.22.9"
+    "@babel/helper-skip-transparent-expression-wrappers" "^7.22.5"
+    "@babel/helper-split-export-declaration" "^7.22.6"
+    semver "^6.3.1"
+
 "@babel/helper-create-class-features-plugin@^7.22.5":
   version "7.22.5"
   resolved "https://registry.yarnpkg.com/@babel/helper-create-class-features-plugin/-/helper-create-class-features-plugin-7.22.5.tgz#2192a1970ece4685fbff85b48da2c32fcb130b7c"
@@ -1183,6 +1198,15 @@
     "@babel/helper-module-transforms" "^7.22.5"
     "@babel/helper-plugin-utils" "^7.22.5"
 
+"@babel/plugin-transform-modules-commonjs@^7.22.11":
+  version "7.22.11"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-commonjs/-/plugin-transform-modules-commonjs-7.22.11.tgz#d7991d3abad199c03b68ee66a64f216c47ffdfae"
+  integrity sha512-o2+bg7GDS60cJMgz9jWqRUsWkMzLCxp+jFDeDUT5sjRlAxcJWZ2ylNdI7QQ2+CH5hWu7OnN+Cv3htt7AkSf96g==
+  dependencies:
+    "@babel/helper-module-transforms" "^7.22.9"
+    "@babel/helper-plugin-utils" "^7.22.5"
+    "@babel/helper-simple-access" "^7.22.5"
+
 "@babel/plugin-transform-modules-commonjs@^7.22.5":
   version "7.22.5"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-commonjs/-/plugin-transform-modules-commonjs-7.22.5.tgz#7d9875908d19b8c0536085af7b053fd5bd651bfa"
@@ -1430,6 +1454,16 @@
   integrity sha512-bYkI5lMzL4kPii4HHEEChkD0rkc+nvnlR6+o/qdqR6zrm0Sv/nodmyLhlq2DO0YKLUNd2VePmPRjJXSBh9OIdA==
   dependencies:
     "@babel/helper-plugin-utils" "^7.22.5"
+
+"@babel/plugin-transform-typescript@^7.22.11":
+  version "7.22.11"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-typescript/-/plugin-transform-typescript-7.22.11.tgz#9f27fb5e51585729374bb767ab6a6d9005a23329"
+  integrity sha512-0E4/L+7gfvHub7wsbTv03oRtD69X31LByy44fGmFzbZScpupFByMcgCJ0VbBTkzyjSJKuRoGN8tcijOWKTmqOA==
+  dependencies:
+    "@babel/helper-annotate-as-pure" "^7.22.5"
+    "@babel/helper-create-class-features-plugin" "^7.22.11"
+    "@babel/helper-plugin-utils" "^7.22.5"
+    "@babel/plugin-syntax-typescript" "^7.22.5"
 
 "@babel/plugin-transform-typescript@^7.22.5":
   version "7.22.5"
@@ -1683,7 +1717,18 @@
     "@babel/plugin-transform-react-jsx-development" "^7.22.5"
     "@babel/plugin-transform-react-pure-annotations" "^7.22.5"
 
-"@babel/preset-typescript@7.22.5", "@babel/preset-typescript@^7.21.0":
+"@babel/preset-typescript@7.22.11":
+  version "7.22.11"
+  resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.22.11.tgz#f218cd0345524ac888aa3dc32f029de5b064b575"
+  integrity sha512-tWY5wyCZYBGY7IlalfKI1rLiGlIfnwsRHZqlky0HVv8qviwQ1Uo/05M6+s+TcTCVa6Bmoo2uJW5TMFX6Wa4qVg==
+  dependencies:
+    "@babel/helper-plugin-utils" "^7.22.5"
+    "@babel/helper-validator-option" "^7.22.5"
+    "@babel/plugin-syntax-jsx" "^7.22.5"
+    "@babel/plugin-transform-modules-commonjs" "^7.22.11"
+    "@babel/plugin-transform-typescript" "^7.22.11"
+
+"@babel/preset-typescript@^7.21.0":
   version "7.22.5"
   resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.22.5.tgz#16367d8b01d640e9a507577ed4ee54e0101e51c8"
   integrity sha512-YbPaal9LxztSGhmndR46FmAbkJ/1fAsw293tSU+I5E5h+cnJ3d4GTwyUgGYmOXJYdGA+uNePle4qbaRzj2NISQ==
@@ -5033,7 +5078,7 @@ babel-preset-current-node-syntax@^1.0.0:
     "@babel/plugin-transform-runtime" "7.22.10"
     "@babel/preset-env" "7.22.10"
     "@babel/preset-react" "7.22.5"
-    "@babel/preset-typescript" "7.22.5"
+    "@babel/preset-typescript" "7.22.11"
     babel-plugin-styled-components "^2.0.7"
 
 babel-preset-jest@^29.5.0:
@@ -7353,7 +7398,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.7"
     eslint-plugin-compat "4.1.4"
-    eslint-plugin-graylog "file:packages//eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-6b893c5e-dcb3-4ddd-8fe7-5cc4f3bbf87c-1692965166957/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.2.3"
     eslint-plugin-jest-dom "5.0.2"
@@ -7361,7 +7406,7 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-jsx-a11y "6.7.1"
     eslint-plugin-react "7.33.2"
     eslint-plugin-react-hooks "4.6.0"
-    eslint-plugin-testing-library "5.11.0"
+    eslint-plugin-testing-library "6.0.1"
 
 eslint-import-resolver-node@^0.3.6:
   version "0.3.6"
@@ -7502,10 +7547,10 @@ eslint-plugin-react@7.33.2:
     semver "^6.3.1"
     string.prototype.matchall "^4.0.8"
 
-eslint-plugin-testing-library@5.11.0:
-  version "5.11.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-5.11.0.tgz#0bad7668e216e20dd12f8c3652ca353009163121"
-  integrity sha512-ELY7Gefo+61OfXKlQeXNIDVVLPcvKTeiQOoMZG9TeuWa7Ln4dUNRv8JdRWBQI9Mbb427XGlVB1aa1QPZxBJM8Q==
+eslint-plugin-testing-library@6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-6.0.1.tgz#c92325341f01fb2f76a3ab1c70d3c0c968c70b11"
+  integrity sha512-CEYtjpcF3hAaQtYsTZqciR7s5z+T0LCMTwJeW+pz6kBnGtc866wAKmhaiK2Gsjc2jWNP7Gt6zhNr2DE1ZW4e+g==
   dependencies:
     "@typescript-eslint/utils" "^5.58.0"
 
@@ -8728,13 +8773,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.17"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-80589e0f-ccf6-45d6-b46a-4f8d2fc7052b-1692965166693/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-80589e0f-ccf6-45d6-b46a-4f8d2fc7052b-1692965166693/node_modules/eslint-config-graylog"
     formik "2.4.3"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-80589e0f-ccf6-45d6-b46a-4f8d2fc7052b-1692965166693/node_modules/jest-preset-graylog"
     jquery "3.7.0"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -8745,7 +8790,7 @@ graphemer@^1.4.0:
     react-router-dom "6.15.0"
     reflux "0.2.13"
     styled-components "6.0.7"
-    typescript "5.1.6"
+    typescript "5.2.2"
     use-query-params "^2.2.0"
     webpack "5.88.2"
     webpack-cli "5.1.4"
@@ -15321,10 +15366,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@5.1.6:
-  version "5.1.6"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.6.tgz#02f8ac202b6dad2c0dd5e0913745b47a37998274"
-  integrity sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==
+typescript@5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.2.2.tgz#5ebb5e5a5b75f085f22bc3f8460fba308310fa78"
+  integrity sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==
 
 ultimate-pagination@1.0.0:
   version "1.0.0"
