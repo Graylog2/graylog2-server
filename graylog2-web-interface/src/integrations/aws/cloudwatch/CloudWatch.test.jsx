@@ -17,8 +17,8 @@
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { exampleFormDataWithKeySecretAuth } from 'integrations/aws/FormData.fixtures';
 
+import { exampleFormDataWithKeySecretAuth } from 'fixtures/aws/FormData.fixtures';
 import { FormDataProvider } from 'integrations/aws/context/FormData';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { StepsContext } from 'integrations/aws/context/Steps';
