@@ -36,15 +36,6 @@ jest.mock('util/AppConfig', () => ({
   telemetry: jest.fn(() => mockedTelemetryConfig),
 }));
 
-jest.mock('posthog-js', () => {
-  const originalModule = jest.requireActual('posthog-js');
-
-  return {
-    __esModule: true,
-    ...originalModule,
-  };
-});
-
 jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
   TelemetrySettingsActions: {
     get: jest.fn(),
