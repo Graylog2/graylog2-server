@@ -132,7 +132,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT))
-                .withCommand("sh", "-c", "opensearch-plugin remove opensearch-security && ./opensearch-docker-entrypoint.sh");
+                .withCommand("sh", "-c", "opensearch-plugin remove opensearch-security && opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
     }
 
     @Override
