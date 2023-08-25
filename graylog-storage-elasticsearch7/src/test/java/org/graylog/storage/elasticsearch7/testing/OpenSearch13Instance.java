@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
@@ -123,14 +124,15 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
                 .withEnv("OPENSEARCH_JAVA_OPTS", "-Xms2g -Xmx2g -Dlog4j2.formatMsgNoLookups=true")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
-                .withEnv("plugins.security.ssl.http.enabled", "false")
-                .withEnv("plugins.security.disabled", "true")
+                //.withEnv("plugins.security.ssl.http.enabled", "false")
+                //.withEnv("plugins.security.disabled", "true")
+                .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
-                .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
+                .waitingFor(Wait.forHttp("/").forPort(ES_PORT))
+                .withCommand("sh", "-c", "opensearch-plugin remove opensearch-security && ./opensearch-docker-entrypoint.sh");
     }
 
     @Override
