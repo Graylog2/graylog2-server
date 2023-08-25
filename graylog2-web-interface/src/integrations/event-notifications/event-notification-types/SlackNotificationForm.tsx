@@ -25,7 +25,7 @@ import { ColorPickerPopover, TimezoneSelect } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { getValueFromInput } from 'util/FormsUtils';
-import type { SlackConfigType, SlackValidationType } from 'event-notifications/types';
+import type { SlackConfigType, SlackValidationType } from 'integrations/event-notifications/types';
 
 type Props = {
   config: SlackConfigType,

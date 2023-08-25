@@ -17,7 +17,7 @@
 import React from 'react';
 
 import CommonNotificationSummary from 'components/event-notifications/event-notification-types/CommonNotificationSummary';
-import type { SlackNotificationSummaryType } from 'event-notifications/types';
+import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 
 function SlackNotificationSummary({ notification, ...restProps }: SlackNotificationSummaryType) {
   return (

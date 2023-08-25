@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { ReadOnlyFormGroup } from 'components/common';
 import { Well } from 'components/bootstrap';
-import type { SlackNotificationSummaryType } from 'event-notifications/types';
+import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 
 const NewExampleWell = styled(Well)(({ theme }) => css`
   margin-bottom: 5px;
