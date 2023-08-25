@@ -22,14 +22,20 @@ From now on, Graylog will shutdown on OutOfMemoryError, trying to log some basic
 ## Java API Changes
 The following Java Code API changes have been made.
 
-| File/method                   | Description                                                      |
-|-------------------------------|------------------------------------------------------------------|
-| `ExampleClass#exampleFuntion` | TODO placeholder comment                                         |
+| File/method                   | Description                                                     |
+|-------------------------------|-----------------------------------------------------------------|
+| `ExampleClass#exampleFuntion` | TODO placeholder comment             |
 
 
 ## REST API Endpoint Changes
 The following REST API changes have been made.
 
-| Endpoint                                              | Description                               |
-|-------------------------------------------------------|-------------------------------------------|
-| `PUT /example/placeholder`                            | TODO placeholder comment                  |
+| Endpoint                                 | Description                                |
+|------------------------------------------|--------------------------------------------|
+| `GET /contentstream/settings/{username}` | Retrieve Content Stream settings for specified user |
+| `PUT /contentstream/enable/{username}`   | Enable Content Stream for specified user   |
+| `PUT /contentstream/disable/{username}`  | Disable Content Stream for specified user  |
+| `PUT /contentstream/topics/{username}`   | Update per user Content Stream topic list  |
+
+
+
