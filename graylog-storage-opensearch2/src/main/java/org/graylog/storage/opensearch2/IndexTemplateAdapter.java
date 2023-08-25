@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import org.graylog2.indexer.indices.Template;
 
-public interface IndexTemplateAdapter {
+interface IndexTemplateAdapter {
     boolean ensureIndexTemplate(String templateName, Template template);
 
     boolean indexTemplateExists(String templateName);
