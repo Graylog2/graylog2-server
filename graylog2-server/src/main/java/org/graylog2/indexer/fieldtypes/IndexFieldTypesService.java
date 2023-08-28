@@ -51,6 +51,7 @@ import static com.mongodb.client.model.Projections.include;
 import static org.graylog2.indexer.fieldtypes.FieldTypeDTO.FIELD_NAME;
 import static org.graylog2.indexer.fieldtypes.FieldTypeDTO.FIELD_PHYSICAL_TYPE;
 import static org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO.FIELD_FIELDS;
+import static org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO.FIELD_INDEX_NAME;
 import static org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO.FIELD_INDEX_SET_ID;
 
 /**
@@ -75,10 +76,10 @@ public class IndexFieldTypesService {
                 objectMapperProvider.get());
 
         this.db.createIndex(new BasicDBObject(ImmutableMap.of(
-                IndexFieldTypesDTO.FIELD_INDEX_NAME, 1,
+                FIELD_INDEX_NAME, 1,
                 FIELD_INDEX_SET_ID, 1
         )), new BasicDBObject("unique", true));
-        this.db.createIndex(new BasicDBObject(IndexFieldTypesDTO.FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
+        this.db.createIndex(new BasicDBObject(FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
         this.db.createIndex(new BasicDBObject(FIELDS_FIELD_NAMES, 1));
         this.db.createIndex(new BasicDBObject(FIELD_INDEX_SET_ID, 1));
     }
@@ -123,7 +124,7 @@ public class IndexFieldTypesService {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrIndexName)));
         } catch (IllegalArgumentException e) {
             // Not an ObjectId, try again with index_name
-            return Optional.ofNullable(db.findOne(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_NAME, idOrIndexName)));
+            return Optional.ofNullable(db.findOne(DBQuery.is(FIELD_INDEX_NAME, idOrIndexName)));
         }
     }
 
@@ -135,7 +136,7 @@ public class IndexFieldTypesService {
     public Optional<IndexFieldTypesDTO> upsert(IndexFieldTypesDTO dto) {
         final WriteResult<IndexFieldTypesDTO, ObjectId> update = MongoDBUpsertRetryer.run(() -> db.update(
                 DBQuery.and(
-                        DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_NAME, dto.indexName()),
+                        DBQuery.is(FIELD_INDEX_NAME, dto.indexName()),
                         DBQuery.is(FIELD_INDEX_SET_ID, dto.indexSetId())
                 ),
                 dto,
@@ -157,7 +158,7 @@ public class IndexFieldTypesService {
             db.removeById(new ObjectId(idOrIndexName));
         } catch (IllegalArgumentException e) {
             // Not an ObjectId, try again with index_name
-            db.remove(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_NAME, idOrIndexName));
+            db.remove(DBQuery.is(FIELD_INDEX_NAME, idOrIndexName));
         }
     }
 
@@ -177,7 +178,7 @@ public class IndexFieldTypesService {
 
     public Collection<IndexFieldTypesDTO> findForFieldNamesAndIndices(Collection<String> fieldNames, Collection<String> indexNames) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.in(IndexFieldTypesDTO.FIELD_INDEX_NAME, indexNames),
+                DBQuery.in(FIELD_INDEX_NAME, indexNames),
                 DBQuery.in(FIELDS_FIELD_NAMES, fieldNames)
         );
 
