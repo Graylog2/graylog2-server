@@ -20,7 +20,7 @@ import ObjectID from 'bson-objectid';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col, Button, Panel } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 import { ConfirmDialog, FormSubmit } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -45,13 +45,21 @@ const ActionsCol = styled(Col)`
   margin-top: 50px;
 `;
 
-const RuleBuilderCol = styled(Col)`
-  display: flex;
-  justify-content: space-between;
+const StyledPanel = styled(Panel)`
+  background-color: #fff;
+  border: 0;
+  box-shadow: none;
+  margin-bottom: 0px;
 `;
 
-const SubTitle = styled.label`
-  color: #aaa;
+const StyledPanelHeading = styled(Panel.Heading)`
+  background-color: #f5f5f5 !important;
+  border: 0;
+`;
+
+const StyledPanelBody = styled(Panel.Body)`
+  border: 0;
+  padding: 0px;
 `;
 
 const RuleBuilder = () => {
@@ -77,6 +85,8 @@ const RuleBuilder = () => {
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
   const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
+  const [conditionsExpanded] = useState<boolean>(true);
+  const [actionsExpanded] = useState<boolean>(true);
 
   useEffect(() => {
     if (initialRule) {
@@ -278,75 +288,72 @@ const RuleBuilder = () => {
           <RuleBuilderForm rule={rule}
                            onChange={setRule} />
         </Col>
-        <RuleBuilderCol xs={4}>
-          <label htmlFor="rule_builder">Rule Builder</label>
-          <Button bsStyle="info"
-                  bsSize="small"
-                  title={initialRule ? 'Convert Rule Builder to Source Code' : 'Use Source Code Editor'}
-                  onClick={() => {
-                    sendTelemetry('click', {
-                      app_pathname: getPathnameWithoutId(pathname),
-                      app_section: 'pipeline-rules',
-                      app_action_value: initialRule ? 'convert-rule-builder-to-source-code-button' : 'source-code-editor-button',
-                    });
-
-                    if (initialRule) {
-                      setRuleSourceCodeToShow(rule);
-                    } else if (isFormDirty(rule)) {
-                      setShowConfirmSourceCodeEditor(true);
-                    } else {
-                      history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
-                    }
-                  }}>
-            {initialRule ? 'Convert to Source Code' : 'Source Code Editor'}
-          </Button>
-        </RuleBuilderCol>
         <Col xs={12}>
+          <label htmlFor="rule_builder">Rule Builder</label>
           <Row>
-            <Col xs={4}>
-              <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
-              {rule.rule_builder.conditions.map((condition, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <RuleBuilderBlock key={index}
-                                  blockDict={conditionsDict || []}
-                                  block={condition}
-                                  order={index}
-                                  type="condition"
-                                  addBlock={addBlock}
-                                  updateBlock={updateBlock}
-                                  deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
-              ))}
-              <RuleBuilderBlock blockDict={conditionsDict || []}
-                                order={newConditionBlockIndex}
-                                type="condition"
-                                addBlock={addBlock}
-                                updateBlock={updateBlock}
-                                deleteBlock={() => setBlockToDelete({
-                                  orderIndex: newConditionBlockIndex,
-                                  type: 'condition',
-                                })} />
-            </Col>
-            <Col xs={4}>
-              <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
-              {rule.rule_builder.actions.map((action, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <RuleBuilderBlock key={index}
-                                  blockDict={actionsDict || []}
-                                  block={action}
-                                  order={index}
-                                  type="action"
-                                  outputVariableList={outputVariableList()}
-                                  addBlock={addBlock}
-                                  updateBlock={updateBlock}
-                                  deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
-              ))}
-              <RuleBuilderBlock blockDict={actionsDict || []}
-                                order={newActionBlockIndex}
-                                type="action"
-                                outputVariableList={outputVariableList()}
-                                addBlock={addBlock}
-                                updateBlock={updateBlock}
-                                deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
+            <Col xs={8}>
+              <StyledPanel expanded={conditionsExpanded}>
+                <StyledPanelHeading>
+                  <Panel.Title toggle>
+                    When
+                  </Panel.Title>
+                </StyledPanelHeading>
+                <Panel.Collapse>
+                  <StyledPanelBody>
+                    {rule.rule_builder.conditions.map((condition, index) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <RuleBuilderBlock key={index}
+                                        blockDict={conditionsDict || []}
+                                        block={condition}
+                                        order={index}
+                                        type="condition"
+                                        addBlock={addBlock}
+                                        updateBlock={updateBlock}
+                                        deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
+                    ))}
+                    <RuleBuilderBlock blockDict={conditionsDict || []}
+                                      order={newConditionBlockIndex}
+                                      type="condition"
+                                      addBlock={addBlock}
+                                      updateBlock={updateBlock}
+                                      deleteBlock={() => setBlockToDelete({
+                                        orderIndex: newConditionBlockIndex,
+                                        type: 'condition',
+                                      })} />
+                  </StyledPanelBody>
+                </Panel.Collapse>
+              </StyledPanel>
+              <br />
+              <StyledPanel expanded={actionsExpanded}>
+                <StyledPanelHeading>
+                  <Panel.Title toggle>
+                    Then
+                  </Panel.Title>
+                </StyledPanelHeading>
+                <Panel.Collapse>
+                  <StyledPanelBody>
+                    {rule.rule_builder.actions.map((action, index) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <RuleBuilderBlock key={index}
+                                        blockDict={actionsDict || []}
+                                        block={action}
+                                        order={index}
+                                        type="action"
+                                        outputVariableList={outputVariableList()}
+                                        addBlock={addBlock}
+                                        updateBlock={updateBlock}
+                                        deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
+                    ))}
+                    <RuleBuilderBlock blockDict={actionsDict || []}
+                                      order={newActionBlockIndex}
+                                      type="action"
+                                      outputVariableList={outputVariableList()}
+                                      addBlock={addBlock}
+                                      updateBlock={updateBlock}
+                                      deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
+                  </StyledPanelBody>
+                </Panel.Collapse>
+              </StyledPanel>
             </Col>
             <Col xs={4}>
               <RuleSimulation rule={rule} />
@@ -360,9 +367,30 @@ const RuleBuilder = () => {
           <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
                       submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
                       centerCol={initialRule && (
-                        <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
-                          Update rule
-                        </Button>
+                        <>
+                          <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
+                            Update rule
+                          </Button>
+                          <Button bsStyle="info"
+                                  title={initialRule ? 'Convert Rule Builder to Source Code' : 'Use Source Code Editor'}
+                                  onClick={() => {
+                                    sendTelemetry('click', {
+                                      app_pathname: getPathnameWithoutId(pathname),
+                                      app_section: 'pipeline-rules',
+                                      app_action_value: initialRule ? 'convert-rule-builder-to-source-code-button' : 'source-code-editor-button',
+                                    });
+
+                                    if (initialRule) {
+                                      setRuleSourceCodeToShow(rule);
+                                    } else if (isFormDirty(rule)) {
+                                      setShowConfirmSourceCodeEditor(true);
+                                    } else {
+                                      history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
+                                    }
+                                  }}>
+                            {initialRule ? 'Convert to Source Code' : 'Source Code Editor'}
+                          </Button>
+                        </>
                       )}
                       onCancel={handleCancel} />
         </ActionsCol>

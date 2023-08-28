@@ -47,22 +47,15 @@ type Props = {
   type: BlockType,
 }
 
-const FormTitle = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
-
-const BlockTitle = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
-`);
-
 const BlockDescription = styled.p(({ theme }) => css`
   color: ${theme.colors.gray[50]};
 `);
 
 const SelectedBlock = styled.div(({ theme }) => css`
-  border-left: 1px solid ${theme.colors.input.border};
-  border-right: 1px solid ${theme.colors.input.border};
-  border-bottom: 1px solid ${theme.colors.input.border};
+  border-left:  1px solid ${theme.colors.gray['90']};
+  border-right:  1px solid ${theme.colors.gray['90']};
+  border-bottom:  1px solid ${theme.colors.gray['90']};
+  border-radius: 0px 0px 10px 10px;
   padding: ${theme.spacings.md};
 `);
 
@@ -81,6 +74,10 @@ const OptionTitle = styled.p(({ theme }) => css`
 const OptionDescription = styled.p<{ $isSelected: boolean }>(({ theme, $isSelected }) => css`
   color: ${$isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
   margin-bottom: ${theme.spacings.xxs};
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `);
 
 const RuleBlockForm = ({
@@ -172,7 +169,6 @@ const RuleBlockForm = ({
   return (
     <Row>
       <Col md={12}>
-        <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
         <Formik enableReinitialize onSubmit={onSubmit} initialValues={initialValues}>
           {({ resetForm, setFieldValue, isValid }) => (
             <Form>
@@ -180,7 +176,7 @@ const RuleBlockForm = ({
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}
                           name={`existingBlock-select-${type}`}
-                          placeholder={`Select ${type}`}
+                          placeholder={`Add ${type}`}
                           options={options}
                           optionRenderer={optionRenderer}
                           clearable={false}
@@ -194,14 +190,14 @@ const RuleBlockForm = ({
                 <SelectedBlock>
                   <SelectedBlockInfo>
                     <Col md={12}>
-                      <BlockTitle>
+                      <h5>
                         {existingBlock?.step_title || selectedBlockDict.rule_builder_name}
                         <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover(selectedBlockDict)}>
                           <Button bsStyle="link">
                             <Icon name="question-circle" fixedWidth title="Function Syntax Help" data-testid="funcSyntaxHelpIcon" />
                           </Button>
                         </OverlayTrigger>
-                      </BlockTitle>
+                      </h5>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>
                   </SelectedBlockInfo>

@@ -28,11 +28,9 @@ import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
 import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
 import { getDictForFunction } from './helpers';
 
-const BlockContainer = styled.div<{ $hasErrors: boolean }>(({ theme, $hasErrors }) => css`
-  border-radius: 4px;
-  border-color: ${$hasErrors ? theme.colors.variant.lighter.danger : theme.colors.variant.lighter.default};
-  padding: ${theme.spacings.md};
-  margin-bottom: ${theme.spacings.md};
+const BlockContainer = styled.div(({ theme }) => css`
+  padding-left: ${theme.spacings.md};
+  padding-top: ${theme.spacings.md};
 `);
 
 type Props = {
@@ -159,7 +157,7 @@ const RuleBuilderBlock = ({
   const showForm = !block || editMode;
 
   return (
-    <BlockContainer className="content" $hasErrors={block?.errors?.length > 0}>
+    <BlockContainer>
       {showForm ? (
         <RuleBlockForm existingBlock={block}
                        onAdd={onAdd}

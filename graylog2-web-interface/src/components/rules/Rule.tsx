@@ -18,8 +18,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { PageHeader } from 'components/common';
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, Button } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import useHistory from 'routing/useHistory';
+import Routes from 'routing/Routes';
 
 import RuleBuilder from './rule-builder/RuleBuilder';
 import RuleForm from './RuleForm';
@@ -34,6 +39,10 @@ type Props = {
 };
 
 const Rule = ({ create, title, isRuleBuilder }: Props) => {
+  const history = useHistory();
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   let pageTitle;
 
   if (create) {
@@ -46,6 +55,20 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
     <div>
       <PipelinesPageNavigation />
       <PageHeader title={pageTitle}
+                  actions={(
+                    <Button bsStyle="success"
+                            onClick={() => {
+                              sendTelemetry('click', {
+                                app_pathname: getPathnameWithoutId(pathname),
+                                app_section: 'pipeline-rules',
+                                app_action_value: 'source-code-editor-button',
+                              });
+
+                              history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                            }}>
+                      Use Source Code Editor
+                    </Button>
+                  )}
                   documentationLink={{
                     title: 'Pipeline rules documentation',
                     path: DocsHelper.PAGES.PIPELINE_RULES,

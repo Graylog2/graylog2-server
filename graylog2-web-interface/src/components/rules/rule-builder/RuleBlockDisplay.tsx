@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Button, Col, Label, Row } from 'components/bootstrap';
-import { IconButton, Icon } from 'components/common';
+import { IconButton } from 'components/common';
 
 import Errors from './Errors';
 import type { RuleBlock } from './types';
@@ -33,16 +33,6 @@ type Props = {
   onNegate: () => void,
   returnType?: RuleBuilderTypes,
 }
-
-const OutputVariable = styled.p(({ theme }) => css`
-  margin-left: ${theme.spacings.xxs};
-  margin-bottom: 0;
-  margin-top: ${theme.spacings.sm};
-`);
-
-const OutputIcon = styled(Icon)(({ theme }) => css`
-  margin-right: ${theme.spacings.sm};
-`);
 
 const TypeLabel = styled(Label)(({ theme }) => css`
   margin-left: ${theme.spacings.xs};
@@ -86,25 +76,24 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
       <Col xs={9} md={10}>
         <Row>
           <Col md={12}>
-            <h3>
+            <h5>
               {negatable
-              && <NegationButton bsStyle="primary" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
+              && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
               {block?.step_title}
-            </h3>
-
-            {block?.outputvariable && (
-            <OutputVariable>
-              <OutputIcon name="level-up-alt" rotation={90} />
-              <Label bsStyle="primary">
-                {`$${block?.outputvariable}`}
-              </Label>
-              {returnTypeLabel && (
-              <TypeLabel bsStyle="default">
-                {returnTypeLabel}
-              </TypeLabel>
+              {block?.outputvariable && (
+              <>
+                &nbsp;&nbsp;
+                <Label bsStyle="primary">
+                  {`$${block?.outputvariable}`}
+                </Label>
+                {returnTypeLabel && (
+                <TypeLabel bsStyle="default">
+                  {returnTypeLabel}
+                </TypeLabel>
+                )}
+              </>
               )}
-            </OutputVariable>
-            )}
+            </h5>
           </Col>
         </Row>
         <Errors objectWithErrors={block} />
