@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import chroma from 'chroma-js';
 
-import ColorSwatch, { Swatch } from './Colors';
+import ColorSwatch from './Colors';
 
 const { colors } = useTheme();
 
@@ -29,7 +29,7 @@ const StyledColorSwatch = styled(ColorSwatch)`
   flex-basis: ${(props) => props.categoryName === 'global' ? '100px' : '1px'};
   max-width: ${(props) => props.categoryName === 'global' ? '200px' : 'auto'};
 
-  ${Swatch} {
+  button {
     margin-right: 6px;
     margin-bottom: 3px;
 

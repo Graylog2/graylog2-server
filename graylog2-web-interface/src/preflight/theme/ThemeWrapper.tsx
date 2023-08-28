@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
-import { ThemeContext } from 'styled-components';
+import React from 'react';
+import { useTheme } from 'styled-components';
 import type { MantineThemeOverride } from '@mantine/core';
 import { Global, MantineProvider } from '@mantine/core';
 
@@ -24,7 +24,7 @@ type Props = {
 };
 
 const ThemeWrapper = ({ children }: Props) => {
-  const theme = useContext(ThemeContext);
+  const theme = useTheme();
 
   const mantineTheme: MantineThemeOverride = {
     colorScheme: theme.mode === 'teint' ? 'light' : 'dark',
