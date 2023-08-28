@@ -34,11 +34,13 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Map;
 import java.util.Set;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -54,6 +56,22 @@ public class FieldTypeMappingsResource extends RestResource {
     @Inject
     public FieldTypeMappingsResource(final FieldTypeMappingsService fieldTypeMappingsService) {
         this.fieldTypeMappingsService = fieldTypeMappingsService;
+    }
+
+    @GET
+    @Path("/type_names")
+    @Timed
+    @ApiOperation(value = "Get list of names of all types valid inside the indexer")
+    public Set<String> getAllFieldTypeNames() {
+        return FieldTypeMapper.TYPE_MAP.keySet();
+    }
+
+    @GET
+    @Path("/types")
+    @Timed
+    @ApiOperation(value = "Get list of all types valid inside the indexer")
+    public Map<String, FieldTypes.Type> getAllFieldTypes() {
+        return FieldTypeMapper.TYPE_MAP;
     }
 
     @PUT
