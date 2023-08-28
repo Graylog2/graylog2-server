@@ -18,11 +18,14 @@ import React, { useMemo, useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import {
-  PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist,
+  PaginatedList,
+  SearchForm,
+  Spinner,
+  NoSearchResult,
+  NoEntitiesExist,
   EntityDataTable,
   Icon,
-  NoEntitiesExist, NoSearchResult,
-  SearchForm, Select,
+  Select,
 } from 'components/common';
 import { Button, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/logic/fieldactions/ChangeFieldType/Constants';
@@ -33,24 +36,38 @@ import type { Sort } from 'stores/PaginationTypes';
 import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import QueryHelper from 'components/common/QueryHelper';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 
 const StyledSelect = styled(Select)`
   width: 400px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 `;
 
 const Container = styled.div`
-  margin-top: 10px;
+  margin-top: 20px;
 `;
 
-const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: { show: boolean, field: string, onSubmit: () => void, onClose: () => void }) => {
+type Props = {
+  show: boolean,
+  field: string,
+  onSubmit: (formValues: { indexSetSelection: Array<string>, newFieldType: string, rotated: boolean }) => void,
+  onClose: () => void }
+
+const renderBulkActions = (
+  selectedDashboardIds: Array<string>,
+  setSelectedDashboardIds: (streamIds: Array<string>) => void,
+) => (
+  <BulkActionsDropdown selectedEntities={selectedDashboardIds} setSelectedEntities={setSelectedDashboardIds} />
+);
+
+const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
   const [query, setQuery] = useState('');
   const [showDetails, setShowDetails] = useState(false);
   const [activePage, setActivePage] = useState(1);
   const [rotated, setRotated] = useState(false);
   const [newFieldType, setNewFieldType] = useState(null);
   const typeOptions = [{ id: 'number', label: 'Number' }, { id: 'string', label: 'String' }];
-  const initialSelection = ['some id'];
+  const initialSelection = Array(100).fill(null).map((_, i) => `some id ${i}`);
 
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -112,6 +129,11 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: { show: boolea
     setShowDetails((cur) => !cur);
   }, []);
 
+  const _onSubmit = useCallback((e) => {
+    e.preventDefault();
+    onSubmit({ indexSetSelection, newFieldType, rotated });
+  }, [indexSetSelection, newFieldType, onSubmit, rotated]);
+
   if (isLoadingLayoutPreferences || !isFirsLoaded) {
     return <Spinner />;
   }
@@ -119,9 +141,10 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: { show: boolea
   return (
     <BootstrapModalForm title={`Change ${field} field type`}
                         submitButtonText="Change field type"
-                        onSubmitForm={onSubmit}
+                        onSubmitForm={_onSubmit}
                         onCancel={onClose}
-                        show={show}>
+                        show={show}
+                        bsSize="large">
       <Alert bsStyle="warning">
         <Icon name="info-circle" />&nbsp;
         Text about how bad to change this value and how you ca brake everything
@@ -134,7 +157,8 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: { show: boolea
                     placeholder="Select field type"
                     required />
       <Alert bsStyle="info">
-        You can choose in which index sets you would like to make the change
+        <Icon name="info-circle" />&nbsp;
+        By default the type will be changed in all possible indexes. But you can choose in which index sets you would like to make the change
       </Alert>
       <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
         <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
@@ -169,6 +193,7 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: { show: boolea
                                                bulkSelection={{
                                                  onChangeSelection,
                                                  initialSelection,
+                                                 actions: renderBulkActions,
                                                }}
                                                columnDefinitions={attributes}
                                                columnRenderers={columnRenderers}

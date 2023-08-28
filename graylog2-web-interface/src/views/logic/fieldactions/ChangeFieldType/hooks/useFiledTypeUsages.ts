@@ -17,7 +17,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
-import type { SearchParams, PaginatedListJSON, Attribute } from 'stores/PaginationTypes';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
@@ -44,10 +44,10 @@ const fetchFieldTypeUsages = (field: string, searchParams: SearchParams) => {
 
   // fetch<PaginatedFieldTypeUsagesResponse>('GET', qualifyUrl(url))
   return Promise.resolve({
-    elements: [
+    elements: Array(100).fill(null).map((_, i) => (
       {
-        id: 'some id',
-        indexSet: 'Index set name or smth else',
+        id: `some id ${i}`,
+        indexSet: `Index set name ${i}`,
         streams: ['stream 1', 'stream 2', 'stream 3', 'stream 4', 'stream 5'],
         typeHistory: [
           {
@@ -55,12 +55,12 @@ const fetchFieldTypeUsages = (field: string, searchParams: SearchParams) => {
             type: 'string',
           },
         ],
-      },
-    ],
-    total: 1,
+      }
+    )),
+    total: 100,
     count: 1,
     page: 1,
-    per_page: 100,
+    per_page: 20,
     attributes: [
       {
         id: 'id',
