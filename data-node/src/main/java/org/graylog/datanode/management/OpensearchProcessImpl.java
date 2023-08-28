@@ -147,7 +147,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public synchronized void stop() {
-        onEvent(ProcessEvent.PROCESS_STOPPED);
         stopProcess();
         stopRestClient();
     }
@@ -164,6 +163,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private void stopProcess() {
         if (this.commandLineProcess != null) {
+            onEvent(ProcessEvent.PROCESS_STOPPED);
             commandLineProcess.close();
         }
     }
