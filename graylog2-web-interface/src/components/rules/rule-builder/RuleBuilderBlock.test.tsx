@@ -31,7 +31,7 @@ describe('RuleBuilderBlock', () => {
                              updateBlock={jest.fn()}
                              deleteBlock={jest.fn()} />);
 
-    expect(screen.getByText(/Select action/i)).toBeInTheDocument();
+    expect(screen.getByText(/Add action/i)).toBeInTheDocument();
   });
 
   it('renders RuleBlockDisplay when a block exists', async () => {

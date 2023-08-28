@@ -83,7 +83,6 @@ describe('RuleBlockForm', () => {
   it('shows function form and adds a block when an option is selected', async () => {
     render(comp({ selectedBlockDict: actionsBlockDict[0] }));
 
-    expect(screen.getByRole('heading', { name: 'Add action' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'has field' })).toBeInTheDocument();
 
     const submitButton = await screen.findByRole('button', { name: 'Add' });
@@ -99,7 +98,6 @@ describe('RuleBlockForm', () => {
   it('continues to show function form and does not add the block when a required field is missing', async () => {
     render(comp({ selectedBlockDict: actionsBlockDict[0] }));
 
-    expect(screen.getByRole('heading', { name: 'Add action' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'has field' })).toBeInTheDocument();
 
     const submitButton = await screen.findByRole('button', { name: 'Add' });
@@ -116,7 +114,6 @@ describe('RuleBlockForm', () => {
   it('marks optional fields', async () => {
     render(comp({ selectedBlockDict: actionsBlockDict[4] }));
 
-    expect(screen.getByRole('heading', { name: 'Add action' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'get substring' })).toBeInTheDocument();
 
     const optionalField = screen.getByText('indexEnd');
@@ -128,7 +125,6 @@ describe('RuleBlockForm', () => {
   it('shows a help icon with function syntax help', async () => {
     render(comp({ selectedBlockDict: actionsBlockDict[4] }));
 
-    expect(screen.getByRole('heading', { name: 'Add action' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'get substring' })).toBeInTheDocument();
 
     const helpIcon = screen.getByTestId('funcSyntaxHelpIcon');
@@ -156,7 +152,6 @@ describe('RuleBlockForm', () => {
   it('shows and updates function form when a block is present', async () => {
     render(comp({ existingBlock: block, selectedBlockDict: actionsBlockDict[4] }));
 
-    expect(screen.getByRole('heading', { name: 'Edit action' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'substring "wingardium leviosa" start "1" end "2"' })).toBeInTheDocument();
 
     const updateButton = await screen.findByRole('button', { name: 'Update' });
