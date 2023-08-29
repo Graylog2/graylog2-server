@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { values, merge, fill, find, isEmpty } from 'lodash';
+import { useTheme } from 'styled-components';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -25,7 +26,6 @@ import useChartData from 'views/components/visualizations/useChartData';
 
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
-import { useTheme } from 'styled-components';
 
 const _generateSeriesTitles = (config, x, y) => {
   const seriesTitles = config.series.map((s) => s.function);
