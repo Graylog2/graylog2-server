@@ -26,3 +26,23 @@ export type FieldTypeUsage = {
   streams: Array<string>,
   typeHistory: Array<TypeHistoryItem>
 }
+
+export type FieldTypeOption = { id: string, label: string };
+
+export type FieldTypeOptions = Array<FieldTypeOption>;
+
+export type ChangeFieldTypeFormValues = { indexSetSelection: Array<string>, newFieldType: string, rotated: boolean }
+
+export type ChangeFieldTypeBodyJson = {
+  index_sets_ids: Array<string>,
+  field_name: string,
+  new_type: string,
+  rotate_immediately: boolean,
+}
+
+export type ChangeFieldTypeBody = {
+  indexSetSelection: Array<string>,
+  newFieldType: string,
+  field: string,
+  rotated: boolean,
+}

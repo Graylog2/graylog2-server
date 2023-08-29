@@ -33,10 +33,12 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import useFiledTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFiledTypeUsages';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import type { Sort } from 'stores/PaginationTypes';
-import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
+import type { FieldTypeUsage, ChangeFieldTypeFormValues } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import QueryHelper from 'components/common/QueryHelper';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import useFiledTypeOptions from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeOptions';
+import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -50,7 +52,7 @@ const Container = styled.div`
 type Props = {
   show: boolean,
   field: string,
-  onSubmit: (formValues: { indexSetSelection: Array<string>, newFieldType: string, rotated: boolean }) => void,
+  onSubmit: (formValues: ChangeFieldTypeFormValues) => void,
   onClose: () => void }
 
 const renderBulkActions = (
@@ -66,7 +68,7 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
   const [activePage, setActivePage] = useState(1);
   const [rotated, setRotated] = useState(false);
   const [newFieldType, setNewFieldType] = useState(null);
-  const typeOptions = [{ id: 'number', label: 'Number' }, { id: 'string', label: 'String' }];
+  const { data: { options: typeOptions }, isLoading: isOptionsLoading } = useFiledTypeOptions();
   const initialSelection = Array(100).fill(null).map((_, i) => `some id ${i}`);
 
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -134,7 +136,7 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
     onSubmit({ indexSetSelection, newFieldType, rotated });
   }, [indexSetSelection, newFieldType, onSubmit, rotated]);
 
-  if (isLoadingLayoutPreferences || !isFirsLoaded) {
+  if (isLoadingLayoutPreferences || !isFirsLoaded || isOptionsLoading) {
     return <Spinner />;
   }
 
