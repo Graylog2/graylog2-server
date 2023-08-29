@@ -44,6 +44,7 @@ export type Command = {
 export type Commands = {
   addCommand: (command: Command) => void,
   removeCommands: (commands: Array<string>) => void,
+  on: (commandName: string, callback: () => void) => void
 };
 
 export type Popup = {
@@ -54,6 +55,15 @@ export type Completer = {
   autoSelect: boolean,
   popup?: Popup,
   activated: boolean,
+  insertMatch: () => boolean,
+  detach: () => void,
+  goTo: (direction: string) => void,
+  keyboardHandler: {
+    commandKeyBinding: {
+      tab: Command,
+    },
+    addCommand: (command: Command) => void
+  }
 };
 
 export type Editor = {
@@ -64,6 +74,7 @@ export type Editor = {
   session: Session,
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,
+  tabstopManager: unknown,
   isFocused: () => boolean,
 };
 
