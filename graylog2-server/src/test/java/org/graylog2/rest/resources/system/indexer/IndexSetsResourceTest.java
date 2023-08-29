@@ -23,6 +23,7 @@ import org.graylog2.indexer.IndexSetStatsCreator;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
@@ -94,6 +95,8 @@ public class IndexSetsResourceTest {
     private SystemJobManager systemJobManager;
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock
+    private IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService;
 
     public IndexSetsResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -106,7 +109,7 @@ public class IndexSetsResourceTest {
     @Before
     public void setUp() throws Exception {
         this.permitted = true;
-        this.indexSetsResource = new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted);
+        this.indexSetsResource = new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, indexSetFieldTypeSummaryService);
     }
 
     private void notPermitted() {
@@ -740,8 +743,8 @@ public class IndexSetsResourceTest {
     private static class TestResource extends IndexSetsResource {
         private final Provider<Boolean> permitted;
 
-        TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, Provider<Boolean> permitted) {
-            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager);
+        TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, Provider<Boolean> permitted, IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService) {
+            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, indexSetFieldTypeSummaryService);
             this.permitted = permitted;
         }
 

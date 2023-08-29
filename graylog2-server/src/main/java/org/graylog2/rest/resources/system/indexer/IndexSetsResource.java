@@ -27,18 +27,22 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetStatsCreator;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.resources.system.indexer.requests.FieldTypeSummaryRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldTypeSummary;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -93,6 +97,7 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
+    private final IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -102,7 +107,8 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
-                             final SystemJobManager systemJobManager) {
+                             final SystemJobManager systemJobManager,
+                             final IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -111,6 +117,21 @@ public class IndexSetsResource extends RestResource {
         this.indexSetStatsCreator = indexSetStatsCreator;
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
+        this.indexSetFieldTypeSummaryService = indexSetFieldTypeSummaryService;
+    }
+
+    @POST
+    @Path("field_type_summaries")
+    @Timed
+    @NoAuditEvent("No change to the DB")
+    @ApiOperation(value = "Get field type summaries for given index sets and field")
+    public List<IndexSetFieldTypeSummary> fieldTypeSummaries(@ApiParam(name = "JSON body", required = true)
+                                                             @Valid @NotNull FieldTypeSummaryRequest request) {
+        final Set<String> indexSetsIds = request.indexSetsIds();
+        final String fieldName = request.fieldName();
+        return indexSetFieldTypeSummaryService.getIndexSetFieldTypeSummary(indexSetsIds,
+                fieldName,
+                indexSetId -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetId));
     }
 
     @GET
