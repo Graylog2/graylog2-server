@@ -29,8 +29,7 @@ import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuil
 import { getDictForFunction } from './helpers';
 
 const BlockContainer = styled.div(({ theme }) => css`
-  padding-left: ${theme.spacings.md};
-  padding-top: ${theme.spacings.md};
+  padding-top: ${theme.spacings.xxs};
 `);
 
 type Props = {

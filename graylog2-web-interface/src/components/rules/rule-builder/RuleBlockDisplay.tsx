@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -38,12 +38,23 @@ const TypeLabel = styled(Label)(({ theme }) => css`
   margin-left: ${theme.spacings.xs};
 `);
 
+const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => css`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin: 0px;
+  height: ${theme.spacings.xl};
+  background-color: ${$hovered ? '#f5f5f5' : 'transparent'};
+`);
+
 const NegationButton = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
   opacity: ${$negate ? '1' : '0.3'};
   margin-right: ${theme.spacings.sm};
 `);
 
 const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, returnType } : Props) => {
+  const [showActions, setShowActions] = useState<boolean>(false);
+
   const readableReturnType = (type: RuleBuilderTypes): string | undefined => {
     switch (type) {
       case RuleBuilderTypes.Boolean:
@@ -72,8 +83,10 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
   const returnTypeLabel = readableReturnType(returnType);
 
   return (
-    <Row>
-      <Col xs={9} md={10}>
+    <StyledRow onMouseEnter={() => setShowActions(true)}
+               onMouseLeave={() => setShowActions(false)}
+               $hovered={showActions}>
+      <Col xs={showActions ? 9 : 12} md={showActions ? 10 : 12}>
         <Row>
           <Col md={12}>
             <h5>
@@ -98,11 +111,13 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
         </Row>
         <Errors objectWithErrors={block} />
       </Col>
-      <Col xs={3} md={2} className="text-right">
-        <IconButton name="edit" onClick={onEdit} title="Edit" />
-        <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
-      </Col>
-    </Row>
+      {showActions && (
+        <Col xs={3} md={2} className="text-right">
+          <IconButton name="edit" onClick={onEdit} title="Edit" />
+          <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
+        </Col>
+      )}
+    </StyledRow>
   );
 };
 
