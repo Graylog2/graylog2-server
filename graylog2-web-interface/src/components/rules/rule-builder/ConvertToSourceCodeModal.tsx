@@ -73,7 +73,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
                   });
 
                   saveRuleSourceCode(rule.source || '');
-                  history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                  history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
                 }}>
           Create new Rule from Code
         </Button>

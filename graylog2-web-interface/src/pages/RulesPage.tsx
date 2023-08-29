@@ -118,7 +118,7 @@ const RulesPage = () => {
                   app_action_value: 'create-rule-button',
                 });
 
-                history.replace(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
+                history.push(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
               }}>
         Create Rule
       </Button>

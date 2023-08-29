@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { PageHeader } from 'components/common';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col, Button, BootstrapModalConfirm } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -39,6 +39,8 @@ type Props = {
 };
 
 const Rule = ({ create, title, isRuleBuilder }: Props) => {
+  const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
+
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -65,7 +67,7 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
                                 app_action_value: 'source-code-editor-button',
                               });
 
-                              history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                              setShowConfirmSourceCodeEditor(true);
                             }}>
                       Use Source Code Editor
                     </Button>
@@ -94,6 +96,18 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
         </Row>
       )}
 
+      {showConfirmSourceCodeEditor && (
+        <BootstrapModalConfirm showModal
+                               title="Switch to Source Code Editor"
+                               onConfirm={() => {
+                                 history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
+                                 setShowConfirmSourceCodeEditor(false);
+                               }}
+                               onCancel={() => setShowConfirmSourceCodeEditor(false)}>
+          <div>You are about to leave this page and go to Source Code Editor.</div>
+          <div>Make sure you have no unsaved changes.</div>
+        </BootstrapModalConfirm>
+      )}
     </div>
   );
 };

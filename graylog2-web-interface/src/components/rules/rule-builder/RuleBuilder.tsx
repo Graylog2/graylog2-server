@@ -35,7 +35,6 @@ import {
   getDictForFunction,
 } from './helpers';
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
-import ConfirmNavigateToSourceCodeEditorModal from './ConfirmNavigateToSourceCodeEditorModal';
 
 import RuleSimulation from '../RuleSimulation';
 import { PipelineRulesContext } from '../RuleContext';
@@ -83,7 +82,6 @@ const RuleBuilder = () => {
   });
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
-  const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
   const [conditionsExpanded] = useState<boolean>(true);
   const [actionsExpanded] = useState<boolean>(true);
 
@@ -201,7 +199,7 @@ const RuleBuilder = () => {
       app_action_value: 'cancel-button',
     });
 
-    history.replace(Routes.SYSTEM.PIPELINES.RULES);
+    history.push(Routes.SYSTEM.PIPELINES.RULES);
   };
 
   const handleSave = async (event?: React.FormEvent<HTMLFormElement>, closeAfter: boolean = false) => {
@@ -374,12 +372,6 @@ const RuleBuilder = () => {
         <ConvertToSourceCodeModal show
                                   onHide={() => setRuleSourceCodeToShow(null)}
                                   rule={ruleSourceCodeToShow} />
-      )}
-      {showConfirmSourceCodeEditor && (
-        <ConfirmNavigateToSourceCodeEditorModal show
-                                                rule={rule}
-                                                onHide={() => setShowConfirmSourceCodeEditor(false)}
-                                                onSave={createRule} />
       )}
     </form>
   );
