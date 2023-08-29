@@ -43,6 +43,7 @@ export type ChartDefinition = {
   },
   customdata?: any,
   colorscale?: [number, string][],
+  colorbar?: { tickfont: { color: string } },
   reversescale?: boolean,
   zmin?: boolean,
   zmax?: boolean,
