@@ -30,8 +30,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Errors from './Errors';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
-import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
-import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
+import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule } from './types';
 import {
   getDictForFunction,
 } from './helpers';
@@ -103,34 +102,9 @@ const RuleBuilder = () => {
 
   const isFormDirty = (_rule: RuleBuilderRule) => Boolean(rule.title || _rule.rule_builder.conditions.length || _rule.rule_builder.conditions.length);
 
-  const getActionOutputVariableName = (order : number) : string => {
-    if (order === 0) return '';
-
-    return `output_${order}`;
-  };
-
   const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
     setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
   }).catch(() => setRule(ruleToValidate));
-
-  const setOutputVariable = (block: RuleBlock, index?: number): RuleBlock => {
-    const newBlock = block;
-    const blockDict = getDictForFunction(actionsDict, block.function);
-
-    const order = typeof index !== 'undefined' ? (index + 1) : (newActionBlockIndex + 1);
-
-    if ((RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict?.return_type)) {
-      newBlock.outputvariable = getActionOutputVariableName(order);
-    }
-
-    return newBlock;
-  };
-
-  const setOutputVariables = (blocks: RuleBlock[]): RuleBlock[] => (
-    blocks.map((block, index) => (
-      setOutputVariable(block, index)
-    ))
-  );
 
   const addBlock = async (type: BlockType, block: RuleBlock) => {
     let ruleToAdd;
@@ -147,14 +121,12 @@ const RuleBuilder = () => {
         },
       };
     } else {
-      const blockToSet = setOutputVariable(block);
-
       ruleToAdd = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder,
           actions: [...rule.rule_builder.actions,
-            { ...blockToSet, id: blockId },
+            { ...block, id: blockId },
           ],
         },
       };
@@ -215,7 +187,7 @@ const RuleBuilder = () => {
       ruleToDelete = {
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, actions: setOutputVariables(currentActions),
+          ...rule.rule_builder, actions: currentActions,
         },
       };
     }
