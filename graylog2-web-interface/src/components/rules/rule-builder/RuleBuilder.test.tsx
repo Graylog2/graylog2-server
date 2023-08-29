@@ -29,7 +29,16 @@ jest.mock('hooks/useRuleBuilder');
 
 describe('RuleBuilder', () => {
   beforeAll(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation((message) => {
+      if (!JSON.stringify(message || '').includes('Warning: validateDOMNesting')) {
+        // eslint-disable-next-line no-console
+        console.error(message);
+      }
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('should save Title and Description', () => {
