@@ -40,6 +40,10 @@ const ActionOutputIndex = styled.b`
   color: #aaa;
 `;
 
+const StyledFormGroup = styled(FormGroup)(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xl};
+`);
+
 type Props = {
   rule?: RuleType | RuleBuilderRule,
 };
@@ -101,7 +105,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
   };
 
   return (
-    <FormGroup>
+    <StyledFormGroup>
       <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
       <div>
         <Input id="message"
@@ -140,6 +144,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                     ))}
                   </div>
                 )}
+                <br />
                 {actionsOutputKeys.length > 0 && (
                   <div data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
@@ -155,7 +160,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
           </>
         )}
       </div>
-    </FormGroup>
+    </StyledFormGroup>
   );
 };
 

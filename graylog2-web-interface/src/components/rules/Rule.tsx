@@ -55,8 +55,9 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
     <div>
       <PipelinesPageNavigation />
       <PageHeader title={pageTitle}
-                  actions={(
+                  actions={(isRuleBuilder && create) ? (
                     <Button bsStyle="success"
+                            bsSize="small"
                             onClick={() => {
                               sendTelemetry('click', {
                                 app_pathname: getPathnameWithoutId(pathname),
@@ -68,7 +69,7 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
                             }}>
                       Use Source Code Editor
                     </Button>
-                  )}
+                  ) : undefined}
                   documentationLink={{
                     title: 'Pipeline rules documentation',
                     path: DocsHelper.PAGES.PIPELINE_RULES,

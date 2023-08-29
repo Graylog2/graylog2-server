@@ -100,8 +100,6 @@ const RuleBuilder = () => {
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
 
-  const isFormDirty = (_rule: RuleBuilderRule) => Boolean(rule.title || _rule.rule_builder.conditions.length || _rule.rule_builder.conditions.length);
-
   const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
     setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
   }).catch(() => setRule(ruleToValidate));
@@ -344,23 +342,17 @@ const RuleBuilder = () => {
                             Update rule
                           </Button>
                           <Button bsStyle="info"
-                                  title={initialRule ? 'Convert Rule Builder to Source Code' : 'Use Source Code Editor'}
+                                  title="Convert Rule Builder to Source Code"
                                   onClick={() => {
                                     sendTelemetry('click', {
                                       app_pathname: getPathnameWithoutId(pathname),
                                       app_section: 'pipeline-rules',
-                                      app_action_value: initialRule ? 'convert-rule-builder-to-source-code-button' : 'source-code-editor-button',
+                                      app_action_value: 'convert-rule-builder-to-source-code-button',
                                     });
 
-                                    if (initialRule) {
-                                      setRuleSourceCodeToShow(rule);
-                                    } else if (isFormDirty(rule)) {
-                                      setShowConfirmSourceCodeEditor(true);
-                                    } else {
-                                      history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
-                                    }
+                                    setRuleSourceCodeToShow(rule);
                                   }}>
-                            {initialRule ? 'Convert to Source Code' : 'Source Code Editor'}
+                            Convert to Source Code
                           </Button>
                         </>
                       )}
