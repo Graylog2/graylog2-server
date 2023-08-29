@@ -19,11 +19,10 @@ package org.graylog2.rest.resources.system.indexer.responses;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
-import java.util.Set;
 
-public record IndexSetFieldTypeSummary(@JsonProperty("id") String id,
-                                       @JsonProperty("title") String title,
-                                       @JsonProperty("streams") Set<String> streams,
+public record IndexSetFieldTypeSummary(@JsonProperty("index_set_id") String id,
+                                       @JsonProperty("index_set_title") String title,
+                                       @JsonProperty("stream_titles") List<String> streams,
                                        @JsonProperty("field_type_history") List<String> fieldTypeHistory
 ) {
 

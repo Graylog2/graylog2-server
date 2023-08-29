@@ -75,7 +75,7 @@ class IndexSetFieldTypeSummaryServiceTest {
     void testFillsSummaryDataProperly() {
         Predicate<String> indexSetPermissionPredicate = indexSetID -> indexSetID.contains("canSee");
 
-        doReturn(Set.of("Stream1", "Stream2")).when(streamService).streamTitlesForIndexSet("canSee");
+        doReturn(List.of("Stream1", "Stream2")).when(streamService).streamTitlesForIndexSet("canSee");
         doReturn(List.of("text", "keyword")).when(indexFieldTypesService).fieldTypeHistory("canSee", "field_name", true);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         doReturn("Index Set From The Top Of The Universe").when(indexSetConfig).title();
@@ -84,6 +84,6 @@ class IndexSetFieldTypeSummaryServiceTest {
         final List<IndexSetFieldTypeSummary> summary = toTest.getIndexSetFieldTypeSummary(Set.of("canSee", "cannotSee"), "field_name", indexSetPermissionPredicate);
         assertThat(summary)
                 .isNotNull()
-                .isEqualTo(List.of(new IndexSetFieldTypeSummary("canSee", "Index Set From The Top Of The Universe", Set.of("Stream1", "Stream2"), List.of("text", "keyword"))));
+                .isEqualTo(List.of(new IndexSetFieldTypeSummary("canSee", "Index Set From The Top Of The Universe", List.of("Stream1", "Stream2"), List.of("text", "keyword"))));
     }
 }

@@ -57,6 +57,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -440,8 +441,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public Set<String> streamTitlesForIndexSet(final String indexSetId) {
-        Set<String> result = new HashSet<>();
+    public List<String> streamTitlesForIndexSet(final String indexSetId) {
+        List<String> result = new LinkedList<>();
         mongoCollection(StreamImpl.class)
                 .find(eq(FIELD_INDEX_SET_ID, indexSetId))
                 .projection(fields(
