@@ -669,7 +669,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>1.7</version>
         </dependency>
         <!-- AWS maintains a separate client for Kinesis. -->
         <dependency>
