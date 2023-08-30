@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.net.URI;
 import java.util.stream.Collectors;
 
 public class CSPServiceImpl implements CSPService {
@@ -38,7 +39,7 @@ public class CSPServiceImpl implements CSPService {
         this.telemetryApiHost = telemetryConfiguration.getTelemetryApiHost();
         this.dbService = dbService;
         this.cspResources = new CSPResources();
-        this.contentStreamRssApiHost = contentStreamConfiguration.getContentStreamRssUri().toString() + "/";
+        this.contentStreamRssApiHost = getContentStreamHost(contentStreamConfiguration.getContentStreamRssUri());
         updateConnectSrc();
     }
 
@@ -57,5 +58,14 @@ public class CSPServiceImpl implements CSPService {
     @Override
     public String cspString(String group) {
         return cspResources.cspString(group);
+    }
+
+    private String getContentStreamHost(URI contentStreamRssApiHost) {
+        String slash = "/";
+        if (contentStreamRssApiHost.getPath().endsWith(slash)) {
+            return contentStreamRssApiHost.toString();
+        } else {
+            return contentStreamRssApiHost.toString() + slash;
+        }
     }
 }
