@@ -263,6 +263,7 @@ const TimeUnitInput = createReactClass({
             <FormControl type="number"
                          name={this.props.name}
                          disabled={!this._isChecked()}
+                         aria-label={label || 'Time unit input'}
                          onChange={this._onUpdate}
                          value={defaultTo(this._getEffectiveValue(), '')} />
             <DropdownButton componentClass={InputGroup.Button}

@@ -19,7 +19,6 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.jooq.lambda.Seq;
@@ -27,13 +26,17 @@ import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MapLiteralExpression extends BaseExpression {
     private final HashMap<String, Expression> map;
 
     public MapLiteralExpression(Token start, HashMap<String, Expression> map) {
         super(start);
-        this.map = map;
+        this.map = map.entrySet().stream()
+                .filter(e -> Objects.nonNull(e.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (prev, next) -> next, HashMap::new));
     }
 
     @Override

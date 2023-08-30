@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css, ThemeContext } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { Alert as MantineAlert } from '@mantine/core';
-import { useContext } from 'react';
 
 import type { ColorVariants } from '../../theme/types';
 
@@ -31,7 +30,7 @@ type Props = {
 };
 
 const Alert = ({ children, type }: Props) => {
-  const theme = useContext(ThemeContext);
+  const theme = useTheme();
 
   const alertStyles = () => ({
     root: {

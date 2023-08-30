@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
-import { ThemeContext } from 'styled-components';
+import { useTheme } from 'styled-components';
 
 const Menu = ({ children, ...otherProps }: MenuProps) => {
-  const theme = useContext(ThemeContext);
+  const theme = useTheme();
 
   const menuStyles = () => ({
     dropdown: {
