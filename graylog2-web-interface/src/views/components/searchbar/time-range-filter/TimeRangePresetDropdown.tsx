@@ -29,7 +29,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import ToolsStore from 'stores/tools/ToolsStore';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constant';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type PresetOption = {
   eventKey?: TimeRange,

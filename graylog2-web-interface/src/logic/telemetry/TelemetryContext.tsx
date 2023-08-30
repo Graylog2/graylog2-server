@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import type { EventType } from 'logic/telemetry/Constant';
+import type { EventType } from 'logic/telemetry/Constants';
 
 export type TelemetryEvent = {
   app_pathname?: string,

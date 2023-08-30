@@ -23,7 +23,7 @@ import { Icon, Spinner } from 'components/common';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constant';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
   position: relative;

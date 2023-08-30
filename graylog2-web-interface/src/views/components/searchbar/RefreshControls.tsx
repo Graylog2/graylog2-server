@@ -25,7 +25,7 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constant';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
