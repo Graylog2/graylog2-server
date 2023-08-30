@@ -25,6 +25,7 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constant';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -55,7 +56,7 @@ const RefreshControls = () => {
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
 
   const _onChange = (interval: number) => {
-    sendTelemetry('input_value_change', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
       app_pathname: 'search',
       app_section: 'search-bar',
       app_action_value: 'refresh-search-control-dropdown',
@@ -68,7 +69,7 @@ const RefreshControls = () => {
   useEffect(() => () => RefreshActions.disable(), []);
 
   const _toggleEnable = useCallback(() => {
-    sendTelemetry('input_button_toggle', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
       app_pathname: 'search',
       app_section: 'search-bar',
       app_action_value: 'refresh-search-control-enable',

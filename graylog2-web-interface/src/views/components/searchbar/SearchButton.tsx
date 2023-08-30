@@ -23,6 +23,7 @@ import { Icon, Spinner } from 'components/common';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constant';
 
 const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
   position: relative;
@@ -68,7 +69,7 @@ const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
   const triggerTelemetry = () => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_BUTTON_CLICKED, {
       app_pathname: 'search',
       app_section: 'search-bar',
       app_action_value: 'search-button',
