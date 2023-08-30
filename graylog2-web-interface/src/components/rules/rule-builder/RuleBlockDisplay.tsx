@@ -34,6 +34,11 @@ type Props = {
   returnType?: RuleBuilderTypes,
 }
 
+const Highlighted = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.info};
+  font-weight: bold;
+`);
+
 const TypeLabel = styled(Label)(({ theme }) => css`
   margin-left: ${theme.spacings.xs};
 `);
@@ -82,6 +87,29 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
 
   const returnTypeLabel = readableReturnType(returnType);
 
+  const highlightedRuleTitle = (termToHighlight: string, title: string = '') => {
+    const parts = title.split("'");
+
+    const partsWithHighlight = parts.map((part) => {
+      if (part === `$${termToHighlight}`) {
+        return <Highlighted>{part}</Highlighted>;
+      }
+
+      return part;
+    });
+
+    return (
+      partsWithHighlight.map((item, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <React.Fragment key={index}>
+          {item}
+        </React.Fragment>
+      )));
+  };
+
+  const highlightedOutput = undefined; // TODO: Set and update in context
+  const setHighlightedOutput = (outputToHighlight: string) => { console.log('Setting highlighted output', outputToHighlight); }; // TODO: Replace this with function from context
+
   return (
     <StyledRow onMouseEnter={() => setShowActions(true)}
                onMouseLeave={() => setShowActions(false)}
@@ -92,12 +120,12 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
             <h5>
               {negatable
               && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
-              {block?.step_title}
+              {highlightedOutput ? (highlightedRuleTitle(highlightedOutput, block?.step_title)) : block?.step_title}
               {block?.outputvariable && (
               <>
                 &nbsp;&nbsp;
-                <Label bsStyle="primary">
-                  {`$${block?.outputvariable}`}
+                <Label bsStyle="primary" onHover={() => setHighlightedOutput(block.outputvariable)}>
+                  {`$${block.outputvariable}`}
                 </Label>
                 {returnTypeLabel && (
                 <TypeLabel bsStyle="default">
