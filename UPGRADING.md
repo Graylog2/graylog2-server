@@ -19,7 +19,7 @@ Because of an error in HttpCore 4.4.12, which is required by Elasticsearch and o
 The Reactor was stopped, which prevented proper Graylog operation and the reason (OutOfMemoryError) was not clearly visible.
 From now on, Graylog will shutdown on OutOfMemoryError, trying to log some basic information about the thread and memory consumption during this event.
 
-## Log parsing changes in the CrowdStrike input
+## CrowdStrike input log parsing changes
 
 Several log parsing changes have been made to the CrowdStrike input.
 
