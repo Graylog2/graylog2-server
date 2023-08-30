@@ -137,7 +137,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
                 highlightedRuleTitle(highlightedOutput, block?.step_title)
               ) : block?.step_title}
               {block?.errors?.length > 0 && (
-                <ErrorMessage>{block.errors[0]}</ErrorMessage>
+                <ErrorMessage>{block.errors.join(', ')}</ErrorMessage>
               )}
             </BlockTitle>
           </Col>
