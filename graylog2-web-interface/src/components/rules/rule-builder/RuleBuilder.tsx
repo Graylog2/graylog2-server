@@ -28,6 +28,7 @@ import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import Errors from './Errors';
+import RuleBuilderProvider from './RuleBuilderProvider';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule } from './types';
@@ -250,91 +251,92 @@ const RuleBuilder = () => {
   );
 
   return (
-    <form onSubmit={(e) => handleSave(e, true)}>
-      <Row className="content">
-        <Col xs={12}>
-          <RuleBuilderForm rule={rule}
-                           onChange={setRule} />
-        </Col>
-        <Col xs={12}>
-          <label htmlFor="rule_builder">Rule Builder</label>
-          <Row>
-            <Col xs={8}>
-              <StyledPanel expanded={conditionsExpanded}>
-                <StyledPanelHeading>
-                  <Panel.Title toggle>
-                    When
-                  </Panel.Title>
-                </StyledPanelHeading>
-                <Panel.Collapse>
-                  <StyledPanelBody>
-                    {rule.rule_builder.conditions.map((condition, index) => (
+    <RuleBuilderProvider>
+      <form onSubmit={(e) => handleSave(e, true)}>
+        <Row className="content">
+          <Col xs={12}>
+            <RuleBuilderForm rule={rule}
+                             onChange={setRule} />
+          </Col>
+          <Col xs={12}>
+            <label htmlFor="rule_builder">Rule Builder</label>
+            <Row>
+              <Col xs={8}>
+                <StyledPanel expanded={conditionsExpanded}>
+                  <StyledPanelHeading>
+                    <Panel.Title toggle>
+                      When
+                    </Panel.Title>
+                  </StyledPanelHeading>
+                  <Panel.Collapse>
+                    <StyledPanelBody>
+                      {rule.rule_builder.conditions.map((condition, index) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <RuleBuilderBlock key={index}
-                                        blockDict={conditionsDict || []}
-                                        block={condition}
-                                        order={index}
+                        <RuleBuilderBlock key={index}
+                                          blockDict={conditionsDict || []}
+                                          block={condition}
+                                          order={index}
+                                          type="condition"
+                                          addBlock={addBlock}
+                                          updateBlock={updateBlock}
+                                          deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
+                      ))}
+                      <RuleBuilderBlock blockDict={conditionsDict || []}
+                                        order={newConditionBlockIndex}
                                         type="condition"
                                         addBlock={addBlock}
                                         updateBlock={updateBlock}
-                                        deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
-                    ))}
-                    <RuleBuilderBlock blockDict={conditionsDict || []}
-                                      order={newConditionBlockIndex}
-                                      type="condition"
-                                      addBlock={addBlock}
-                                      updateBlock={updateBlock}
-                                      deleteBlock={() => setBlockToDelete({
-                                        orderIndex: newConditionBlockIndex,
-                                        type: 'condition',
-                                      })} />
-                  </StyledPanelBody>
-                </Panel.Collapse>
-              </StyledPanel>
-              <br />
-              <StyledPanel expanded={actionsExpanded}>
-                <StyledPanelHeading>
-                  <Panel.Title toggle>
-                    Then
-                  </Panel.Title>
-                </StyledPanelHeading>
-                <Panel.Collapse>
-                  <StyledPanelBody>
-                    {rule.rule_builder.actions.map((action, index) => (
+                                        deleteBlock={() => setBlockToDelete({
+                                          orderIndex: newConditionBlockIndex,
+                                          type: 'condition',
+                                        })} />
+                    </StyledPanelBody>
+                  </Panel.Collapse>
+                </StyledPanel>
+                <br />
+                <StyledPanel expanded={actionsExpanded}>
+                  <StyledPanelHeading>
+                    <Panel.Title toggle>
+                      Then
+                    </Panel.Title>
+                  </StyledPanelHeading>
+                  <Panel.Collapse>
+                    <StyledPanelBody>
+                      {rule.rule_builder.actions.map((action, index) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <RuleBuilderBlock key={index}
-                                        blockDict={actionsDict || []}
-                                        block={action}
-                                        order={index}
+                        <RuleBuilderBlock key={index}
+                                          blockDict={actionsDict || []}
+                                          block={action}
+                                          order={index}
+                                          type="action"
+                                          outputVariableList={outputVariableList()}
+                                          addBlock={addBlock}
+                                          updateBlock={updateBlock}
+                                          deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
+                      ))}
+                      <RuleBuilderBlock blockDict={actionsDict || []}
+                                        order={newActionBlockIndex}
                                         type="action"
                                         outputVariableList={outputVariableList()}
                                         addBlock={addBlock}
                                         updateBlock={updateBlock}
-                                        deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
-                    ))}
-                    <RuleBuilderBlock blockDict={actionsDict || []}
-                                      order={newActionBlockIndex}
-                                      type="action"
-                                      outputVariableList={outputVariableList()}
-                                      addBlock={addBlock}
-                                      updateBlock={updateBlock}
-                                      deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
-                  </StyledPanelBody>
-                </Panel.Collapse>
-              </StyledPanel>
-            </Col>
-            <Col xs={4}>
-              <RuleSimulation rule={rule} />
-            </Col>
-          </Row>
-        </Col>
-        <Col xs={12}>
-          <Errors objectWithErrors={rule.rule_builder} />
-        </Col>
-        <ActionsCol xs={12}>
-          <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
-                      submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
-                      centerCol={initialRule && (
+                                        deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
+                    </StyledPanelBody>
+                  </Panel.Collapse>
+                </StyledPanel>
+              </Col>
+              <Col xs={4}>
+                <RuleSimulation rule={rule} />
+              </Col>
+            </Row>
+          </Col>
+          <Col xs={12}>
+            <Errors objectWithErrors={rule.rule_builder} />
+          </Col>
+          <ActionsCol xs={12}>
+            <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
+                        submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
+                        centerCol={initialRule && (
                         <>
                           <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
                             Update rule
@@ -353,11 +355,11 @@ const RuleBuilder = () => {
                             Convert to Source Code
                           </Button>
                         </>
-                      )}
-                      onCancel={handleCancel} />
-        </ActionsCol>
-      </Row>
-      {blockToDelete && (
+                        )}
+                        onCancel={handleCancel} />
+          </ActionsCol>
+        </Row>
+        {blockToDelete && (
         <ConfirmDialog title={`Delete ${blockToDelete.type}`}
                        show
                        onConfirm={() => {
@@ -367,13 +369,14 @@ const RuleBuilder = () => {
                        onCancel={() => setBlockToDelete(null)}>
           <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
         </ConfirmDialog>
-      )}
-      {ruleSourceCodeToShow && (
+        )}
+        {ruleSourceCodeToShow && (
         <ConvertToSourceCodeModal show
                                   onHide={() => setRuleSourceCodeToShow(null)}
                                   rule={ruleSourceCodeToShow} />
-      )}
-    </form>
+        )}
+      </form>
+    </RuleBuilderProvider>
   );
 };
 

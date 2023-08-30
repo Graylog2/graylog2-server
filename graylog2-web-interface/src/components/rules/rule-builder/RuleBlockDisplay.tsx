@@ -24,6 +24,7 @@ import { IconButton } from 'components/common';
 import Errors from './Errors';
 import type { RuleBlock } from './types';
 import { ruleBlockPropType, RuleBuilderTypes } from './types';
+import { useRuleBuilder } from './RuleBuilderContext';
 
 type Props = {
   block: RuleBlock,
@@ -36,7 +37,6 @@ type Props = {
 
 const Highlighted = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.info};
-  font-weight: bold;
 `);
 
 const TypeLabel = styled(Label)(({ theme }) => css`
@@ -59,6 +59,7 @@ const NegationButton = styled(Button)<{ $negate: boolean }>(({ theme, $negate })
 
 const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, returnType } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
+  const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
 
   const readableReturnType = (type: RuleBuilderTypes): string | undefined => {
     switch (type) {
@@ -88,10 +89,10 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
   const returnTypeLabel = readableReturnType(returnType);
 
   const highlightedRuleTitle = (termToHighlight: string, title: string = '') => {
-    const parts = title.split("'");
+    const parts = title.split(/('\$.*?')/);
 
     const partsWithHighlight = parts.map((part) => {
-      if (part === `$${termToHighlight}`) {
+      if (part === `'$${termToHighlight}'`) {
         return <Highlighted>{part}</Highlighted>;
       }
 
@@ -107,9 +108,6 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
       )));
   };
 
-  const highlightedOutput = undefined; // TODO: Set and update in context
-  const setHighlightedOutput = (outputToHighlight: string) => { console.log('Setting highlighted output', outputToHighlight); }; // TODO: Replace this with function from context
-
   return (
     <StyledRow onMouseEnter={() => setShowActions(true)}
                onMouseLeave={() => setShowActions(false)}
@@ -120,11 +118,15 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
             <h5>
               {negatable
               && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
-              {highlightedOutput ? (highlightedRuleTitle(highlightedOutput, block?.step_title)) : block?.step_title}
+              {highlightedOutput ? (
+                highlightedRuleTitle(highlightedOutput, block?.step_title)
+              ) : block?.step_title}
               {block?.outputvariable && (
               <>
                 &nbsp;&nbsp;
-                <Label bsStyle="primary" onHover={() => setHighlightedOutput(block.outputvariable)}>
+                <Label bsStyle="primary"
+                       onMouseEnter={() => setHighlightedOutput(block.outputvariable)}
+                       onMouseLeave={() => setHighlightedOutput(undefined)}>
                   {`$${block.outputvariable}`}
                 </Label>
                 {returnTypeLabel && (
