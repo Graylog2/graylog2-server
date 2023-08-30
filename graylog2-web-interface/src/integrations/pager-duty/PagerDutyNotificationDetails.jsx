@@ -19,17 +19,15 @@ import PropTypes from 'prop-types';
 
 import { ReadOnlyFormGroup } from 'components/common';
 
-const PagerDutyNotificationDetails = ({ notification }) => {
-  return (
-    <>
-      <ReadOnlyFormGroup label="Routing Key" value={notification.config?.routing_key} />
-      <ReadOnlyFormGroup label="Custom Incident" value={notification.config?.custom_incident} />
-      <ReadOnlyFormGroup label="Key Prefix" value={notification.config?.key_prefix} />
-      <ReadOnlyFormGroup label="Client Name" value={notification.config?.client_name} />
-      <ReadOnlyFormGroup label="Client URL" value={notification.config?.client_url} />
-    </>
-  );
-};
+const PagerDutyNotificationDetails = ({ notification }) => (
+  <>
+    <ReadOnlyFormGroup label="Routing Key" value={notification.config?.routing_key} />
+    <ReadOnlyFormGroup label="Custom Incident" value={notification.config?.custom_incident} />
+    <ReadOnlyFormGroup label="Key Prefix" value={notification.config?.key_prefix} />
+    <ReadOnlyFormGroup label="Client Name" value={notification.config?.client_name} />
+    <ReadOnlyFormGroup label="Client URL" value={notification.config?.client_url} />
+  </>
+);
 
 PagerDutyNotificationDetails.propTypes = {
   notification: PropTypes.shape({

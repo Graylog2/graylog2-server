@@ -29,10 +29,10 @@ const KinesisSetupStep = ({ label, progress }) => {
   return (
     <StepItem>
       <IconWrap>
-        {!data && !loading && !error && <i className="fa fa-hourglass-start fa-2x" style={{ color: '#DCE1E5' }} />}
-        {loading && <i className="fa fa-spinner fa-2x fa-spin" style={{ color: '#0063BE' }} />}
-        {data && <i className="fa fa-check fa-2x" style={{ color: '#00AE42' }} />}
-        {error && <i className="fa fa-times fa-2x" style={{ color: '#AD0707' }} />}
+        {!data && !loading && !error && <i className="fa fa-hourglass-start fa-2x" style={{ color: '#dce1e5' }} />}
+        {loading && <i className="fa fa-spinner fa-2x fa-spin" style={{ color: '#0063be' }} />}
+        {data && <i className="fa fa-check fa-2x" style={{ color: '#00ae42' }} />}
+        {error && <i className="fa fa-times fa-2x" style={{ color: '#ad0707' }} />}
       </IconWrap>
 
       <Content>
