@@ -50,7 +50,7 @@ public class DatanodeContainerizedBackend {
 
     public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
         this.network = Network.newNetwork();
-        this.mongodbContainer = createMongodbContainer();
+        this.mongodbContainer = createMongodbContainer(this.network);
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
                 hooks, createDockerImageFile(getOpensearchVersion()),
@@ -137,7 +137,7 @@ public class DatanodeContainerizedBackend {
                                 .build());
     }
 
-    private GenericContainer<?> createMongodbContainer() {
+    public static GenericContainer<?> createMongodbContainer(Network network) {
         return new GenericContainer<>("mongo:5.0")
                 .withNetwork(network)
                 .withNetworkAliases("mongodb")
