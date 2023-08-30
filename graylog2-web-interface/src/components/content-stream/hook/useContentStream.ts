@@ -20,6 +20,8 @@ import { XMLParser } from 'fast-xml-parser';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { DEFAULT_FEED } from 'components/content-stream/Constants';
 import AppConfig from 'util/AppConfig';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
 export type FeedMediaContent = {
   'media:title'?: {
@@ -97,9 +99,11 @@ export const fetchNewsFeed = (rssUrl: string) => rssUrl && window.fetch(rssUrl, 
 export const CONTENT_STREAM_CONTENT_KEY = ['content-stream', 'content'];
 
 const useContentStream = (path?: string): { isLoadingFeed: boolean, feedList: Array<FeedITem>, error: Error } => {
+  const { permissions } = useCurrentUser();
   const { rss_url } = AppConfig.contentStream() || {};
+
   const contentStreamPlugin = usePluginEntities('content-stream')[0];
-  const getPath = contentStreamPlugin?.hooks?.useContentStreamTag || getDefaultTag;
+  const getPath = (isPermitted(permissions, ['licenseinfos:read']) && contentStreamPlugin?.hooks?.useContentStreamTag) || getDefaultTag;
   const rssUrl = rss_url && `${rss_url}/${path || getPath()}/feed`;
 
   const {
