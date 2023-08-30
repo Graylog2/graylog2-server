@@ -169,7 +169,7 @@ const LoadingMessage = styled.p`
   font-size: 16px;
   font-weight: bold;
   padding-top: 15px;
-  color: #A6AFBD;
+  color: #a6afbd;
 `;
 
 export default KinesisStreams;

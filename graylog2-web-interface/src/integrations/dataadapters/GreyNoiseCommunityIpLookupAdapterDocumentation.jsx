@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable react/no-unescaped-entities, no-template-curly-in-string */
+
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';
@@ -23,13 +23,12 @@ class GreyNoiseCommunityIpLookupAdapterDocumentation extends React.Component {
   render() {
     return (
       <div>
-          <Alert style={{ marginBottom: 10 }} bsStyle="warning">
-              <h4 style={{ marginBottom: 10 }}>Deprecation Warning</h4>
-              <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
-          </Alert>
+        <Alert style={{ marginBottom: 10 }} bsStyle="warning">
+          <h4 style={{ marginBottom: 10 }}>Deprecation Warning</h4>
+          <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
+        </Alert>
       </div>
-    )
-    ;
+    );
   }
 }
 

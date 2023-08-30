@@ -70,7 +70,7 @@ FormAdvancedOptions.propTypes = {
 };
 
 const StyledAdditionalFields = styled(AdditionalFields)`
-  margin: 0 0 35px;
+margin: 0 0 35px;
 `;
 
 export default FormAdvancedOptions;

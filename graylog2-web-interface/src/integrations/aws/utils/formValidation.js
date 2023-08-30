@@ -45,9 +45,7 @@ const formValidation = {
     return customErrorMessage || errorOutput.message;
   },
 
-  isFormValid: (requiredFields, context) => {
-    return !!requiredFields.find((field) => (!context[field] || !context[field].value || context[field].error));
-  },
+  isFormValid: (requiredFields, context) => !!requiredFields.find((field) => (!context[field] || !context[field].value || context[field].error)),
 };
 
 export default formValidation;

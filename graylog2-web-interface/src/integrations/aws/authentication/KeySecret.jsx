@@ -47,7 +47,7 @@ const KeySecret = ({ onChange, awsKey, awsSecret }) => (
 );
 
 const StyledMaskedInput = styled(MaskedInput)`
-  margin-bottom: 0;
+margin-bottom: 0;
 `;
 
 KeySecret.propTypes = {
