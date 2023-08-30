@@ -20,16 +20,14 @@ import PageHeader from 'components/common/PageHeader';
 
 import EmbeddedCloudWatchApp from './EmbeddedCloudWatchApp';
 
-const CloudWatchApp = () => {
-  return (
-    <>
-      <PageHeader title="AWS Integrations">
-        <span>This feature retrieves log messages from various AWS sources.</span>
-      </PageHeader>
-      <EmbeddedCloudWatchApp />
-    </>
-  );
-};
+const CloudWatchApp = () => (
+  <>
+    <PageHeader title="AWS Integrations">
+      <span>This feature retrieves log messages from various AWS sources.</span>
+    </PageHeader>
+    <EmbeddedCloudWatchApp />
+  </>
+);
 
 CloudWatchApp.propTypes = {};
 

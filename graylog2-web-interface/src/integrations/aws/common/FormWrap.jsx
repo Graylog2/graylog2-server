@@ -158,7 +158,7 @@ const ErrorOutputStyle = createGlobalStyle`
       .panel-heading > a {
         font-size: 14px;
         text-decoration: none;
-        color: #AD0707;
+        color: #ad0707;
 
         &:hover {
           text-decoration: none;
@@ -175,7 +175,7 @@ const ErrorOutput = styled.span`
 const ErrorToggleInfo = styled.button`
   border: 0;
   background: none;
-  color: #1F1F1F;
+  color: #1f1f1f;
   font-size: 11px;
   text-transform: uppercase;
   margin: 12px 0 0;

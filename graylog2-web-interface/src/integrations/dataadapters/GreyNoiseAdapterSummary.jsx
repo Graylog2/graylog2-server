@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line react/prefer-stateless-function
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -34,16 +34,16 @@ class GreyNoiseAdapterSummary extends React.Component {
 
   render() {
     return (
-        <div>
-          <dl>
-            <dt>API Token</dt>
-            <dd>******</dd>
-          </dl>
-          <Alert style={{marginBottom: 10}} bsStyle="danger">
-            <h4 style={{marginBottom: 10}}>Deprecation Warning</h4>
-            <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
-          </Alert>
-        </div>
+      <div>
+        <dl>
+          <dt>API Token</dt>
+          <dd>******</dd>
+        </dl>
+        <Alert style={{ marginBottom: 10 }} bsStyle="danger">
+          <h4 style={{ marginBottom: 10 }}>Deprecation Warning</h4>
+          <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
+        </Alert>
+      </div>
     );
   }
 }

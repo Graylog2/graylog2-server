@@ -227,7 +227,7 @@ StepReview.defaultProps = {
 };
 
 const Container = styled.div`
-  border: 1px solid #A6AFBD;
+  border: 1px solid #a6afbd;
   margin: 25px 0;
   padding: 15px;
   border-radius: 4px;
@@ -246,7 +246,7 @@ const ReviewItems = styled.ul`
     padding: 5px;
 
     &:nth-of-type(odd) {
-      background-color: rgba(220, 225, 229, 0.4);
+      background-color: rgb(220 225 229 / 40%);
     }
   }
 
@@ -263,11 +263,11 @@ const EditAnchor = styled.a`
   cursor: pointer;
 
   &::before {
-    content: "(";
+    content: '(';
   }
 
   &::after {
-    content: ")";
+    content: ')';
   }
 `;
 

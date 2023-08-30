@@ -30,15 +30,15 @@ const INPUT_MESSAGE = "Domain should begin with 'https://'";
 const INPUT_PLACEHOLDER = 'https://vpce-1234.service.region.vpce.amazonaws.com';
 
 const StyledAdditionalFields = styled(AdditionalFields)`
-  margin: 0 0 35px;
+margin: 0 0 35px;
 `;
 
 const StyledSectionTitle = styled(SectionTitle)`
-  margin: 12px 0 0;
+margin: 12px 0 0;
 `;
 
 const StyledSectionNote = styled(SectionNote)`
-  margin: 0 0 12px;
+margin: 0 0 12px;
 `;
 
 const AWSCustomEndpoints = ({ onChange }) => {
