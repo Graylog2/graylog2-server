@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class IndexSetFieldTypeSummaryServiceTest {
@@ -55,25 +56,29 @@ class IndexSetFieldTypeSummaryServiceTest {
     @Test
     void testDoesNotReturnResultsForIndexSetsIfUserMissesPriviledges() {
         Predicate<String> indexSetPermissionPredicateAlwaysReturningFalse = x -> false;
-        final List<IndexSetFieldTypeSummary> summary = toTest.getIndexSetFieldTypeSummary(Set.of("id"), "field_name", indexSetPermissionPredicateAlwaysReturningFalse);
+        doReturn(Set.of("index_set_id")).when(streamService).indexSetIdsByIds(Set.of("stream_id"));
+        final List<IndexSetFieldTypeSummary> summary = toTest.getIndexSetFieldTypeSummary(Set.of("stream_id"), "field_name", indexSetPermissionPredicateAlwaysReturningFalse);
+
         assertThat(summary).isEmpty();
         verifyNoInteractions(indexFieldTypesService);
-        verifyNoInteractions(streamService);
+        verifyNoMoreInteractions(streamService);
         verifyNoInteractions(indexSetService);
     }
 
     @Test
     void testDoesNotReturnResultsForIndexSetsIfItDoesNotExist() {
         Predicate<String> indexSetPermissionPredicateAlwaysReturningFalse = x -> false;
-        final List<IndexSetFieldTypeSummary> summary = toTest.getIndexSetFieldTypeSummary(Set.of("id"), "field_name", indexSetPermissionPredicateAlwaysReturningFalse);
+        doReturn(Set.of("index_set_id")).when(streamService).indexSetIdsByIds(Set.of("stream_id"));
+        final List<IndexSetFieldTypeSummary> summary = toTest.getIndexSetFieldTypeSummary(Set.of("stream_id"), "field_name", indexSetPermissionPredicateAlwaysReturningFalse);
         assertThat(summary).isEmpty();
         verifyNoInteractions(indexFieldTypesService);
-        verifyNoInteractions(streamService);
+        verifyNoMoreInteractions(streamService);
     }
 
     @Test
     void testFillsSummaryDataProperly() {
         Predicate<String> indexSetPermissionPredicate = indexSetID -> indexSetID.contains("canSee");
+        doReturn(Set.of("canSee", "cannotSee")).when(streamService).indexSetIdsByIds(Set.of("stream_id"));
 
         doReturn(List.of("Stream1", "Stream2")).when(streamService).streamTitlesForIndexSet("canSee");
         doReturn(List.of("text", "keyword")).when(indexFieldTypesService).fieldTypeHistory("canSee", "field_name", true);
@@ -81,7 +86,7 @@ class IndexSetFieldTypeSummaryServiceTest {
         doReturn("Index Set From The Top Of The Universe").when(indexSetConfig).title();
         doReturn(Optional.of(indexSetConfig)).when(indexSetService).get("canSee");
 
-        final List<IndexSetFieldTypeSummary> summary = toTest.getIndexSetFieldTypeSummary(Set.of("canSee", "cannotSee"), "field_name", indexSetPermissionPredicate);
+        final List<IndexSetFieldTypeSummary> summary = toTest.getIndexSetFieldTypeSummary(Set.of("stream_id"), "field_name", indexSetPermissionPredicate);
         assertThat(summary)
                 .isNotNull()
                 .isEqualTo(List.of(new IndexSetFieldTypeSummary("canSee", "Index Set From The Top Of The Universe", List.of("Stream1", "Stream2"), List.of("text", "keyword"))));

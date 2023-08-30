@@ -23,8 +23,8 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 public record FieldTypeSummaryRequest(@NotNull @NotEmpty
-                                      @JsonProperty("index_sets_ids")
-                                      Set<String> indexSetsIds,
+                                      @JsonProperty("streams_ids")
+                                      Set<String> streamsIds,
                                       @NotNull @NotEmpty
                                       @JsonProperty("field_name")
                                       String fieldName) {

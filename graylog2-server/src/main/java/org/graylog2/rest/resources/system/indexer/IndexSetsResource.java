@@ -127,9 +127,9 @@ public class IndexSetsResource extends RestResource {
     @ApiOperation(value = "Get field type summaries for given index sets and field")
     public List<IndexSetFieldTypeSummary> fieldTypeSummaries(@ApiParam(name = "JSON body", required = true)
                                                              @Valid @NotNull FieldTypeSummaryRequest request) {
-        final Set<String> indexSetsIds = request.indexSetsIds();
+        final Set<String> streamsIds = request.streamsIds();
         final String fieldName = request.fieldName();
-        return indexSetFieldTypeSummaryService.getIndexSetFieldTypeSummary(indexSetsIds,
+        return indexSetFieldTypeSummaryService.getIndexSetFieldTypeSummary(streamsIds,
                 fieldName,
                 indexSetId -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetId));
     }

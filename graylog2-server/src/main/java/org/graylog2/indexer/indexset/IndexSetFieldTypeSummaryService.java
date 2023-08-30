@@ -42,12 +42,13 @@ public class IndexSetFieldTypeSummaryService {
         this.indexSetService = indexSetService;
     }
 
-    public List<IndexSetFieldTypeSummary> getIndexSetFieldTypeSummary(final Set<String> indexSetsIds,
+    public List<IndexSetFieldTypeSummary> getIndexSetFieldTypeSummary(final Set<String> streamIds,
                                                                       final String fieldName,
                                                                       final Predicate<String> indexSetPermissionPredicate) {
         //There is a potential to improve performance by introducing a complicated aggregation pipeline joining multiple Mongo collections, especially if permission restrictions were simplified.
         //For now simpler solution has been used in the implementation.
         List<IndexSetFieldTypeSummary> response = new LinkedList<>();
+        final Set<String> indexSetsIds = streamService.indexSetIdsByIds(streamIds);
         for (String indexSetId : indexSetsIds) {
             if (indexSetPermissionPredicate.test(indexSetId)) {
                 final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
