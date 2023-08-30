@@ -37,6 +37,7 @@ type Props = {
 
 const Highlighted = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.info};
+  font-weight: bold;
 `);
 
 const TypeLabel = styled(Label)(({ theme }) => css`
