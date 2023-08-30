@@ -1,0 +1,4 @@
+type = "c"
+message = "Merging integrations plugin into core repository."
+
+pulls = ["16274"]
