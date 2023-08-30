@@ -97,6 +97,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Api(value = "Events/Definitions", description = "Event definition management", tags = {CLOUD_VISIBLE})
 @Path("/events/definitions")
@@ -260,7 +261,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
-        final EventDefinitionDto entity = schedule ? eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) : eventDefinitionHandler.createWithoutSchedule(dto, Optional.of(userContext.getUser()));
+        final EventDefinitionDto entity = schedule ?
+                eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) :
+                eventDefinitionHandler.createWithoutSchedule(dto.toBuilder().state(EventDefinition.State.DISABLED).build(), Optional.of(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(entity).build();
     }
@@ -347,7 +350,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
-                new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to enable", definitionId)));
+                new BadRequestException(f("Unable to find event definition '%s' to enable", definitionId)));
         eventDefinitionHandler.schedule(definitionId);
         return eventDefinitionDto.toBuilder().state(EventDefinition.State.ENABLED).build();
     }
@@ -378,7 +381,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                          @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
-                new BadRequestException(org.graylog2.shared.utilities.StringUtils.f("Unable to find event definition '%s' to disable", definitionId)));
+                new BadRequestException(f("Unable to find event definition '%s' to disable", definitionId)));
         eventDefinitionHandler.unschedule(definitionId);
         return eventDefinitionDto.toBuilder().state(EventDefinition.State.DISABLED).build();
     }
@@ -426,6 +429,21 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         } catch (EventProcessorException e) {
             throw new InternalServerErrorException(e.getMessage(), e);
         }
+    }
+
+    @POST
+    @ApiOperation("Duplicate an event definition")
+    @Path("{definitionId}/duplicate")
+    @Consumes(MediaType.WILDCARD)
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
+    public Response duplicate(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId, @Context UserContext userContext) {
+        final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
+                new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
+        checkEventDefinitionPermissions(eventDefinitionDto, "create");
+
+        final EventDefinitionDto saved = eventDefinitionHandler.duplicate(eventDefinitionDto, Optional.of(userContext.getUser()));
+        return Response.ok().entity(saved).build();
     }
 
     @POST
