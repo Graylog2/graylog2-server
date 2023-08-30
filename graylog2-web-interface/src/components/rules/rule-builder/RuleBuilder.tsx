@@ -30,7 +30,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import RuleBuilderProvider from './RuleBuilderProvider';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
-import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule } from './types';
+import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
+import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
 import {
   getDictForFunction,
 } from './helpers';
@@ -60,6 +61,13 @@ const StyledPanelBody = styled(Panel.Body)`
   padding: 0px;
 `;
 
+const getLastOutputIndexFromRule = (rule: RuleBuilderRule): number => {
+  const outputIndexes = rule.rule_builder?.actions?.map((block: RuleBlock) => block?.outputvariable).filter((outputvariable) => (outputvariable !== null));
+  const lastOutputIndex = Number(outputIndexes[outputIndexes.length - 1].replace('output_', ''));
+
+  return lastOutputIndex;
+};
+
 const RuleBuilder = () => {
   const {
     rule: initialRule,
@@ -84,16 +92,29 @@ const RuleBuilder = () => {
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
   const [conditionsExpanded] = useState<boolean>(true);
   const [actionsExpanded] = useState<boolean>(true);
+  const [lastOutputIndex, setLastOutputIndex] = useState<number>(0);
 
   useEffect(() => {
     if (initialRule) {
       setRule(initialRule);
+      setLastOutputIndex(getLastOutputIndexFromRule(initialRule));
     }
   }, [initialRule]);
 
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+
+  const setOutputVariable = (block: RuleBlock, outputIndex: number): RuleBlock => {
+    const newBlock = block;
+    const blockDict = getDictForFunction(actionsDict, block.function);
+
+    if ((RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict?.return_type)) {
+      newBlock.outputvariable = `output_${outputIndex}`;
+    }
+
+    return newBlock;
+  };
 
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
@@ -117,12 +138,16 @@ const RuleBuilder = () => {
         },
       };
     } else {
+      const nextOutputIndex = lastOutputIndex + 1;
+      const blockToSet = setOutputVariable(block, nextOutputIndex);
+      setLastOutputIndex(nextOutputIndex);
+
       ruleToAdd = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder,
           actions: [...rule.rule_builder.actions,
-            { ...block, id: blockId },
+            { ...blockToSet, id: blockId },
           ],
         },
       };
@@ -227,8 +252,6 @@ const RuleBuilder = () => {
   };
 
   const hasRuleBuilderErrors = (): boolean => {
-    if (rule.rule_builder.errors?.length > 0) return true;
-
     if (rule.rule_builder.actions.some(((action) => action.errors?.length > 0))) {
       return true;
     }
