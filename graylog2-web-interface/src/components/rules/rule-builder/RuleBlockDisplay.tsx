@@ -58,6 +58,12 @@ const NegationButton = styled(Button)<{ $negate: boolean }>(({ theme, $negate })
   margin-right: ${theme.spacings.sm};
 `);
 
+const BlockTitle = styled.h5`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
 const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, returnType } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
@@ -113,41 +119,42 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
     <StyledRow onMouseEnter={() => setShowActions(true)}
                onMouseLeave={() => setShowActions(false)}
                $hovered={showActions}>
-      <Col xs={showActions ? 9 : 12} md={showActions ? 10 : 12}>
+      <Col xs={9} md={10}>
         <Row>
-          <Col md={12}>
-            <h5>
+          <Col xs={10} sm={9} md={8} lg={6}>
+            <BlockTitle>
               {negatable
               && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
               {highlightedOutput ? (
                 highlightedRuleTitle(highlightedOutput, block?.step_title)
               ) : block?.step_title}
-              {block?.outputvariable && (
-              <>
-                &nbsp;&nbsp;
-                <Label bsStyle="primary"
-                       onMouseEnter={() => setHighlightedOutput(block.outputvariable)}
-                       onMouseLeave={() => setHighlightedOutput(undefined)}>
-                  {`$${block.outputvariable}`}
-                </Label>
-                {returnTypeLabel && (
-                <TypeLabel bsStyle="default">
-                  {returnTypeLabel}
-                </TypeLabel>
-                )}
-              </>
-              )}
-            </h5>
+            </BlockTitle>
           </Col>
+          {block?.outputvariable && (
+            <Col xs={2} sm={3} md={4} lg={6}>
+              <Label bsStyle="primary"
+                     onMouseEnter={() => setHighlightedOutput(block.outputvariable)}
+                     onMouseLeave={() => setHighlightedOutput(undefined)}>
+                {`$${block.outputvariable}`}
+              </Label>
+              {returnTypeLabel && (
+              <TypeLabel bsStyle="default">
+                {returnTypeLabel}
+              </TypeLabel>
+              )}
+            </Col>
+          )}
         </Row>
         <Errors objectWithErrors={block} />
       </Col>
-      {showActions && (
-        <Col xs={3} md={2} className="text-right">
-          <IconButton name="edit" onClick={onEdit} title="Edit" />
-          <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
-        </Col>
-      )}
+      <Col xs={3} md={2} className="text-right">
+        {showActions && (
+          <>
+            <IconButton name="edit" onClick={onEdit} title="Edit" />
+            <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
+          </>
+        )}
+      </Col>
     </StyledRow>
   );
 };
