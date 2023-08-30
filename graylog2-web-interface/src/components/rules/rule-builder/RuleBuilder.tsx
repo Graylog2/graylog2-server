@@ -62,8 +62,8 @@ const StyledPanelBody = styled(Panel.Body)`
 `;
 
 const getLastOutputIndexFromRule = (rule: RuleBuilderRule): number => {
-  const outputIndexes = rule.rule_builder?.actions?.map((block: RuleBlock) => block?.outputvariable).filter((outputvariable) => (outputvariable !== null));
-  const lastOutputIndex = Number(outputIndexes[outputIndexes.length - 1].replace('output_', ''));
+  const outputIndexes = rule.rule_builder?.actions?.map((block: RuleBlock) => block?.outputvariable).filter((outputvariable) => (outputvariable !== null)) || [];
+  const lastOutputIndex = Number(outputIndexes[outputIndexes.length - 1]?.replace('output_', '') || 0);
 
   return lastOutputIndex;
 };
