@@ -25,7 +25,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import type { WidgetPositions } from 'views/types';
+import { layoutToPositions, positionsToLayout } from 'views/logic/widgets/normalizeWidgetPositions';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
@@ -95,7 +95,7 @@ const _gridClass = (locked: boolean, isResizable: boolean, draggableHandle: stri
   return `${className} unlocked`;
 };
 
-type Position = {
+export type Position = {
   id: string,
   col: number,
   row: number,
@@ -108,19 +108,7 @@ const _onLayoutChange = (newLayout: Layout, callback: ((newPositions: Position[]
     return undefined;
   }
 
-  const newPositions: Position[] = [];
-
-  newLayout
-    .filter(({ i }) => !i.startsWith('gap'))
-    .forEach((widget) => {
-      newPositions.push({
-        id: widget.i,
-        col: widget.x + 1,
-        row: widget.y + 1,
-        height: widget.h,
-        width: widget.w,
-      });
-    });
+  const newPositions: Position[] = layoutToPositions(newLayout.filter(({ i }) => !i.startsWith('gap')));
 
   return callback(newPositions);
 };
@@ -147,19 +135,8 @@ type Props = {
   width?: number,
 }
 
-const computeLayout = (positions: WidgetPositions = {}) => Object.keys(positions).map((id) => {
-  const { col, row, height, width } = positions[id];
-
-  return {
-    i: id,
-    x: col ? Math.max(col - 1, 0) : 0,
-    y: (row === undefined || row <= 0 ? Infinity : row - 1),
-    h: height || 1,
-    w: width || 1,
-  };
-});
-
-type Layout = { i: string, x: number, y: number, h: number, w: number }[];
+export type LayoutItem = { i: string, x: number, y: number, h: number, w: number };
+export type Layout = Array<LayoutItem>;
 
 const removeGaps = (_layout: Layout) => {
   const gapIndices = [];
@@ -198,7 +175,7 @@ const ReactGridContainer = ({
   const onLayoutChange = useCallback<ItemCallback>((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
   const onSyncLayout = useCallback((layout: Layout) => _onLayoutChange(layout, _onSyncLayout), [_onSyncLayout]);
   const gridClass = _gridClass(locked, isResizable, draggableHandle, className);
-  const layout = useMemo(() => computeLayout(positions), [positions]);
+  const layout = useMemo(() => positionsToLayout(positions), [positions]);
 
   // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
   // https://github.com/STRML/react-grid-layout/issues/371
