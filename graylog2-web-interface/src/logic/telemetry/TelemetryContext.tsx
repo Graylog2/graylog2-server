@@ -17,6 +17,7 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
+import type { EventType } from 'logic/telemetry/Constant';
 
 export type TelemetryEvent = {
   app_pathname?: string,
@@ -43,7 +44,7 @@ export type TelemetryEventType =
   | 'navigate';
 
 type ContextType = {
-  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,
+  sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent) => void,
 }
 const TelemetryContext = React.createContext<ContextType>({
   sendTelemetry: () => {
