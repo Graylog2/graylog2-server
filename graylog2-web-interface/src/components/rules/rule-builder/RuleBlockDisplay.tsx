@@ -129,8 +129,8 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
                $hovered={showActions}>
       <Col xs={9} md={10}>
         <Row>
-          <Col xs={10} sm={9} md={8} lg={6}>
-            <BlockTitle>
+          <Col xs={10} md={9}>
+            <BlockTitle title={block?.step_title}>
               {negatable
               && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
               {highlightedOutput ? (
@@ -142,7 +142,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
             </BlockTitle>
           </Col>
           {block?.outputvariable && (
-            <Col xs={2} sm={3} md={4} lg={6}>
+            <Col xs={2} md={3}>
               <Label bsStyle="primary"
                      onMouseEnter={() => setHighlightedOutput(block.outputvariable)}
                      onMouseLeave={() => setHighlightedOutput(undefined)}>
