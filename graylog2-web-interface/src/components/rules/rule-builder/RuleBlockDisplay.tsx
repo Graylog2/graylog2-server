@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components';
 import { Button, Col, Label, Row } from 'components/bootstrap';
 import { IconButton } from 'components/common';
 
-import Errors from './Errors';
 import type { RuleBlock } from './types';
 import { ruleBlockPropType, RuleBuilderTypes } from './types';
 import { useRuleBuilder } from './RuleBuilderContext';
@@ -63,6 +62,15 @@ const BlockTitle = styled.h5`
   white-space: nowrap;
   overflow: hidden;
 `;
+
+const ErrorMessage = styled.p(({ theme }) => css`
+  color: ${theme.colors.variant.danger};
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0px;
+`);
 
 const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, returnType } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
@@ -128,6 +136,9 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
               {highlightedOutput ? (
                 highlightedRuleTitle(highlightedOutput, block?.step_title)
               ) : block?.step_title}
+              {block?.errors?.length > 0 && (
+                <ErrorMessage>{block.errors[0]}</ErrorMessage>
+              )}
             </BlockTitle>
           </Col>
           {block?.outputvariable && (
@@ -145,7 +156,6 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
             </Col>
           )}
         </Row>
-        <Errors objectWithErrors={block} />
       </Col>
       <Col xs={3} md={2} className="text-right">
         {showActions && (

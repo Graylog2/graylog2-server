@@ -27,7 +27,6 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-import Errors from './Errors';
 import RuleBuilderProvider from './RuleBuilderProvider';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
@@ -329,9 +328,6 @@ const RuleBuilder = () => {
                 <RuleSimulation rule={rule} />
               </Col>
             </Row>
-          </Col>
-          <Col xs={12}>
-            <Errors objectWithErrors={rule.rule_builder} />
           </Col>
           <ActionsCol xs={12}>
             <FormSubmit disabledSubmit={hasRuleBuilderErrors()}

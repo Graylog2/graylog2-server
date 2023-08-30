@@ -71,6 +71,10 @@ const OptionTitle = styled.p(({ theme }) => css`
   margin-bottom: ${theme.spacings.xxs};
 `);
 
+const SelectRow = styled(Row)(({ theme }) => css`
+  margin-top: ${theme.spacings.xxs};
+`);
+
 const OptionDescription = styled.p<{ $isSelected: boolean }>(({ theme, $isSelected }) => css`
   color: ${$isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
   margin-bottom: ${theme.spacings.xxs};
@@ -172,7 +176,7 @@ const RuleBlockForm = ({
         <Formik enableReinitialize onSubmit={onSubmit} initialValues={initialValues}>
           {({ resetForm, setFieldValue, isValid }) => (
             <Form>
-              <Row>
+              <SelectRow>
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}
                           name={`existingBlock-select-${type}`}
@@ -184,7 +188,7 @@ const RuleBlockForm = ({
                           onChange={(option: string) => handleChange(option, resetForm)}
                           value={selectedBlockDict?.name || ''} />
                 </Col>
-              </Row>
+              </SelectRow>
 
               {selectedBlockDict && (
                 <SelectedBlock>
