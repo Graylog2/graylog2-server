@@ -17,6 +17,7 @@
 package org.graylog2.shared.rest.resources.csp;
 
 import org.graylog.security.authservice.DBAuthServiceBackendService;
+import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.rest.PaginationParameters;
 import org.slf4j.Logger;
@@ -28,14 +29,16 @@ import java.util.stream.Collectors;
 public class CSPServiceImpl implements CSPService {
     private static final Logger LOG = LoggerFactory.getLogger(CSPServiceImpl.class);
     private final String telemetryApiHost;
+    private final String contentStreamRssApiHost;
     private final DBAuthServiceBackendService dbService;
     private final CSPResources cspResources;
 
     @Inject
-    protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, DBAuthServiceBackendService dbService) {
+    protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, ContentStreamConfiguration contentStreamConfiguration, DBAuthServiceBackendService dbService) {
         this.telemetryApiHost = telemetryConfiguration.getTelemetryApiHost();
         this.dbService = dbService;
         this.cspResources = new CSPResources();
+        this.contentStreamRssApiHost = contentStreamConfiguration.getContentStreamRssUri().toString() + "/";
         updateConnectSrc();
     }
 
@@ -46,7 +49,7 @@ public class CSPServiceImpl implements CSPService {
                 .filter(java.util.Optional::isPresent)
                 .map(optList -> String.join(" ", optList.get()))
                 .collect(Collectors.joining(" "));
-        String connectSrcValue = "'self' " + telemetryApiHost + " " + hostList;
+        String connectSrcValue = "'self' " + telemetryApiHost + " " + contentStreamRssApiHost + " " + hostList;
         cspResources.updateAll("connect-src", connectSrcValue);
         LOG.debug("Updated CSP: {}", connectSrcValue);
     }
