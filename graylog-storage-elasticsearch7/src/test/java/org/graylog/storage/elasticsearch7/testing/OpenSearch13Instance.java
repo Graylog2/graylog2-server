@@ -127,6 +127,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
                 .withEnv("plugins.security.disabled", "true")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
+                .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));

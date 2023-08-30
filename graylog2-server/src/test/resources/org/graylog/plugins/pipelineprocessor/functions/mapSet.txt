@@ -1,0 +1,9 @@
+rule "mapSet"
+when
+  true
+then
+  let newValue = {k1: "v1", k2: "v2"};
+  map_set(newValue, "k1", "v11");
+  map_set(newValue, "k3", 1);
+  set_fields(newValue);
+end

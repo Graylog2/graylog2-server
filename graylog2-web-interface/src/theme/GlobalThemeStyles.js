@@ -645,7 +645,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   /* additional styles for 'StyledAceEditor' */
-  .ace_editor.ace_autocomplete.ace-queryinput {
+  .ace_editor.ace_autocomplete {
     width: 600px !important;
     margin-top: 6px;
     background-color: ${theme.colors.input.background};

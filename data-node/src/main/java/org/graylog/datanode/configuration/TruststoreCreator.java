@@ -18,6 +18,8 @@ package org.graylog.datanode.configuration;
 
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.security.certutil.CertConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TruststoreCreator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TruststoreCreator.class);
 
     private final Map<String, X509Certificate> rootCertificates;
     private final RootCertificateFinder rootCertificateFinder;
@@ -54,6 +58,7 @@ public class TruststoreCreator {
         trustStore.load(null, null);
 
         for (Map.Entry<String, X509Certificate> cert : rootCertificates.entrySet()) {
+            LOG.info("Adding certificate {} to the truststore", cert.getKey());
             trustStore.setCertificateEntry(cert.getKey(), cert.getValue());
         }
 

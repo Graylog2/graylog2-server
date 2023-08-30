@@ -93,6 +93,8 @@ import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
+import org.graylog.plugins.pipelineprocessor.functions.maps.MapRemove;
+import org.graylog.plugins.pipelineprocessor.functions.maps.MapSet;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -201,6 +203,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     private static LookupTableService lookupTableService;
     private static LookupTableService.Function lookupServiceFunction;
     private static LookupTable lookupTable;
+    private static Map aMap;
 
     private static Logger loggerMock;
 
@@ -378,7 +381,10 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupAddStringList.NAME, new LookupAddStringList(lookupTableService));
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
         functions.put(LookupHasValue.NAME, new LookupHasValue(lookupTableService));
-	functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
+        functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
+
+        functions.put(MapRemove.NAME, new MapRemove());
+        functions.put(MapSet.NAME, new MapSet());
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1366,8 +1372,27 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void mapSet() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("k1")).isEqualTo("v11");
+        assertThat(message.getField("k3")).isEqualTo(1L);
+    }
+
+    @Test
+    public void mapRemove() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("k1")).isNull();
+    }
+
+    @Test
     public void removeField() {
-        Rule rule = parser.parseRule(ruleForTest(), true);
+        final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = new Message("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 

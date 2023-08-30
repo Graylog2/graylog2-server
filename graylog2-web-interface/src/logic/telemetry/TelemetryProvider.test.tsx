@@ -15,16 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { PostHog } from 'posthog-js/react';
-import { usePostHog } from 'posthog-js/react';
-import { act, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { asMock, MockStore } from 'helpers/mocking';
 import TelemetryInit from 'logic/telemetry/TelemetryInit';
 import { TelemetrySettingsStore } from 'stores/telemetry/TelemetrySettingsStore';
-import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
+import TelemetryContext from 'logic/telemetry/TelemetryContext';
 
 const mockedTelemetryConfig = {
   api_key: 'key',
@@ -57,8 +55,6 @@ jest.mock('util/AppConfig', () => ({
   telemetry: jest.fn(() => mockedTelemetryConfig),
 }));
 
-jest.mock('posthog-js/react');
-
 jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
   TelemetrySettingsActions: {
     get: jest.fn(),
@@ -66,56 +62,45 @@ jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
   TelemetrySettingsStore: MockStore(),
 }));
 
+jest.useFakeTimers();
+
 jest.mock('@graylog/server-api', () => ({
   Telemetry: {
     get: jest.fn(),
   },
 }));
 
-const Wrapper = ({ children }: { children: React.ReactElement }) => (
-  <TelemetryInit>
-    <TelemetryProvider>
-      {children}
-    </TelemetryProvider>
-  </TelemetryInit>
-);
+const renderSUT = () => {
+  const consume = jest.fn();
+
+  render(
+    <TelemetryInit>
+      <TelemetryContext.Consumer>
+        {consume}
+      </TelemetryContext.Consumer>
+    </TelemetryInit>,
+  );
+
+  return consume;
+};
 
 describe('<TelemetryProvider>', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should render TelemetryProvider', async () => {
-    jest.useFakeTimers();
-    const mockPostHogIdentify = jest.fn();
-    const mockPostHogGroup = jest.fn();
-
+  it('should render TelemetryProvider', () => {
     asMock(useTelemetryData).mockReturnValue({ data: mockTelemetryData, isSuccess: true } as any);
 
     asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
       telemetrySetting: {
         telemetry_permission_asked: false,
-        telemetry_enabled: false,
+        telemetry_enabled: true,
       },
     });
 
-    asMock(usePostHog).mockReturnValue({
-      group: mockPostHogGroup,
-      identify: mockPostHogIdentify,
-      capture: jest.fn(),
-    } as unknown as PostHog);
+    const consume = renderSUT();
 
-    render(
-      <Wrapper>
-        <div>Test</div>
-      </Wrapper>,
-    );
-
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
-
-    await expect(mockPostHogGroup).toHaveBeenCalled();
-    await expect(mockPostHogIdentify).toHaveBeenCalled();
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ sendTelemetry: expect.anything() }));
   });
 });
