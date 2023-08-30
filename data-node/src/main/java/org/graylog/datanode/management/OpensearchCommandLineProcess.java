@@ -38,6 +38,7 @@ public class OpensearchCommandLineProcess implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchCommandLineProcess.class);
 
     private final CommandLineProcess commandLineProcess;
+    private final CommandLineProcessListener resultHandler;
 
     /**
      * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
@@ -77,7 +78,8 @@ public class OpensearchCommandLineProcess implements Closeable {
         final Path executable = config.opensearchDir().resolve(Paths.get("bin", "opensearch"));
         final List<String> arguments = config.asMap().entrySet().stream()
                 .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
-        commandLineProcess = new CommandLineProcess(executable, arguments, listener, config.getEnv());
+        resultHandler = new CommandLineProcessListener(listener);
+        commandLineProcess = new CommandLineProcess(executable, arguments, resultHandler, config.getEnv());
     }
 
     public void start() {
@@ -87,6 +89,8 @@ public class OpensearchCommandLineProcess implements Closeable {
     @Override
     public void close() {
         commandLineProcess.stop();
+        resultHandler.stopListening();
+
     }
 
     @NotNull

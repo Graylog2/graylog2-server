@@ -26,6 +26,7 @@ import UseCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForE
 import generateId from 'logic/generateId';
 import asMock from 'helpers/mocking/AsMock';
 import type View from 'views/logic/views/View';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 const counter = () => {
   let index = 0;
@@ -78,6 +79,13 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 jest.mock('logic/generateId', () => jest.fn());
 
 jest.mock('bson-objectid', () => jest.fn());
+const mock_color = StaticColor.create('#ffffff');
+
+jest.mock('views/logic/views/formatting/highlighting/HighlightingRule', () => ({
+  ...jest.requireActual('views/logic/views/formatting/highlighting/HighlightingRule'),
+  randomColor: jest.fn(() => mock_color),
+  __esModule: true,
+}));
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),

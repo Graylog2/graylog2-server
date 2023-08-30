@@ -117,7 +117,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        return new OpensearchContainer(DockerImageName.parse(image))
+        var container = new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
                 .withReuse(isNull(System.getenv("BUILD_ID")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
@@ -128,6 +128,14 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS);
+
+        // disabling the performance plugin in 2.0.1 consistently created errors during CI runs, but keeping it running
+        // in later versions sometimes created errors on CI, too.
+        if(version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.7.0")) {
+            return container.withCommand("sh", "-c", "opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
+        } else {
+            return container;
+        }
     }
 
     @Override
