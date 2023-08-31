@@ -6005,10 +6005,10 @@ crypt@0.0.2:
   resolved "https://registry.yarnpkg.com/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
   integrity sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=
 
-csp-header@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/csp-header/-/csp-header-5.1.0.tgz#6aa7aecbc2b4118e808f8e50106dc918c4f16f62"
-  integrity sha512-HIKOtf0g4LrWSZKKZA/VSvjU7wLFknXW31NqvCfkkAU6g6RObEbR+E1TLThx4nfE1ozY4be9/5p+u6hmyVi7OQ==
+csp-header@^5.2.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/csp-header/-/csp-header-5.2.1.tgz#4152b83af88febc7737640ce11e266d59f353d23"
+  integrity sha512-qOJNu39JZkPrbrAM40a1tQCePEPYVIoI6nMDhX4RA07QjU8efS+zyd/zE83XJu85KKazH9NjKlvvlswFMteMgg==
 
 css-box-model@^1.2.0:
   version "1.2.1"
@@ -7413,7 +7413,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.7"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-f0847d1f-f8f6-497c-af26-cdb5059673e2-1693382123770/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.2.3"
     eslint-plugin-jest-dom "5.1.0"
@@ -7820,11 +7820,11 @@ expect@^29.6.2:
     jest-util "^29.6.2"
 
 express-csp-header@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/express-csp-header/-/express-csp-header-5.1.0.tgz#0f9923bb9d80a17593d325091e2f44c6f8da90e7"
-  integrity sha512-+5pXxmnwklwbJuiMZSbCYwihNttSOqKsp5WhLUaO8cpuRE4CLOBFJEpoanDbbr+S4+FF/TOmHd7sVDgHSzVxWg==
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/express-csp-header/-/express-csp-header-5.2.1.tgz#015361becc72013c439e9366ca48cbec609891d4"
+  integrity sha512-HvVCUa3GwqH9m4rG0y+s6bHENNxtPzLccM1bSmZNiMIWwMc38Q2Gkz6byiDkrqmnqaCJ9+9cc/p2Pd4QqOmx9Q==
   dependencies:
-    csp-header "^5.1.0"
+    csp-header "^5.2.1"
     psl "1.8.0"
 
 express-formidable@^1.2.0:
@@ -8789,13 +8789,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.17"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-c07de0ae-ddbc-4688-baf6-a6e6ffc3cdd7-1693382123540/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-c07de0ae-ddbc-4688-baf6-a6e6ffc3cdd7-1693382123540/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.3"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-c07de0ae-ddbc-4688-baf6-a6e6ffc3cdd7-1693382123540/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -12651,15 +12651,10 @@ prr@~1.0.1:
   resolved "https://registry.yarnpkg.com/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
   integrity sha1-0/wRS6BplaRexok/SEzrHXj19HY=
 
-psl@1.8.0, psl@^1.1.33:
+psl@1.8.0, psl@^1.1.28, psl@^1.1.33:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/psl/-/psl-1.8.0.tgz#9326f8bcfb013adcc005fdff056acce020e51c24"
   integrity sha512-RIdOzyoavK+hA18OGGWDqUTsCLhtA7IcZ/6NCs4fFJaHBDab+pDDmDIByWFRQJq2Cd7r1OoQxBGKOaztq+hjIQ==
-
-psl@^1.1.28:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/psl/-/psl-1.7.0.tgz#f1c4c47a8ef97167dea5d6bbf4816d736e884a3c"
-  integrity sha512-5NsSEDv8zY70ScRnOTn7bK7eanl2MvFrOrS/R6x+dBt5g1ghnj9Zv90kO8GwT8gxcu2ANyFprnFYB85IogIJOQ==
 
 pump@^3.0.0:
   version "3.0.0"
