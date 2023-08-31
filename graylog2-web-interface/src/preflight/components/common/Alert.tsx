@@ -17,8 +17,7 @@
 import * as React from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { Alert as MantineAlert } from '@mantine/core';
-
-import type { ColorVariants } from '../../theme/types';
+import type { ColorVariant } from '@graylog/sawmill';
 
 const StyledAlert = styled(MantineAlert)(({ theme }) => css`
   margin: ${theme.spacings.md} 0;
@@ -26,7 +25,7 @@ const StyledAlert = styled(MantineAlert)(({ theme }) => css`
 
 type Props = {
   children: React.ReactNode,
-  type: ColorVariants,
+  type: ColorVariant,
 };
 
 const Alert = ({ children, type }: Props) => {

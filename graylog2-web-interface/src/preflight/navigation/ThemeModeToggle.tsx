@@ -24,7 +24,7 @@ import { Icon } from 'preflight/components/common';
 import {
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
-} from 'theme/constants';
+} from 'preflight/theme/constants';
 
 const ThemeModeToggleWrap = styled.div`
   display: flex;
