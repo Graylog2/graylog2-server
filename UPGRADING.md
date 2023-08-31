@@ -30,12 +30,13 @@ The following Java Code API changes have been made.
 ## REST API Endpoint Changes
 The following REST API changes have been made.
 
-| Endpoint                                 | Description                                |
-|------------------------------------------|--------------------------------------------|
+| Endpoint                                 | Description                                         |
+|------------------------------------------|-----------------------------------------------------|
 | `GET /contentstream/settings/{username}` | Retrieve Content Stream settings for specified user |
-| `PUT /contentstream/enable/{username}`   | Enable Content Stream for specified user   |
-| `PUT /contentstream/disable/{username}`  | Disable Content Stream for specified user  |
-| `PUT /contentstream/topics/{username}`   | Update per user Content Stream topic list  |
+| `PUT /contentstream/enable/{username}`   | Enable Content Stream for specified user            |
+| `PUT /contentstream/disable/{username}`  | Disable Content Stream for specified user           |
+| `PUT /contentstream/topics/{username}`   | Update per user Content Stream topic list           |
+| `GET /plugins/org.graylog.plugins.license/licenses/tags`      | Retrieve Content Stream tags based on license       |
 
 
 
