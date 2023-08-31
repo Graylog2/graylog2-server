@@ -199,7 +199,8 @@ public class DatanodeClusterIT {
                         .log().all();
             });
         } catch (Exception retryException) {
-            LOG.error("DataNode Container logs follow:\n" + nodeA.getLogs());
+            LOG.error("DataNode Container logs from nodeA follow:\n" + nodeA.getLogs());
+            LOG.error("DataNode Container logs from node B follow:\n" + nodeB.getLogs());
             throw retryException;
         }
     }
