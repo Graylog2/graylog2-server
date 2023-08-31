@@ -28,6 +28,7 @@ import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 import org.graylog2.bootstrap.CliCommand;
 
+import java.nio.file.Path;
 import java.util.List;
 
 
@@ -35,7 +36,7 @@ import java.util.List;
 public class CertutilCsr implements CliCommand {
 
     @Option(name = "--privateKey", description = "Keystore with private key")
-    protected String privateKeyFilename = "csr-private-key.key";
+    protected Path privateKeyFilename = Path.of("csr-private-key.key");
 
     @Option(name = "--csrFile", description = "Keystore with private key")
     protected String csrFilename = "csr.csr";
@@ -54,7 +55,7 @@ public class CertutilCsr implements CliCommand {
         this.csrGenerator = new CsrGenerator();
     }
 
-    public CertutilCsr(final String privateKeyFilename,
+    public CertutilCsr(final Path privateKeyFilename,
                        final String csrFilename,
                        final CommandLineConsole console) {
         this.privateKeyFilename = privateKeyFilename;
