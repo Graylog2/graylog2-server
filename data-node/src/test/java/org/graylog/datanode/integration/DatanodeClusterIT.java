@@ -195,7 +195,8 @@ public class DatanodeClusterIT {
                         .auth().basic(usernameNodeA, passwordNodeA)
                         .log().all()
                         .get("https://localhost:" + mappedPort + "/_cluster/health")
-                        .then();
+                        .then()
+                        .log().all();
             });
         } catch (Exception retryException) {
             LOG.error("DataNode Container logs follow:\n" + nodeA.getLogs());
