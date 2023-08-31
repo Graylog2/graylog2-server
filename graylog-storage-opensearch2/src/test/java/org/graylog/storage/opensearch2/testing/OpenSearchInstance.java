@@ -97,7 +97,10 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 false,
                 false,
                 new BasicCredentialsProvider(),
-                null)
+                null,
+                "not_wanting_jwt",
+                false,
+                false)
                 .get();
     }
 

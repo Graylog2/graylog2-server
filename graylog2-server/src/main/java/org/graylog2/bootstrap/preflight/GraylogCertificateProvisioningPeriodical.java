@@ -17,8 +17,12 @@
 package org.graylog2.bootstrap.preflight;
 
 import com.google.common.base.Splitter;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import okhttp3.Call;
 import okhttp3.Credentials;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -39,9 +43,11 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
+import org.graylog2.security.OpenSearchJWTTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -50,6 +56,8 @@ import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -57,7 +65,10 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -206,9 +217,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
             try {
                 URI uri = new URI(node.getTransportAddress());
                 if (!isNullOrEmpty(uri.getUserInfo())) {
-                    var list = Splitter.on(":").limit(2).splitToList(uri.getUserInfo());
                     builder.authenticator((route, response) -> {
-                        String credential = Credentials.basic(list.get(0), list.get(1));
+                        String credential = "Bearer " + OpenSearchJWTTokenUtil.createToken(passwordSecret.getBytes(StandardCharsets.UTF_8));
                         return response.request().newBuilder().header("Authorization", credential).build();
                     });
                 }

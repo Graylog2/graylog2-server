@@ -16,8 +16,10 @@
  */
 package org.graylog.datanode.configuration.variants;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.Configuration;
@@ -28,9 +30,11 @@ import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -39,7 +43,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -55,6 +61,7 @@ public class OpensearchSecurityConfiguration {
     private final KeystoreInformation transportCertificate;
     private final KeystoreInformation httpCertificate;
     private KeystoreInformation truststore;
+    private final ObjectMapper objectMapper = new YAMLMapper();
 
     public OpensearchSecurityConfiguration(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
         this.transportCertificate = transportCertificate;
@@ -92,6 +99,7 @@ public class OpensearchSecurityConfiguration {
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
             configureInitialAdmin(localConfiguration, opensearchConfigDir, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
+            enableJwtInConfig(opensearchConfigDir, localConfiguration.getPasswordSecret());
         }
         return this;
     }
@@ -115,6 +123,9 @@ public class OpensearchSecurityConfiguration {
             // configured node names.
             config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
 
+            config.put("plugins.security.audit.type", "debug");
+            config.put("logger.org.opensearch.security", "debug");
+            config.put("logger.com.amazon.dlic.auth.http.jwt", "debug");
 
             config.put("plugins.security.ssl.http.enabled", "true");
 
@@ -131,6 +142,29 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.http.enabled", "false");
         }
         return config.build();
+    }
+
+    private Map<String, Object> getMap(final Map<String, Object> map, final String... keys) {
+        Map<String, Object> result = map;
+        for(final String key: List.of(keys)) {
+            result = (Map<String, Object>)result.get(key);
+        };
+        return result;
+    }
+
+    private void enableJwtInConfig(final Path opensearchConfigDir, final String signingKey) throws IOException {
+        final File file = opensearchConfigDir.resolve(Path.of("opensearch-security", "config.yml")).toFile();
+        Map<String, Object> contents = objectMapper.readValue(file, new TypeReference<>() {});
+
+        Map<String, Object> jwt_auth_domain = getMap(contents, "config", "dynamic", "authc", "jwt_auth_domain");
+        jwt_auth_domain.put("http_enabled", true);
+        jwt_auth_domain.put("transport_enabled", true);
+
+        Map<String, Object> config = getMap(jwt_auth_domain, "http_authenticator", "config");
+        config.put("signing_key", Base64.getEncoder().encodeToString(signingKey.getBytes(StandardCharsets.UTF_8)));
+        config.put("roles_key", "os_roles");
+
+        objectMapper.writeValue(file, contents);
     }
 
     public boolean securityEnabled() {
@@ -159,7 +193,7 @@ public class OpensearchSecurityConfiguration {
         config.put("plugins.security.allow_default_init_securityindex", "true");
         //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
 
-        config.put("plugins.security.audit.type", "internal_opensearch");
+        //config.put("plugins.security.audit.type", "internal_opensearch");
         config.put("plugins.security.enable_snapshot_restore_privilege", "true");
         config.put("plugins.security.check_snapshot_restore_write_privileges", "true");
         config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access");
@@ -188,7 +222,7 @@ public class OpensearchSecurityConfiguration {
         final Map<String, Object> adminUserConfig = (Map) map.get("admin");
 
         map.remove("admin");
-        map.put(adminUsername, adminUserConfig);
+/*        map.put(adminUsername, adminUserConfig);
 
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(12);
         final String hashWithPrefix = passwordAlgorithm.hash(adminPassword);
@@ -196,7 +230,7 @@ public class OpensearchSecurityConfiguration {
         // remove the prefix and suffix, we need just the hash itself
         final String hash = hashWithPrefix.substring("{bcrypt}".length(), hashWithPrefix.indexOf("{salt}"));
         adminUserConfig.put("hash", hash);
-
+*/
         final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
         mapper.writeValue(fos, map);
     }

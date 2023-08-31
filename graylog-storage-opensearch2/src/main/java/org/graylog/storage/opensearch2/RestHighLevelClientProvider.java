@@ -18,26 +18,38 @@ package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.opensearch2.org.apache.http.message.BasicHeader;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.security.OpenSearchJWTTokenUtil;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -66,7 +78,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteOpenSearchDeprecationWarnings,
             CredentialsProvider credentialsProvider,
-            TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
+            TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
+            @Named("password_secret") String signingKey,
+            @RunsWithDataNode Boolean runsWithDataNode,
+            @Named("opensearch_use_jwt") boolean opensearchUseJwt) {
 
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
 
@@ -78,7 +93,9 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     maxTotalConnectionsPerRoute,
                     useExpectContinue,
                     muteOpenSearchDeprecationWarnings,
-                credentialsProvider);
+                credentialsProvider,
+                    runsWithDataNode || opensearchUseJwt,
+                    signingKey);
 
             var sniffer = SnifferWrapper.create(
                     client.getLowLevelClient(),
@@ -121,20 +138,32 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             int maxTotalConnectionsPerRoute,
             boolean useExpectContinue,
             boolean muteElasticsearchDeprecationWarnings,
-            CredentialsProvider credentialsProvider) {
+            CredentialsProvider credentialsProvider,
+            boolean isSecuredDataNode,
+            final String signingKey) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
         final RestClientBuilder restClientBuilder = RestClient.builder(esHosts)
-                .setRequestConfigCallback(requestConfig -> requestConfig
-                        .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
-                        .setSocketTimeout(Math.toIntExact(socketTimeout.toMilliseconds()))
-                        .setExpectContinueEnabled(useExpectContinue)
-                        .setAuthenticationEnabled(true)
+                .setRequestConfigCallback(requestConfig -> {
+                            requestConfig
+                                    .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
+                                    .setSocketTimeout(Math.toIntExact(socketTimeout.toMilliseconds()))
+                                    .setExpectContinueEnabled(useExpectContinue);
+                            if (!isSecuredDataNode) {
+                                requestConfig.setAuthenticationEnabled(true);
+                            }
+                            return requestConfig;
+                        }
                 )
                 .setHttpClientConfigCallback(httpClientConfig -> {
                     httpClientConfig
                         .setMaxConnTotal(maxTotalConnections)
-                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
-                        .setDefaultCredentialsProvider(credentialsProvider);
+                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
+
+                    if(isSecuredDataNode) {
+                        httpClientConfig.setDefaultHeaders(List.of(new BasicHeader("Authorization", "Bearer " + OpenSearchJWTTokenUtil.createToken(signingKey.getBytes(StandardCharsets.UTF_8)))));
+                    } else {
+                        httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
+                    }
 
                     if(muteElasticsearchDeprecationWarnings) {
                         httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());

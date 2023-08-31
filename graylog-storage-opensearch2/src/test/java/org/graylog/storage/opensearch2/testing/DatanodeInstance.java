@@ -63,7 +63,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
 
     @Override
     protected String imageName() {
-        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev");
+        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "5.2-dev");
     }
 
     @Override
@@ -89,7 +89,10 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 false,
                 false,
                 new BasicCredentialsProvider(),
-                null)
+                null,
+                "maybe_want_jwt_here",
+                false,
+                false)
                 .get();
     }
 

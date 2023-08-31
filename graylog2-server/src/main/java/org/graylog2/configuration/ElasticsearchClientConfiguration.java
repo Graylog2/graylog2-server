@@ -40,6 +40,9 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {ListOfURIsWithHostAndSchemeValidator.class})
     List<URI> elasticsearchHosts = new ArrayList<>();
 
+    @Parameter(value = "opensearch_use_jwt")
+    boolean opensearchUseJwt = false;
+
     @Parameter(value = "elasticsearch_connect_timeout", validators = {PositiveDurationValidator.class})
     Duration elasticsearchConnectTimeout = Duration.seconds(10);
 

@@ -29,6 +29,8 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
+import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.security.OpenSearchJWTTokenUtil;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -44,6 +46,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -55,16 +58,23 @@ public class VersionProbe {
     private final OkHttpClient okHttpClient;
     private final int connectionAttempts;
     private final Duration delayBetweenAttempts;
+    private final byte[] signingKey;
+    private final boolean useJWT;
 
     @Inject
     public VersionProbe(ObjectMapper objectMapper,
                         OkHttpClient okHttpClient,
                         @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
-                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay) {
+                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay,
+                        @Named("password_secret") String signingKey,
+                        @RunsWithDataNode Boolean runsWithDataNode,
+                        @Named("opensearch_use_jwt") boolean opensearchUseJwt) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
         this.connectionAttempts = elasticsearchVersionProbeAttempts;
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
+        this.signingKey = signingKey.getBytes(StandardCharsets.UTF_8);
+        this.useJWT = runsWithDataNode || opensearchUseJwt;
     }
 
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
@@ -138,17 +148,27 @@ public class VersionProbe {
                 .flatMap(this::parseVersion);
     }
 
-    private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
-        if (Strings.emptyToNull(host.getUserInfo()) != null) {
+    private Optional<String> getAuthToken(final URI host, final byte[] signingKey, final boolean useJWT) {
+        if(useJWT) {
+            return Optional.of(OpenSearchJWTTokenUtil.createToken(signingKey));
+        } else if (Strings.emptyToNull(host.getUserInfo()) != null) {
             final String[] credentials = host.getUserInfo().split(":");
             final String username = credentials[0];
             final String password = credentials[1];
-            final String authToken = Credentials.basic(username, password);
+            return Optional.of(Credentials.basic(username, password));
+        }
 
+        return Optional.empty();
+    }
+
+    private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
+        final Optional<String> authToken = getAuthToken(host, signingKey, useJWT);
+
+        if(authToken.isPresent()) {
             return okHttpClient.newBuilder()
                     .addInterceptor(chain -> {
                         final Request originalRequest = chain.request();
-                        final Request.Builder builder = originalRequest.newBuilder().header("Authorization", authToken);
+                        final Request.Builder builder = originalRequest.newBuilder().header("Authorization", authToken.get());
                         final Request newRequest = builder.build();
                         return chain.proceed(newRequest);
                     })
