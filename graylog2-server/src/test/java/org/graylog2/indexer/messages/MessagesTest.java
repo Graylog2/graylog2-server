@@ -33,12 +33,10 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -89,10 +87,10 @@ public class MessagesTest {
     public void bulkIndexingShouldAccountMessageSizes() throws IOException {
         when(messagesAdapter.bulkIndex(any())).thenReturn(Collections.emptyList());
         final IndexSet indexSet = mock(IndexSet.class);
-        final List<Map.Entry<IndexSet, Message>> messageList = ImmutableList.of(
-                createMessageListEntry(indexSet, messageWithSize(17)),
-                createMessageListEntry(indexSet, messageWithSize(23)),
-                createMessageListEntry(indexSet, messageWithSize(42))
+        final List<MessageWithIndex> messageList = List.of(
+                new MessageWithIndex(messageWithSize(17), indexSet),
+                new MessageWithIndex(messageWithSize(23), indexSet),
+                new MessageWithIndex(messageWithSize(42), indexSet)
         );
 
         messages.bulkIndex(messageList);
@@ -105,10 +103,10 @@ public class MessagesTest {
     public void bulkIndexingShouldAccountMessageSizesForSystemTrafficSeparately() throws IOException {
         when(messagesAdapter.bulkIndex(any())).thenReturn(Collections.emptyList());
         final IndexSet indexSet = mock(IndexSet.class);
-        final List<Map.Entry<IndexSet, Message>> messageList = ImmutableList.of(
-                createMessageListEntry(indexSet, messageWithSize(17)),
-                createMessageListEntry(indexSet, messageWithSize(23)),
-                createMessageListEntry(indexSet, messageWithSize(42))
+        final List<MessageWithIndex> messageList = List.of(
+                new MessageWithIndex(messageWithSize(17), indexSet),
+                new MessageWithIndex(messageWithSize(23), indexSet),
+                new MessageWithIndex(messageWithSize(42), indexSet)
         );
 
         messages.bulkIndex(messageList, true);
@@ -195,10 +193,6 @@ public class MessagesTest {
         when(mock.getMessageId()).thenReturn(msgId);
         when(mock.getTimestamp()).thenReturn(ts);
         return mock;
-    }
-
-    private Map.Entry<IndexSet, Message> createMessageListEntry(IndexSet indexSet, Message message) {
-        return new AbstractMap.SimpleEntry<>(indexSet, message);
     }
 
     private Message messageWithSize(long size) {
