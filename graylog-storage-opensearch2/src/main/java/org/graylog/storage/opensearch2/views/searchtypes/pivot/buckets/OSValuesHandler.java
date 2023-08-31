@@ -90,11 +90,9 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     }
 
     private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit, boolean skipEmptyValues) {
-        return valueBuckets.size() > 1
-                ? supportsMultiTerms && skipEmptyValues
+        return supportsMultiTerms && skipEmptyValues
                 ? createMultiTerms(valueBuckets, ordering, limit)
-                : createScriptedTerms(valueBuckets, ordering, limit)
-                : createSimpleTerms(valueBuckets.get(0), ordering, limit);
+                : createScriptedTerms(valueBuckets, ordering, limit);
     }
 
     private AggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {

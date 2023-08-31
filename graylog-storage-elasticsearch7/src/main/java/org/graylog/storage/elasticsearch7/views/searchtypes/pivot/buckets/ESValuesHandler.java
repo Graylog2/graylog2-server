@@ -80,9 +80,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
 
     private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
-        return valueBuckets.size() > 1
-                ? createScriptedTerms(valueBuckets, ordering, limit)
-                : createSimpleTerms(valueBuckets.get(0), ordering, limit);
+        return createScriptedTerms(valueBuckets, ordering, limit);
     }
 
     private TermsAggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {
