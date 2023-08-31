@@ -28,11 +28,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,7 +83,7 @@ class MessagesBulkIndexRetryingTest {
         when(mockedMessage.getId()).thenReturn(messageId);
         when(mockedMessage.getTimestamp()).thenReturn(DateTime.now(DateTimeZone.UTC));
 
-        final List<Map.Entry<IndexSet, Message>> messageList = messageListWith(mockedMessage);
+        final List<MessageWithIndex> messageList = messageListWith(mockedMessage);
 
         final Set<String> result = messages.bulkIndex(messageList);
 
@@ -100,7 +98,7 @@ class MessagesBulkIndexRetryingTest {
                 .thenThrow(new IOException("Boom!"))
                 .thenReturn(Collections.emptyList());
 
-        final List<Map.Entry<IndexSet, Message>> messageList = messageListWith(mock(Message.class));
+        final List<MessageWithIndex> messageList = messageListWith(mock(Message.class));
 
         final Set<String> result = messages.bulkIndex(messageList);
 
@@ -164,10 +162,10 @@ class MessagesBulkIndexRetryingTest {
         assertThat(result).containsOnly("other-error-id");
     }
 
-    private List<Map.Entry<IndexSet, Message>> messagesWithIds(String... ids) {
+    private List<MessageWithIndex> messagesWithIds(String... ids) {
         return Arrays.stream(ids)
                 .map(this::messageWithId)
-                .map(m -> new AbstractMap.SimpleEntry<>(mock(IndexSet.class), m))
+                .map(m -> new MessageWithIndex(m, mock(IndexSet.class)))
                 .collect(Collectors.toList());
     }
 
@@ -178,10 +176,8 @@ class MessagesBulkIndexRetryingTest {
         return mockedMessage;
     }
 
-    private List<Map.Entry<IndexSet, Message>> messageListWith(Message mockedMessage) {
-        return ImmutableList.of(
-                new AbstractMap.SimpleEntry<>(mock(IndexSet.class), mockedMessage)
-        );
+    private List<MessageWithIndex> messageListWith(Message mockedMessage) {
+        return List.of(new MessageWithIndex(mockedMessage, mock(IndexSet.class)));
     }
 
     private Messages.IndexingError errorResultItem(String messageId, Messages.IndexingError.ErrorType errorType, String errorReason) {
