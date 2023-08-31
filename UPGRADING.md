@@ -36,7 +36,7 @@ The following REST API changes have been made.
 | `PUT /contentstream/enable/{username}`   | Enable Content Stream for specified user            |
 | `PUT /contentstream/disable/{username}`  | Disable Content Stream for specified user           |
 | `PUT /contentstream/topics/{username}`   | Update per user Content Stream topic list           |
-| `GET /plugins/org.graylog.plugins.license/licenses/tags`      | Retrieve Content Stream tags based on license       |
+| `GET /contentstream/tags`                | Retrieve Content Stream tags based on license       |
 
 
 

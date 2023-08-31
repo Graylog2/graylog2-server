@@ -14,23 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.contentstream.rest;
+package org.graylog2.contentstream;
 
-public enum ContentStreamTags {
-    OPEN("open-feed"),              //anyone on opensource
-    ENTERPRISE("enterprise-feed"),  //anyone with Enterprise or Security License
-    SMB("smb-feed");                //anyone with Small business free enterprise license (OPS only not security)
+import org.graylog.enterprise.EnterpriseService;
 
-    public static final long SMB_TRAFFIC_LIMIT = 2L * 1024 * 1024 * 1024;
+import javax.inject.Inject;
+import java.util.List;
 
-    private String tag;
+public class ContentStreamFeedTagsService implements ContentStreamFeedTags {
+    private final EnterpriseService enterpriseService;
 
-    ContentStreamTags(String tag) {
-        this.tag = tag;
+    @Inject
+    public ContentStreamFeedTagsService(EnterpriseService enterpriseService) {
+        this.enterpriseService = enterpriseService;
     }
 
     @Override
-    public String toString() {
-        return tag;
+    public List<String> getTags() {
+        if (enterpriseService.hasLicenseInstalled()) {
+            return List.of(FeedTags.ENTERPRISE.toString());
+        } else {
+            return List.of(FeedTags.OPEN.toString());
+        }
     }
 }
