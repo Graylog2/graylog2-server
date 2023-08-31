@@ -15,7 +15,7 @@
     "@testing-library/jest-dom": "5.17.0",
     "@testing-library/react": "12.1.5",
     "@testing-library/react-hooks": "^8.0.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/user-event": "^14.4.3",
     "@types/enzyme": "3.10.13",
     "babel-jest": "29.6.2",
     "enzyme": "3.11.0",
