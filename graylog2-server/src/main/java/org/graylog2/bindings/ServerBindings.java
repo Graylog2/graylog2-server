@@ -41,8 +41,6 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
-import org.graylog2.contentstream.ContentStreamFeedTags;
-import org.graylog2.contentstream.ContentStreamFeedTagsService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
@@ -208,8 +206,6 @@ public class ServerBindings extends Graylog2Module {
 
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
         bind(CSPEventListener.class).asEagerSingleton();
-
-        bind(ContentStreamFeedTags.class).to(ContentStreamFeedTagsService.class);
     }
 
     private void bindDynamicFeatures() {

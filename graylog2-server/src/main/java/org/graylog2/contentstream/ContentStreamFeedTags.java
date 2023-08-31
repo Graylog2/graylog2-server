@@ -16,8 +16,11 @@
  */
 package org.graylog2.contentstream;
 
+import com.google.inject.ImplementedBy;
+
 import java.util.List;
 
+@ImplementedBy(ContentStreamFeedTagsService.class)
 public interface ContentStreamFeedTags {
     public enum FeedTags {
         OPEN("open-feed"),              //anyone on opensource
