@@ -37,9 +37,6 @@ const Alert = ({ children, type }: Props) => {
       borderColor: theme.colors.variant.lighter[type],
       backgroundColor: `${theme.colors.variant.lightest[type]} !important`,
     },
-    message: {
-      fontSize: theme.fonts.size.medium.rem,
-    },
   });
 
   return (
