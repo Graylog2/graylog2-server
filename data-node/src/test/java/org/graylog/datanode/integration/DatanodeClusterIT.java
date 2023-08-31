@@ -193,6 +193,7 @@ public class DatanodeClusterIT {
                 return RestAssured.given()
                         .trustStore(trustStore)
                         .auth().basic(usernameNodeA, passwordNodeA)
+                        .log().all()
                         .get("https://localhost:" + mappedPort + "/_cluster/health")
                         .then();
             });
