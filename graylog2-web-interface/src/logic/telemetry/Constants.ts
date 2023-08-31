@@ -22,6 +22,17 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_REFRESH_CONTROL_PRESET_SELECTED: 'Search Refresh Control Preset Selected',
   SEARCH_REFRESH_CONTROL_TOGGLED: 'Search Refresh Control Toggled',
   SEARCH_BUTTON_CLICKED: 'Search Button Clicked',
+  SEARCH_FILTER_CREATE_CLICKED: 'Search Filter Create Clicked',
+  SEARCH_FILTER_LOAD_CLICKED: 'Search Filter Load Clicked',
+  SEARCH_FILTER_LOADED: 'Search Filter Loaded',
+  SEARCH_FILTER_ITEM_MENU_TOGGLED: 'Search Filter Item Menu Toggled',
+  SEARCH_FILTER_ITEM_DISABLED_TOGGLED: 'Search Filter Item Disabled Toggled',
+  SEARCH_FILTER_ITEM_SHARE_CLICKED: 'Search Filter Item Share Clicked',
+  SEARCH_FILTER_ITEM_EDIT_CLICKED: 'Search Filter Item Edit Clicked',
+  SEARCH_FILTER_ITEM_COPIED: 'Search Filter Item Copied',
+  SEARCH_FILTER_ITEM_REMOVED: 'Search Filter Item Removed',
+  SEARCH_FILTER_ITEM_REFERENCE_REPLACED: 'Search Filter Item Reference Replaced',
+  SEARCH_FILTER_ITEM_NEGATION_TOGGLED: 'Search Filter Item Negation Toggled',
 } as const;
 type ObjectValues<T> = T[keyof T];
 
