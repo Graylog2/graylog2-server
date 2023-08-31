@@ -70,8 +70,8 @@ public class DatanodeClusterIT {
         trustStore = DatanodeSecurityTestUtils.buildTruststore(ca);
 
         hostnameNodeA = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, "nodeA");
-        final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, "nodeA");
+        final KeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeA);
+        final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
         usernameNodeA = RandomStringUtils.randomAlphabetic(10);
         passwordNodeA = RandomStringUtils.randomAlphabetic(10);
 
@@ -89,8 +89,8 @@ public class DatanodeClusterIT {
 
 
         final String hostnameNodeB = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, "nodeB");
-        final KeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, "nodeB");
+        final KeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeB);
+        final KeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeB);
         final String usernameNodeB = RandomStringUtils.randomAlphabetic(10);
         final String passwordNodeB = RandomStringUtils.randomAlphabetic(10);
 
@@ -120,8 +120,8 @@ public class DatanodeClusterIT {
     void testAddingNodeToExistingCluster() throws ExecutionException, RetryException {
 
         final String hostnameNodeC = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
-        final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, "nodeB");
-        final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, "nodeB");
+        final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
+        final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
         final String usernameNodeC = RandomStringUtils.randomAlphabetic(10);
         final String passwordNodeC = RandomStringUtils.randomAlphabetic(10);
 
