@@ -99,7 +99,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final NodeService nodeService,
                                                     final CsrSigner csrSigner,
                                                     final ClusterConfigService clusterConfigService,
-                                                    final @Named("password_secret") String passwordSecret, ClusterEventBus clusterEventBus) {
+                                                    final @Named("password_secret") String passwordSecret,
+                                                    ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -214,17 +215,10 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         Request request = new Request.Builder().url(node.getTransportAddress()).build();
         if(okHttpClient.isPresent()) {
             OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
-            try {
-                URI uri = new URI(node.getTransportAddress());
-                if (!isNullOrEmpty(uri.getUserInfo())) {
-                    builder.authenticator((route, response) -> {
-                        String credential = "Bearer " + OpenSearchJWTTokenUtil.createToken(passwordSecret.getBytes(StandardCharsets.UTF_8));
-                        return response.request().newBuilder().header("Authorization", credential).build();
-                    });
-                }
-            } catch (URISyntaxException ex) {
-                return false;
-            }
+            builder.authenticator((route, response) -> {
+                String credential = "Bearer " + OpenSearchJWTTokenUtil.createToken(passwordSecret.getBytes(StandardCharsets.UTF_8));
+                return response.request().newBuilder().header("Authorization", credential).build();
+            });
             Call call = builder.build().newCall(request);
             try(Response response = call.execute()) {
                 return response.isSuccessful();

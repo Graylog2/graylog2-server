@@ -98,7 +98,6 @@ public class OpensearchSecurityConfiguration {
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
-            configureInitialAdmin(localConfiguration, opensearchConfigDir, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
             enableJwtInConfig(opensearchConfigDir, localConfiguration.getPasswordSecret());
         }
         return this;
@@ -123,9 +122,10 @@ public class OpensearchSecurityConfiguration {
             // configured node names.
             config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
 
-            config.put("plugins.security.audit.type", "debug");
-            config.put("logger.org.opensearch.security", "debug");
-            config.put("logger.com.amazon.dlic.auth.http.jwt", "debug");
+            // these were enabled to debug JWT
+            // config.put("plugins.security.audit.type", "debug");
+            // config.put("logger.org.opensearch.security", "debug");
+            // config.put("logger.com.amazon.dlic.auth.http.jwt", "debug");
 
             config.put("plugins.security.ssl.http.enabled", "true");
 
@@ -202,37 +202,6 @@ public class OpensearchSecurityConfiguration {
         config.put("node.max_local_storage_nodes", "3");
 
         return config.build();
-    }
-
-    protected void configureInitialAdmin(final Configuration localConfiguration, final Path opensearchConfigDir,
-                                         final String adminUsername,
-                                         final String adminPassword) throws IOException {
-        final Path internalUsersFile = opensearchConfigDir.resolve("opensearch-security").resolve("internal_users.yml");
-
-        Objects.requireNonNull(localConfiguration.getRestApiUsername(),
-                "rest_api_username has to be configured the usage of secured Opensearch REST api"
-        );
-
-        Objects.requireNonNull(localConfiguration.getRestApiPassword(),
-                "rest_api_password has to be configured the usage of secured Opensearch REST api"
-        );
-
-        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), TypeReferences.MAP_STRING_OBJECT);
-        final Map<String, Object> adminUserConfig = (Map) map.get("admin");
-
-        map.remove("admin");
-/*        map.put(adminUsername, adminUserConfig);
-
-        final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(12);
-        final String hashWithPrefix = passwordAlgorithm.hash(adminPassword);
-
-        // remove the prefix and suffix, we need just the hash itself
-        final String hash = hashWithPrefix.substring("{bcrypt}".length(), hashWithPrefix.indexOf("{salt}"));
-        adminUserConfig.put("hash", hash);
-*/
-        final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
-        mapper.writeValue(fos, map);
     }
 
     private void logCertificateInformation(String certificateType, KeystoreInformation keystore) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {

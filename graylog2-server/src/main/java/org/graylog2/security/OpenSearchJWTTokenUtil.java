@@ -24,7 +24,8 @@ public class OpenSearchJWTTokenUtil {
                 .setSubject("admin")
                 .setIssuer("graylog")
                 .setNotBefore(now)
-                .setExpiration(new Date(nowMillis + 60*1000))
+                // TODO: expiration to a smaller time, automatic refresh
+                .setExpiration(new Date(nowMillis + 24*60*60*1000))
                 .signWith(signatureAlgorithm, signingKey);
 
         return builder.compact();
