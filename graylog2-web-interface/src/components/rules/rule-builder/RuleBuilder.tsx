@@ -62,10 +62,9 @@ const StyledPanelBody = styled(Panel.Body)`
 `;
 
 const getLastOutputIndexFromRule = (rule: RuleBuilderRule): number => {
-  const outputIndexes = rule.rule_builder?.actions?.map((block: RuleBlock) => block?.outputvariable).filter((outputvariable) => (outputvariable !== null)) || [];
-  const lastOutputIndex = Number(outputIndexes[outputIndexes.length - 1]?.replace('output_', '') || 0);
+  const outputIndexes = rule.rule_builder?.actions?.map((block: RuleBlock) => Number(block?.outputvariable?.replace('output_', '') || 0))?.sort((a, b) => a - b) || [];
 
-  return lastOutputIndex;
+  return outputIndexes[outputIndexes.length - 1] || 0;
 };
 
 const RuleBuilder = () => {
@@ -109,8 +108,12 @@ const RuleBuilder = () => {
     const newBlock = block;
     const blockDict = getDictForFunction(actionsDict, block.function);
 
-    if ((RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict?.return_type)) {
+    if (
+      (RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict?.return_type)
+      && !newBlock.outputvariable
+    ) {
       newBlock.outputvariable = `output_${outputIndex}`;
+      setLastOutputIndex(outputIndex);
     }
 
     return newBlock;
@@ -138,9 +141,7 @@ const RuleBuilder = () => {
         },
       };
     } else {
-      const nextOutputIndex = lastOutputIndex + 1;
-      const blockToSet = setOutputVariable(block, nextOutputIndex);
-      setLastOutputIndex(nextOutputIndex);
+      const blockToSet = setOutputVariable(block, lastOutputIndex + 1);
 
       ruleToAdd = {
         ...rule,
@@ -174,7 +175,7 @@ const RuleBuilder = () => {
     } else {
       const currentActions = [...rule.rule_builder.actions];
 
-      currentActions[orderIndex] = block;
+      currentActions[orderIndex] = setOutputVariable(block, lastOutputIndex + 1);
 
       ruleToUpdate = {
         ...rule,

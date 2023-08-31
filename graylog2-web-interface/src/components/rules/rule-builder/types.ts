@@ -107,7 +107,7 @@ export const outputVariablesPropType = PropTypes.arrayOf(
     variableName: PropTypes.string.isRequired,
     variableType: PropTypes.string,
     stepOrder: PropTypes.number.isRequired,
-    blockId: PropTypes.string.isRequired,
+    blockId: PropTypes.string,
   }),
 );
 
