@@ -65,6 +65,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { updateQuery } from 'views/logic/slices/viewSlice';
 import useHandlerContext from 'views/components/useHandlerContext';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -104,7 +106,10 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => {
+const useInitialFormValues = ({ currentQuery, queryFilters }: {
+  currentQuery: Query | undefined,
+  queryFilters: Immutable.Map<QueryId, FilterType>
+}) => {
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
@@ -129,7 +134,10 @@ type Props = {
 };
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
-  const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({ key: stream.title, value: stream.id })));
+  const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({
+    key: stream.title,
+    value: stream.id,
+  })));
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
@@ -141,6 +149,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery),
     [currentQuery, dispatch, onSubmit, pluggableSearchBarControls]);
   const handlerContext = useHandlerContext();
+  const sendTelemetry = useSendTelemetry();
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -158,7 +167,17 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                            limitDuration={limitDuration}
                            onSubmit={_onSubmit}
                            validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)}>
-              {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
+              {({
+                dirty,
+                errors,
+                isSubmitting,
+                isValid,
+                isValidating,
+                handleSubmit,
+                values,
+                setFieldValue,
+                validateForm,
+              }) => {
                 const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
                 return (
@@ -167,7 +186,18 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                     <SearchBarContainer>
                       <TimeRangeRow>
                         <TimeRangeFilter limitDuration={limitDuration}
-                                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                         onChange={(nextTimeRange) => {
+                                           setFieldValue('timerange', nextTimeRange);
+
+                                           sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_UPDATED, {
+                                             app_pathname: 'search',
+                                             app_section: 'search-bar',
+                                             app_action_value: 'time-range-picker',
+                                             event_details: {
+                                               timerange: nextTimeRange,
+                                             },
+                                           });
+                                         }}
                                          value={values?.timerange}
                                          hasErrorOnMount={!!errors.timerange} />
                         <StreamsAndRefresh>

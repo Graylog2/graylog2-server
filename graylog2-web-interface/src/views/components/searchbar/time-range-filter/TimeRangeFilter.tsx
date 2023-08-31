@@ -84,7 +84,7 @@ const TimeRangeFilter = ({
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TOGGLED, {
       app_pathname: 'search',
       app_section: 'search-bar',
-      app_action_value: 'time-range-dropdown',
+      app_action_value: 'time-range-picker',
       event_details: {
         showing: !show,
       },
