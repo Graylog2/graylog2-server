@@ -16,11 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { SetStateAction } from 'react';
-import { useMemo, useState, useCallback, useRef } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
-import isFunction from 'lodash/isFunction';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -33,6 +31,7 @@ import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
@@ -219,7 +218,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   visibleColumns,
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
-  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection || []);
+  const [selectedEntities, setSelectedEntities] = useSelectedEntities<Entity['id']>(initialSelection, onChangeSelection);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkAction = typeof actions === 'function';
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || typeof actions === 'function';
@@ -244,22 +243,15 @@ const EntityDataTable = <Entity extends EntityBase>({
     fixedActionsCellWidth,
   });
 
-  const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
-    const newState = isFunction(setSelectedEntitiesArgument) ? setSelectedEntitiesArgument(selectedEntities) : setSelectedEntitiesArgument;
-
-    setSelectedEntities(newState);
-    if (onChangeSelection) onChangeSelection(newState);
-  }, [onChangeSelection, selectedEntities]);
-
   const onToggleEntitySelect = useCallback((itemId: string) => {
-    _setSelectedEntities(((cur) => {
+    setSelectedEntities(((cur) => {
       if (cur.includes(itemId)) {
         return cur.filter((id) => id !== itemId);
       }
 
       return [...cur, itemId];
     }));
-  }, [_setSelectedEntities]);
+  }, [setSelectedEntities]);
 
   return (
     <ExpandedSectionsProvider>
@@ -268,7 +260,7 @@ const EntityDataTable = <Entity extends EntityBase>({
           {displayBulkAction && (
             <BulkActionsRow bulkActions={actions}
                             selectedEntities={selectedEntities}
-                            setSelectedEntities={_setSelectedEntities} />
+                            setSelectedEntities={setSelectedEntities} />
           )}
         </div>
         <LayoutConfigRow>
@@ -290,7 +282,7 @@ const EntityDataTable = <Entity extends EntityBase>({
                      actionsColWidth={actionsColWidth}
                      columnsWidths={columnsWidths}
                      selectedEntities={selectedEntities}
-                     setSelectedEntities={_setSelectedEntities}
+                     setSelectedEntities={setSelectedEntities}
                      data={data}
                      columnRenderersByAttribute={columnRenderersByAttribute}
                      onSortChange={onSortChange}
