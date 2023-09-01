@@ -108,6 +108,15 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.google.inject</groupId>

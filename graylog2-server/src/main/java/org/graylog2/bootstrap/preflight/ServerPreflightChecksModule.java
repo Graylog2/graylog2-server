@@ -47,7 +47,6 @@ public class ServerPreflightChecksModule extends Graylog2Module {
                 .build(TrustManagerProvider.class));
 
         bind(CustomCAX509TrustManager.class).asEagerSingleton();
-        bind(String.class).annotatedWith(JwtBearerToken.class).toProvider(JwtBearerTokenProvider.class).asEagerSingleton();
 
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();
@@ -55,6 +54,7 @@ public class ServerPreflightChecksModule extends Graylog2Module {
         bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(AuditEventSender.class).to(NullAuditEventSender.class);
 
+        bind(String.class).annotatedWith(JwtBearerToken.class).toProvider(JwtBearerTokenProvider.class).asEagerSingleton();
         // The MongoDBPreflightCheck is not registered here, because it is called separately from ServerBootstrap
         addPreflightCheck(SearchDbPreflightCheck.class);
         addPreflightCheck(DiskJournalPreflightCheck.class);

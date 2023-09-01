@@ -31,7 +31,6 @@ import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.security.JwtBearerToken;
-import org.graylog2.security.JwtBearerTokenProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;

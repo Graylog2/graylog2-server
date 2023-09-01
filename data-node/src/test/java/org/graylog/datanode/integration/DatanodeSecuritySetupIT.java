@@ -28,6 +28,7 @@ import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
+import org.graylog2.security.JwtBearerTokenProvider;
 import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,11 +37,15 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLHandshakeException;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -58,6 +63,8 @@ public class DatanodeSecuritySetupIT {
     private String httpPassword;
     private KeyStore trustStore;
     private String containerHostname;
+
+    static final String SIGNING_SECRET = "0123456789012345678901234567890123456789012345678901234567890987654321098765432109876543211";
 
     @BeforeEach
     void setUp() throws IOException, GeneralSecurityException {
@@ -103,16 +110,19 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
 
             datanodeContainer.withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true");
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", SIGNING_SECRET);
         }).start();
     }
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
+        final String jwtToken = JwtBearerTokenProvider.createToken(SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.ofSeconds(180));
+        LOG.info("JWT Token: " + jwtToken);
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore, jwtToken);
 
         try {
-            given().headers( "Authorization", "Bearer " + "TODO: create bearerToken")
+            given().header( "Authorization", "Bearer " + jwtToken)
                 .trustStore(trustStore)
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
@@ -124,12 +134,13 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort, KeyStore trustStore) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore, final String jwtToken) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
+                .retryIfException(input -> input instanceof SSLHandshakeException)
                 .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
@@ -137,7 +148,7 @@ public class DatanodeSecuritySetupIT {
             var hostname = Tools.getLocalCanonicalHostname();
             var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
             LOG.info("Trying to connect to: {}", url);
-            retryer.call(() -> RestAssured.given()
+            retryer.call(() -> RestAssured.given().header( "Authorization", "Bearer " + jwtToken)
                     .trustStore(trustStore)
                     .get(url)
                     .then());

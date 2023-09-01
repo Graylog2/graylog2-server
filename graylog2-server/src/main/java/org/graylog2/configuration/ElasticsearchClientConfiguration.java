@@ -38,15 +38,6 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {ListOfURIsWithHostAndSchemeValidator.class})
     List<URI> elasticsearchHosts = new ArrayList<>();
 
-    @Parameter(value = "opensearch_use_jwt_authentication")
-    boolean opensearchUseJwtAuthentication = false;
-
-    @Parameter(value = "opensearch_jwt_token_caching_duration")
-    Duration opensearchJwtTokenCachingDuration = Duration.seconds(60);
-
-    @Parameter(value = "opensearch_jwt_token_expiration_duration")
-    Duration opensearchJwtTokenExpirationDuration = Duration.seconds(180);
-
     @Parameter(value = "elasticsearch_connect_timeout", validators = {PositiveDurationValidator.class})
     Duration elasticsearchConnectTimeout = Duration.seconds(10);
 
@@ -100,4 +91,13 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
+
+    @Parameter(value = "opensearch_use_jwt_authentication")
+    boolean opensearchUseJwtAuthentication = false;
+
+    @Parameter(value = "opensearch_jwt_token_caching_duration")
+    Duration opensearchJwtTokenCachingDuration = Duration.seconds(60);
+
+    @Parameter(value = "opensearch_jwt_token_expiration_duration")
+    Duration opensearchJwtTokenExpirationDuration = Duration.seconds(180);
 }
