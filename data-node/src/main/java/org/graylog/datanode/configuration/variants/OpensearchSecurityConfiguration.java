@@ -79,7 +79,7 @@ public class OpensearchSecurityConfiguration {
      * initial set of opensearch users, it will create and persist a truststore that will be set as a system-wide
      * truststore.
      */
-    public OpensearchSecurityConfiguration configure(Configuration localConfiguration) throws GeneralSecurityException, IOException {
+    public OpensearchSecurityConfiguration configure(Configuration localConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
         if (securityEnabled()) {
 
             logCertificateInformation("transport certificate", transportCertificate);
@@ -98,7 +98,7 @@ public class OpensearchSecurityConfiguration {
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
-            enableJwtInConfig(opensearchConfigDir, localConfiguration.getPasswordSecret());
+            enableJwtInConfig(opensearchConfigDir, signingKey);
         }
         return this;
     }
@@ -152,7 +152,7 @@ public class OpensearchSecurityConfiguration {
         return result;
     }
 
-    private void enableJwtInConfig(final Path opensearchConfigDir, final String signingKey) throws IOException {
+    private void enableJwtInConfig(final Path opensearchConfigDir, final byte[] signingKey) throws IOException {
         final File file = opensearchConfigDir.resolve(Path.of("opensearch-security", "config.yml")).toFile();
         Map<String, Object> contents = objectMapper.readValue(file, new TypeReference<>() {});
 
@@ -161,7 +161,7 @@ public class OpensearchSecurityConfiguration {
         jwt_auth_domain.put("transport_enabled", true);
 
         Map<String, Object> config = getMap(jwt_auth_domain, "http_authenticator", "config");
-        config.put("signing_key", Base64.getEncoder().encodeToString(signingKey.getBytes(StandardCharsets.UTF_8)));
+        config.put("signing_key", Base64.getEncoder().encodeToString(signingKey));
         config.put("roles_key", "os_roles");
 
         objectMapper.writeValue(file, contents);

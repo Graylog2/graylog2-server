@@ -112,8 +112,7 @@ public class DatanodeSecuritySetupIT {
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
 
         try {
-            given()
-                .auth().basic(httpUsername, httpPassword)
+            given().headers( "Authorization", "Bearer " + "TODO: create bearerToken")
                 .trustStore(trustStore)
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()

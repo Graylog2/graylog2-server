@@ -90,9 +90,9 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 false,
                 new BasicCredentialsProvider(),
                 null,
-                "maybe_want_jwt_here",
+                true,
                 false,
-                false)
+                "maybe_want_jwt_here")
                 .get();
     }
 

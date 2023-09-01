@@ -204,10 +204,6 @@ public class Configuration extends BaseConfiguration {
         }
     }
 
-    public String getPasswordSecret() {
-        return passwordSecret;
-    }
-
     @Parameter(value = "rest_api_password")
     private String restApiPassword;
 

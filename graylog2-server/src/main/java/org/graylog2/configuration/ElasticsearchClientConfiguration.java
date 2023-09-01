@@ -25,12 +25,10 @@ import org.graylog2.configuration.converters.URIListConverter;
 import org.graylog2.configuration.validators.ElasticsearchVersionValidator;
 import org.graylog2.configuration.validators.HttpOrHttpsSchemeValidator;
 import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidator;
-import org.graylog2.configuration.validators.NonEmptyListValidator;
 import org.graylog2.storage.SearchVersion;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ElasticsearchClientConfiguration {
@@ -40,8 +38,8 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {ListOfURIsWithHostAndSchemeValidator.class})
     List<URI> elasticsearchHosts = new ArrayList<>();
 
-    @Parameter(value = "opensearch_use_jwt")
-    boolean opensearchUseJwt = false;
+    @Parameter(value = "opensearch_use_jwt_authentication")
+    boolean opensearchUseJwtAuthentication = false;
 
     @Parameter(value = "elasticsearch_connect_timeout", validators = {PositiveDurationValidator.class})
     Duration elasticsearchConnectTimeout = Duration.seconds(10);

@@ -16,17 +16,33 @@
  */
 package org.graylog2.security;
 
+import com.google.common.base.Suppliers;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
-public class OpenSearchJWTTokenUtil {
-    public static String createToken(byte[] apiKeySecretBytes) {
+@Singleton
+public class JwtBearerTokenProvider implements Provider<String> {
+    private final Supplier<String> authHeaderBearerString;
+
+    @Inject
+    public JwtBearerTokenProvider(@Named("password_secret") String signingKey) {
+        authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8)), 5, TimeUnit.SECONDS);
+    }
+
+   private String createToken(byte[] apiKeySecretBytes) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
         long nowMillis = System.currentTimeMillis();
@@ -34,16 +50,20 @@ public class OpenSearchJWTTokenUtil {
 
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
-        JwtBuilder builder = Jwts.builder().setId("graylog datanode connect")
+        JwtBuilder builder = Jwts.builder().setId("graylog datanode connect " + nowMillis)
                 .addClaims(Map.of("os_roles", "admin"))
                 .setIssuedAt(now)
                 .setSubject("admin")
                 .setIssuer("graylog")
                 .setNotBefore(now)
-                // TODO: expiration to a smaller time, automatic refresh
-                .setExpiration(new Date(nowMillis + 24*60*60*1000))
-                .signWith(signatureAlgorithm, signingKey);
+                .setExpiration(new Date(nowMillis + 30*1000))
+                .signWith(signingKey, signatureAlgorithm);
 
         return builder.compact();
+    }
+
+    @Override
+    public String get() {
+        return authHeaderBearerString.get();
     }
 }

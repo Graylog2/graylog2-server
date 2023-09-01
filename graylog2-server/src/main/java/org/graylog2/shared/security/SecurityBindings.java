@@ -26,6 +26,8 @@ import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponse
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.DefaultX509TrustManager;
+import org.graylog2.security.JwtBearerToken;
+import org.graylog2.security.JwtBearerTokenProvider;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -46,6 +48,7 @@ public class SecurityBindings extends PluginModule {
                 .implement(TrustManager.class, DefaultX509TrustManager.class)
                 .build(TrustManagerProvider.class));
         bind(CustomCAX509TrustManager.class).asEagerSingleton();
+        bind(String.class).annotatedWith(JwtBearerToken.class).toProvider(JwtBearerTokenProvider.class).asEagerSingleton();
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                 .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);
