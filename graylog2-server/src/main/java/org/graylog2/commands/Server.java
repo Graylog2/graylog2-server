@@ -78,6 +78,7 @@ import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.indexer.FieldTypeManagementModule;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
@@ -179,7 +180,7 @@ public class Server extends ServerBootstrap {
                 new RetentionStrategyBindings(elasticsearchConfiguration),
                 new PeriodicalBindings(),
                 new ObjectMapperModule(chainingClassLoader),
-                new RestApiBindings(configuration, featureFlags.isOn("field_types_management")),
+                new RestApiBindings(configuration),
                 new PasswordAlgorithmBindings(),
                 new DecoratorBindings(),
                 new AuditBindings(),
@@ -205,6 +206,10 @@ public class Server extends ServerBootstrap {
                 new StreamsModule(),
                 new TracingModule()
         );
+
+        if (featureFlags.isOn("field_types_management")) {
+            modules.add(new FieldTypeManagementModule());
+        }
         return modules.build();
     }
 
