@@ -15,10 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type TypeHistoryItem = {
-  timestamp: string,
-  type: string,
-}
+export type TypeHistoryItem = string;
 
 export type FieldTypeUsage = {
   id: string,

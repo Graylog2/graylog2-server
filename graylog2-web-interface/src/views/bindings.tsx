@@ -295,7 +295,7 @@ const exports: PluginExports = {
     {
       type: 'change-field-type',
       title: 'Change field type',
-      isEnabled: () => true,
+      isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
       component: ChangeFieldType,
     },

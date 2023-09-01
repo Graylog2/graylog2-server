@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useContext } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -38,7 +38,9 @@ import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/u
 import QueryHelper from 'components/common/QueryHelper';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useFiledTypeOptions from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeOptions';
-import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
+import { ActionContext } from 'views/logic/ActionContext';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import { filtersToStreamSet } from 'views/logic/queries/Query';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -70,7 +72,11 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
   const [newFieldType, setNewFieldType] = useState(null);
   const { data: { options: typeOptions }, isLoading: isOptionsLoading } = useFiledTypeOptions();
   const initialSelection = Array(100).fill(null).map((_, i) => `some id ${i}`);
+  const { widget, message } = useContext(ActionContext);
+  const currentQuery = useCurrentQuery();
+  const currentStreams = useMemo(() => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS(), [message?.fields?.streams, currentQuery.filter, widget?.streams]);
 
+  console.log({ currentStreams });
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -147,26 +153,27 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
                         onCancel={onClose}
                         show={show}
                         bsSize="large">
-      <Alert bsStyle="warning">
-        <Icon name="info-circle" />&nbsp;
-        Text about how bad to change this value and how you ca brake everything
-      </Alert>
-      <StyledSelect inputId="field_type"
-                    valueKey="id"
-                    options={typeOptions}
-                    value={newFieldType}
-                    onChange={(value) => setNewFieldType(value)}
-                    placeholder="Select field type"
-                    required />
-      <Alert bsStyle="info">
-        <Icon name="info-circle" />&nbsp;
-        By default the type will be changed in all possible indexes. But you can choose in which index sets you would like to make the change
-      </Alert>
-      <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
-        <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
-        {showDetails ? 'Hide index sets' : 'Show index sets'}
-      </Button>
-      {
+      <div>
+        <Alert bsStyle="warning">
+          <Icon name="info-circle" />&nbsp;
+          Text about how bad to change this value and how you ca brake everything
+        </Alert>
+        <StyledSelect inputId="field_type"
+                      valueKey="id"
+                      options={typeOptions}
+                      value={newFieldType}
+                      onChange={(value) => setNewFieldType(value)}
+                      placeholder="Select field type"
+                      required />
+        <Alert bsStyle="info">
+          <Icon name="info-circle" />&nbsp;
+          By default the type will be changed in all possible indexes. But you can choose in which index sets you would like to make the change
+        </Alert>
+        <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
+          <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
+          {showDetails ? 'Hide index sets' : 'Show index sets'}
+        </Button>
+        {
         showDetails && (
           <Container>
             <PaginatedList onChange={onPageChange}
@@ -212,12 +219,13 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
         )
       }
 
-      <Input type="checkbox"
-             id="rotate"
-             name="rotate"
-             label="Rotating indexes"
-             onChange={() => setRotated((cur) => !cur)}
-             checked={rotated} />
+        <Input type="checkbox"
+               id="rotate"
+               name="rotate"
+               label="Rotating indexes"
+               onChange={() => setRotated((cur) => !cur)}
+               checked={rotated} />
+      </div>
     </BootstrapModalForm>
   );
 };

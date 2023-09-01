@@ -34,7 +34,7 @@ type Options = {
 
 const fieldTypeUsagesUrl = qualifyUrl('/dashboards');
 
-const fetchFieldTypeUsages = (field: string, searchParams: SearchParams) => {
+const fetchFieldTypeUsages = ({ field, streamIds }: { field: string, streamIds: Array<string>}, searchParams: SearchParams) => {
   const url = PaginationURL(
     fieldTypeUsagesUrl,
     searchParams.page,
@@ -42,19 +42,14 @@ const fetchFieldTypeUsages = (field: string, searchParams: SearchParams) => {
     searchParams.query,
     { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
-  // fetch<PaginatedFieldTypeUsagesResponse>('GET', qualifyUrl(url))
+  // fetch<PaginatedFieldTypeUsagesResponse>('POST', qualifyUrl(url), {})
   return Promise.resolve({
     elements: Array(100).fill(null).map((_, i) => (
       {
         id: `some id ${i}`,
         indexSet: `Index set name ${i}`,
         streams: ['stream 1', 'stream 2', 'stream 3', 'stream 4', 'stream 5'],
-        typeHistory: [
-          {
-            timestamp: '2001-01-01 15:00',
-            type: 'string',
-          },
-        ],
+        typeHistory: ['string', 'number', 'date'],
       }
     )),
     total: 100,
@@ -88,7 +83,7 @@ const fetchFieldTypeUsages = (field: string, searchParams: SearchParams) => {
         id: 'typeHistory',
         searchable: true,
         sortable: true,
-        title: 'Type history',
+        title: 'Current type',
         type: 'STRING',
       },
     ],

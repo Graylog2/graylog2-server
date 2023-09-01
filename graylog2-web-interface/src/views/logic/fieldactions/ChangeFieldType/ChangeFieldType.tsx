@@ -26,6 +26,7 @@ const ChangeFieldType = ({
   onClose,
 }: ActionComponentProps) => {
   const [show, setShow] = useState(true);
+
   const { putFiledTypeMutation } = usePutFiledTypeMutation();
   const handleOnClose = useCallback(() => {
     setShow(false);

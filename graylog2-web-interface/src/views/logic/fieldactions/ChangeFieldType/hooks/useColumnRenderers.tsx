@@ -15,14 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import take from 'lodash/take';
+import last from 'lodash/last';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { FieldTypeUsage, TypeHistoryItem } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { HoverForHelp, Timestamp } from 'components/common';
 
-const Container = styled.div`
-  display: flex;
+const RestTypesContainer = styled.i(({ theme }) => css`
+  font-size: ${theme.fonts.size.small};
+  display: block;
+  margin-top: 5px;
+`);
+
+const FlexContainer = styled.div`
+  display: inline-flex;
   gap: 5px;
   flex-wrap: wrap;
 `;
@@ -31,21 +38,26 @@ export const useColumnRenderers = () => {
   const customColumnRenderers: ColumnRenderers<FieldTypeUsage> = useMemo(() => ({
     attributes: {
       streams: {
-        renderCell: (streams: Array<string>) => <Container>{streams.map((stream) => <span>{stream}</span>)}</Container>,
+        renderCell: (streams: Array<string>) => <FlexContainer>{streams.map((stream) => <span>{stream}</span>)}</FlexContainer>,
       },
       typeHistory: {
-        renderCell: (items: Array<TypeHistoryItem>) => (
-          <Container>
-            {items.map((item) => (
-              <span>
-                {item.type}
-                <HoverForHelp displayLeftMargin>
-                  <Timestamp dateTime={item.timestamp} />
-                </HoverForHelp>
-              </span>
-            ))}
-          </Container>
-        ),
+        renderCell: (items: Array<TypeHistoryItem>) => {
+          const latest = last(items);
+          const rest = take(items, items.length - 1);
+
+          return (
+            <div>
+              <span><b>{latest}</b></span>
+              <RestTypesContainer>
+                (previous values:
+                <FlexContainer>
+                  {rest.map((item) => <span>{item}</span>)}
+                </FlexContainer>
+                )
+              </RestTypesContainer>
+            </div>
+          );
+        },
       },
     },
   }), []);
