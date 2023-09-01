@@ -16,10 +16,11 @@
  */
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import type {CompletionResult, Token} from 'views/components/searchbar/queryinput/ace-types';
+import type { CompletionResult, Token } from 'views/components/searchbar/queryinput/ace-types';
 import { createSearch } from 'fixtures/searches';
 
-import FieldNameCompletion, {Suggestion} from './FieldNameCompletion';
+import type { Suggestion } from './FieldNameCompletion';
+import FieldNameCompletion from './FieldNameCompletion';
 
 const _createField = (name: string) => FieldTypeMapping.create(name, FieldType.create('string', []));
 
@@ -38,7 +39,6 @@ describe('FieldNameCompletion', () => {
     userTimezone,
     view: createSearch(),
   };
-
 
   const completionsFor = ({
     currentToken,
@@ -66,11 +66,11 @@ describe('FieldNameCompletion', () => {
       prefix,
       prevToken,
       tokens,
-    }).map((result) => result[targetKey])
-  }
+    }).map((result) => result[targetKey]);
+  };
 
   it('returns empty list if inputs are empty', () => {
-    expect(completionsFor({ prefix: '', currentToken: null, tokens: [] })).toEqual([])
+    expect(completionsFor({ prefix: '', currentToken: null, tokens: [] })).toEqual([]);
   });
 
   it('returns matching fields if prefix is present in one field name', () => {
@@ -79,7 +79,7 @@ describe('FieldNameCompletion', () => {
       value: 'mess',
     };
 
-    expect(completionsFor({ prefix: 'mess', currentToken: token, tokens: [token] })).toEqual(['message'])
+    expect(completionsFor({ prefix: 'mess', currentToken: token, tokens: [token] })).toEqual(['message']);
   });
 
   it('returns matching fields if prefix is present in at least one field name', () => {
@@ -92,8 +92,8 @@ describe('FieldNameCompletion', () => {
       prefix: 'e',
       currentToken: token,
       tokens: [token],
-      staticSuggestions: []
-    })).toEqual(['source', 'message', 'timestamp'])
+      staticSuggestions: [],
+    })).toEqual(['source', 'message', 'timestamp']);
   });
 
   it('suffixes matching fields with colon', () => {
@@ -107,7 +107,7 @@ describe('FieldNameCompletion', () => {
       currentToken: token,
       tokens: [token],
       targetKey: 'value',
-      staticSuggestions: []
+      staticSuggestions: [],
     })).toEqual(['source:', 'message:', 'timestamp:']);
   });
 
