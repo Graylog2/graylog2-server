@@ -121,10 +121,12 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", "<root-pw-sha2>")
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb:27017/graylog")
                 .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
+                .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", "config")
+                .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
                 .withExposedPorts(9200, 9300)
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/_cluster/health").forPort(OPENSEARCH_PORT).forStatusCode(200).forResponsePredicate(s -> s.contains("\"status\":\"green\"")));
+                .waitingFor(Wait.forHttp("/_cluster/health").forPort(OPENSEARCH_PORT).forStatusCode(200).forResponsePredicate(s -> s.contains("\"status\":\"green\"")).withStartupTimeout(java.time.Duration.ofSeconds(120)));
     }
 
     @Override
