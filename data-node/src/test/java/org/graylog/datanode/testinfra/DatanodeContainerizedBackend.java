@@ -112,8 +112,14 @@ public class DatanodeContainerizedBackend {
         return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
     }
 
+    private static String getArch() {
+        final String arch = System.getProperty("os.arch");
+        // See SystemArchProvider for reference, we do it the other way around here because of OpenSearch packaging/naming
+        return "arm64".equals(arch) ? "aarch64" : arch;
+    }
+
     private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
-        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-x64.tar.gz";
+        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-" + getArch() + ".tar.gz";
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
                 // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
                 // be later used by the ADD command
