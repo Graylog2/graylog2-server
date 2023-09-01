@@ -28,7 +28,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.time.Duration;
+import com.github.joschi.jadconfig.util.Duration;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +42,7 @@ public class JwtBearerTokenProvider implements Provider<String> {
     public JwtBearerTokenProvider(@Named("password_secret") String signingKey,
                                   @Named("opensearch_jwt_token_expiration_duration") final Duration tokenExpirationDuration,
                                   @Named("opensearch_jwt_token_caching_duration") final Duration cachingDuration) {
-        authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8), tokenExpirationDuration), cachingDuration.getSeconds(), TimeUnit.SECONDS);
+        authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8), tokenExpirationDuration), cachingDuration.toSeconds(), TimeUnit.SECONDS);
     }
 
    public static String createToken(final byte[] apiKeySecretBytes, final Duration tokenExpirationDuration) {
@@ -59,7 +59,7 @@ public class JwtBearerTokenProvider implements Provider<String> {
                 .setSubject("admin")
                 .setIssuer("graylog")
                 .setNotBefore(now)
-                .setExpiration(new Date(nowMillis + tokenExpirationDuration.toMillis()))
+                .setExpiration(new Date(nowMillis + tokenExpirationDuration.toMilliseconds()))
                 .signWith(signingKey, signatureAlgorithm);
 
         return builder.compact();
