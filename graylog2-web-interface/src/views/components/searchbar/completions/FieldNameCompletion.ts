@@ -27,7 +27,7 @@ import {
 import type { CompletionResult, Token } from '../queryinput/ace-types';
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
-type Suggestion = Readonly<{
+export type Suggestion = Readonly<{
   name: string,
   type: Readonly<{
     type: string,
