@@ -56,7 +56,7 @@ public class JwtBearerTokenProvider implements Provider<String> {
                 .setSubject("admin")
                 .setIssuer("graylog")
                 .setNotBefore(now)
-                .setExpiration(new Date(nowMillis + 24*60*60*1000))
+                .setExpiration(new Date(nowMillis + 180*1000))
                 .signWith(signingKey, signatureAlgorithm);
 
         return builder.compact();
