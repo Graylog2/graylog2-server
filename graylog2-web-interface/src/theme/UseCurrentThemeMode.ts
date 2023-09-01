@@ -15,85 +15,71 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback, useContext, useState } from 'react';
+import type { ColorScheme } from '@graylog/sawmill';
 
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 
-import type { ThemeMode } from './constants';
+import type { LegacyColorScheme } from './constants';
 import {
   PREFERENCES_THEME_MODE,
   DEFAULT_THEME_MODE,
-  THEME_MODE_DARK,
-  NEW_THEME_MODE_DARK,
-  THEME_MODE_LIGHT, NEW_THEME_MODE_LIGHT,
+  LEGACY_COLOR_SCHEME_DARK,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
 } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
 
-type CurrentUser = {
-  currentUser?: {
-    username: string;
-    read_only: boolean;
-  };
+const modeFromPreferences = (userPreferences: Record<typeof PREFERENCES_THEME_MODE, LegacyColorScheme>) => {
+  if (userPreferences[PREFERENCES_THEME_MODE]) {
+    return userPreferences[PREFERENCES_THEME_MODE] === LEGACY_COLOR_SCHEME_DARK ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
+  }
+
+  return null;
 };
 
-type NewThemeMode = typeof NEW_THEME_MODE_LIGHT | typeof NEW_THEME_MODE_DARK;
+const modeFromStore = () => {
+  const mode = Store.get(PREFERENCES_THEME_MODE);
 
-const toNewThemeModeName = (themeMode: ThemeMode): NewThemeMode => {
-  if (themeMode === THEME_MODE_DARK) {
-    return NEW_THEME_MODE_DARK;
+  if (mode) {
+    return mode === LEGACY_COLOR_SCHEME_DARK ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
   }
 
-  if (themeMode === THEME_MODE_LIGHT) {
-    return NEW_THEME_MODE_LIGHT;
-  }
-
-  return themeMode;
+  return null;
 };
 
-const fromNewThemeModeName = (themeMode: NewThemeMode): ThemeMode => {
-  if (themeMode === NEW_THEME_MODE_DARK) {
-    return THEME_MODE_DARK;
-  }
-
-  if (themeMode === NEW_THEME_MODE_LIGHT) {
-    return THEME_MODE_LIGHT;
-  }
-
-  return themeMode;
-};
-
-const _getInitialThemeMode = (userPreferences, browserThemePreference, initialThemeModeOverride) => {
+const getInitialThemeMode = (userPreferences: Record<typeof PREFERENCES_THEME_MODE, LegacyColorScheme>, browserThemePreference: ColorScheme, initialThemeModeOverride: ColorScheme) => {
   if (initialThemeModeOverride) {
     return initialThemeModeOverride;
   }
 
-  const userThemePreference = fromNewThemeModeName(userPreferences[PREFERENCES_THEME_MODE]) ?? Store.get(PREFERENCES_THEME_MODE);
+  const userThemePreference = modeFromPreferences(userPreferences) ?? modeFromStore();
 
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
 
-const useCurrentThemeMode = (initialThemeModeOverride: ThemeMode): [ThemeMode, (newThemeMode: ThemeMode) => void] => {
+const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
   const browserThemePreference = usePrefersColorScheme();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
-    username: (userStore as CurrentUser)?.currentUser?.username,
-    userIsReadOnly: (userStore as CurrentUser)?.currentUser?.read_only ?? true,
+    username: userStore.currentUser?.username,
+    userIsReadOnly: userStore.currentUser?.read_only ?? true,
   }));
 
   const userPreferences = useContext(UserPreferencesContext);
-  const initialThemeMode = _getInitialThemeMode(userPreferences, browserThemePreference, initialThemeModeOverride);
-  const [currentThemeMode, setCurrentThemeMode] = useState<ThemeMode>(initialThemeMode);
+  const initialThemeMode = getInitialThemeMode(userPreferences, browserThemePreference, initialThemeModeOverride);
+  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(initialThemeMode);
 
-  const changeCurrentThemeMode = useCallback((newThemeMode: ThemeMode) => {
+  const changeCurrentThemeMode = useCallback((newThemeMode: ColorScheme) => {
     setCurrentThemeMode(newThemeMode);
     Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 
     if (!userIsReadOnly) {
-      const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: toNewThemeModeName(newThemeMode) };
+      const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
 
       PreferencesStore.saveUserPreferences(username, nextPreferences);
     }
@@ -102,4 +88,4 @@ const useCurrentThemeMode = (initialThemeModeOverride: ThemeMode): [ThemeMode, (
   return [currentThemeMode, changeCurrentThemeMode];
 };
 
-export default useCurrentThemeMode;
+export default usePreferredColorScheme;

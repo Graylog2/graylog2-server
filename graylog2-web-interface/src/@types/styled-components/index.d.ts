@@ -23,7 +23,7 @@ declare module 'styled-components' {
   import type { Colors } from 'src/theme/colors';
   import type { Fonts } from 'src/theme/fonts';
   import type { Utils } from 'src/theme/utils';
-  import type { ThemeMode } from 'src/theme/constants';
+  import type { LegacyColorScheme } from 'src/theme/constants';
   import type { Spacings } from 'src/theme/spacings';
   import type { Breakpoints } from 'src/theme/breakpoints';
 
@@ -32,7 +32,7 @@ declare module 'styled-components' {
     colors: Colors,
     fonts: Fonts,
     utils: Utils,
-    mode: ThemeMode,
+    mode: LegacyColorScheme,
     spacings: Spacings,
     changeMode: (string) => void,
     components: { [component: string]: any }

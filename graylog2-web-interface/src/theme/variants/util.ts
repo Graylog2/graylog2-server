@@ -19,7 +19,7 @@ import type { $PropertyType } from 'utility-types';
 
 import type { Colors } from 'theme/colors';
 
-import type { ThemeMode } from '../constants';
+import type { LegacyColorScheme } from '../constants';
 import { THEME_MODE_LIGHT, THEME_MODE_DARK } from '../constants';
 
 const lightThemeRatio = ['0.22', '0.55', '0.88'];
@@ -53,7 +53,7 @@ const generateGrayScale = (colorStart, colorEnd) => {
   return gray;
 };
 
-const generateTableColors = (mode: ThemeMode, variant: $PropertyType<Colors, 'variant'>) => {
+const generateTableColors = (mode: LegacyColorScheme, variant: $PropertyType<Colors, 'variant'>) => {
   if (![THEME_MODE_DARK, THEME_MODE_LIGHT].includes(mode)) {
     throw new Error(`Requires "${THEME_MODE_DARK}" or "${THEME_MODE_LIGHT}" mode option.`);
   }
@@ -85,7 +85,7 @@ const generateTableColors = (mode: ThemeMode, variant: $PropertyType<Colors, 'va
   return tableColors;
 };
 
-const generateVariantColors = (mode: ThemeMode, variant) => {
+const generateVariantColors = (mode: LegacyColorScheme, variant) => {
   if (![THEME_MODE_DARK, THEME_MODE_LIGHT].includes(mode)) {
     throw new Error(`Requires "${THEME_MODE_DARK}" or "${THEME_MODE_LIGHT}" mode option.`);
   }
@@ -118,7 +118,7 @@ const generateVariantColors = (mode: ThemeMode, variant) => {
 };
 
 const generateInputColors = (
-  _mode: ThemeMode,
+  _mode: LegacyColorScheme,
   global: $PropertyType<Colors, 'global'>,
   gray: $PropertyType<Colors, 'gray'>,
   variant: $PropertyType<Colors, 'variant'>,
@@ -138,7 +138,7 @@ const generateInputColors = (
 };
 
 const generateGlobalColors = (
-  mode: ThemeMode,
+  mode: LegacyColorScheme,
   brand: $PropertyType<Colors, 'brand'>,
   global: $PropertyType<Colors, 'global'>,
   variant: $PropertyType<Colors, 'variant'>,

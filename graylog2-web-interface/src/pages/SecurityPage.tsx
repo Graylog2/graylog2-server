@@ -23,7 +23,7 @@ import SecurityNoLicenseImageDark from 'assets/security-no-license-bg-dark.png';
 import SecurityNoLicenseOverlay from 'assets/security-no-license-overlay.png';
 import SecurityNoLicenseOverlayDark from 'assets/security-no-license-overlay-dark.png';
 import ThemeModeContext from 'theme/ThemeModeContext';
-import type { ThemeMode } from 'theme/constants';
+import type { LegacyColorScheme } from 'theme/constants';
 
 const generateStyles = () => css<{ backgroundImage: string }>`
   body {
@@ -45,10 +45,10 @@ const SecurityPageStyles = createGlobalStyle`
 const SecurityPage = () => (
   <PageLayout>
     <ThemeModeContext.Consumer>
-      {(theme: ThemeMode) => (<SecurityPageStyles backgroundImage={theme === 'noir' ? SecurityNoLicenseImageDark : SecurityNoLicenseImage} />)}
+      {(theme: LegacyColorScheme) => (<SecurityPageStyles backgroundImage={theme === 'noir' ? SecurityNoLicenseImageDark : SecurityNoLicenseImage} />)}
     </ThemeModeContext.Consumer>
     <ThemeModeContext.Consumer>
-      {(theme: ThemeMode) => (
+      {(theme: LegacyColorScheme) => (
         <div>
           <a href="https://www.graylog.org/explore-security/" target="_blank" rel="noreferrer">
             <img style={{ height: '500px' }} src={theme === 'noir' ? SecurityNoLicenseOverlayDark : SecurityNoLicenseOverlay} alt="security-overlay" />

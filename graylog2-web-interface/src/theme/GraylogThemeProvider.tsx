@@ -15,95 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import { ThemeProvider } from 'styled-components';
+import type { ColorScheme } from '@graylog/sawmill';
+import { SawmillSC } from '@graylog/sawmill';
+import { useMemo } from 'react';
 
-import buttonStyles from 'components/bootstrap/styles/buttonStyles';
-import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-import { breakpoints, colors, fonts, utils, spacings } from './index';
 import RegeneratableThemeContext from './RegeneratableThemeContext';
 import ThemeModeContext from './ThemeModeContext';
-import type { Colors } from './colors';
-import type { ThemeMode } from './constants';
-import { THEME_MODES } from './constants';
+import { THEME_MODES, TO_LEGACY_THEME_MODE } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
-interface generateCustomThemeColorsType {
-  graylogColors: Colors,
-  mode: ThemeMode,
-  initialLoad: boolean,
+type Props = {
+  children: React.ReactNode,
+  initialThemeModeOverride: ColorScheme
 }
 
-interface generateThemeType {
-  changeMode: (ThemeMode) => void,
-  mode: ThemeMode,
-  initialLoad?: boolean,
-  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomThemeColorsType) => Promise<Colors> | undefined,
-}
-
-function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
-  const formattedUtils = {
-    ...utils,
-    colorLevel: utils.colorLevel(currentThemeColors),
-    readableColor: utils.readableColor(currentThemeColors),
-  };
-
-  return {
-    mode,
-    changeMode,
-    breakpoints,
-    colors: currentThemeColors,
-    fonts,
-    spacings,
-    components: {
-      button: buttonStyles({ colors: currentThemeColors, utils: formattedUtils }),
-      aceEditor: aceEditorStyles({ colors: currentThemeColors }),
-    },
-    utils: formattedUtils,
-  };
-}
-
-const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLoad = false }: generateThemeType) => {
-  if (generateCustomThemeColors) {
-    return generateCustomThemeColors({
-      graylogColors: colors[mode],
-      mode,
-      initialLoad,
-    }).then((currentThemeColors) => buildTheme(currentThemeColors, changeMode, mode));
-  }
-
-  return Promise.resolve(colors[mode]).then((currentThemeColors) => buildTheme(currentThemeColors, changeMode, mode));
-};
-
-const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
-  const [mode, changeMode] = useCurrentThemeMode(initialThemeModeOverride);
-
+const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => {
+  const [colorScheme, changeColorScheme] = useCurrentThemeMode(initialThemeModeOverride);
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
-  const generateCustomThemeColors = themeCustomizer?.[0]?.actions?.generateCustomThemeColors;
+  const { customThemeColors } = themeCustomizer?.[0]?.hooks?.useThemeColors() ?? {};
 
-  const [theme, setTheme] = useState<DefaultTheme>();
-
-  useEffect(() => {
-    _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: true }).then(setTheme);
-  }, [changeMode, generateCustomThemeColors, mode, setTheme]);
-
-  const regeneratableThemeContextValue = useMemo(() => {
-    const regenerateTheme = () => {
-      _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: false }).then(setTheme);
-    };
-
-    return ({ regenerateTheme });
-  }, [changeMode, generateCustomThemeColors, mode]);
-
-  const themeModeContextValue = useMemo(() => mode, [mode]);
+  const theme = useMemo(() => new SawmillSC({
+    colorScheme,
+    changeColorScheme,
+    customColors: customThemeColors?.[TO_LEGACY_THEME_MODE[colorScheme]],
+  }), [changeColorScheme, colorScheme, customThemeColors]);
 
   return theme ? (
-    <RegeneratableThemeContext.Provider value={regeneratableThemeContextValue}>
-      <ThemeModeContext.Provider value={themeModeContextValue}>
+    <RegeneratableThemeContext.Provider value={theme}>
+      <ThemeModeContext.Provider value={colorScheme}>
         <ThemeProvider theme={theme}>
           {children}
         </ThemeProvider>

@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 
-import type { ThemeMode } from 'theme/constants';
-import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE } from 'theme/constants';
+import type { LegacyColorScheme } from 'theme/constants';
+import { LEGACY_DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE } from 'theme/constants';
 
 import { singleton } from '../logic/singleton';
 
@@ -26,7 +26,7 @@ export type UserPreferences = {
   updateUnfocussed: boolean,
   searchSidebarIsPinned?: boolean,
   dashboardSidebarIsPinned?: boolean,
-  [PREFERENCES_THEME_MODE]: ThemeMode,
+  [PREFERENCES_THEME_MODE]: LegacyColorScheme,
 };
 
 export const defaultUserPreferences = {
@@ -34,7 +34,7 @@ export const defaultUserPreferences = {
   updateUnfocussed: false,
   searchSidebarIsPinned: false,
   dashboardSidebarIsPinned: false,
-  [PREFERENCES_THEME_MODE]: DEFAULT_THEME_MODE,
+  [PREFERENCES_THEME_MODE]: LEGACY_DEFAULT_THEME_MODE,
 };
 
 const UserPreferencesContext = React.createContext<UserPreferences>(defaultUserPreferences);

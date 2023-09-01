@@ -1,0 +1,51 @@
+{
+  "colorScheme": "dark",
+  "fontFamily": "\"Source Sans Pro\", \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+  "fontFamilyMonospace": "\"Ubuntu Mono\", Menlo, Monaco, Consolas, \"Courier New\", monospace",
+  "fontSizes": {
+    "xs": 13.17124185159991,
+    "sm": 14.053715055657104,
+    "md": 16,
+    "lg": 17.072,
+    "xl": 22.127995771681707
+  },
+  "headings": {
+    "fontFamily": "\"Source Sans Pro\", \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+    "sizes": {
+      "h1": {
+        "fontSize": "1.5745299861316333rem"
+      },
+      "h2": {
+        "fontSize": "1.2961572031209998rem"
+      },
+      "h3": {
+        "fontSize": "1.2147677629999998rem"
+      },
+      "h4": {
+        "fontSize": "1.1384889999999999rem"
+      },
+      "h5": {
+        "fontSize": "1.067rem"
+      },
+      "h6": {
+        "fontSize": "1rem"
+      }
+    }
+  },
+  "spacing": {
+    "xxs": "0.24rem",
+    "xs": "0.40rem",
+    "sm": "0.64rem",
+    "md": "1.04rem",
+    "lg": "1.68rem",
+    "xl": "2.72rem"
+  },
+  "components": {
+    "Text": {
+      "defaultProps": {
+        "color": "#fff"
+      }
+    },
+    "Anchor": {}
+  }
+}

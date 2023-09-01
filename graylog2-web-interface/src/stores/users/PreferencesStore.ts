@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 
-import type { PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';
+import type { PREFERENCES_THEME_MODE, LegacyColorScheme } from 'theme/constants';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -46,7 +46,7 @@ export type PreferencesUpdateMap = {
   updateUnfocussed: boolean | BooleanString,
   dashboardSidebarIsPinned?: boolean | BooleanString,
   searchSidebarIsPinned?: boolean | BooleanString,
-  [PREFERENCES_THEME_MODE]: ThemeMode,
+  [PREFERENCES_THEME_MODE]: LegacyColorScheme,
 };
 
 export type PreferencesMap = {
@@ -54,7 +54,7 @@ export type PreferencesMap = {
   updateUnfocussed: boolean,
   dashboardSidebarIsPinned?: boolean,
   searchSidebarIsPinned?: boolean,
-  [PREFERENCES_THEME_MODE]: ThemeMode,
+  [PREFERENCES_THEME_MODE]: LegacyColorScheme,
 };
 
 type PreferencesResponse = {
