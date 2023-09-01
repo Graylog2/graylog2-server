@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.integration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
@@ -38,14 +39,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLHandshakeException;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -116,7 +115,7 @@ public class DatanodeSecuritySetupIT {
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
-        final String jwtToken = JwtBearerTokenProvider.createToken(SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.ofSeconds(180));
+        final String jwtToken = JwtBearerTokenProvider.createToken(SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
         LOG.info("JWT Token: " + jwtToken);
 
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore, jwtToken);
