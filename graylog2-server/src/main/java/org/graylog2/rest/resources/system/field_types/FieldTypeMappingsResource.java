@@ -29,6 +29,7 @@ import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -85,7 +86,7 @@ public class FieldTypeMappingsResource extends RestResource {
                                     @Valid
                                     @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request
     ) {
-        checkPermissions(request.indexSetsIds());
+        checkPermissionsForCreation(request.indexSetsIds());
 
         //TODO: more complex validation of request
         final FieldTypes.Type type = FieldTypeMapper.TYPE_MAP.get(request.newType());
@@ -94,30 +95,14 @@ public class FieldTypeMappingsResource extends RestResource {
         }
 
 
-        CustomFieldMapping customMapping = new CustomFieldMapping(request.fieldName(), type);
+        var customMapping = new CustomFieldMapping(request.fieldName(), type);
         fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();
     }
 
 
-
-    private void checkPermissions(final Set<String> indexSetsIds) {
-//        TODO:
-//        Role permission check
-//        final boolean hasProperRole = getSubject().hasRole("Template manager or smth like that");
-//        if (!hasProperRole) {
-//            throw new ForbiddenException("Not authorized ...");
-//        }
-
-        //or
-
-//        TODO:
-//        Individual permissions per index set
-//        for (String indexSetId : indexSetsIds) {
-//        what permission is needed?
-//        do we want a partial change if permitted for some index sets?
-//        checkPermission(RestPermissions.INDEXSETS_EDIT, indexSetId);
-//        }
+    private void checkPermissionsForCreation(final Set<String> indexSetsIds) {
+        indexSetsIds.forEach(indexSetId -> checkPermission(RestPermissions.TYPE_MAPPINGS_CREATE, indexSetId));
     }
 }
