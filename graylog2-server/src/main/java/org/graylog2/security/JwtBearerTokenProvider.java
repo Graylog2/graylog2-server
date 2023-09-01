@@ -39,7 +39,7 @@ public class JwtBearerTokenProvider implements Provider<String> {
 
     @Inject
     public JwtBearerTokenProvider(@Named("password_secret") String signingKey) {
-        authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8)), 5, TimeUnit.SECONDS);
+        authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8)), 60, TimeUnit.SECONDS);
     }
 
    private String createToken(byte[] apiKeySecretBytes) {
@@ -56,7 +56,7 @@ public class JwtBearerTokenProvider implements Provider<String> {
                 .setSubject("admin")
                 .setIssuer("graylog")
                 .setNotBefore(now)
-                .setExpiration(new Date(nowMillis + 30*1000))
+                .setExpiration(new Date(nowMillis + 24*60*60*1000))
                 .signWith(signingKey, signatureAlgorithm);
 
         return builder.compact();

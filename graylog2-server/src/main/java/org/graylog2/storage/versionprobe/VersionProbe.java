@@ -150,7 +150,7 @@ public class VersionProbe {
 
     private Optional<String> getAuthToken(final URI host, final boolean useJWT) {
         if(useJWT) {
-            return Optional.of("Bearer " + jwtBearerToken);
+            return Optional.of(jwtBearerToken);
         } else if (Strings.emptyToNull(host.getUserInfo()) != null) {
             final String[] credentials = host.getUserInfo().split(":");
             final String username = credentials[0];
