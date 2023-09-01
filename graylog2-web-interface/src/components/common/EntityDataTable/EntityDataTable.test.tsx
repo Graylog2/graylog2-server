@@ -186,7 +186,7 @@ describe('<EntityDataTable />', () => {
                             data={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
-                            bulkActions={renderBulkActions}
+                            bulkSelection={{ actions: renderBulkActions }}
                             columnDefinitions={columnDefinitions} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
@@ -208,7 +208,7 @@ describe('<EntityDataTable />', () => {
                             data={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
-                            bulkActions={renderBulkActions}
+                            bulkSelection={{ actions: renderBulkActions }}
                             columnDefinitions={columnDefinitions} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
@@ -230,7 +230,7 @@ describe('<EntityDataTable />', () => {
                             data={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
-                            bulkActions={() => <div />}
+                            bulkSelection={{ actions: () => <div /> }}
                             columnDefinitions={columnDefinitions} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
@@ -256,7 +256,7 @@ describe('<EntityDataTable />', () => {
                             data={data}
                             onSortChange={() => {}}
                             onColumnsChange={onColumnsChange}
-                            bulkActions={() => <div />}
+                            bulkSelection={{ actions: () => <div /> }}
                             columnDefinitions={columnDefinitions} />);
 
     userEvent.click(screen.getByRole('button', { name: /configure visible columns/i }));

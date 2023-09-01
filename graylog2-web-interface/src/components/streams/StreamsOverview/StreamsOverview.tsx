@@ -136,7 +136,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    onSortChange={onSortChange}
                                    onPageSizeChange={onPageSizeChange}
                                    pageSize={layoutConfig.pageSize}
-                                   bulkActions={bulkActions}
+                                   bulkSelection={{ actions: bulkActions }}
                                    expandedSectionsRenderer={expandedSections}
                                    activeSort={layoutConfig.sort}
                                    rowActions={entityActions}

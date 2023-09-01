@@ -16,9 +16,11 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import type { SetStateAction } from 'react';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
+import isFunction from 'lodash/isFunction';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -157,8 +159,14 @@ type Props<Entity extends EntityBase> = {
    * This prop controls if the column ids need to be transformed to camel case to connect them with the entity attributes.
    */
   entityAttributesAreCamelCase?: boolean,
-  /** Supported bulk actions */
-  bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
+  bulkSelection?: {
+    /** Supported bulk actions */
+    actions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
+    /** Callback which runs on selection change */
+    onChangeSelection?: (selectedEntities: Array<Entity['id']>) => void,
+    /** Initial selected items */
+    initialSelection?: Array<Entity['id']>
+  },
   /** List of all available columns. Column ids need to be snake case. */
   columnDefinitions: Array<Column>,
   /** Custom cell and header renderer for a column. Column ids need to be snake case. */
@@ -193,7 +201,11 @@ const EntityDataTable = <Entity extends EntityBase>({
   actionsCellWidth: fixedActionsCellWidth,
   activeSort,
   entityAttributesAreCamelCase,
-  bulkActions,
+  bulkSelection: {
+    actions,
+    onChangeSelection,
+    initialSelection,
+  },
   columnDefinitions,
   columnRenderers: customColumnRenderers,
   columnsOrder,
@@ -207,9 +219,10 @@ const EntityDataTable = <Entity extends EntityBase>({
   visibleColumns,
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
-  const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
+  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection || []);
   const displayActionsCol = typeof rowActions === 'function';
-  const displayBulkSelectCol = typeof bulkActions === 'function';
+  const displayBulkAction = typeof actions === 'function';
+  const displayBulkSelectCol = typeof onChangeSelection === 'function' || typeof actions === 'function';
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
 
   const accessibleColumns = useMemo(
@@ -231,24 +244,31 @@ const EntityDataTable = <Entity extends EntityBase>({
     fixedActionsCellWidth,
   });
 
+  const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
+    const newState = isFunction(setSelectedEntitiesArgument) ? setSelectedEntitiesArgument(selectedEntities) : setSelectedEntitiesArgument;
+
+    setSelectedEntities(newState);
+    if (onChangeSelection) onChangeSelection(newState);
+  }, [onChangeSelection, selectedEntities]);
+
   const onToggleEntitySelect = useCallback((itemId: string) => {
-    setSelectedEntities(((cur) => {
+    _setSelectedEntities(((cur) => {
       if (cur.includes(itemId)) {
         return cur.filter((id) => id !== itemId);
       }
 
       return [...cur, itemId];
     }));
-  }, []);
+  }, [_setSelectedEntities]);
 
   return (
     <ExpandedSectionsProvider>
       <ActionsRow>
         <div>
-          {displayBulkSelectCol && (
-            <BulkActionsRow bulkActions={bulkActions}
+          {displayBulkAction && (
+            <BulkActionsRow bulkActions={actions}
                             selectedEntities={selectedEntities}
-                            setSelectedEntities={setSelectedEntities} />
+                            setSelectedEntities={_setSelectedEntities} />
           )}
         </div>
         <LayoutConfigRow>
@@ -270,7 +290,7 @@ const EntityDataTable = <Entity extends EntityBase>({
                      actionsColWidth={actionsColWidth}
                      columnsWidths={columnsWidths}
                      selectedEntities={selectedEntities}
-                     setSelectedEntities={setSelectedEntities}
+                     setSelectedEntities={_setSelectedEntities}
                      data={data}
                      columnRenderersByAttribute={columnRenderersByAttribute}
                      onSortChange={onSortChange}
@@ -304,7 +324,6 @@ const EntityDataTable = <Entity extends EntityBase>({
 EntityDataTable.defaultProps = {
   actionsCellWidth: undefined,
   activeSort: undefined,
-  bulkActions: undefined,
   columnRenderers: undefined,
   columnsOrder: [],
   expandedSectionsRenderer: undefined,
@@ -312,6 +331,7 @@ EntityDataTable.defaultProps = {
   pageSize: undefined,
   rowActions: undefined,
   entityAttributesAreCamelCase: true,
+  bulkSelection: {},
 };
 
 export default EntityDataTable;
