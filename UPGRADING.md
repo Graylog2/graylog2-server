@@ -7,6 +7,15 @@ Upgrading to Graylog 5.2.x
 
 ## Breaking Changes
 
+- Removing support for legacy "Collector Sidecars".
+
+  Graylog 3.0 introduced "Graylog Sidecars" as an replacement for the old Collector Sidecars (version 0.1.x).
+
+  With Graylog 5.2 support for the legacy Collector Sidecars will be finally removed.
+
+  Please refer to the migration guide [Upgrading from the Collector Sidecar](https://archivedocs.graylog.org/en/3.3/pages/sidecar.html#upgrading-from-the-collector-sidecar)
+  if you are still using the old Sidecars before upgrading Graylog to 5.2.
+
 ## Deprecation and Change in Functionality of GreyNoise Data Adapters
 
 - GreyNoise Community IP Lookup Data Adapters have been marked as deprecated. Existing Data Adapters can no longer be
