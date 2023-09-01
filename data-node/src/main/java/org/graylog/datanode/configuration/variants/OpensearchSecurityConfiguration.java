@@ -123,8 +123,8 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
 
             // these were enabled to debug JWT
-            config.put("plugins.security.audit.type", "debug");
-            config.put("logger.org.opensearch.security", "debug");
+            //config.put("plugins.security.audit.type", "debug");
+            //config.put("logger.org.opensearch.security", "debug");
             // config.put("logger.com.amazon.dlic.auth.http.jwt", "debug");
 
             config.put("plugins.security.ssl.http.enabled", "true");
