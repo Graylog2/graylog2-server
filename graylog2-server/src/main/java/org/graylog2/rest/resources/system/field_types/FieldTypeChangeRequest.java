@@ -23,15 +23,15 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 public record FieldTypeChangeRequest(@NotNull @NotEmpty
-                                     @JsonProperty("index_sets_ids")
+                                     @JsonProperty("index_sets")
                                      Set<String> indexSetsIds,
                                      @NotNull @NotEmpty
-                                     @JsonProperty("field_name")
+                                     @JsonProperty("field")
                                      String fieldName,
                                      @NotNull @NotEmpty
-                                     @JsonProperty("new_type")
+                                     @JsonProperty("type")
                                      String newType,
-                                     @JsonProperty("rotate_immediately")
+                                     @JsonProperty("rotate")
                                      boolean rotateImmediately) {
 
 }
