@@ -27,7 +27,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetStatsCreator;
@@ -40,11 +39,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.rest.models.tools.responses.PageListResponse;
-import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.rest.resources.system.indexer.requests.FieldTypeSummaryRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldTypeSummary;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -76,14 +71,12 @@ import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService.DEFAULT_SORT_FIELD;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -122,34 +115,6 @@ public class IndexSetsResource extends RestResource {
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
         this.indexSetFieldTypeSummaryService = indexSetFieldTypeSummaryService;
-    }
-
-    @POST
-    @Path("field_type_summaries")
-    @Timed
-    @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Get field type summaries for given index sets and field")
-    public PageListResponse<IndexSetFieldTypeSummary> fieldTypeSummaries(@ApiParam(name = "JSON body", required = true)
-                                                                         @Valid @NotNull FieldTypeSummaryRequest request,
-                                                                         @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                                         @ApiParam(name = "sort",
-                                                                                   value = "The field to sort the result on",
-                                                                                   required = true,
-                                                                                   allowableValues = "index_set_id,index_set_title")
-                                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
-                                                                         @DefaultValue("asc") @QueryParam("order") String order) {
-        final Set<String> streamsIds = request.streamsIds();
-        final String fieldName = request.fieldName();
-        return indexSetFieldTypeSummaryService.getIndexSetFieldTypeSummary(streamsIds,
-                fieldName,
-                indexSetId -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetId),
-                page,
-                perPage,
-                sort,
-                Sorting.Direction.valueOf(order.toUpperCase(Locale.ROOT))
-        );
     }
 
     @GET
