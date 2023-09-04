@@ -19,7 +19,7 @@ package org.graylog2.indexer.indexset;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
-public record CustomFieldMapping(@JsonProperty("field_name") String fieldName,
-                                 @JsonProperty("field_type") FieldTypes.Type physicalType) {
+public record CustomFieldMapping(@JsonProperty("field") String fieldName,
+                                 @JsonProperty("type") FieldTypes.Type physicalType) {
 
 }
