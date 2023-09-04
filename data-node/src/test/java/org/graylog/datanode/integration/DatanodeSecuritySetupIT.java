@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.integration;
 
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
@@ -29,7 +28,6 @@ import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
-import org.graylog2.security.JwtBearerTokenProvider;
 import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -62,8 +59,6 @@ public class DatanodeSecuritySetupIT {
     private String httpPassword;
     private KeyStore trustStore;
     private String containerHostname;
-
-    static final String SIGNING_SECRET = "0123456789012345678901234567890123456789012345678901234567890987654321098765432109876543211";
 
     @BeforeEach
     void setUp() throws IOException, GeneralSecurityException {
@@ -109,31 +104,29 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
 
             datanodeContainer.withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true");
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", SIGNING_SECRET);
         }).start();
     }
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
-        final String jwtToken = JwtBearerTokenProvider.createToken(SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
-        LOG.info("JWT Token: " + jwtToken);
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore, jwtToken);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
 
         try {
-            given().header( "Authorization", "Bearer " + jwtToken)
-                .trustStore(trustStore)
-                .get("https://localhost:" + backend.getOpensearchRestPort())
-                .then().assertThat()
-                .body("name", Matchers.equalTo(containerHostname))
-                .body("cluster_name", Matchers.equalTo("datanode-cluster"));
+            given()
+                    .auth().basic(httpUsername, httpPassword)
+                    .trustStore(trustStore)
+                    .get("https://localhost:" + backend.getOpensearchRestPort())
+                    .then().assertThat()
+                    .body("name", Matchers.equalTo(containerHostname))
+                    .body("cluster_name", Matchers.equalTo("datanode-cluster"));
         } catch (Exception ex) {
             LOG.error("Error connecting to OpenSearch in the DataNode, showing logs:\n{}", backend.getLogs());
             throw ex;
         }
     }
 
-    private void waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore, final String jwtToken) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort, KeyStore trustStore) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
@@ -147,7 +140,7 @@ public class DatanodeSecuritySetupIT {
             var hostname = Tools.getLocalCanonicalHostname();
             var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
             LOG.info("Trying to connect to: {}", url);
-            retryer.call(() -> RestAssured.given().header( "Authorization", "Bearer " + jwtToken)
+            retryer.call(() -> RestAssured.given()
                     .trustStore(trustStore)
                     .get(url)
                     .then());
