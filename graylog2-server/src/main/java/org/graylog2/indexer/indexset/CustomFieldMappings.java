@@ -16,11 +16,36 @@
  */
 package org.graylog2.indexer.indexset;
 
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
+import org.graylog2.indexer.fieldtypes.FieldTypes;
+import software.amazon.awssdk.utils.ImmutableMap;
+
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
+    public record TypeDescription(String description, FieldTypes.Type type) {}
+
+    public static final Map<String, TypeDescription> AVAILABLE_TYPES = ImmutableMap.<String, TypeDescription>builder()
+            .put("string", new TypeDescription("String (aggregatable)", FieldTypeMapper.STRING_TYPE))
+            .put("string_fts", new TypeDescription("String (full-text searchable)", FieldTypeMapper.STRING_FTS_TYPE))
+            .put("long", new TypeDescription("Number (long)", FieldTypeMapper.LONG_TYPE))
+            .put("int", new TypeDescription("Number (int)", FieldTypeMapper.INT_TYPE))
+            .put("short", new TypeDescription("Number (short)", FieldTypeMapper.SHORT_TYPE))
+            .put("byte", new TypeDescription("Byte", FieldTypeMapper.BYTE_TYPE))
+            .put("double", new TypeDescription("Floating Point Number (double)", FieldTypeMapper.DOUBLE_TYPE))
+            .put("float", new TypeDescription("Floating Point Number (float)", FieldTypeMapper.FLOAT_TYPE))
+            .put("date", new TypeDescription("Date", FieldTypeMapper.DATE_TYPE))
+            .put("boolean", new TypeDescription("Boolean", FieldTypeMapper.BOOLEAN_TYPE))
+            .put("binary", new TypeDescription("Binary Data", FieldTypeMapper.BINARY_TYPE))
+            .put("geo-point", new TypeDescription("Geo Point", FieldTypeMapper.GEO_POINT_TYPE))
+            .put("ip", new TypeDescription("IP", FieldTypeMapper.IP_TYPE))
+            .put("streams", new TypeDescription("Streams", FieldTypeMapper.STREAMS_TYPE))
+            .put("input", new TypeDescription("Input", FieldTypeMapper.INPUT_TYPE))
+            .put("node", new TypeDescription("Node", FieldTypeMapper.NODE_TYPE))
+            .build();
 
     public CustomFieldMappings() {
         super();

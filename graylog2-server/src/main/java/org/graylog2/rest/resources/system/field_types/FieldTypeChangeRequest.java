@@ -30,7 +30,7 @@ public record FieldTypeChangeRequest(@NotNull @NotEmpty
                                      String fieldName,
                                      @NotNull @NotEmpty
                                      @JsonProperty("type")
-                                     String newType,
+                                     String type,
                                      @JsonProperty("rotate")
                                      boolean rotateImmediately) {
 

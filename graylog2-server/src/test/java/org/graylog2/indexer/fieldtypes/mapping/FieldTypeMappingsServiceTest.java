@@ -17,7 +17,6 @@
 package org.graylog2.indexer.fieldtypes.mapping;
 
 import org.graylog2.indexer.MongoIndexSet;
-import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -47,8 +46,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class FieldTypeMappingsServiceTest {
 
-    private final CustomFieldMapping newCustomMapping = new CustomFieldMapping("new_field", FieldTypes.Type.builder().type("long").build());
-    private final CustomFieldMapping existingCustomFieldMapping = new CustomFieldMapping("existing_field", FieldTypes.Type.builder().type("text").build());
+    private final CustomFieldMapping newCustomMapping = new CustomFieldMapping("new_field", "long");
+    private final CustomFieldMapping existingCustomFieldMapping = new CustomFieldMapping("existing_field", "string_fts");
 
     private FieldTypeMappingsService toTest;
 

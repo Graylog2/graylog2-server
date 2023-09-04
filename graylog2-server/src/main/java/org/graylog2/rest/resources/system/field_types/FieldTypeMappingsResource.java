@@ -28,6 +28,7 @@ import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -43,6 +44,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -60,19 +62,13 @@ public class FieldTypeMappingsResource extends RestResource {
     }
 
     @GET
-    @Path("/type_names")
-    @Timed
-    @ApiOperation(value = "Get list of names of all types valid inside the indexer")
-    public Set<String> getAllFieldTypeNames() {
-        return FieldTypeMapper.TYPE_MAP.keySet();
-    }
-
-    @GET
     @Path("/types")
     @Timed
     @ApiOperation(value = "Get list of all types valid inside the indexer")
-    public Map<String, FieldTypes.Type> getAllFieldTypes() {
-        return FieldTypeMapper.TYPE_MAP;
+    public Map<String, String> getAllFieldTypes() {
+        return CustomFieldMappings.AVAILABLE_TYPES.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().description()));
     }
 
     @PUT
@@ -89,13 +85,13 @@ public class FieldTypeMappingsResource extends RestResource {
         checkPermissionsForCreation(request.indexSetsIds());
 
         //TODO: more complex validation of request
-        final FieldTypes.Type type = FieldTypeMapper.TYPE_MAP.get(request.newType());
+        final FieldTypes.Type type = FieldTypeMapper.TYPE_MAP.get(request.type());
         if (type == null) {
-            throw new BadRequestException("Invalid type provided : " + request.newType());
+            throw new BadRequestException("Invalid type provided : " + request.type());
         }
 
 
-        var customMapping = new CustomFieldMapping(request.fieldName(), type);
+        var customMapping = new CustomFieldMapping(request.fieldName(), request.type());
         fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();

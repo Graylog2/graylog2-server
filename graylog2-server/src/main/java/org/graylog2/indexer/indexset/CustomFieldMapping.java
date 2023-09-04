@@ -19,7 +19,16 @@ package org.graylog2.indexer.indexset;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
-public record CustomFieldMapping(@JsonProperty("field") String fieldName,
-                                 @JsonProperty("type") FieldTypes.Type physicalType) {
+import static org.graylog2.indexer.indexset.CustomFieldMappings.AVAILABLE_TYPES;
 
+public record CustomFieldMapping(@JsonProperty("field") String fieldName,
+                                 @JsonProperty("type") String type) {
+    public FieldTypes.Type toPhysicalType() {
+        var typeDescription = AVAILABLE_TYPES.get(type());
+        if (typeDescription == null) {
+            throw new IllegalStateException("Invalid type specified: " + type());
+        }
+
+        return typeDescription.type();
+    }
 }
