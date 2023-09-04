@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { Attribute, PaginatedListJSON } from 'stores/PaginationTypes';
+
 export type TypeHistoryItem = string;
 
 export type FieldTypeUsage = {
   id: string,
-  indexSet: string,
-  streams: Array<string>,
-  typeHistory: Array<TypeHistoryItem>
+  indexSetTitle: string,
+  streamTitles: Array<string>,
+  types: Array<TypeHistoryItem>
 }
 
 export type FieldTypeOption = { id: string, label: string };
@@ -43,3 +45,15 @@ export type ChangeFieldTypeBody = {
   field: string,
   rotated: boolean,
 }
+
+export type FieldTypeUsageElement = {
+   index_set_id: string,
+   index_set_title: string,
+   stream_titles: Array<string>,
+   types: Array<string>
+}
+
+export type PaginatedFieldTypeUsagesResponse = PaginatedListJSON & {
+  elements: Array<FieldTypeUsageElement>,
+  attributes: Array<Attribute>,
+};

@@ -37,10 +37,10 @@ const FlexContainer = styled.div`
 export const useColumnRenderers = () => {
   const customColumnRenderers: ColumnRenderers<FieldTypeUsage> = useMemo(() => ({
     attributes: {
-      streams: {
+      streamTitles: {
         renderCell: (streams: Array<string>) => <FlexContainer>{streams.map((stream) => <span>{stream}</span>)}</FlexContainer>,
       },
-      typeHistory: {
+      types: {
         renderCell: (items: Array<TypeHistoryItem>) => {
           const latest = last(items);
           const rest = take(items, items.length - 1);
@@ -48,6 +48,7 @@ export const useColumnRenderers = () => {
           return (
             <div>
               <span><b>{latest}</b></span>
+              {!!rest.length && (
               <RestTypesContainer>
                 (previous values:
                 <FlexContainer>
@@ -55,6 +56,7 @@ export const useColumnRenderers = () => {
                 </FlexContainer>
                 )
               </RestTypesContainer>
+              )}
             </div>
           );
         },

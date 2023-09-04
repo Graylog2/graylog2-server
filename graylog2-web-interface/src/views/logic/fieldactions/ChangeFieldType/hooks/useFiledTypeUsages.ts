@@ -20,7 +20,8 @@ import UserNotification from 'util/UserNotification';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
-import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
+import type { FieldTypeUsage, PaginatedFieldTypeUsagesResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
+import fetch from 'logic/rest/FetchProvider';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -32,9 +33,9 @@ type Options = {
   enabled: boolean,
 }
 
-const fieldTypeUsagesUrl = qualifyUrl('/dashboards');
+const fieldTypeUsagesUrl = qualifyUrl('/system/indices/index_sets/types');
 
-const fetchFieldTypeUsages = ({ field, streamIds }: { field: string, streamIds: Array<string>}, searchParams: SearchParams) => {
+const fetchFieldTypeUsages = async ({ field, streams }: { field: string, streams: Array<string>}, searchParams: SearchParams) => {
   const url = PaginationURL(
     fieldTypeUsagesUrl,
     searchParams.page,
@@ -42,61 +43,27 @@ const fetchFieldTypeUsages = ({ field, streamIds }: { field: string, streamIds: 
     searchParams.query,
     { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
-  // fetch<PaginatedFieldTypeUsagesResponse>('POST', qualifyUrl(url), {})
-  return Promise.resolve({
-    elements: Array(100).fill(null).map((_, i) => (
-      {
-        id: `some id ${i}`,
-        indexSet: `Index set name ${i}`,
-        streams: ['stream 1', 'stream 2', 'stream 3', 'stream 4', 'stream 5'],
-        typeHistory: ['string', 'number', 'date'],
-      }
-    )),
-    total: 100,
-    count: 1,
-    page: 1,
-    per_page: 20,
-    attributes: [
-      {
-        id: 'id',
-        searchable: false,
-        sortable: false,
-        title: 'id',
-        type: 'STRING',
-        hidden: true,
-      },
-      {
-        id: 'indexSet',
-        searchable: true,
-        sortable: true,
-        title: 'Index set',
-        type: 'STRING',
-      },
-      {
-        id: 'streams',
-        searchable: true,
-        sortable: true,
-        title: 'Streams',
-        type: 'STRING',
-      },
-      {
-        id: 'typeHistory',
-        searchable: true,
-        sortable: true,
-        title: 'Current type',
-        type: 'STRING',
-      },
-    ],
-  }).then(
+  return fetch<PaginatedFieldTypeUsagesResponse>('POST', qualifyUrl(url), { field, streams }).then(
     ({ elements, total, count, page, per_page: perPage, attributes }) => ({
-      list: elements,
+      list: elements
+        .map(({
+          stream_titles,
+          index_set_title,
+          index_set_id,
+          types,
+        }) => ({
+          streamTitles: stream_titles,
+          types,
+          id: index_set_id,
+          indexSetTitle: index_set_title,
+        })),
       pagination: { total, count, page, perPage },
       attributes,
     }),
   );
 };
 
-const useFiledTypeUsages = (searchParams: SearchParams, field: string, { enabled }: Options = { enabled: true }): {
+const useFiledTypeUsages = ({ streams, field }: { streams: Array<string>, field: string }, searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
     list: Readonly<Array<FieldTypeUsage>>,
     pagination: { total: number },
@@ -108,7 +75,7 @@ const useFiledTypeUsages = (searchParams: SearchParams, field: string, { enabled
 } => {
   const { data, refetch, isInitialLoading, isLoading } = useQuery(
     ['fieldTypeUsages', field, searchParams],
-    () => fetchFieldTypeUsages(field, searchParams),
+    () => fetchFieldTypeUsages({ streams, field }, searchParams),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading ${field} types failed with status: ${errorThrown}`,

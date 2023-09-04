@@ -71,12 +71,11 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
   const [rotated, setRotated] = useState(false);
   const [newFieldType, setNewFieldType] = useState(null);
   const { data: { options: typeOptions }, isLoading: isOptionsLoading } = useFiledTypeOptions();
-  const initialSelection = Array(100).fill(null).map((_, i) => `some id ${i}`);
+
   const { widget, message } = useContext(ActionContext);
   const currentQuery = useCurrentQuery();
   const currentStreams = useMemo(() => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS(), [message?.fields?.streams, currentQuery.filter, widget?.streams]);
 
-  console.log({ currentStreams });
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -90,7 +89,8 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
   }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
-  const { data: { list, attributes, pagination }, isFirsLoaded } = useFiledTypeUsages(searchParams, field, { enabled: !isLoadingLayoutPreferences });
+  const { data: { list, attributes, pagination }, isFirsLoaded } = useFiledTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
+  const initialSelection = useMemo(() => list.map(({ id }) => id), [list]);
   const [indexSetSelection, setIndexSetSelection] = useState(initialSelection);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
@@ -191,11 +191,11 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
               </div>
               {!list?.length && !query && (
               <NoEntitiesExist>
-                No dashboards have been created yet.
+                No index sets have been found.
               </NoEntitiesExist>
               )}
               {!list?.length && query && (
-              <NoSearchResult>No dashboards have been found.</NoSearchResult>
+              <NoSearchResult>No index sets have been found.</NoSearchResult>
               )}
               {list.length && (
               <EntityDataTable<FieldTypeUsage> activeSort={layoutConfig.sort}
