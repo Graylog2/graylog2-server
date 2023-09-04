@@ -44,7 +44,7 @@ export type TelemetryEventType =
   | 'navigate';
 
 type ContextType = {
-  sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent) => void,
+  sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent | { [key: string] : string }) => void,
 }
 const TelemetryContext = React.createContext<ContextType>({
   sendTelemetry: () => {
