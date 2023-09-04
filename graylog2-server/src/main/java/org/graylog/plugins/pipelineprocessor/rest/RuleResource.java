@@ -100,7 +100,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
     private final PipelineServiceHelper pipelineServiceHelper;
-    private final StreamService streamService;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -119,7 +118,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
         this.pipelineServiceHelper = pipelineServiceHelper;
-        this.streamService = streamService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -138,7 +136,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .source(ruleSource.source())
                 .createdAt(now)
                 .modifiedAt(now)
-                .ruleBuilder(ruleSource.ruleBuilder())
+                .ruleBuilder(ruleSource.ruleBuilder().normalize())
                 .build();
 
         final RuleDao save;
@@ -176,7 +174,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("only used to test a rule, no changes made in the system")
     public Message simulate(
             @ApiParam(name = "request", required = true) @NotNull SimulateRuleRequest request
-    ) throws NotFoundException {
+    ) {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(request.ruleSource().id(), request.ruleSource().source(), true);
         Message message = ruleSimulator.createMessage(request.message());
         return ruleSimulator.simulate(rule, message);
@@ -290,7 +288,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .description(update.description())
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
-                .ruleBuilder(update.ruleBuilder())
+                .ruleBuilder(update.ruleBuilder().normalize())
                 .build();
 
         final RuleDao savedRule;

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 @AutoValue
@@ -63,6 +64,25 @@ public abstract class RuleBuilder {
                 .conditions(conditions)
                 .actions(actions)
                 .errors(errors)
+                .build();
+    }
+
+    /**
+     * Normalize data post-editing. In particular, renumber output variables starting from 1 in increments of 1.
+     */
+    public RuleBuilder normalize() {
+        List<RuleBuilderStep> normalizedActions = new ArrayList<>();
+        int outputSeq = 1;
+        for (RuleBuilderStep action : actions()) {
+            String outputVariable = action.outputvariable();
+            if (action.isGeneratedOutput()) {
+                outputVariable = action.generateOutput(outputSeq++);
+            }
+            normalizedActions.add(action.toBuilder().outputvariable(outputVariable).build());
+        }
+
+        return toBuilder()
+                .actions(normalizedActions)
                 .build();
     }
 
