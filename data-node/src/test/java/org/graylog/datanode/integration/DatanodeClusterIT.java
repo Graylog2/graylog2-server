@@ -185,7 +185,7 @@ public class DatanodeClusterIT {
 
     private void waitForNodesCount(final int countOfNodes) throws ExecutionException, RetryException {
         final String jwtToken = JwtBearerTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
-        LOG.info("JWT: " + jwtToken);
+
         try {
             final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
