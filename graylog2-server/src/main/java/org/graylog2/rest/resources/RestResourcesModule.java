@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources;
 
 import org.graylog2.Configuration;
-import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.bootstrap.preflight.web.resources.CertificateRenewalResource;
+import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.resources.cluster.ClusterDeflectorResource;
 import org.graylog2.rest.resources.cluster.ClusterInputStatesResource;
@@ -73,6 +73,7 @@ import org.graylog2.rest.resources.system.debug.bundle.SupportBundleClusterResou
 import org.graylog2.rest.resources.system.debug.bundle.SupportBundleResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
+import org.graylog2.rest.resources.system.indexer.IndexSetsMappingResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsResource;
 import org.graylog2.rest.resources.system.indexer.IndexTemplatesResource;
 import org.graylog2.rest.resources.system.indexer.IndexerClusterResource;
@@ -187,6 +188,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(IndexerClusterResource.class);
         addSystemRestResource(IndexerOverviewResource.class);
         addSystemRestResource(IndexSetsResource.class);
+        addSystemRestResource(IndexSetsMappingResource.class);
         addSystemRestResource(IndexSetDefaultsResource.class);
         addSystemRestResource(IndexTemplatesResource.class);
         addSystemRestResource(IndicesResource.class);
