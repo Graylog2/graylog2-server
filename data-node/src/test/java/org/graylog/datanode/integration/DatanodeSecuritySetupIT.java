@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.integration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
@@ -28,6 +29,7 @@ import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
+import org.graylog2.security.JwtBearerTokenProvider;
 import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -85,6 +88,7 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", transportCert.passwordAsString());
             datanodeContainer.withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "false");
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
 
             // configure http security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE", "datanode-https-certificates.p12");
@@ -109,12 +113,12 @@ public class DatanodeSecuritySetupIT {
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
+        final String jwtToken = JwtBearerTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
 
         try {
-            given()
-                    .auth().basic(httpUsername, httpPassword)
+            given().header( "Authorization", "Bearer " + jwtToken)
                     .trustStore(trustStore)
                     .get("https://localhost:" + backend.getOpensearchRestPort())
                     .then().assertThat()

@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Properties;
 
 public class DatanodeContainerizedBackend {
+    static public final String SIGNING_SECRET = "0123456789012345678901234567890123456789012345678901234567890987654321098765432109876543211";
 
     public static final int DATANODE_REST_PORT = 8999;
     public static final int DATANODE_OPENSEARCH_PORT = 9200;
@@ -95,7 +96,7 @@ public class DatanodeContainerizedBackend {
 
                 .withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin")
                 .withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin")
-                .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", "this_is_not_used_but_required")
+                .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", SIGNING_SECRET)
 
                 .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
                 .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + DATANODE_REST_PORT)

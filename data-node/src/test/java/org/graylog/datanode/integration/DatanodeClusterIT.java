@@ -66,8 +66,6 @@ public class DatanodeClusterIT {
     private String passwordNodeA;
     private KeystoreInformation ca;
 
-    static final String SIGNING_SECRET = "0123456789012345678901234567890123456789012345678901234567890987654321098765432109876543211";
-
     @BeforeEach
     void setUp() throws GeneralSecurityException, IOException {
 
@@ -154,6 +152,7 @@ public class DatanodeClusterIT {
                 mongodb,
                 hostname,
                 datanodeContainer -> {
+                    datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", hostnameNodeA);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", hostnameNodeA + ":9300");
 
@@ -185,7 +184,7 @@ public class DatanodeClusterIT {
     }
 
     private void waitForNodesCount(int countOfNodes) throws ExecutionException, RetryException {
-        final String jwtToken = JwtBearerTokenProvider.createToken(SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
+        final String jwtToken = JwtBearerTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
         try {
             final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
