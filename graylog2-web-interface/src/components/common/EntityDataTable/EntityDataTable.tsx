@@ -20,7 +20,6 @@ import type { SetStateAction } from 'react';
 import { useMemo, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
-import isFunction from 'lodash/isFunction';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -244,16 +243,8 @@ const EntityDataTable = <Entity extends EntityBase>({
     displayBulkSelectCol,
     fixedActionsCellWidth,
   });
-
-  const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
-    const newState = isFunction(setSelectedEntitiesArgument) ? setSelectedEntitiesArgument(selectedEntities) : setSelectedEntitiesArgument;
-
-    setSelectedEntities(newState);
-    if (onChangeSelection) onChangeSelection(newState);
-  }, [onChangeSelection, selectedEntities]);
-
   const onToggleEntitySelect = useCallback((itemId: string) => {
-    _setSelectedEntities(((cur) => {
+    setSelectedEntities(((cur) => {
       if (cur.includes(itemId)) {
         return cur.filter((id) => id !== itemId);
       }
@@ -269,7 +260,7 @@ const EntityDataTable = <Entity extends EntityBase>({
           {displayBulkAction && (
             <BulkActionsRow bulkActions={actions}
                             selectedEntities={selectedEntities}
-                            setSelectedEntities={_setSelectedEntities} />
+                            setSelectedEntities={setSelectedEntities} />
           )}
         </div>
         <LayoutConfigRow>
@@ -291,7 +282,7 @@ const EntityDataTable = <Entity extends EntityBase>({
                      actionsColWidth={actionsColWidth}
                      columnsWidths={columnsWidths}
                      selectedEntities={selectedEntities}
-                     setSelectedEntities={_setSelectedEntities}
+                     setSelectedEntities={setSelectedEntities}
                      data={data}
                      columnRenderersByAttribute={columnRenderersByAttribute}
                      onSortChange={onSortChange}
