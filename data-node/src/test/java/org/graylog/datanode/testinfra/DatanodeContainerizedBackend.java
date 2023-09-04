@@ -83,7 +83,6 @@ public class DatanodeContainerizedBackend {
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")
                 .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/bin/config")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", "dist")
 
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb/graylog")
                 .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
