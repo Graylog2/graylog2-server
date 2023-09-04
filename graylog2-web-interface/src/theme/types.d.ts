@@ -23,6 +23,7 @@ interface CustomizationHooks {
     customThemeColors: {},
     isDefaultColors: boolean,
     isSaved: boolean,
+    isLoadingCustomColors: boolean,
     onChangeTheme: ({ mode, key, type, hex }: {mode:LegacyColorScheme, key:string, type:string, hex:string}) => void,
     onResetTheme: () => Promise,
     onRevertTheme: () => Promise,

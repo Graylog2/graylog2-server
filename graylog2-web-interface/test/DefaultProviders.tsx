@@ -17,13 +17,12 @@
 import * as React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { defaultTimezone, defaultUser } from 'defaultMockValues';
-import { SawmillSC } from '@graylog/sawmill';
+import { SawmillSC, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
-import { THEME_MODE_LIGHT } from 'theme/constants';
 
-const theme = new SawmillSC({ colorScheme: THEME_MODE_LIGHT, changeColorScheme: () => {} });
+const theme = new SawmillSC({ colorScheme: COLOR_SCHEME_LIGHT, changeColorScheme: () => {} });
 
 type Props = {
   children: React.ReactNode,

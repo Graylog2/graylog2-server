@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useState, useEffect } from 'react';
-
-import { THEME_MODE_DARK, THEME_MODE_LIGHT } from 'theme/constants';
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
 
 // * https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia
 // * https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList
@@ -31,20 +30,20 @@ const usePrefersColorScheme = () => {
   const mqlLight = window.matchMedia('(prefers-color-scheme: light)');
   const mqlDark = window.matchMedia('(prefers-color-scheme: dark)');
 
-  const prefersScheme = mqlDark.matches ? THEME_MODE_DARK : THEME_MODE_LIGHT;
+  const prefersScheme = mqlDark.matches ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
   const [scheme, setScheme] = useState(prefersScheme);
 
   useEffect(() => {
     if (window.matchMedia) {
       const handleLight = (ev) => {
         if (ev.matches) {
-          setScheme(THEME_MODE_LIGHT);
+          setScheme(COLOR_SCHEME_LIGHT);
         }
       };
 
       const handleDark = (ev) => {
         if (ev.matches) {
-          setScheme(THEME_MODE_DARK);
+          setScheme(COLOR_SCHEME_DARK);
         }
       };
 
