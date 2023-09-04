@@ -144,7 +144,8 @@ public class DatanodeSecuritySetupIT {
             var hostname = Tools.getLocalCanonicalHostname();
             var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
             LOG.info("Trying to connect to: {}", url);
-            retryer.call(() -> RestAssured.given().header( "Authorization", "Bearer " + jwtToken)
+            retryer.call(() -> RestAssured.given() //.header( "Authorization", "Bearer " + jwtToken)
+                    .auth().basic(httpUsername, httpPassword)
                     .trustStore(trustStore)
                     .get(url)
                     .then());
