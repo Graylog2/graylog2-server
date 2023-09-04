@@ -24,8 +24,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
@@ -131,7 +129,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         // Check if we can index about 300MB of messages (once the large batch gets split up)
         final int MESSAGECOUNT = 101;
         // Each Message is about 1 MB
-        final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
+        final List<MessageWithIndex> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
         final Set<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
 
         assertThat(failedItems).isEmpty();
@@ -150,7 +148,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void unevenTooLargeBatchesGetSplitUp() throws Exception {
         final int MESSAGECOUNT = 100;
         final int LARGE_MESSAGECOUNT = 20;
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
+        final List<MessageWithIndex> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
         messageBatch.addAll(createMessageBatch(1024 * 1024 * 5, LARGE_MESSAGECOUNT));
         final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
 
@@ -169,9 +167,9 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final Message message2 = new Message("Another message", "loghost-b", now());
         message2.addField(fieldName, "fourty-two");
 
-        final List<Map.Entry<IndexSet, Message>> messageBatch = ImmutableList.of(
-                entry(indexSet, message1),
-                entry(indexSet, message2)
+        final List<MessageWithIndex> messageBatch = List.of(
+                new MessageWithIndex(message1, indexSet),
+                new MessageWithIndex(message2, indexSet)
         );
 
         final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
@@ -186,7 +184,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         triggerFloodStage(INDEX_NAME);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final AtomicBoolean succeeded = new AtomicBoolean(false);
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
+        final List<MessageWithIndex> messageBatch = createMessageBatch(1024, 50);
 
         final Future<Set<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
@@ -246,7 +244,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().addAliasMapping(index1, INDEX_NAME);
         client().addAliasMapping(index2, INDEX_NAME);
 
-        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, 50);
+        final ArrayList<MessageWithIndex> messageBatch = createMessageBatch(1024, 50);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final AtomicBoolean succeeded = new AtomicBoolean(false);
 
@@ -269,8 +267,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void properlySerializesCustomObjectsInMessageField() throws IOException {
         final Message message = new Message("Some message", "somesource", now());
         message.addField("custom_object", new TextNode("foo"));
-        final List<Map.Entry<IndexSet, Message>> messageBatch = ImmutableList.of(
-                Maps.immutableEntry(indexSet, message)
+        final List<MessageWithIndex> messageBatch = List.of(
+                new MessageWithIndex(message, indexSet)
         );
 
         final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
@@ -315,12 +313,12 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         return DateTime.now(DateTimeZone.UTC);
     }
 
-    private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
-        final ArrayList<Map.Entry<IndexSet, Message>> messageList = new ArrayList<>();
+    private ArrayList<MessageWithIndex> createMessageBatch(int size, int count) {
+        final ArrayList<MessageWithIndex> messageList = new ArrayList<>();
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", now())));
+            messageList.add(new MessageWithIndex(new Message(i + message, "source", now()), indexSet));
         }
         return messageList;
     }

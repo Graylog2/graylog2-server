@@ -30,6 +30,7 @@ const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean 
   overflow: hidden;
   flex-grow: 3;
   height: ${$enabled ? 'initial' : 'min-content'};
+
   @media (max-width: ${theme.breakpoints.max.md}) {
     flex-grow: 1;
   }
