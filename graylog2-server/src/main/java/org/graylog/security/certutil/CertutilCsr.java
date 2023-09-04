@@ -35,7 +35,7 @@ import java.util.List;
 @Command(name = "csr", description = "Create CSR", groupNames = {"certutil"})
 public class CertutilCsr implements CliCommand {
 
-    @Option(name = "--privateKey", description = "Keystore with private key")
+    @Option(name = "--privateKey", description = "Keystore with private key", typeConverterProvider = PathTypeConverterProvider.class )
     protected Path privateKeyFilename = Path.of("csr-private-key.key");
 
     @Option(name = "--csrFile", description = "Keystore with private key")
