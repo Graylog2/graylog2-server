@@ -24,6 +24,7 @@ import styled from 'styled-components';
 import URI from 'urijs';
 import QS from 'qs';
 
+import { getPathnameWithoutId } from 'util/URLUtils';
 import { Button, Col, Row } from 'components/bootstrap';
 import { ModalSubmit, Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
@@ -31,6 +32,9 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import type User from 'logic/users/User';
 import useQuery from 'routing/useQuery';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -39,6 +43,13 @@ import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
 const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
+const STEP_TELEMETRY_KEYS = [
+  TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS_STEP_CLICKED,
+  TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_STEP_CLICKED,
+  TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS_STEP_CLICKED,
+  TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS_STEP_CLICKED,
+  TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY_STEP_CLICKED,
+];
 
 const getConditionPlugin = (type: string | undefined) => {
   if (type === undefined) {
@@ -85,6 +96,8 @@ const EventDefinitionForm = ({
   const { step } = useQuery();
   const [activeStep, setActiveStep] = useState(step as string || STEP_KEYS[0]);
   const history = useHistory();
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     const currentUrl = new URI(window.location.href);
@@ -96,10 +109,6 @@ const EventDefinitionForm = ({
     }
   }, [activeStep, history]);
 
-  const handleStepChange = (nextStep) => {
-    setActiveStep(nextStep);
-  };
-
   const handleSubmit = (event: SyntheticEvent) => {
     if (event) {
       event.preventDefault();
@@ -108,36 +117,6 @@ const EventDefinitionForm = ({
     if (activeStep === last(STEP_KEYS)) {
       onSubmit();
     }
-  };
-
-  const renderButtons = () => {
-    if (activeStep === last(STEP_KEYS)) {
-      return (
-        <ModalSubmit onCancel={onCancel}
-                     onSubmit={handleSubmit}
-                     submitButtonText={`${eventDefinition.id ? 'Update' : 'Create'} event definition`} />
-      );
-    }
-
-    const activeStepIndex = STEP_KEYS.indexOf(activeStep);
-    const previousStep = activeStepIndex > 0 ? STEP_KEYS[activeStepIndex - 1] : undefined;
-    const nextStep = STEP_KEYS[activeStepIndex + 1];
-
-    return (
-      <div>
-        <Button bsStyle="info"
-                onClick={() => handleStepChange(previousStep)}
-                disabled={activeStepIndex === 0}>
-          Previous
-        </Button>
-        <div className="pull-right">
-          <Button bsStyle="info"
-                  onClick={() => handleStepChange(nextStep)}>
-            Next
-          </Button>
-        </div>
-      </div>
-    );
   };
 
   const defaultStepProps = {
@@ -184,6 +163,69 @@ const EventDefinitionForm = ({
       ),
     },
   ];
+
+  const handleStepChange = (nextStep) => {
+    sendTelemetry(STEP_TELEMETRY_KEYS[STEP_KEYS.indexOf(nextStep)], {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_action_value: 'event-definition-step',
+      current_step: steps[STEP_KEYS.indexOf(activeStep)].title,
+    });
+
+    setActiveStep(nextStep);
+  };
+
+  const renderButtons = () => {
+    if (activeStep === last(STEP_KEYS)) {
+      return (
+        <ModalSubmit onCancel={onCancel}
+                     onSubmit={handleSubmit}
+                     submitButtonText={`${eventDefinition.id ? 'Update' : 'Create'} event definition`} />
+      );
+    }
+
+    const activeStepIndex = STEP_KEYS.indexOf(activeStep);
+
+    const handlePreviousClick = () => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_PREVIOUS_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+        app_action_value: 'previous-button',
+        current_step: steps[activeStepIndex].title,
+      });
+
+      const previousStep = activeStepIndex > 0 ? STEP_KEYS[activeStepIndex - 1] : undefined;
+      setActiveStep(previousStep);
+    };
+
+    const handleNextClick = () => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NEXT_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+        app_action_value: 'next-button',
+        current_step: steps[activeStepIndex].title,
+      });
+
+      const nextStep = STEP_KEYS[activeStepIndex + 1];
+      setActiveStep(nextStep);
+    };
+
+    return (
+      <div>
+        <Button bsStyle="info"
+                onClick={handlePreviousClick}
+                disabled={activeStepIndex === 0}>
+          Previous
+        </Button>
+        <div className="pull-right">
+          <Button bsStyle="info"
+                  onClick={handleNextClick}>
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Row>
