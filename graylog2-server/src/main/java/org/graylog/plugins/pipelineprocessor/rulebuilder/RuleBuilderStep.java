@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.mongojack.ObjectId;
@@ -24,6 +25,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder.FIELD_ERRORS;
 
@@ -38,6 +40,9 @@ public abstract class RuleBuilderStep {
     public static final String FIELD_TITLE = "step_title";
     public static final String FIELD_OPERATOR = "operator";
     public static final String FIELD_NESTED_CONDITIONS = "conditions";
+
+    private static final String OUTPUT_PREFIX = "output_";
+    private static final Pattern OUTPUT_PATTERN = Pattern.compile("output_\\d+");
 
     @JsonProperty(FIELD_ID)
     @Nullable
@@ -104,6 +109,19 @@ public abstract class RuleBuilderStep {
 
     public abstract Builder toBuilder();
 
+
+    @JsonIgnore
+    public boolean isGeneratedOutput() {
+        if (outputvariable() == null) {
+            return false;
+        }
+        return OUTPUT_PATTERN.matcher(outputvariable()).matches();
+    }
+
+    @JsonIgnore
+    public String generateOutput(int index) {
+        return OUTPUT_PREFIX + index;
+    }
 
     @AutoValue.Builder
     public abstract static class Builder {
