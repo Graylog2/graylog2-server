@@ -115,7 +115,7 @@ public class DatanodeSecuritySetupIT {
     void testSecuredSetup() throws ExecutionException, RetryException {
         final String jwtToken = JwtBearerTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore, jwtToken);
 
         try {
             given().header( "Authorization", "Bearer " + jwtToken)
@@ -130,7 +130,7 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort, KeyStore trustStore) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore, final String jwtToken) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
@@ -144,7 +144,7 @@ public class DatanodeSecuritySetupIT {
             var hostname = Tools.getLocalCanonicalHostname();
             var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
             LOG.info("Trying to connect to: {}", url);
-            retryer.call(() -> RestAssured.given()
+            retryer.call(() -> RestAssured.given().header( "Authorization", "Bearer " + jwtToken)
                     .trustStore(trustStore)
                     .get(url)
                     .then());
