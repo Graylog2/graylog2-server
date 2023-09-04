@@ -16,16 +16,16 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import MenuItem from 'components/bootstrap/MenuItem';
 import { DropdownButton } from 'components/bootstrap';
 
-type Props = {
-  children: React.ReactNode,
+type Props = PropsWithChildren<{
   selectedEntities: Array<string>,
   setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
 
-};
+}>;
 
 const BulkActionsDropdown = ({ selectedEntities, setSelectedEntities, children }: Props) => {
   const cancelEntitySelection = useCallback(() => setSelectedEntities([]), [setSelectedEntities]);
@@ -36,7 +36,7 @@ const BulkActionsDropdown = ({ selectedEntities, setSelectedEntities, children }
                     id="bulk-actions-dropdown"
                     disabled={!selectedEntities?.length}>
       {children}
-      <MenuItem divider />
+      {Boolean(React.Children.count(children)) && <MenuItem divider />}
       <MenuItem onClick={cancelEntitySelection}>Cancel selection</MenuItem>
     </DropdownButton>
   );
