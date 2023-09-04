@@ -243,6 +243,7 @@ const EntityDataTable = <Entity extends EntityBase>({
     displayBulkSelectCol,
     fixedActionsCellWidth,
   });
+
   const onToggleEntitySelect = useCallback((itemId: string) => {
     setSelectedEntities(((cur) => {
       if (cur.includes(itemId)) {
