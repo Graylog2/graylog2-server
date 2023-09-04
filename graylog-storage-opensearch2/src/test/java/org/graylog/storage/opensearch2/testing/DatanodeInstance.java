@@ -123,6 +123,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
                 .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", "config")
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", "dist")
                 .withExposedPorts(9200, 9300)
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
