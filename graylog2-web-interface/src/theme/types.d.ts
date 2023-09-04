@@ -27,7 +27,8 @@ interface CustomizationHooks {
     onResetTheme: () => Promise,
     onRevertTheme: () => Promise,
     onSaveTheme: () => Promise,
-  })
+  }),
+  useCustomThemeColors: (isInitialLoad?: boolean) => ({ data: any, isInitialLoading: boolean })
 }
 
 interface CustomizationActions {

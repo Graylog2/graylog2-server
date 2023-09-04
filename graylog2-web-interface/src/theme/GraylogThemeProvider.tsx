@@ -23,9 +23,8 @@ import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 
-import RegeneratableThemeContext from './RegeneratableThemeContext';
 import ThemeModeContext from './ThemeModeContext';
-import { THEME_MODES, TO_LEGACY_THEME_MODE } from './constants';
+import { THEME_MODES } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
 type Props = {
@@ -36,22 +35,20 @@ type Props = {
 const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => {
   const [colorScheme, changeColorScheme] = useCurrentThemeMode(initialThemeModeOverride);
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
-  const { customThemeColors } = themeCustomizer?.[0]?.hooks?.useThemeColors() ?? {};
+  const { data: customThemeColors } = themeCustomizer?.[0]?.hooks?.useCustomThemeColors() ?? {};
 
   const theme = useMemo(() => new SawmillSC({
     colorScheme,
     changeColorScheme,
-    customColors: customThemeColors?.[TO_LEGACY_THEME_MODE[colorScheme]],
+    customColors: customThemeColors?.[colorScheme],
   }), [changeColorScheme, colorScheme, customThemeColors]);
 
   return theme ? (
-    <RegeneratableThemeContext.Provider value={theme}>
-      <ThemeModeContext.Provider value={colorScheme}>
-        <ThemeProvider theme={theme}>
-          {children}
-        </ThemeProvider>
-      </ThemeModeContext.Provider>
-    </RegeneratableThemeContext.Provider>
+    <ThemeModeContext.Provider value={colorScheme}>
+      <ThemeProvider theme={theme}>
+        {children}
+      </ThemeProvider>
+    </ThemeModeContext.Provider>
   ) : null;
 };
 
