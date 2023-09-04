@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.integration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
@@ -27,6 +28,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
+import org.graylog2.security.JwtBearerTokenProvider;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,8 +37,10 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -57,6 +61,8 @@ public class DatanodeClusterIT {
     private KeyStore trustStore;
     private String usernameNodeA;
     private String passwordNodeA;
+
+    static final String SIGNING_SECRET = "0123456789012345678901234567890123456789012345678901234567890987654321098765432109876543211";
 
     @BeforeEach
     void setUp() throws GeneralSecurityException, IOException {
@@ -155,6 +161,7 @@ public class DatanodeClusterIT {
 
     @Test
     void testClusterFormation() throws ExecutionException, RetryException {
+        final String jwtToken = JwtBearerTokenProvider.createToken(SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
         try {
             final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
@@ -162,13 +169,14 @@ public class DatanodeClusterIT {
                     .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                     .retryIfException(input -> input instanceof NoHttpResponseException)
                     .retryIfException(input -> input instanceof SocketException)
+                    .retryIfException(input -> input instanceof SSLHandshakeException)
                     .retryIfResult(input -> !input.extract().body().path("number_of_nodes").equals(2))
                     .retryIfResult(input -> !input.extract().body().path("status").equals("green"))
                     .build();
 
             final Integer opensearchPort = nodeA.getOpensearchRestPort();
 
-            retryer.call(() -> this.getStatus(opensearchPort))
+            retryer.call(() -> this.getStatus(opensearchPort, jwtToken))
                     .assertThat()
                     .body("status", Matchers.equalTo("green"))
                     .body("number_of_nodes", Matchers.equalTo(2))
@@ -179,10 +187,10 @@ public class DatanodeClusterIT {
         }
     }
 
-    private ValidatableResponse getStatus(Integer mappedPort) {
-        return RestAssured.given()
+    private ValidatableResponse getStatus(final Integer mappedPort, final String jwtToken) {
+
+        return RestAssured.given().header( "Authorization", "Bearer " + jwtToken)
                 .trustStore(trustStore)
-                .auth().basic(usernameNodeA, passwordNodeA)
                 .get("https://localhost:" + mappedPort + "/_cluster/health")
                 .then();
     }
