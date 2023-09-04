@@ -77,6 +77,7 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_NOTIFICATIONS_CANCEL_CLICKED: 'EventDefinition Notifications Cancel Clicked',
   EVENTDEFINITION_SUMMARY_CANCEL_CLICKED: 'EventDefinition Summary Cancel Clicked',
   EVENTDEFINITION_SUMMARY_CREATE_CLICKED: 'EventDefinition Summary Create Clicked',
+  EVENTDEFINITION_SUMMARY_UPDATE_CLICKED: 'EventDefinition Summary Update Clicked',
 } as const;
 type ObjectValues<T> = T[keyof T];
 
