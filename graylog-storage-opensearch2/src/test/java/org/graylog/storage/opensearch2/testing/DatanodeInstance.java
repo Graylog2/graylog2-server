@@ -63,7 +63,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
 
     @Override
     protected String imageName() {
-        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "dev");
+        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "5.2-dev");
     }
 
     @Override
@@ -118,6 +118,8 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", "<root-pw-sha2>")
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb:27017/graylog")
                 .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
+                .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", "config")
+                .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
                 .withExposedPorts(9200, 9300)
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
