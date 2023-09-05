@@ -22,7 +22,10 @@ import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @AutoValue
 public abstract class RuleBuilder {
@@ -68,22 +71,50 @@ public abstract class RuleBuilder {
     }
 
     /**
-     * Normalize data post-editing. In particular, renumber output variables starting from 1 in increments of 1.
+     * Normalize data post-editing
      */
-    public RuleBuilder normalize() {
-        List<RuleBuilderStep> normalizedActions = new ArrayList<>();
-        int outputSeq = 1;
+    public Optional<RuleBuilder> normalize() {
+        // Renumber generated output variables
+        Map<Integer, Integer> varMapping = new HashMap<>();
+        List<RuleBuilderStep> normalizedOutputs = new ArrayList<>();
+        int newIndex = 1;
         for (RuleBuilderStep action : actions()) {
             String outputVariable = action.outputvariable();
-            if (action.isGeneratedOutput()) {
-                outputVariable = action.generateOutput(outputSeq++);
+            int varIndex = action.generatedOutputIndex();
+            if (varIndex >= 0) {
+                varMapping.put(varIndex, newIndex);
+                outputVariable = action.generateOutput(newIndex++);
             }
-            normalizedActions.add(action.toBuilder().outputvariable(outputVariable).build());
+            normalizedOutputs.add(action.toBuilder().outputvariable(outputVariable).build());
         }
 
-        return toBuilder()
-                .actions(normalizedActions)
-                .build();
+        if (newIndex == 1) {
+            return Optional.empty(); // no renumbering required
+        }
+
+        // Renumber parameters that are generated output variables.
+        // These might be out of order, so we need to do it after renumbering all output variables.
+        List<RuleBuilderStep> normalizedOutputsAndParams = new ArrayList<>();
+        for (RuleBuilderStep action : normalizedOutputs) {
+            Map<String, Object> updatedParams = new HashMap<>();
+            for (Map.Entry<String, Object> entry : action.parameters().entrySet()) {
+                if (entry.getValue() instanceof String valueString) {
+                    int paramIndex = action.generatedParameterIndex(valueString);
+                    if (paramIndex > 0) {
+                        updatedParams.put(entry.getKey(), action.generateParam(paramIndex));
+                    } else {
+                        updatedParams.put(entry.getKey(), entry.getValue());
+                    }
+                } else {
+                    updatedParams.put(entry.getKey(), entry.getValue());
+                }
+            }
+            normalizedOutputsAndParams.add(action.toBuilder().parameters(updatedParams).build());
+        }
+
+        return Optional.of(toBuilder()
+                .actions(normalizedOutputsAndParams)
+                .build());
     }
 
     @AutoValue.Builder

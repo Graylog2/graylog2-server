@@ -36,6 +36,8 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -72,6 +74,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -100,6 +103,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
     private final PipelineServiceHelper pipelineServiceHelper;
+    private final RuleBuilderService ruleBuilderService;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -109,7 +113,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
                         PaginatedRuleService paginatedRuleService,
                         FunctionRegistry functionRegistry,
                         PipelineServiceHelper pipelineServiceHelper,
-                        StreamService streamService) {
+                        StreamService streamService,
+                        RuleBuilderService ruleBuilderService) {
         this.ruleService = ruleService;
         this.ruleSimulator = ruleSimulator;
         this.pipelineService = pipelineService;
@@ -118,6 +123,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
         this.pipelineServiceHelper = pipelineServiceHelper;
+        this.ruleBuilderService = ruleBuilderService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -129,14 +135,18 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), false);
+        final Optional<RuleBuilder> normalizedRuleBuilder = ruleSource.ruleBuilder().normalize();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
                 .description(ruleSource.description())
-                .source(ruleSource.source())
+                .source(normalizedRuleBuilder.isPresent() ?
+                        ruleBuilderService.generateRuleSource(ruleSource.title(), normalizedRuleBuilder.get(), false)
+                        : ruleSource.source()
+                )
                 .createdAt(now)
                 .modifiedAt(now)
-                .ruleBuilder(ruleSource.ruleBuilder().normalize())
+                .ruleBuilder(normalizedRuleBuilder.orElse(ruleSource.ruleBuilder()))
                 .build();
 
         final RuleDao save;
@@ -283,12 +293,16 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
         final RuleDao ruleDao = ruleService.load(id);
         final Rule rule = pipelineRuleService.parseRuleOrThrow(id, update.source(), false);
+        final Optional<RuleBuilder> normalizedRuleBuilder = update.ruleBuilder().normalize();
         final RuleDao toSave = ruleDao.toBuilder()
                 .title(rule.name())
                 .description(update.description())
-                .source(update.source())
+                .source(normalizedRuleBuilder.isPresent() ?
+                        ruleBuilderService.generateRuleSource(update.title(), normalizedRuleBuilder.get(), false)
+                        : update.source()
+                )
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
-                .ruleBuilder(update.ruleBuilder().normalize())
+                .ruleBuilder(normalizedRuleBuilder.orElse(update.ruleBuilder()))
                 .build();
 
         final RuleDao savedRule;
