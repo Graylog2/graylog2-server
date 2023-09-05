@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTheme } from 'styled-components';
 import { Global, MantineProvider } from '@mantine/core';
 import { SawmillMantine } from '@graylog/sawmill';
@@ -25,8 +25,10 @@ type Props = {
 
 const ThemeWrapper = ({ children }: Props) => {
   const theme = useTheme();
-
-  const mantineTheme = new SawmillMantine({ colorScheme: theme.mode, changeColorScheme: theme.changeMode });
+  const mantineTheme = useMemo(
+    () => SawmillMantine({ colorScheme: theme.mode }),
+    [theme.mode],
+  );
 
   const globalStyles = () => ({
     body: {

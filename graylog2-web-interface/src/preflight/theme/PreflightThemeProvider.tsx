@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import type { ColorScheme } from '@graylog/sawmill';
 import { SawmillSC } from '@graylog/sawmill';
@@ -25,17 +25,25 @@ type Props = {
   children: React.ReactNode,
 };
 
-const PreflightThemeProvider = ({ children }: Props) => {
+const usePreflightTheme = () => {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(DEFAULT_THEME_MODE);
 
-  const handleColorSchemeChange = useCallback((nextMode: ColorScheme) => {
+  const onChangeColorScheme = useCallback((nextMode: ColorScheme) => {
     setColorScheme(nextMode);
   }, []);
 
-  const theme = new SawmillSC({
-    colorScheme: colorScheme,
-    changeColorScheme: handleColorSchemeChange,
-  });
+  return useMemo(() => {
+    const theme = SawmillSC({ colorScheme });
+
+    return ({
+      ...theme,
+      changeMode: onChangeColorScheme,
+    });
+  }, [colorScheme, onChangeColorScheme]);
+};
+
+const PreflightThemeProvider = ({ children }: Props) => {
+  const theme = usePreflightTheme();
 
   return (
     <ThemeProvider theme={theme}>
