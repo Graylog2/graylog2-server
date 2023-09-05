@@ -114,7 +114,7 @@ public class DatanodeContainerizedBackend {
     }
 
     private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
-        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
+        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-x64.tar.gz";
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
                 // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
                 // be later used by the ADD command
