@@ -61,7 +61,6 @@ public class OpensearchSecurityConfiguration {
     private final KeystoreInformation transportCertificate;
     private final KeystoreInformation httpCertificate;
     private KeystoreInformation truststore;
-    private final ObjectMapper objectMapper = new YAMLMapper();
 
     public OpensearchSecurityConfiguration(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
         this.transportCertificate = transportCertificate;
@@ -122,9 +121,9 @@ public class OpensearchSecurityConfiguration {
             // configured node names.
             config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
 
-            // these were enabled to debug JWT
-            //config.put("plugins.security.audit.type", "debug");
-            //config.put("logger.org.opensearch.security", "debug");
+            // these properties were enabled to debug JWT
+            // config.put("plugins.security.audit.type", "debug");
+            // config.put("logger.org.opensearch.security", "debug");
             // config.put("logger.com.amazon.dlic.auth.http.jwt", "debug");
 
             config.put("plugins.security.ssl.http.enabled", "true");
@@ -148,21 +147,16 @@ public class OpensearchSecurityConfiguration {
         Map<String, Object> result = map;
         for(final String key: List.of(keys)) {
             result = (Map<String, Object>)result.get(key);
-        };
+        }
         return result;
     }
 
     private void enableJwtInConfig(final Path opensearchConfigDir, final byte[] signingKey) throws IOException {
+        final ObjectMapper objectMapper = new YAMLMapper();
         final File file = opensearchConfigDir.resolve(Path.of("opensearch-security", "config.yml")).toFile();
         Map<String, Object> contents = objectMapper.readValue(file, new TypeReference<>() {});
-
-        Map<String, Object> jwt_auth_domain = getMap(contents, "config", "dynamic", "authc", "jwt_auth_domain");
-        jwt_auth_domain.put("http_enabled", true);
-        jwt_auth_domain.put("transport_enabled", true);
-
-        Map<String, Object> config = getMap(jwt_auth_domain, "http_authenticator", "config");
+        Map<String, Object> config = getMap(contents, "config", "dynamic", "authc", "jwt_auth_domain", "http_authenticator", "config");
         config.put("signing_key", Base64.getEncoder().encodeToString(signingKey));
-        config.put("roles_key", "os_roles");
 
         objectMapper.writeValue(file, contents);
     }
