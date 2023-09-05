@@ -26,6 +26,10 @@ import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import * as FormsUtils from 'util/FormsUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
@@ -43,6 +47,9 @@ type Props = {
 }
 
 const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   const handleChange = (event) => {
     const { name } = event.target;
 
@@ -50,6 +57,13 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
   };
 
   const handlePriorityChange = (nextPriority) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS_PRIORITY_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-details',
+      app_action_value: 'priority-select',
+      priority: priorityOptions[toNumber(nextPriority) - 1]?.label,
+    });
+
     onChange('priority', toNumber(nextPriority));
   };
 
