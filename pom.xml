@@ -232,9 +232,9 @@
         </repository>
     </repositories>
 
+    <!-- Ensure consistent versions across dependencies and transitive dependencies -->
     <dependencyManagement>
         <dependencies>
-            <!-- Ensure consistent httpclient/httpcore versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
@@ -260,7 +260,6 @@
                 <artifactId>httpcore-nio</artifactId>
                 <version>${apache-httpcore.version}</version>
             </dependency>
-            <!-- Ensure consistent Netty versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
@@ -287,25 +286,21 @@
                 <version>${netty-tcnative-boringssl-static.version}</version>
                 <classifier>linux-x86_64</classifier>
             </dependency>
-            <!-- Ensure consistent commons-lang3 versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
-            <!-- Ensure consistent zstd-jni versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>com.github.luben</groupId>
                 <artifactId>zstd-jni</artifactId>
                 <version>${zstd.version}</version>
             </dependency>
-            <!-- Ensure consistent json-path versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
             </dependency>
-            <!-- Ensure consistent asm versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
@@ -315,6 +310,13 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
