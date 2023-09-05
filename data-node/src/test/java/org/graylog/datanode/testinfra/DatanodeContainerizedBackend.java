@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.testinfra;
 
-import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.graylognode.MavenPackager;
