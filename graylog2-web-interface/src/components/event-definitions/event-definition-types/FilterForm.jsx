@@ -41,6 +41,10 @@ import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -116,6 +120,8 @@ class FilterForm extends React.Component {
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     currentUser: PropTypes.object.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -197,15 +203,49 @@ class FilterForm extends React.Component {
 
   handleConfigChange = (event) => {
     const { name } = event.target;
+    const value = FormsUtils.getValueFromInput(event.target);
 
-    this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
+    if (name === '_is_scheduled') {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
+        app_pathname: getPathnameWithoutId(this.props.location.pathname),
+        app_section: 'event-definition-condition',
+        app_action_value: 'enable-checkbox',
+        is_scheduled: value,
+      });
+    }
+
+    this.propagateChange(name, value);
   };
 
   handleStreamsChange = (nextValue) => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_STREAM_SELECTED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-condition',
+      app_action_value: 'stream-select',
+    });
+
     this.propagateChange('streams', nextValue);
   };
 
   handleTimeRangeChange = (fieldName) => (nextValue, nextUnit) => {
+    const { searchWithinMsUnit, executeEveryMsUnit } = this.state;
+
+    if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
+        app_pathname: getPathnameWithoutId(this.props.location.pathname),
+        app_section: 'event-definition-condition',
+        app_action_value: 'searchWithinMsUnit-select',
+        new_unit: nextUnit,
+      });
+    } else if (fieldName === 'execute_every_ms' && nextUnit !== executeEveryMsUnit) {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
+        app_pathname: getPathnameWithoutId(this.props.location.pathname),
+        app_section: 'event-definition-condition',
+        app_action_value: 'executeEveryMsUnit-select',
+        new_unit: nextUnit,
+      });
+    }
+
     const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
 
     this.propagateChange(fieldName, durationInMs);
@@ -345,6 +385,6 @@ class FilterForm extends React.Component {
   }
 }
 
-export default connect(FilterForm, {
+export default connect(withLocation(withTelemetry(FilterForm)), {
   lookupTables: LookupTablesStore,
 });
