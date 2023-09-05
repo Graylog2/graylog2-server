@@ -1,0 +1,10 @@
+{
+  "ip": "1.2.3.4",
+  "noise": false,
+  "riot": true,
+  "classification": "benign",
+  "name": "Cloudflare",
+  "link": "https://viz.greynoise.io/riot/1.2.3.4",
+  "last_seen": "2020-01-01",
+  "message": "Success"
+}

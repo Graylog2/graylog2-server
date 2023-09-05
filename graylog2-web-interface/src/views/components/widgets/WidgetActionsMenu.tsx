@@ -39,8 +39,7 @@ import useView from 'views/hooks/useView';
 import createSearch from 'views/logic/slices/createSearch';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
-import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { selectQuery, updateView } from 'views/logic/slices/viewSlice';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import type { HistoryFunction } from 'routing/useHistory';
@@ -111,10 +110,9 @@ const _onMoveWidgetToPage = async (
   if (newDashboard) {
     const searchResponse = await createSearch(newDashboard.search);
     const updatedDashboard = newDashboard.toBuilder().search(searchResponse).build();
-    await dispatch(loadView(updatedDashboard));
+    await dispatch(updateView(updatedDashboard, true));
     setShowMoveWidgetToTab(false);
     await dispatch(selectQuery(queryId));
-    await dispatch(execute());
   }
 };
 

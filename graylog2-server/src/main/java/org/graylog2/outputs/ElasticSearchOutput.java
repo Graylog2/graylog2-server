@@ -20,6 +20,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -88,10 +89,10 @@ public class ElasticSearchOutput implements MessageOutput {
         throw new UnsupportedOperationException("Method not supported!");
     }
 
-    public Set<String> writeMessageEntries(List<Map.Entry<IndexSet, Message>> messageList) throws Exception {
+    public Set<String> writeMessageEntries(List<MessageWithIndex> messageList) throws Exception {
         if (LOG.isTraceEnabled()) {
             final String sortedIds = messageList.stream()
-                    .map(Map.Entry::getValue)
+                    .map(MessageWithIndex::message)
                     .map(Message::getId)
                     .sorted(Comparator.naturalOrder())
                     .collect(Collectors.joining(", "));

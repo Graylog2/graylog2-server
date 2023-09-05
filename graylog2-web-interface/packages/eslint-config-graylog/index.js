@@ -63,6 +63,7 @@ module.exports = {
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
         'react/jsx-no-constructed-context-values': 'off',
+        'testing-library/await-async-events': 'off',
         'testing-library/no-debugging-utils': 'warn',
         'testing-library/prefer-screen-queries': 'off',
         'testing-library/render-result-naming-convention': 'off',

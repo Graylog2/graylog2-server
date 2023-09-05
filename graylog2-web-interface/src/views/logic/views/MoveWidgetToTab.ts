@@ -20,6 +20,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import normalizeViewState from 'views/logic/views/normalizeViewState';
 
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
@@ -57,7 +58,7 @@ const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: V
     .build();
 
   return dashboard.toBuilder()
-    .state(dashboard.state.set(queryId, newViewState))
+    .state(dashboard.state.set(queryId, normalizeViewState(newViewState)))
     .build();
 };
 
