@@ -115,7 +115,7 @@ public class DatanodeSecuritySetupIT {
     void testSecuredSetup() throws ExecutionException, RetryException {
         final String jwtToken = JwtBearerTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore, jwtToken);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), backend.getOpensearchRestPort(), trustStore, jwtToken);
 
         try {
             given().header( "Authorization", "Bearer " + jwtToken)
@@ -130,7 +130,7 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private void waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore, final String jwtToken) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final Integer opensearchPort, final KeyStore trustStore, final String jwtToken) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
@@ -142,12 +142,13 @@ public class DatanodeSecuritySetupIT {
 
         try {
             var hostname = Tools.getLocalCanonicalHostname();
-            var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
-            LOG.info("Trying to connect to: {}", url);
-            retryer.call(() -> RestAssured.given() //.header( "Authorization", "Bearer " + jwtToken)
+            var rest = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
+            var os = StringUtils.f("https://%s:%d", hostname, opensearchPort);
+            LOG.info("Trying to connect to REST API at: {}, OpenSearch is at: {}", rest, os);
+            retryer.call(() -> RestAssured.given()
                     .auth().basic(httpUsername, httpPassword)
                     .trustStore(trustStore)
-                    .get(url)
+                    .get(rest)
                     .then());
         } catch (Exception ex) {
             LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());

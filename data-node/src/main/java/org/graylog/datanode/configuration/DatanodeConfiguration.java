@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.datanode.OpensearchDistribution;
 
 /**
@@ -25,6 +26,7 @@ import org.graylog.datanode.OpensearchDistribution;
 public record DatanodeConfiguration(
         OpensearchDistribution opensearchDistribution,
         String nodeName,
-        int processLogsBufferSize
+        int processLogsBufferSize,
+        String jwtToken
 ) {
 }

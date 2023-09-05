@@ -69,7 +69,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
-        return OpensearchRestClient.build(configuration, trustManager);
+        return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
     }
 
     @Override

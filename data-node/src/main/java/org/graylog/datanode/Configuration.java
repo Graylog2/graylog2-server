@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
@@ -195,6 +196,24 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
+
+    public String getPasswordSecret() {
+        return passwordSecret;
+    }
+
+    @Parameter(value = "opensearch_jwt_token_caching_duration")
+    Duration opensearchJwtTokenCachingDuration = Duration.seconds(60);
+
+    public Duration getOpensearchJwtTokenCachingDuration() {
+        return opensearchJwtTokenCachingDuration;
+    }
+
+    @Parameter(value = "opensearch_jwt_token_expiration_duration")
+    Duration opensearchJwtTokenExpirationDuration = Duration.seconds(180);
+
+    public Duration getOpensearchJwtTokenExpirationDuration() {
+        return opensearchJwtTokenExpirationDuration;
+    }
 
     @ValidatorMethod
     @SuppressWarnings("unused")

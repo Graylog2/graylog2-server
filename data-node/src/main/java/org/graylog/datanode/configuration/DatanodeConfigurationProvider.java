@@ -18,11 +18,13 @@ package org.graylog.datanode.configuration;
 
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.OpensearchDistribution;
+import org.graylog2.security.JwtBearerTokenProvider;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 @Singleton
@@ -33,10 +35,14 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     @Inject
     public DatanodeConfigurationProvider(final Configuration localConfiguration) throws IOException {
         final OpensearchDistribution opensearchDistribution = detectOpensearchDistribution(localConfiguration);
+        final JwtBearerTokenProvider provider = new JwtBearerTokenProvider(localConfiguration.getPasswordSecret(), localConfiguration.getOpensearchJwtTokenExpirationDuration(), localConfiguration.getOpensearchJwtTokenCachingDuration());
+        final var jwtToken = provider.get();
+
         datanodeConfiguration = new DatanodeConfiguration(
                 opensearchDistribution,
                 localConfiguration.getDatanodeNodeName(),
-                localConfiguration.getProcessLogsBufferSize()
+                localConfiguration.getProcessLogsBufferSize(),
+                jwtToken
         );
     }
 
