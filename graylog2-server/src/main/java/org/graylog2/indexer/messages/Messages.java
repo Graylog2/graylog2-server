@@ -28,11 +28,9 @@ import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import org.graylog.failure.FailureSubmissionService;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.plugin.Message;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
@@ -45,7 +43,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -115,25 +112,25 @@ public class Messages {
         return messagesAdapter.analyze(toAnalyze, index, analyzer);
     }
 
-    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
+    public Set<String> bulkIndex(final List<MessageWithIndex> messageList) {
         return bulkIndex(messageList, false, null);
     }
 
-    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, IndexingListener indexingListener) {
+    public Set<String> bulkIndex(final List<MessageWithIndex> messageList, IndexingListener indexingListener) {
         return bulkIndex(messageList, false, indexingListener);
     }
 
-    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic) {
+    public Set<String> bulkIndex(final List<MessageWithIndex> messageList, boolean isSystemTraffic) {
         return bulkIndex(messageList, isSystemTraffic, null);
     }
 
-    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic, IndexingListener indexingListener) {
+    public Set<String> bulkIndex(final List<MessageWithIndex> messageList, boolean isSystemTraffic, IndexingListener indexingListener) {
         if (messageList.isEmpty()) {
             return Set.of();
         }
 
         final List<IndexingRequest> indexingRequestList = messageList.stream()
-                .map(entry -> IndexingRequest.create(entry.getKey(), entry.getValue()))
+                .map(entry -> IndexingRequest.create(entry.indexSet(), entry.message()))
                 .collect(Collectors.toList());
 
         return bulkIndexRequests(indexingRequestList, isSystemTraffic, indexingListener);
