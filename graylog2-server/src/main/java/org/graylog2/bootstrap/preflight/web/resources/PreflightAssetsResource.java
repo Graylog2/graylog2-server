@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-@Path("")
+@Path("/")
 public class PreflightAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final LoadingCache<URI, FileSystem> fileSystemCache;
@@ -82,7 +82,6 @@ public class PreflightAssetsResource {
                 });
     }
 
-    @Path("/")
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response index(@Context Request request) {
