@@ -6,6 +6,7 @@ Upgrading to Graylog 5.2.x
 - New pipeline rule functions for manipulating maps: `map_set` and `map_remove`.
 
 ## Breaking Changes
+- If you use the DataNode, the nodes system clocks have to be synchronized for JWT usage.
 
 ## Deprecation and Change in Functionality of GreyNoise Data Adapters
 
