@@ -21,26 +21,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 public class ChunkedBulkIndexer {
     private static final Logger LOG = LoggerFactory.getLogger(ChunkedBulkIndexer.class);
 
     public interface BulkIndex {
-        List<Messages.IndexingError> apply(Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException;
+        IndexingResults apply(Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException;
     }
 
-    public List<Messages.IndexingError> index(List<IndexingRequest> messageList, BulkIndex bulkIndex) throws IOException {
+    public IndexingResults index(List<IndexingRequest> messageList, BulkIndex bulkIndex) throws IOException {
         if (messageList.isEmpty()) {
-            return Collections.emptyList();
+            return IndexingResults.empty();
         }
 
         int chunkSize = messageList.size();
         int offset = 0;
-        for (;;) {
+        IndexingResults.Builder accumulatedResults = IndexingResults.Builder.create();
+        for (; ; ) {
             try {
-                return bulkIndex.apply(new Chunk(messageList, offset, chunkSize));
+                var results = bulkIndex.apply(new Chunk(messageList, offset, chunkSize));
+                accumulatedResults.addResults(results);
+                return accumulatedResults.build();
             } catch (EntityTooLargeException e) {
                 if (e instanceof TooManyRequestsException) {
                     LOG.warn("Bulk index failed with 'Too many requests' error. Retrying by splitting up batch size <{}>.", chunkSize);
@@ -52,6 +54,7 @@ public class ChunkedBulkIndexer {
                 }
                 offset += e.indexedSuccessfully;
                 chunkSize /= 2;
+                accumulatedResults.addResults(e.previousResults);
             }
             if (chunkSize == 0) {
                 throw new ElasticsearchException("Bulk index cannot split output batch any further.");
@@ -73,15 +76,17 @@ public class ChunkedBulkIndexer {
 
     public static class EntityTooLargeException extends Exception {
         public final int indexedSuccessfully;
+        public final IndexingResults previousResults;
 
-        public EntityTooLargeException(int indexedSuccessfully)  {
+        public EntityTooLargeException(int indexedSuccessfully, IndexingResults previousResults) {
             this.indexedSuccessfully = indexedSuccessfully;
+            this.previousResults = previousResults;
         }
     }
 
     public static class TooManyRequestsException extends EntityTooLargeException {
-        public TooManyRequestsException(int indexedSuccessfully) {
-            super(indexedSuccessfully);
+        public TooManyRequestsException(int indexedSuccessfully, IndexingResults previousResults) {
+            super(indexedSuccessfully, previousResults);
         }
     }
 }

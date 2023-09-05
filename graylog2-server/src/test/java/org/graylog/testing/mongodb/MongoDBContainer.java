@@ -72,4 +72,13 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
             return "could not get info from container!";
         }
     }
+
+    @Override
+    public void close() {
+        super.close();
+        final Network network = getNetwork();
+        if(network != null) {
+            network.close();
+        }
+    }
 }
