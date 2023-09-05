@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "4.33.0",
-    "@types/create-react-class": "15.6.3",
+    "@types/create-react-class": "15.6.4",
     "@types/jquery": "3.5.18",
     "@types/react": "18.2.20",
     "babel-preset-graylog": "file:../babel-preset-graylog",
