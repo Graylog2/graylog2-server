@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
+import { upperCase } from 'lodash';
 
 import type { ActionContexts } from 'views/types';
 import Icon from 'components/common/Icon';
@@ -34,6 +35,8 @@ import {
 } from 'views/components/actions/ActionHandler';
 import HoverForHelp from 'components/common/HoverForHelp';
 import useAppDispatch from 'stores/useAppDispatch';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledMenuItem = styled(MenuItem)`
   && > a {
@@ -118,15 +121,26 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
   );
 };
 
-type ActionHandlerItemProps = Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'overflowingComponents' | 'setOverflowingComponents' | 'type'> & {
+type ActionHandlerItemProps =
+  Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'overflowingComponents' | 'setOverflowingComponents' | 'type'>
+  & {
   action: HandlerAction<ActionContexts>,
   disabled: boolean,
   field: string,
 };
 
-const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle }: ActionHandlerItemProps) => {
+const ActionHandlerItem = ({
+  disabled,
+  action,
+  handlerArgs,
+  setOverflowingComponents,
+  overflowingComponents,
+  type,
+  onMenuToggle,
+}: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const dispatch = useAppDispatch();
+  const sendTelemetry = useSendTelemetry();
 
   const setActionComponents: SetActionComponents = useCallback((fn) => {
     setOverflowingComponents(fn(overflowingComponents));
@@ -135,7 +149,13 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
   const handler = useMemo(() => createHandlerFor(dispatch, action, setActionComponents), [action, dispatch, setActionComponents]);
 
   const onSelect = useCallback(() => {
-    const { resetFocus = false } = action;
+    const { resetFocus = false, title } = action;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION[upperCase(title).replace(/\s|\//g, '_')], {
+      app_pathname: 'search',
+      app_section: 'search-field-value',
+      event_details: {},
+    });
 
     if (resetFocus) {
       unsetWidgetFocusing();
@@ -144,7 +164,7 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
     onMenuToggle();
 
     handler(handlerArgs);
-  }, [action, handler, handlerArgs, onMenuToggle, unsetWidgetFocusing]);
+  }, [action, handler, handlerArgs, onMenuToggle, sendTelemetry, unsetWidgetFocusing]);
 
   const { field } = handlerArgs;
 
@@ -157,14 +177,28 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
   );
 };
 
-const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle }: Props) => {
+const ActionMenuItem = ({
+  action,
+  handlerArgs,
+  setOverflowingComponents,
+  overflowingComponents,
+  type,
+  onMenuToggle,
+}: Props) => {
   const { isEnabled = () => true } = action;
   const dispatch = useAppDispatch();
   const actionDisabled = dispatch((_dispatch, getState) => !isEnabled(handlerArgs, getState));
   const { field } = handlerArgs;
 
   if (isExternalLinkAction(action)) {
-    return <ExternalLinkItem action={action} disabled={actionDisabled} field={field} handlerArgs={handlerArgs} onMenuToggle={onMenuToggle} type={type} />;
+    return (
+      <ExternalLinkItem action={action}
+                        disabled={actionDisabled}
+                        field={field}
+                        handlerArgs={handlerArgs}
+                        onMenuToggle={onMenuToggle}
+                        type={type} />
+    );
   }
 
   return (

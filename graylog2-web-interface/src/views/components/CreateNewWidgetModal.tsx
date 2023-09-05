@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import kebabCase from 'lodash/kebabCase';
+import { upperCase } from 'lodash';
 
 import { Modal, Button } from 'components/bootstrap';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -27,6 +27,7 @@ import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const modalTitle = 'Create new widget';
 
@@ -70,10 +71,9 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
 
   const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
     const onClick = async () => {
-      sendTelemetry('click', {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
         app_pathname: 'search',
-        app_section: 'widget',
-        app_action_value: `widget-create-${kebabCase(title)}-button`,
+        app_section: 'search-widget',
       });
 
       const newId = generateId();

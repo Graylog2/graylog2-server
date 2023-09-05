@@ -34,6 +34,42 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_FILTER_ITEM_REMOVED: 'Search Filter Item Removed',
   SEARCH_FILTER_ITEM_REFERENCE_REPLACED: 'Search Filter Item Reference Replaced',
   SEARCH_FILTER_ITEM_NEGATION_TOGGLED: 'Search Filter Item Negation Toggled',
+  SEARCH_WIDGET_EXPORT_DOWNLOADED: 'Search Widget Export Downloaded',
+  SEARCH_WIDGET_ACTION: {
+    FOCUSED: 'Search Widget Focused',
+    DELETED: 'Search Widget Deleted',
+    MOVE: 'Search Widget Moved',
+    DUPLICATE: 'Search Widget Duplicate',
+    COPY_TO_DASHBOARD: 'Search Widget Copy To Dashboard Clicked',
+  },
+  SEARCH_WIDGET_CREATE: {
+    AGGREGATION: 'Search Widget Aggregation Created',
+    MESSAGE_COUNT: 'Search Widget Message Count Created',
+    MESSAGE_TABLE: 'Search Widget Message Table Created',
+    LOG_VIEW: 'Search Widget Log View Created',
+  },
+  SEARCH_FIELD_VALUE_ACTION: {
+    CHART: 'Search Field Action Chart Clicked',
+    STATISTICS: 'Search Field Action Statistics Clicked',
+    SHOW_TOP_VALUES: 'Search Field Action Show Top Values Clicked',
+    ADD_TO_TABLE: 'Search Field Action Add To Table Clicked',
+    REMOVE_FROM_TABLE: 'Search Field Action Remove From Table Clicked',
+    ADD_TO_ALL_TABLES: 'Search Field Action Add To All Tables Clicked',
+    COPY_FIELD_NAME_TO_CLIPBOARD: 'Search Field Action Copy Field Name To Clipboard Clicked',
+    REMOVE_FROM_ALL_TABLES: 'Search Field Action Remove From All Tables Clicked',
+    EXCLUDE_FROM_RESULTS: 'Search Value Action Exclude From Results Clicked',
+    ADD_TO_QUERY: 'Search Value Action Add To Query Clicked',
+    SHOW_DOCUMENT_FOR_VALUE: 'Search Value Action Show Document For Value Clicked',
+    CREATE_EXTRACTOR: 'Search Value Action Create Extractor Clicked',
+    HIGHLIGHT_THIS_VALUE: 'Search Value Action Highlight This Value Clicked',
+    COPY_VALUE_TO_CLIPBOARD: 'Search Value Action Copy Value To Clipboard Clicked',
+    CREATE_EVENT_DEFINITION: 'Search Value Action Create Event Definition Clicked',
+    INSERT_INTO_DASHBOARD_SEARCH: 'Search Value Action Insert Into Dashboard/Search Clicked',
+  },
+  DASHBOARD_FULL_SCREEN_MODE_STARTED: 'Dashboard Fullscreen Mode Started',
+  SEARCH_MESSAGE_TABLE_SHOW_SURROUNDING_MESSAGE: 'Search Message Table Show Surrounding Message Clicked ',
+  SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM: 'Search Message Table Test Against Stream Clicked ',
+
   // Event Definitions
   EVENTDEFINITION_CREATE_BUTTON_CLICKED: 'EventDefinition Create Button Clicked',
   EVENTDEFINITION_DETAILS_STEP_CLICKED: 'EventDefinition Details Step Clicked',
@@ -79,6 +115,9 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_SUMMARY_CREATE_CLICKED: 'EventDefinition Summary Create Clicked',
   EVENTDEFINITION_SUMMARY_UPDATE_CLICKED: 'EventDefinition Summary Update Clicked',
 } as const;
+
 type ObjectValues<T> = T[keyof T];
 
-export type EventType = ObjectValues<typeof TELEMETRY_EVENT_TYPE>
+export type EventType =
+  ObjectValues<typeof TELEMETRY_EVENT_TYPE>
+  | ObjectValues<typeof TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION>
