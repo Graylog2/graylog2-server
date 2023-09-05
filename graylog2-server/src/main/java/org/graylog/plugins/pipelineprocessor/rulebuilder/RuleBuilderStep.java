@@ -25,6 +25,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder.FIELD_ERRORS;
@@ -42,7 +43,8 @@ public abstract class RuleBuilderStep {
     public static final String FIELD_NESTED_CONDITIONS = "conditions";
 
     private static final String OUTPUT_PREFIX = "output_";
-    private static final Pattern OUTPUT_PATTERN = Pattern.compile("output_\\d+");
+    private static final Pattern OUTPUT_PATTERN = Pattern.compile(OUTPUT_PREFIX + "(\\d+)");
+    private static final Pattern PARAMETER_PATTERN = Pattern.compile("\\$" + OUTPUT_PREFIX + "(\\d+)");
 
     @JsonProperty(FIELD_ID)
     @Nullable
@@ -109,18 +111,33 @@ public abstract class RuleBuilderStep {
 
     public abstract Builder toBuilder();
 
+    @JsonIgnore
+    public int generatedOutputIndex() {
+        return matchPatternWithIndex(outputvariable(), OUTPUT_PATTERN);
+    }
 
     @JsonIgnore
-    public boolean isGeneratedOutput() {
-        if (outputvariable() == null) {
-            return false;
+    public int generatedParameterIndex(String parameter) {
+        return matchPatternWithIndex(parameter, PARAMETER_PATTERN);
+    }
+
+    @JsonIgnore
+    private int matchPatternWithIndex(String value, Pattern pattern) {
+        Matcher matcher = pattern.matcher(value);
+        if (matcher.matches()) {
+            return Integer.parseInt(matcher.group(1));
         }
-        return OUTPUT_PATTERN.matcher(outputvariable()).matches();
+        return -1;
     }
 
     @JsonIgnore
     public String generateOutput(int index) {
         return OUTPUT_PREFIX + index;
+    }
+
+    @JsonIgnore
+    public String generateParam(int index) {
+        return "$" + OUTPUT_PREFIX + index;
     }
 
     @AutoValue.Builder
