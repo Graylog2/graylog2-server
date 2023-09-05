@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import 'styled-components';
-import type { SawmillSC } from '@graylog/sawmill';
+import type { SawmillSCType, ColorScheme } from '@graylog/sawmill';
 
 declare module 'styled-components' {
-  // We need to define the theme interface here and can't use relative
-  // paths, because otherwise the paths do not get resolved properly
-  // when importing core components which are using the theme, in plugins.
-  export interface DefaultTheme extends SawmillSC {}
+  export interface DefaultTheme extends SawmillSCType {
+    changeMode: (newColorScheme: ColorScheme) => void,
+  }
 }

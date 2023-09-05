@@ -22,7 +22,7 @@ import { SawmillSC, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
-const theme = new SawmillSC({ colorScheme: COLOR_SCHEME_LIGHT, changeColorScheme: () => {} });
+const theme = SawmillSC({ colorScheme: COLOR_SCHEME_LIGHT });
 
 type Props = {
   children: React.ReactNode,
@@ -30,7 +30,7 @@ type Props = {
 
 const DefaultProviders = ({ children }: Props) => (
   <CurrentUserContext.Provider value={defaultUser}>
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={{ ...theme, changeMode: () => {} }}>
       <UserDateTimeProvider tz={defaultTimezone}>
         {children}
       </UserDateTimeProvider>
