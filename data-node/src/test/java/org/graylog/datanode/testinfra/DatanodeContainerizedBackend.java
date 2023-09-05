@@ -115,6 +115,12 @@ public class DatanodeContainerizedBackend {
 
     private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
         final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
+        final Path downloadedOpensearch = Path.of("target", "downloads", opensearchTarArchive);
+
+        if(!Files.exists(downloadedOpensearch)) {
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path" + downloadedOpensearch.toAbsolutePath() + " doesn't exist!");
+        }
+
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
                 // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
                 // be later used by the ADD command
