@@ -35,7 +35,8 @@ type Props = {
 const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => {
   const [colorScheme, changeColorScheme] = usePreferredColorScheme(initialThemeModeOverride);
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
-  const { data: customThemeColors } = themeCustomizer?.[0]?.hooks?.useCustomThemeColors() ?? {};
+  const useCustomThemeColors = themeCustomizer?.[0]?.hooks.useCustomThemeColors;
+  const { data: customThemeColors } = useCustomThemeColors?.() ?? {};
 
   const theme = useMemo(() => new SawmillSC({
     colorScheme,
