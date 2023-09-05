@@ -24,8 +24,8 @@ import { useMemo } from 'react';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 import ColorSchemeContext from './ColorSchemeContext';
-import { THEME_MODES } from './constants';
-import useCurrentThemeMode from './UseCurrentThemeMode';
+import { COLOR_SCHEMES } from './constants';
+import usePreferredColorScheme from './usePreferredColorScheme';
 
 type Props = {
   children: React.ReactNode,
@@ -33,7 +33,7 @@ type Props = {
 }
 
 const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => {
-  const [colorScheme, changeColorScheme] = useCurrentThemeMode(initialThemeModeOverride);
+  const [colorScheme, changeColorScheme] = usePreferredColorScheme(initialThemeModeOverride);
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
   const { data: customThemeColors } = themeCustomizer?.[0]?.hooks?.useCustomThemeColors() ?? {};
 
@@ -54,7 +54,7 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => 
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
-  initialThemeModeOverride: PropTypes.oneOf(THEME_MODES),
+  initialThemeModeOverride: PropTypes.oneOf(COLOR_SCHEMES),
 };
 
 GraylogThemeProvider.defaultProps = {
