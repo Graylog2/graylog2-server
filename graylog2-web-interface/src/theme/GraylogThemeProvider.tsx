@@ -23,7 +23,7 @@ import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 
-import ThemeModeContext from './ThemeModeContext';
+import ColorSchemeContext from './ColorSchemeContext';
 import { THEME_MODES } from './constants';
 import useCurrentThemeMode from './UseCurrentThemeMode';
 
@@ -44,11 +44,11 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => 
   }), [changeColorScheme, colorScheme, customThemeColors]);
 
   return theme ? (
-    <ThemeModeContext.Provider value={colorScheme}>
+    <ColorSchemeContext.Provider value={colorScheme}>
       <ThemeProvider theme={theme}>
         {children}
       </ThemeProvider>
-    </ThemeModeContext.Provider>
+    </ColorSchemeContext.Provider>
   ) : null;
 };
 

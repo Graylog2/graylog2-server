@@ -17,13 +17,14 @@
 
 import * as React from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
+import { COLOR_SCHEME_DARK } from '@graylog/sawmill';
+import { useContext } from 'react';
 
 import SecurityNoLicenseImage from 'assets/security-no-license-bg.png';
 import SecurityNoLicenseImageDark from 'assets/security-no-license-bg-dark.png';
 import SecurityNoLicenseOverlay from 'assets/security-no-license-overlay.png';
 import SecurityNoLicenseOverlayDark from 'assets/security-no-license-overlay-dark.png';
-import ThemeModeContext from 'theme/ThemeModeContext';
-import type { LegacyColorScheme } from 'theme/constants';
+import ColorSchemeContext from 'theme/ColorSchemeContext';
 
 const generateStyles = () => css<{ backgroundImage: string }>`
   body {
@@ -42,21 +43,22 @@ const SecurityPageStyles = createGlobalStyle`
   ${generateStyles()}
 `;
 
-const SecurityPage = () => (
-  <PageLayout>
-    <ThemeModeContext.Consumer>
-      {(theme: LegacyColorScheme) => (<SecurityPageStyles backgroundImage={theme === 'noir' ? SecurityNoLicenseImageDark : SecurityNoLicenseImage} />)}
-    </ThemeModeContext.Consumer>
-    <ThemeModeContext.Consumer>
-      {(theme: LegacyColorScheme) => (
-        <div>
-          <a href="https://www.graylog.org/explore-security/" target="_blank" rel="noreferrer">
-            <img style={{ height: '500px' }} src={theme === 'noir' ? SecurityNoLicenseOverlayDark : SecurityNoLicenseOverlay} alt="security-overlay" />
-          </a>
-        </div>
-      )}
-    </ThemeModeContext.Consumer>
-  </PageLayout>
-);
+const SecurityPage = () => {
+  const colorScheme = useContext(ColorSchemeContext);
+
+  return (
+    <PageLayout>
+      <SecurityPageStyles backgroundImage={colorScheme === COLOR_SCHEME_DARK ? SecurityNoLicenseImageDark : SecurityNoLicenseImage} />
+
+      <div>
+        <a href="https://www.graylog.org/explore-security/" target="_blank" rel="noreferrer">
+          <img style={{ height: '500px' }}
+               src={colorScheme === COLOR_SCHEME_DARK ? SecurityNoLicenseOverlayDark : SecurityNoLicenseOverlay}
+               alt="security-overlay" />
+        </a>
+      </div>
+    </PageLayout>
+  );
+};
 
 export default SecurityPage;
