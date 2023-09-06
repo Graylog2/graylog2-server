@@ -89,7 +89,7 @@ public class Configuration extends BaseConfiguration {
     private String opensearchConfigLocation = "config";
 
     @Parameter(value = "config_location")
-    private String configLocation;
+    private String configLocation = "config";
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
