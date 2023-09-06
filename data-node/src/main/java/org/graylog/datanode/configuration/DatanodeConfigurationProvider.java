@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 @Singleton
@@ -35,7 +34,7 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     @Inject
     public DatanodeConfigurationProvider(final Configuration localConfiguration) throws IOException {
         final OpensearchDistribution opensearchDistribution = detectOpensearchDistribution(localConfiguration);
-        final JwtBearerTokenProvider provider = new JwtBearerTokenProvider(localConfiguration.getPasswordSecret(), localConfiguration.getOpensearchJwtTokenExpirationDuration(), localConfiguration.getOpensearchJwtTokenCachingDuration());
+        final JwtBearerTokenProvider provider = new JwtBearerTokenProvider(localConfiguration.getPasswordSecret(), localConfiguration.getIndexerJwtAuthTokenExpirationDuration(), localConfiguration.getIndexerJwtAuthTokenCachingDuration());
         final var jwtToken = provider.get();
 
         datanodeConfiguration = new DatanodeConfiguration(

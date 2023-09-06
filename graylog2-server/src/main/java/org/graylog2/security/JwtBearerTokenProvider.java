@@ -40,8 +40,8 @@ public class JwtBearerTokenProvider implements Provider<String> {
 
     @Inject
     public JwtBearerTokenProvider(@Named("password_secret") String signingKey,
-                                  @Named("opensearch_jwt_token_expiration_duration") final Duration tokenExpirationDuration,
-                                  @Named("opensearch_jwt_token_caching_duration") final Duration cachingDuration) {
+                                  @Named("indexer_jwt_auth_token_expiration_duration") final Duration tokenExpirationDuration,
+                                  @Named("indexer_jwt_auth_token_caching_duration") final Duration cachingDuration) {
         authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8), tokenExpirationDuration), cachingDuration.toSeconds(), TimeUnit.SECONDS);
     }
 

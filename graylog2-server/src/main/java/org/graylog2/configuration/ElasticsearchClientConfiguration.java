@@ -95,9 +95,9 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "opensearch_use_jwt_authentication")
     boolean opensearchUseJwtAuthentication = false;
 
-    @Parameter(value = "opensearch_jwt_token_caching_duration")
+    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
     Duration opensearchJwtTokenCachingDuration = Duration.seconds(60);
 
-    @Parameter(value = "opensearch_jwt_token_expiration_duration")
+    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     Duration opensearchJwtTokenExpirationDuration = Duration.seconds(180);
 }

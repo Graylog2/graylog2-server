@@ -201,18 +201,18 @@ public class Configuration extends BaseConfiguration {
         return passwordSecret;
     }
 
-    @Parameter(value = "opensearch_jwt_token_caching_duration")
-    Duration opensearchJwtTokenCachingDuration = Duration.seconds(60);
+    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
+    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
 
-    public Duration getOpensearchJwtTokenCachingDuration() {
-        return opensearchJwtTokenCachingDuration;
+    public Duration getIndexerJwtAuthTokenCachingDuration() {
+        return indexerJwtAuthTokenCachingDuration;
     }
 
-    @Parameter(value = "opensearch_jwt_token_expiration_duration")
-    Duration opensearchJwtTokenExpirationDuration = Duration.seconds(180);
+    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
+    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
-    public Duration getOpensearchJwtTokenExpirationDuration() {
-        return opensearchJwtTokenExpirationDuration;
+    public Duration getIndexerJwtAuthTokenExpirationDuration() {
+        return indexerJwtAuthTokenExpirationDuration;
     }
 
     @ValidatorMethod
