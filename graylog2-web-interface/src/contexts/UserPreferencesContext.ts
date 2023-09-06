@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { ColorScheme } from '@graylog/sawmill';
 
-import type { LegacyColorScheme } from 'theme/constants';
 import { LEGACY_DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE } from 'theme/constants';
 
 import { singleton } from '../logic/singleton';
@@ -26,7 +26,7 @@ export type UserPreferences = {
   updateUnfocussed: boolean,
   searchSidebarIsPinned?: boolean,
   dashboardSidebarIsPinned?: boolean,
-  [PREFERENCES_THEME_MODE]: LegacyColorScheme,
+  [PREFERENCES_THEME_MODE]: ColorScheme,
 };
 
 export const defaultUserPreferences = {

@@ -22,25 +22,29 @@ import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 
+import type { LegacyColorScheme } from './constants';
 import {
-  PREFERENCES_THEME_MODE,
-  DEFAULT_THEME_MODE,
-  LEGACY_COLOR_SCHEME_DARK,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  DEFAULT_THEME_MODE,
+  LEGACY_COLOR_SCHEME_DARK,
+  LEGACY_COLOR_SCHEME_LIGHT,
+  PREFERENCES_THEME_MODE,
 } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
 
-const modeFromStore = () => {
-  const mode = Store.get(PREFERENCES_THEME_MODE);
-
-  if (mode) {
-    return mode === LEGACY_COLOR_SCHEME_DARK ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
+const fromLegacyColorSchemeName = (legacyColorScheme: LegacyColorScheme): ColorScheme => {
+  if (legacyColorScheme === LEGACY_COLOR_SCHEME_LIGHT) {
+    return COLOR_SCHEME_LIGHT;
   }
 
-  return null;
+  if (legacyColorScheme === LEGACY_COLOR_SCHEME_DARK) {
+    return COLOR_SCHEME_DARK;
+  }
+
+  return legacyColorScheme;
 };
 
 const getInitialThemeMode = (userPreferences: Record<typeof PREFERENCES_THEME_MODE, ColorScheme>, browserThemePreference: ColorScheme, initialThemeModeOverride: ColorScheme) => {
@@ -48,7 +52,7 @@ const getInitialThemeMode = (userPreferences: Record<typeof PREFERENCES_THEME_MO
     return initialThemeModeOverride;
   }
 
-  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? modeFromStore();
+  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? fromLegacyColorSchemeName(Store.get(PREFERENCES_THEME_MODE));
 
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
