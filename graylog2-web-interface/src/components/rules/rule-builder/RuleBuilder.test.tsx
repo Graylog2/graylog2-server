@@ -56,7 +56,6 @@ describe('RuleBuilder', () => {
       <PipelineRulesContext.Provider value={{
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
@@ -91,7 +90,6 @@ describe('RuleBuilder', () => {
       <PipelineRulesContext.Provider value={{
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
@@ -124,7 +122,6 @@ describe('RuleBuilder', () => {
       <PipelineRulesContext.Provider value={{
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
@@ -154,7 +151,6 @@ describe('RuleBuilder', () => {
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
@@ -189,7 +185,6 @@ describe('RuleBuilder', () => {
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
