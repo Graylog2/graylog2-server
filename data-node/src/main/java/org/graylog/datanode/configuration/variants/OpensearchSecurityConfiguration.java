@@ -92,7 +92,7 @@ public class OpensearchSecurityConfiguration {
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
-            enableJwtInConfig(opensearchConfigDir, signingKey);
+            enableJwtAuthenticationInConfig(opensearchConfigDir, signingKey);
         }
         return this;
     }
@@ -141,7 +141,7 @@ public class OpensearchSecurityConfiguration {
         return result;
     }
 
-    private void enableJwtInConfig(final Path opensearchConfigDir, final byte[] signingKey) throws IOException {
+    private void enableJwtAuthenticationInConfig(final Path opensearchConfigDir, final byte[] signingKey) throws IOException {
         final ObjectMapper objectMapper = new YAMLMapper();
         final File file = opensearchConfigDir.resolve(Path.of("opensearch-security", "config.yml")).toFile();
         Map<String, Object> contents = objectMapper.readValue(file, new TypeReference<>() {});

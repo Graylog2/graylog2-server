@@ -114,12 +114,6 @@ public class DatanodeContainerizedBackend {
         return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
     }
 
-    private static String getArch() {
-        final String arch = System.getProperty("os.arch");
-        // See SystemArchProvider for reference, we do it the other way around here because of OpenSearch packaging/naming
-        return "arm64".equals(arch) ? "aarch64" : arch;
-    }
-
     private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
         final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
         final Path downloadedOpensearch = Path.of("target", "downloads", opensearchTarArchive);

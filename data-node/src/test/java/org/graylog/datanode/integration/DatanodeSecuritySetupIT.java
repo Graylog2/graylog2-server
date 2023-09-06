@@ -119,12 +119,12 @@ public class DatanodeSecuritySetupIT {
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
-        final String jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
+        final String jwtAuthToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), backend.getOpensearchRestPort(), trustStore, jwtToken);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), backend.getOpensearchRestPort(), trustStore);
 
         try {
-            given().header( "Authorization", "Bearer " + jwtToken)
+            given().header( "Authorization", "Bearer " + jwtAuthToken)
                     .trustStore(trustStore)
                     .get("https://localhost:" + backend.getOpensearchRestPort())
                     .then().assertThat()
@@ -136,7 +136,7 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private void waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final Integer opensearchPort, final KeyStore trustStore, final String jwtToken) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final Integer opensearchPort, final KeyStore trustStore) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
