@@ -80,13 +80,13 @@ public class Configuration extends BaseConfiguration {
     private String opensearchDistributionRoot = "dist";
 
     @Parameter(value = "opensearch_data_location")
-    private String opensearchDataLocation = "data";
+    private String opensearchDataLocation = "datanode/data";
 
     @Parameter(value = "opensearch_logs_location")
-    private String opensearchLogsLocation = "logs";
+    private String opensearchLogsLocation = "datanode/logs";
 
     @Parameter(value = "opensearch_config_location")
-    private String opensearchConfigLocation = "config";
+    private String opensearchConfigLocation = "datanode/config";
 
     @Parameter(value = "config_location")
     private String configLocation = "config";
