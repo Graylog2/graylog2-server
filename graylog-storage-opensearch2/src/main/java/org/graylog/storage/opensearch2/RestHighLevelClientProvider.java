@@ -27,8 +27,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.security.JwtBearerToken;
-import org.graylog2.security.JwtBearerTokenProvider;
+import org.graylog2.security.IndexerJwtAuthToken;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
@@ -40,7 +39,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -74,7 +72,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
             @RunsWithDataNode Boolean runsWithDataNode,
             @Named("indexer_use_jwt_authentication") boolean indexerUseJwtAuthentication,
-            @JwtBearerToken String jwtBearerToken) {
+            @IndexerJwtAuthToken String jwtBearerToken) {
 
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
 

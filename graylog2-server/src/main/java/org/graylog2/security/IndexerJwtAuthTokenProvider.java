@@ -35,13 +35,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 @Singleton
-public class JwtBearerTokenProvider implements Provider<String> {
+public class IndexerJwtAuthTokenProvider implements Provider<String> {
     private final Supplier<String> authHeaderBearerString;
 
     @Inject
-    public JwtBearerTokenProvider(@Named("password_secret") String signingKey,
-                                  @Named("indexer_jwt_auth_token_expiration_duration") final Duration tokenExpirationDuration,
-                                  @Named("indexer_jwt_auth_token_caching_duration") final Duration cachingDuration) {
+    public IndexerJwtAuthTokenProvider(@Named("password_secret") String signingKey,
+                                       @Named("indexer_jwt_auth_token_expiration_duration") final Duration tokenExpirationDuration,
+                                       @Named("indexer_jwt_auth_token_caching_duration") final Duration cachingDuration) {
         authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8), tokenExpirationDuration), cachingDuration.toSeconds(), TimeUnit.SECONDS);
     }
 

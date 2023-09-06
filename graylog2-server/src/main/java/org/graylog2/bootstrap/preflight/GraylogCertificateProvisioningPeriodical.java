@@ -37,7 +37,7 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
-import org.graylog2.security.JwtBearerToken;
+import org.graylog2.security.IndexerJwtAuthToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +85,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final CsrSigner csrSigner,
                                                     final ClusterConfigService clusterConfigService,
                                                     final @Named("password_secret") String passwordSecret,
-                                                    @JwtBearerToken String jwtBearerToken,
+                                                    @IndexerJwtAuthToken String jwtBearerToken,
                                                     ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;

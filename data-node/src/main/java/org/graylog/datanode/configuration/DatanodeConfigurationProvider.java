@@ -18,7 +18,7 @@ package org.graylog.datanode.configuration;
 
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.OpensearchDistribution;
-import org.graylog2.security.JwtBearerTokenProvider;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -34,7 +34,7 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     @Inject
     public DatanodeConfigurationProvider(final Configuration localConfiguration) throws IOException {
         final OpensearchDistribution opensearchDistribution = detectOpensearchDistribution(localConfiguration);
-        final JwtBearerTokenProvider provider = new JwtBearerTokenProvider(localConfiguration.getPasswordSecret(), localConfiguration.getIndexerJwtAuthTokenExpirationDuration(), localConfiguration.getIndexerJwtAuthTokenCachingDuration());
+        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(localConfiguration.getPasswordSecret(), localConfiguration.getIndexerJwtAuthTokenExpirationDuration(), localConfiguration.getIndexerJwtAuthTokenCachingDuration());
         final var jwtToken = provider.get();
 
         datanodeConfiguration = new DatanodeConfiguration(

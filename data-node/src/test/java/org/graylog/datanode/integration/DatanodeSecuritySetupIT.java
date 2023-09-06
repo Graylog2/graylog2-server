@@ -29,7 +29,7 @@ import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
-import org.graylog2.security.JwtBearerTokenProvider;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -119,7 +119,7 @@ public class DatanodeSecuritySetupIT {
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
-        final String jwtToken = JwtBearerTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
+        final String jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), backend.getOpensearchRestPort(), trustStore, jwtToken);
 

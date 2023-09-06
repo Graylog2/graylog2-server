@@ -25,5 +25,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.PARAMETER, ElementType.TYPE })
 @Qualifier
-public @interface JwtBearerToken {
+public @interface IndexerJwtAuthToken {
 }

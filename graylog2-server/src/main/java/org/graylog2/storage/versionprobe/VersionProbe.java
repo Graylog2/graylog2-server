@@ -30,7 +30,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.security.JwtBearerToken;
+import org.graylog2.security.IndexerJwtAuthToken;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class VersionProbe {
                         @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay,
                         @RunsWithDataNode Boolean runsWithDataNode,
                         @Named("indexer_use_jwt_authentication") boolean opensearchUseJwtAuthentication,
-                        @JwtBearerToken String jwtBearerToken) {
+                        @IndexerJwtAuthToken String jwtBearerToken) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
         this.connectionAttempts = elasticsearchVersionProbeAttempts;

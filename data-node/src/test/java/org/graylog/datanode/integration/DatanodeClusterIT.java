@@ -28,7 +28,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
-import org.graylog2.security.JwtBearerTokenProvider;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -184,7 +184,7 @@ public class DatanodeClusterIT {
     }
 
     private void waitForNodesCount(final int countOfNodes) throws ExecutionException, RetryException {
-        final String jwtToken = JwtBearerTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
+        final String jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
         try {
             final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
