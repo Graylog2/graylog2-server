@@ -71,5 +71,7 @@ public interface StreamService extends PersistedService {
 
     List<Stream> loadAllWithIndexSet(String indexSetId);
 
+    List<String> streamTitlesForIndexSet(String indexSetId);
+
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
 }
