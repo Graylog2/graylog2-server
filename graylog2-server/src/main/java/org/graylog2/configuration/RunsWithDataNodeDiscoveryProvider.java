@@ -66,11 +66,11 @@ public class RunsWithDataNodeDiscoveryProvider implements Provider<Boolean> {
         if (preflightResult == PreflightConfigResult.FINISHED) {
             final List<URI> discovered = discover();
             if (!discovered.isEmpty()) {
-                LOG.info("Running with DataNode(s).");
+                LOG.debug("Running with DataNode(s).");
                 return Boolean.TRUE;
             }
         }
-        LOG.info("Not running with DataNode(s).");
+        LOG.debug("Not running with DataNode(s).");
         return Boolean.FALSE;
     }
 
