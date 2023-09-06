@@ -33,7 +33,7 @@ const useRoutePattern = () => {
     }
 
     return undefined;
-  }, [location.pathname, dataRouterContext?.router?.routes]);
+  }, [location.pathname, dataRouterContext]);
 };
 
 export default singleton('hooks.useRoutePattern', () => useRoutePattern);
