@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.testinfra;
 
+import com.google.common.base.Suppliers;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
@@ -32,6 +33,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 public class DatanodeContainerizedBackend {
 
@@ -41,6 +43,8 @@ public class DatanodeContainerizedBackend {
     private final Network network;
     private final GenericContainer<?> mongodbContainer;
     private final GenericContainer<?> datanodeContainer;
+
+    private static final Supplier<ImageFromDockerfile> imageSupplier = Suppliers.memoize(() -> createImage(getOpensearchVersion()));
 
     public DatanodeContainerizedBackend() {
         this(new DatanodeDockerHooksAdapter());
@@ -55,7 +59,7 @@ public class DatanodeContainerizedBackend {
         this.mongodbContainer = createMongodbContainer(this.network);
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
-                hooks, createDockerImageFile(getOpensearchVersion()),
+                hooks,
                 getDatanodeVersion());
     }
 
@@ -65,15 +69,13 @@ public class DatanodeContainerizedBackend {
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
                 hooks,
-                createDockerImageFile(getOpensearchVersion()),
                 getDatanodeVersion());
     }
 
-    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion) {
-
+    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, String datanodeVersion) {
         MavenPackager.packageJarIfNecessary(createConfig());
 
-        GenericContainer<?> container = new GenericContainer<>(image)
+        GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
 
@@ -114,7 +116,7 @@ public class DatanodeContainerizedBackend {
         return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
     }
 
-    private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
+    private static ImageFromDockerfile createImage(String opensearchVersion) {
         final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
         final Path downloadedOpensearch = Path.of("target", "downloads", opensearchTarArchive);
 
@@ -196,10 +198,10 @@ public class DatanodeContainerizedBackend {
         }
     }
 
-    private String getOpensearchVersion() {
+    private static String getOpensearchVersion() {
         try {
             final Properties props = new Properties();
-            props.load(getClass().getResourceAsStream("/opensearch.properties"));
+            props.load(DatanodeContainerizedBackend.class.getResourceAsStream("/opensearch.properties"));
             return props.getProperty("opensearchVersion");
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -22,6 +22,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.NoHttpResponseException;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.SocketException;
@@ -44,6 +46,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 
@@ -57,9 +60,11 @@ public class DatanodeClusterIT {
     static Path tempDir;
     private String hostnameNodeA;
     private KeyStore trustStore;
-    private String usernameNodeA;
-    private String passwordNodeA;
+    private String initialAdminUsername;
+    private String initialAdminPassword;
     private KeystoreInformation ca;
+    private Network network;
+    private GenericContainer<?> mongodbContainer;
 
     @BeforeEach
     void setUp() throws GeneralSecurityException, IOException {
@@ -72,43 +77,45 @@ public class DatanodeClusterIT {
         hostnameNodeA = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         final KeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeA);
         final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
-        usernameNodeA = RandomStringUtils.randomAlphabetic(10);
-        passwordNodeA = RandomStringUtils.randomAlphabetic(10);
+        initialAdminUsername = RandomStringUtils.randomAlphabetic(10);
+        initialAdminPassword = RandomStringUtils.randomAlphabetic(10);
 
-        final Network network = Network.newNetwork();
-        final GenericContainer<?> mongodb = DatanodeContainerizedBackend.createMongodbContainer(network);
+        this.network = Network.newNetwork();
+        this.mongodbContainer = DatanodeContainerizedBackend.createMongodbContainer(network);
         nodeA = createDatanodeContainer(
                 network,
-                mongodb,
+                mongodbContainer,
                 hostnameNodeA,
                 transportNodeA,
                 httpNodeA,
-                usernameNodeA,
-                passwordNodeA
-        ).start();
+                initialAdminUsername,
+                initialAdminPassword
+        );
 
 
         final String hostnameNodeB = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         final KeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeB);
         final KeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeB);
-        final String usernameNodeB = RandomStringUtils.randomAlphabetic(10);
-        final String passwordNodeB = RandomStringUtils.randomAlphabetic(10);
 
         nodeB = createDatanodeContainer(
                 network,
-                mongodb,
+                mongodbContainer,
                 hostnameNodeB,
                 transportNodeB,
                 httpNodeB,
-                usernameNodeB,
-                passwordNodeB
-        ).start();
+                initialAdminUsername,
+                initialAdminPassword
+        );
+
+        Stream.of(nodeA, nodeB).parallel().forEach(DatanodeContainerizedBackend::start);
     }
 
     @AfterEach
     void tearDown() {
         nodeB.stop();
         nodeA.stop();
+        network.close();
+        mongodbContainer.stop();
     }
 
     @Test
@@ -122,16 +129,14 @@ public class DatanodeClusterIT {
         final String hostnameNodeC = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
         final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
-        final String usernameNodeC = RandomStringUtils.randomAlphabetic(10);
-        final String passwordNodeC = RandomStringUtils.randomAlphabetic(10);
 
         final DatanodeContainerizedBackend nodeC = createDatanodeContainer(
                 nodeA.getNetwork(), nodeA.getMongodbContainer(),
                 hostnameNodeC,
                 transportNodeC,
                 httpNodeC,
-                usernameNodeC,
-                passwordNodeC
+                initialAdminUsername,
+                initialAdminPassword
         );
 
         nodeC.start();
@@ -184,6 +189,8 @@ public class DatanodeClusterIT {
                     .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                     .retryIfException(input -> input instanceof NoHttpResponseException)
                     .retryIfException(input -> input instanceof SocketException)
+                    .retryIfException(input -> input instanceof SSLHandshakeException) // may happen before SSL is configured properly
+                    .retryIfResult(input -> !input.extract().contentType().startsWith("application/json"))
                     .retryIfResult(input -> !input.extract().body().path("number_of_nodes").equals(countOfNodes))
                     .retryIfResult(input -> !input.extract().body().path("status").equals("green"))
                     .retryIfResult(input -> !input.extract().body().path("discovered_cluster_manager").equals(true))
@@ -192,11 +199,10 @@ public class DatanodeClusterIT {
                 Integer mappedPort = nodeA.getOpensearchRestPort();
                 return RestAssured.given()
                         .trustStore(trustStore)
-                        .auth().basic(usernameNodeA, passwordNodeA)
-                        .log().all()
+                        .auth().basic(initialAdminUsername, initialAdminPassword)
+                        .accept(ContentType.JSON)
                         .get("https://localhost:" + mappedPort + "/_cluster/health")
-                        .then()
-                        .log().all();
+                        .then();
             });
         } catch (Exception retryException) {
             LOG.error("DataNode Container logs from nodeA follow:\n" + nodeA.getLogs());
