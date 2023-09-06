@@ -80,6 +80,7 @@ const RuleBuilder = () => {
   const {
     rawMessageToSimulate,
     simulateRule,
+    setRuleSimulationResult,
   } = useContext(PipelineRulesContext);
 
   const [rule, setRule] = useState<RuleBuilderRule>({
@@ -124,6 +125,10 @@ const RuleBuilder = () => {
 
   const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
     setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
+
+    if (ruleValidated.rule_builder?.errors?.length > 0) {
+      setRuleSimulationResult(null);
+    }
   }).catch(() => setRule(ruleToValidate));
 
   const addBlock = async (type: BlockType, block: RuleBlock) => {
@@ -287,8 +292,8 @@ const RuleBuilder = () => {
               <Col xs={8}>
                 <StyledPanel expanded={conditionsExpanded}>
                   <StyledPanelHeading>
-                    <Panel.Title toggle>
-                      When
+                    <Panel.Title toggle title="The logical AND operator is used here to combine the conditions">
+                      When (and)
                     </Panel.Title>
                   </StyledPanelHeading>
                   <Panel.Collapse>

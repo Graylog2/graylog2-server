@@ -62,7 +62,6 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setRawMessageToSimulate,
     ruleSimulationResult,
     setRuleSimulationResult,
-    setStartRuleSimulation,
   } = useContext(PipelineRulesContext);
 
   const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {}).sort();
@@ -73,8 +72,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
 
   useEffect(() => () => {
     setRuleSimulationResult(null);
-    setStartRuleSimulation(false);
-  }, [setRawMessageToSimulate, setRuleSimulationResult, setStartRuleSimulation]);
+  }, [setRuleSimulationResult]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
   const errorMessage = currentRule?.rule_builder?.errors?.length > 0 ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
@@ -108,7 +106,6 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
 
     setRawMessageToSimulate('');
     setRuleSimulationResult(null);
-    setStartRuleSimulation(false);
   };
 
   return (
