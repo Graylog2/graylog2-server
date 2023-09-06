@@ -22,7 +22,13 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 
 import type { ThemeMode } from './constants';
-import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
+import {
+  PREFERENCES_THEME_MODE,
+  DEFAULT_THEME_MODE,
+  THEME_MODE_DARK,
+  NEW_THEME_MODE_DARK,
+  THEME_MODE_LIGHT, NEW_THEME_MODE_LIGHT,
+} from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
@@ -34,12 +40,38 @@ type CurrentUser = {
   };
 };
 
+type NewThemeMode = typeof NEW_THEME_MODE_LIGHT | typeof NEW_THEME_MODE_DARK;
+
+const toNewThemeModeName = (themeMode: ThemeMode): NewThemeMode => {
+  if (themeMode === THEME_MODE_DARK) {
+    return NEW_THEME_MODE_DARK;
+  }
+
+  if (themeMode === THEME_MODE_LIGHT) {
+    return NEW_THEME_MODE_LIGHT;
+  }
+
+  return themeMode;
+};
+
+const fromNewThemeModeName = (themeMode: NewThemeMode): ThemeMode => {
+  if (themeMode === NEW_THEME_MODE_DARK) {
+    return THEME_MODE_DARK;
+  }
+
+  if (themeMode === NEW_THEME_MODE_LIGHT) {
+    return THEME_MODE_LIGHT;
+  }
+
+  return themeMode;
+};
+
 const _getInitialThemeMode = (userPreferences, browserThemePreference, initialThemeModeOverride) => {
   if (initialThemeModeOverride) {
     return initialThemeModeOverride;
   }
 
-  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
+  const userThemePreference = fromNewThemeModeName(userPreferences[PREFERENCES_THEME_MODE]) ?? Store.get(PREFERENCES_THEME_MODE);
 
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
@@ -61,7 +93,7 @@ const useCurrentThemeMode = (initialThemeModeOverride: ThemeMode): [ThemeMode, (
     Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 
     if (!userIsReadOnly) {
-      const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
+      const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: toNewThemeModeName(newThemeMode) };
 
       PreferencesStore.saveUserPreferences(username, nextPreferences);
     }

@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.messages;
 
-import com.google.common.collect.ImmutableList;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexSet;
@@ -31,10 +30,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.messages.IndexingError.Type.IndexBlocked;
+import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
+import static org.graylog2.indexer.messages.IndexingError.Type.Unknown;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -59,10 +60,10 @@ class MessagesBulkIndexRetryingTest {
 
     @Test
     public void bulkIndexingShouldNotDoAnythingForEmptyList() throws Exception {
-        final Set<String> result = messages.bulkIndex(Collections.emptyList());
+        final IndexingResults indexingResults = messages.bulkIndex(Collections.emptyList());
 
-        assertThat(result).isNotNull()
-                .isEmpty();
+        assertThat(indexingResults).isNotNull();
+        assertThat(indexingResults.allResults()).isEmpty();
 
         verify(messagesAdapter, never()).bulkIndex(any());
     }
@@ -71,9 +72,8 @@ class MessagesBulkIndexRetryingTest {
     public void bulkIndexingShouldNotRetryForIndexMappingErrors() throws Exception {
         final String messageId = "BOOMID";
 
-        final List<Messages.IndexingError> errorResult = ImmutableList.of(
-                errorResultItem(messageId, Messages.IndexingError.ErrorType.MappingError, "failed to parse [http_response_code]")
-        );
+        final IndexingResults errorResult =
+                IndexingResults.create(List.of(), List.of(errorResultItem(messageId, MappingError, "failed to parse [http_response_code]")));
 
         when(messagesAdapter.bulkIndex(any()))
                 .thenReturn(errorResult)
@@ -85,9 +85,10 @@ class MessagesBulkIndexRetryingTest {
 
         final List<MessageWithIndex> messageList = messageListWith(mockedMessage);
 
-        final Set<String> result = messages.bulkIndex(messageList);
+        var result = messages.bulkIndex(messageList);
 
-        assertThat(result).hasSize(1);
+        assertThat(result.errors()).hasSize(1);
+        assertThat(result.successes()).hasSize(0);
 
         verify(messagesAdapter, times(1)).bulkIndex(any());
     }
@@ -96,70 +97,81 @@ class MessagesBulkIndexRetryingTest {
     public void bulkIndexingShouldRetry() throws Exception {
         when(messagesAdapter.bulkIndex(any()))
                 .thenThrow(new IOException("Boom!"))
-                .thenReturn(Collections.emptyList());
+                .thenReturn(IndexingResults.empty());
 
         final List<MessageWithIndex> messageList = messageListWith(mock(Message.class));
 
-        final Set<String> result = messages.bulkIndex(messageList);
+        var result = messages.bulkIndex(messageList);
 
-        assertThat(result).isNotNull().isEmpty();
+        assertThat(result).isNotNull();
+        assertThat(result.allResults()).isEmpty();
 
         verify(messagesAdapter, times(2)).bulkIndex(any());
     }
 
     @Test
     public void bulkIndexingShouldRetryIfIndexBlocked() throws IOException {
-        final List<Messages.IndexingError> errorResult = Collections.singletonList(
-                errorResultItem("blocked-id", Messages.IndexingError.ErrorType.IndexBlocked, "Index is read-only")
-        );
-        final List<Messages.IndexingError> successResult = Collections.emptyList();
+        final IndexingResults errorResult =
+                IndexingResults.create(List.of(), List.of(errorResultItem("blocked-id", IndexBlocked, "Index is read-only")));
 
         when(messagesAdapter.bulkIndex(any()))
                 .thenReturn(errorResult)
-                .thenReturn(successResult);
+                .thenReturn(IndexingResults.empty());
 
-        final Set<String> result = messages.bulkIndex(messagesWithIds("blocked-id"));
+        var result = messages.bulkIndex(messagesWithIds("blocked-id"));
 
         verify(messagesAdapter, times(2)).bulkIndex(any());
-        assertThat(result).isNotNull().isEmpty();
+        assertThat(result).isNotNull();
+        assertThat(result.allResults()).isEmpty();
     }
 
     @Test
     public void indexBlockedRetriesShouldOnlyRetryIndexBlockedErrors() throws IOException {
-        final List<Messages.IndexingError> errorResult = ImmutableList.of(
-                errorResultItem("blocked-id", Messages.IndexingError.ErrorType.IndexBlocked, "Index is read-only"),
-                errorResultItem("other-error-id", Messages.IndexingError.ErrorType.Unknown, "Some other error")
-        );
-        final List<Messages.IndexingError> successResult = Collections.emptyList();
+        final IndexingResults errorResult =
+                IndexingResults.create(List.of(),
+                        List.of(
+                                errorResultItem("blocked-id", IndexBlocked, "Index is read-only"),
+                                errorResultItem("other-error-id", Unknown, "Some other error")
+                        )
+                );
 
         when(messagesAdapter.bulkIndex(any()))
                 .thenReturn(errorResult)
-                .thenReturn(successResult);
+                .thenReturn(IndexingResults.empty());
 
-        final Set<String> result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
+        var result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
         verify(messagesAdapter, times(2)).bulkIndex(any());
-        assertThat(result).containsOnly("other-error-id");
+        assertThat(result.errors()).map(IndexingError::message).map(Indexable::getId)
+                .containsOnly("other-error-id");
     }
 
     @Test
     public void retriedIndexBlockErrorsThatFailWithDifferentErrorsAreTreatedAsPersistentFailures() throws IOException {
-        final List<Messages.IndexingError> errorResult = ImmutableList.of(
-                errorResultItem("blocked-id", Messages.IndexingError.ErrorType.IndexBlocked, "Index is read-only"),
-                errorResultItem("other-error-id", Messages.IndexingError.ErrorType.IndexBlocked, "Index is read-only")
-        );
-        final List<Messages.IndexingError> secondErrorResult = ImmutableList.of(
-                errorResultItem("other-error-id", Messages.IndexingError.ErrorType.Unknown, "Some other error")
-        );
+        final IndexingError someOtherError = errorResultItem("other-error-id", Unknown, "Some other error");
+        final IndexingResults errorResult =
+                IndexingResults.create(List.of(),
+                        List.of(
+                                errorResultItem("blocked-id", IndexBlocked, "Index is read-only"),
+                                someOtherError
+                        )
+                );
+        final IndexingResults secondErrorResult =
+                IndexingResults.create(List.of(),
+                        List.of(
+                                someOtherError
+                        )
+                );
 
         when(messagesAdapter.bulkIndex(any()))
                 .thenReturn(errorResult)
                 .thenReturn(secondErrorResult);
 
-        final Set<String> result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
+        var result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
         verify(messagesAdapter, times(2)).bulkIndex(any());
-        assertThat(result).containsOnly("other-error-id");
+        assertThat(result.errors()).hasSize(1);
+        assertThat(result.errors()).map(IndexingError::message).map(Indexable::getId).containsOnly("other-error-id");
     }
 
     private List<MessageWithIndex> messagesWithIds(String... ids) {
@@ -180,11 +192,11 @@ class MessagesBulkIndexRetryingTest {
         return List.of(new MessageWithIndex(mockedMessage, mock(IndexSet.class)));
     }
 
-    private Messages.IndexingError errorResultItem(String messageId, Messages.IndexingError.ErrorType errorType, String errorReason) {
+    private IndexingError errorResultItem(String messageId, IndexingError.Type errorType, String errorReason) {
         final Message message = mock(Message.class);
         when(message.getTimestamp()).thenReturn(DateTime.now(DateTimeZone.UTC));
         when(message.getId()).thenReturn(messageId);
 
-        return Messages.IndexingError.create(message, "randomIndex", errorType, errorReason);
+        return IndexingError.create(message, "randomIndex", errorType, errorReason);
     }
 }

@@ -32,7 +32,6 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -71,11 +70,11 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
         final int MESSAGECOUNT = 50;
         // Each Message is about 1 MB
         final List<MessageWithIndex> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
-        final Set<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
+        var results = this.messages.bulkIndex(largeMessageBatch);
 
         client().refreshNode(); // wait for ES to finish indexing
 
-        assertThat(failedItems).isEmpty();
+        assertThat(results.errors()).isEmpty();
         assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT);
     }
 

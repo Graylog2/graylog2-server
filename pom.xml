@@ -195,7 +195,7 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.17.6</testcontainers.version>
+        <testcontainers.version>1.19.0</testcontainers.version>
         <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
