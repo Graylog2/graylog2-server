@@ -14,17 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.messages;
+package org.graylog2.rest.resources.system.indexer.requests;
 
-import org.graylog2.indexer.results.ResultMessage;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.io.IOException;
-import java.util.List;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.Set;
 
-public interface MessagesAdapter {
-    ResultMessage get(String messageId, String index) throws IOException, DocumentNotFoundException;
-
-    List<String> analyze(String toAnalyze, String index, String analyzer) throws IOException;
-
-    IndexingResults bulkIndex(final List<IndexingRequest> messageList) throws IOException;
+public record FieldTypeSummaryRequest(@NotNull @NotEmpty
+                                      @JsonProperty("streams")
+                                      Set<String> streamsIds,
+                                      @NotNull @NotEmpty
+                                      @JsonProperty("field")
+                                      String fieldName) {
 }

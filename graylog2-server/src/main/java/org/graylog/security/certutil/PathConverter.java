@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.messages;
+package org.graylog.security.certutil;
 
-import org.graylog2.indexer.results.ResultMessage;
+import com.github.rvesse.airline.types.TypeConverter;
+import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
 
-import java.io.IOException;
-import java.util.List;
+import java.nio.file.Path;
 
-public interface MessagesAdapter {
-    ResultMessage get(String messageId, String index) throws IOException, DocumentNotFoundException;
+public class PathConverter implements TypeConverter {
+    @Override
+    public Object convert(String name, Class<?> type, String value) {
+        return Path.of(value);
+    }
 
-    List<String> analyze(String toAnalyze, String index, String analyzer) throws IOException;
-
-    IndexingResults bulkIndex(final List<IndexingRequest> messageList) throws IOException;
+    @Override
+    public void setNumericConverter(NumericTypeConverter converter) {
+    }
 }

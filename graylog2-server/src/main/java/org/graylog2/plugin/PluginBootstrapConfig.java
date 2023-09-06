@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.messages;
+package org.graylog2.plugin;
 
-import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.shared.plugins.PluginLoader;
 
-import java.io.IOException;
-import java.util.List;
-
-public interface MessagesAdapter {
-    ResultMessage get(String messageId, String index) throws IOException, DocumentNotFoundException;
-
-    List<String> analyze(String toAnalyze, String index, String analyzer) throws IOException;
-
-    IndexingResults bulkIndex(final List<IndexingRequest> messageList) throws IOException;
+/**
+ * A configuration bean to be processed by {@link com.github.joschi.jadconfig.JadConfig}.
+ * <p>
+ * Configurations implementing this interface should be loaded via the {@link java.util.ServiceLoader} mechanism. See
+ * {@link PluginLoader#loadPluginBootstrapConfigs()}.
+ */
+public interface PluginBootstrapConfig {
 }

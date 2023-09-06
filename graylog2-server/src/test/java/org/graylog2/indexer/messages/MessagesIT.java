@@ -47,7 +47,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -130,9 +129,10 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final int MESSAGECOUNT = 101;
         // Each Message is about 1 MB
         final List<MessageWithIndex> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
-        final Set<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
+        var results = this.messages.bulkIndex(largeMessageBatch);
 
-        assertThat(failedItems).isEmpty();
+        assertThat(results.errors()).isEmpty();
+        assertThat(results.successes()).hasSize(MESSAGECOUNT);
 
         Thread.sleep(2000); // wait for ES to finish indexing
 
@@ -150,9 +150,10 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final int LARGE_MESSAGECOUNT = 20;
         final List<MessageWithIndex> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
         messageBatch.addAll(createMessageBatch(1024 * 1024 * 5, LARGE_MESSAGECOUNT));
-        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
+        var results = this.messages.bulkIndex(messageBatch);
 
-        assertThat(failedItems).isEmpty();
+        assertThat(results.errors()).isEmpty();
+        assertThat(results.successes()).hasSize(MESSAGECOUNT + LARGE_MESSAGECOUNT);
 
         client().refreshNode(); // wait for ES to finish indexing
 
@@ -172,9 +173,9 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 new MessageWithIndex(message2, indexSet)
         );
 
-        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
+        var results = this.messages.bulkIndex(messageBatch);
 
-        assertThat(failedItems).hasSize(1);
+        assertThat(results.errors()).hasSize(1);
 
         verify(failureSubmissionService).submitIndexingErrors(argThat(arg -> arg.size() == 1));
     }
@@ -186,15 +187,15 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final AtomicBoolean succeeded = new AtomicBoolean(false);
         final List<MessageWithIndex> messageBatch = createMessageBatch(1024, 50);
 
-        final Future<Set<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+        final Future<IndexingResults> resultsFuture = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
         countDownLatch.await();
 
         resetFloodStage(INDEX_NAME);
         waitForClusterBlockRelease();
 
-        final Set<String> failedItems = result.get(3, TimeUnit.MINUTES);
-        assertThat(failedItems).isEmpty();
+        var results = resultsFuture.get(3, TimeUnit.MINUTES);
+        assertThat(results.errors()).isEmpty();
 
         client().refreshNode();
 
@@ -248,14 +249,14 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final AtomicBoolean succeeded = new AtomicBoolean(false);
 
-        final Future<Set<String>> result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+        final Future<IndexingResults> resultsFuture = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
         countDownLatch.await();
 
         client().removeAliasMapping(index2, INDEX_NAME);
 
-        final Set<String> failedItems = result.get(3, TimeUnit.MINUTES);
-        assertThat(failedItems).isEmpty();
+        var results = resultsFuture.get(3, TimeUnit.MINUTES);
+        assertThat(results.errors()).isEmpty();
 
         client().refreshNode();
 
@@ -271,9 +272,9 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 new MessageWithIndex(message, indexSet)
         );
 
-        final Set<String> failedItems = this.messages.bulkIndex(messageBatch);
+        var results = this.messages.bulkIndex(messageBatch);
 
-        assertThat(failedItems).isEmpty();
+        assertThat(results.errors()).isEmpty();
 
         client().refreshNode();
 
@@ -282,7 +283,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(resultMessage.getMessage().getField("custom_object")).isEqualTo("foo");
     }
 
-    private Future<Set<String>> background(Callable<Set<String>> task) {
+    private Future<IndexingResults> background(Callable<IndexingResults> task) {
         final ExecutorService executor = Executors.newFixedThreadPool(1,
                 new ThreadFactoryBuilder().setNameFormat("messages-it-%d").build());
 
