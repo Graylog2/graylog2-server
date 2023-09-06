@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import 'styled-components';
-import type { SawmillSCType, ColorScheme } from '@graylog/sawmill';
+import type { StyledComponentsTheme, ColorScheme } from '@graylog/sawmill';
 
 declare module 'styled-components' {
-  export interface DefaultTheme extends SawmillSCType {
+  export interface DefaultTheme extends StyledComponentsTheme {
     changeMode: (newColorScheme: ColorScheme) => void,
   }
 }
