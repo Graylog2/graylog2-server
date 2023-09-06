@@ -23,6 +23,7 @@ import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
@@ -35,7 +36,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -143,13 +143,13 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         log.debug("Flushing {} messages completed", messages.size());
     }
 
-    protected Set<String> indexMessageBatch(List<MessageWithIndex> messages) throws Exception {
+    protected IndexingResults indexMessageBatch(List<MessageWithIndex> messages) throws Exception {
         try (Timer.Context ignored = processTime.time()) {
             lastFlushTime.set(System.nanoTime());
-            final Set<String> failedMessageIds = writeMessageEntries(messages);
+            final IndexingResults indexingResults = writeMessageEntries(messages);
             batchSize.update(messages.size());
             bufferFlushes.mark();
-            return failedMessageIds;
+            return indexingResults;
         }
     }
 
