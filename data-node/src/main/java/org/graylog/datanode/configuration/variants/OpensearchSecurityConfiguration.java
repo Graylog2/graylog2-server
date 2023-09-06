@@ -145,8 +145,21 @@ public class OpensearchSecurityConfiguration {
         final ObjectMapper objectMapper = new YAMLMapper();
         final File file = opensearchConfigDir.resolve(Path.of("opensearch-security", "config.yml")).toFile();
         Map<String, Object> contents = objectMapper.readValue(file, new TypeReference<>() {});
+
+        /* TODO: the following two lines should be active, once #16334 is merged and there are nightly builds of master available to build a compatible 5.2-dev DataNode Docker image
         Map<String, Object> config = filterConfigurationMap(contents, "config", "dynamic", "authc", "jwt_auth_domain", "http_authenticator", "config");
         config.put("signing_key", Base64.getEncoder().encodeToString(signingKey));
+        */
+
+        // TODO: remove the following block, once #16334 is merged and there are nightly builds of master available to build a compatible 5.2-dev DataNode Docker image
+        Map<String, Object> jwt_auth_domain = filterConfigurationMap(contents, "config", "dynamic", "authc", "jwt_auth_domain");
+        jwt_auth_domain.put("http_enabled", true);
+        jwt_auth_domain.put("transport_enabled", true);
+
+        Map<String, Object> config = filterConfigurationMap(jwt_auth_domain, "http_authenticator", "config");
+        config.put("signing_key", Base64.getEncoder().encodeToString(signingKey));
+        config.put("roles_key", "os_roles");
+        // TODO: remove up until here
 
         objectMapper.writeValue(file, contents);
     }
