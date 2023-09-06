@@ -18,7 +18,7 @@ package org.graylog.failure;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.messages.IndexingError;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
@@ -30,6 +30,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
+import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
 
 /**
  * A supplementary service layer, which is aimed to simplify failure
@@ -138,7 +140,7 @@ public class FailureSubmissionService {
      * Submits Elasticsearch indexing errors to the failure queue
      * @param indexingErrors a collection of indexing errors
      */
-    public void submitIndexingErrors(Collection<Messages.IndexingError> indexingErrors) {
+    public void submitIndexingErrors(Collection<IndexingError> indexingErrors) {
         try {
             final FailureBatch fb = FailureBatch.indexingFailureBatch(
                     indexingErrors.stream()
@@ -164,14 +166,14 @@ public class FailureSubmissionService {
         }
     }
 
-    private IndexingFailure fromIndexingError(Messages.IndexingError indexingError) {
+    private IndexingFailure fromIndexingError(IndexingError indexingError) {
         return new IndexingFailure(
-                indexingError.errorType() == Messages.IndexingError.ErrorType.MappingError ?
+                indexingError.error().type() == MappingError ?
                         IndexingFailureCause.MappingError : IndexingFailureCause.UNKNOWN,
                 String.format(Locale.ENGLISH,
                         "Failed to index message with id '%s' targeting '%s'",
                         indexingError.message().getMessageId(), indexingError.index()),
-                indexingError.errorMessage(),
+                indexingError.error().errorMessage(),
                 Tools.nowUTC(),
                 indexingError.message(),
                 indexingError.index()
