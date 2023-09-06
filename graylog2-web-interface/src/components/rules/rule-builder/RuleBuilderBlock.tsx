@@ -148,7 +148,10 @@ const RuleBuilderBlock = ({
   };
 
   const isBlockNegatable = (): boolean => (
-    currentBlockDict?.return_type === RuleBuilderTypes.Boolean
+    type === 'condition' && (
+      currentBlockDict?.return_type === RuleBuilderTypes.Boolean
+      || currentBlockDict?.rule_builder_function_group === 'Boolean Functions'
+    )
   );
 
   const options = blockDict.map(({ name, description, rule_builder_name }) => ({ label: rule_builder_name, value: name, description: description }));
