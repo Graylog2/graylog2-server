@@ -50,6 +50,7 @@ const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => cs
   margin: 0px;
   height: ${theme.spacings.xl};
   background-color: ${$hovered ? '#f5f5f5' : 'transparent'};
+  border-left: solid 1px ${theme.colors.gray[80]};
 `);
 
 const NegationButton = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
