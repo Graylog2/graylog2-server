@@ -40,6 +40,12 @@ const ActionOutputIndex = styled.b`
   color: #aaa;
 `;
 
+const OutputText = styled.div`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
 const StyledFormGroup = styled(FormGroup)(({ theme }) => css`
   margin-bottom: ${theme.spacings.xl};
 `);
@@ -71,6 +77,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
   }, [setRawMessageToSimulate, setRuleSimulationResult, setStartRuleSimulation]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
+  const errorMessage = currentRule?.rule_builder?.errors?.length > 0 ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRawMessageToSimulate(event.target.value);
@@ -115,10 +122,11 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                onChange={handleRawMessageChange}
                title="Message string or JSON"
                help="Enter a normal string to simulate the message field or a JSON to simulate the whole message."
+               error={errorMessage}
                rows={3} />
         <Button bsStyle="info"
                 bsSize="xsmall"
-                disabled={!rawMessageToSimulate}
+                disabled={!rawMessageToSimulate || Boolean(errorMessage)}
                 onClick={handleRunRuleSimulation}>
           Run rule simulation
         </Button>
@@ -138,9 +146,9 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                   <div data-testid="conditions-output">
                     <label htmlFor="simulation_conditions_output">Conditions Output</label>
                     {conditionsOutputKeys.map((conditionsOutputKey) => (
-                      <div key={conditionsOutputKey}>
+                      <OutputText key={conditionsOutputKey}>
                         <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[conditionsOutputKey])}
-                      </div>
+                      </OutputText>
                     ))}
                   </div>
                 )}
@@ -149,9 +157,9 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                   <div data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
                     {actionsOutputKeys.map((actionsOutputKey) => (
-                      <div key={actionsOutputKey}>
+                      <OutputText key={actionsOutputKey}>
                         <ActionOutputIndex>{actionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
-                      </div>
+                      </OutputText>
                     ))}
                   </div>
                 )}
