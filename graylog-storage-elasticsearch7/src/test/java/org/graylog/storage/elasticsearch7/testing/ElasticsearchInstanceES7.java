@@ -131,6 +131,7 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
+                .withEnv("cluster.routing.allocation.disk.threshold_enabled", "true")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));

@@ -30,6 +30,7 @@ import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -105,6 +106,11 @@ public class DatanodeSecuritySetupIT {
 
             datanodeContainer.withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true");
         }).start();
+    }
+
+    @AfterEach
+    void tearDown() {
+        backend.stop();
     }
 
     @Test
