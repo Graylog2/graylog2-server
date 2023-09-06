@@ -30,11 +30,10 @@ public class MigrationsModule extends PluginModule {
         Multibinder.newSetBinder(binder(), V20201103145400_LegacyAuthServiceMigration.MigrationModule.class);
 
         addMigration(V19700101000000_GenerateClusterId.class);
-        addMigration(V20151210140600_ElasticsearchConfigMigration.class);
+        addMigration(V20151210140600_AddSearchesClusterConfigMigration.class);
         addMigration(V20161116172100_DefaultIndexSetMigration.class);
         addMigration(V20161116172200_CreateDefaultStreamMigration.class);
         addMigration(V20161122174500_AssignIndexSetsToStreamsMigration.class);
-        addMigration(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
         addMigration(V20161215163900_MoveIndexSetDefaultConfig.class);
         addMigration(V20161216123500_DefaultIndexSetMigration.class);
         addMigration(V20170110150100_FixAlertConditionsMigration.class);
