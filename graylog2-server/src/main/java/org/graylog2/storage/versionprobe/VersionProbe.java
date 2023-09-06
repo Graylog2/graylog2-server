@@ -66,7 +66,7 @@ public class VersionProbe {
                         @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
                         @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay,
                         @RunsWithDataNode Boolean runsWithDataNode,
-                        @Named("opensearch_use_jwt_authentication") boolean opensearchUseJwtAuthentication,
+                        @Named("indexer_use_jwt_authentication") boolean opensearchUseJwtAuthentication,
                         @JwtBearerToken String jwtBearerToken) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;

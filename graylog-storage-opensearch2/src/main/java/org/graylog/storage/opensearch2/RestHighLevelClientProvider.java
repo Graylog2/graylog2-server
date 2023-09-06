@@ -73,7 +73,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             CredentialsProvider credentialsProvider,
             TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
             @RunsWithDataNode Boolean runsWithDataNode,
-            @Named("opensearch_use_jwt_authentication") boolean opensearchUseJwtAuthentication,
+            @Named("indexer_use_jwt_authentication") boolean indexerUseJwtAuthentication,
             @JwtBearerToken String jwtBearerToken) {
 
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
@@ -87,7 +87,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     useExpectContinue,
                     muteOpenSearchDeprecationWarnings,
                 credentialsProvider,
-                    runsWithDataNode || opensearchUseJwtAuthentication,
+                    runsWithDataNode || indexerUseJwtAuthentication,
                     jwtBearerToken);
 
             var sniffer = SnifferWrapper.create(

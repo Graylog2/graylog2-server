@@ -92,12 +92,12 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
 
-    @Parameter(value = "opensearch_use_jwt_authentication")
-    boolean opensearchUseJwtAuthentication = false;
+    @Parameter(value = "indexer_use_jwt_authentication")
+    boolean indexerUseJwtAuthentication = false;
 
     @Parameter(value = "indexer_jwt_auth_token_caching_duration")
-    Duration opensearchJwtTokenCachingDuration = Duration.seconds(60);
+    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
 
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
-    Duration opensearchJwtTokenExpirationDuration = Duration.seconds(180);
+    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 }
