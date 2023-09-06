@@ -81,7 +81,7 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
                         .orElseThrow(() -> new IllegalArgumentException("No Opensearch distribution found for architecture " + osArch)));
     }
 
-    private static String archCode(final String osArch) {
+    public static String archCode(final String osArch) {
         return switch (osArch) {
             case "amd64" -> "x64";
             case "x86_64" -> "x64";
