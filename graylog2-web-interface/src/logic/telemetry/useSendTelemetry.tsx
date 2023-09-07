@@ -14,14 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
+import type { Optional } from 'utility-types';
 
+import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
+import useRoutePattern from 'routing/useRoutePattern';
 
 const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
+  const route = useRoutePattern();
 
-  return sendTelemetry;
+  return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => sendTelemetry(
+    eventType,
+    { app_path_pattern: route, ...event },
+  ), [sendTelemetry, route]);
 };
 
 export default useSendTelemetry;

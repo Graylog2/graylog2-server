@@ -4,6 +4,7 @@
       "_id": {
         "$oid": "54e3deadbeefdeadbeefaffe"
       },
+      "type": "org.graylog2.plugin.cluster.ClusterId",
       "title": "Dummy object"
     }
   ]

@@ -8,6 +8,11 @@ Upgrading to Graylog 5.2.x
 ## Breaking Changes
 - If you use the DataNode, the nodes system clocks have to be synchronized for JWT usage.
 
+### Migrating from legacy index templates to composable index templates
+
+Starting with Graylog 5.2, we are migrating from using [legacy index templates](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/indices-templates-v1.html) to [composable index template]
+(https://www.elastic.co/guide/en/elasticsearch/reference/7.17/index-templates.html). While this gives us more flexibility and predictability for field types in index mappings, this also requires that existing custom legacy index templates need to be migrated to composable index templates manually as well.
+
 ### Removed support for legacy "Collector Sidecars"
 
 Graylog 3.0 introduced "Graylog Sidecars" as a replacement for the old Collector Sidecars (version 0.1.x).
