@@ -17,7 +17,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import type { ColorScheme } from '@graylog/sawmill';
-import { SawmillSC } from '@graylog/sawmill';
+import SawmillSC from '@graylog/sawmill/styled-components';
 
 import { DEFAULT_THEME_MODE } from './constants';
 
