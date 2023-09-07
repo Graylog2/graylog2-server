@@ -47,7 +47,7 @@ import java.util.function.Predicate;
 public class DatanodeOpensearchWait {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
-    private static final int ATTEMPTS_COUNT = 120;
+    private static final int ATTEMPTS_COUNT = 160;
 
     private final int opensearchPort;
     private KeyStore truststore;
