@@ -18,8 +18,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Button, Col, Label, Row } from 'components/bootstrap';
+import { Button, Col, Label, Row, MenuItem } from 'components/bootstrap';
 import { IconButton } from 'components/common';
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
 import type { RuleBlock } from './types';
 import { ruleBlockPropType, RuleBuilderTypes } from './types';
@@ -31,6 +33,9 @@ type Props = {
   onDelete: () => void,
   onEdit: () => void,
   onNegate: () => void,
+  onDuplicate: () => void,
+  onInsertAbove: () => void,
+  onInsertBelow: () => void,
   returnType?: RuleBuilderTypes,
 }
 
@@ -73,7 +78,17 @@ const ErrorMessage = styled.p(({ theme }) => css`
   margin: 0px;
 `);
 
-const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, returnType } : Props) => {
+const ActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: end;
+`;
+
+const EditIconButton = styled(IconButton)(({ theme }) => css`
+  margin-right: ${theme.spacings.xs};
+`);
+
+const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
 
@@ -160,10 +175,32 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, return
       </Col>
       <Col xs={3} md={2} className="text-right">
         {showActions && (
-          <>
-            <IconButton name="edit" onClick={onEdit} title="Edit" />
-            <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
-          </>
+          <ActionsContainer>
+            <EditIconButton name="edit" onClick={onEdit} title="Edit" />
+            <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
+                                   buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+                                   bsSize="xsmall"
+                                   closeOnSelect={false}
+                                   dropdownZIndex={1000}>
+              {({ toggleDropdown }) => (
+                <>
+                  <MenuItem onClick={onEdit}>Edit</MenuItem>
+                  <MenuItem onClick={() => {
+                    onDuplicate();
+                    toggleDropdown();
+                    setShowActions(false);
+                  }}>
+                    Duplicate
+                  </MenuItem>
+                  <MenuItem divider />
+                  <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
+                  <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
+                  <MenuItem divider />
+                  <MenuItem onClick={onDelete}>Delete</MenuItem>
+                </>
+              )}
+            </OverlayDropdownButton>
+          </ActionsContainer>
         )}
       </Col>
     </StyledRow>

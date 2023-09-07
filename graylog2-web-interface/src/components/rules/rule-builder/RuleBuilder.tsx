@@ -131,30 +131,31 @@ const RuleBuilder = () => {
     }
   }).catch(() => setRule(ruleToValidate));
 
-  const addBlock = async (type: BlockType, block: RuleBlock) => {
+  const addBlock = async (type: BlockType, block: RuleBlock, orderIndex?: number) => {
     let ruleToAdd;
     const blockId = new ObjectID().toString();
 
     if (type === 'condition') {
-      ruleToAdd = {
-        ...rule,
-        rule_builder: {
-          ...rule.rule_builder,
-          conditions: [...rule.rule_builder.conditions,
-            { ...block, id: blockId },
-          ],
-        },
-      };
-    } else {
-      const blockToSet = setOutputVariable(block, lastOutputIndex + 1);
+      const newConditions = rule.rule_builder.conditions;
+      newConditions.splice(orderIndex || newConditions.length, 0, { ...block, id: blockId });
 
       ruleToAdd = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder,
-          actions: [...rule.rule_builder.actions,
-            { ...blockToSet, id: blockId },
-          ],
+          conditions: newConditions,
+        },
+      };
+    } else {
+      const blockToSet = setOutputVariable(block, lastOutputIndex + 1);
+      const newActions = rule.rule_builder.actions;
+      newActions.splice(orderIndex || newActions.length, 0, { ...blockToSet, id: blockId });
+
+      ruleToAdd = {
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder,
+          actions: newActions,
         },
       };
     }

@@ -38,7 +38,7 @@ type Props = {
   block?: RuleBlock,
   order: number,
   outputVariableList?: OutputVariables,
-  addBlock: (type: string, block: RuleBlock) => void,
+  addBlock: (type: string, block: RuleBlock, orderIndex?: number) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
   deleteBlock: (orderIndex: number, type: string) => void,
 };
@@ -138,6 +138,33 @@ const RuleBuilderBlock = ({
     updateBlock(order, type, buildBlockData({ toggleNegate: true }));
   };
 
+  const onDuplicate = async () => {
+    sendTelemetry('click', {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `duplicate-${type}`,
+    });
+
+    const duplicatedBlock = { ...block, outputvariable: null };
+    addBlock(type, duplicatedBlock, order + 1);
+  };
+
+  const onInsertAbove = () => {
+    sendTelemetry('click', {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `insert-above-${type}`,
+    });
+  };
+
+  const onInsertBelow = () => {
+    sendTelemetry('click', {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `insert-below-${type}`,
+    });
+  };
+
   const onUpdate = (params: { [key: string]: any }, functionName: string) => {
     updateBlock(order, type, buildBlockData({ newFunctionName: functionName, newParams: params }));
     setEditMode(false);
@@ -176,6 +203,9 @@ const RuleBuilderBlock = ({
                           onDelete={onDelete}
                           onEdit={onEdit}
                           onNegate={onNegate}
+                          onDuplicate={onDuplicate}
+                          onInsertAbove={onInsertAbove}
+                          onInsertBelow={onInsertBelow}
                           returnType={currentBlockDict?.return_type}
                           negatable={isBlockNegatable()} />
       )}
