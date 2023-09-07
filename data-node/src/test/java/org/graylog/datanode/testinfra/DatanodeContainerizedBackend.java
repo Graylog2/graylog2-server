@@ -20,8 +20,10 @@ import com.google.common.base.Suppliers;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
@@ -41,10 +43,12 @@ public class DatanodeContainerizedBackend {
     public static final int DATANODE_OPENSEARCH_PORT = 9200;
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
     private final Network network;
+    private boolean shouldCloseNetwork = false;
     private final GenericContainer<?> mongodbContainer;
+    private boolean shouldCloseMongodb = false;
     private final GenericContainer<?> datanodeContainer;
 
-    private static final Supplier<ImageFromDockerfile> imageSupplier = Suppliers.memoize(() -> createImage(getOpensearchVersion()));
+    private static final Supplier<ImageFromDockerfile> imageSupplier = Suppliers.memoize(DatanodeContainerizedBackend::createImage);
 
     public DatanodeContainerizedBackend() {
         this(new DatanodeDockerHooksAdapter());
@@ -55,8 +59,14 @@ public class DatanodeContainerizedBackend {
     }
 
     public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
+
         this.network = Network.newNetwork();
         this.mongodbContainer = createMongodbContainer(this.network);
+
+        // we have created these resources, we have to close them.
+        this.shouldCloseNetwork = true;
+        this.shouldCloseMongodb = true;
+
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
                 hooks,
@@ -116,8 +126,8 @@ public class DatanodeContainerizedBackend {
         return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
     }
 
-    private static ImageFromDockerfile createImage(String opensearchVersion) {
-        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
+    private static ImageFromDockerfile createImage() {
+        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
         final Path downloadedOpensearch = Path.of("target", "downloads", opensearchTarArchive);
 
         if(!Files.exists(downloadedOpensearch)) {
@@ -148,23 +158,23 @@ public class DatanodeContainerizedBackend {
     }
 
     public static GenericContainer<?> createMongodbContainer(Network network) {
-        return new GenericContainer<>("mongo:5.0")
-                .withNetwork(network)
-                .withNetworkAliases("mongodb")
-                .withExposedPorts(27017);
+        return MongoDBContainer.create(MongodbServer.MONGO5, network);
     }
 
 
     public DatanodeContainerizedBackend start() {
-        mongodbContainer.start();
         datanodeContainer.start();
         return this;
     }
 
     public void stop() {
         datanodeContainer.stop();
-        mongodbContainer.stop();
-        network.close();
+        if (shouldCloseMongodb) {
+            mongodbContainer.stop();
+        }
+        if (shouldCloseNetwork) {
+            network.close();
+        }
     }
 
     public Network getNetwork() {

@@ -17,15 +17,8 @@
 package org.graylog.datanode.integration;
 
 import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.NoHttpResponseException;
+import org.graylog.datanode.DatanodeOpensearchWait;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.junit.jupiter.api.AfterEach;
@@ -37,15 +30,12 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
-import javax.net.ssl.SSLHandshakeException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.net.SocketException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
@@ -82,6 +72,8 @@ public class DatanodeClusterIT {
 
         this.network = Network.newNetwork();
         this.mongodbContainer = DatanodeContainerizedBackend.createMongodbContainer(network);
+        this.mongodbContainer.start();
+
         nodeA = createDatanodeContainer(
                 network,
                 mongodbContainer,
@@ -114,8 +106,8 @@ public class DatanodeClusterIT {
     void tearDown() {
         nodeB.stop();
         nodeA.stop();
-        network.close();
         mongodbContainer.stop();
+        network.close();
     }
 
     @Test
@@ -184,26 +176,10 @@ public class DatanodeClusterIT {
 
     private void waitForNodesCount(int countOfNodes) throws ExecutionException, RetryException {
         try {
-            final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
-                    .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                    .withStopStrategy(StopStrategies.stopAfterAttempt(120))
-                    .retryIfException(input -> input instanceof NoHttpResponseException)
-                    .retryIfException(input -> input instanceof SocketException)
-                    .retryIfException(input -> input instanceof SSLHandshakeException) // may happen before SSL is configured properly
-                    .retryIfResult(input -> !input.extract().contentType().startsWith("application/json"))
-                    .retryIfResult(input -> !input.extract().body().path("number_of_nodes").equals(countOfNodes))
-                    .retryIfResult(input -> !input.extract().body().path("status").equals("green"))
-                    .retryIfResult(input -> !input.extract().body().path("discovered_cluster_manager").equals(true))
-                    .build();
-            retryer.call(() -> {
-                Integer mappedPort = nodeA.getOpensearchRestPort();
-                return RestAssured.given()
-                        .trustStore(trustStore)
-                        .auth().basic(initialAdminUsername, initialAdminPassword)
-                        .accept(ContentType.JSON)
-                        .get("https://localhost:" + mappedPort + "/_cluster/health")
-                        .then();
-            });
+            DatanodeOpensearchWait.onPort(nodeA.getOpensearchRestPort())
+                    .withTruststore(trustStore)
+                    .withBasicAuth(initialAdminUsername, initialAdminPassword)
+                    .waitForNodesCount(countOfNodes);
         } catch (Exception retryException) {
             LOG.error("DataNode Container logs from nodeA follow:\n" + nodeA.getLogs());
             LOG.error("DataNode Container logs from node B follow:\n" + nodeB.getLogs());

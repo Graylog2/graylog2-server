@@ -37,6 +37,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.file.Path;
@@ -137,6 +138,8 @@ public class DatanodeSecuritySetupIT {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
+                .retryIfException(input -> input instanceof SSLHandshakeException) // may happen before SSL is configured properly
+                .retryIfResult(input -> !input.extract().contentType().startsWith("application/json"))
                 .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
