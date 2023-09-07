@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { defaultTimezone, defaultUser } from 'defaultMockValues';
-import { SawmillSC, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
+import { COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
+import SawmillSC from '@graylog/sawmill/styled-components';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';

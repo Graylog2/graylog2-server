@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 import type { ColorScheme } from '@graylog/sawmill';
-import { SawmillSC } from '@graylog/sawmill';
+import SawmillSC from '@graylog/sawmill/styled-components';
 import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
