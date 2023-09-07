@@ -14,9 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog.storage.elasticsearch7;
 
-public class Constants {
-    public static final String COMPOSABLE_INDEX_TEMPLATES_FEATURE = "composable_index_templates";
-    public static final String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
+import org.graylog2.indexer.indices.Template;
+
+interface IndexTemplateAdapter {
+    boolean ensureIndexTemplate(String templateName, Template template);
+
+    boolean indexTemplateExists(String templateName);
+
+    boolean deleteIndexTemplate(String templateName);
 }

@@ -16,6 +16,8 @@
  */
 package org.graylog.testing.elasticsearch;
 
+import org.graylog2.indexer.indices.Template;
+
 import java.util.Map;
 
 public interface Client {
@@ -46,7 +48,7 @@ public interface Client {
 
     boolean templateExists(String templateName);
 
-    void putTemplate(String templateName, Map<String, Object> source);
+    void putTemplate(String templateName, Template source);
 
     void deleteTemplates(String... templates);
 

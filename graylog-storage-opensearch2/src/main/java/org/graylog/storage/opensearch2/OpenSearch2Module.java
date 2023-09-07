@@ -42,11 +42,12 @@ import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
 
 public class OpenSearch2Module extends VersionAwareModule {
-
     private final SearchVersion supportedVersion;
+    private final boolean useComposableIndexTemplates;
 
-    public OpenSearch2Module(final SearchVersion supportedVersion) {
+    public OpenSearch2Module(final SearchVersion supportedVersion, boolean useComposableIndexTemplates) {
         this.supportedVersion = supportedVersion;
+        this.useComposableIndexTemplates = useComposableIndexTemplates;
     }
 
     @Override
@@ -55,6 +56,11 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
+        if (useComposableIndexTemplates) {
+            bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
+        } else {
+            bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
+        }
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS2.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
