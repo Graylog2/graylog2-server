@@ -29,6 +29,8 @@ import { StaticColor } from 'views/logic/views/formatting/highlighting/Highlight
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slices/highlightActions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import ColorPreview from './ColorPreview';
 
@@ -37,7 +39,7 @@ export const Container = styled.div<{ $displayBorder?: boolean }>(({ theme, $dis
   padding-top: 5px;
   padding-bottom: 5px;
   word-break: break-word;
-  
+
   &:not(:last-child) {
     border-bottom: ${$displayBorder ? `1px solid ${theme.colors.global.background}` : 'none'};
   }
@@ -109,13 +111,33 @@ type Props = {
   dragHandleProps?: DraggableProvidedDragHandleProps;
 };
 
-const HighlightingRule = forwardRef<HTMLDivElement, Props>(({ rule, className, draggableProps, dragHandleProps }, ref) => {
+const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
+  rule,
+  className,
+  draggableProps,
+  dragHandleProps,
+}, ref) => {
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
   const dispatch = useAppDispatch();
+  const sendTelemetry = useSendTelemetry();
 
-  const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => dispatch(updateColor(rule, newColor, hidePopover)), [dispatch, rule]);
-  const _onDelete = useCallback(() => dispatch(onDelete(rule)), [dispatch, rule]);
+  const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_UPDATED, {
+      app_pathname: 'search',
+      app_action_value: 'search-sidebar-highlight-color-update',
+    });
+
+    dispatch(updateColor(rule, newColor, hidePopover));
+  }, [dispatch, rule, sendTelemetry]);
+  const _onDelete = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
+      app_pathname: 'search',
+      app_action_value: 'search-sidebar-highlight-delete',
+    });
+
+    dispatch(onDelete(rule));
+  }, [dispatch, rule, sendTelemetry]);
 
   return (
     <Container className={className} ref={ref} {...(draggableProps ?? {})}>
@@ -128,9 +150,9 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({ rule, className, d
           <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
           <IconButton title="Remove this Highlighting Rule" name="trash-alt" onClick={_onDelete} />
           {dragHandleProps && (
-          <DragHandle {...dragHandleProps}>
-            <Icon name="bars" />
-          </DragHandle>
+            <DragHandle {...dragHandleProps}>
+              <Icon name="bars" />
+            </DragHandle>
           )}
         </ButtonContainer>
       </RightCol>

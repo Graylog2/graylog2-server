@@ -21,13 +21,23 @@ import useAppDispatch from 'stores/useAppDispatch';
 import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { redo } from 'views/logic/slices/undoRedoActions';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const TITLE = 'Redo';
 
 const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
-  const onClick = useCallback(() => dispatch(redo()), [dispatch]);
+  const sendTelemetry = useSendTelemetry();
+  const onClick = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_REDO, {
+      app_pathname: 'search',
+      app_action_value: 'search-sidebar-redo',
+    });
+
+    dispatch(redo());
+  }, [dispatch, sendTelemetry]);
 
   return (
     <NavItem disabled={!isRedoAvailable}
