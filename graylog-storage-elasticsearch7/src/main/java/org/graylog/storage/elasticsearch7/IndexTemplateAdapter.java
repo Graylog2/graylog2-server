@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+package org.graylog.storage.elasticsearch7;
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.graylog2.indexer.indices.Template;
 
-public class MongoDBPreflightCheckTest5 extends MongoDBPreflightCheckTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO5);
+interface IndexTemplateAdapter {
+    boolean ensureIndexTemplate(String templateName, Template template);
 
+    boolean indexTemplateExists(String templateName);
+
+    boolean deleteIndexTemplate(String templateName);
 }

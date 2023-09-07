@@ -1,4 +1,4 @@
 type = "a"
-message = "run matrix tests with a given indexer version"
+message = "Run matrix tests with a given indexer version."
 
-pull = ["15088"]
+pulls = ["15088"]

@@ -16,9 +16,10 @@
  */
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import type { CompletionResult } from 'views/components/searchbar/queryinput/ace-types';
+import type { CompletionResult, Token } from 'views/components/searchbar/queryinput/ace-types';
 import { createSearch } from 'fixtures/searches';
 
+import type { Suggestion } from './FieldNameCompletion';
 import FieldNameCompletion from './FieldNameCompletion';
 
 const _createField = (name: string) => FieldTypeMapping.create(name, FieldType.create('string', []));
@@ -31,9 +32,7 @@ const userTimezone = 'Europe/Berlin';
 
 describe('FieldNameCompletion', () => {
   const requestDefaults = {
-    currentToken: null,
-    lastToken: null,
-    prefix: '',
+    prevToken: null,
     tokens: [],
     currentTokenIdx: 0,
     fieldTypes: dummyFieldTypes,
@@ -41,83 +40,130 @@ describe('FieldNameCompletion', () => {
     view: createSearch(),
   };
 
-  it('returns empty list if inputs are empty', () => {
-    const fieldTypes = createFieldTypes([]);
+  const completionsFor = ({
+    currentToken,
+    currentTokenIdx = requestDefaults.currentTokenIdx,
+    prefix,
+    prevToken = requestDefaults.prevToken,
+    staticSuggestions,
+    targetKey = 'name',
+    tokens = requestDefaults.tokens,
+  }: {
+    currentToken: Token,
+    currentTokenIdx?: number
+    prefix: string,
+    prevToken?: Token,
+    staticSuggestions?: Array<Suggestion>
+    targetKey?: string
+    tokens: Array<Token>
+  }) => {
+    const completer = new FieldNameCompletion(staticSuggestions);
 
-    const completer = new FieldNameCompletion([]);
-
-    expect(completer.getCompletions({
+    return completer.getCompletions({
       ...requestDefaults,
-      fieldTypes,
-    })).toEqual([]);
+      currentToken,
+      currentTokenIdx,
+      prefix,
+      prevToken,
+      tokens,
+    }).map((result) => result[targetKey]);
+  };
+
+  it('returns empty list if inputs are empty', () => {
+    expect(completionsFor({ prefix: '', currentToken: null, tokens: [] })).toEqual([]);
   });
 
   it('returns matching fields if prefix is present in one field name', () => {
-    const completer = new FieldNameCompletion();
+    const token = {
+      type: 'term',
+      value: 'mess',
+    };
 
-    expect(completer.getCompletions({
-      ...requestDefaults,
-      prefix: 'mess',
-    }).map((result) => result.name)).toEqual(['message']);
+    expect(completionsFor({ prefix: 'mess', currentToken: token, tokens: [token] })).toEqual(['message']);
   });
 
   it('returns matching fields if prefix is present in at least one field name', () => {
-    const completer = new FieldNameCompletion([]);
+    const token = {
+      type: 'term',
+      value: 'e',
+    };
 
-    expect(completer.getCompletions({
-      ...requestDefaults,
+    expect(completionsFor({
       prefix: 'e',
-    }).map((result) => result.name)).toEqual(['source', 'message', 'timestamp']);
+      currentToken: token,
+      tokens: [token],
+      staticSuggestions: [],
+    })).toEqual(['source', 'message', 'timestamp']);
   });
 
   it('suffixes matching fields with colon', () => {
-    const completer = new FieldNameCompletion([]);
+    const token = {
+      type: 'term',
+      value: 'e',
+    };
 
-    expect(completer.getCompletions({
-      ...requestDefaults,
+    expect(completionsFor({
       prefix: 'e',
-    }).map((result) => result.value))
-      .toEqual(['source:', 'message:', 'timestamp:']);
+      currentToken: token,
+      tokens: [token],
+      targetKey: 'value',
+      staticSuggestions: [],
+    })).toEqual(['source:', 'message:', 'timestamp:']);
   });
 
   it('returns _exist_-operator if matching prefix', () => {
-    const completer = new FieldNameCompletion();
+    const token = {
+      type: 'term',
+      value: '_e',
+    };
 
-    expect(completer.getCompletions({
-      ...requestDefaults,
+    expect(completionsFor({
       prefix: '_e',
-    }).map((result) => result.value)).toEqual(['_exists_:']);
+      currentToken: token,
+      tokens: [token],
+      targetKey: 'value',
+    })).toEqual(['_exists_:']);
   });
 
   it('returns matching fields after _exists_-operator', () => {
-    const completer = new FieldNameCompletion();
+    const prevToken = {
+      type: 'keyword',
+      value: '_exists_:',
+    };
+    const currentToken = {
+      type: 'term',
+      value: 'e',
+    };
 
-    expect(completer.getCompletions({
-      ...requestDefaults,
-      lastToken: {
-        type: 'keyword',
-        value: '_exists_:',
-      },
+    expect(completionsFor({
+      prevToken,
+      currentToken,
+      tokens: [prevToken, currentToken],
+      currentTokenIdx: 1,
       prefix: 'e',
-    }).map((result) => result.name)).toEqual(['source', 'message', 'timestamp']);
+    })).toEqual(['source', 'message', 'timestamp']);
   });
 
   it('returns exists operator together with matching fields', () => {
-    const completer = new FieldNameCompletion();
+    const currentToken = {
+      type: 'term',
+      value: 'e',
+    };
 
-    expect(completer.getCompletions({
-      ...requestDefaults,
+    expect(completionsFor({
+      currentToken,
+      tokens: [currentToken],
       prefix: 'e',
-    }).map((result) => result.name)).toEqual(['_exists_', 'source', 'message', 'timestamp']);
+    })).toEqual(['_exists_', 'source', 'message', 'timestamp']);
   });
 
   it('returns empty list when current token is a keyword and the the prefix is empty', () => {
-    const completer = new FieldNameCompletion();
     const currentToken = { type: 'keyword', value: 'http_method:', index: 0, start: 0 };
 
-    expect(completer.getCompletions({
-      ...requestDefaults,
+    expect(completionsFor({
       currentToken,
+      tokens: [currentToken],
+      prefix: '',
     })).toEqual([]);
   });
 
@@ -127,7 +173,7 @@ describe('FieldNameCompletion', () => {
     const fieldTypes = {
       all: {
         foo: _createField('foo'),
-        bar: _createField('bar'),
+        foo2: _createField('foo2'),
       },
       query: {
         foo: _createField('foo'),
@@ -136,10 +182,17 @@ describe('FieldNameCompletion', () => {
 
     it('scores fields of current query higher', () => {
       const completer = new FieldNameCompletion([]);
+      const token = {
+        type: 'term',
+        value: 'fo',
+      };
 
       const completions = completer.getCompletions({
         ...requestDefaults,
         fieldTypes,
+        tokens: [token],
+        currentToken: token,
+        prefix: 'fo',
       });
 
       const completion = (fieldName: string) => completionByName(fieldName, completions);
@@ -147,8 +200,8 @@ describe('FieldNameCompletion', () => {
       expect(completion('foo')?.score).toEqual(12);
       expect(completion('foo')?.meta).not.toMatch('(not in streams)');
 
-      expect(completion('bar')?.score).toEqual(3);
-      expect(completion('bar')?.meta).toMatch('(not in streams)');
+      expect(completion('foo2')?.score).toEqual(3);
+      expect(completion('foo2')?.meta).toMatch('(not in streams)');
     });
   });
 });

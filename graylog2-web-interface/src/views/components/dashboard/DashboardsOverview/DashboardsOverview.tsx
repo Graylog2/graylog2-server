@@ -116,7 +116,7 @@ const DashboardsOverview = () => {
       )}
       {!!dashboards?.length && (
         <EntityDataTable<View> activeSort={layoutConfig.sort}
-                               bulkActions={renderBulkActions}
+                               bulkSelection={{ actions: renderBulkActions }}
                                columnDefinitions={attributes}
                                columnRenderers={customColumnRenderers}
                                columnsOrder={DEFAULT_LAYOUT.columnsOrder}
