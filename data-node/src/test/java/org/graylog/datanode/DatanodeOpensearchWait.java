@@ -23,7 +23,6 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.base.Predicate;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -43,6 +42,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 public class DatanodeOpensearchWait {
 
@@ -76,8 +76,7 @@ public class DatanodeOpensearchWait {
 
     public ValidatableResponse waitForGreenStatus() throws ExecutionException, RetryException {
         return waitForOpensearch(
-                input -> !input.extract().body().path("status").equals("green")
-        );
+                input -> !input.extract().body().path("status").equals("green"));
     }
 
     public ValidatableResponse waitForNodesCount(int countOfNodes) throws ExecutionException, RetryException {
@@ -89,7 +88,9 @@ public class DatanodeOpensearchWait {
     }
 
 
+    @SafeVarargs
     private ValidatableResponse waitForOpensearch(Predicate<ValidatableResponse>... predicates) throws ExecutionException, RetryException {
+        //noinspection UnstableApiUsage
         final RetryerBuilder<ValidatableResponse> builder = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(ATTEMPTS_COUNT))
@@ -100,17 +101,15 @@ public class DatanodeOpensearchWait {
                 .withRetryListener(new RetryListener() {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
-                        ;
-                        if (attempt.hasResult()) {
-                            if (attempt.getResult() instanceof ValidatableResponse response) {
-                                lastRecordedResponse = serializeResponse(response.extract());
-                            }
+                        if (attempt.hasResult() && attempt.getResult() instanceof ValidatableResponse response) {
+                            lastRecordedResponse = serializeResponse(response.extract());
                         }
                     }
+
                 });
 
         for (Predicate<ValidatableResponse> predicate : predicates) {
-            builder.retryIfResult(predicate);
+            builder.retryIfResult(predicate::test);
         }
 
         final Retryer<ValidatableResponse> retryer = builder
