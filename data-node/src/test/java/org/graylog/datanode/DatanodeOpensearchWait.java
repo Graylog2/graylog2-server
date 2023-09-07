@@ -103,9 +103,10 @@ public class DatanodeOpensearchWait {
                     public <V> void onRetry(Attempt<V> attempt) {
                         if (attempt.hasResult() && attempt.getResult() instanceof ValidatableResponse response) {
                             lastRecordedResponse = serializeResponse(response.extract());
+                        } else if (attempt.getExceptionCause() != null) {
+                            lastRecordedResponse = attempt.getExceptionCause().getMessage();
                         }
                     }
-
                 });
 
         for (Predicate<ValidatableResponse> predicate : predicates) {
