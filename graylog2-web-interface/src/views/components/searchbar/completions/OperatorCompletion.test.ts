@@ -65,7 +65,7 @@ describe('OperatorCompletion', () => {
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken: token,
-      lastToken: null,
+      prevToken: null,
       prefix: 'N',
       tokens: [token],
       currentTokenIdx: 0,
@@ -76,13 +76,13 @@ describe('OperatorCompletion', () => {
 
   it('suggests NOT operator after empty term', () => {
     const token = term('N', 1, 1);
-    const lastToken = whitespace();
+    const prevToken = whitespace();
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken: token,
-      lastToken,
+      prevToken,
       prefix: 'N',
-      tokens: [lastToken, token],
+      tokens: [prevToken, token],
       currentTokenIdx: 1,
     });
 
@@ -92,12 +92,12 @@ describe('OperatorCompletion', () => {
   it('suggests AND operator after non-empty term for term starting with "A"', () => {
     const prefix = 'A';
     const token = term(prefix, 2, 4);
-    const lastToken = whitespace();
-    const tokens = [term('foo'), lastToken, token];
+    const prevToken = whitespace();
+    const tokens = [term('foo'), prevToken, token];
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken: token,
-      lastToken,
+      prevToken,
       prefix,
       tokens,
       currentTokenIdx: 2,
@@ -109,12 +109,12 @@ describe('OperatorCompletion', () => {
   it('suggests OR operator after non-empty term for term starting with "R"', () => {
     const prefix = 'R';
     const token = term(prefix, 2, 4);
-    const lastToken = whitespace();
-    const tokens = [term('foo'), lastToken, token];
+    const prevToken = whitespace();
+    const tokens = [term('foo'), prevToken, token];
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken: token,
-      lastToken,
+      prevToken,
       prefix,
       tokens,
       currentTokenIdx: 2,
@@ -126,12 +126,12 @@ describe('OperatorCompletion', () => {
   it('suggests OR/NOT operators after non-empty term for term starting with "O"', () => {
     const prefix = 'O';
     const token = term(prefix, 2, 4);
-    const lastToken = whitespace();
-    const tokens = [term('foo'), lastToken, token];
+    const prevToken = whitespace();
+    const tokens = [term('foo'), prevToken, token];
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken: token,
-      lastToken,
+      prevToken,
       prefix,
       tokens,
       currentTokenIdx: 2,
@@ -143,12 +143,12 @@ describe('OperatorCompletion', () => {
   it('does not suggest OR operator after operator for term starting with "O"', () => {
     const prefix = 'O';
     const token = term(prefix, 4, 8);
-    const lastToken = whitespace();
+    const prevToken = whitespace();
     const tokens = [term('foo'), whitespace(), and(), whitespace(), token];
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken: token,
-      lastToken,
+      prevToken,
       prefix,
       tokens,
       currentTokenIdx: 4,
@@ -160,12 +160,12 @@ describe('OperatorCompletion', () => {
   it('does not suggest AND operator after operator for term starting with "A"', () => {
     const prefix = 'A';
     const token = term(prefix, 4, 8);
-    const lastToken = whitespace();
+    const prevToken = whitespace();
     const tokens = [term('foo'), whitespace(), or(), whitespace(), token];
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken: token,
-      lastToken,
+      prevToken,
       prefix,
       tokens,
       currentTokenIdx: 4,
@@ -177,12 +177,12 @@ describe('OperatorCompletion', () => {
   it('does not suggest AND operator after operator for term starting with "A", followed by other terms', () => {
     const prefix = 'A';
     const currentToken = term(prefix, 4, 8);
-    const lastToken = whitespace();
+    const prevToken = whitespace();
     const tokens = [term('foo'), whitespace(), or(), whitespace(), currentToken, whitespace(), term('qux')];
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken,
-      lastToken,
+      prevToken,
       prefix,
       tokens,
       currentTokenIdx: 4,
@@ -196,7 +196,7 @@ describe('OperatorCompletion', () => {
     const results = operatorCompletion.getCompletions({
       ...requestDefaults,
       currentToken: token,
-      lastToken: null,
+      prevToken: null,
       prefix: 'N',
       tokens: [token],
       currentTokenIdx: 0,
