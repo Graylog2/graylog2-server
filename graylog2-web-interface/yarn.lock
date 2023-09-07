@@ -8384,10 +8384,10 @@ formidable@^1.0.17:
   resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.2.2.tgz#bf69aea2972982675f00865342b982986f6b8dd9"
   integrity sha512-V8gLm+41I/8kguQ4/o1D3RIHRmhYFG4pnNyonvua+40rqcEmT4+V71yaZ3B457xbbgCsCfjSPi65u/W6vK1U5Q==
 
-formik@2.4.3:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/formik/-/formik-2.4.3.tgz#6020e85eb3e3e8415b3b19d6f4f65793ab754b24"
-  integrity sha512-2Dy79Szw3zlXmZiokUdKsn+n1ow4G8hRrC/n92cOWHNTWXCRpQXlyvz6HcjW7aSQZrldytvDOavYjhfmDnUq8Q==
+formik@2.4.4:
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/formik/-/formik-2.4.4.tgz#41b775db867713fd4ea34930068391b01749b69c"
+  integrity sha512-MV99upag7fCC3JfsI60WcxhymwNZnJUcMcnGuoz6mDf78SUfBbKjmfcA9LzHx4lEmjzmOflhP7oqz+ZQv5eStg==
   dependencies:
     deepmerge "^2.1.1"
     hoist-non-react-statics "^3.3.0"
@@ -8932,7 +8932,7 @@ graphemer@^1.4.0:
     babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
     eslint-config-graylog "file:packages/eslint-config-graylog"
-    formik "2.4.3"
+    formik "2.4.4"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
     jest-preset-graylog "file:packages/jest-preset-graylog"
@@ -11342,9 +11342,9 @@ mapbox-gl@1.10.1:
     vt-pbf "^3.1.1"
 
 marked@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-8.0.0.tgz#e808c02daf9d72485477d3ff9a4e193fec94a4db"
-  integrity sha512-RI/D5csFVreNrFchdKFSdV38GDHJdD7OdmbNWYzGvApPb0A9pyypgfHC/FBH4ugmRE8cr7yg/TH7tu8585eMhA==
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-8.0.1.tgz#62005c60d88926ef4b4a45e51ac76c5076c6e63d"
+  integrity sha512-eEbeEb/mJwh+sNLEhHOWtxMgjN/NEwZUBs1nkiIH2sTQTq07KmPMQ48ihyvo5+Ya56spVOPhunfGr6406crCVA==
 
 material-colors@^1.2.1:
   version "1.2.6"
