@@ -326,10 +326,11 @@ public class ElasticsearchConfiguration {
             );
         }
 
-        if (getMaxIndexRetentionPeriod() != null && getMaxIndexRetentionPeriod().toStandardSeconds().compareTo(timeSizeOptimizingRotationMaxLifeTimeSeconds) < 0) {
+        if (getMaxIndexRetentionPeriod() != null &&
+                getMaxIndexRetentionPeriod().toStandardSeconds().plus(calculatedLeeway).compareTo(timeSizeOptimizingRotationMaxLifeTimeSeconds) < 0) {
             throw new ValidationException(f("\"%s=%s\" cannot to be larger than \"%s=%s\"",
                     TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME, getTimeSizeOptimizingRotationMaxLifeTime(),
-                    MAX_INDEX_RETENTION_PERIOD, getMaxIndexRetentionPeriod())
+                    MAX_INDEX_RETENTION_PERIOD + " + leeway", getMaxIndexRetentionPeriod().plus(calculatedLeeway))
             );
         }
     }
