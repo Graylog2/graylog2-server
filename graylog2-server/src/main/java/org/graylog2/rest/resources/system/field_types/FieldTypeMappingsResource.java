@@ -87,7 +87,7 @@ public class FieldTypeMappingsResource extends RestResource {
         //TODO: more complex validation of request
         final FieldTypes.Type type = FieldTypeMapper.TYPE_MAP.get(request.type());
         if (type == null) {
-            throw new BadRequestException("Invalid type provided : " + request.type());
+            throw new BadRequestException("Invalid type provided: " + request.type());
         }
 
 
