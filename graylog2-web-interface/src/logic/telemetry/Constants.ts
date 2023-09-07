@@ -41,6 +41,7 @@ export const TELEMETRY_EVENT_TYPE = {
     MOVE: 'Search Widget Moved',
     DUPLICATE: 'Search Widget Duplicate',
     COPY_TO_DASHBOARD: 'Search Widget Copy To Dashboard Clicked',
+    SEARCH_WIDGET_HORIZONTAL_STRETCH: 'Search Widget Horizontal Width Toggled',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
@@ -116,8 +117,8 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_SUMMARY_UPDATE_CLICKED: 'EventDefinition Summary Update Clicked',
 } as const;
 
-type ObjectValues<T> = T[keyof T];
+type ExtractObjectValues<T extends object> = {
+  [K in keyof T]: T[K] extends object ? ExtractObjectValues<T[K]> : T[K];
+}[keyof T];
 
-export type EventType =
-  ObjectValues<typeof TELEMETRY_EVENT_TYPE>
-  | ObjectValues<typeof TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION>
+export type EventType = ExtractObjectValues<typeof TELEMETRY_EVENT_TYPE>;

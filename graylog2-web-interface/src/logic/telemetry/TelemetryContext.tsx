@@ -20,13 +20,11 @@ import { singleton } from 'logic/singleton';
 import type { EventType } from 'logic/telemetry/Constants';
 
 export type TelemetryEvent = {
-  app_path_pattern: string,
+  app_path_pattern?: string,
   app_pathname?: string,
   app_section?: string,
   app_action_value?: string
-  event_details?: {
-    [key: string]: unknown,
-  }
+  [key: string]: unknown,
 };
 
 export type TelemetryEventType =
@@ -42,13 +40,14 @@ export type TelemetryEventType =
   | 'modal_open'
   | 'select'
   | 'visit'
-  | 'navigate';
+  | 'navigate' | EventType;
 
 type ContextType = {
-  sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent | { [key: string] : unknown }) => void,
+  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent | { [key: string]: unknown }) => void,
 }
 const TelemetryContext = React.createContext<ContextType>({
-  sendTelemetry: () => {},
+  sendTelemetry: () => {
+  },
 });
 
 export default singleton('contexts.TelemetryContext', () => TelemetryContext);
