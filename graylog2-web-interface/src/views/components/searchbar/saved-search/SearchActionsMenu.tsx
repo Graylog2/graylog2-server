@@ -97,7 +97,6 @@ const SearchActionsMenu = () => {
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
-
   const pluggableSearchActions = usePluginEntities('views.components.searchActions');
   const searchActions = useMemo(() => pluggableSearchActions.map(
     ({ component: PluggableSearchAction, key }) => (

@@ -20,6 +20,7 @@ import { singleton } from 'logic/singleton';
 import type { EventType } from 'logic/telemetry/Constants';
 
 export type TelemetryEvent = {
+  app_path_pattern: string,
   app_pathname?: string,
   app_section?: string,
   app_action_value?: string
@@ -47,8 +48,7 @@ type ContextType = {
   sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent | { [key: string] : unknown }) => void,
 }
 const TelemetryContext = React.createContext<ContextType>({
-  sendTelemetry: () => {
-  },
+  sendTelemetry: () => {},
 });
 
 export default singleton('contexts.TelemetryContext', () => TelemetryContext);
