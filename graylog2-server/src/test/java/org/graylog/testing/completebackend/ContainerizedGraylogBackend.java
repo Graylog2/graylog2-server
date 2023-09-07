@@ -160,8 +160,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public void close() {
         node.close();
-        mongodb.close();
         searchServer.close();
+        mongodb.close();
 
         if (emailServerInstance != null) {
             emailServerInstance.close();

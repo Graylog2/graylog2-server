@@ -33,12 +33,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refres
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchType;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
@@ -46,8 +44,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexR
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplatesExistRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
@@ -72,6 +68,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
@@ -105,16 +102,19 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final StatsApi statsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
+    private final IndexTemplateAdapter indexTemplateAdapter;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
                              StatsApi statsApi,
                              CatApi catApi,
-                             ClusterStateApi clusterStateApi) {
+                             ClusterStateApi clusterStateApi,
+                             IndexTemplateAdapter indexTemplateAdapter) {
         this.client = client;
         this.statsApi = statsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
+        this.indexTemplateAdapter = indexTemplateAdapter;
     }
 
     @Override
@@ -204,20 +204,18 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
-        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
-                .source(template);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
-                "Unable to create index template " + templateName);
-
-        return result.isAcknowledged();
+    public boolean ensureIndexTemplate(String templateName, Template template) {
+        return indexTemplateAdapter.ensureIndexTemplate(templateName, template);
     }
 
     @Override
     public boolean indexTemplateExists(String templateName) {
-        return client.execute((c, requestOptions) -> c.indices().existsTemplate(new IndexTemplatesExistRequest(templateName),
-                requestOptions), "Unable to verify index template existence " + templateName);
+        return indexTemplateAdapter.indexTemplateExists(templateName);
+    }
+
+    @Override
+    public boolean deleteIndexTemplate(String templateName) {
+        return indexTemplateAdapter.deleteIndexTemplate(templateName);
     }
 
     @Override
@@ -339,15 +337,6 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
                         Map.Entry::getKey,
                         entry -> entry.getValue().stream().map(AliasMetadata::alias).collect(Collectors.toSet())
                 ));
-    }
-
-    @Override
-    public boolean deleteIndexTemplate(String templateName) {
-        final DeleteIndexTemplateRequest request = new DeleteIndexTemplateRequest(templateName);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteTemplate(request, requestOptions),
-                "Unable to delete index template " + templateName);
-        return result.isAcknowledged();
     }
 
     @Override
