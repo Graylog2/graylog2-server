@@ -42,6 +42,7 @@ import { updateView } from 'views/logic/slices/viewSlice';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import useHistory from 'routing/useHistory';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
+import useHotkeys from 'hooks/useHotkeys';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -108,6 +109,8 @@ const DashboardActionsMenu = () => {
   }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, view.id]);
   const _onSaveView = useCallback(() => dispatch(OnSaveViewAction(view)), [dispatch, view]);
   const _onUpdateView = useCallback((updatedView) => dispatch(updateView(updatedView)), [dispatch]);
+
+  useHotkeys('SAVE', _onSaveView, { scopes: 'dashboard' });
 
   return (
     <ButtonGroup>

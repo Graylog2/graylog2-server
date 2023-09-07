@@ -29,6 +29,7 @@ import useColumnRenderers from 'views/components/dashboard/DashboardsOverview/us
 import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/components/dashboard/DashboardsOverview/Constants';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
+import useHotkeysContext from 'hooks/useHotkeysContext';
 
 import BulkActions from './BulkActions';
 
@@ -88,6 +89,9 @@ const DashboardsOverview = () => {
     updateTableLayout({ sort: newSort });
     paginationQueryParameter.resetPage();
   }, [paginationQueryParameter, updateTableLayout]);
+  const { hotkeys, enabledScopes, activeHotkeys } = useHotkeysContext();
+
+  console.log('Daschboards', { hotkeys, enabledScopes, activeHotkeys });
 
   if (isLoadingDashboards || isLoadingLayoutPreferences) {
     return <Spinner />;

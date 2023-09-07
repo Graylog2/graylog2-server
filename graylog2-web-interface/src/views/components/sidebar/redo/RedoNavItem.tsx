@@ -21,6 +21,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { redo } from 'views/logic/slices/undoRedoActions';
+import useHotkeys from 'hooks/useHotkeys';
 
 const TITLE = 'Redo';
 
@@ -28,6 +29,7 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(redo()), [dispatch]);
+  useHotkeys('REDO', () => dispatch(redo()), { scopes: 'view' });
 
   return (
     <NavItem disabled={!isRedoAvailable}
