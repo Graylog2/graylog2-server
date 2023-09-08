@@ -44,7 +44,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.5.0</opensearch.version>
+        <opensearch.version>2.9.0</opensearch.version>
         <opensearch.rest.client.version>2.2.0-1</opensearch.rest.client.version>
 
         <!--

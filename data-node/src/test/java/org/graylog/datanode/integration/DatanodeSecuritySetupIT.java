@@ -142,7 +142,8 @@ public class DatanodeSecuritySetupIT {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
-                .retryIfException(input -> input instanceof SSLHandshakeException)
+                .retryIfException(input -> input instanceof SSLHandshakeException) // may happen before SSL is configured properly
+                .retryIfResult(input -> !input.extract().contentType().startsWith("application/json"))
                 .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 
