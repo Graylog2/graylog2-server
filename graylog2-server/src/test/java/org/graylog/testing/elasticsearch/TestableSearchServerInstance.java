@@ -48,6 +48,8 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     protected final String heapSize;
     protected final GenericContainer<?> container;
 
+    protected static volatile boolean isFirstContainerStart = true;
+
     @Override
     public abstract Client client();
 
@@ -74,6 +76,8 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
                 container.followOutput(new Slf4jLogConsumer(LOG).withPrefix(image));
             //}
             containersByVersion.put(cacheKey, container);
+        } else {
+            isFirstContainerStart = false;
         }
         return containersByVersion.get(cacheKey);
     }

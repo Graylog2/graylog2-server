@@ -26,7 +26,7 @@ public enum SearchServer {
     ES7(ELASTICSEARCH, "7.10.2"),
     OS1(OPENSEARCH, "1.3.12"),
     OS2(OPENSEARCH, "2.0.1"),
-     OS2_LATEST(OPENSEARCH, "2.8.0"),
+    OS2_LATEST(OPENSEARCH, "2.9.0"),
     DATANODE_DEV(DATANODE, "5.2.0");
 
     public static final SearchServer DEFAULT_VERSION = DATANODE_DEV;

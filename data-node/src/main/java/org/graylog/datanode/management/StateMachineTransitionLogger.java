@@ -19,20 +19,20 @@ package org.graylog.datanode.management;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+public class StateMachineTransitionLogger implements StateMachineTracer {
 
-public interface ManagableProcess<T> {
+    private static final Logger LOG = LoggerFactory.getLogger(StateMachineTransitionLogger.class);
 
-    void startWithConfig(T configuration);
+    @Override
+    public void trigger(ProcessEvent trigger) {
 
-    void restart() throws IOException;
+    }
 
-    void stop();
-
-    void onEvent(ProcessEvent event);
-
-    void addStateMachineTracer(StateMachineTracer stateMachineTracer);
-
-    boolean isInState(ProcessState state);
+    @Override
+    public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
+        LOG.debug("Triggered {}, source state: {}, destination: {}", trigger, source, destination);
+    }
 }
