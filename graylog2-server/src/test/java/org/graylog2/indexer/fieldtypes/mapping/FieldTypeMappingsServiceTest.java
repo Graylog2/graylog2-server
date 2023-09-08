@@ -38,10 +38,11 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FieldTypeMappingsServiceTest {
@@ -69,7 +70,7 @@ class FieldTypeMappingsServiceTest {
         doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
 
         //simple storage mocking
-        when(mongoIndexSetService.save(any())).thenAnswer(i -> i.getArguments()[0]);
+        lenient().when(mongoIndexSetService.save(any())).thenAnswer(i -> i.getArguments()[0]);
     }
 
     @Test
@@ -99,6 +100,16 @@ class FieldTypeMappingsServiceTest {
 
         verify(mongoIndexSetService).save(expectedUpdatedConfig);
         verify(existingMongoIndexSet).cycle();
+        verifyNoMoreInteractions(mongoIndexSetService);
+    }
+
+    @Test
+    void testDoesNotCycleIndexSetWhenMappingAlreadyExisted() {
+        toTest.changeFieldType(existingCustomFieldMapping,
+                new LinkedHashSet<>(List.of("existing_index_set", "wrong_index_set")),
+                true);
+
+        verify(existingMongoIndexSet, never()).cycle();
         verifyNoMoreInteractions(mongoIndexSetService);
     }
 
