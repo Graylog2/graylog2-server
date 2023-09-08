@@ -111,9 +111,10 @@ class ImportsViewModal extends React.Component {
       return (
         <Alert bsStyle="info">
           <Icon name="info-circle" />&nbsp;
-          There are no configuration uploads available. Please go to <strong>System -&gt; Collectors (legacy)
+          There are no configuration uploads available. Please go to
+          <strong>System -&gt; Collectors (legacy)
             -&gt; Details -&gt; Import Configuration
-                                                                     </strong> and import your first configuration. You need at least
+          </strong> and import your first configuration. You need at least
           Sidecar version 0.1.8 to make this feature available.
         </Alert>
       );

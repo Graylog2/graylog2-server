@@ -28,8 +28,8 @@ import ConfigurationHelperStyle from './ConfigurationHelper.css';
 const _renderConfigList = (configurations) => (
   <ul className={ConfigurationHelperStyle.ulStyle}>
     {configurations.map((conf) => (
-      <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}
-      </a>
+      <li key={conf.id}>
+        <a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a>
       </li>
     ))}
   </ul>
