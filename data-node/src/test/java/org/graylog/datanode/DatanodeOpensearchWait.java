@@ -139,19 +139,23 @@ public class DatanodeOpensearchWait {
     }
 
     private void printShardsInfo() {
-        final RequestSpecification req = RestAssured.given()
-                .accept(ContentType.JSON);
+        try {
+            final RequestSpecification req = RestAssured.given()
+                    .accept(ContentType.JSON);
 
-        Optional.ofNullable(truststore).ifPresent(ts -> req.trustStore(truststore));
+            Optional.ofNullable(truststore).ifPresent(ts -> req.trustStore(truststore));
 
-        if (username != null && password != null) {
-            req.auth().basic(username, password);
+            if (username != null && password != null) {
+                req.auth().basic(username, password);
+            }
+
+            final String shardsResponse = req.get("https://localhost:" + opensearchPort + "/_cat/shards?v=true&h=index,shard,prirep,state,node,unassigned.reason&s=state")
+                    .then().extract().body().asString();
+
+            LOG.warn("Cluster shards status: {}", shardsResponse);
+        } catch (Exception e) {
+            LOG.warn("Failed to obtain shard info", e);
         }
-
-        final String shardsResponse = req.get("https://localhost:" + opensearchPort + "/_cat/shards?v=true&h=index,shard,prirep,state,node,unassigned.reason&s=state")
-                .then().extract().body().asString();
-
-        LOG.warn("Cluster shards status: {}", shardsResponse);
     }
 
     @NotNull
