@@ -3294,26 +3294,31 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.33.0.tgz#7756da9a75a424e521622b1d84eb55b7a2b33715"
   integrity sha512-qYu73ptvnzRh6se2nyBIDHGBQvPY1XXl3yR769B7B6mIDD7s+EZhdlWHQ67JI6UOTFRaI7wupnTnwJ3gE0Mr/g==
 
-"@tanstack/query-persist-client-core@4.33.0":
-  version "4.33.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-4.33.0.tgz#38bddb653cd61fa7303039e6d13dd5f39c38d0e0"
-  integrity sha512-3P16+2JjcUU5CHi10jJuwd0ZQYvQtSuzLvCUCjVuAnj3GZjfSso1v8t6WAObAr9RPuIC6vDXeOQ3mr07EF/NxQ==
+"@tanstack/query-core@4.35.0":
+  version "4.35.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.35.0.tgz#61e5cf9363b423ed665740c422902e65619eb7da"
+  integrity sha512-4GMcKQuLZQi6RFBiBZNsLhl+hQGYScRZ5ZoVq8QAzfqz9M7vcGin/2YdSESwl7WaV+Qzsb5CZOAbMBes4lNTnA==
+
+"@tanstack/query-persist-client-core@4.35.0":
+  version "4.35.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-4.35.0.tgz#95894da4ab70011462c673e370dbb59f1c7993e7"
+  integrity sha512-un1zoD6D80lrJ1x1jtPzhm1xrdPbhG9unf4y0Tl58/eCZz1VIjw+rR4hG+kn/hfzxX/kY4AMvtwMPxtt3HiAdg==
   dependencies:
-    "@tanstack/query-core" "4.33.0"
+    "@tanstack/query-core" "4.35.0"
 
 "@tanstack/query-sync-storage-persister@^4.33.0":
-  version "4.33.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.33.0.tgz#9f821335db7c08177211fe151a0ffd76f0b1f4e0"
-  integrity sha512-V6igMcdEOXPRpvmNFQ6I/iJaw9NhxWy7x8PWamm2cgSsLi8bHaDvUVuWkZm+ikI47QjoCUk7qll/82JYLaH+pw==
+  version "4.35.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.35.0.tgz#42340674e34223ae8cd49e498335d51ecb70aa14"
+  integrity sha512-idNCZ7GF401X/NUHS0G0VQNhB36h1VTPobWBJYAEGkz6uvS8CpVuruGyvmVPuR61SE2k94g/Qc4jWQMcDeFM+g==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.33.0"
+    "@tanstack/query-persist-client-core" "4.35.0"
 
 "@tanstack/react-query-persist-client@^4.33.0":
-  version "4.33.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-4.33.0.tgz#ec37f43837c35d3f99738df49832b265e2723112"
-  integrity sha512-B3q0r1tqTTSkd9vctyqFj28xdGZJ+Dnr/7H05Ta1JF1w7EauVQl8ILrmXADecwvILnr1xoZO6lvi2W+mZxMinw==
+  version "4.35.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-4.35.0.tgz#45948bb5b807f53fd5b5373d29734c619e6e804e"
+  integrity sha512-hcFyWjDIKqaRH38MMPKOXqRzxqAHSRrWV9N2vqo6N1LbMaIdbwvL1sZQ9vfUuBXSoyq1kbhSLVdoz6Kpx/gA8A==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.33.0"
+    "@tanstack/query-persist-client-core" "4.35.0"
 
 "@tanstack/react-query@4.33.0":
   version "4.33.0"
@@ -6040,9 +6045,9 @@ core-js-pure@^3.0.0:
   integrity sha512-lacdXOimsiD0QyNf9BC/mxivNJ/ybBGJXQFKzRekp1WTHoVUWsUHEn+2T8GJAzzIhyOuXA+gOxCVN3l+5PLPUA==
 
 core-js@3:
-  version "3.32.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.32.1.tgz#a7d8736a3ed9dd05940c3c4ff32c591bb735be77"
-  integrity sha512-lqufgNn9NLnESg5mQeYsxQP5w7wrViSj0jr/kv6ECQiByzQkrn1MKvV0L3acttpDqfQrHLwr2KCMgX5b8X+lyQ==
+  version "3.32.2"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.32.2.tgz#172fb5949ef468f93b4be7841af6ab1f21992db7"
+  integrity sha512-pxXSw1mYZPDGvTQqEc5vgIb83jGQKFGYWY76z4a7weZXUolw3G+OvpZqSRcfYOoOVUQJYEPsWeQK8pKEnUtWxQ==
 
 core-js@^2.6.5:
   version "2.6.11"
@@ -8384,10 +8389,10 @@ formidable@^1.0.17:
   resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.2.2.tgz#bf69aea2972982675f00865342b982986f6b8dd9"
   integrity sha512-V8gLm+41I/8kguQ4/o1D3RIHRmhYFG4pnNyonvua+40rqcEmT4+V71yaZ3B457xbbgCsCfjSPi65u/W6vK1U5Q==
 
-formik@2.4.3:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/formik/-/formik-2.4.3.tgz#6020e85eb3e3e8415b3b19d6f4f65793ab754b24"
-  integrity sha512-2Dy79Szw3zlXmZiokUdKsn+n1ow4G8hRrC/n92cOWHNTWXCRpQXlyvz6HcjW7aSQZrldytvDOavYjhfmDnUq8Q==
+formik@2.4.4:
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/formik/-/formik-2.4.4.tgz#41b775db867713fd4ea34930068391b01749b69c"
+  integrity sha512-MV99upag7fCC3JfsI60WcxhymwNZnJUcMcnGuoz6mDf78SUfBbKjmfcA9LzHx4lEmjzmOflhP7oqz+ZQv5eStg==
   dependencies:
     deepmerge "^2.1.1"
     hoist-non-react-statics "^3.3.0"
@@ -8932,7 +8937,7 @@ graphemer@^1.4.0:
     babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
     eslint-config-graylog "file:packages/eslint-config-graylog"
-    formik "2.4.3"
+    formik "2.4.4"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
     jest-preset-graylog "file:packages/jest-preset-graylog"
@@ -11342,9 +11347,9 @@ mapbox-gl@1.10.1:
     vt-pbf "^3.1.1"
 
 marked@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-8.0.0.tgz#e808c02daf9d72485477d3ff9a4e193fec94a4db"
-  integrity sha512-RI/D5csFVreNrFchdKFSdV38GDHJdD7OdmbNWYzGvApPb0A9pyypgfHC/FBH4ugmRE8cr7yg/TH7tu8585eMhA==
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-8.0.1.tgz#62005c60d88926ef4b4a45e51ac76c5076c6e63d"
+  integrity sha512-eEbeEb/mJwh+sNLEhHOWtxMgjN/NEwZUBs1nkiIH2sTQTq07KmPMQ48ihyvo5+Ya56spVOPhunfGr6406crCVA==
 
 material-colors@^1.2.1:
   version "1.2.6"
@@ -12658,9 +12663,9 @@ postcss@^8.4.19, postcss@^8.4.21, postcss@^8.4.23:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.77.3"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.77.3.tgz#8d032842ee070b375635fec96b8c7f0800c2bced"
-  integrity sha512-DKsGpBIUjQSihhGruEW8wpVCkeDxU4jz7gADdXX2jEWV6bl4WpUPxjo1ukidVDFvvc/ihCM5PQWMQrItexdpSA==
+  version "1.78.1"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.78.1.tgz#06c951a63c950724f3c34952fb91446e234020ad"
+  integrity sha512-5tJoF56gGg4B4CSlLbWHuTpi7Ch7wksjCkPonHlQAc61ZZRymTB63tRheCvkcf+Omf8PBkO+2NJ0XEgrkRHE0A==
   dependencies:
     fflate "^0.4.1"
 
