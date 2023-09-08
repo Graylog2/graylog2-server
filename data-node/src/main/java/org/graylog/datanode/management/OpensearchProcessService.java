@@ -56,7 +56,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private OpensearchProcess createOpensearchProcess(DatanodeConfiguration datanodeConfiguration) {
         final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
-        process.setStateMachineTracer(watchdog);
+        process.addStateMachineTracer(watchdog);
+        process.addStateMachineTracer(new StateMachineTransitionLogger());
         return process;
     }
 
