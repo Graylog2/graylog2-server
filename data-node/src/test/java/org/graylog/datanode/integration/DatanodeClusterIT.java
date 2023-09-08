@@ -187,7 +187,7 @@ public class DatanodeClusterIT {
         try {
             DatanodeOpensearchWait.onPort(nodeA.getOpensearchRestPort())
                     .withTruststore(trustStore)
-                    .withBasicAuth(initialAdminUsername, initialAdminPassword)
+                    .withJwtAuth(jwtToken)
                     .waitForNodesCount(countOfNodes);
         } catch (Exception retryException) {
             LOG.error("DataNode Container logs from nodeA follow:\n" + nodeA.getLogs());

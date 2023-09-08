@@ -53,6 +53,7 @@ public class DatanodeOpensearchWait {
     private KeyStore truststore;
     private String username;
     private String password;
+    private String jwtToken;
     private String lastRecordedResponse;
 
     private DatanodeOpensearchWait(int opensearchPort) {
@@ -71,6 +72,11 @@ public class DatanodeOpensearchWait {
     public DatanodeOpensearchWait withBasicAuth(String username, String password) {
         this.username = username;
         this.password = password;
+        return this;
+    }
+
+    public DatanodeOpensearchWait withJwtAuth(String jwtToken) {
+        this.jwtToken = jwtToken;
         return this;
     }
 
@@ -122,8 +128,8 @@ public class DatanodeOpensearchWait {
 
                 Optional.ofNullable(truststore).ifPresent(ts -> req.trustStore(truststore));
 
-                if (username != null && password != null) {
-                    req.auth().basic(username, password);
+                if (jwtToken != null) {
+                    req.header( "Authorization", "Bearer " + jwtToken);
                 }
 
                 return req.get(formatClusterHeathUrl())
