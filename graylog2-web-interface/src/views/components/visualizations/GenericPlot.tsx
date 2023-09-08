@@ -39,7 +39,7 @@ const StyledPlot = styled(Plot)(({ theme }) => css`
   .hoverlayer .hovertext {
     rect {
       fill: ${theme.colors.global.contentBackground} !important;
-      opcity: 0.9 !important;
+      opacity: 0.9 !important;
     }
 
     .name {
