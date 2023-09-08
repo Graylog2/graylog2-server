@@ -57,8 +57,8 @@ public class DatanodeClusterIT {
     static Path tempDir;
     private String hostnameNodeA;
     private KeyStore trustStore;
-    private String usernameNodeA;
-    private String passwordNodeA;
+    private String initialAdminUsername;
+    private String initialAdminPassword;
     private KeystoreInformation ca;
 
     @BeforeEach
@@ -72,8 +72,9 @@ public class DatanodeClusterIT {
         hostnameNodeA = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         final KeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, "nodeA");
         final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, "nodeA");
-        usernameNodeA = RandomStringUtils.randomAlphabetic(10);
-        passwordNodeA = RandomStringUtils.randomAlphabetic(10);
+
+        initialAdminUsername = RandomStringUtils.randomAlphabetic(10);
+        initialAdminPassword = RandomStringUtils.randomAlphabetic(10);
 
         final Network network = Network.newNetwork();
         final GenericContainer<?> mongodb = DatanodeContainerizedBackend.createMongodbContainer(network);
@@ -83,16 +84,14 @@ public class DatanodeClusterIT {
                 hostnameNodeA,
                 transportNodeA,
                 httpNodeA,
-                usernameNodeA,
-                passwordNodeA
+                initialAdminUsername,
+                initialAdminPassword
         ).start();
 
 
         final String hostnameNodeB = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         final KeystoreInformation transportNodeB = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, "nodeB");
         final KeystoreInformation httpNodeB = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, "nodeB");
-        final String usernameNodeB = RandomStringUtils.randomAlphabetic(10);
-        final String passwordNodeB = RandomStringUtils.randomAlphabetic(10);
 
         nodeB = createDatanodeContainer(
                 network,
@@ -100,8 +99,8 @@ public class DatanodeClusterIT {
                 hostnameNodeB,
                 transportNodeB,
                 httpNodeB,
-                usernameNodeB,
-                passwordNodeB
+                initialAdminUsername,
+                initialAdminPassword
         ).start();
     }
 
@@ -122,16 +121,14 @@ public class DatanodeClusterIT {
         final String hostnameNodeC = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, "nodeB");
         final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, "nodeB");
-        final String usernameNodeC = RandomStringUtils.randomAlphabetic(10);
-        final String passwordNodeC = RandomStringUtils.randomAlphabetic(10);
 
         final DatanodeContainerizedBackend nodeC = createDatanodeContainer(
                 nodeA.getNetwork(), nodeA.getMongodbContainer(),
                 hostnameNodeC,
                 transportNodeC,
                 httpNodeC,
-                usernameNodeC,
-                passwordNodeC
+                initialAdminUsername,
+                initialAdminPassword
         );
 
         nodeC.start();
@@ -192,7 +189,7 @@ public class DatanodeClusterIT {
                 Integer mappedPort = nodeA.getOpensearchRestPort();
                 return RestAssured.given()
                         .trustStore(trustStore)
-                        .auth().basic(usernameNodeA, passwordNodeA)
+                        .auth().basic(initialAdminUsername, initialAdminPassword)
                         .get("https://localhost:" + mappedPort + "/_cluster/health")
                         .then();
             });
