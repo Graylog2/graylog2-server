@@ -23,7 +23,7 @@ import { IconButton } from 'components/common';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
-import type { RuleBlock } from './types';
+import type { BlockType, RuleBlock } from './types';
 import { ruleBlockPropType, RuleBuilderTypes } from './types';
 import { useRuleBuilder } from './RuleBuilderContext';
 
@@ -37,6 +37,7 @@ type Props = {
   onInsertAbove: () => void,
   onInsertBelow: () => void,
   returnType?: RuleBuilderTypes,
+  type: BlockType,
 }
 
 const Highlighted = styled.span(({ theme }) => css`
@@ -88,12 +89,12 @@ const EditIconButton = styled(IconButton)(({ theme }) => css`
   margin-right: ${theme.spacings.xs};
 `);
 
-const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType } : Props) => {
+const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
 
-  const readableReturnType = (type: RuleBuilderTypes): string | undefined => {
-    switch (type) {
+  const readableReturnType = (_type: RuleBuilderTypes): string | undefined => {
+    switch (_type) {
       case RuleBuilderTypes.Boolean:
         return 'boolean';
       case RuleBuilderTypes.Message:
@@ -174,7 +175,13 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
         </Row>
       </Col>
       <Col xs={3} md={2} className="text-right">
-        {showActions && (
+        {showActions && type === 'condition' && (
+          <ActionsContainer>
+            <IconButton name="edit" onClick={onEdit} title="Edit" />
+            <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
+          </ActionsContainer>
+        )}
+        {showActions && type === 'action' && (
           <ActionsContainer>
             <EditIconButton name="edit" onClick={onEdit} title="Edit" />
             <OverlayDropdownButton title={MORE_ACTIONS_TITLE}

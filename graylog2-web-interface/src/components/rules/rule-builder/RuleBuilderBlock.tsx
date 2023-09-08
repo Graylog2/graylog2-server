@@ -207,7 +207,8 @@ const RuleBuilderBlock = ({
                           onInsertAbove={onInsertAbove}
                           onInsertBelow={onInsertBelow}
                           returnType={currentBlockDict?.return_type}
-                          negatable={isBlockNegatable()} />
+                          negatable={isBlockNegatable()}
+                          type={type} />
       )}
     </BlockContainer>
   );
