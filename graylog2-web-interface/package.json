@@ -48,7 +48,6 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@graylog/sawmill": "^2.0.2",
     "@mantine/core": "^6.0.4",
     "@mantine/dropzone": "^6.0.10",
     "@mantine/hooks": "^6.0.4",
