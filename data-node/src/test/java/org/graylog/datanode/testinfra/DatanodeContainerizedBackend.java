@@ -110,6 +110,11 @@ public class DatanodeContainerizedBackend {
 
                 .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
                 .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + DATANODE_REST_PORT)
+
+                // disable disk threshold in tests, it causes problems in github builds where we don't have
+                // enough free space
+                .withEnv("opensearch.cluster.routing.allocation.disk.threshold_enabled", "false")
+
                 .withNetworkAliases(nodeName)
                 .dependsOn(mongodbContainer)
                 .waitingFor(new LogMessageWaitStrategy()
