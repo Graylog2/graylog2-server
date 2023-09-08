@@ -83,7 +83,11 @@ const smallestUnit = (duration: string) => {
 const fetchCurrentConfig = () => ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
 
 const NoExistingPolicy = ({ createPolicy }: { createPolicy: () => void }) => (
-  <span>There is no Certificate Renewal Policy yet. Click <Button onClick={createPolicy} bsSize="xsmall" bsStyle="primary">here</Button> to create one.</span>
+  <span>There is no Certificate Renewal Policy yet. Click <Button onClick={createPolicy}
+                                                                  bsSize="xsmall"
+                                                                  bsStyle="primary">here
+  </Button> to create one.
+  </span>
 );
 
 const certicateRenewalModes = ['AUTOMATIC', 'MANUAL'].map((mode) => ({ label: capitalize(mode), value: mode }));
@@ -200,9 +204,7 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
       <Modal show={showModal}
              onHide={resetConfig}
              aria-modal="true"
-             aria-labelledby="dialog_label"
-             data-app-section="configurations_index_defaults"
-             data-event-element={modalTitle}>
+             aria-labelledby="dialog_label">
         <Formik<FormConfig> onSubmit={saveConfig} initialValues={formConfig}>
           {({ values, setFieldValue, isSubmitting, isValid, isValidating }) => (
             <Form>

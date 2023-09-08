@@ -209,16 +209,16 @@ const CollectorConfigurationModal = ({
               : <em>Unknown collector</em>}
           </small>
         </CollectorTableCell>
-        <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags && <Icon name="times" title={`Remove ${configName}`} />}</UnselectTableCell>
+        <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags
+          && <Icon name="times" title={`Remove ${configName}`} />}
+        </UnselectTableCell>
       </TableRow>
     );
   });
 
   return (
     <BootstrapModalWrapper showModal={show}
-                           onHide={onCancel}
-                           data-app-section="collectors_administration_assign_configurations"
-                           data-event-element={`Edit ${selectedCollectorName} Configurations`}>
+                           onHide={onCancel}>
       <Modal.Header>
         <ModalTitle>
           Edit <b>{selectedCollectorName}</b> Configurations
@@ -236,7 +236,8 @@ const CollectorConfigurationModal = ({
                           topMargin={0} />
         {(rows.length > 0) && (
           <InfoContainer bsStyle="info">
-            Collector configurations that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned using tags and cannot be changed here.
+            Collector configurations that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned
+            using tags and cannot be changed here.
           </InfoContainer>
         )}
         <ConfigurationContainer>
@@ -245,7 +246,9 @@ const CollectorConfigurationModal = ({
               {(rows.length === 0) ? (
                 <TableRow>
                   <td colSpan={6}>
-                    <NoConfigurationMessage>No configurations available for the selected log collector.</NoConfigurationMessage>
+                    <NoConfigurationMessage>No configurations available for the selected log
+                      collector.
+                    </NoConfigurationMessage>
                   </td>
                 </TableRow>
               ) : (
@@ -254,7 +257,9 @@ const CollectorConfigurationModal = ({
               <StickyTableRowFooter>
                 <td colSpan={6}>
                   <AddNewConfiguration>
-                    <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new configuration</Link>
+                    <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new
+                      configuration
+                    </Link>
                   </AddNewConfiguration>
                 </td>
               </StickyTableRowFooter>
@@ -265,7 +270,11 @@ const CollectorConfigurationModal = ({
       <Modal.Footer>
         <Button type="button" onClick={onCancel}>Cancel</Button>
         <Button type="button" onClick={onReset}>Reset</Button>
-        <Button type="submit" bsStyle="primary" disabled={isNotDirty} onClick={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}>Save</Button>
+        <Button type="submit"
+                bsStyle="primary"
+                disabled={isNotDirty}
+                onClick={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}>Save
+        </Button>
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
