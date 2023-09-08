@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.Set;
 
 public class FieldTypeMappingsService {
@@ -51,9 +52,9 @@ public class FieldTypeMappingsService {
         for (String indexSetId : indexSetsIds) {
             try {
                 indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
-                    final IndexSetConfig updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
+                    var updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
                     if (rotateImmediately) {
-                        cycleIndexSet(updatedIndexSetConfig);
+                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
                     }
                 });
             } catch (Exception ex) {
@@ -62,14 +63,17 @@ public class FieldTypeMappingsService {
         }
     }
 
-    private IndexSetConfig storeMapping(final CustomFieldMapping customMapping,
-                                        final IndexSetConfig indexSetConfig) {
+    private Optional<IndexSetConfig> storeMapping(final CustomFieldMapping customMapping,
+                                                  final IndexSetConfig indexSetConfig) {
         final CustomFieldMappings previousCustomFieldMappings = indexSetConfig.customFieldMappings();
-        return mongoIndexSetService.save(
+        if (previousCustomFieldMappings.contains(customMapping)) {
+            return Optional.empty();
+        }
+        return Optional.of(mongoIndexSetService.save(
                 indexSetConfig.toBuilder()
                         .customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping))
                         .build()
-        );
+        ));
     }
 
     private void cycleIndexSet(final IndexSetConfig indexSetConfig) {
