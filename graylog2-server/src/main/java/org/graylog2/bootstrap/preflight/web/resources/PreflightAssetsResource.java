@@ -119,7 +119,7 @@ public class PreflightAssetsResource {
             }
             case "jar" -> {
                 final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
-                path = fileSystem.getPath(filename);
+                path = fileSystem.getPath(PreflightConstants.ASSETS_RESOURCE_DIR + filename);
                 fileContents = Resources.toByteArray(resourceUrl);
             }
             default -> throw new IllegalArgumentException("Not a JAR or local file: " + resourceUrl);
