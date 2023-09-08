@@ -18,12 +18,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 import CurrentUserProvider from './CurrentUserProvider';
 import UserDateTimeProvider from './UserDateTimeProvider';
-
-import GlobalThemeStyles from '../theme/GlobalThemeStyles';
 
 const ThemeAndUserProvider = ({ children }) => (
   <CurrentUserProvider>

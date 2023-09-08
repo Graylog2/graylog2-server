@@ -64,7 +64,7 @@ const useInputListStyles = (size: 'small' | 'normal') => {
       ...provided,
       color: inputListTheme.colors.input.placeholder,
       lineHeight: '28px',
-      fontFamily: theme.fonts.family.body,
+      fontFamily: inputListTheme.fonts.family.body,
       fontSize: inputListTheme.fonts.size.body,
       fontWeight: 400,
       whiteSpace: 'nowrap',
