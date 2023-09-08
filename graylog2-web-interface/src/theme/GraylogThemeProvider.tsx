@@ -25,7 +25,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 import ColorSchemeContext from './ColorSchemeContext';
 import { COLOR_SCHEMES } from './constants';
-import usePreferredColorScheme from './usePreferredColorScheme';
+import usePreferredColorScheme from './hooks/usePreferredColorScheme';
 
 type Props = {
   children: React.ReactNode,

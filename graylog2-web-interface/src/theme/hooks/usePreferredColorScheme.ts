@@ -22,7 +22,9 @@ import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 
-import type { LegacyColorScheme } from './constants';
+import useBrowserColorSchemePreference from './useBrowserColorSchemePreference';
+
+import type { LegacyColorScheme } from '../constants';
 import {
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
@@ -30,10 +32,8 @@ import {
   LEGACY_COLOR_SCHEME_DARK,
   LEGACY_COLOR_SCHEME_LIGHT,
   PREFERENCES_THEME_MODE,
-} from './constants';
-
-import UserPreferencesContext from '../contexts/UserPreferencesContext';
-import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
+} from '../constants';
+import UserPreferencesContext from '../../contexts/UserPreferencesContext';
 
 const fromLegacyColorSchemeName = (legacyColorScheme: LegacyColorScheme): ColorScheme => {
   if (legacyColorScheme === LEGACY_COLOR_SCHEME_LIGHT) {
@@ -58,7 +58,7 @@ const getInitialThemeMode = (userPreferences: Record<typeof PREFERENCES_THEME_MO
 };
 
 const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
-  const browserThemePreference = usePrefersColorScheme();
+  const browserThemePreference = useBrowserColorSchemePreference();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
     username: userStore.currentUser?.username,

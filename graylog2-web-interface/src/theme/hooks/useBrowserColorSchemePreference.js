@@ -22,7 +22,7 @@ import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
 // * https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Testing_media_queries
 // * https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
-const usePrefersColorScheme = () => {
+const useBrowserColorSchemePreference = () => {
   if (!window.matchMedia) {
     return null;
   }
@@ -31,8 +31,10 @@ const usePrefersColorScheme = () => {
   const mqlDark = window.matchMedia('(prefers-color-scheme: dark)');
 
   const prefersScheme = mqlDark.matches ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [scheme, setScheme] = useState(prefersScheme);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (window.matchMedia) {
       const handleLight = (ev) => {
@@ -57,9 +59,10 @@ const usePrefersColorScheme = () => {
     }
 
     return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return scheme;
 };
 
-export default usePrefersColorScheme;
+export default useBrowserColorSchemePreference;
