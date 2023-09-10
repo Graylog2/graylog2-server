@@ -2474,16 +2474,16 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@graylog/sawmill@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-1.0.5.tgz#180026fa7cf109c395092cf83386dc9568e536a5"
-  integrity sha512-G68cdxnxmyIyEKJvqjJHrWUADPp9F3iIX6/YLiamTqvrewXJvmHPFslm+n5nD9qjnhMcOxOZGu17kwPbNx2tVw==
+"@graylog/sawmill@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.0.tgz#0e8a2e9e65be45c495837318cfd2bec5140ef3e2"
+  integrity sha512-7zQpquuBP55Z2D9auLStiPAq3t2bLYy2nVd7U7shcCoTXeMlUinmPy7HiOpCKyRifXfs6xtvRuNbwXHyYpvUVg==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
     "@openfonts/ubuntu-mono_latin" "^1.44.1"
     chroma-js "^2.1.2"
-    prop-types "^15.7.2"
+    lodash "^4.17.21"
 
 "@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"
