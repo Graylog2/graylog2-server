@@ -15,41 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQuery } from '@tanstack/react-query';
-import startCase from 'lodash/startCase';
 
 import UserNotification from 'util/UserNotification';
-import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
-import type { FieldTypeUsage, FieldTypeOptions } from 'views/logic/fieldactions/ChangeFieldType/types';
+import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
+import fetch from 'logic/rest/FetchProvider';
 
 const INITIAL_DATA = {
-  options: [],
+  fieldTypes: {},
 };
 
-const fieldTypeUsagesUrl = qualifyUrl('/system/indices/mappings/type_names');
+const fieldTypeUsagesUrl = qualifyUrl('/system/indices/mappings/types');
 
-const fetchFieldTypeOptions = async () => {
-  const url = fieldTypeUsagesUrl;
+const fetchFieldTypes = async () => {
+  const fieldTypes = await fetch('GET', fieldTypeUsagesUrl);
 
-  // fetch('GET', qualifyUrl(fieldTypeUsagesUrl))
-  const types = await Promise.resolve(['type_1', 'type_2', 'type_3', 'type_4', 'type_5']);
-
-  return ({
-    options: types.map((type) => ({
-      id: type,
-      label: startCase(type),
-    })),
-  });
+  return ({ fieldTypes });
 };
 
 const useFiledTypeOptions = (): {
-  data: { options: FieldTypeOptions },
+  data: { fieldTypes: FieldTypes },
   isLoading: boolean,
 } => {
   const { data, isLoading } = useQuery(
     ['fieldTypeOptions'],
-    () => fetchFieldTypeOptions(),
+    () => fetchFieldTypes(),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading field type options failed with status: ${errorThrown}`,

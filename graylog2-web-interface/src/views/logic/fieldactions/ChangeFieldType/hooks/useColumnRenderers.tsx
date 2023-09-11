@@ -20,7 +20,7 @@ import take from 'lodash/take';
 import last from 'lodash/last';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import type { FieldTypeUsage, TypeHistoryItem } from 'views/logic/fieldactions/ChangeFieldType/types';
+import type { FieldTypes, FieldTypeUsage, TypeHistoryItem } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 const RestTypesContainer = styled.i(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
@@ -34,7 +34,7 @@ const FlexContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-export const useColumnRenderers = () => {
+export const useColumnRenderers = (fieldTypes: FieldTypes) => {
   const customColumnRenderers: ColumnRenderers<FieldTypeUsage> = useMemo(() => ({
     attributes: {
       streamTitles: {
@@ -42,8 +42,8 @@ export const useColumnRenderers = () => {
       },
       types: {
         renderCell: (items: Array<TypeHistoryItem>) => {
-          const latest = last(items);
-          const rest = take(items, items.length - 1);
+          const latest = fieldTypes[last(items)] || last(items);
+          const rest = take(items, items.length - 1).map((item) => fieldTypes[item] || item);
 
           return (
             <div>
@@ -62,7 +62,7 @@ export const useColumnRenderers = () => {
         },
       },
     },
-  }), []);
+  }), [fieldTypes]);
 
   return customColumnRenderers;
 };

@@ -20,8 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import type { ChangeFieldTypeBody } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { ChangeFieldTypeBodyJson } from 'views/logic/fieldactions/ChangeFieldType/types';
+import type { ChangeFieldTypeBody, ChangeFieldTypeBodyJson } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 export const urlPrefix = '/system/indices/mappings';
 
@@ -31,18 +30,15 @@ const putFiledType = async ({
   rotated,
   field,
 }: ChangeFieldTypeBody) => {
-  const url = `${urlPrefix}`;
-  const bodyJson = {
-    index_sets_ids: indexSetSelection,
-    new_type: newFieldType,
-    rotate_immediately: rotated,
-    field_name: field,
+  const url = qualifyUrl(urlPrefix);
+  const body = {
+    index_sets: indexSetSelection,
+    type: newFieldType,
+    rotate: rotated,
+    field: field,
   };
 
-  console.log({ bodyJson });
-
-  return Promise.resolve();
-  // return fetch<ChangeFieldTypeBodyJson>('PUT', qualifyUrl(url), body);
+  return fetch<ChangeFieldTypeBodyJson>('PUT', url, body);
 };
 
 const usePutFiledTypeMutation = () => {

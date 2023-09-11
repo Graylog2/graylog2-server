@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState, useContext } from 'react';
+import React, { useMemo, useCallback, useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -37,7 +37,7 @@ import type { FieldTypeUsage, ChangeFieldTypeFormValues } from 'views/logic/fiel
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import QueryHelper from 'components/common/QueryHelper';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
-import useFiledTypeOptions from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeOptions';
+import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import { ActionContext } from 'views/logic/ActionContext';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
@@ -70,8 +70,11 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
   const [activePage, setActivePage] = useState(1);
   const [rotated, setRotated] = useState(false);
   const [newFieldType, setNewFieldType] = useState(null);
-  const { data: { options: typeOptions }, isLoading: isOptionsLoading } = useFiledTypeOptions();
-
+  const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
+  const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes).map(([id, label]) => ({
+    id,
+    label,
+  })), [fieldTypes]);
   const { widget, message } = useContext(ActionContext);
   const currentQuery = useCurrentQuery();
   const currentStreams = useMemo(() => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS(), [message?.fields?.streams, currentQuery.filter, widget?.streams]);
@@ -91,8 +94,13 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
   }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
   const { data: { list, attributes, pagination }, isFirsLoaded } = useFiledTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
   const initialSelection = useMemo(() => list.map(({ id }) => id), [list]);
-  const [indexSetSelection, setIndexSetSelection] = useState(initialSelection);
+
+  const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
+
+  useEffect(() => {
+    setIndexSetSelection(initialSelection);
+  }, [initialSelection]);
 
   const onPageChange = useCallback(
     (newPage: number, newPageSize: number) => {
@@ -127,7 +135,7 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
     updateTableLayout({ displayedAttributes });
   }, [updateTableLayout]);
 
-  const columnRenderers = useColumnRenderers();
+  const columnRenderers = useColumnRenderers(fieldTypes);
 
   const onChangeSelection = useCallback((newSelection) => {
     setIndexSetSelection(newSelection);
@@ -160,7 +168,7 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
         </Alert>
         <StyledSelect inputId="field_type"
                       valueKey="id"
-                      options={typeOptions}
+                      options={fieldTypeOptions}
                       value={newFieldType}
                       onChange={(value) => setNewFieldType(value)}
                       placeholder="Select field type"
