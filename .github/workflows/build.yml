@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest-4-cores-public
+    runs-on: ubuntu-latest-8-cores-public
     strategy:
       matrix:
         java-version: [ 17 ]
