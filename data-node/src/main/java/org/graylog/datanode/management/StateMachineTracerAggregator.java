@@ -20,19 +20,28 @@ import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
 
-import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
-public interface ManagableProcess<T> {
+public class StateMachineTracerAggregator implements StateMachineTracer {
 
-    void startWithConfig(T configuration);
+    private final List<StateMachineTracer> delegates = new LinkedList<>();
 
-    void restart() throws IOException;
+    public void addTracer(StateMachineTracer tracer) {
+        delegates.add(tracer);
+    }
 
-    void stop();
+    public void removeTracer(StateMachineTracer tracer) {
+        delegates.remove(tracer);
+    }
 
-    void onEvent(ProcessEvent event);
+    @Override
+    public void trigger(ProcessEvent processEvent) {
+        delegates.forEach(d -> d.trigger(processEvent));
+    }
 
-    void addStateMachineTracer(StateMachineTracer stateMachineTracer);
-
-    boolean isInState(ProcessState state);
+    @Override
+    public void transition(ProcessEvent processEvent, ProcessState s1, ProcessState s2) {
+        delegates.forEach(d -> d.transition(processEvent, s1, s2));
+    }
 }

@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
-import * as GraylogSawmill from '@graylog/sawmill';
-import type { TChangeMode, TThemeMode } from '@graylog/sawmill';
+import type { ColorScheme } from '@graylog/sawmill';
+import SawmillSC from '@graylog/sawmill/styled-components';
 
 import { DEFAULT_THEME_MODE } from './constants';
 
@@ -25,16 +25,25 @@ type Props = {
   children: React.ReactNode,
 };
 
-const Sawmill = GraylogSawmill.default;
+const usePreflightTheme = () => {
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(DEFAULT_THEME_MODE);
+
+  const onChangeColorScheme = useCallback((nextMode: ColorScheme) => {
+    setColorScheme(nextMode);
+  }, []);
+
+  return useMemo(() => {
+    const theme = SawmillSC({ colorScheme });
+
+    return ({
+      ...theme,
+      changeMode: onChangeColorScheme,
+    });
+  }, [colorScheme, onChangeColorScheme]);
+};
 
 const PreflightThemeProvider = ({ children }: Props) => {
-  const [mode, setMode] = useState<TThemeMode>(DEFAULT_THEME_MODE);
-
-  const handleModeChange: TChangeMode = (nextMode) => {
-    setMode(nextMode);
-  };
-
-  const theme = new Sawmill(GraylogSawmill[mode], mode, handleModeChange);
+  const theme = usePreflightTheme();
 
   return (
     <ThemeProvider theme={theme}>
