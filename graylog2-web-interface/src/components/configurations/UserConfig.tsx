@@ -113,9 +113,7 @@ const UserConfig = () => {
           <Modal show={showModal && formConfig}
                  onHide={resetConfig}
                  aria-modal="true"
-                 aria-labelledby="dialog_label"
-                 data-app-section="configurations_user"
-                 data-event-element={modalTitle}>
+                 aria-labelledby="dialog_label">
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
               {({ isSubmitting, values, setFieldValue }) => (
                 <Form>
@@ -132,7 +130,7 @@ const UserConfig = () => {
                                        id="enable_global_session_timeout"
                                        label={(
                                          <LabelSpan>Enable global session timeout</LabelSpan>
-                                         )} />
+                                       )} />
                           <InputDescription help="If enabled, it will be set for all the users." />
                         </Col>
                         <Col sm={12}>
