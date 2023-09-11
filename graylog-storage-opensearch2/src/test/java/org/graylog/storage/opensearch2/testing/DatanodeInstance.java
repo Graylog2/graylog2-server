@@ -125,7 +125,7 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 .withExposedPorts(9200, 9300)
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/_cluster/health").forPort(OPENSEARCH_PORT).forStatusCode(200).forResponsePredicate(s -> s.contains("\"status\":\"green\"")).withStartupTimeout(java.time.Duration.ofSeconds(120)));
+                .waitingFor(Wait.forHttp("/_cluster/health").forPort(OPENSEARCH_PORT).forStatusCode(200).forResponsePredicate(s -> s.contains("\"status\":\"green\"")).withStartupTimeout(java.time.Duration.ofSeconds(300)));
     }
 
     @Override
