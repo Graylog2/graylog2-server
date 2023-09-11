@@ -21,9 +21,7 @@ import { Popover, Table, Button } from 'components/bootstrap';
 
 const rolesQueryHelpPopover = (
   <Popover id="role-search-query-help"
-           title="Search Syntax Help"
-           data-app-section="role_search_query_helper"
-           data-event-element="Available search fields">
+           title="Search Syntax Help">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>

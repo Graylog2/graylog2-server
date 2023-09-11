@@ -74,9 +74,7 @@ const AssignIndexSetModal = ({
   return (
     <Modal title={modalTitle}
            onHide={toggleShowModal}
-           show
-           data-app-section="stream_bulk_actions"
-           data-event-element="Assign Index Set">
+           show>
       <Formik initialValues={{ index_set_id: undefined }}
               onSubmit={onSubmit}
               validate={validate}>
@@ -112,7 +110,14 @@ type Props = {
   setSelectedStreamIds: (streamIds: Array<string>) => void,
 }
 
-const AssignIndexSetAction = ({ indexSets, selectedStreamIds, setSelectedStreamIds, descriptor, refetchStreams, onSelect }: Props) => {
+const AssignIndexSetAction = ({
+  indexSets,
+  selectedStreamIds,
+  setSelectedStreamIds,
+  descriptor,
+  refetchStreams,
+  onSelect,
+}: Props) => {
   const [showIndexSetModal, setShowIndexSetModal] = useState(false);
 
   const toggleAssignIndexSetModal = useCallback(() => {
