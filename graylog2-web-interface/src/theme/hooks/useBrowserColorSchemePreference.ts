@@ -16,6 +16,7 @@
  */
 import { useState, useEffect } from 'react';
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
+import type { ColorScheme } from '@mantine/core';
 
 // * https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia
 // * https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList
@@ -32,18 +33,18 @@ const useBrowserColorSchemePreference = () => {
 
   const prefersScheme = mqlDark.matches ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [scheme, setScheme] = useState(prefersScheme);
+  const [scheme, setScheme] = useState<ColorScheme>(prefersScheme);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (window.matchMedia) {
-      const handleLight = (ev) => {
+      const handleLight = (ev: MediaQueryListEvent) => {
         if (ev.matches) {
           setScheme(COLOR_SCHEME_LIGHT);
         }
       };
 
-      const handleDark = (ev) => {
+      const handleDark = (ev: MediaQueryListEvent) => {
         if (ev.matches) {
           setScheme(COLOR_SCHEME_DARK);
         }
