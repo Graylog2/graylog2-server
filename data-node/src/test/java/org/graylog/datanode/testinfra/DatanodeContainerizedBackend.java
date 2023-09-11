@@ -16,20 +16,26 @@
  */
 package org.graylog.datanode.testinfra;
 
+import com.google.common.base.Suppliers;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 public class DatanodeContainerizedBackend {
 
@@ -37,8 +43,12 @@ public class DatanodeContainerizedBackend {
     public static final int DATANODE_OPENSEARCH_PORT = 9200;
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
     private final Network network;
+    private boolean shouldCloseNetwork = false;
     private final GenericContainer<?> mongodbContainer;
+    private boolean shouldCloseMongodb = false;
     private final GenericContainer<?> datanodeContainer;
+
+    private static final Supplier<ImageFromDockerfile> imageSupplier = Suppliers.memoize(DatanodeContainerizedBackend::createImage);
 
     public DatanodeContainerizedBackend() {
         this(new DatanodeDockerHooksAdapter());
@@ -49,11 +59,17 @@ public class DatanodeContainerizedBackend {
     }
 
     public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
+
         this.network = Network.newNetwork();
         this.mongodbContainer = createMongodbContainer(this.network);
+
+        // we have created these resources, we have to close them.
+        this.shouldCloseNetwork = true;
+        this.shouldCloseMongodb = true;
+
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
-                hooks, createDockerImageFile(getOpensearchVersion()),
+                hooks,
                 getDatanodeVersion());
     }
 
@@ -63,24 +79,21 @@ public class DatanodeContainerizedBackend {
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
                 hooks,
-                createDockerImageFile(getOpensearchVersion()),
                 getDatanodeVersion());
     }
 
-    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion) {
-
+    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, String datanodeVersion) {
         MavenPackager.packageJarIfNecessary(createConfig());
 
-        GenericContainer<?> container = new GenericContainer<>(image)
+        GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")
-                .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/bin/config")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/datanode/data")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/datanode/logs")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/datanode/config")
 
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb/graylog")
                 .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
@@ -97,6 +110,11 @@ public class DatanodeContainerizedBackend {
 
                 .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
                 .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + DATANODE_REST_PORT)
+
+                // disable disk threshold in tests, it causes problems in github builds where we don't have
+                // enough free space
+                .withEnv("opensearch.cluster.routing.allocation.disk.threshold_enabled", "false")
+
                 .withNetworkAliases(nodeName)
                 .dependsOn(mongodbContainer)
                 .waitingFor(new LogMessageWaitStrategy()
@@ -112,8 +130,14 @@ public class DatanodeContainerizedBackend {
         return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
     }
 
-    private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
-        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-x64.tar.gz";
+    private static ImageFromDockerfile createImage() {
+        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
+        final Path downloadedOpensearch = Path.of("target", "downloads", opensearchTarArchive);
+
+        if(!Files.exists(downloadedOpensearch)) {
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path" + downloadedOpensearch.toAbsolutePath() + " doesn't exist!");
+        }
+
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
                 // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
                 // be later used by the ADD command
@@ -138,23 +162,23 @@ public class DatanodeContainerizedBackend {
     }
 
     public static GenericContainer<?> createMongodbContainer(Network network) {
-        return new GenericContainer<>("mongo:5.0")
-                .withNetwork(network)
-                .withNetworkAliases("mongodb")
-                .withExposedPorts(27017);
+        return MongoDBContainer.create(MongodbServer.MONGO5, network);
     }
 
 
     public DatanodeContainerizedBackend start() {
-        mongodbContainer.start();
         datanodeContainer.start();
         return this;
     }
 
     public void stop() {
         datanodeContainer.stop();
-        mongodbContainer.stop();
-        network.close();
+        if (shouldCloseMongodb) {
+            mongodbContainer.stop();
+        }
+        if (shouldCloseNetwork) {
+            network.close();
+        }
     }
 
     public Network getNetwork() {
@@ -188,10 +212,10 @@ public class DatanodeContainerizedBackend {
         }
     }
 
-    private String getOpensearchVersion() {
+    private static String getOpensearchVersion() {
         try {
             final Properties props = new Properties();
-            props.load(getClass().getResourceAsStream("/opensearch.properties"));
+            props.load(DatanodeContainerizedBackend.class.getResourceAsStream("/opensearch.properties"));
             return props.getProperty("opensearchVersion");
         } catch (IOException e) {
             throw new RuntimeException(e);

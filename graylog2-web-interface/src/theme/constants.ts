@@ -23,6 +23,9 @@ const PREFERENCES_THEME_MODE: PreferencesThemeMode = 'themeMode';
 const ROOT_FONT_SIZE = 16; // This value is also being maintained as @font-size-base in bootstrap-config.js
 const THEME_MODE_LIGHT = 'teint';
 const THEME_MODE_DARK = 'noir';
+
+const NEW_THEME_MODE_LIGHT = 'light';
+const NEW_THEME_MODE_DARK = 'dark';
 const DEFAULT_THEME_MODE: ThemeMode = prefersDarkMode ? THEME_MODE_DARK : THEME_MODE_LIGHT;
 const THEME_MODES: Array<ThemeMode> = [THEME_MODE_LIGHT, THEME_MODE_DARK];
 const INPUT_BORDER_RADIUS = 0;
@@ -34,6 +37,8 @@ export {
   ROOT_FONT_SIZE,
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
+  NEW_THEME_MODE_LIGHT,
+  NEW_THEME_MODE_DARK,
   THEME_MODES,
   INPUT_BORDER_RADIUS,
   NAV_ITEM_HEIGHT,

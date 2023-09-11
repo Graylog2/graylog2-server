@@ -21,8 +21,13 @@ import kebabCase from 'lodash/kebabCase';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const withModalTelemetry = (Component) => (props: ModalProps) => {
-  const { show, 'data-event-element': eventElement, 'data-app-section': appSection }: any = props;
+type ModalWithTelemetryProps = ModalProps & {
+  'data-event-element': string,
+  'data-app-section': string,
+}
+
+const withModalTelemetry = (Component: React.ComponentType<ModalProps>) => (props: ModalWithTelemetryProps) => {
+  const { show, 'data-event-element': eventElement, 'data-app-section': appSection } = props;
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {

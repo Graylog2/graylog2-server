@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2.testing;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.storage.opensearch2.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch2.CountsAdapterOS2;
 import org.graylog.storage.opensearch2.IndexFieldTypePollerAdapterOS2;
 import org.graylog.storage.opensearch2.IndexToolsAdapterOS2;
@@ -64,7 +65,8 @@ public class AdaptersOS2 implements Adapters {
         return new IndicesAdapterOS2(client,
                 new org.graylog.storage.opensearch2.stats.StatsApi(objectMapper, client),
                 new org.graylog.storage.opensearch2.cat.CatApi(objectMapper, client),
-                new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client)
+                new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client),
+                new ComposableIndexTemplateAdapter(client, objectMapper)
         );
     }
 

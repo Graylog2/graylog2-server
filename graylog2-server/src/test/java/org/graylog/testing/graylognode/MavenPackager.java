@@ -41,7 +41,7 @@ public class MavenPackager {
         return includeFrontend ? MVN_COMMAND : MVN_COMMAND + EXCLUDE_FE;
     }
 
-    public static void packageJarIfNecessary(NodeContainerConfig config) {
+    public static synchronized void packageJarIfNecessary(NodeContainerConfig config) {
         if (isRunFromMaven()) {
             LOG.info("Running from Maven. Assuming jars are current.");
         } else if (jarHasBeenPackagedInThisRun) {

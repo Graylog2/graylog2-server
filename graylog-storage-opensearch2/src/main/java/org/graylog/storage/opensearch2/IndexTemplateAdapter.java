@@ -14,16 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PropTypeBreakpoints, PropTypeColors, PropTypeFonts, PropTypeSpacings, PropTypeUtils } from '@graylog/sawmill';
-import PropTypes from 'prop-types';
+package org.graylog.storage.opensearch2;
 
-export type ColorVariants = 'danger' | 'default' | 'info' | 'primary' | 'success' | 'warning';
-const ThemePropTypes = PropTypes.shape({
-  breakpoints: PropTypeBreakpoints,
-  colors: PropTypeColors,
-  fonts: PropTypeFonts,
-  utils: PropTypeUtils,
-  spacings: PropTypeSpacings,
-});
+import org.graylog2.indexer.indices.Template;
 
-export default ThemePropTypes;
+interface IndexTemplateAdapter {
+    boolean ensureIndexTemplate(String templateName, Template template);
+
+    boolean indexTemplateExists(String templateName);
+
+    boolean deleteIndexTemplate(String templateName);
+}
