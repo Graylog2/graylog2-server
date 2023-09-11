@@ -164,6 +164,7 @@
         <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.12.0</shiro.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <oshi.version>5.3.7</oshi.version>
         <siv-mode.version>1.4.1</siv-mode.version>
         <slf4j.version>1.7.30</slf4j.version>
@@ -317,6 +318,11 @@
                 <version>${jackson.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
