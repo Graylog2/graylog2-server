@@ -3,6 +3,11 @@ name: Build the repository
 on: 
   pull_request:
 
+# Cancel running build when new ref gets pushed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest-4-cores-public
