@@ -16,14 +16,15 @@
  */
 package org.graylog2.indexer.indexset;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
-import software.amazon.awssdk.utils.ImmutableMap;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
     public record TypeDescription(String description, FieldTypes.Type type) {}
@@ -46,6 +47,10 @@ public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
             .put("input", new TypeDescription("Input", FieldTypeMapper.INPUT_TYPE))
             .put("node", new TypeDescription("Node", FieldTypeMapper.NODE_TYPE))
             .build();
+
+    public static final Map<FieldTypes.Type, String> REVERSE_TYPES = AVAILABLE_TYPES.entrySet()
+            .stream()
+            .collect(Collectors.toMap(entry -> entry.getValue().type, Map.Entry::getKey));
 
     public CustomFieldMappings() {
         super();

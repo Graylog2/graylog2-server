@@ -50,9 +50,11 @@ import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.include;
 import static org.graylog2.indexer.fieldtypes.FieldTypeDTO.FIELD_NAME;
 import static org.graylog2.indexer.fieldtypes.FieldTypeDTO.FIELD_PHYSICAL_TYPE;
+import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
 import static org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO.FIELD_FIELDS;
 import static org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO.FIELD_INDEX_NAME;
 import static org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO.FIELD_INDEX_SET_ID;
+import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
 
 /**
  * Manages the "index_field_types" MongoDB collection.
@@ -104,6 +106,8 @@ public class IndexFieldTypesService {
 
         aggregateResult
                 .map(document -> ((Document) document.get(FIELD_FIELDS)).getString(FIELD_PHYSICAL_TYPE))
+                .map(TYPE_MAP::get)
+                .map(REVERSE_TYPES::get)
                 .forEach(typeHistory::add);
 
         if (!skipEntriesWithUnchangedType) {
