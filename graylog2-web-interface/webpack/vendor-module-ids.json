@@ -135,6 +135,8 @@
       "./node_modules/@emotion/weak-memoize/dist/weak-memoize.browser.esm.js": 220,
       "./node_modules/@floating-ui/react-dom/dist/floating-ui.react-dom.esm.js": 58463,
       "./node_modules/@floating-ui/react/dist/floating-ui.react.esm.js": 94993,
+      "./node_modules/@graylog/sawmill/dist/THEME_BASE.js": 7813,
+      "./node_modules/@graylog/sawmill/dist/index.js": 6491,
       "./node_modules/@mantine/core/esm/Accordion/Accordion.context.js": 74174,
       "./node_modules/@mantine/core/esm/Accordion/Accordion.errors.js": 7346,
       "./node_modules/@mantine/core/esm/Accordion/Accordion.js": 35492,
