@@ -78,6 +78,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final String passwordSecret;
     private final ClusterEventBus clusterEventBus;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
+    private final PreflightConfigService preflightConfigService;
 
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
@@ -88,7 +89,9 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final NodeService nodeService,
                                                     final CsrSigner csrSigner,
                                                     final ClusterConfigService clusterConfigService,
-                                                    final @Named("password_secret") String passwordSecret, ClusterEventBus clusterEventBus) {
+                                                    final @Named("password_secret") String passwordSecret,
+                                                    final ClusterEventBus clusterEventBus,
+                                                    final PreflightConfigService preflightConfigService) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -99,6 +102,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = clusterEventBus;
+        this.preflightConfigService = preflightConfigService;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -155,6 +159,17 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 
                 var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+
+                // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
+                preflightConfigService.getPersistedConfig().ifPresent(cfg -> {
+                    if (cfg.result().equals(PreflightConfigResult.FINISHED)) {
+                        nodes.stream()
+                                .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
+                                .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
+                                        .state(DataNodeProvisioningConfig.State.CONFIGURED)
+                                        .build()));
+                    }
+                });
 
                 nodes.stream()
                         .filter(c -> DataNodeProvisioningConfig.State.CSR.equals(c.state()))
