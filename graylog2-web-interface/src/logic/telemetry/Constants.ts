@@ -43,6 +43,8 @@ export const TELEMETRY_EVENT_TYPE = {
     COPY_TO_DASHBOARD: 'Search Widget Copy To Dashboard Clicked',
     SEARCH_WIDGET_HORIZONTAL_STRETCH: 'Search Widget Horizontal Width Toggled',
     SEARCH_WIDGET_EXTRA_ACTION: 'Search Widget Extra Action Clicked',
+    WIDGET_EDIT_TOGGLED: 'Search Widget Edit Toggled',
+    WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
@@ -71,13 +73,17 @@ export const TELEMETRY_EVENT_TYPE = {
   DASHBOARD_FULL_SCREEN_MODE_STARTED: 'Dashboard Fullscreen Mode Started',
   SEARCH_MESSAGE_TABLE_SHOW_SURROUNDING_MESSAGE: 'Search Message Table Show Surrounding Message Clicked ',
   SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM: 'Search Message Table Test Against Stream Clicked ',
+  SEARCH_MESSAGE_TABLE_DETAILS_TOGGLED: 'Widget Message Table Details Toggled',
   SEARCH_SIDEBAR_TOGGLE: 'Search Sidebar Toggled',
   SEARCH_SIDEBAR_HIGHLIGHT_CREATED: 'Search Sidebar Highlight Created',
   SEARCH_SIDEBAR_HIGHLIGHT_UPDATED: 'Search Sidebar Highlight Updated',
   SEARCH_SIDEBAR_HIGHLIGHT_DELETED: 'Search Sidebar Highlight Deleted',
   SEARCH_SIDEBAR_REDO: 'Search Sidebar Redo',
   SEARCH_SIDEBAR_UNDO: 'Search Sidebar Undo',
-
+  DASHBOARD_ACTION: {
+    DASHBOARD_CREATE_CLICKED: 'Dashboard Create Clicked',
+    DASHBOARD_CREATE_PAGE: 'Dashboard Create Page Clicked',
+  },
   // Event Definitions
   EVENTDEFINITION_CREATE_BUTTON_CLICKED: 'EventDefinition Create Button Clicked',
   EVENTDEFINITION_DETAILS_STEP_CLICKED: 'EventDefinition Details Step Clicked',
