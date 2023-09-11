@@ -30,12 +30,14 @@ import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.file.Path;
@@ -77,8 +79,8 @@ public class DatanodeSecuritySetupIT {
 
         backend = new DatanodeContainerizedBackend(containerHostname, datanodeContainer -> {
             // provide the keystore files to the docker container
-            datanodeContainer.withFileSystemBind(transportCert.location().toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/bin/config/datanode-transport-certificates.p12");
-            datanodeContainer.withFileSystemBind(httpCert.location().toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/bin/config/datanode-https-certificates.p12");
+            datanodeContainer.withFileSystemBind(transportCert.location().toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-transport-certificates.p12");
+            datanodeContainer.withFileSystemBind(httpCert.location().toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-https-certificates.p12");
 
             // configure transport security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");
@@ -106,6 +108,11 @@ public class DatanodeSecuritySetupIT {
         }).start();
     }
 
+    @AfterEach
+    void tearDown() {
+        backend.stop();
+    }
+
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
 
@@ -131,6 +138,8 @@ public class DatanodeSecuritySetupIT {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
+                .retryIfException(input -> input instanceof SSLHandshakeException) // may happen before SSL is configured properly
+                .retryIfResult(input -> !input.extract().contentType().startsWith("application/json"))
                 .retryIfResult(input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE"))
                 .build();
 

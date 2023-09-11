@@ -39,14 +39,6 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
     public static final int MONGODB_PORT = 27017;
     public static final String NETWORK_ALIAS = "mongodb";
 
-    public static MongoDBContainer create() {
-        return create(Network.newNetwork());
-    }
-
-    public static MongoDBContainer create(MongodbServer version) {
-        return create(version, Network.newNetwork());
-    }
-
     public static MongoDBContainer create(Network network) {
         return create(MongodbServer.DEFAULT_VERSION, network);
     }
@@ -70,6 +62,15 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
         } else {
             LOG.warn("Could not get info from Docker container! getContainerInfo() returned null.");
             return "could not get info from container!";
+        }
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        final Network network = getNetwork();
+        if(network != null) {
+            network.close();
         }
     }
 }

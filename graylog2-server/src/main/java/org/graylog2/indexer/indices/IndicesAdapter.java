@@ -58,7 +58,7 @@ public interface IndicesAdapter {
     void updateIndexMetaData(@Nonnull String indexName, @Nonnull Map<String, Object> metaData, boolean mergeExisting);
     Map<String, Object> getIndexMetaData(@Nonnull String indexName);
 
-    boolean ensureIndexTemplate(String templateName, Map<String, Object> template);
+    boolean ensureIndexTemplate(String templateName, Template template);
 
     boolean indexTemplateExists(String templateName);
 

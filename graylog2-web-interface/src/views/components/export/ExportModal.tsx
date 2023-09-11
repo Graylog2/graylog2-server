@@ -74,7 +74,14 @@ type FormState = {
 const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
   const executionState = useSearchExecutionState();
   const { state: viewStates } = view;
-  const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
+  const {
+    shouldEnableDownload,
+    title,
+    initialWidget,
+    shouldShowWidgetSelection,
+    shouldAllowWidgetSelection,
+    downloadFile,
+  } = ExportStrategy.createExportStrategy(view.type);
   const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
 
   const [loading, setLoading] = useState(false);
@@ -111,9 +118,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
 
         return (
           <BootstrapModalWrapper showModal
-                                 onHide={closeModal}
-                                 data-app-section="dashboard_export"
-                                 data-event-element={title}>
+                                 onHide={closeModal}>
             <Form>
               <Modal.Header>
                 <Modal.Title>{title}</Modal.Title>
@@ -145,12 +150,12 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
               </Modal.Body>
               <Modal.Footer>
                 <ModalSubmit leftCol={
-                              allowWidgetSelection && (
-                                <Button bsStyle="link" onClick={resetSelectedWidget} className="pull-left">
-                                  Select different message table
-                                </Button>
-                              )
-                             }
+                  allowWidgetSelection && (
+                    <Button bsStyle="link" onClick={resetSelectedWidget} className="pull-left">
+                      Select different message table
+                    </Button>
+                  )
+                }
                              onCancel={closeModal}
                              disabledSubmit={!enableDownload}
                              isSubmitting={loading}
@@ -173,7 +178,8 @@ ExportModal.propTypes = {
 };
 
 ExportModal.defaultProps = {
-  closeModal: () => {},
+  closeModal: () => {
+  },
   directExportWidgetId: null,
 };
 

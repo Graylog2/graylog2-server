@@ -148,7 +148,7 @@ const EventDefinitionsContainer = () => {
                                             onSortChange={onSortChange}
                                             onPageSizeChange={onPageSizeChange}
                                             pageSize={layoutConfig.pageSize}
-                                            bulkActions={renderBulkActions}
+                                            bulkSelection={{ actions: renderBulkActions }}
                                             activeSort={layoutConfig.sort}
                                             actionsCellWidth={160}
                                             rowActions={renderEventDefinitionActions}
