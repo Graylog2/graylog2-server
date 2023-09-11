@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -54,19 +55,9 @@ public class FieldTypeMappingsIT {
     void changeFieldTypeFromStringToIp() {
         var indexSet = api.indices().createIndexSet("Field Type Mappings Test", "Testing custom field type mapping", "custom-mappings");
         var stream = api.streams().createStream("Field Type Mappings Stream", indexSet, Streams.StreamRule.exact("field-type-mappings-test", "test-id", false));
+        var gelfInput = api.gelf().createGelfHttpInput();
 
-        api.gelf()
-                .createGelfHttpInput()
-                .postMessage(
-                        """
-                                {
-                                "short_message":"field-type-mappings-test",
-                                "test_id": "field-type-mappings-test",
-                                "source":"example.org",
-                                "source_ip": "192.168.1.1",
-                                "timestamp": "2019-07-23 09:53:08.175",
-                                "level":3
-                                }""");
+        gelfInput.postMessage(messageWithTimestamp("2019-07-23 09:53:08.175"));
 
         api.search().waitForMessage("field-type-mappings-test");
         var previousType = new ArrayList<>(api.fieldTypes().waitForFieldTypeDefinitions("source_ip"));
@@ -88,7 +79,26 @@ public class FieldTypeMappingsIT {
                 .body()
                 .asString()
                 .contains("custom-mappings_1"), "Waiting for new index after rotation timed out.", Duration.ofSeconds(60));
+
+        gelfInput.postMessage(messageWithTimestamp("2023-07-23 09:53:08.175"));
+
+        api.waitFor(() -> {
+            var fieldTypes = api.fieldTypes().getFieldTypes(AbsoluteRange.create("2023-01-01T00:00:00.000Z", "2024-01-01T00:00:00.000Z"), Set.of(stream));
+            var sourceIpField = fieldTypes.stream().filter(type -> type.name().equals("source_ip")).findFirst();
+
+            return sourceIpField.map(type -> type.type().type().equals("ip")).orElse(false);
+        }, "Waiting for field type to change to `ip` timed out.", Duration.ofSeconds(60));
     }
 
-
+    public String messageWithTimestamp(String timestamp) {
+        return String.format("""
+                {
+                "short_message":"field-type-mappings-test",
+                "test_id": "field-type-mappings-test",
+                "source":"example.org",
+                "source_ip": "192.168.1.1",
+                "timestamp": "%s",
+                "level":3
+                }""", timestamp);
+    }
 }
