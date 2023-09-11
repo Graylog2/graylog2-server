@@ -61,9 +61,7 @@ class ContentPackDownloadControl extends React.Component {
     return (
       <BootstrapModalWrapper showModal={this.state.showDownloadModal}
                              onHide={this._closeModal}
-                             bsSize="large"
-                             data-app-section="content_pack_actions"
-                             data-event-element={modalTitle}>
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>

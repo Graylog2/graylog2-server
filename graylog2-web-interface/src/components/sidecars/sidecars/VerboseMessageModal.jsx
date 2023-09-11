@@ -31,9 +31,7 @@ const VerboseMessage = styled.div`
 const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }) => (
   <BootstrapModalWrapper showModal={showModal}
                          onHide={onHide}
-                         bsSize="large"
-                         data-app-section="sidecar_verbose_message"
-                         data-event-element={`Error Details for ${collectorName}`}>
+                         bsSize="large">
     <Modal.Header closeButton>
       <Modal.Title><span>Error Details for <em>{collectorName}</em></span></Modal.Title>
     </Modal.Header>

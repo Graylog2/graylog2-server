@@ -18,9 +18,7 @@
 import { Popover as BootstrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import withPopoverTelemetry from 'components/common/withPopoverTelemetry';
-
-const Popover = styled(withPopoverTelemetry(BootstrapPopover))(({ theme }) => {
+const Popover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
   const arrowColor = theme.colors.variant.lightest.default;
   const backgroundColor = theme.colors.global.contentBackground;
@@ -76,7 +74,7 @@ const Popover = styled(withPopoverTelemetry(BootstrapPopover))(({ theme }) => {
         }
       }
     }
-`;
+  `;
 });
 
 /** @component */
