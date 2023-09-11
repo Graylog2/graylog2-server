@@ -23,6 +23,7 @@ import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -84,9 +85,9 @@ public class FieldTypeMappingsIT {
 
         api.waitFor(() -> api.get("/system/indexer/indices/" + indexSet + "/list ", 200)
                 .extract()
-                .jsonPath()
-                .getString("all.indices[0].index_name")
-                .equals("custom-mappings-1"), "Waiting for new index after rotation timed out.");
+                .body()
+                .asString()
+                .contains("custom-mappings_1"), "Waiting for new index after rotation timed out.", Duration.ofSeconds(60));
     }
 
 
