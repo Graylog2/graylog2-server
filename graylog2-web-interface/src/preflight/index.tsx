@@ -21,7 +21,6 @@ import { Notifications } from '@mantine/notifications';
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
 import GlobalThemeStyles from 'preflight/theme/GlobalThemeStyles';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
-import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
 import App from './App';
 
@@ -29,12 +28,8 @@ ReactDOM.render((
   <PreflightThemeProvider>
     <GlobalThemeStyles />
     <DefaultQueryClientProvider>
-      <ThemeWrapper>
-        <>
-          <Notifications />
-          <App />
-        </>
-      </ThemeWrapper>
+      <Notifications />
+      <App />
     </DefaultQueryClientProvider>
   </PreflightThemeProvider>
 ),
