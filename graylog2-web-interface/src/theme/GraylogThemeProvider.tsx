@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 import type { ColorScheme } from '@graylog/sawmill';
 import SawmillSC from '@graylog/sawmill/styled-components';
+import type { MantineTheme } from '@graylog/sawmill/mantine';
 import SawmillMantine from '@graylog/sawmill/mantine';
 import { useMemo } from 'react';
 import { MantineProvider } from '@mantine/core';
@@ -39,6 +40,7 @@ const useSCTheme = (
   colorScheme: ColorScheme,
   changeColorScheme: (newColorScheme: ColorScheme) => void,
   useCustomThemeColors: () => ({ data: ThemesColors }),
+  mantineTheme: MantineTheme,
 ) => {
   const { data: customThemeColors } = useCustomThemeColors?.() ?? {};
 
@@ -51,6 +53,7 @@ const useSCTheme = (
     return ({
       ...theme,
       changeMode: changeColorScheme,
+      mantine: mantineTheme,
     });
   }, [changeColorScheme, colorScheme, customThemeColors]);
 };
@@ -71,8 +74,8 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => 
   const [colorScheme, changeColorScheme] = usePreferredColorScheme(initialThemeModeOverride);
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
   const useCustomThemeColors = themeCustomizer?.[0]?.hooks.useCustomThemeColors;
-  const scTheme = useSCTheme(colorScheme, changeColorScheme, useCustomThemeColors);
   const mantineTheme = useMantineTheme(colorScheme, useCustomThemeColors);
+  const scTheme = useSCTheme(colorScheme, changeColorScheme, useCustomThemeColors, mantineTheme);
 
   return (
     <ColorSchemeContext.Provider value={colorScheme}>

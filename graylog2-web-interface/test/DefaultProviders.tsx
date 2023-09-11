@@ -35,7 +35,7 @@ type Props = {
 const DefaultProviders = ({ children }: Props) => (
   <CurrentUserContext.Provider value={defaultUser}>
     <MantineProvider theme={themeMantine}>
-      <ThemeProvider theme={{ ...themeSC, changeMode: () => {} }}>
+      <ThemeProvider theme={{ ...themeSC, changeMode: () => {}, mantine: themeMantine }}>
         <UserDateTimeProvider tz={defaultTimezone}>
           {children}
         </UserDateTimeProvider>
