@@ -66,8 +66,7 @@ class MetricsComponent extends React.Component {
       return (
         <Row className="content">
           <Col md={12}>
-            <Alert bsStyle="danger">
-              <Icon name="exclamation-triangle" />&nbsp;
+            <Alert bsStyle="danger" title={<Icon name="exclamation-triangle" />}>
               {error ? (
                 <span>
                   Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em>{' '}

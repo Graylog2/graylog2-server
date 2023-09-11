@@ -46,8 +46,8 @@ const AuthenticationOverviewPage = () => {
       {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
         <Row className="content">
           <Col xs={12}>
-            <Alert bsStyle="warning">
-              <Icon name="exclamation-circle" /> None of the configured authentication services is currently active.
+            <Alert bsStyle="warning" icon={<Icon name="exclamation-circle" />}>
+              None of the configured authentication services is currently active.
             </Alert>
           </Col>
         </Row>

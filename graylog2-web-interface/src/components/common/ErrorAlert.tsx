@@ -47,10 +47,10 @@ const ErrorAlert = ({ children, onClose, bsStyle = 'warning', marginTopBottom = 
 
   return (
     <Container margin={marginTopBottom}>
-      <Alert bsStyle={finalBsStyle}>
+      <Alert bsStyle={finalBsStyle} title="Runtime Error">
         <StyledRow>
           <Col md={11}>
-            {runtimeError && <h4>Runtime Error</h4>}
+            {runtimeError}
             {children}
           </Col>
           <Col md={1}>

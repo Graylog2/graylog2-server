@@ -14,61 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// import * as React from 'react';
-// import styled, { css } from 'styled-components';
-// // eslint-disable-next-line no-restricted-imports
-// import { Alert as BootstrapAlert } from 'react-bootstrap';
-// import type { ColorVariant } from '@graylog/sawmill';
-//
-// interface Props {
-//   bsStyle: ColorVariant,
-//   children: React.ReactNode,
-//   onDismiss?: () => void,
-// }
-//
-// const StyledAlert = styled(BootstrapAlert)<{ bsStyle: ColorVariant }>(({ bsStyle = 'info', theme }) => {
-//   const borderColor = theme.colors.variant.lighter[bsStyle];
-//   const backgroundColor = theme.colors.variant.lightest[bsStyle];
-//
-//   return css`
-//     background-color: ${backgroundColor};
-//     border-color: ${borderColor};
-//     color: ${theme.utils.contrastingColor(backgroundColor)};
-//
-//     a:not(.btn) {
-//       color: ${theme.utils.contrastingColor(backgroundColor, 'AA')};
-//       font-weight: bold;
-//       text-decoration: underline;
-//
-//       &:hover,
-//       &:focus,
-//       &:active {
-//         color: ${theme.utils.contrastingColor(backgroundColor)};
-//       }
-//
-//       &:hover,
-//       &:focus {
-//         text-decoration: none;
-//       }
-//     }
-//
-//     &.alert-dismissible {
-//       .close {
-//         top: -9px;
-//       }
-//     }
-// `;
-// });
-//
-// const Alert = ({ bsStyle, ...rest }: Props) => <StyledAlert bsStyle={bsStyle} {...rest} />;
-//
-// Alert.defaultProps = {
-//   onDismiss: undefined,
-// };
-//
-// export default Alert;
-
 import * as React from 'react';
+import type { CSSProperties } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { Alert as MantineAlert } from '@mantine/core';
 import type { ColorVariant } from '@graylog/sawmill';
@@ -78,36 +25,46 @@ const StyledAlert = styled(MantineAlert)(({ theme }) => css`
 `);
 
 type Props = {
-  children: React.ReactNode,
   bsStyle: ColorVariant,
-  withCloseButton?: boolean
-  onClose?: () => void,
+  children: React.ReactNode,
+  className?: string,
   icon?: React.ReactNode,
+  onClose?: () => void,
+  style?: CSSProperties,
+  title?: React.ReactNode,
 };
 
-const Alert = ({ children, bsStyle, withCloseButton, onClose, icon }: Props) => {
+const Alert = ({ children, bsStyle, onClose, icon, title, style, className }: Props) => {
   const theme = useTheme();
   const alertStyles = () => ({
     message: {
       fontSize: theme.mantine.fontSizes.md,
     },
+    title: {
+      fontSize: theme.mantine.fontSizes.md,
+    },
   });
 
   return (
-    <StyledAlert icon={icon}
-                 styles={alertStyles}
+    <StyledAlert className={className}
+                 icon={icon}
                  color={bsStyle}
-                 withCloseButton={withCloseButton}
-                 onClose={onClose}>
+                 onClose={onClose}
+                 style={style}
+                 styles={alertStyles}
+                 title={title}
+                 withCloseButton={typeof onClose === 'function'}>
       {children}
     </StyledAlert>
   );
 };
 
 Alert.defaultProps = {
-  onClose: undefined,
-  withCloseButton: false,
+  className: undefined,
   icon: undefined,
+  onClose: undefined,
+  style: undefined,
+  title: undefined,
 };
 
 export default Alert;

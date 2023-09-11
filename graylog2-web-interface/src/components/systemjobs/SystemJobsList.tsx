@@ -57,9 +57,8 @@ const SystemJobsList = ({ jobs }): React.ReactElement => {
   return (
     (formattedJobs.length === 0)
       ? (
-        <StyledAlert bsStyle="info">
-          <Icon name="info-circle" />{' '}
-          &nbsp;No active system jobs.
+        <StyledAlert bsStyle="info" icon={<Icon name="info-circle" />}>
+          No active system jobs.
         </StyledAlert>
       )
       : (

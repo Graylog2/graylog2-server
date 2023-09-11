@@ -45,8 +45,8 @@ class InputTypesDataTable extends React.Component {
 
     if (Object.keys(this.props.inputDescriptions).length === 0) {
       return (
-        <Alert bsStyle="warning">
-          <Icon name="exclamation-triangle" />&nbsp; Input types are unavailable.
+        <Alert bsStyle="warning" icon={<Icon name="exclamation-triangle" />}>
+          Input types are unavailable.
         </Alert>
       );
     }

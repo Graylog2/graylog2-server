@@ -193,13 +193,13 @@ const IndexMaintenanceStrategiesConfiguration = ({
     <span>
       <StyledH3>{title}</StyledH3>
       {description && (
-        <StyledAlert>
-          <Icon name="info-circle" />{' '} {description}
+        <StyledAlert icon={<Icon name="info-circle" />}>
+          {description}
         </StyledAlert>
       )}
       {helpText && (
-        <StyledAlert>
-          <Icon name="info-circle" />{' '} {helpText}
+        <StyledAlert icon={<Icon name="info-circle" />}>
+          {helpText}
         </StyledAlert>
       )}
       {shouldShowMaxRetentionWarning && (
@@ -210,8 +210,8 @@ const IndexMaintenanceStrategiesConfiguration = ({
         </StyledAlert>
       )}
       {shouldShowInvalidRetentionWarning() && (
-        <StyledAlert bsStyle="danger">
-          <Icon name="exclamation-triangle" />{' '} {getDisplayName()} strategy was deactivated.
+        <StyledAlert bsStyle="danger" icon={<Icon name="exclamation-triangle" />}>
+          {getDisplayName()} strategy was deactivated.
           Please configure a valid retention strategy.
         </StyledAlert>
       )}

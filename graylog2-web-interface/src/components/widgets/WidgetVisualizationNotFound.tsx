@@ -31,8 +31,8 @@ const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
   useEffect(() => onRenderComplete(), [onRenderComplete]);
 
   return (
-    <Alert bsStyle="danger">
-      <Icon name="exclamation-circle" /> Widget Visualization (<i>{widgetClassName}</i>) not found.
+    <Alert bsStyle="danger" icon={<Icon name="exclamation-circle" />}>
+      Widget Visualization (<i>{widgetClassName}</i>) not found.
       It looks like the plugin supplying this widget is not loaded.
     </Alert>
   );

@@ -195,9 +195,9 @@ const Scratchpad = () => {
                        position={position}>
       <ContentArea>
         {!isSecurityWarningConfirmed && (
-          <StyledAlert bsStyle="warning" bsSize="sm">
-            <Icon name="exclamation-triangle" size="lg" />
-            <AlertNote>We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in
+          <StyledAlert bsStyle="warning" bsSize="sm" icon={<Icon name="exclamation-triangle" size="lg" />}>
+            <AlertNote>
+              We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in
               this area.
             </AlertNote>
             <Button bsStyle="link" bsSize="sm" onClick={handleGotIt}>Got It!</Button>

@@ -29,7 +29,9 @@ class IndexerFailuresList extends React.Component {
   render() {
     if (this.props.failures.length === 0) {
       return (
-        <Alert bsStyle="success"><Icon name="check-circle" /> Hurray! There are not any indexer failures.</Alert>
+        <Alert bsStyle="success" icon={<Icon name="check-circle" />}>
+          Hurray! There are not any indexer failures.
+        </Alert>
       );
     }
 

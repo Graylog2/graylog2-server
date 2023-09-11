@@ -85,8 +85,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
            label="Sessions Timeout">
       <Row className="no-bm">
         <Col xs={12}>
-          <Alert bsStyle="info">
-            <Icon name="info-circle" />{' '}<b>Changing the session timeout</b><br />
+          <Alert bsStyle="info" icon={<Icon name="info-circle" />} title="Changing the session timeout">
             Changing the timeout setting for sessions will log the user out of Graylog and will invalidate all their
             current sessions. If you are changing the setting for your own user, you will be logged out at the moment
             of saving the setting. In that case, make sure to save any pending changes before changing the timeout.

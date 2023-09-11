@@ -74,8 +74,8 @@ const IndexerClusterHealthSummary = ({ health, name }: {
   };
 
   return (
-    <ESClusterStatus bsStyle={alertClassForHealth()}>
-      <Icon name={iconNameForHealth()} /> &nbsp;{formattedTextForHealth}{' '}
+    <ESClusterStatus bsStyle={alertClassForHealth()} icon={<Icon name={iconNameForHealth()} />}>
+      {formattedTextForHealth}{' '}
       Shards:{' '}
       {health.shards.active} active,{' '}
       {health.shards.initializing} initializing,{' '}

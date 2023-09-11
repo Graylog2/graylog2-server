@@ -24,8 +24,8 @@ type Props = {
 }
 
 const TelemetryInfoText = ({ showProfile }: Props) => (
-  <Alert bsStyle="info">
-    <Icon name="info-circle" /> We would like to collect anonymous usage data to help us prioritize improvements
+  <Alert bsStyle="info" icon={<Icon name="info-circle" />}>
+    We would like to collect anonymous usage data to help us prioritize improvements
     and make Graylog better in the future.
     <br />
     We do not collect personal data, sensitive information, or content such as logs in your

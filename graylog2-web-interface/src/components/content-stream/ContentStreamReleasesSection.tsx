@@ -52,9 +52,9 @@ const ContentStreamReleasesSection = () => {
 
   if (error || isEmpty(feedList)) {
     return (
-      <Alert bsStyle="info">
+      <Alert bsStyle="info" icon={<Icon name="exclamation-triangle" />}>
         <p>
-          <Icon name="exclamation-triangle" /> Unable to load RSS feed at the moment ! You can read more
+          Unable to load RSS feed at the moment ! You can read more
           on {' '}
           <ExternalLink href="https://www.graylog.org/post/tag/release-info">
             Graylog.org

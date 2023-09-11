@@ -34,9 +34,8 @@ const _formatNotificationCount = (count: number) => {
 const getTitle = (count) => (count === 0 ? 'No notifications' : `There ${_formatNotificationCount(count)}`);
 
 const getContent = (count: number, notificationsList: Array<NotificationType>) => (count === 0 ? (
-  <Alert bsStyle="success" className="notifications-none">
-    <Icon name="check-circle" />{' '}
-      &nbsp;No notifications
+  <Alert bsStyle="success" className="notifications-none" icon={<Icon name="check-circle" />}>
+    No notifications
   </Alert>
 ) : (
   notificationsList?.map((notification) => <Notification key={`${notification.type}-${notification?.key}-${notification.timestamp}`} notification={notification} />)

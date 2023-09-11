@@ -70,9 +70,8 @@ class SystemOverviewDetails extends React.Component {
           </Alert>
         </Col>
         <Col md={4}>
-          <Alert bsStyle={lbStatus === 'ALIVE' ? 'success' : 'danger'}>
+          <Alert bsStyle={lbStatus === 'ALIVE' ? 'success' : 'danger'} icon={<Icon name="heart" />}>
             <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" /></span>
-            <Icon name="heart" />&nbsp;
             Marked as <strong>{lbStatus}</strong> for load balancers
           </Alert>
         </Col>

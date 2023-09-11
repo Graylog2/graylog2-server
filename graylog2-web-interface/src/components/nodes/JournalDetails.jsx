@@ -111,8 +111,8 @@ const JournalDetails = createReactClass({
 
     if (!journalInformation.enabled) {
       return (
-        <Alert bsStyle="warning">
-          <Icon name="exclamation-triangle" />&nbsp; The disk journal is disabled on this node.
+        <Alert bsStyle="warning" icon={<Icon name="exclamation-triangle" />}>
+          The disk journal is disabled on this node.
         </Alert>
       );
     }
@@ -121,8 +121,8 @@ const JournalDetails = createReactClass({
 
     if (Object.keys(metrics).length === 0) {
       return (
-        <Alert bsStyle="warning">
-          <Icon name="exclamation-triangle" />&nbsp; Journal metrics unavailable.
+        <Alert bsStyle="warning" icon={<Icon name="exclamation-triangle" />}>
+          Journal metrics unavailable.
         </Alert>
       );
     }

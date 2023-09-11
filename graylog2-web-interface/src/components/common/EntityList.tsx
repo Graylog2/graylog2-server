@@ -41,8 +41,7 @@ type Props = {
 const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
   if (items.length === 0) {
     return (
-      <Alert bsStyle={bsNoItemsStyle}>
-        <Icon name="info-circle" />&nbsp;
+      <Alert bsStyle={bsNoItemsStyle} icon={<Icon name="info-circle" />}>
         {noItemsText}
       </Alert>
     );

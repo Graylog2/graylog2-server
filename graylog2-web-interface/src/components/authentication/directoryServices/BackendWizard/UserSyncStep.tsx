@@ -189,8 +189,7 @@ const UserSyncStep = ({
 
           <Row>
             <Col sm={9} smOffset={3}>
-              <Alert bsStyle="info">
-                <Icon name="info-circle" />{' '}
+              <Alert bsStyle="info" title={<Icon name="info-circle" />}>
                 We recommend you test your user login in the sidebar panel to verify your settings.
               </Alert>
             </Col>

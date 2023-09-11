@@ -55,7 +55,7 @@ const useSCTheme = (
       changeMode: changeColorScheme,
       mantine: mantineTheme,
     });
-  }, [changeColorScheme, colorScheme, customThemeColors]);
+  }, [changeColorScheme, colorScheme, customThemeColors, mantineTheme]);
 };
 
 const useMantineTheme = (

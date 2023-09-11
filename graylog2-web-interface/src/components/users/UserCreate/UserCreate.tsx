@@ -259,7 +259,8 @@ const UserCreate = () => {
                                      key={role.id} />
                     ))}
                     {!hasValidRole && (
-                      <Alert bsStyle="danger">You need to select at least one of
+                      <Alert bsStyle="danger">
+                        You need to select at least one of
                         the <em>Reader</em> or <em>Admin</em> roles.
                       </Alert>
                     )}
@@ -273,8 +274,7 @@ const UserCreate = () => {
               {submitError && (
                 <Row>
                   <Col xs={9} xsOffset={3}>
-                    <Alert bsStyle="danger">
-                      <b>Failed to create user</b><br />
+                    <Alert bsStyle="danger" title="Failed to create user">
                       {showSubmitError(submitError)}
                     </Alert>
                   </Col>

@@ -64,8 +64,8 @@ class DecoratorList extends React.Component<Props> {
     if (!decorators || decorators.length === 0) {
       return (
         <AlertContainer>
-          <Alert bsStyle="info" className={DecoratorStyles.noDecoratorsAlert}>
-            <Icon name="info-circle" />&nbsp;No decorators configured.
+          <Alert bsStyle="info" className={DecoratorStyles.noDecoratorsAlert} icon={<Icon name="info-circle" />}>
+            No decorators configured.
           </Alert>
         </AlertContainer>
       );

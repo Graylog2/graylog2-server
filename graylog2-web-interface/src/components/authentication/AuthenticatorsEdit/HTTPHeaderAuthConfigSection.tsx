@@ -87,8 +87,8 @@ const HTTPHeaderAuthConfigSection = () => {
                              help="HTTP header containing the implicitly trusted name of the Graylog user. (The header match is ignoring case sensitivity)" />
             <Row>
               <Col mdOffset={3} md={9}>
-                <Alert bsStyle="info">
-                  <Icon name="info-circle" /> Please configure the <code>trusted_proxies</code> setting in the Graylog
+                <Alert bsStyle="info" title={<Icon name="info-circle" />}>
+                  Please configure the <code>trusted_proxies</code> setting in the Graylog
                   server configuration file.
                 </Alert>
               </Col>

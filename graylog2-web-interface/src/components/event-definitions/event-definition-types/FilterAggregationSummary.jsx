@@ -63,8 +63,8 @@ const renderQueryParameters = (queryParameters) => {
       .join(', ');
 
     return (
-      <Alert bsStyle="danger">
-        <Icon name="exclamation-triangle" />&nbsp;There are undeclared query parameters: {undeclaredParameters}
+      <Alert bsStyle="danger" title={<Icon name="exclamation-triangle" />}>
+        There are undeclared query parameters: {undeclaredParameters}
       </Alert>
     );
   }
@@ -158,7 +158,7 @@ class FilterAggregationSummary extends React.Component {
               {validationResults.isValid
                 ? <AggregationConditionSummary series={series} conditions={conditions} />
                 : (
-                  <Alert bsSize="small" bsStyle="danger"><Icon name="exclamation-triangle" />&nbsp;
+                  <Alert bsSize="small" bsStyle="danger" icon={<Icon name="exclamation-triangle" />}>
                     Condition is not valid: {validationResults.errors.join(', ')}
                   </Alert>
                 )}
