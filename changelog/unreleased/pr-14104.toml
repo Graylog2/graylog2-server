@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Handle missing log collector for sidecar configurations."
+
+pulls = ["14104"]

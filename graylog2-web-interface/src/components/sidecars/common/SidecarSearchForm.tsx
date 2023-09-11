@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { OverlayTrigger, SearchForm, Icon } from 'components/common';
@@ -22,12 +22,15 @@ import { Popover, Table, Button } from 'components/bootstrap';
 
 import style from './SidecarSearchForm.css';
 
+type Props = {
+  query: string,
+  children: React.ReactNode,
+  onSearch: (query: string, callback: () => void) => void,
+  onReset: () => void,
+};
+
 const queryHelpPopover = (
-  <Popover id="search-query-help"
-           className={style.popoverWide}
-           title="Search Syntax Help"
-           data-app-section="sidecar_search_query_helper"
-           data-event-element="Available search fields">
+  <Popover id="search-query-help" className={style.popoverWide} title="Search Syntax Help">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -66,7 +69,7 @@ const queryHelpPopover = (
     <p><strong>Examples</strong></p>
     <p>
       Find sidecars that did not communicate with Graylog since a date:<br />
-      <kbd>{'last_seen:<=2018-04-10'}</kbd><br />
+      <kbd>last_seen:&lt;=2018-04-10</kbd><br />
     </p>
     <p>
       Find sidecars with <code>failing</code> or <code>unknown</code> status:<br />
@@ -81,11 +84,13 @@ const queryHelp = (
   </OverlayTrigger>
 );
 
-const SidecarSearchForm = ({ query, onSearch, onReset, children }) => (
+const SidecarSearchForm = ({ query, onSearch, onReset, children }: Props) => (
   <SearchForm query={query}
               onSearch={onSearch}
               onReset={onReset}
+              searchButtonLabel="Find"
               placeholder="Find sidecars"
+              queryWidth={400}
               queryHelpComponent={queryHelp}
               topMargin={0}
               useLoadingState>

@@ -14,35 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import createReactClass from 'create-react-class';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 
 import OperatingSystemIcon from './OperatingSystemIcon';
 
-const CollectorIndicator = createReactClass({
-  propTypes: {
-    collector: PropTypes.string.isRequired,
-    operatingSystem: PropTypes.string,
-  },
+type Props = {
+  collector: string,
+  operatingSystem?: string,
+};
 
-  getDefaultProps() {
-    return {
-      operatingSystem: undefined,
-    };
-  },
+const CollectorIndicator = ({ collector, operatingSystem }: Props) => (
+  <span>
+    <OperatingSystemIcon operatingSystem={operatingSystem} /> {collector}
+    {operatingSystem && <span> on {upperFirst(operatingSystem)}</span>}
+  </span>
+);
 
-  render() {
-    const { collector, operatingSystem } = this.props;
+CollectorIndicator.propTypes = {
+  collector: PropTypes.string.isRequired,
+  operatingSystem: PropTypes.string,
+};
 
-    return (
-      <span>
-        <OperatingSystemIcon operatingSystem={operatingSystem} /> {collector}
-        {operatingSystem && <span> on {upperFirst(operatingSystem)}</span>}
-      </span>
-    );
-  },
-});
+CollectorIndicator.defaultProps = {
+  operatingSystem: undefined,
+};
 
 export default CollectorIndicator;
