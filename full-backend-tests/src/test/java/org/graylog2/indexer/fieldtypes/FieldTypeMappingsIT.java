@@ -26,6 +26,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
@@ -91,7 +92,7 @@ public class FieldTypeMappingsIT {
     }
 
     public String messageWithTimestamp(String timestamp) {
-        return String.format("""
+        return String.format(Locale.ROOT, """
                 {
                 "short_message":"field-type-mappings-test",
                 "test_id": "field-type-mappings-test",
