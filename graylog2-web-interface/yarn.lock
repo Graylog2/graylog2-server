@@ -2475,9 +2475,9 @@
     prop-types "^15.8.1"
 
 "@graylog/sawmill@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.0.tgz#0e8a2e9e65be45c495837318cfd2bec5140ef3e2"
-  integrity sha512-7zQpquuBP55Z2D9auLStiPAq3t2bLYy2nVd7U7shcCoTXeMlUinmPy7HiOpCKyRifXfs6xtvRuNbwXHyYpvUVg==
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.2.tgz#0620cd879be2ebe924580ddbfc49106194cc0644"
+  integrity sha512-K0Bm1gvHDDjg9fB7tpNQv8xcJMiCKpJo8FKzYAbBr5Bj/b+0ZZw1y4rFtwklXI5V8E0ykAYdJj1n4QpQcmc6vg==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
