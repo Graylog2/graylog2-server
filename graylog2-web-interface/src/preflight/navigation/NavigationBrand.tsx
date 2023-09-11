@@ -19,7 +19,7 @@ import { useTheme } from 'styled-components';
 
 const NavigationBrand = () => {
   const theme = useTheme();
-  const logoSecondColor = theme.mode === 'teint' ? theme.colors.brand.concrete : 'white';
+  const logoSecondColor = theme.mode === 'light' ? theme.colors.brand.concrete : 'white';
 
   return (
     <svg width="135" height="43" viewBox="0 0 287 92" fill="none" xmlns="http://www.w3.org/2000/svg">
