@@ -14,14 +14,7 @@ jobs:
         working-directory: graylog2-web-interface
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Yarn cache
-        uses: actions/cache@v2
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('graylog2-web-interface/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-          path: ~/.cache/yarn
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: yarn install
       - name: Updating browserslist db
