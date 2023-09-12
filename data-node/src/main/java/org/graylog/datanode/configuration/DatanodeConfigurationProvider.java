@@ -34,14 +34,13 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     @Inject
     public DatanodeConfigurationProvider(final Configuration localConfiguration) throws IOException {
         final OpensearchDistribution opensearchDistribution = detectOpensearchDistribution(localConfiguration);
-        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(localConfiguration.getPasswordSecret(), localConfiguration.getIndexerJwtAuthTokenExpirationDuration(), localConfiguration.getIndexerJwtAuthTokenCachingDuration());
-        final var jwtAuthToken = provider.get();
+        final IndexerJwtAuthTokenProvider jwtTokenProvider = new IndexerJwtAuthTokenProvider(localConfiguration.getPasswordSecret(), localConfiguration.getIndexerJwtAuthTokenExpirationDuration(), localConfiguration.getIndexerJwtAuthTokenCachingDuration());
 
         datanodeConfiguration = new DatanodeConfiguration(
                 opensearchDistribution,
                 localConfiguration.getDatanodeNodeName(),
                 localConfiguration.getProcessLogsBufferSize(),
-                jwtAuthToken
+                jwtTokenProvider
         );
     }
 

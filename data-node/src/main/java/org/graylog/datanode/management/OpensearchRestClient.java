@@ -39,14 +39,16 @@ public class OpensearchRestClient {
 
         org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder builder = org.graylog.shaded.opensearch2.org.opensearch.client.RestClient.builder(host);
         if ("https".equals(host.getSchemeName())) {
-            final var jwtAuthToken = datanodeConfiguration.indexerJwtAuthToken();
 
             try {
                 final var sslContext = SSLContext.getInstance("TLS");
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
 
                 builder.setHttpClientConfigCallback(httpClientBuilder -> {
-                    httpClientBuilder.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", jwtAuthToken));
+                    httpClientBuilder.addInterceptorLast((HttpRequestInterceptor) (request, context) -> {
+                        final String jwtToken = datanodeConfiguration.indexerJwtAuthTokenProvider().get();
+                        request.addHeader("Authorization", jwtToken);
+                    });
                     httpClientBuilder.setSSLContext(sslContext);
                     return httpClientBuilder;
                 });

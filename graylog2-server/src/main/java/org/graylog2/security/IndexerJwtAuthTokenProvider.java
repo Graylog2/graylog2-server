@@ -29,6 +29,9 @@ import javax.inject.Singleton;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import com.github.joschi.jadconfig.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -38,11 +41,16 @@ import java.util.function.Supplier;
 public class IndexerJwtAuthTokenProvider implements Provider<String> {
     private final Supplier<String> authHeaderBearerString;
 
+    private static final Logger LOG = LoggerFactory.getLogger(IndexerJwtAuthTokenProvider.class);
+
     @Inject
     public IndexerJwtAuthTokenProvider(@Named("password_secret") String signingKey,
                                        @Named("indexer_jwt_auth_token_expiration_duration") final Duration tokenExpirationDuration,
                                        @Named("indexer_jwt_auth_token_caching_duration") final Duration cachingDuration) {
-        authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8), tokenExpirationDuration), cachingDuration.toSeconds(), TimeUnit.SECONDS);
+        authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> {
+            LOG.debug("Creating new JWT token, expiration set to {}", tokenExpirationDuration);
+            return "Bearer " + createToken(signingKey.getBytes(StandardCharsets.UTF_8), tokenExpirationDuration);
+        }, cachingDuration.toSeconds(), TimeUnit.SECONDS);
     }
 
    public static String createToken(final byte[] apiKeySecretBytes, final Duration tokenExpirationDuration) {
