@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLHandshakeException;
 import java.net.SocketException;
 import java.security.KeyStore;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -96,6 +98,11 @@ public class DatanodeOpensearchWait {
 
     @SafeVarargs
     private ValidatableResponse waitForOpensearch(Predicate<ValidatableResponse>... predicates) throws ExecutionException, RetryException {
+
+        if(LOG.isInfoEnabled()) {
+            LOG.info("cURL request: " + formatCurlConnectionInfo());
+        }
+
         //noinspection UnstableApiUsage
         final RetryerBuilder<ValidatableResponse> builder = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
@@ -142,6 +149,16 @@ public class DatanodeOpensearchWait {
             printShardsInfo();
             throw e;
         }
+    }
+
+    private String formatCurlConnectionInfo() {
+        List<String> builder = new LinkedList<>();
+        builder.add("curl -k"); // trust self-signed certs
+        if(jwtToken != null) {
+            builder.add("-H \"Authorization: Bearer " + jwtToken + "\"");
+        }
+        builder.add(formatClusterHeathUrl());
+        return String.join(" ", builder);
     }
 
     private void printShardsInfo() {
