@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog2.security;
 
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * DatanodeConfiguration holds the static configuration as parsed during the datanode startup, either from the
- * config file or from the ENV properties.
- */
-public record DatanodeConfiguration(
-        OpensearchDistribution opensearchDistribution,
-        String nodeName,
-        int processLogsBufferSize,
-        IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider
-) {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER, ElementType.TYPE })
+@Qualifier
+public @interface IndexerJwtAuthToken {
 }

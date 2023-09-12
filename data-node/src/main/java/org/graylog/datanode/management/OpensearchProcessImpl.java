@@ -71,7 +71,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
-        return OpensearchRestClient.build(configuration, trustManager);
+        return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
     }
 
     @Override
@@ -98,8 +98,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 .map(httpHost -> new URIBuilder()
                         .setHost(httpHost.getHostName())
                         .setPort(httpHost.getPort())
-                        .setScheme(httpHost.getSchemeName())
-                        .setUserInfo(configuration.get().authUsername(), configuration.get().authPassword()).toString())
+                        .setScheme(httpHost.getSchemeName()).toString())
                 .orElse(""); // TODO: will this cause problems in the nodeservice?
         return URI.create(baseUrl);
     }
