@@ -23,6 +23,7 @@ import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import { Modal } from 'components/bootstrap';
 
 import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
 import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
@@ -55,6 +56,8 @@ const RuleBuilderBlock = ({
 }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [insertMode, setInsertMode] = useState<'above'|'below'|undefined>(undefined);
+  const [insertBlockDict, setInsertBlockDict] = useState<BlockDict>(undefined);
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -90,6 +93,8 @@ const RuleBuilderBlock = ({
   };
 
   const resetBlock = () => {
+    setEditMode(false);
+
     if (block) {
       setCurrentBlockDict(blockDict.find(((b) => b.name === block.function)));
     } else {
@@ -97,9 +102,14 @@ const RuleBuilderBlock = ({
     }
   };
 
+  const resetInsertBlock = () => {
+    setInsertMode(undefined);
+    setInsertBlockDict(undefined);
+  };
+
   const onCancel = () => {
-    setEditMode(false);
     resetBlock();
+    resetInsertBlock();
   };
 
   const onAdd = (paramsToAdd) => {
@@ -149,12 +159,24 @@ const RuleBuilderBlock = ({
     addBlock(type, duplicatedBlock, order + 1);
   };
 
+  const onInsert = (paramsToAdd) => {
+    if (insertMode) {
+      const newBlock: RuleBlock = { id: '', function: insertBlockDict.name, params: paramsToAdd, outputvariable: null };
+
+      addBlock(type, newBlock, insertMode === 'above' ? order : order + 1);
+    }
+
+    onCancel();
+  };
+
   const onInsertAbove = () => {
     sendTelemetry('click', {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `insert-above-${type}`,
     });
+
+    setInsertMode('above');
   };
 
   const onInsertBelow = () => {
@@ -163,15 +185,22 @@ const RuleBuilderBlock = ({
       app_section: 'pipeline-rule-builder',
       app_action_value: `insert-below-${type}`,
     });
+
+    setInsertMode('below');
   };
 
   const onUpdate = (params: { [key: string]: any }, functionName: string) => {
     updateBlock(order, type, buildBlockData({ newFunctionName: functionName, newParams: params }));
-    setEditMode(false);
+
+    onCancel();
   };
 
   const onSelect = (option: string) => {
     setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
+  };
+
+  const onInsertSelect = (option: string) => {
+    setInsertBlockDict(blockDict.find(((b) => b.name === option)));
   };
 
   const isBlockNegatable = (): boolean => (
@@ -199,16 +228,39 @@ const RuleBuilderBlock = ({
                        selectedBlockDict={currentBlockDict}
                        type={type} />
       ) : (
-        <RuleBlockDisplay block={block}
-                          onDelete={onDelete}
-                          onEdit={onEdit}
-                          onNegate={onNegate}
-                          onDuplicate={onDuplicate}
-                          onInsertAbove={onInsertAbove}
-                          onInsertBelow={onInsertBelow}
-                          returnType={currentBlockDict?.return_type}
-                          negatable={isBlockNegatable()}
-                          type={type} />
+        <>
+          <RuleBlockDisplay block={block}
+                            onDelete={onDelete}
+                            onEdit={onEdit}
+                            onNegate={onNegate}
+                            onDuplicate={onDuplicate}
+                            onInsertAbove={onInsertAbove}
+                            onInsertBelow={onInsertBelow}
+                            returnType={currentBlockDict?.return_type}
+                            negatable={isBlockNegatable()}
+                            type={type} />
+          {Boolean(insertMode) && (
+            <Modal show
+                   bsSize="lg"
+                   enforceFocus
+                   onHide={resetInsertBlock}>
+              <Modal.Header closeButton>
+                <Modal.Title>Insert new action {insertMode} action N°{order + 1}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <RuleBlockForm onAdd={onInsert}
+                               onCancel={onCancel}
+                               onUpdate={onUpdate}
+                               onSelect={onInsertSelect}
+                               order={order}
+                               options={options}
+                               outputVariableList={outputVariableList}
+                               selectedBlockDict={insertBlockDict}
+                               type={type} />
+              </Modal.Body>
+            </Modal>
+          )}
+        </>
       )}
     </BlockContainer>
   );

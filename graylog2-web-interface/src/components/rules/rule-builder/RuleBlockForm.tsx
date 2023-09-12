@@ -73,6 +73,7 @@ const OptionTitle = styled.p(({ theme }) => css`
 
 const SelectRow = styled(Row)(({ theme }) => css`
   margin-top: ${theme.spacings.xxs};
+  margin-bottom: ${theme.spacings.xxs};
 `);
 
 const OptionDescription = styled.p<{ $isSelected: boolean }>(({ theme, $isSelected }) => css`
@@ -183,6 +184,7 @@ const RuleBlockForm = ({
                           optionRenderer={optionRenderer}
                           clearable={false}
                           matchProp="label"
+                          autoFocus
                           onChange={(option: string) => handleChange(option, resetForm)}
                           value={selectedBlockDict?.name || ''} />
                 </Col>

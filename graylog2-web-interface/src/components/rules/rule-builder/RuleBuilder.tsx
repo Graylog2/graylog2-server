@@ -149,7 +149,7 @@ const RuleBuilder = () => {
     } else {
       const blockToSet = setOutputVariable(block, lastOutputIndex + 1);
       const newActions = rule.rule_builder.actions;
-      newActions.splice(orderIndex || newActions.length, 0, { ...blockToSet, id: blockId });
+      newActions.splice(Number.isNaN(orderIndex) ? newActions.length : orderIndex, 0, { ...blockToSet, id: blockId });
 
       ruleToAdd = {
         ...rule,

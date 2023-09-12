@@ -200,8 +200,20 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
                     Duplicate
                   </MenuItem>
                   <MenuItem divider />
-                  <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
-                  <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
+                  <MenuItem onClick={() => {
+                    onInsertAbove();
+                    toggleDropdown();
+                    setShowActions(false);
+                  }}>
+                    Insert above
+                  </MenuItem>
+                  <MenuItem onClick={() => {
+                    onInsertBelow();
+                    toggleDropdown();
+                    setShowActions(false);
+                  }}>
+                    Insert below
+                  </MenuItem>
                   <MenuItem divider />
                   <MenuItem onClick={onDelete}>Delete</MenuItem>
                 </>
