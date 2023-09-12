@@ -191,9 +191,6 @@ public class Configuration extends BaseConfiguration {
         return opensearchProcessLogsBufferSize;
     }
 
-    @Parameter(value = "rest_api_username")
-    private String restApiUsername;
-
     @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
 
@@ -222,9 +219,6 @@ public class Configuration extends BaseConfiguration {
             throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
         }
     }
-
-    @Parameter(value = "rest_api_password")
-    private String restApiPassword;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "data/node-id";
@@ -292,16 +286,6 @@ public class Configuration extends BaseConfiguration {
     public String getDatanodeHttpCertificatePassword() {
         return datanodeHttpCertificatePassword;
     }
-
-
-    public String getRestApiUsername() {
-        return restApiUsername;
-    }
-
-    public String getRestApiPassword() {
-        return restApiPassword;
-    }
-
 
     public Optional<String> getOpensearchNetworkHostHost() {
         return Optional.ofNullable(opensearchNetworkHostHost);

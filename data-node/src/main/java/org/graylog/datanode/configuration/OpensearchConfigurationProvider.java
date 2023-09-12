@@ -97,8 +97,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
-                    localConfiguration.getRestApiUsername(),
-                    localConfiguration.getRestApiPassword(),
                     "datanode-cluster",
                     localConfiguration.getDatanodeNodeName(),
                     Collections.emptyList(),
