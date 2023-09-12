@@ -50,8 +50,10 @@ class ContentPacksList extends React.Component {
 
   static defaultProps = {
     contentPacks: [],
-    onDeletePack: () => {},
-    onInstall: () => {},
+    onDeletePack: () => {
+    },
+    onInstall: () => {
+    },
     contentPackMetadata: {},
   };
 
@@ -95,14 +97,14 @@ class ContentPacksList extends React.Component {
     const modal = (
       <BootstrapModalWrapper showModal={this.state.showModal}
                              onHide={closeModal}
-                             bsSize="large"
-                             data-app-section="content_pack_install"
-                             data-event-element="Install Content Pack">
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Install Content Pack</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ContentPackInstall ref={(node) => { installRef = node; }}
+          <ContentPackInstall ref={(node) => {
+            installRef = node;
+          }}
                               contentPack={item}
                               onInstall={onInstallProp} />
         </Modal.Body>
@@ -126,7 +128,9 @@ class ContentPacksList extends React.Component {
       const { openFunc, installModal } = this._installModal(item);
       let downloadRef;
       const downloadModal = (
-        <ContentPackDownloadControl ref={(node) => { downloadRef = node; }}
+        <ContentPackDownloadControl ref={(node) => {
+          downloadRef = node;
+        }}
                                     contentPackId={item.id}
                                     revision={item.rev} />
       );
@@ -140,7 +144,10 @@ class ContentPacksList extends React.Component {
         <ControlledTableList.Item key={item.id}>
           <Row className="row-sm">
             <Col md={9}>
-              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Latest Version: {item.rev} <ContentPackStatus contentPackId={item.id} states={states} /> </small>
+              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link>
+                <small>Latest
+                  Version: {item.rev} <ContentPackStatus contentPackId={item.id} states={states} />
+                </small>
               </h3>
             </Col>
             <Col md={3} className="text-right">
@@ -155,9 +162,15 @@ class ContentPacksList extends React.Component {
                   <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
                     <MenuItem>Create New Version</MenuItem>
                   </LinkContainer>
-                  <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
+                  <MenuItem onSelect={() => {
+                    downloadRef.open();
+                  }}>Download
+                  </MenuItem>
                   <MenuItem divider />
-                  <MenuItem onSelect={() => { onDeletePack(item.id); }}>Delete All Versions</MenuItem>
+                  <MenuItem onSelect={() => {
+                    onDeletePack(item.id);
+                  }}>Delete All Versions
+                  </MenuItem>
                 </DropdownButton>
                 {downloadModal}
               </ButtonToolbar>
@@ -196,7 +209,11 @@ class ContentPacksList extends React.Component {
                   onChange={this._onChangePage} />
     );
 
-    const pageSizeSelect = <PageSizeSelect onChange={this._itemsShownChange} pageSize={pageSize} pageSizes={[10, 25, 50, 100]} />;
+    const pageSizeSelect = (
+      <PageSizeSelect onChange={this._itemsShownChange}
+                      pageSize={pageSize}
+                      pageSizes={[10, 25, 50, 100]} />
+    );
 
     const noContentMessage = contentPacks.length <= 0
       ? <NoEntitiesExist>No content packs found. Please create or upload one</NoEntitiesExist>

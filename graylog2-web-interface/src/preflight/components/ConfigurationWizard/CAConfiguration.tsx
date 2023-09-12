@@ -24,7 +24,7 @@ import CAUpload from './CAUpload';
 
 const StyledTabs = styled(Tabs)(({ theme }) => css`
   button {
-    font-size: ${theme.fonts.size.body.rem};
+    font-size: ${theme.fonts.size.body};
   }
 `);
 

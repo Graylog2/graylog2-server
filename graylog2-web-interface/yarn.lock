@@ -2474,16 +2474,16 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@graylog/sawmill@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-1.0.5.tgz#180026fa7cf109c395092cf83386dc9568e536a5"
-  integrity sha512-G68cdxnxmyIyEKJvqjJHrWUADPp9F3iIX6/YLiamTqvrewXJvmHPFslm+n5nD9qjnhMcOxOZGu17kwPbNx2tVw==
+"@graylog/sawmill@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.0.tgz#0e8a2e9e65be45c495837318cfd2bec5140ef3e2"
+  integrity sha512-7zQpquuBP55Z2D9auLStiPAq3t2bLYy2nVd7U7shcCoTXeMlUinmPy7HiOpCKyRifXfs6xtvRuNbwXHyYpvUVg==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
     "@openfonts/ubuntu-mono_latin" "^1.44.1"
     chroma-js "^2.1.2"
-    prop-types "^15.7.2"
+    lodash "^4.17.21"
 
 "@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"
@@ -3299,13 +3299,6 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.35.0.tgz#61e5cf9363b423ed665740c422902e65619eb7da"
   integrity sha512-4GMcKQuLZQi6RFBiBZNsLhl+hQGYScRZ5ZoVq8QAzfqz9M7vcGin/2YdSESwl7WaV+Qzsb5CZOAbMBes4lNTnA==
 
-"@tanstack/query-persist-client-core@4.33.0":
-  version "4.33.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-4.33.0.tgz#38bddb653cd61fa7303039e6d13dd5f39c38d0e0"
-  integrity sha512-3P16+2JjcUU5CHi10jJuwd0ZQYvQtSuzLvCUCjVuAnj3GZjfSso1v8t6WAObAr9RPuIC6vDXeOQ3mr07EF/NxQ==
-  dependencies:
-    "@tanstack/query-core" "4.33.0"
-
 "@tanstack/query-persist-client-core@4.35.0":
   version "4.35.0"
   resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-4.35.0.tgz#95894da4ab70011462c673e370dbb59f1c7993e7"
@@ -3314,11 +3307,11 @@
     "@tanstack/query-core" "4.35.0"
 
 "@tanstack/query-sync-storage-persister@^4.33.0":
-  version "4.33.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.33.0.tgz#9f821335db7c08177211fe151a0ffd76f0b1f4e0"
-  integrity sha512-V6igMcdEOXPRpvmNFQ6I/iJaw9NhxWy7x8PWamm2cgSsLi8bHaDvUVuWkZm+ikI47QjoCUk7qll/82JYLaH+pw==
+  version "4.35.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.35.0.tgz#42340674e34223ae8cd49e498335d51ecb70aa14"
+  integrity sha512-idNCZ7GF401X/NUHS0G0VQNhB36h1VTPobWBJYAEGkz6uvS8CpVuruGyvmVPuR61SE2k94g/Qc4jWQMcDeFM+g==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.33.0"
+    "@tanstack/query-persist-client-core" "4.35.0"
 
 "@tanstack/react-query-persist-client@^4.33.0":
   version "4.35.0"
@@ -4533,10 +4526,10 @@ accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.8:
     mime-types "~2.1.34"
     negotiator "0.6.3"
 
-ace-builds@1.24.1, ace-builds@^1.4.14:
-  version "1.24.1"
-  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.24.1.tgz#90c929d9e31bb1092aea9deb32767bf51f77b034"
-  integrity sha512-TLcxMxiTRX5Eq9bBVSd/bTJlanCBULiv/IULLohJDDaCAfcpZKJBVSd4OWfN/j2c2jCLc+jhpNWGELiJZw3wPw==
+ace-builds@1.24.2, ace-builds@^1.4.14:
+  version "1.24.2"
+  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.24.2.tgz#ef0ddb37af9a87754004d086f54b81ab36dabffa"
+  integrity sha512-zjvJiEw05BADxPMq5gN/Vgc9FgyiiDHpdy676Af1nJk8DF4ipgf0cNmV3wy8JHeQ6vezypEZV6pHQu9avO+WtQ==
 
 acorn-globals@^4.1.0:
   version "4.3.4"
@@ -6052,9 +6045,9 @@ core-js-pure@^3.0.0:
   integrity sha512-lacdXOimsiD0QyNf9BC/mxivNJ/ybBGJXQFKzRekp1WTHoVUWsUHEn+2T8GJAzzIhyOuXA+gOxCVN3l+5PLPUA==
 
 core-js@3:
-  version "3.32.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.32.1.tgz#a7d8736a3ed9dd05940c3c4ff32c591bb735be77"
-  integrity sha512-lqufgNn9NLnESg5mQeYsxQP5w7wrViSj0jr/kv6ECQiByzQkrn1MKvV0L3acttpDqfQrHLwr2KCMgX5b8X+lyQ==
+  version "3.32.2"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.32.2.tgz#172fb5949ef468f93b4be7841af6ab1f21992db7"
+  integrity sha512-pxXSw1mYZPDGvTQqEc5vgIb83jGQKFGYWY76z4a7weZXUolw3G+OvpZqSRcfYOoOVUQJYEPsWeQK8pKEnUtWxQ==
 
 core-js@^2.6.5:
   version "2.6.11"
@@ -12670,9 +12663,9 @@ postcss@^8.4.19, postcss@^8.4.21, postcss@^8.4.23:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.77.3"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.77.3.tgz#8d032842ee070b375635fec96b8c7f0800c2bced"
-  integrity sha512-DKsGpBIUjQSihhGruEW8wpVCkeDxU4jz7gADdXX2jEWV6bl4WpUPxjo1ukidVDFvvc/ihCM5PQWMQrItexdpSA==
+  version "1.78.1"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.78.1.tgz#06c951a63c950724f3c34952fb91446e234020ad"
+  integrity sha512-5tJoF56gGg4B4CSlLbWHuTpi7Ch7wksjCkPonHlQAc61ZZRymTB63tRheCvkcf+Omf8PBkO+2NJ0XEgrkRHE0A==
   dependencies:
     fflate "^0.4.1"
 
