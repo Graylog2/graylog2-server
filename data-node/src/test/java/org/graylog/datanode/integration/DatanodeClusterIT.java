@@ -16,11 +16,14 @@
  */
 package org.graylog.datanode.integration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.DatanodeOpensearchWait;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,8 +33,11 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -144,6 +150,7 @@ public class DatanodeClusterIT {
                 mongodb,
                 hostname,
                 datanodeContainer -> {
+                    datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", hostnameNodeA);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", hostnameNodeA + ":9300");
 
@@ -174,11 +181,13 @@ public class DatanodeClusterIT {
                 });
     }
 
-    private void waitForNodesCount(int countOfNodes) throws ExecutionException, RetryException {
+    private void waitForNodesCount(final int countOfNodes) throws ExecutionException, RetryException {
+        final String jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
+
         try {
             DatanodeOpensearchWait.onPort(nodeA.getOpensearchRestPort())
                     .withTruststore(trustStore)
-                    .withBasicAuth(initialAdminUsername, initialAdminPassword)
+                    .withJwtAuth(jwtToken)
                     .waitForNodesCount(countOfNodes);
         } catch (Exception retryException) {
             LOG.error("DataNode Container logs from nodeA follow:\n" + nodeA.getLogs());

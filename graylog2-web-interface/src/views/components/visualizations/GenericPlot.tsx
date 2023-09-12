@@ -39,7 +39,7 @@ const StyledPlot = styled(Plot)(({ theme }) => css`
   .hoverlayer .hovertext {
     rect {
       fill: ${theme.colors.global.contentBackground} !important;
-      opcity: 0.9 !important;
+      opacity: 0.9 !important;
     }
 
     .name {
@@ -177,7 +177,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     const { chartData, layout, setChartColor, theme } = this.props;
     const fontSettings = {
       color: theme.colors.global.textDefault,
-      size: ROOT_FONT_SIZE * theme.fonts.size.small.replace(/rem|em/i, ''),
+      size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
       family: theme.fonts.family.body,
     };
     const defaultLayout = {

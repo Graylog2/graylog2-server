@@ -21,8 +21,8 @@ import defer from 'lodash/defer';
 
 import { Icon, Toggle } from 'components/common';
 import {
-  THEME_MODE_LIGHT,
-  THEME_MODE_DARK,
+  COLOR_SCHEME_LIGHT,
+  COLOR_SCHEME_DARK,
 } from 'theme/constants';
 
 const ThemeModeToggleWrap = styled.div`
@@ -50,29 +50,29 @@ const ThemeModeToggle = () => {
     const { checked } = event.target;
     event.persist();
     setLoadingTheme(true);
-    const newMode = checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
+    const newMode = checked ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
     defer(() => theme.changeMode(newMode));
   };
 
-  const loadingLightMode = currentMode === THEME_MODE_DARK && loadingTheme;
-  const loadingDarkMode = currentMode === THEME_MODE_LIGHT && loadingTheme;
+  const loadingLightMode = currentMode === COLOR_SCHEME_DARK && loadingTheme;
+  const loadingDarkMode = currentMode === COLOR_SCHEME_LIGHT && loadingTheme;
 
   return (
     <ThemeModeToggleWrap>
       <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'}
                 spin={loadingLightMode}
-                $currentMode={currentMode === THEME_MODE_LIGHT} />
+                $currentMode={currentMode === COLOR_SCHEME_LIGHT} />
       <Toggle>
-        <input value={THEME_MODE_DARK}
+        <input value={COLOR_SCHEME_DARK}
                type="checkbox"
                onChange={toggleThemeMode}
-               checked={currentMode === THEME_MODE_DARK}
+               checked={currentMode === COLOR_SCHEME_DARK}
                disabled={loadingLightMode || loadingDarkMode} />
         <span className="slider" />
       </Toggle>
       <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'}
                 spin={loadingDarkMode}
-                $currentMode={currentMode === THEME_MODE_DARK} />
+                $currentMode={currentMode === COLOR_SCHEME_DARK} />
     </ThemeModeToggleWrap>
   );
 };

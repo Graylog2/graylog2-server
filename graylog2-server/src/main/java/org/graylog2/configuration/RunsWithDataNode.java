@@ -14,27 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
+package org.graylog2.configuration;
 
-import breakpoints, { breakpointPropTypes } from './breakpoints';
-import colors, { colorsPropTypes } from './colors';
-import fonts, { fontsPropTypes } from './fonts';
-import utils, { utilsPropTypes } from './utils';
-import spacings, { spacingsPropTypes } from './spacings';
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-const themePropTypes = PropTypes.shape({
-  breakpoints: breakpointPropTypes,
-  colors: colorsPropTypes,
-  fonts: fontsPropTypes,
-  utils: utilsPropTypes,
-  spacings: spacingsPropTypes,
-});
-
-export {
-  breakpoints,
-  colors,
-  fonts,
-  utils,
-  themePropTypes,
-  spacings,
-};
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER, ElementType.TYPE })
+@Qualifier
+public @interface RunsWithDataNode {
+}

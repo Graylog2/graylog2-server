@@ -25,12 +25,10 @@ import org.graylog2.configuration.converters.URIListConverter;
 import org.graylog2.configuration.validators.ElasticsearchVersionValidator;
 import org.graylog2.configuration.validators.HttpOrHttpsSchemeValidator;
 import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidator;
-import org.graylog2.configuration.validators.NonEmptyListValidator;
 import org.graylog2.storage.SearchVersion;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ElasticsearchClientConfiguration {
@@ -93,4 +91,13 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
+
+    @Parameter(value = "indexer_use_jwt_authentication")
+    boolean indexerUseJwtAuthentication = false;
+
+    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
+    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
+
+    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
+    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 }

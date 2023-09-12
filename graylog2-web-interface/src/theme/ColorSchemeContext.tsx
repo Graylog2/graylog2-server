@@ -18,6 +18,6 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-const RegeneratableThemeContext = React.createContext<{regenerateTheme:() => void} | undefined>(undefined);
+const ColorSchemeContext = React.createContext<{} | undefined>(undefined);
 
-export default singleton('contexts.RegeneratableThemeContext', () => RegeneratableThemeContext);
+export default singleton('contexts.ColorSchemeContext', () => ColorSchemeContext);
