@@ -48,13 +48,11 @@ import java.util.function.Predicate;
 
 public class DatanodeOpensearchWait {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeOpensearchWait.class);
     private static final int ATTEMPTS_COUNT = 160;
 
     private final int opensearchPort;
     private KeyStore truststore;
-    private String username;
-    private String password;
     private String jwtToken;
     private String lastRecordedResponse;
 
@@ -68,12 +66,6 @@ public class DatanodeOpensearchWait {
 
     public DatanodeOpensearchWait withTruststore(KeyStore truststore) {
         this.truststore = truststore;
-        return this;
-    }
-
-    public DatanodeOpensearchWait withBasicAuth(String username, String password) {
-        this.username = username;
-        this.password = password;
         return this;
     }
 
@@ -168,8 +160,8 @@ public class DatanodeOpensearchWait {
 
             Optional.ofNullable(truststore).ifPresent(ts -> req.trustStore(truststore));
 
-            if (username != null && password != null) {
-                req.auth().basic(username, password);
+            if (jwtToken != null) {
+                req.header( "Authorization", "Bearer " + jwtToken);
             }
 
             final String shardsResponse = req.get("https://localhost:" + opensearchPort + "/_cat/shards?v=true&h=index,shard,prirep,state,node,unassigned.reason&s=state")
