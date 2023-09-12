@@ -30,6 +30,8 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -42,23 +44,12 @@ import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
-public class DatanodeInstance extends TestableSearchServerInstance {
+public class DatanodeInstance extends OpenSearchInstance {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
     public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
 
-    private final OpenSearchClient openSearchClient;
-    private final Client client;
-    private final FixtureImporter fixtureImporter;
-    private final Adapters adapters;
-
     public DatanodeInstance(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(version, network, heapSize);
-
-        RestHighLevelClient restHighLevelClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientOS2(this.openSearchClient, featureFlags);
-        this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS2(openSearchClient);
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        super(version, network, heapSize, featureFlags);
     }
 
     @Override
@@ -69,45 +60,6 @@ public class DatanodeInstance extends TestableSearchServerInstance {
     @Override
     public SearchServer searchServer() {
         return DATANODE_VERSION;
-    }
-
-    private RestHighLevelClient buildRestClient() {
-        return new RestHighLevelClientProvider(
-                new GracefulShutdownService(),
-                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
-                Duration.seconds(60),
-                Duration.seconds(60),
-                Duration.seconds(60),
-                1,
-                1,
-                1,
-                false,
-                false,
-                null,
-                Duration.seconds(60),
-                "http",
-                false,
-                false,
-                new BasicCredentialsProvider(),
-                null,
-                true,
-                false,
-                "maybe_want_jwt_here")
-                .get();
-    }
-
-    @Override
-    public Client client() {
-        return this.client;
-    }
-
-    @Override
-    public FixtureImporter fixtureImporter() {
-        return this.fixtureImporter;
-    }
-
-    public OpenSearchClient openSearchClient() {
-        return this.openSearchClient;
     }
 
     @Override
@@ -122,19 +74,19 @@ public class DatanodeInstance extends TestableSearchServerInstance {
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb:27017/graylog")
                 .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
-                .withExposedPorts(9200, 9300)
+                .withExposedPorts(8999, 9200, 9300)
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forHttp("/_cluster/health").forPort(OPENSEARCH_PORT).forStatusCode(200).forResponsePredicate(s -> s.contains("\"status\":\"green\"")).withStartupTimeout(java.time.Duration.ofSeconds(300)));
-    }
-
-    @Override
-    public Adapters adapters() {
-        return this.adapters;
-    }
-
-    @Override
-    public String getLogs() {
-        return this.container.getLogs();
+                .waitingFor(
+                        Wait.forHttp("/_cluster/health")
+                                .forPort(OPENSEARCH_PORT)
+                                .forStatusCode(200)
+                                .forResponsePredicate(s -> {
+                                    LOG.info("Response while waiting: {}", s);
+                                    // allow yellow for fixing indices later
+                                    return s.contains("\"status\":\"green\"") || s.contains("\"status\":\"yellow\"");
+                                })
+                                .withStartupTimeout(java.time.Duration.ofSeconds(180))
+                );
     }
 }
