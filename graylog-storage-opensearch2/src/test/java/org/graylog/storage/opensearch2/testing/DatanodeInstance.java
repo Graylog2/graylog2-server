@@ -33,7 +33,7 @@ import static java.util.Objects.isNull;
 
 public class DatanodeInstance extends OpenSearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
-    public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
+    public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE52;
     private final String mongoDBUri;
     private final String passwordSecret;
     private final String rootPasswordSha2;

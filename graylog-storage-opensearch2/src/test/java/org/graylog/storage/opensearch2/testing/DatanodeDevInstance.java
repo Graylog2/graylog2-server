@@ -17,19 +17,14 @@
 package org.graylog.storage.opensearch2.testing;
 
 import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.datanode.DatanodeDevContainerInstanceProvider;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.PullPolicy;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
-import java.util.Locale;
-
-import static java.util.Objects.isNull;
 
 public class DatanodeDevInstance extends OpenSearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevInstance.class);
@@ -47,7 +42,7 @@ public class DatanodeDevInstance extends OpenSearchInstance {
 
     @Override
     protected String imageName() {
-        return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "5.2-dev");
+        return "creating image locally by provider";
     }
 
     @Override
@@ -57,6 +52,12 @@ public class DatanodeDevInstance extends OpenSearchInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
+        var builder =  DatanodeDevContainerInstanceProvider.getBuilderFor(this.version()).orElseThrow(() -> new UnsupportedOperationException("Can not build container for Search version " + this.version() + " - not supported."));
+
+        builder.passwordSecret(passwordSecret).rootPasswordSha2(rootPasswordSha2).network(network).mongoDbUri(mongoDBUri).restPort(8999).openSearchPort(9200);
+
+        return builder.build();
+/*
         return new GenericContainer<>(DockerImageName.parse(image))
                 .withImagePullPolicy(PullPolicy.alwaysPull())
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
@@ -80,6 +81,6 @@ public class DatanodeDevInstance extends OpenSearchInstance {
                                     return s.contains("\"status\":\"green\"") || s.contains("\"status\":\"yellow\"");
                                 })
                                 .withStartupTimeout(java.time.Duration.ofSeconds(180))
-                );
+                ); */
     }
 }
