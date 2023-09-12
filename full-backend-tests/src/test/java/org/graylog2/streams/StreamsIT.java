@@ -17,7 +17,6 @@
 package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
-import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -32,7 +31,7 @@ import static io.restassured.RestAssured.given;
 import static org.graylog2.rest.models.tools.responses.PageListResponse.ELEMENTS_FIELD_NAME;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, serverLifecycle = Lifecycle.CLASS)
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5)
 public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 

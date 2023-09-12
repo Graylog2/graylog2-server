@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
-import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -80,7 +79,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO5)
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5)
 public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()

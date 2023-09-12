@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views;
 
-import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
@@ -28,7 +27,7 @@ import java.util.Map;
 
 import static org.hamcrest.core.StringContains.containsString;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@ContainerMatrixTestsConfiguration
 public class StartPageRecentActivityIT {
 
     private final GraylogApis api;

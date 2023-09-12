@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.fullbackend;
 
-import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -29,7 +28,7 @@ import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
+@ContainerMatrixTestsConfiguration(withMailServerEnabled = true)
 public class FiltersIT {
     private static final String DEFAULT_CONNECT_SRC = "connect-src 'self' https://graylog.org/post/tag/ https://telemetry.graylog.cloud;";
     private final GraylogApis api;

@@ -29,7 +29,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.VM, withMailServerEnabled = true)
 class BackendStartupIT {
     private final GraylogApis api;
 
