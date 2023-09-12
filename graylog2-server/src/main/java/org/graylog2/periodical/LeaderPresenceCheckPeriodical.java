@@ -157,6 +157,6 @@ public class LeaderPresenceCheckPeriodical extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 1;
+        return 5;
     }
 }
