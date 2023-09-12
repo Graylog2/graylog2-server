@@ -16,6 +16,7 @@
  */
 package org.graylog.events;
 
+import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -66,6 +67,7 @@ import org.graylog.events.rest.EventsResource;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.notifications.NotificationSystemEventPublisher;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 
@@ -173,5 +175,7 @@ public class EventsModule extends PluginModule {
         install(new FactoryModuleBuilder().implement(AggregationSearch.class, PivotAggregationSearch.class).build(AggregationSearch.Factory.class));
 
         addMigration(V20230629140000_RenameFieldTypeOfEventDefinitionSeries.class);
+
+        serviceBinder().addBinding().to(NotificationSystemEventPublisher.class).in(Scopes.SINGLETON);
     }
 }

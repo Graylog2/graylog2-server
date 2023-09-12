@@ -70,9 +70,9 @@ public class SystemNotificationRenderResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get HTML formatted message")
     public TemplateRenderResponse renderHtmlWithKey(@ApiParam(name = "type", required = true) @PathParam("type") Notification.Type type,
-                                             @ApiParam(name = "key", required = true) @PathParam("key") String key,
-                                             @ApiParam(name = "JSON body", required = false)
-                                             TemplateRenderRequest request) {
+                                                    @ApiParam(name = "key", required = true) @PathParam("key") String key,
+                                                    @ApiParam(name = "JSON body", required = false)
+                                                    TemplateRenderRequest request) {
         return render(type, key, SystemNotificationRenderService.Format.HTML, request);
     }
 
@@ -82,9 +82,9 @@ public class SystemNotificationRenderResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get plaintext formatted message")
     public TemplateRenderResponse renderPlainText(@ApiParam(name = "type", required = true)
-                                  @PathParam("type") Notification.Type type,
-                                  @ApiParam(name = "JSON body", required = false)
-                                  TemplateRenderRequest request) {
+                                                  @PathParam("type") Notification.Type type,
+                                                  @ApiParam(name = "JSON body", required = false)
+                                                  TemplateRenderRequest request) {
         return render(type, null, SystemNotificationRenderService.Format.PLAINTEXT, request);
     }
 
@@ -94,9 +94,9 @@ public class SystemNotificationRenderResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get plaintext formatted message")
     public TemplateRenderResponse renderPlainTextWithKey(@ApiParam(name = "type", required = true) @PathParam("type") Notification.Type type,
-                                                  @ApiParam(name = "key", required = true) @PathParam("key") String key,
-                                                  @ApiParam(name = "JSON body", required = false)
-                                                  TemplateRenderRequest request) {
+                                                         @ApiParam(name = "key", required = true) @PathParam("key") String key,
+                                                         @ApiParam(name = "JSON body", required = false)
+                                                         TemplateRenderRequest request) {
         return render(type, key, SystemNotificationRenderService.Format.PLAINTEXT, request);
     }
 
@@ -108,6 +108,7 @@ public class SystemNotificationRenderResource extends RestResource {
         Map<String, Object> values = (request != null) ? request.values() : new HashMap<>();
         SystemNotificationRenderService.RenderResponse renderResponse =
                 systemNotificationRenderService.render(type, key, format, values);
+
         return TemplateRenderResponse.create(renderResponse.title, renderResponse.description);
     }
 }
