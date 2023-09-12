@@ -191,9 +191,7 @@ const IndexSetsDefaultsConfig = () => {
           <Modal show={showModal}
                  onHide={resetConfig}
                  aria-modal="true"
-                 aria-labelledby="dialog_label"
-                 data-app-section="configurations_index_defaults"
-                 data-event-element={modalTitle}>
+                 aria-labelledby="dialog_label">
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
               {({ values, setFieldValue, isSubmitting }) => (
                 <Form>

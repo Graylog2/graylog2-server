@@ -106,9 +106,7 @@ const PermissionsConfig = () => {
           <Modal show={showModal}
                  onHide={resetConfig}
                  aria-modal="true"
-                 aria-labelledby="dialog_label"
-                 data-app-section="configurations_permissions"
-                 data-event-element={modalTitle}>
+                 aria-labelledby="dialog_label">
             <Formik onSubmit={saveConfig} initialValues={config}>
 
               {({ isSubmitting }) => (
@@ -126,7 +124,7 @@ const PermissionsConfig = () => {
                                        id="shareWithEveryone"
                                        label={(
                                          <LabelSpan>Share with everyone</LabelSpan>
-                                         )} />
+                                       )} />
                           <InputDescription help="Control whether it is possible to share with everyone." />
                         </Col>
                         <Col sm={12}>
@@ -135,7 +133,7 @@ const PermissionsConfig = () => {
                                        id="shareWithUsers"
                                        label={(
                                          <LabelSpan>Share with users</LabelSpan>
-                                         )} />
+                                       )} />
                           <InputDescription help="Control whether it is possible to share with single users." />
                         </Col>
 

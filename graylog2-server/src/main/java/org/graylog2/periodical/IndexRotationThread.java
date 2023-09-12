@@ -97,7 +97,7 @@ public class IndexRotationThread extends Periodical {
                 }
             });
         } else {
-            LOG.debug("Elasticsearch cluster isn't healthy. Skipping index rotation.");
+            LOG.warn("Elasticsearch cluster isn't healthy. Skipping index rotation.");
         }
     }
 

@@ -17,9 +17,18 @@
 package org.graylog.storage.opensearch2.testing;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -35,12 +44,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.isNull;
 
@@ -63,10 +76,55 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        if(isFirstContainerStart) {
+            afterContainerCreated();
+        }
     }
 
     public static OpenSearchInstance create() {
         return OpenSearchInstanceBuilder.builder().instantiate();
+    }
+
+    protected void afterContainerCreated() {
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.9.0")) {
+            fixNumberOfReplicaForMlPlugin();
+        }
+    }
+
+    /**
+     * TODO: this is a workaround and should be removed once we can configure the default number of replicas for ML and SAP plugins or
+     * opensearch fixes their code so it sets number_of_replicas to 0 when the cluster is running in the single-node mode.
+     *
+     * @see <a href="https://github.com/opensearch-project/security/issues/3130">https://github.com/opensearch-project/security/issues/3130</a>
+     * When opensearch starts in a single-node mode, the ML and security analysis plugins still configure its
+     * indices to require replicas. We can't change this behaviour currently, so we have to adapt the setting
+     * after the indices are created and before the tests can start.
+     */
+    private void fixNumberOfReplicaForMlPlugin() {
+        openSearchClient().execute((client, requestOptions) -> {
+            try {
+                waitForIndices(client, requestOptions, ".plugins-ml-config");
+            } catch (ExecutionException | RetryException e) {
+                throw new RuntimeException("Failed to wait for indices", e);
+            }
+
+            final UpdateSettingsRequest req = new UpdateSettingsRequest().indices(".plugins-ml-config", ".opensearch-sap-pre-packaged-rules-config", ".opensearch-sap-log-types-config");
+            req.settings(Map.of("number_of_replicas", "0"));
+            return client.indices().putSettings(req, requestOptions);
+        });
+    }
+
+    private GetIndexResponse waitForIndices(RestHighLevelClient client, RequestOptions requestOptions, String... indices) throws ExecutionException, RetryException {
+        return RetryerBuilder.<GetIndexResponse>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
+                .retryIfResult(input -> !new HashSet<>(Arrays.asList(input.getIndices())).containsAll(Arrays.asList(indices)))
+                .build()
+                .call(() -> {
+                    final GetIndexRequest request = new GetIndexRequest("*");
+                    request.indicesOptions(IndicesOptions.lenientExpandOpen());
+                    return client.indices().get(request, requestOptions);
+                });
     }
 
     @Override
@@ -97,7 +155,10 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 false,
                 false,
                 new BasicCredentialsProvider(),
-                null)
+                null,
+                false,
+                false,
+                "maybe_want_jwt_here")
                 .get();
     }
 

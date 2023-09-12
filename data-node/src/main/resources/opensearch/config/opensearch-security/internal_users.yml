@@ -6,6 +6,4 @@ _meta:
   type: "internalusers"
   config_version: 2
 
-# Define your internal users here
-
 # all demo users have been removed, so that they don't end up in our data node by accident
