@@ -31,14 +31,14 @@ import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
-public class DatanodeInstance extends OpenSearchInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeInstance.class);
+public class DatanodeDevInstance extends OpenSearchInstance {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevInstance.class);
     public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
     private final String mongoDBUri;
     private final String passwordSecret;
     private final String rootPasswordSha2;
 
-    public DatanodeInstance(final SearchVersion version, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
+    public DatanodeDevInstance(final SearchVersion version, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
         super(version, network, heapSize, featureFlags);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;

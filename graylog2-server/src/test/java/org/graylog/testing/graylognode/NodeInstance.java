@@ -38,10 +38,10 @@ public class NodeInstance implements Closeable {
 
     private final GenericContainer<?> container;
 
-    public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts,
+    public static NodeInstance createStarted(Network network, String mongoDbUri, final String passwordSecret, final String rootPasswordSha2, String elasticsearchUri, SearchVersion elasticsearchVersion, int[] extraPorts,
                                              PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
                                              List<String> enabledFeatureFlags) {
-        NodeContainerConfig config = new NodeContainerConfig(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags);
+        NodeContainerConfig config = new NodeContainerConfig(network, mongoDbUri, passwordSecret, rootPasswordSha2, elasticsearchUri, elasticsearchVersion, extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags);
         GenericContainer<?> container = NodeContainerFactory.buildContainer(config);
         return new NodeInstance(container);
     }

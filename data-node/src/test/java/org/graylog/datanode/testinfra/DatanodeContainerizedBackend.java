@@ -18,12 +18,13 @@ package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
 import org.graylog.datanode.OpensearchDistribution;
+import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
-import org.graylog.testing.mongodb.MongoDBContainer;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
@@ -38,14 +39,14 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 public class DatanodeContainerizedBackend {
-    static public final String SIGNING_SECRET = "0123456789012345678901234567890123456789012345678901234567890987654321098765432109876543211";
+    static public final String SIGNING_SECRET = ContainerizedGraylogBackend.PASSWORD_SECRET;
 
     public static final int DATANODE_REST_PORT = 8999;
     public static final int DATANODE_OPENSEARCH_PORT = 9200;
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
     private final Network network;
     private boolean shouldCloseNetwork = false;
-    private final GenericContainer<?> mongodbContainer;
+    private final MongoDBTestService mongoDBTestService;
     private boolean shouldCloseMongodb = false;
     private final GenericContainer<?> datanodeContainer;
 
@@ -62,7 +63,7 @@ public class DatanodeContainerizedBackend {
     public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
 
         this.network = Network.newNetwork();
-        this.mongodbContainer = createMongodbContainer(this.network);
+        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, this.network);
 
         // we have created these resources, we have to close them.
         this.shouldCloseNetwork = true;
@@ -74,9 +75,9 @@ public class DatanodeContainerizedBackend {
                 getDatanodeVersion());
     }
 
-    public DatanodeContainerizedBackend(Network network, GenericContainer<?> mongodbContainer, String nodeName, DatanodeDockerHooks hooks) {
+    public DatanodeContainerizedBackend(Network network, MongoDBTestService mongoDBTestService, String nodeName, DatanodeDockerHooks hooks) {
         this.network = network;
-        this.mongodbContainer = mongodbContainer;
+        this.mongoDBTestService = mongoDBTestService;
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
                 hooks,
@@ -96,7 +97,7 @@ public class DatanodeContainerizedBackend {
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/datanode/logs")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/datanode/config")
 
-                .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb/graylog")
+                .withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongoDBTestService.internalUri())
                 .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_HTTP_PORT", "" + DATANODE_OPENSEARCH_PORT)
@@ -117,7 +118,6 @@ public class DatanodeContainerizedBackend {
                 .withEnv("opensearch.cluster.routing.allocation.disk.threshold_enabled", "false")
 
                 .withNetworkAliases(nodeName)
-                .dependsOn(mongodbContainer)
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
@@ -128,7 +128,7 @@ public class DatanodeContainerizedBackend {
     }
 
     private NodeContainerConfig createConfig() {
-        return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
+        return new NodeContainerConfig(this.network, mongoDBTestService.internalUri(), SIGNING_SECRET, "rootPasswordSha2", null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
     }
 
     private static ImageFromDockerfile createImage() {
@@ -162,11 +162,6 @@ public class DatanodeContainerizedBackend {
                                 .build());
     }
 
-    public static GenericContainer<?> createMongodbContainer(Network network) {
-        return MongoDBContainer.create(MongodbServer.MONGO5, network);
-    }
-
-
     public DatanodeContainerizedBackend start() {
         datanodeContainer.start();
         return this;
@@ -175,7 +170,7 @@ public class DatanodeContainerizedBackend {
     public void stop() {
         datanodeContainer.stop();
         if (shouldCloseMongodb) {
-            mongodbContainer.stop();
+            mongoDBTestService.close();
         }
         if (shouldCloseNetwork) {
             network.close();
@@ -186,8 +181,8 @@ public class DatanodeContainerizedBackend {
         return network;
     }
 
-    public GenericContainer<?> getMongodbContainer() {
-        return mongodbContainer;
+    public MongoDBTestService getMongoDb() {
+        return mongoDBTestService;
     }
 
     public String getLogs() {

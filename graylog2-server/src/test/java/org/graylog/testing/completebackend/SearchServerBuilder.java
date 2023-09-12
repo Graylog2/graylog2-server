@@ -18,6 +18,7 @@ package org.graylog.testing.completebackend;
 
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
     private Network network;
     private String heapSize = DEFAULT_HEAP_SIZE;
     private List<String> featureFlags = List.of();
+    private String mongoDbUri;
+    private String passwordSecret;
+    private String rootPasswordSha2;
 
     public SearchServerBuilder(final SearchVersion version) {
         this.version = version;
@@ -63,6 +67,33 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
 
     public List<String> getFeatureFlags() {
         return featureFlags;
+    }
+
+    public SearchServerBuilder<T> mongoDbUri(final String mongoDbUri) {
+        this.mongoDbUri = mongoDbUri;
+        return this;
+    }
+
+    public String getMongoDbUri() {
+        return mongoDbUri;
+    }
+
+    public SearchServerBuilder<T> passwordSecret(final String passwordSecret) {
+        this.passwordSecret = passwordSecret;
+        return this;
+    }
+
+    public String getPasswordSecret() {
+        return passwordSecret;
+    }
+
+    public SearchServerBuilder<T> rootPasswordSha2(final String rootPasswordSha2) {
+        this.rootPasswordSha2 = rootPasswordSha2;
+        return this;
+    }
+
+    public String getRootPasswordSha2() {
+        return rootPasswordSha2;
     }
 
     protected abstract T instantiate();

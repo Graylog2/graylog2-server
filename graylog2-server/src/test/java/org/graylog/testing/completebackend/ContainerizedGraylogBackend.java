@@ -35,6 +35,9 @@ import java.util.stream.Collectors;
 
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
+    public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdran";
+    public static final String ROOT_PASSWORD_SHA_2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+
     private Network network;
     private SearchServerInstance searchServer;
     private MongoDBInstance mongodb;
@@ -75,7 +78,12 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
 
-        SearchServerInstance searchServer = builder.network(network).featureFlags(enabledFeatureFlags).build();
+        SearchServerInstance searchServer = builder.network(network)
+                .mongoDbUri(mongoDB.internalUri())
+                .passwordSecret(PASSWORD_SECRET)
+                .rootPasswordSha2(ROOT_PASSWORD_SHA_2)
+                .featureFlags(enabledFeatureFlags)
+                .build();
 
         if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
@@ -84,7 +92,9 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         try {
             NodeInstance node = NodeInstance.createStarted(
                     network,
-                    MongoDBInstance.internalUri(),
+                    mongoDB.internalUri(),
+                    PASSWORD_SECRET,
+                    ROOT_PASSWORD_SHA_2,
                     searchServer.internalUri(),
                     searchServer.version(),
                     extraPorts,

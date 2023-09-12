@@ -17,17 +17,15 @@
 package org.graylog.storage.opensearch2.testing;
 
 import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
 import org.graylog2.storage.SearchVersion;
 
-import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
+public class DatanodeDevInstanceBuilder extends SearchServerBuilder<DatanodeDevInstance> {
+    public DatanodeDevInstanceBuilder(SearchVersion version) {
+        super(version);
+    }
 
-public class DatanodeInstanceProvider implements SearchServerInterfaceProvider {
     @Override
-    public SearchServerBuilder getBuilderFor(final SearchVersion version) {
-        if(version.satisfies(DATANODE, "^5.1.0")) {
-            return new DatanodeInstanceBuilder(version);
-        }
-        return null;
+    protected DatanodeDevInstance instantiate() {
+        return new DatanodeDevInstance(getVersion(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getRootPasswordSha2(), getHeapSize(), getFeatureFlags());
     }
 }
