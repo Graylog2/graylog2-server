@@ -33,8 +33,6 @@ public record OpensearchConfiguration(
         String hostname,
         int httpPort,
         int transportPort,
-        String authUsername,
-        String authPassword,
         String clusterName, String nodeName, List<String> nodeRoles,
         List<String> discoverySeedHosts,
         OpensearchSecurityConfiguration opensearchSecurityConfiguration,
