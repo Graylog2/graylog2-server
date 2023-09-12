@@ -23,7 +23,7 @@ import { getSavedRuleSourceCode, removeSavedRuleSourceCode } from 'hooks/useRule
 
 let VALIDATE_TIMEOUT;
 
-export const DEFAULT_SIMULATOR_JSON_MESSAGE = '{\n    "message": "test"\n}';
+export const DEFAULT_SIMULATOR_JSON_MESSAGE = 'message: test\nsource: unknown\n';
 
 export const PipelineRulesContext = createContext(undefined);
 
@@ -76,8 +76,38 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     RulesActions.parse(nextRule, callback);
   }, [rule, description]);
 
+  const jsonifyText = (text: string): string => {
+    try {
+      JSON.parse(text);
+
+      return text;
+    } catch {
+      try {
+        const rawMessageToJson = `{"${
+          text
+            .trim()
+            .replace(/^\s*\n/gm, '')
+            .replace(/"|'|`/g, '')
+            .replace(/=/g, ':')
+            .split('\n')
+            .map((line) => line.trim().split(':').map((keyValue) => keyValue.trim()))
+            .filter((keyValue) => keyValue[0] && keyValue[1])
+            .map((keyValue) => keyValue.join('":"'))
+            .join('","')
+        }"}`;
+
+        JSON.parse(rawMessageToJson);
+
+        return rawMessageToJson;
+      } catch {
+        return text;
+      }
+    }
+  };
+
   const simulateRule = useCallback((messageString: string, _rule: RuleType, callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult) => {
-    RulesActions.simulate(messageString, _rule, callback);
+    const messageToSimulate = jsonifyText(messageString);
+    RulesActions.simulate(messageToSimulate, _rule, callback);
   }, []);
 
   useEffect(() => {

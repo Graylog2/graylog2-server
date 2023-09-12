@@ -81,35 +81,6 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
     setRawMessageToSimulate(event.target.value);
   };
 
-  const jsonifyText = (text: string): string => {
-    try {
-      JSON.parse(text);
-
-      return text;
-    } catch {
-      try {
-        const rawMessageToJson = `{"${
-          text
-            .trim()
-            .replace(/^\s*\n/gm, '')
-            .replace(/"|'|`/g, '')
-            .replace(/=/g, ':')
-            .split('\n')
-            .map((line) => line.trim().split(':').map((keyValue) => keyValue.trim()))
-            .filter((keyValue) => keyValue[0] && keyValue[1])
-            .map((keyValue) => keyValue.join('":"'))
-            .join('","')
-        }"}`;
-
-        JSON.parse(rawMessageToJson);
-
-        return rawMessageToJson;
-      } catch {
-        return text;
-      }
-    }
-  };
-
   const handleRunRuleSimulation = () => {
     sendTelemetry('click', {
       app_pathname: getPathnameWithoutId(pathname),
@@ -118,10 +89,8 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
       event_details: { is_rule_builder },
     });
 
-    const messageToSimulate = jsonifyText(rawMessageToSimulate);
-
     simulateRule(
-      messageToSimulate,
+      rawMessageToSimulate,
       currentRule || rule,
       setRuleSimulationResult,
     );
@@ -149,7 +118,7 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
                value={rawMessageToSimulate}
                onChange={handleRawMessageChange}
                title="Message string or JSON"
-               help="Enter a normal string to simulate the message field or a JSON to simulate the whole message."
+               help="Enter a normal string to simulate the message field, Key-Value pairs or a JSON to simulate the whole message."
                error={errorMessage}
                rows={4} />
         <Button bsStyle="info"
