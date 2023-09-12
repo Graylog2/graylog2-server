@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.testinfra;
+package org.graylog.testing.datanode;
 
 import org.testcontainers.containers.GenericContainer;
 

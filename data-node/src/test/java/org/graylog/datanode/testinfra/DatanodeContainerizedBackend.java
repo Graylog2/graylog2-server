@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -64,6 +65,7 @@ public class DatanodeContainerizedBackend {
 
         this.network = Network.newNetwork();
         this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, this.network);
+        this.mongoDBTestService.start();
 
         // we have created these resources, we have to close them.
         this.shouldCloseNetwork = true;
