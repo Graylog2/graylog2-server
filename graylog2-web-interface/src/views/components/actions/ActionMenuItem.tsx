@@ -37,6 +37,8 @@ import HoverForHelp from 'components/common/HoverForHelp';
 import useAppDispatch from 'stores/useAppDispatch';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 const StyledMenuItem = styled(MenuItem)`
   && > a {
@@ -140,6 +142,7 @@ const ActionHandlerItem = ({
 }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   const setActionComponents: SetActionComponents = useCallback((fn) => {
@@ -152,7 +155,7 @@ const ActionHandlerItem = ({
     const { resetFocus = false, title } = action;
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION[upperCase(title).replace(/\s|\//g, '_')], {
-      app_pathname: 'search',
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-field-value',
       event_details: {},
     });
@@ -164,7 +167,7 @@ const ActionHandlerItem = ({
     onMenuToggle();
 
     handler(handlerArgs);
-  }, [action, handler, handlerArgs, onMenuToggle, sendTelemetry, unsetWidgetFocusing]);
+  }, [action, handler, handlerArgs, location.pathname, onMenuToggle, sendTelemetry, unsetWidgetFocusing]);
 
   const { field } = handlerArgs;
 

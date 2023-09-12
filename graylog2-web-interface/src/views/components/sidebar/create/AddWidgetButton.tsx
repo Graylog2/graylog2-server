@@ -19,6 +19,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import sortBy from 'lodash/sortBy';
 import upperCase from 'lodash/upperCase';
+import type { Location } from 'history';
 
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
@@ -30,6 +31,8 @@ import withTelemetry from 'logic/telemetry/withTelemetry';
 import type { EventType } from 'logic/telemetry/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import withLocation from 'routing/withLocation';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
@@ -51,6 +54,7 @@ const CreateButton = styled(Button)`
 type Props = {
   onClick: () => void,
   sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent) => void,
+  location: Location
 };
 
 type State = {
@@ -101,12 +105,12 @@ class AddWidgetButton extends React.Component<Props, State> {
   }
 
   _createHandlerFor = (dispatch: AppDispatch, creator: Creator): () => void => {
-    const { onClick, sendTelemetry } = this.props;
+    const { onClick, sendTelemetry, location } = this.props;
 
     if (isCreatorFunc(creator)) {
       return () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')], {
-          app_pathname: 'search',
+          app_pathname: getPathnameWithoutId(location.pathname),
           app_section: 'search-sidebar',
           event_details: {
             widgetType: creator.type,
@@ -197,4 +201,4 @@ class AddWidgetButton extends React.Component<Props, State> {
   }
 }
 
-export default withTelemetry(AddWidgetButton);
+export default withLocation(withTelemetry(AddWidgetButton));

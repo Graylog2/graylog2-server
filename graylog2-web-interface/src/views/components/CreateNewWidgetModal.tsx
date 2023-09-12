@@ -28,6 +28,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 const modalTitle = 'Create new widget';
 
@@ -67,12 +69,13 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
     const onClick = async () => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
-        app_pathname: 'search',
+        app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'search-widget',
       });
 
@@ -87,7 +90,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
         <HugeIcon><WidgetIcon /></HugeIcon>{title}
       </CreateWidgetButton>
     );
-  }), [creators, dispatch, position, sendTelemetry, view]);
+  }), [creators, dispatch, location.pathname, position, sendTelemetry, view]);
 
   return (
     <Modal onHide={onCancel}

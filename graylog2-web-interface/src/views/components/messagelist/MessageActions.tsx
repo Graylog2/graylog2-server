@@ -27,13 +27,16 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
 
   const sendEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
-      app_pathname: 'search',
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-message-table',
       app_action_value: 'seach-message-table-test-against-stream',
     });

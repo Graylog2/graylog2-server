@@ -26,6 +26,8 @@ import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePr
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
@@ -82,6 +84,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
 
 const Sidebar = ({ searchPageLayout, results, children, sections, actions }: Props) => {
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
   const queryId = useActiveQueryId();
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const initialSectionKey = sections[0].key;
@@ -90,7 +93,7 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions }: Pro
 
   const toggleSidebar = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_TOGGLE, {
-      app_pathname: 'search',
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'search_sidebar',
       initialSectionKey,
       activeSectionKey,

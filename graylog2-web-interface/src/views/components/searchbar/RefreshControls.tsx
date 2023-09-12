@@ -26,6 +26,8 @@ import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -52,12 +54,13 @@ const durationToMS = (duration: string) => moment.duration(duration).asMilliseco
 
 const RefreshControls = () => {
   const refreshConfig = useRefreshConfig();
+  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
 
   const _onChange = (interval: number) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
-      app_pathname: 'search',
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'refresh-search-control-dropdown',
       event_details: { interval: interval },

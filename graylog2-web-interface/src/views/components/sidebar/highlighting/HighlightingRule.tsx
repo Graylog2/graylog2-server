@@ -31,6 +31,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slices/highlightActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 import ColorPreview from './ColorPreview';
 
@@ -121,23 +123,24 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
   const [showForm, setShowForm] = useState(false);
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
 
   const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_UPDATED, {
-      app_pathname: 'search',
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'search-sidebar-highlight-color-update',
     });
 
-    dispatch(updateColor(rule, newColor, hidePopover));
-  }, [dispatch, rule, sendTelemetry]);
+    return dispatch(updateColor(rule, newColor, hidePopover));
+  }, [dispatch, location.pathname, rule, sendTelemetry]);
   const _onDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
-      app_pathname: 'search',
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'search-sidebar-highlight-delete',
     });
 
-    dispatch(onDelete(rule));
-  }, [dispatch, rule, sendTelemetry]);
+    return dispatch(onDelete(rule));
+  }, [dispatch, location.pathname, rule, sendTelemetry]);
 
   return (
     <Container className={className} ref={ref} {...(draggableProps ?? {})}>

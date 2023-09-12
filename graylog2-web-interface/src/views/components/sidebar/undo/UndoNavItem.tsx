@@ -23,6 +23,8 @@ import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors
 import { undo } from 'views/logic/slices/undoRedoActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 const TITLE = 'Undo';
 
@@ -30,14 +32,16 @@ const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
+
   const onClick = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_UNDO, {
-      app_pathname: 'search',
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'search-sidebar-undo',
     });
 
-    dispatch(undo());
-  }, [dispatch, sendTelemetry]);
+    return dispatch(undo());
+  }, [dispatch, location.pathname, sendTelemetry]);
 
   return (
     <NavItem disabled={!isUndoAvailable}

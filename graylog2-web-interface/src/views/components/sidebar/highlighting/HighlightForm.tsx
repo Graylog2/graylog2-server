@@ -45,6 +45,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { addHighlightingRule, updateHighlightingRule } from 'views/logic/slices/highlightActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 type Props = {
   onClose: () => void,
@@ -109,6 +111,7 @@ const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
 const HighlightForm = ({ onClose, rule }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
   const fields = fieldTypes?.all
     ? fieldTypes.all
     : Immutable.List<FieldTypeMapping>();
@@ -121,7 +124,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
     const newColor = colorFromObject(color);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE[`SEARCH_SIDEBAR_HIGHLIGHT_${rule ? 'UPDATED' : 'CREATED'}`], {
-      app_pathname: 'search',
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'search-sidebar-highlight',
     });
 
@@ -130,7 +133,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
     }
 
     return dispatch(addHighlightingRule(HighlightingRule.create(field, value, condition, newColor))).then(onClose);
-  }, [dispatch, onClose, rule, sendTelemetry]);
+  }, [dispatch, location.pathname, onClose, rule, sendTelemetry]);
 
   const headerPrefix = rule ? 'Edit' : 'Create';
   const submitButtonPrefix = rule ? 'Update' : 'Create';

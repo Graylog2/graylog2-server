@@ -224,8 +224,16 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
     onToggleEdit();
   }, [dispatch, id, oldWidget, onToggleEdit, pathname, sendTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
-  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
-  }), [dispatch, id]);
+  const onWidgetConfigChange = useCallback(async (newWidgetConfig: WidgetConfig) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'search-widget',
+      app_action_value: 'widget-edit-update-button',
+    });
+
+    return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
+    });
+  }, [dispatch, id, pathname, sendTelemetry]);
   const activeQuery = useActiveQueryId();
 
   const { config } = widget;

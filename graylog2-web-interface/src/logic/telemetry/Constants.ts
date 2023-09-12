@@ -19,6 +19,8 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_TIMERANGE_PRESET_SELECTED: 'Search TimeRange Preset Selected',
   SEARCH_TIMERANGE_PICKER_TOGGLED: 'Search TimeRange Picker Toggled',
   SEARCH_TIMERANGE_PICKER_UPDATED: 'Search TimeRange Picker Updated',
+  SEARCH_TIMERANGE_PICKER_CANCELED: 'Search TimeRange Picker Canceled',
+  SEARCH_TIMERANGE_PICKER_TAB_SELECTED: 'Search TimeRange Picker Tab Selected',
   SEARCH_STREAM_INPUT_CHANGED: 'Search Stream Input Changed',
   SEARCH_REFRESH_CONTROL_PRESET_SELECTED: 'Search Refresh Control Preset Selected',
   SEARCH_REFRESH_CONTROL_TOGGLED: 'Search Refresh Control Toggled',
@@ -45,6 +47,7 @@ export const TELEMETRY_EVENT_TYPE = {
     SEARCH_WIDGET_EXTRA_ACTION: 'Search Widget Extra Action Clicked',
     WIDGET_EDIT_TOGGLED: 'Search Widget Edit Toggled',
     WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
+    WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
@@ -81,8 +84,16 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_SIDEBAR_REDO: 'Search Sidebar Redo',
   SEARCH_SIDEBAR_UNDO: 'Search Sidebar Undo',
   DASHBOARD_ACTION: {
+    DASHBOARD_NEW_SAVED: 'Dashboard New Saved',
+    DASHBOARD_SAVED: 'Dashboard Saved',
+    DASHBOARD_UPDATED: 'Dashboard Updated',
     DASHBOARD_CREATE_CLICKED: 'Dashboard Create Clicked',
     DASHBOARD_CREATE_PAGE: 'Dashboard Create Page Clicked',
+    DASHBOARD_PAGE_CONFIGURATION: 'Dashboard Page Configuration Clicked',
+    DASHBOARD_PAGE_CONFIGURATION_UPDATED: 'Dashboard Page Configuration Updated',
+    DASHBOARD_PAGE_CONFIGURATION_CANCELED: 'Dashboard Page Configuration Update Cancel',
+    DASHBOARD_PAGE_CONFIGURATION_SORTING_UPDATED: 'Dashboard Page Configuration Sorting Updated',
+    DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED: 'Dashboard Page Configuration Page Remove',
   },
   // Event Definitions
   EVENTDEFINITION_CREATE_BUTTON_CLICKED: 'EventDefinition Create Button Clicked',

@@ -347,7 +347,7 @@ const AdaptableQueryTabs = ({
                    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
                      app_pathname: 'dashboard',
                      app_section: 'dashboard',
-                     app_action_value: 'dashboard-create-page-button1',
+                     app_action_value: 'dashboard-create-page-button',
                    });
 
                    onSelect('new');
@@ -356,7 +356,17 @@ const AdaptableQueryTabs = ({
           <Icon name="plus" />
         </NavItem>
       </StyledQueryNav>
-      <IconButton title="Open pages configuration" name="cog" onClick={() => setShowConfigurationModal(true)} />
+      <IconButton title="Open pages configuration"
+                  name="cog"
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION, {
+                      app_pathname: 'dashboard',
+                      app_section: 'dashboard',
+                      app_action_value: 'dashboard-page-configuration-button',
+                    });
+
+                    setShowConfigurationModal(true);
+                  }} />
       {showConfigurationModal && (
         <AdaptableQueryTabsConfiguration show={showConfigurationModal}
                                          setShow={setShowConfigurationModal}
