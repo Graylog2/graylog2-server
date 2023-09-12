@@ -159,7 +159,6 @@ public class OpensearchSecurityConfiguration {
         config.put("plugins.security.allow_default_init_securityindex", "true");
         //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
 
-        config.put("plugins.security.audit.type", "internal_opensearch");
         config.put("plugins.security.enable_snapshot_restore_privilege", "true");
         config.put("plugins.security.check_snapshot_restore_write_privileges", "true");
         config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access");
