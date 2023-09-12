@@ -45,12 +45,12 @@ function renderAppContainer(appContainer) {
   ReactDOM.render(
     <CustomizationProvider>
       <TelemetryInit>
-        <GraylogThemeProvider>
-          <GlobalThemeStyles />
-          <LoginQueryClientProvider>
+        <LoginQueryClientProvider>
+          <GraylogThemeProvider>
+            <GlobalThemeStyles />
             <AppFacade />
-          </LoginQueryClientProvider>
-        </GraylogThemeProvider>
+          </GraylogThemeProvider>
+        </LoginQueryClientProvider>
       </TelemetryInit>
     </CustomizationProvider>,
     appContainer,

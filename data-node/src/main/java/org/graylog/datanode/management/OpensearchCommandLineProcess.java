@@ -31,8 +31,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class OpensearchCommandLineProcess implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchCommandLineProcess.class);
@@ -76,10 +78,23 @@ public class OpensearchCommandLineProcess implements Closeable {
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
         final Path executable = config.opensearchDir().resolve(Paths.get("bin", "opensearch"));
-        final List<String> arguments = config.asMap().entrySet().stream()
+        final List<String> arguments = getOpensearchConfigurationArguments(config).entrySet().stream()
                 .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
         resultHandler = new CommandLineProcessListener(listener);
         commandLineProcess = new CommandLineProcess(executable, arguments, resultHandler, config.getEnv());
+    }
+
+    private static Map<String, String> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
+        Map<String, String> allArguments = new LinkedHashMap<>(config.asMap());
+
+        // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
+        // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
+        // additionally, the env variables have to be prefixed with opensearch. (e.g. "opensearch.cluster.routing.allocation.disk.threshold_enabled")
+        config.getEnv().getEnv().entrySet().stream()
+                .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
+                .peek(entry -> LOG.info("Detected pass-through opensearch property {}:{}", entry.getKey().substring("opensearch.".length()), entry.getValue()))
+                .forEach(entry -> allArguments.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
+        return allArguments;
     }
 
     public void start() {

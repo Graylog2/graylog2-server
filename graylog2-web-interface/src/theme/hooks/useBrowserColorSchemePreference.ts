@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useState, useEffect } from 'react';
-
-import { THEME_MODE_DARK, THEME_MODE_LIGHT } from 'theme/constants';
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
+import type { ColorScheme } from '@mantine/core';
 
 // * https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia
 // * https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList
 // * https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Testing_media_queries
 // * https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
-const usePrefersColorScheme = () => {
+const useBrowserColorSchemePreference = () => {
   if (!window.matchMedia) {
     return null;
   }
@@ -31,20 +31,22 @@ const usePrefersColorScheme = () => {
   const mqlLight = window.matchMedia('(prefers-color-scheme: light)');
   const mqlDark = window.matchMedia('(prefers-color-scheme: dark)');
 
-  const prefersScheme = mqlDark.matches ? THEME_MODE_DARK : THEME_MODE_LIGHT;
-  const [scheme, setScheme] = useState(prefersScheme);
+  const prefersScheme = mqlDark.matches ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [scheme, setScheme] = useState<ColorScheme>(prefersScheme);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (window.matchMedia) {
-      const handleLight = (ev) => {
+      const handleLight = (ev: MediaQueryListEvent) => {
         if (ev.matches) {
-          setScheme(THEME_MODE_LIGHT);
+          setScheme(COLOR_SCHEME_LIGHT);
         }
       };
 
-      const handleDark = (ev) => {
+      const handleDark = (ev: MediaQueryListEvent) => {
         if (ev.matches) {
-          setScheme(THEME_MODE_DARK);
+          setScheme(COLOR_SCHEME_DARK);
         }
       };
 
@@ -58,9 +60,10 @@ const usePrefersColorScheme = () => {
     }
 
     return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return scheme;
 };
 
-export default usePrefersColorScheme;
+export default useBrowserColorSchemePreference;

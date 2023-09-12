@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ThemeMode } from 'theme/constants';
+import type { ColorScheme } from '@graylog/sawmill';
+import type { DeepPartial } from 'utility-types';
+import type { ThemeBaseColors } from '@graylog/sawmill/dist/types';
+
+import type { LegacyColorScheme } from 'theme/constants';
 import type { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
 
 interface CustomizationHooks {
@@ -23,15 +27,35 @@ interface CustomizationHooks {
     customThemeColors: {},
     isDefaultColors: boolean,
     isSaved: boolean,
-    onChangeTheme: ({ mode, key, type, hex }: {mode:ThemeMode, key:string, type:string, hex:string}) => void,
+    isLoadingCustomColors: boolean,
+    onChangeTheme: ({
+      mode,
+      key,
+      type,
+      hex,
+    }: {
+      mode: ColorScheme,
+      key: string,
+      type: string,
+      hex: string
+    }) => void,
     onResetTheme: () => Promise,
     onRevertTheme: () => Promise,
     onSaveTheme: () => Promise,
-  })
+  }),
+  useCustomThemeColors: (isInitialLoad?: boolean) => ({ data: Record<ColorScheme, DeepPartial<ThemeBaseColors>>, isInitialLoading: boolean })
 }
 
 interface CustomizationActions {
-  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: {graylogColors: Colors, mode: ThemeMode, initialLoad: boolean}) => Promise,
+  generateCustomThemeColors: ({
+    graylogColors,
+    mode,
+    initialLoad,
+  }: {
+    graylogColors: Colors,
+    mode: LegacyColorScheme,
+    initialLoad: boolean
+  }) => Promise,
 }
 
 interface CustomizationType {

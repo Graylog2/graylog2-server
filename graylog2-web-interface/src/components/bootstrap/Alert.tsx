@@ -18,16 +18,15 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
-
-import type { ColorVariants } from 'theme/colors';
+import type { ColorVariant } from '@graylog/sawmill';
 
 interface Props {
-  bsStyle: ColorVariants,
+  bsStyle: ColorVariant,
   children: React.ReactNode,
   onDismiss?: () => void,
 }
 
-const StyledAlert = styled(BootstrapAlert)<{ bsStyle: ColorVariants }>(({ bsStyle = 'info', theme }) => {
+const StyledAlert = styled(BootstrapAlert)<{ bsStyle: ColorVariant }>(({ bsStyle = 'info', theme }) => {
   const borderColor = theme.colors.variant.lighter[bsStyle];
   const backgroundColor = theme.colors.variant.lightest[bsStyle];
 
