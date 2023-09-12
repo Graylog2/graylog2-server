@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
-import { upperCase } from 'lodash';
+import upperCase from 'lodash/upperCase';
 
 import type { ActionContexts } from 'views/types';
 import Icon from 'components/common/Icon';

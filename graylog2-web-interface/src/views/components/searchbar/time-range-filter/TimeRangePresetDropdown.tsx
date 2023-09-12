@@ -151,7 +151,7 @@ const TimeRangePresetDropdown = ({
       app_action_value: 'timerange-preset-selector',
       event_details: { timerange },
     });
-  }, [formatTime, onChange, sendTelemetry]);
+  }, [formatTime, location.pathname, onChange, sendTelemetry]);
 
   const onToggle = useCallback(async (isOpen: boolean) => {
     if (typeof onToggleProp === 'function') {

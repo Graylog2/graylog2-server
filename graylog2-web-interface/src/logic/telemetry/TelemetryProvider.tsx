@@ -90,9 +90,10 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
           ...license,
           ...plugin,
           ...searchCluster,
+          ...getGlobalProps(telemetryData),
         });
 
-        posthog.identify(user, { ...userDetails });
+        posthog.identify(user, { ...userDetails, ...getGlobalProps(telemetryData) });
         setShowTelemetryInfo(!isPermissionAsked);
       }
     };
