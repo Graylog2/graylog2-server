@@ -55,20 +55,23 @@ public class ValidatorService {
         List<RuleBuilderStep> validatedConditions = validateWithResults(ruleBuilder.conditions(), conditionValidators);
         validationBuilder.conditions(validatedConditions);
 
+        String source = null;
+
         try {
             validationBuilder.errors(null);
-            parseRule(ruleBuilderDto, validationBuilder.build());
+            source = parseRule(ruleBuilderDto, validationBuilder.build());
         } catch (Exception exception) {
             validationBuilder.errors(List.of(exception.getMessage()));
         }
 
         RuleBuilder validatedRuleBuilder = validationBuilder.build();
-        return ruleBuilderDto.toBuilder().ruleBuilder(validatedRuleBuilder).build();
+        return ruleBuilderDto.toBuilder().ruleBuilder(validatedRuleBuilder).source(source).build();
     }
 
-    private void parseRule(RuleBuilderDto ruleBuilderDto, RuleBuilder validatedRuleBuilder) throws ParseException {
+    private String parseRule(RuleBuilderDto ruleBuilderDto, RuleBuilder validatedRuleBuilder) throws ParseException {
         String source = ruleBuilderService.generateRuleSource(ruleBuilderDto.title(), validatedRuleBuilder, false);
         pipelineRuleParser.parseRule(source, true);
+        return source;
     }
 
     public void validateAndFailFast(RuleBuilderDto ruleBuilderDto) throws IllegalArgumentException, ParseException {

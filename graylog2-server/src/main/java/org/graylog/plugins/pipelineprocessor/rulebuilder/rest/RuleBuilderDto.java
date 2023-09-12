@@ -45,6 +45,10 @@ public abstract class RuleBuilderDto {
     public abstract String description();
 
     @JsonProperty
+    @Nullable
+    public abstract String source();
+
+    @JsonProperty
     public abstract RuleBuilder ruleBuilder();
 
     @JsonProperty
@@ -59,6 +63,7 @@ public abstract class RuleBuilderDto {
     public static RuleBuilderDto create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
+                                        @JsonProperty("source") @Nullable String source,
                                         @JsonProperty("rule_builder") RuleBuilder ruleBuilder,
                                         @JsonProperty("created_at") @Nullable DateTime createdAt,
                                         @JsonProperty("modified_at") @Nullable DateTime modifiedAt,
@@ -67,6 +72,7 @@ public abstract class RuleBuilderDto {
                 .id(id)
                 .title(title)
                 .description(description)
+                .source(source)
                 .ruleBuilder(ruleBuilder)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
@@ -86,6 +92,8 @@ public abstract class RuleBuilderDto {
         public abstract Builder title(String title);
 
         public abstract Builder description(String description);
+
+        public abstract Builder source(String source);
 
         public abstract Builder ruleBuilder(RuleBuilder ruleBuilder);
 
