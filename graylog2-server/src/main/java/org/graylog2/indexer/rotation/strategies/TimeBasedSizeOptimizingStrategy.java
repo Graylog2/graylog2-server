@@ -69,8 +69,8 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     @Override
     public RotationStrategyConfig defaultConfiguration() {
         return TimeBasedSizeOptimizingStrategyConfig.builder()
-                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinLifeTime())
-                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLifeTime())
+                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMinLifeTime())
+                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMaxLifeTime())
                 .build();
     }
 
