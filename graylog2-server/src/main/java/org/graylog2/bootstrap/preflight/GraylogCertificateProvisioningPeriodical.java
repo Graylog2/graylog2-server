@@ -162,7 +162,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
 
                 // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
                 preflightConfigService.getPersistedConfig().ifPresent(cfg -> {
-                    if (cfg.result().equals(PreflightConfigResult.FINISHED)) {
+                    if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC) && cfg.result().equals(PreflightConfigResult.FINISHED)) {
                         nodes.stream()
                                 .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
                                 .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
