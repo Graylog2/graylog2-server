@@ -136,7 +136,7 @@ const IndexSetsComponent = () => {
 `;
 
   const StatsInfoText = styled.span(({ theme }) => css`
-    color: ${theme.colors.textAlt};
+    color: ${theme.colors.global.textAlt};
     font-style: italic;
 `);
 

@@ -26,8 +26,6 @@ const EventKeyHelpPopover = (props) => {
   return (
     <Popover id={id}
              title={title}
-             data-app-section="event_key_helper"
-             data-event-element={title}
              {...otherProps}>
       <p>
         Event Keys are Fields used to arrange Events into groups. A group is created for each unique Key, so

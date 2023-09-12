@@ -140,9 +140,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       <Modal show={showModal}
              onHide={resetConfig}
              aria-modal="true"
-             aria-labelledby="dialog_label"
-             data-app-section="configurations_geolocation_processor"
-             data-event-element={modalTitle}>
+             aria-labelledby="dialog_label">
         <Formik onSubmit={handleSubmit} initialValues={curConfig}>
           {({ values, setFieldValue, isSubmitting }) => (
             <Form>

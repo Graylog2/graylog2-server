@@ -42,9 +42,7 @@ const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => 
                     placement="right"
                     overlay={(
                       <Popover id="session-badge-details"
-                               title={sessionActive ? 'Logged in' : ''}
-                               data-app-section="users_overview_item"
-                               data-event-element="Logged In">
+                               title={sessionActive ? 'Logged in' : ''}>
                         {sessionActive ? (
                           <>
                             <div>Last activity: {lastActivity
@@ -54,7 +52,7 @@ const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => 
                           </>
                         ) : 'Not logged in'}
                       </Popover>
-                      )}
+                    )}
                     rootClose>
       <LoggedInIcon active={sessionActive} />
     </OverlayTrigger>

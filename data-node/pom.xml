@@ -44,8 +44,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.5.0</opensearch.version>
-        <opensearch.rest.client.version>2.2.0-1</opensearch.rest.client.version>
+        <opensearch.version>2.9.0</opensearch.version>
+        <opensearch.rest.client.version>2.9.0-1</opensearch.rest.client.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -361,7 +361,7 @@
 
         <dependency>
             <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch22-rest-high-level-client</artifactId>
+            <artifactId>opensearch2-rest-high-level-client</artifactId>
             <version>${opensearch.rest.client.version}</version>
             <exclusions>
                 <exclusion>
@@ -372,7 +372,7 @@
         </dependency>
         <dependency>
             <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch22-rest-client-sniffer</artifactId>
+            <artifactId>opensearch2-rest-client-sniffer</artifactId>
             <version>${opensearch.rest.client.version}</version>
             <exclusions>
                 <exclusion>

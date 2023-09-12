@@ -21,9 +21,7 @@ import { OverlayTrigger, Icon } from 'components/common';
 
 const sharedEntitiesQueryHelperPopover = (
   <Popover id="shared-entities-search-query-help"
-           title="Search Syntax Help"
-           data-app-section="shared_entities_query_helper"
-           data-event-element="Available search fields">
+           title="Search Syntax Help">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
