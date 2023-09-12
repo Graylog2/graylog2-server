@@ -83,7 +83,7 @@ public class RotationStrategyResource extends RestResource {
                 .collect(Collectors.toList());
 
         final RotationStrategies.Context context =
-                RotationStrategies.Context.create(elasticsearchConfiguration.getTimeSizeOptimizingRotationFixedLeeway());
+                RotationStrategies.Context.create(elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway());
 
         return RotationStrategies.create(strategies, context);
     }

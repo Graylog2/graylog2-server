@@ -41,9 +41,7 @@ const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => (
     <OverlayTrigger trigger={['hover', 'focus']}
                     placement="right"
                     overlay={(
-                      <Popover id="session-badge-details"
-                               data-app-section="session_badge"
-                               data-event-element="Status">
+                      <Popover id="session-badge-details">
                         {`User is ${accountStatus}`}{!authServiceEnabled ? ' (authentication service is disabled)' : ''}
                       </Popover>
                     )}

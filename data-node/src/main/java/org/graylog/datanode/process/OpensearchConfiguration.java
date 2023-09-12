@@ -44,9 +44,11 @@ public record OpensearchConfiguration(
 
         Map<String, String> config = new LinkedHashMap<>();
 
+        config.put("action.auto_create_index", "false");
+
         // currently, startup fails on macOS without disabling this filter.
         // for a description of the filter (although it's for ES), see https://www.elastic.co/guide/en/elasticsearch/reference/7.17/_system_call_filter_check.html
-        if(OS.isFamilyMac()) {
+        if (OS.isFamilyMac()) {
             config.put("bootstrap.system_call_filter", "false");
         }
 

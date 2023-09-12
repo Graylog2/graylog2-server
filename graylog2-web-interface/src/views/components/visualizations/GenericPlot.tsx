@@ -39,7 +39,7 @@ const StyledPlot = styled(Plot)(({ theme }) => css`
   .hoverlayer .hovertext {
     rect {
       fill: ${theme.colors.global.contentBackground} !important;
-      opcity: 0.9 !important;
+      opacity: 0.9 !important;
     }
 
     .name {
@@ -177,7 +177,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     const { chartData, layout, setChartColor, theme } = this.props;
     const fontSettings = {
       color: theme.colors.global.textDefault,
-      size: ROOT_FONT_SIZE * theme.fonts.size.small.replace(/rem|em/i, ''),
+      size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
       family: theme.fonts.family.body,
     };
     const defaultLayout = {
@@ -278,8 +278,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
                                    target={legendConfig.target}>
                             <Popover id="legend-config"
                                      title={`Configuration for ${legendConfig.name}`}
-                                     className={styles.locals.customPopover}
-                                     data-event-element="Generic Plot">
+                                     className={styles.locals.customPopover}>
                               <ColorPicker color={legendConfig.color}
                                            colors={defaultColors}
                                            onChange={(newColor) => this._onColorSelect(setColor, legendConfig.name, newColor)} />
