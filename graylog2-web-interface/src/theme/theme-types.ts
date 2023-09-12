@@ -14,23 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { ColorScheme, ThemeBaseColors } from '@graylog/sawmill';
+import type { DeepPartial } from 'utility-types';
 
-import React from 'react';
-import { shallow } from 'wrappedEnzyme';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-
-import DelegatedSearchPage from 'pages/DelegatedSearchPage';
-
-test('Renders other component if registered', () => {
-  const SimpleComponent = () => <div>Hello!</div>;
-
-  PluginStore.register(new PluginManifest({}, {
-    pages: {
-      search: { component: SimpleComponent },
-    },
-  }));
-
-  const tree = shallow(<DelegatedSearchPage />);
-
-  expect(tree).toMatchSnapshot();
-});
+export type ThemesColors = Record<ColorScheme, DeepPartial<ThemeBaseColors>>
