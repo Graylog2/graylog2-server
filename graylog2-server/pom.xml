@@ -104,6 +104,11 @@
             <groupId>org.apache.directory.api</groupId>
             <artifactId>api-all</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${commons-csv.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.google.inject</groupId>
