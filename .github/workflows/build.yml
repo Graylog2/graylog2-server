@@ -15,10 +15,6 @@ jobs:
       matrix:
         java-version: [ 17 ]
     steps:
-      - name: Freeing up more disk space
-        run: |
-          sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
-          sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
       - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v3
