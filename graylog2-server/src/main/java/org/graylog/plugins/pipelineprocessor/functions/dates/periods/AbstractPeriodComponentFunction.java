@@ -55,7 +55,7 @@ public abstract class AbstractPeriodComponentFunction extends AbstractFunction<P
                 .pure(true)
                 .returnType(Period.class)
                 .params(value)
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName(getRuleBuilderName())
                 .ruleBuilderTitle(getRuleBuilderTitle())
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)

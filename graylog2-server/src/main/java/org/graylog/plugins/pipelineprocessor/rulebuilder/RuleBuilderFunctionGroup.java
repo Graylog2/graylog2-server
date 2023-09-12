@@ -29,6 +29,8 @@ public enum RuleBuilderFunctionGroup {
     DATE("Date Functions", 30),
     PATTERN("Pattern Matching Functions", 35),
     LOOKUP("Lookup Table Functions", 37),
+    ENCODING("Encoding/Decoding Functions", 38),
+    HASH("Hash Functions", 39),
     EXTRACTORS("Extractor Functions", 40),
     OTHER("Other", 999);
 

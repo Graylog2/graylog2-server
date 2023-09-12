@@ -85,7 +85,7 @@ public class Join extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(ImmutableList.of(elementsParam, delimiterParam, startIndexParam, endIndexParam))
                 .description("Joins the elements of the provided array into a single String")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Join array to string")
                 .ruleBuilderTitle("Join '${elements}' into a single string, <#if start??>starting with ${start} </#if><#if indexEnd??>and ending with ${indexEnd} <#/if>using '${delimiter!' '} as separator.")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)

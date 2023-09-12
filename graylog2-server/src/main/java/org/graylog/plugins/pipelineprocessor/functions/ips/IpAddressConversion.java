@@ -77,7 +77,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
                         defaultParam
                 ))
                 .description("Converts a value to an IPAddress using its string representation")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to IP")
                 .ruleBuilderTitle("Convert '${value}' to an IP address")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)

@@ -76,7 +76,7 @@ public class Split extends AbstractFunction<List<String>> {
                 .returnType(RETURN_TYPE)
                 .params(ImmutableList.of(pattern, value, limit))
                 .description("Split a string around matches of this pattern (Java syntax)")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Split string")
                 .ruleBuilderTitle("Split '${value}' around matches of pattern '${pattern}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)

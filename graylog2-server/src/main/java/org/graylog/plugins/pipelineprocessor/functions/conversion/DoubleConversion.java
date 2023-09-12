@@ -68,7 +68,7 @@ public class DoubleConversion extends AbstractFunction<Double> {
                         defaultParam
                 ))
                 .description("Converts a value to a double value using its string representation")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to double")
                 .ruleBuilderTitle("Convert '${value}' to double")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
