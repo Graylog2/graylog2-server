@@ -42,8 +42,8 @@ const ChangeFieldType = ({
       newFieldType,
       rotated,
       field,
-    });
-  }, [field, putFiledTypeMutation]);
+    }).then(() => handleOnClose());
+  }, [field, handleOnClose, putFiledTypeMutation]);
 
   return show ? <ChangeFieldTypeModal onSubmit={onSubmit} field={field} onClose={handleOnClose} show={show} /> : null;
 };

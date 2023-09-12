@@ -44,6 +44,7 @@ export const useColumnRenderers = (fieldTypes: FieldTypes) => {
         renderCell: (items: Array<TypeHistoryItem>) => {
           const latest = fieldTypes[last(items)] || last(items);
           const rest = take(items, items.length - 1).map((item) => fieldTypes[item] || item);
+          if (!latest) return <i>type is not defined</i>;
 
           return (
             <div>
