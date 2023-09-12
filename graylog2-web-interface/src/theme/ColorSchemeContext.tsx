@@ -18,6 +18,6 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-const ThemeModeContext = React.createContext<{} | undefined>(undefined);
+const ColorSchemeContext = React.createContext<{} | undefined>(undefined);
 
-export default singleton('contexts.ThemeModeContext', () => ThemeModeContext);
+export default singleton('contexts.ColorSchemeContext', () => ColorSchemeContext);
