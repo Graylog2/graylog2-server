@@ -32,23 +32,25 @@ export type ActiveHotkey = {
 export type ActiveHotkeys = Immutable.Map<`${ScopeName}.${string}`, ActiveHotkey>
 
 export type HotkeyCollection = {
-  [key in ScopeName]: {
-    title: string,
-    description: string,
-    actions: {
-      [name: string]: { keys: string, description: string }
-    }
+  title: string,
+  description: string,
+  actions: {
+    [name: string]: { keys: string, description: string }
   }
+}
+
+export type HotkeyCollections = {
+  [key in ScopeName]: HotkeyCollection
 }
 
 type HotkeysContextType = {
   disableScope: (scopes: ScopeParam) => void,
   enableScope: (scopes: ScopeParam) => void,
   setActiveScopes: (scopes: ScopeParam) => void,
-  hotkeys: Array<Hotkey>,
+  hotkeys: readonly Hotkey[],
   toggleScope: (scopes: ScopeName) => void,
   enabledScopes: Array<ScopeName>,
-  hotKeysCollection: HotkeyCollection,
+  hotKeysCollection: HotkeyCollections,
   activeHotkeys: ActiveHotkeys,
   addActiveHotkey: (props: { scope: ScopeName, actionKey: string, options: Options & { scopes: ScopeName } }) => void,
   removeActiveHotkey: (props: { scope: ScopeName, actionKey: string }) => void,

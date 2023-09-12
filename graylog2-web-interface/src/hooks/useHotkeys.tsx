@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { HotkeyCallback, Keys, Options } from 'react-hotkeys-hook';
+import type { HotkeyCallback, Options } from 'react-hotkeys-hook';
 import { useHotkeys as originalUseHotkeys } from 'react-hotkeys-hook';
-import type { Hotkey } from 'react-hotkeys-hook/dist/types';
 import { useEffect, useMemo } from 'react';
-import isArray from 'lodash/isArray';
 
-import type { ScopeName, ScopeParam } from 'contexts/HotkeysContext';
+import type { ScopeName } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 
 const defaultOptions: Options = {
@@ -46,7 +44,7 @@ const useHotkeys = <T extends HTMLElement>(
   dependencies?: Array<unknown>,
 ) => {
   const {
-    hotkeys, hotKeysCollection, enableScope, disableScope, addActiveHotkey,
+    hotKeysCollection, addActiveHotkey,
     removeActiveHotkey,
   } = useHotkeysContext();
   // const scope = options?.scopes ?? '*';
@@ -74,14 +72,14 @@ const useHotkeys = <T extends HTMLElement>(
       options: {
         scopes: options.scopes,
         enabled: options.enabled,
+        combinationKey: options.combinationKey,
       },
     });
 
     return () => removeActiveHotkey({ scope: options.scopes, actionKey });
-  }, [actionKey, addActiveHotkey, options.enabled, options.scopes, removeActiveHotkey]);
+  }, [actionKey, addActiveHotkey, options.combinationKey, options.enabled, options.scopes, removeActiveHotkey]);
 
   const keys = hotKeysCollection?.[options?.scopes]?.actions?.[actionKey]?.keys;
-  console.log({ hotKeysCollection, keys, sc: options?.scopes, actionKey });
 
   return originalUseHotkeys<T>(keys, callback, mergedOptions, dependencies);
 };

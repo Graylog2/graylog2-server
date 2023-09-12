@@ -167,11 +167,11 @@ const SearchActionsMenu = () => {
 
   useHotkeys('SAVE', () => {
     saveSearch(title);
-  }, { scopes: 'search', enabled: isDirty }, [isDirty, saveSearch, title]);
+  }, { scopes: 'search', enabled: (isDirty && loaded) }, [loaded, isDirty, saveSearch, title]);
 
   useHotkeys('SAVE_AS', () => {
     openFormModal();
-  }, { scopes: 'search', enabled: isDirty });
+  }, { scopes: 'search', enabled: (isDirty && loaded) || !loaded });
 
   return (
     <Container aria-label="Search Meta Buttons">

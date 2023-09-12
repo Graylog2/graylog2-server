@@ -16,22 +16,22 @@
  */
 import * as React from 'react';
 import type { PropsWithChildren } from 'react';
-import { useCallback, useState } from 'react';
-import type {
-  Options,
-} from 'react-hotkeys-hook';
+import { useCallback, useMemo, useState } from 'react';
 import {
   HotkeysProvider as OriginalHotkeysProvider,
   useHotkeysContext as useOriginalHotkeysContext,
 } from 'react-hotkeys-hook';
+import type {
+  Options,
+} from 'react-hotkeys-hook';
 import isArray from 'lodash/isArray';
 import Immutable from 'immutable';
 
-import type { ScopeName, ScopeParam, ActiveHotkeys, HotkeyCollection } from 'contexts/HotkeysContext';
+import type { ScopeName, ScopeParam, ActiveHotkeys, HotkeyCollections } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
 import HotkeysModal from 'contexts/HotkeysModal';
 
-export const defaultHotKeysCollection: HotkeyCollection = {
+export const defaultHotKeysCollection: HotkeyCollections = {
   view: {
     title: 'General',
     description: 'Main hot keys',
@@ -60,7 +60,7 @@ export const defaultHotKeysCollection: HotkeyCollection = {
 
 const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   // const [activeScopes, setActiveScopes] = useState<Immutable.Set<ScopeName>>(Immutable.Set(['*']));
-  const [hotKeysCollection] = useState<HotkeyCollection>(defaultHotKeysCollection);
+  const [hotKeysCollection] = useState<HotkeyCollections>(defaultHotKeysCollection);
   const [activeHotkeys, setActiveHotkeys] = useState<ActiveHotkeys>(Immutable.Map());
   const { enabledScopes, hotkeys, disableScope, toggleScope, enableScope } = useOriginalHotkeysContext();
   const _enableScope = useCallback((scopes: ScopeParam) => {
@@ -88,19 +88,22 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
     setActiveHotkeys((cur) => cur.delete(`${scope}.${actionKey}`));
   }, []);
 
+  const value = useMemo(() => ({
+
+    disableScope: _disableScope,
+    enableScope: _enableScope,
+    setActiveScopes,
+    hotkeys,
+    toggleScope,
+    enabledScopes: enabledScopes as Array<ScopeName>,
+    hotKeysCollection,
+    activeHotkeys,
+    addActiveHotkey,
+    removeActiveHotkey,
+  }), [_disableScope, _enableScope, activeHotkeys, addActiveHotkey, enabledScopes, hotKeysCollection, hotkeys, removeActiveHotkey, setActiveScopes, toggleScope]);
+
   return (
-    <HotkeysContext.Provider value={{
-      disableScope: _disableScope,
-      enableScope: _enableScope,
-      setActiveScopes,
-      hotkeys,
-      toggleScope,
-      enabledScopes,
-      hotKeysCollection,
-      activeHotkeys,
-      addActiveHotkey,
-      removeActiveHotkey,
-    }}>
+    <HotkeysContext.Provider value={value}>
       {children}
     </HotkeysContext.Provider>
   );
