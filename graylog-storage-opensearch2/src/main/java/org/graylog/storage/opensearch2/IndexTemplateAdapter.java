@@ -14,27 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
+package org.graylog.storage.opensearch2;
 
-import breakpoints, { breakpointPropTypes } from './breakpoints';
-import colors, { colorsPropTypes } from './colors';
-import fonts, { fontsPropTypes } from './fonts';
-import utils, { utilsPropTypes } from './utils';
-import spacings, { spacingsPropTypes } from './spacings';
+import org.graylog2.indexer.indices.Template;
 
-const themePropTypes = PropTypes.shape({
-  breakpoints: breakpointPropTypes,
-  colors: colorsPropTypes,
-  fonts: fontsPropTypes,
-  utils: utilsPropTypes,
-  spacings: spacingsPropTypes,
-});
+interface IndexTemplateAdapter {
+    boolean ensureIndexTemplate(String templateName, Template template);
 
-export {
-  breakpoints,
-  colors,
-  fonts,
-  utils,
-  themePropTypes,
-  spacings,
-};
+    boolean indexTemplateExists(String templateName);
+
+    boolean deleteIndexTemplate(String templateName);
+}

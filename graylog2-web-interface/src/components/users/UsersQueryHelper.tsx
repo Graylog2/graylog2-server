@@ -21,9 +21,7 @@ import { OverlayTrigger, Icon } from 'components/common';
 
 const userQueryHelperPopover = (
   <Popover id="user-search-query-help"
-           title="Search Syntax Help"
-           data-app-section="user_search_query_helper"
-           data-event-element="Available search fields">
+           title="Search Syntax Help">
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>

@@ -156,9 +156,7 @@ const RuleBlockForm = ({
 
   const buildHelpPopover = (blockDict: BlockDict) => (
     <HelpPopover id="selected-block-Dict-help"
-                 title="Function Syntax Help"
-                 data-app-section="pipeline-rule-builder"
-                 data-event-element="Function Syntax Help">
+                 title="Function Syntax Help">
       <RuleHelperTable entries={[blockDict]} expanded={{ [blockDict.name]: true }} />
     </HelpPopover>
   );
@@ -196,9 +194,15 @@ const RuleBlockForm = ({
                     <Col md={12}>
                       <h5>
                         {existingBlock?.step_title || selectedBlockDict.rule_builder_name}
-                        <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover(selectedBlockDict)}>
+                        <OverlayTrigger trigger="click"
+                                        rootClose
+                                        placement="right"
+                                        overlay={buildHelpPopover(selectedBlockDict)}>
                           <Button bsStyle="link">
-                            <Icon name="question-circle" fixedWidth title="Function Syntax Help" data-testid="funcSyntaxHelpIcon" />
+                            <Icon name="question-circle"
+                                  fixedWidth
+                                  title="Function Syntax Help"
+                                  data-testid="funcSyntaxHelpIcon" />
                           </Button>
                         </OverlayTrigger>
                       </h5>

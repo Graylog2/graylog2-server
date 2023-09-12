@@ -14,16 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PropTypeBreakpoints, PropTypeColors, PropTypeFonts, PropTypeSpacings, PropTypeUtils } from '@graylog/sawmill';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 
-export type ColorVariants = 'danger' | 'default' | 'info' | 'primary' | 'success' | 'warning';
-const ThemePropTypes = PropTypes.shape({
-  breakpoints: PropTypeBreakpoints,
-  colors: PropTypeColors,
-  fonts: PropTypeFonts,
-  utils: PropTypeUtils,
-  spacings: PropTypeSpacings,
-});
+import { singleton } from 'logic/singleton';
 
-export default ThemePropTypes;
+const ColorSchemeContext = React.createContext<{} | undefined>(undefined);
+
+export default singleton('contexts.ColorSchemeContext', () => ColorSchemeContext);

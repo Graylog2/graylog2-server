@@ -28,6 +28,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -40,7 +41,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -122,10 +122,11 @@ public class IndexTemplatesResource extends RestResource {
     public static abstract class IndexTemplateResponse {
         @JsonProperty("name")
         public abstract String name();
-        @JsonProperty("template")
-        public abstract Map<String, Object> template();
 
-        public static IndexTemplateResponse create(String name, Map<String, Object> template) {
+        @JsonProperty("template")
+        public abstract Template template();
+
+        public static IndexTemplateResponse create(String name, Template template) {
             return new AutoValue_IndexTemplatesResource_IndexTemplateResponse(name, template);
         }
     }

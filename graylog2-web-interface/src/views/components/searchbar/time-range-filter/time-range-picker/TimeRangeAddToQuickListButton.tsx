@@ -59,7 +59,7 @@ const isTimerangeEqual = (firstTimerange: TimeRange, secondTimerange: TimeRange)
   return isEqual(firstTimerange, secondTimerange);
 };
 
-const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target } : Props) => {
+const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target }: Props) => {
   const { userTimezone } = useUserDateTime();
   const { config } = useSearchConfiguration();
   const { values: { timeRangeTabs, activeTab } } = useFormikContext<TimeRangePickerFormValues>();
@@ -86,8 +86,6 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target } : Pro
                 target={target}>
         <Popover title="Save as preset"
                  id="add-to-quick-list-popover"
-                 data-app-section="add-to-quick-list-popover_form"
-                 data-event-element="Add to quick list"
                  data-testid="add-to-quick-list-popover">
           <Input type="text"
                  id="add-to-quick-list-description"

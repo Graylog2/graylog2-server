@@ -57,7 +57,7 @@ public class TestableProcess implements ManagableProcess<String> {
     }
 
     @Override
-    public void setStateMachineTracer(StateMachineTracer stateMachineTracer) {
+    public void addStateMachineTracer(StateMachineTracer stateMachineTracer) {
         stateMachine.setTrace(stateMachineTracer);
     }
 

@@ -14,10 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext, useMemo } from 'react';
+import { useLocation, UNSAFE_DataRouterContext as DataRouterContext, matchRoutes } from 'react-router-dom';
 
 import { singleton } from 'logic/singleton';
 
-const RegeneratableThemeContext = React.createContext<{regenerateTheme:() => void} | undefined>(undefined);
+const useRoutePattern = () => {
+  const location = useLocation();
+  const dataRouterContext = useContext(DataRouterContext);
 
-export default singleton('contexts.RegeneratableThemeContext', () => RegeneratableThemeContext);
+  return useMemo(() => {
+    if (dataRouterContext?.router?.routes) {
+      const { router: { routes } } = dataRouterContext;
+      const matches = matchRoutes(routes, location.pathname);
+      const { route } = matches.at(-1);
+
+      return route.path;
+    }
+
+    return undefined;
+  }, [location.pathname, dataRouterContext]);
+};
+
+export default singleton('hooks.useRoutePattern', () => useRoutePattern);

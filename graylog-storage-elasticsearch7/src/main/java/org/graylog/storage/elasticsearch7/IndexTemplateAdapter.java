@@ -14,10 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.storage.elasticsearch7;
 
-import { singleton } from 'logic/singleton';
+import org.graylog2.indexer.indices.Template;
 
-const ThemeModeContext = React.createContext<{} | undefined>(undefined);
+interface IndexTemplateAdapter {
+    boolean ensureIndexTemplate(String templateName, Template template);
 
-export default singleton('contexts.ThemeModeContext', () => ThemeModeContext);
+    boolean indexTemplateExists(String templateName);
+
+    boolean deleteIndexTemplate(String templateName);
+}

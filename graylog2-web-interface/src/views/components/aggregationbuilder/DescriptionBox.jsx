@@ -73,9 +73,7 @@ class DescriptionBox extends React.Component {
         <Position placement="bottom"
                   target={this.target}>
           <Popover title="Config options"
-                   id="config-popover"
-                   data-app-section="edit_message_list"
-                   data-event-element="Config options">
+                   id="config-popover">
             {configurableElement}
           </Popover>
         </Position>
@@ -88,7 +86,9 @@ class DescriptionBox extends React.Component {
 
     if (configurableOptions) {
       return (
-        <ConfigButton ref={(node) => { this.target = node; }}
+        <ConfigButton ref={(node) => {
+          this.target = node;
+        }}
                       type="button"
                       onClick={this.onToggleConfig}>
           <Icon name="wrench" />
