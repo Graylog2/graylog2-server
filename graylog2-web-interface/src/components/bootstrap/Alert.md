@@ -1,21 +1,51 @@
-### Default
+#### Default
 
-```js
-<Alert icon={<i className="fa fa-exclamation-triangle fa-fw fa-lg" />}>
-  <strong>Default</strong> Lorem ipsum dolor sit amet consectetur adipisicing elit.
+```tsx
+<Alert>
+  Default - Lorem ipsum dolor sit amet consectetur adipisicing elit.
 </Alert>
 ```
 
-### Variants
+#### Variants
 
-```js
+```tsx
 const styles = ['Danger', 'Info', 'Success', 'Warning'];
 
 styles.map((style, i) => {
   return (
-    <Alert bsStyle={style.toLowerCase()} key={`button-${style}-${i}`} icon={<i className="fa fa-exclamation-triangle fa-fw fa-lg" />}>
-      <strong>{style}</strong> Lorem ipsum dolor sit amet consectetur <a href="#">adipisicing elit</a>.
+    <Alert bsStyle={style.toLowerCase()} key={`button-${style}-${i}`}>
+      {style} - Lorem ipsum dolor sit amet consectetur adipisicing elit.
     </Alert>
   )
 })
+```
+
+
+#### With Title
+
+```tsx
+<Alert title="The Title">
+  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+</Alert>
+```
+
+
+#### With Icon
+
+```tsx
+import Icon from 'components/common/Icon';
+
+<Alert icon={<Icon name="exclamation-triangle" />}>
+  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+</Alert>
+```
+
+#### With Close Button
+
+```tsx
+import Icon from 'components/common/Icon';
+
+<Alert onClose={() => window.alert('You clicked on the alert close icon.')}>
+  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+</Alert>
 ```
