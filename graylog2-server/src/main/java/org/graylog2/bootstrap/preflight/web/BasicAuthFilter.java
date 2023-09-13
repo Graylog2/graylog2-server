@@ -23,6 +23,7 @@ import org.graylog2.Configuration;
 import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -30,17 +31,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class PreflightAuthFilter implements ContainerRequestFilter {
+public class BasicAuthFilter implements ContainerRequestFilter {
 
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
     private static final String AUTHENTICATION_SCHEME = "Basic";
     private final String adminUsername;
     private final String adminPasswordHash;
+    private final String realm;
 
     @Inject
-    public PreflightAuthFilter(Configuration configuration) {
+    public BasicAuthFilter(Configuration configuration) {
         this.adminUsername = configuration.getRootUsername();
         this.adminPasswordHash = configuration.getRootPasswordSha2();
+        this.realm = "preflight-config";
+    }
+
+    public BasicAuthFilter(String adminUsername, String adminPasswordHash, String realm) {
+        this.adminUsername = adminUsername;
+        this.adminPasswordHash = adminPasswordHash;
+        this.realm = realm;
     }
 
     @Override
@@ -52,7 +61,8 @@ public class PreflightAuthFilter implements ContainerRequestFilter {
         if (authorization == null || authorization.isEmpty()) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
                     .entity("You cannot access this resource")
-                    .header("WWW-Authenticate", "Basic realm=preflight-config")
+                    .type(MediaType.TEXT_PLAIN_TYPE)
+                    .header("WWW-Authenticate", "Basic realm=" + this.realm)
                     .build());
             return;
         }

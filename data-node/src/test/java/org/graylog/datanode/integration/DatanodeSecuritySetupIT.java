@@ -58,8 +58,6 @@ public class DatanodeSecuritySetupIT {
     @TempDir
     static Path tempDir;
     private DatanodeContainerizedBackend backend;
-    private String httpUsername;
-    private String httpPassword;
     private KeyStore trustStore;
     private String containerHostname;
 
@@ -76,9 +74,6 @@ public class DatanodeSecuritySetupIT {
         // use the CA to generate HTTP certificate keystore
         final KeystoreInformation httpCert = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, containerHostname, Tools.getLocalCanonicalHostname());
 
-        httpUsername = RandomStringUtils.randomAlphabetic(10);
-        httpPassword = RandomStringUtils.randomAlphabetic(10);
-
         backend = new DatanodeContainerizedBackend(containerHostname, datanodeContainer -> {
             // provide the keystore files to the docker container
             datanodeContainer.withFileSystemBind(transportCert.location().toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-transport-certificates.p12");
@@ -88,15 +83,10 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", transportCert.passwordAsString());
             datanodeContainer.withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "false");
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
 
             // configure http security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE", "datanode-https-certificates.p12");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", httpCert.passwordAsString());
-
-            // configure initial admin username and password for Opensearch REST
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", httpUsername);
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", httpPassword);
 
             // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
             // to be able to reach opensearch from outside the container and docker network (true?)
@@ -152,7 +142,7 @@ public class DatanodeSecuritySetupIT {
             var os = StringUtils.f("https://%s:%d", hostname, opensearchPort);
             LOG.info("Trying to connect to REST API at: {}, OpenSearch is at: {}", rest, os);
             retryer.call(() -> RestAssured.given()
-                    .auth().basic(httpUsername, httpPassword)
+                    .auth().basic("datanode", DatanodeContainerizedBackend.DATANODE_REST_API_PASSWORD)
                     .trustStore(trustStore)
                     .get(rest)
                     .then());

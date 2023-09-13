@@ -43,6 +43,7 @@ import org.graylog.datanode.configuration.variants.OpensearchSecurityConfigurati
 import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.CertConstants;
+import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
@@ -223,11 +224,17 @@ public class JerseyService extends AbstractIdleService {
                              int maxHeaderSize,
                              boolean enableGzip,
                              Set<Resource> additionalResources) {
+        final boolean isSecuredInstance = sslEngineConfigurator != null;
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
+
+        if(isSecuredInstance) {
+            resourceConfig.register(new BasicAuthFilter("datanode", configuration.getPasswordSecret(), "Datanode"));
+        }
+
         final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(
                 listenUri,
                 resourceConfig,
-                sslEngineConfigurator != null,
+                isSecuredInstance,
                 sslEngineConfigurator,
                 false);
 
