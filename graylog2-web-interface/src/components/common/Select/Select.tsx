@@ -510,7 +510,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       .map((v) => {
         const availableOption = options.find((option) => option[valueKey || ''] === v);
 
-        return availableOption ?? { [displayKey]: String(value), [valueKey]: value };
+        return availableOption;
       });
   };
 
