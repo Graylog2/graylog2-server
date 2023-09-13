@@ -38,7 +38,5 @@ public interface DatanodeDevContainerBuilder {
 
     DatanodeDevContainerBuilder network(Network network);
 
-    DatanodeDevContainerBuilder pathPrefix(Path prefix);
-
     GenericContainer<?> build();
 }

@@ -18,12 +18,14 @@ package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
 import org.graylog.datanode.OpensearchDistribution;
+import org.graylog.testing.PropertyLoader;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +49,15 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
 
-    private Path prefix = Path.of(".");
+    private static final String PROPERTIES_FILE = "api-it-tests.properties";
+
+    protected static Path getProjectReposPath() {
+        return new File(PropertyLoader.get(PROPERTIES_FILE, "project_repos_dir")).toPath();
+    }
+
+    protected static Path getPath() {
+        return getProjectReposPath().resolve("graylog2-server").resolve("data-node");
+    }
 
     @Override
     public org.graylog.testing.datanode.DatanodeDevContainerBuilder mongoDbUri(final String mongoDbUri) {
@@ -103,12 +113,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         return this;
     }
 
-    @Override
-    public org.graylog.testing.datanode.DatanodeDevContainerBuilder pathPrefix(final Path prefix) {
-        this.prefix = prefix;
-        return this;
-    }
-
     public GenericContainer<?> build() {
         GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
                 .withExposedPorts(restPort, openSearchHttpPort)
@@ -145,8 +149,8 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
-        container.withFileSystemBind(prefix.toString() + "/target/graylog-datanode-" + getDatanodeVersion() + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
-                .withFileSystemBind(prefix.toString() + "/target/lib", IMAGE_WORKING_DIR + "/lib/");
+        container.withFileSystemBind(getPath() + "/target/graylog-datanode-" + getDatanodeVersion() + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
+                .withFileSystemBind(getPath() + "/target/lib", IMAGE_WORKING_DIR + "/lib/");
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
     }
@@ -173,16 +177,10 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     private static ImageFromDockerfile createImage() {
         final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
-        final Path downloadedOpensearchInFullBackend = Path.of("..", "data-node", "target", "downloads", opensearchTarArchive);
-        final Path downloadedOpensearchInEnterpriseFullBackend = Path.of("..", "..", "graylog2-server", "data-node", "target", "downloads", opensearchTarArchive);
-        Path downloadedOpensearch;
+        final Path downloadedOpensearch = getPath().resolve(Path.of("target", "downloads", opensearchTarArchive));
 
-        if(Files.exists(downloadedOpensearchInFullBackend)) {
-            downloadedOpensearch = downloadedOpensearchInFullBackend;
-        } else if(Files.exists(downloadedOpensearchInEnterpriseFullBackend)) {
-            downloadedOpensearch = downloadedOpensearchInEnterpriseFullBackend;
-        } else {
-            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, neither " + downloadedOpensearchInFullBackend.toAbsolutePath() + " or " + downloadedOpensearchInEnterpriseFullBackend.toAbsolutePath() + " exist!");
+        if(!Files.exists(downloadedOpensearch)) {
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
         }
 
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
