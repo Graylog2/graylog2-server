@@ -18,44 +18,109 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
-import CreateEventDefinition from 'views/logic/valueactions/createEventDefinition/CreateEventDefinition';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { AdditionalContext } from 'views/logic/ActionContext';
-import { mappedDataResult, mockedContexts, modalDataResult } from 'fixtures/createEventDefinitionFromValue';
-import useMappedData from 'views/logic/valueactions/createEventDefinition/hooks/useMappedData';
-import useModalData from 'views/logic/valueactions/createEventDefinition/hooks/useModalData';
+import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFiledTypeUsages';
+import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
+import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
 const onClose = jest.fn();
-const renderCreateDefinitionAction = ({
+const renderChangeTypeAction = ({
   queryId = 'query-id',
   field = 'field',
   type = FieldType.create('STRING'),
   value = 'value',
-  contexts = mockedContexts,
 }) => render(
-  <AdditionalContext.Provider value={contexts}>
-    <CreateEventDefinition onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
-  </AdditionalContext.Provider>,
+  <TestStoreProvider>
+    <ChangeFieldType onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
+  </TestStoreProvider>,
 );
+const attributes = [
+  {
+    id: 'index_set_id',
+    title: 'Index Set Id',
+    type: 'STRING',
+    sortable: true,
+    hidden: true,
+  },
+  {
+    id: 'index_set_title',
+    title: 'Index Set Title',
+    type: 'STRING',
+    sortable: true,
+  },
+  {
+    id: 'stream_titles',
+    title: 'Stream Titles',
+    type: 'STRING',
+    sortable: false,
+  },
+  {
+    id: 'types',
+    title: 'Field Type History',
+    type: 'STRING',
+    sortable: false,
+  },
+];
+const paginatedFieldUsage = (usage: FieldTypeUsage = {
+  id: 'id',
+  indexSetTitle: 'Index Title',
+  streamTitles: ['Stream Title'],
+  types: ['string'],
+}) => ({
+  data: {
+    list: [usage],
+    pagination: {
+      total: 1,
+      page: 1,
+      perPage: 5,
+      count: 1,
+    },
+    attributes,
+  },
+  refetch: () => {},
+  isInitialLoading: false,
+  isFirsLoaded: true,
+});
 
-jest.mock('views/logic/valueactions/createEventDefinition/hooks/useModalData', () => jest.fn());
-jest.mock('views/logic/valueactions/createEventDefinition/hooks/useMappedData', () => jest.fn());
+const fieldTypes = {
+  data: {
+    fieldTypes: {
+      string: 'String type',
+    },
+  },
+  isLoading: false,
+};
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
 
-describe('CreateEventDefinition', () => {
-  it('runs hooks with correct params and shows modal', async () => {
-    asMock(useMappedData).mockReturnValue(mappedDataResult);
-    asMock(useModalData).mockReturnValue(modalDataResult);
-    renderCreateDefinitionAction({});
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFiledTypeUsages', () => jest.fn());
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
-    expect(useMappedData).toHaveBeenCalledWith({
-      contexts: mockedContexts,
-      field: 'field',
-      queryId: 'query-id',
-      value: 'value',
+describe('ChangeFieldType', () => {
+  beforeEach(() => {
+    asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFiledTypeMutation: () => {} });
+    asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage());
+    asMock(useFieldTypes).mockReturnValue(fieldTypes);
+
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: {
+        ...layoutPreferences,
+        displayedAttributes: ['index_set_title',
+          'stream_titles',
+          'types'],
+      },
+      isInitialLoading: false,
     });
+  });
 
-    expect(useModalData).toHaveBeenCalledWith(mappedDataResult);
+  it('Shows modal', async () => {
+    renderChangeTypeAction({});
 
-    await screen.findByText('Configure new event definition');
+    await screen.findByText('Change field field type');
   });
 });
