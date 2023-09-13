@@ -49,8 +49,8 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     private Adapters adapters;
     private List<String> featureFlags;
 
-    public ElasticsearchInstanceES7(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(version, network, heapSize);
+    public ElasticsearchInstanceES7(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(version, hostname, network, heapSize);
         this.featureFlags = featureFlags;
     }
 
@@ -139,7 +139,7 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.threshold_enabled", "true")
                 .withNetwork(network)
-                .withNetworkAliases(HOSTNAME)
+                .withNetworkAliases(hostname)
                 .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
     }
 }

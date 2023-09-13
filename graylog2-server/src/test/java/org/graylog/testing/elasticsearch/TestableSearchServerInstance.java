@@ -41,12 +41,12 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     private static final Map<ContainerCacheKey, GenericContainer<?>> containersByVersion = new ConcurrentHashMap<>();
 
-    public static final String HOSTNAME = "indexer";
     protected static final int OPENSEARCH_PORT = 9200;
 
     private final SearchVersion version;
     protected final String heapSize;
     protected final Network network;
+    protected final String hostname;
     protected GenericContainer<?> container;
 
     protected static volatile boolean isFirstContainerStart = true;
@@ -57,10 +57,11 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public abstract FixtureImporter fixtureImporter();
 
-    protected TestableSearchServerInstance(final SearchVersion version, final Network network, final String heapSize) {
+    protected TestableSearchServerInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize) {
         this.version = version;
         this.heapSize = heapSize;
         this.network = network;
+        this.hostname = hostname;
     }
 
     protected abstract String imageName();
@@ -109,7 +110,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     @Override
     public String internalUri() {
-        return String.format(Locale.US, "http://%s:%d", HOSTNAME, OPENSEARCH_PORT);
+        return String.format(Locale.US, "http://%s:%d", hostname, OPENSEARCH_PORT);
     }
 
     @Override

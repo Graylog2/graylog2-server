@@ -27,6 +27,7 @@ import java.util.List;
 public abstract class SearchServerBuilder<T extends SearchServerInstance> {
     public static final String DEFAULT_HEAP_SIZE = "2g";
     private final SearchVersion version;
+    private String hostname = "indexer";
     private Network network;
     private String heapSize = DEFAULT_HEAP_SIZE;
     private List<String> featureFlags = List.of();
@@ -94,6 +95,15 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
 
     public String getRootPasswordSha2() {
         return rootPasswordSha2;
+    }
+
+    public SearchServerBuilder<T> hostname(final String hostname) {
+        this.hostname = hostname;
+        return this;
+    }
+
+    public String getHostname() {
+        return hostname;
     }
 
     protected abstract T instantiate();

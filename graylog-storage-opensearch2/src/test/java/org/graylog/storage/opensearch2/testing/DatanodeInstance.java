@@ -38,8 +38,8 @@ public class DatanodeInstance extends OpenSearchInstance {
     private final String passwordSecret;
     private final String rootPasswordSha2;
 
-    public DatanodeInstance(final SearchVersion version, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
-        super(version, network, heapSize, featureFlags);
+    public DatanodeInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
+        super(version, hostname, network, heapSize, featureFlags);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
         this.rootPasswordSha2 = rootPasswordSha2;
@@ -75,7 +75,7 @@ public class DatanodeInstance extends OpenSearchInstance {
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
                 .withExposedPorts(8999, 9200, 9300)
                 .withNetwork(network)
-                .withNetworkAliases(HOSTNAME)
+                .withNetworkAliases(hostname)
                 .waitingFor(
                         Wait.forHttp("/_cluster/health")
                                 .forPort(OPENSEARCH_PORT)
