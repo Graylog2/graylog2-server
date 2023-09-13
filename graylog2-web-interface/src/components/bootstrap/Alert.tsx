@@ -16,21 +16,23 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
+import type { CSSProperties } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import { Alert as MantineAlert, useMantineTheme } from '@mantine/core';
 
-interface Props {
+type Props = {
   bsStyle: ColorVariant,
   children: React.ReactNode,
+  className?: string,
   onDismiss?: () => void,
+  style?: CSSProperties,
 }
 
 const StyledAlert = styled(MantineAlert)(({ theme }) => css`
   margin: ${theme.mantine.spacing.md} 0;
 `);
 
-const Alert = ({ bsStyle, ...rest }: Props) => {
+const Alert = ({ children, bsStyle, style, className, onDismiss }: Props) => {
   const theme = useMantineTheme();
   const alertStyles = () => ({
     message: {
@@ -41,11 +43,23 @@ const Alert = ({ bsStyle, ...rest }: Props) => {
     },
   });
 
-  return <StyledAlert styles={alertStyles} color={bsStyle} {...rest} />;
+  return (
+    <StyledAlert className={className}
+                 color={bsStyle}
+                 style={style}
+                 styles={alertStyles}
+                 onClose={onDismiss}
+                 withCloseButton={typeof onDismiss === 'function'}>
+      {children}
+    </StyledAlert>
+  );
 };
 
 Alert.defaultProps = {
+  className: undefined,
   onDismiss: undefined,
+  style: undefined,
+  title: undefined,
 };
 
 export default Alert;
