@@ -26,13 +26,14 @@ type Props = {
   className?: string,
   onDismiss?: () => void,
   style?: CSSProperties,
+  title?: React.ReactNode,
 }
 
 const StyledAlert = styled(MantineAlert)(({ theme }) => css`
   margin: ${theme.mantine.spacing.md} 0;
 `);
 
-const Alert = ({ children, bsStyle, style, className, onDismiss }: Props) => {
+const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props) => {
   const theme = useMantineTheme();
   const alertStyles = () => ({
     message: {
@@ -49,6 +50,7 @@ const Alert = ({ children, bsStyle, style, className, onDismiss }: Props) => {
                  style={style}
                  styles={alertStyles}
                  onClose={onDismiss}
+                 title={title}
                  withCloseButton={typeof onDismiss === 'function'}>
       {children}
     </StyledAlert>

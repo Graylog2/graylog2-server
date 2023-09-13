@@ -158,7 +158,8 @@ class FilterAggregationSummary extends React.Component {
               {validationResults.isValid
                 ? <AggregationConditionSummary series={series} conditions={conditions} />
                 : (
-                  <Alert bsSize="small" bsStyle="danger"><Icon name="exclamation-triangle" />&nbsp;
+                  <Alert bsSize="small" bsStyle="danger">
+                    <Icon name="exclamation-triangle" />&nbsp;
                     Condition is not valid: {validationResults.errors.join(', ')}
                   </Alert>
                 )}
