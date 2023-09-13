@@ -42,21 +42,27 @@ import java.util.List;
 import static java.util.Objects.isNull;
 
 public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
-    private final RestHighLevelClient restHighLevelClient;
-    private final ElasticsearchClient elasticsearchClient;
-    private final Client client;
-    private final FixtureImporter fixtureImporter;
+    private RestHighLevelClient restHighLevelClient;
+    private ElasticsearchClient elasticsearchClient;
+    private Client client;
+    private FixtureImporter fixtureImporter;
     private Adapters adapters;
+    private List<String> featureFlags;
 
     public ElasticsearchInstanceES7(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
         super(version, network, heapSize);
+        this.featureFlags = featureFlags;
+    }
 
+    public ElasticsearchInstanceES7 init() {
+        super.init();
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        return this;
     }
 
     public static ElasticsearchInstanceES7 create() {
@@ -133,7 +139,7 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.threshold_enabled", "true")
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
+                .withNetworkAliases(HOSTNAME)
                 .waitingFor(Wait.forHttp("/").forPort(OPENSEARCH_PORT));
     }
 }

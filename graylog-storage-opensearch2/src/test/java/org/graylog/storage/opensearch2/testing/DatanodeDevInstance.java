@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public class DatanodeDevInstance extends OpenSearchInstance {
@@ -41,6 +42,12 @@ public class DatanodeDevInstance extends OpenSearchInstance {
     }
 
     @Override
+    public DatanodeDevInstance init() {
+        super.init();
+        return this;
+    }
+
+    @Override
     protected String imageName() {
         return "creating image locally by provider";
     }
@@ -52,9 +59,9 @@ public class DatanodeDevInstance extends OpenSearchInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        var builder =  DatanodeDevContainerInstanceProvider.getBuilderFor(this.version()).orElseThrow(() -> new UnsupportedOperationException("Can not build container for Search version " + this.version() + " - not supported."));
+        var builder = DatanodeDevContainerInstanceProvider.getBuilderFor(this.version()).orElseThrow(() -> new UnsupportedOperationException("Can not build container for Search version " + this.version() + " - not supported."));
 
-        builder.passwordSecret(passwordSecret).rootPasswordSha2(rootPasswordSha2).network(network).mongoDbUri(mongoDBUri).restPort(8999).openSearchPort(9200);
+        builder.passwordSecret(passwordSecret).rootPasswordSha2(rootPasswordSha2).network(network).mongoDbUri(mongoDBUri).restPort(8999).openSearchPort(9200).pathPrefix(Path.of("..", "data-node"));
 
         return builder.build();
 /*

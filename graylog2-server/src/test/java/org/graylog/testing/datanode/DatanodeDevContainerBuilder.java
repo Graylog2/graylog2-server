@@ -4,6 +4,8 @@ package org.graylog.testing.datanode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import java.nio.file.Path;
+
 public interface DatanodeDevContainerBuilder {
     DatanodeDevContainerBuilder mongoDbUri(final String mongoDbUri);
     DatanodeDevContainerBuilder passwordSecret(final String passwordSecret);
@@ -18,6 +20,8 @@ public interface DatanodeDevContainerBuilder {
     DatanodeDevContainerBuilder customizer(DatanodeDockerHooks hooks);
 
     DatanodeDevContainerBuilder network(Network network);
+
+    DatanodeDevContainerBuilder pathPrefix(Path prefix);
 
     GenericContainer<?> build();
 }

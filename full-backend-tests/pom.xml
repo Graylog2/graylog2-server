@@ -58,7 +58,7 @@
 
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-server</artifactId>
+            <artifactId>data-node</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

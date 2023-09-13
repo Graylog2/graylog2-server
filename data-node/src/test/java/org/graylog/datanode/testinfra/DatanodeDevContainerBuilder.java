@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
 
@@ -26,8 +27,10 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private int restPort;
     private int openSearchPort;
     private String nodeName;
-    private DatanodeDockerHooks customizer;
+    private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
+
+    private Path prefix = Path.of(".");
 
     @Override
     public org.graylog.testing.datanode.DatanodeDevContainerBuilder mongoDbUri(final String mongoDbUri) {
@@ -67,13 +70,19 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     @Override
     public org.graylog.testing.datanode.DatanodeDevContainerBuilder customizer(final DatanodeDockerHooks hooks) {
-        this.customizer = hooks;
+        this.customizer = Optional.of(hooks);
         return this;
     }
 
     @Override
     public org.graylog.testing.datanode.DatanodeDevContainerBuilder network(final Network network) {
         this.network = network;
+        return this;
+    }
+
+    @Override
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder pathPrefix(final Path prefix) {
+        this.prefix = prefix;
         return this;
     }
 
@@ -112,9 +121,9 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
-        container.withFileSystemBind("target/graylog-datanode-" + getDatanodeVersion() + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
-                .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
-        customizer.onContainer(container);
+        container.withFileSystemBind(prefix.toString() + "/target/graylog-datanode-" + getDatanodeVersion() + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
+                .withFileSystemBind(prefix.toString() + "/target/lib", IMAGE_WORKING_DIR + "/lib/");
+        customizer.ifPresent(c -> c.onContainer(container));
         return container;
     }
 
@@ -140,10 +149,10 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     private static ImageFromDockerfile createImage() {
         final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
-        final Path downloadedOpensearch = Path.of("target", "downloads", opensearchTarArchive);
+        final Path downloadedOpensearch = Path.of("..", "data-node", "target", "downloads", opensearchTarArchive);
 
         if(!Files.exists(downloadedOpensearch)) {
-            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path" + downloadedOpensearch.toAbsolutePath() + " doesn't exist!");
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path: " + downloadedOpensearch.toAbsolutePath() + " doesn't exist!");
         }
 
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)

@@ -78,7 +78,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
 
-        SearchServerInstance searchServer = builder.network(network)
+        SearchServerInstance searchServer = builder
+                .network(network)
                 .mongoDbUri(mongoDB.internalUri())
                 .passwordSecret(PASSWORD_SECRET)
                 .rootPasswordSha2(ROOT_PASSWORD_SHA_2)

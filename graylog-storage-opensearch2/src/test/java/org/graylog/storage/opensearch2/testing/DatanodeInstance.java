@@ -46,6 +46,12 @@ public class DatanodeInstance extends OpenSearchInstance {
     }
 
     @Override
+    public DatanodeInstance init() {
+        super.init();
+        return this;
+    }
+
+    @Override
     protected String imageName() {
         return String.format(Locale.ROOT, "graylog/graylog-datanode:%s", "5.2-dev");
     }
@@ -69,7 +75,7 @@ public class DatanodeInstance extends OpenSearchInstance {
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
                 .withExposedPorts(8999, 9200, 9300)
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
+                .withNetworkAliases(HOSTNAME)
                 .waitingFor(
                         Wait.forHttp("/_cluster/health")
                                 .forPort(OPENSEARCH_PORT)
