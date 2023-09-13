@@ -17,8 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
-import { Alert as BootstrapAlert } from 'react-bootstrap';
 import type { ColorVariant } from '@graylog/sawmill';
+import { Alert as MantineAlert } from '@mantine/core';
 
 interface Props {
   bsStyle: ColorVariant,
@@ -26,7 +26,7 @@ interface Props {
   onDismiss?: () => void,
 }
 
-const StyledAlert = styled(BootstrapAlert)<{ bsStyle: ColorVariant }>(({ bsStyle = 'info', theme }) => {
+const StyledAlert = styled(MantineAlert)<{ bsStyle: ColorVariant }>(({ bsStyle = 'info', theme }) => {
   const borderColor = theme.colors.variant.lighter[bsStyle];
   const backgroundColor = theme.colors.variant.lightest[bsStyle];
 
