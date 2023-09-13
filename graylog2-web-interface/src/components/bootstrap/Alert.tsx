@@ -26,41 +26,11 @@ interface Props {
   onDismiss?: () => void,
 }
 
-const StyledAlert = styled(MantineAlert)<{ bsStyle: ColorVariant }>(({ bsStyle = 'info', theme }) => {
-  const borderColor = theme.colors.variant.lighter[bsStyle];
-  const backgroundColor = theme.colors.variant.lightest[bsStyle];
+const StyledAlert = styled(MantineAlert)(({ theme }) => css`
+  margin: ${theme.mantine.spacing.md} 0;
+`);
 
-  return css`
-    background-color: ${backgroundColor};
-    border-color: ${borderColor};
-    color: ${theme.utils.contrastingColor(backgroundColor)};
-
-    a:not(.btn) {
-      color: ${theme.utils.contrastingColor(backgroundColor, 'AA')};
-      font-weight: bold;
-      text-decoration: underline;
-
-      &:hover,
-      &:focus,
-      &:active {
-        color: ${theme.utils.contrastingColor(backgroundColor)};
-      }
-
-      &:hover,
-      &:focus {
-        text-decoration: none;
-      }
-    }
-
-    &.alert-dismissible {
-      .close {
-        top: -9px;
-      }
-    }
-`;
-});
-
-const Alert = ({ bsStyle, ...rest }: Props) => <StyledAlert bsStyle={bsStyle} {...rest} />;
+const Alert = ({ bsStyle, ...rest }: Props) => <StyledAlert color={bsStyle} {...rest} />;
 
 Alert.defaultProps = {
   onDismiss: undefined,
