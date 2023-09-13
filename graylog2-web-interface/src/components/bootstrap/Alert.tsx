@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import type { ColorVariant } from '@graylog/sawmill';
-import { Alert as MantineAlert } from '@mantine/core';
+import { Alert as MantineAlert, useMantineTheme } from '@mantine/core';
 
 interface Props {
   bsStyle: ColorVariant,
@@ -30,7 +30,19 @@ const StyledAlert = styled(MantineAlert)(({ theme }) => css`
   margin: ${theme.mantine.spacing.md} 0;
 `);
 
-const Alert = ({ bsStyle, ...rest }: Props) => <StyledAlert color={bsStyle} {...rest} />;
+const Alert = ({ bsStyle, ...rest }: Props) => {
+  const theme = useMantineTheme();
+  const alertStyles = () => ({
+    message: {
+      fontSize: theme.fontSizes.md,
+    },
+    title: {
+      fontSize: theme.fontSizes.md,
+    },
+  });
+
+  return <StyledAlert styles={alertStyles} color={bsStyle} {...rest} />;
+};
 
 Alert.defaultProps = {
   onDismiss: undefined,
