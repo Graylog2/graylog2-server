@@ -181,6 +181,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                 .description(ruleBuilderDto.description())
                 .ruleBuilder(ruleBuilderDto.ruleBuilder())
                 .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilderDto.ruleBuilder(), generateSimulatorFields))
+                .simulatorMessage(ruleBuilderDto.simulatorMessage())
                 .build();
     }
 

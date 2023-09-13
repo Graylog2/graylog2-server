@@ -123,6 +123,9 @@ public abstract class RuleBuilderStep {
 
     @JsonIgnore
     private int matchPatternWithIndex(String value, Pattern pattern) {
+        if (value == null) {
+            return -1;
+        }
         Matcher matcher = pattern.matcher(value);
         if (matcher.matches()) {
             return Integer.parseInt(matcher.group(1));

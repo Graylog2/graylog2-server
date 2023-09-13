@@ -147,6 +147,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .createdAt(now)
                 .modifiedAt(now)
                 .ruleBuilder(normalizedRuleBuilder.orElse(ruleSource.ruleBuilder()))
+                .simulatorMessage(ruleSource.simulatorMessage())
                 .build();
 
         final RuleDao save;
