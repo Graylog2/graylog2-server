@@ -14,144 +14,102 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { useEffect } from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import withParams from 'routing/withParams';
-import withLocation from 'routing/withLocation';
-import { IndexSetsActions, IndexSetsStore, IndexSetPropType } from 'stores/indices/IndexSetsStore';
+import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
-import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
-import withHistory from 'routing/withHistory';
-import withTelemetry from 'logic/telemetry/withTelemetry';
+import useParams from 'routing/useParams';
+import useHistory from 'routing/useHistory';
+
+import useSendTelemetry from '../logic/telemetry/useSendTelemetry';
 
 const _saveConfiguration = (history, indexSet) => IndexSetsActions.update(indexSet).then(() => {
   history.push(Routes.SYSTEM.INDICES.LIST);
 });
 
-class IndexSetConfigurationPage extends React.Component {
-  componentDidMount() {
-    IndexSetsActions.get(this.props.params.indexSetId);
+const IndexSetConfigurationPage = () => {
+  const { indexSetId } = useParams();
+  const { indexSet } = useStore(IndexSetsStore);
+  const {
+    retentionStrategies,
+    rotationStrategies,
+    retentionStrategiesContext,
+  } = useStore(IndicesConfigurationStore);
+  const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
+
+  useEffect(() => {
+    IndexSetsActions.get(indexSetId);
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
-  }
+  }, [indexSetId]);
 
-  _formCancelLink = () => {
-    const { location: { query: { from } }, indexSet } = this.props;
-
-    if (from === 'details') {
+  const formCancelLink = () => {
+    if (history?.query?.from === 'details') {
       return Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id);
     }
 
     return Routes.SYSTEM.INDICES.LIST;
   };
 
-  _isLoading = () => {
-    const { indexSet, rotationStrategies, retentionStrategies } = this.props;
+  const isLoading = () => !indexSet || !rotationStrategies || !retentionStrategies || (indexSetId !== indexSet.id);
 
-    return !indexSet || !rotationStrategies || !retentionStrategies;
+  if (isLoading()) {
+    return <Spinner />;
+  }
+
+  const saveConfiguration = (newIndexSet) => {
+    _saveConfiguration(history, newIndexSet);
+
+    sendTelemetry('form_submit', {
+      app_pathname: 'indexsets',
+      app_section: 'indexset',
+      app_action_value: 'configuration-form',
+    });
   };
 
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
+  return (
+    <DocumentTitle title="Configure Index Set">
+      <div>
+        <PageHeader title="Configure Index Set"
+                    documentationLink={{
+                      title: 'Index model documentation',
+                      path: DocsHelper.PAGES.INDEX_MODEL,
+                    }}
+                    topActions={(
+                      <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                        <Button bsStyle="info">Index sets overview</Button>
+                      </LinkContainer>
+                    )}>
+          <span>
+            Modify the current configuration for this index set, allowing you to customize the retention, sharding,
+            and replication of messages coming from one or more streams.
+          </span>
+        </PageHeader>
 
-    const {
-      indexSet,
-      retentionStrategiesContext,
-      rotationStrategies,
-      retentionStrategies,
-      history,
-      sendTelemetry,
-    } = this.props;
-
-    const saveConfiguration = (newIndexSet) => {
-      _saveConfiguration(history, newIndexSet);
-
-      sendTelemetry('form_submit', {
-        app_pathname: 'indexsets',
-        app_section: 'indexset',
-        app_action_value: 'configuration-form',
-      });
-    };
-
-    return (
-      <DocumentTitle title="Configure Index Set">
-        <div>
-          <PageHeader title="Configure Index Set"
-                      documentationLink={{
-                        title: 'Index model documentation',
-                        path: DocsHelper.PAGES.INDEX_MODEL,
-                      }}
-                      topActions={(
-                        <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                          <Button bsStyle="info">Index sets overview</Button>
-                        </LinkContainer>
-            )}>
-            <span>
-              Modify the current configuration for this index set, allowing you to customize the retention, sharding,
-              and replication of messages coming from one or more streams.
-            </span>
-          </PageHeader>
-
-          <Row className="content">
-            <Col md={12}>
-              <IndexSetConfigurationForm indexSet={indexSet}
-                                         retentionStrategiesContext={retentionStrategiesContext}
-                                         rotationStrategies={rotationStrategies}
-                                         retentionStrategies={retentionStrategies}
-                                         submitButtonText="Update index set"
-                                         submitLoadingText="Updating index set..."
-                                         cancelLink={this._formCancelLink()}
-                                         onUpdate={saveConfiguration} />
-            </Col>
-          </Row>
-        </div>
-      </DocumentTitle>
-    );
-  }
-}
-
-IndexSetConfigurationPage.propTypes = {
-  params: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  retentionStrategies: PropTypes.arrayOf(RetentionStrategyPropType),
-  rotationStrategies: PropTypes.arrayOf(RotationStrategyPropType),
-  indexSet: IndexSetPropType,
-  retentionStrategiesContext: PropTypes.shape({
-    max_index_retention_period: PropTypes.string,
-  }),
-  history: PropTypes.object.isRequired,
-  sendTelemetry: PropTypes.func.isRequired,
+        <Row className="content">
+          <Col md={12}>
+            <IndexSetConfigurationForm indexSet={indexSet}
+                                       retentionStrategiesContext={retentionStrategiesContext}
+                                       rotationStrategies={rotationStrategies}
+                                       retentionStrategies={retentionStrategies}
+                                       submitButtonText="Update index set"
+                                       submitLoadingText="Updating index set..."
+                                       cancelLink={formCancelLink()}
+                                       onUpdate={saveConfiguration} />
+          </Col>
+        </Row>
+      </div>
+    </DocumentTitle>
+  );
 };
 
-IndexSetConfigurationPage.defaultProps = {
-  retentionStrategies: undefined,
-  rotationStrategies: undefined,
-  indexSet: undefined,
-  retentionStrategiesContext: {
-    max_index_retention_period: undefined,
-  },
-};
-
-export default connect(
-  withHistory(withParams(withLocation(withTelemetry(IndexSetConfigurationPage)))),
-  {
-    indexSets: IndexSetsStore,
-    indicesConfigurations: IndicesConfigurationStore,
-  },
-  ({ indexSets, indicesConfigurations }) => ({
-    indexSet: indexSets.indexSet,
-    rotationStrategies: indicesConfigurations.rotationStrategies,
-    retentionStrategies: indicesConfigurations.retentionStrategies,
-    retentionStrategiesContext: indicesConfigurations.retentionStrategiesContext,
-  }),
-);
+export default IndexSetConfigurationPage;
