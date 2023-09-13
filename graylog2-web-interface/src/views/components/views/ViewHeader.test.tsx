@@ -29,10 +29,14 @@ import asMock from 'helpers/mocking/AsMock';
 
 jest.mock('views/logic/views/OnSaveViewAction');
 
-jest.mock('views/logic/slices/viewSlice', () => ({
-  ...jest.requireActual('views/logic/slices/viewSlice'),
-  updateView: jest.fn(),
-}));
+jest.mock('views/logic/slices/viewSlice', () => {
+  const actualModule = jest.requireActual('views/logic/slices/viewSlice');
+
+  return {
+    ...actualModule,
+    updateView: jest.fn(actualModule.updateView),
+  };
+});
 
 const view = createSearch()
   .toBuilder()
@@ -50,7 +54,6 @@ const ViewHeader = () => (
 describe('ViewHeader', () => {
   beforeEach(() => {
     asMock(onSaveView).mockReturnValue(async () => {});
-    asMock(updateView).mockReturnValue(async () => {});
   });
 
   beforeAll(loadViewsPlugin);
