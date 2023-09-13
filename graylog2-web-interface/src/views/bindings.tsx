@@ -98,7 +98,11 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import Icon from 'components/common/Icon';
 import viewsReducers from 'views/viewsReducers';
 import CreateEventDefinition from 'views/logic/valueactions/createEventDefinition/CreateEventDefinition';
-import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
+import ChangeFieldType, {
+  ChangeFieldTypeHelp,
+  isChangeFieldTypeEnabled,
+  isChangeFieldTypeHidden,
+} from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -295,9 +299,11 @@ const exports: PluginExports = {
     {
       type: 'change-field-type',
       title: 'Change field type',
-      isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
+      isEnabled: isChangeFieldTypeEnabled,
+      isHidden: isChangeFieldTypeHidden,
       resetFocus: false,
       component: ChangeFieldType,
+      help: ChangeFieldTypeHelp,
     },
   ],
   valueActions: filterCloudValueActions([

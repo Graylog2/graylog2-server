@@ -16,10 +16,14 @@
  */
 import React, { useCallback, useState } from 'react';
 
-import type { ActionComponentProps } from 'views/components/actions/ActionHandler';
+import type { ActionComponentProps, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import type { ChangeFieldTypeFormValues } from 'views/logic/fieldactions/ChangeFieldType/types';
+import { isFunction } from 'views/logic/aggregationbuilder/Series';
+import isReservedField from 'views/logic/IsReservedField';
+import type User from 'logic/users/User';
+import AppConfig from 'util/AppConfig';
 
 const ChangeFieldType = ({
   field,
@@ -46,6 +50,25 @@ const ChangeFieldType = ({
   }, [field, handleOnClose, putFiledTypeMutation]);
 
   return show ? <ChangeFieldTypeModal onSubmit={onSubmit} field={field} onClose={handleOnClose} show={show} /> : null;
+};
+
+const hasMappingPermission = (currentUser: User) => currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
+
+export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => {
+  const { currentUser } = contexts;
+
+  return (!isFunction(field) && !type.isDecorated() && !isReservedField(field) && field !== 'source' && hasMappingPermission(currentUser));
+};
+
+export const isChangeFieldTypeHidden = () => !AppConfig.isFeatureEnabled('field_types_management');
+
+export const ChangeFieldTypeHelp = ({ contexts }: ActionHandlerArguments) => {
+  const { currentUser } = contexts;
+  hasMappingPermission(currentUser);
+
+  if (hasMappingPermission(currentUser)) return null;
+
+  return ({ title: 'No permission', description: 'You don\'t have permission to do that action' });
 };
 
 export default ChangeFieldType;
