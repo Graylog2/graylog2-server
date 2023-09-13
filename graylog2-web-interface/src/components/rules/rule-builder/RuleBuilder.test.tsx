@@ -45,7 +45,7 @@ describe('RuleBuilder', () => {
     const createRule = jest.fn();
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: null,
@@ -79,7 +79,7 @@ describe('RuleBuilder', () => {
     const updateRule = jest.fn();
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title: '', description: '', rule_builder },
@@ -112,7 +112,7 @@ describe('RuleBuilder', () => {
   it('should be able to convert Rule Builder to Source Code', () => {
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title, description, rule_builder },
@@ -140,7 +140,7 @@ describe('RuleBuilder', () => {
   it('should show simulator', () => {
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title, description, rule_builder },
@@ -166,7 +166,7 @@ describe('RuleBuilder', () => {
   it('should show simulator with conditions and actions output', () => {
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
     const conditionOutput1 = 'condition_output_1';
     const actionOutput1 = 'action_output_1';
     const actionOutput2 = 'action_output_2';
