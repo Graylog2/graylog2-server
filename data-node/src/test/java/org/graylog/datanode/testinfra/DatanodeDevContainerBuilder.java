@@ -173,10 +173,16 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     private static ImageFromDockerfile createImage() {
         final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
-        final Path downloadedOpensearch = Path.of("..", "data-node", "target", "downloads", opensearchTarArchive);
+        final Path downloadedOpensearchInFullBackend = Path.of("..", "data-node", "target", "downloads", opensearchTarArchive);
+        final Path downloadedOpensearchInEnterpriseFullBackend = Path.of("..", "..", "graylog2-server", "data-node", "target", "downloads", opensearchTarArchive);
+        Path downloadedOpensearch;
 
-        if(!Files.exists(downloadedOpensearch)) {
-            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path: " + downloadedOpensearch.toAbsolutePath() + " doesn't exist!");
+        if(Files.exists(downloadedOpensearchInFullBackend)) {
+            downloadedOpensearch = downloadedOpensearchInFullBackend;
+        } else if(Files.exists(downloadedOpensearchInEnterpriseFullBackend)) {
+            downloadedOpensearch = downloadedOpensearchInEnterpriseFullBackend;
+        } else {
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, neither " + downloadedOpensearchInFullBackend.toAbsolutePath() + " or " + downloadedOpensearchInEnterpriseFullBackend.toAbsolutePath() + " exist!");
         }
 
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
