@@ -48,10 +48,6 @@ const LongContent = styled.div<{ $visible: boolean}>(({ $visible }) => css`
 const StyledAlert = styled(Alert)`
   margin-bottom: 6px;
   padding-right: 9px;
-  
-  &.alert-dismissable .close {
-    right: 12px;
-  }
 `;
 
 const Wrapper = styled.div`

@@ -17,7 +17,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Icon } from 'components/common';
 import { Alert, Button } from 'components/bootstrap';
 import { IndexRangeSummary } from 'components/indices';
 import { IndicesActions } from 'stores/indices/IndicesStore';
@@ -45,7 +44,7 @@ class ClosedIndexDetails extends React.Component {
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />
         <Alert bsStyle="info">
-          <Icon name="info-circle" /> This index is closed. Index information is not available{' '}
+          This index is closed. Index information is not available{' '}
           at the moment, please reopen the index and try again.
         </Alert>
 

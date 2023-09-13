@@ -20,6 +20,8 @@ import type { CSSProperties } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import { Alert as MantineAlert, useMantineTheme } from '@mantine/core';
 
+import Icon from 'components/common/Icon';
+
 type Props = {
   bsStyle: ColorVariant,
   children: React.ReactNode,
@@ -33,6 +35,18 @@ const StyledAlert = styled(MantineAlert)(({ theme }) => css`
   margin: ${theme.mantine.spacing.md} 0;
 `);
 
+const iconNameForType = (bsStyle: ColorVariant) => {
+  switch (bsStyle) {
+    case 'warning':
+    case 'danger':
+      return 'exclamation-triangle';
+    case 'success':
+      return 'circle-check';
+    default:
+      return 'info-circle';
+  }
+};
+
 const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props) => {
   const theme = useMantineTheme();
   const alertStyles = () => ({
@@ -43,6 +57,7 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
       fontSize: theme.fontSizes.md,
     },
   });
+  const iconName = iconNameForType(bsStyle);
 
   return (
     <StyledAlert className={className}
@@ -51,6 +66,7 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
                  styles={alertStyles}
                  onClose={onDismiss}
                  title={title}
+                 icon={<Icon name={iconName} />}
                  withCloseButton={typeof onDismiss === 'function'}>
       {children}
     </StyledAlert>

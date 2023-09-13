@@ -72,20 +72,21 @@ const Notification = ({ notification }: Props) => {
 
   /* eslint-disable react/no-danger */
   return (
-    <StyledAlert bsStyle="danger">
+    <StyledAlert bsStyle="danger"
+                 title={(
+                   <>
+                     {message.title}{' '}
+
+                     <NotificationTimestamp>
+                       (triggered <RelativeTime dateTime={notification.timestamp} />)
+                     </NotificationTimestamp>
+                   </>
+                 )}>
       <StyledButton className="delete-notification" bsStyle="link" onClick={_onClose}>
         <Icon name="times" />
       </StyledButton>
 
-      <NotificationHead>
-        <Icon name="bolt" />{' '}
-        <span />
-        {message.title}{' '}
-
-        <NotificationTimestamp>
-          (triggered <RelativeTime dateTime={notification.timestamp} />)
-        </NotificationTimestamp>
-      </NotificationHead>
+      <NotificationHead />
       <div dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message?.description) }}
            className="notification-description" />
     </StyledAlert>

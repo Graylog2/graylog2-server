@@ -24,8 +24,6 @@ import { ListGroup, ListGroupItem, Label, Alert } from 'components/bootstrap';
 import { RelativeTime, Spinner, ExternalLink } from 'components/common';
 import useContentStream from 'components/content-stream/hook/useContentStream';
 
-import Icon from '../common/Icon';
-
 const StyledListGroupItem = styled(ListGroupItem)(({ theme }: { theme: DefaultTheme }) => css`
   display: flex;
   gap: ${theme.spacings.md};
@@ -54,7 +52,7 @@ const ContentStreamReleasesSection = () => {
     return (
       <Alert bsStyle="info">
         <p>
-          <Icon name="exclamation-triangle" /> Unable to load RSS feed at the moment ! You can read more
+          Unable to load RSS feed at the moment ! You can read more
           on {' '}
           <ExternalLink href="https://www.graylog.org/post/tag/release-info">
             Graylog.org

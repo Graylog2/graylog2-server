@@ -17,10 +17,9 @@
 import * as React from 'react';
 
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
 
 const ProfileUpdateInfo = () => (
-  <Alert bsStyle="info" title={<><Icon name="info-circle" />{' '}<b> First and Last Name</b></>}>
+  <Alert bsStyle="info" title="First and Last Name">
     With Graylog 4.1, we&apos;ve added distinct first and last name fields. These must be provided before the user’s profile can be saved.
   </Alert>
 );
