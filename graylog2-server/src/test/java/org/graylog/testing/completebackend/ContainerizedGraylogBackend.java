@@ -19,6 +19,8 @@ package org.graylog.testing.completebackend;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.graylognode.MavenPackager;
+import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.storage.SearchVersion;
@@ -78,6 +80,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
 
+        MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
+
         SearchServerInstance searchServer = builder
                 .network(network)
                 .mongoDbUri(mongoDB.internalUri())
@@ -91,16 +95,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         }
 
         try {
-            NodeInstance node = NodeInstance.createStarted(
-                    network,
-                    mongoDB.internalUri(),
-                    PASSWORD_SECRET,
-                    ROOT_PASSWORD_SHA_2,
-                    searchServer.internalUri(),
-                    searchServer.version(),
-                    extraPorts,
-                    pluginJarsProvider, mavenProjectDirProvider,
-                    enabledFeatureFlags);
+            var nodeContainerConfig = new NodeContainerConfig(network, mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags);
+            NodeInstance node = NodeInstance.createStarted(nodeContainerConfig);
             this.network = network;
             this.searchServer = searchServer;
             this.mongodb = mongoDB;

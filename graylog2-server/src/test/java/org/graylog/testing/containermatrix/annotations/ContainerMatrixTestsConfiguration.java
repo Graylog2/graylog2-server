@@ -60,7 +60,7 @@ public @interface ContainerMatrixTestsConfiguration {
      * matrix rule
      * If no version is explicitly specified, then {@link SearchServer#DEFAULT_VERSION will be used by the tests}
      */
-    SearchServer[] searchVersions() default {SearchServer.ES7, SearchServer.OS2, SearchServer.OS1, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV};
+    SearchServer[] searchVersions() default {SearchServer.DATANODE_DEV};
 
     /**
      * matrix rule

@@ -85,7 +85,7 @@ public class DatanodeContainerizedBackend {
     }
 
     private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer) {
-        MavenPackager.packageJarIfNecessary(createConfig());
+        MavenPackager.packageJarIfNecessary(new DefaultMavenProjectDirProvider());
 
         return new DatanodeDevContainerBuilder()
                 .restPort(DATANODE_REST_PORT)
@@ -99,20 +99,6 @@ public class DatanodeContainerizedBackend {
                 .customizer(customizer)
                 .build();
     }
-
-    private NodeContainerConfig createConfig() {
-        return new NodeContainerConfig(this.network,
-                mongoDBTestService.internalUri(),
-                ContainerizedGraylogBackend.PASSWORD_SECRET,
-                ContainerizedGraylogBackend.ROOT_PASSWORD_SHA_2,
-                null,
-                null,
-                new int[]{},
-                new DefaultPluginJarsProvider(),
-                new DefaultMavenProjectDirProvider(),
-                Collections.emptyList());
-    }
-
 
     public DatanodeContainerizedBackend start() {
         datanodeContainer.start();
