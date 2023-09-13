@@ -76,6 +76,7 @@ public class DatanodeClusterIT {
 
         this.network = Network.newNetwork();
         this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, network);
+        this.mongoDBTestService.start();
 
         nodeA = createDatanodeContainer(
                 network,
@@ -126,7 +127,7 @@ public class DatanodeClusterIT {
         final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
 
         final DatanodeContainerizedBackend nodeC = createDatanodeContainer(
-                nodeA.getNetwork(), nodeA.getMongoDb(),
+                network, mongoDBTestService,
                 hostnameNodeC,
                 transportNodeC,
                 httpNodeC,
@@ -142,7 +143,7 @@ public class DatanodeClusterIT {
 
     @NotNull
     private DatanodeContainerizedBackend createDatanodeContainer(Network network,
-                                                                 MongoDBTestService mongodb, 
+                                                                 MongoDBTestService mongodb,
                                                                  String hostname,
                                                                  KeystoreInformation transportKeystore,
                                                                  KeystoreInformation httpKeystore,
@@ -153,6 +154,7 @@ public class DatanodeClusterIT {
                 mongodb,
                 hostname,
                 datanodeContainer -> {
+                    datanodeContainer.withNetwork(network);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", hostnameNodeA);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", hostnameNodeA + ":9300");
@@ -181,6 +183,7 @@ public class DatanodeClusterIT {
                     // container and docker network, where we do the hostname validation.
                     datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(hostname));
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", hostname);
+                    datanodeContainer.withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongodb.internalUri());
                 });
     }
 
