@@ -24,14 +24,17 @@ import { IndexSetConfigurationForm } from 'components/indices';
 import { useStore } from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import useParams from 'routing/useParams';
+import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import useQuery from 'routing/useQuery';
 
 import useSendTelemetry from '../logic/telemetry/useSendTelemetry';
 
-const _saveConfiguration = (history, indexSet) => IndexSetsActions.update(indexSet).then(() => {
+const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) => IndexSetsActions.update(indexSet).then(() => {
   history.push(Routes.SYSTEM.INDICES.LIST);
 });
 
@@ -44,6 +47,7 @@ const IndexSetConfigurationPage = () => {
     retentionStrategiesContext,
   } = useStore(IndicesConfigurationStore);
   const history = useHistory();
+  const { from } = useQuery();
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
@@ -53,7 +57,7 @@ const IndexSetConfigurationPage = () => {
   }, [indexSetId]);
 
   const formCancelLink = () => {
-    if (history?.query?.from === 'details') {
+    if (from === 'details') {
       return Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id);
     }
 
@@ -66,7 +70,7 @@ const IndexSetConfigurationPage = () => {
     return <Spinner />;
   }
 
-  const saveConfiguration = (newIndexSet) => {
+  const saveConfiguration = (newIndexSet: IndexSet) => {
     _saveConfiguration(history, newIndexSet);
 
     sendTelemetry('form_submit', {
