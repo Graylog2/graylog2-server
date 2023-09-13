@@ -134,7 +134,7 @@ const RuleBuilder = () => {
   const newActionBlockIndex = rule.rule_builder.actions.length;
 
   const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
-    setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
+    setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder, source: ruleValidated.source });
 
     if (ruleValidated.rule_builder?.errors?.length > 0) {
       setRuleSimulationResult(null);
