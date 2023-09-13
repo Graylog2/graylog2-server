@@ -50,7 +50,7 @@ const StyleGuideStyles = createGlobalStyle(({ theme }) => css`
 `);
 
 type Props = {
-  children: React.Component,
+  children: React.ReactNode,
 }
 
 const StyleGuideWrapper = ({ children }: Props) => {
@@ -58,7 +58,7 @@ const StyleGuideWrapper = ({ children }: Props) => {
     path: '/:url?',
     element: (
       <CurrentUserContext.Provider value={adminUser}>
-        <GraylogThemeProvider initialThemeModeOverride="teint">
+        <GraylogThemeProvider initialThemeModeOverride="light">
           <StyleGuideStyles />
           {children}
         </GraylogThemeProvider>
