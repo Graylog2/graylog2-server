@@ -252,7 +252,7 @@ const RuleBuilderBlock = ({
                                onCancel={onCancel}
                                onUpdate={onUpdate}
                                onSelect={onInsertSelect}
-                               order={order}
+                               order={insertMode === 'above' ? order : order + 1}
                                options={options}
                                outputVariableList={outputVariableList}
                                selectedBlockDict={insertBlockDict}
