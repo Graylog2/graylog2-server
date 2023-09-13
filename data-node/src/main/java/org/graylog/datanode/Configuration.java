@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
@@ -190,11 +191,26 @@ public class Configuration extends BaseConfiguration {
         return opensearchProcessLogsBufferSize;
     }
 
-    @Parameter(value = "rest_api_username")
-    private String restApiUsername;
-
     @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
+
+    public String getPasswordSecret() {
+        return passwordSecret;
+    }
+
+    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
+    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
+
+    public Duration getIndexerJwtAuthTokenCachingDuration() {
+        return indexerJwtAuthTokenCachingDuration;
+    }
+
+    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
+    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
+
+    public Duration getIndexerJwtAuthTokenExpirationDuration() {
+        return indexerJwtAuthTokenExpirationDuration;
+    }
 
     @ValidatorMethod
     @SuppressWarnings("unused")
@@ -203,9 +219,6 @@ public class Configuration extends BaseConfiguration {
             throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
         }
     }
-
-    @Parameter(value = "rest_api_password")
-    private String restApiPassword;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "data/node-id";
@@ -273,16 +286,6 @@ public class Configuration extends BaseConfiguration {
     public String getDatanodeHttpCertificatePassword() {
         return datanodeHttpCertificatePassword;
     }
-
-
-    public String getRestApiUsername() {
-        return restApiUsername;
-    }
-
-    public String getRestApiPassword() {
-        return restApiPassword;
-    }
-
 
     public Optional<String> getOpensearchNetworkHostHost() {
         return Optional.ofNullable(opensearchNetworkHostHost);

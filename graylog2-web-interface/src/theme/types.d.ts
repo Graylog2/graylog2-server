@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { ColorScheme } from '@graylog/sawmill';
-import type { DeepPartial } from 'utility-types';
-import type { ThemeBaseColors } from '@graylog/sawmill/dist/types';
 
 import type { LegacyColorScheme } from 'theme/constants';
 import type { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
+
+import type { ThemesColors } from './theme-types';
 
 interface CustomizationHooks {
   useThemeCustomizer: () => ({
@@ -43,7 +43,7 @@ interface CustomizationHooks {
     onRevertTheme: () => Promise,
     onSaveTheme: () => Promise,
   }),
-  useCustomThemeColors: (isInitialLoad?: boolean) => ({ data: Record<ColorScheme, DeepPartial<ThemeBaseColors>>, isInitialLoading: boolean })
+  useCustomThemeColors: (isInitialLoad?: boolean) => ({ data: ThemesColors, isInitialLoading: boolean })
 }
 
 interface CustomizationActions {

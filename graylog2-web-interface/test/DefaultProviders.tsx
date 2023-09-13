@@ -19,11 +19,14 @@ import { ThemeProvider } from 'styled-components';
 import { defaultTimezone, defaultUser } from 'defaultMockValues';
 import { COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
 import SawmillSC from '@graylog/sawmill/styled-components';
+import SawmillMantine from '@graylog/sawmill/mantine';
+import { MantineProvider } from '@mantine/core';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
-const theme = SawmillSC({ colorScheme: COLOR_SCHEME_LIGHT });
+const scTheme = SawmillSC({ colorScheme: COLOR_SCHEME_LIGHT });
+const mantineTheme = SawmillMantine({ colorScheme: COLOR_SCHEME_LIGHT });
 
 type Props = {
   children: React.ReactNode,
@@ -31,11 +34,13 @@ type Props = {
 
 const DefaultProviders = ({ children }: Props) => (
   <CurrentUserContext.Provider value={defaultUser}>
-    <ThemeProvider theme={{ ...theme, changeMode: () => {} }}>
-      <UserDateTimeProvider tz={defaultTimezone}>
-        {children}
-      </UserDateTimeProvider>
-    </ThemeProvider>
+    <MantineProvider theme={mantineTheme}>
+      <ThemeProvider theme={{ ...scTheme, changeMode: () => {}, mantine: mantineTheme }}>
+        <UserDateTimeProvider tz={defaultTimezone}>
+          {children}
+        </UserDateTimeProvider>
+      </ThemeProvider>
+    </MantineProvider>
   </CurrentUserContext.Provider>
 );
 

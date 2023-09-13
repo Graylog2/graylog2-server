@@ -127,7 +127,7 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
                 // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode())
-                .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?")
+                .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdran")
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
                 .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:" + API_PORT)
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)

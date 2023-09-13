@@ -14,10 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import type { ColorScheme } from '@graylog/sawmill';
 import SawmillSC from '@graylog/sawmill/styled-components';
+import { MantineProvider } from '@mantine/core';
+import type { MantineTheme } from '@graylog/sawmill/mantine';
+import SawmillMantine from '@graylog/sawmill/mantine';
 
 import { DEFAULT_THEME_MODE } from './constants';
 
@@ -25,30 +28,38 @@ type Props = {
   children: React.ReactNode,
 };
 
-const usePreflightTheme = () => {
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(DEFAULT_THEME_MODE);
+const useSCTheme = (
+  colorScheme: ColorScheme,
+  setColorScheme: (newColorScheme: ColorScheme) => void,
+  mantineTheme: MantineTheme,
+) => useMemo(() => {
+  const theme = SawmillSC({ colorScheme });
 
-  const onChangeColorScheme = useCallback((nextMode: ColorScheme) => {
+  const onChangeColorScheme = (nextMode: ColorScheme) => {
     setColorScheme(nextMode);
-  }, []);
+  };
 
-  return useMemo(() => {
-    const theme = SawmillSC({ colorScheme });
-
-    return ({
-      ...theme,
-      changeMode: onChangeColorScheme,
-    });
-  }, [colorScheme, onChangeColorScheme]);
-};
+  return ({
+    ...theme,
+    changeMode: onChangeColorScheme,
+    mantine: mantineTheme,
+  });
+}, [colorScheme, mantineTheme, setColorScheme]);
 
 const PreflightThemeProvider = ({ children }: Props) => {
-  const theme = usePreflightTheme();
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(DEFAULT_THEME_MODE);
+  const mantineTheme = useMemo(
+    () => SawmillMantine({ colorScheme }),
+    [colorScheme],
+  );
+  const scTheme = useSCTheme(colorScheme, setColorScheme, mantineTheme);
 
   return (
-    <ThemeProvider theme={theme}>
-      {children}
-    </ThemeProvider>
+    <MantineProvider theme={mantineTheme}>
+      <ThemeProvider theme={scTheme}>
+        {children}
+      </ThemeProvider>
+    </MantineProvider>
   );
 };
 
