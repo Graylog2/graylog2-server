@@ -2,4 +2,4 @@ type = "f" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecu
 message = "Fixes validation of max index retention lifetime for time-size-optimizing indices."
 
 issues = ["Graylog2/graylog-plugin-enterprise#5685"]
-pulls = ["16392"]
+pulls = ["16448"]
