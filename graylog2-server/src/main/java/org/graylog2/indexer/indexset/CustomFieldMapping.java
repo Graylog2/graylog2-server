@@ -17,18 +17,26 @@
 package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.indexer.fieldtypes.FieldTypes;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
 import static org.graylog2.indexer.indexset.CustomFieldMappings.AVAILABLE_TYPES;
 
 public record CustomFieldMapping(@JsonProperty("field") String fieldName,
                                  @JsonProperty("type") String type) {
-    public FieldTypes.Type toPhysicalType() {
+    public String toPhysicalType() {
         var typeDescription = AVAILABLE_TYPES.get(type());
         if (typeDescription == null) {
             throw new IllegalStateException("Invalid type specified: " + type());
         }
 
-        return typeDescription.type();
+        var reverseMap = TYPE_MAP.entrySet()
+                .stream()
+                .filter(entry -> !entry.getKey().equals("half_float") && !entry.getKey().equals("scaled_float"))
+                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+
+        return reverseMap.get(typeDescription.type());
     }
 }

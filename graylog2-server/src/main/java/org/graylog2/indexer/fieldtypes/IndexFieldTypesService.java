@@ -65,7 +65,6 @@ public class IndexFieldTypesService {
     private final JacksonDBCollection<IndexFieldTypesDTO, ObjectId> db;
     private final StreamService streamService;
     private final MongoCollection<Document> mongoCollection;
-
     @Inject
     public IndexFieldTypesService(MongoConnection mongoConnection,
                                   StreamService streamService,

@@ -111,7 +111,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put("streams", notAnalyzedString());
 
         if (customFieldMappings != null) {
-            customFieldMappings.forEach(customMapping -> builder.put(customMapping.fieldName(), type(customMapping.toPhysicalType().type())));
+            customFieldMappings.forEach(customMapping -> builder.put(customMapping.fieldName(), type(customMapping.toPhysicalType())));
         }
 
         return builder.build();
