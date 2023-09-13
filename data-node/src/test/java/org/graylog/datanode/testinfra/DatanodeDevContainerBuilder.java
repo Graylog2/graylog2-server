@@ -43,7 +43,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private int restPort = 8999;
     private int openSearchHttpPort = 9200;
     private int openSearchTransportPort = 9300;
-    private String nodeName;
+    private String nodeName = "node1";
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
 
