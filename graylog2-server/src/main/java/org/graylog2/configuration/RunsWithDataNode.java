@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.configuration;
 
-import React from 'react';
-import { shallow } from 'wrappedEnzyme';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import DelegatedSearchPage from 'pages/DelegatedSearchPage';
-
-test('Renders other component if registered', () => {
-  const SimpleComponent = () => <div>Hello!</div>;
-
-  PluginStore.register(new PluginManifest({}, {
-    pages: {
-      search: { component: SimpleComponent },
-    },
-  }));
-
-  const tree = shallow(<DelegatedSearchPage />);
-
-  expect(tree).toMatchSnapshot();
-});
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER, ElementType.TYPE })
+@Qualifier
+public @interface RunsWithDataNode {
+}

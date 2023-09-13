@@ -19,21 +19,20 @@ import React, { useRef } from 'react';
 import $ from 'jquery';
 
 import ModalSubmit from 'components/common/ModalSubmit';
-import StringUtils from 'util/StringUtils';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  backdrop: boolean|'static'|undefined,
+  backdrop: boolean | 'static' | undefined,
   submitButtonDisabled: boolean,
   formProps: object,
-  bsSize: 'lg'|'large'|'sm'|'small',
+  bsSize: 'lg' | 'large' | 'sm' | 'small',
   show: boolean,
   submitButtonText: string,
   onSubmitForm: (event) => void,
   onCancel: () => void,
-  title: string|React.ReactNode,
+  title: string | React.ReactNode,
   children: React.ReactNode,
 };
 
@@ -84,7 +83,6 @@ const BootstrapModalForm = ({
                            showModal={show}
                            backdrop={backdrop}
                            onHide={onCancel}
-                           data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
                            {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>

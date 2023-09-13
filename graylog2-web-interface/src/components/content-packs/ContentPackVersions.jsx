@@ -35,9 +35,12 @@ class ContentPackVersions extends React.Component {
   };
 
   static defaultProps = {
-    onChange: () => {},
-    onDeletePack: () => {},
-    onInstall: () => {},
+    onChange: () => {
+    },
+    onDeletePack: () => {
+    },
+    onInstall: () => {
+    },
   };
 
   constructor(props) {
@@ -80,7 +83,9 @@ class ContentPackVersions extends React.Component {
     const { openFunc, installModal } = this._installModal(pack);
     let downloadRef;
     const downloadModal = (
-      <ContentPackDownloadControl ref={(node) => { downloadRef = node; }}
+      <ContentPackDownloadControl ref={(node) => {
+        downloadRef = node;
+      }}
                                   contentPackId={pack.id}
                                   revision={pack.rev} />
     );
@@ -96,14 +101,22 @@ class ContentPackVersions extends React.Component {
         <td>{pack.rev}</td>
         <td className="text-right">
           <ButtonToolbar className="pull-right">
-            <Button bsStyle="success" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
+            <Button bsStyle="success"
+                    bsSize="small"
+                    onClick={() => {
+                      downloadRef.open();
+                    }}>Download
+            </Button>
             <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
               <MenuItem onClick={openFunc}>Install</MenuItem>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
                 <MenuItem>Create New From Revision</MenuItem>
               </LinkContainer>
               <MenuItem divider />
-              <MenuItem onClick={() => { onDeletePack(pack.id, pack.rev); }}>Delete</MenuItem>
+              <MenuItem onClick={() => {
+                onDeletePack(pack.id, pack.rev);
+              }}>Delete
+              </MenuItem>
               {installModal}
             </DropdownButton>
           </ButtonToolbar>
@@ -134,14 +147,14 @@ class ContentPackVersions extends React.Component {
     const modal = (
       <BootstrapModalWrapper showModal={this.state.showModal}
                              onHide={closeModal}
-                             bsSize="large"
-                             data-app-section="content_pack_versions"
-                             data-event-element="Install">
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Install</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ContentPackInstall ref={(node) => { installRef = node; }}
+          <ContentPackInstall ref={(node) => {
+            installRef = node;
+          }}
                               contentPack={item}
                               onInstall={onInstallProp} />
         </Modal.Body>
