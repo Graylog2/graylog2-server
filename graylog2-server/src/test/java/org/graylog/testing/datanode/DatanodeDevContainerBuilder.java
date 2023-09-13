@@ -29,7 +29,8 @@ public interface DatanodeDevContainerBuilder {
 
     DatanodeDevContainerBuilder restPort(int restPort);
 
-    DatanodeDevContainerBuilder openSearchPort(int openSearchPort);
+    DatanodeDevContainerBuilder openSearchHttpPort(int openSearchHttpPort);
+    DatanodeDevContainerBuilder openSearchTransportPort(int openSearchTransportPort);
 
     DatanodeDevContainerBuilder nodeName(String nodeName);
 

@@ -43,7 +43,8 @@ public class DatanodeContainerizedBackend {
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
     static public final String SIGNING_SECRET = ContainerizedGraylogBackend.PASSWORD_SECRET;
     public static final int DATANODE_REST_PORT = 8999;
-    public static final int DATANODE_OPENSEARCH_PORT = 9200;
+    public static final int DATANODE_OPENSEARCH_HTTP_PORT = 9200;
+    public static final int DATANODE_OPENSEARCH_TRANSPORT_PORT = 9300;
 
     private final Network network;
     private boolean shouldCloseNetwork = false;
@@ -88,15 +89,28 @@ public class DatanodeContainerizedBackend {
 
         return new DatanodeDevContainerBuilder()
                 .restPort(DATANODE_REST_PORT)
-                .openSearchPort(DATANODE_OPENSEARCH_PORT)
+                .openSearchHttpPort(DATANODE_OPENSEARCH_HTTP_PORT)
+                .openSearchTransportPort(DATANODE_OPENSEARCH_TRANSPORT_PORT)
                 .mongoDbUri(mongoDBTestService.internalUri())
                 .nodeName(nodeName)
                 .network(network)
+                .passwordSecret(ContainerizedGraylogBackend.PASSWORD_SECRET)
+                .rootPasswordSha2(ContainerizedGraylogBackend.ROOT_PASSWORD_SHA_2)
+                .customizer(customizer)
                 .build();
     }
 
     private NodeContainerConfig createConfig() {
-        return new NodeContainerConfig(this.network, mongoDBTestService.internalUri(), SIGNING_SECRET, "rootPasswordSha2", null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
+        return new NodeContainerConfig(this.network,
+                mongoDBTestService.internalUri(),
+                ContainerizedGraylogBackend.PASSWORD_SECRET,
+                ContainerizedGraylogBackend.ROOT_PASSWORD_SHA_2,
+                null,
+                null,
+                new int[]{},
+                new DefaultPluginJarsProvider(),
+                new DefaultMavenProjectDirProvider(),
+                Collections.emptyList());
     }
 
 
@@ -133,7 +147,10 @@ public class DatanodeContainerizedBackend {
 
 
     public Integer getOpensearchRestPort() {
-        return datanodeContainer.getMappedPort(DATANODE_OPENSEARCH_PORT);
+        return datanodeContainer.getMappedPort(DATANODE_OPENSEARCH_HTTP_PORT);
     }
 
+    public Integer getOpensearchTransportPort() {
+        return datanodeContainer.getMappedPort(DATANODE_OPENSEARCH_TRANSPORT_PORT);
+    }
 }

@@ -40,8 +40,9 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private String passwordSecret;
     private String rootPasswordSha2;
     private String mongoDbUri;
-    private int restPort;
-    private int openSearchPort;
+    private int restPort = 8999;
+    private int openSearchHttpPort = 9200;
+    private int openSearchTransportPort = 9300;
     private String nodeName;
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
@@ -73,8 +74,14 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     }
 
     @Override
-    public org.graylog.testing.datanode.DatanodeDevContainerBuilder openSearchPort(final int openSearchPort) {
-        this.openSearchPort = openSearchPort;
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder openSearchHttpPort(final int openSearchHttpPort) {
+        this.openSearchHttpPort = openSearchHttpPort;
+        return this;
+    }
+
+    @Override
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder openSearchTransportPort(final int openSearchTransportPort) {
+        this.openSearchTransportPort = openSearchTransportPort;
         return this;
     }
 
@@ -104,7 +111,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     public GenericContainer<?> build() {
         GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
-                .withExposedPorts(restPort, openSearchPort)
+                .withExposedPorts(restPort, openSearchHttpPort)
                 .withNetwork(network)
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
@@ -116,9 +123,9 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongoDbUri)
                 .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
 
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_HTTP_PORT", "" + openSearchPort)
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_TRANSPORT_PORT", "9300")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", "node1:9300")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_HTTP_PORT", "" + openSearchHttpPort)
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_TRANSPORT_PORT", "" + openSearchTransportPort)
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", openSearchTransportPort + ":" + nodeName)
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
 
@@ -174,7 +181,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
                 // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
                 // be later used by the ADD command
-                .withFileFromPath(opensearchTarArchive, Path.of("..", "data-node", "target", "downloads", opensearchTarArchive))
+                .withFileFromPath(opensearchTarArchive, downloadedOpensearch)
                 .withDockerfileFromBuilder(builder ->
                         builder.from("eclipse-temurin:17-jre-jammy")
                                 .workDir(IMAGE_WORKING_DIR)
@@ -189,7 +196,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                                 .run("useradd opensearch")
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
                                 .user("opensearch")
-                                .expose(DatanodeContainerizedBackend.DATANODE_REST_PORT, DatanodeContainerizedBackend.DATANODE_OPENSEARCH_PORT)
+                                .expose(DatanodeContainerizedBackend.DATANODE_REST_PORT, DatanodeContainerizedBackend.DATANODE_OPENSEARCH_HTTP_PORT)
                                 .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
                                 .build());
     }

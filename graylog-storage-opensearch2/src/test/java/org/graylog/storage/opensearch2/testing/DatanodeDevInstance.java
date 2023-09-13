@@ -61,33 +61,8 @@ public class DatanodeDevInstance extends OpenSearchInstance {
     public GenericContainer<?> buildContainer(String image, Network network) {
         var builder = DatanodeDevContainerInstanceProvider.getBuilderFor(this.version()).orElseThrow(() -> new UnsupportedOperationException("Can not build container for Search version " + this.version() + " - not supported."));
 
-        builder.passwordSecret(passwordSecret).rootPasswordSha2(rootPasswordSha2).network(network).mongoDbUri(mongoDBUri).restPort(8999).openSearchPort(9200).pathPrefix(Path.of("..", "data-node"));
+        builder.nodeName(HOSTNAME).passwordSecret(passwordSecret).rootPasswordSha2(rootPasswordSha2).network(network).mongoDbUri(mongoDBUri).restPort(8999).openSearchHttpPort(9200).openSearchTransportPort(9300).pathPrefix(Path.of("..", "data-node"));
 
         return builder.build();
-/*
-        return new GenericContainer<>(DockerImageName.parse(image))
-                .withImagePullPolicy(PullPolicy.alwaysPull())
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
-                .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
-                .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
-                .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", rootPasswordSha2)
-                .withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongoDBUri)
-                .withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true")
-                .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
-                .withExposedPorts(8999, 9200, 9300)
-                .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(
-                        Wait.forHttp("/_cluster/health")
-                                .forPort(OPENSEARCH_PORT)
-                                .forStatusCode(200)
-                                .forResponsePredicate(s -> {
-                                    LOG.info("Response while waiting: {}", s);
-                                    // allow yellow for fixing indices later
-                                    return s.contains("\"status\":\"green\"") || s.contains("\"status\":\"yellow\"");
-                                })
-                                .withStartupTimeout(java.time.Duration.ofSeconds(180))
-                ); */
     }
 }
