@@ -43,9 +43,6 @@ public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
             .put("binary", new TypeDescription("Binary Data", FieldTypeMapper.BINARY_TYPE))
             .put("geo-point", new TypeDescription("Geo Point", FieldTypeMapper.GEO_POINT_TYPE))
             .put("ip", new TypeDescription("IP", FieldTypeMapper.IP_TYPE))
-            .put("streams", new TypeDescription("Streams", FieldTypeMapper.STREAMS_TYPE))
-            .put("input", new TypeDescription("Input", FieldTypeMapper.INPUT_TYPE))
-            .put("node", new TypeDescription("Node", FieldTypeMapper.NODE_TYPE))
             .build();
 
     public static final Map<FieldTypes.Type, String> REVERSE_TYPES = AVAILABLE_TYPES.entrySet()
