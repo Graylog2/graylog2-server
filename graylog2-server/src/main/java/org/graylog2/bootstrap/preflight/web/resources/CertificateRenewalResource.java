@@ -59,22 +59,24 @@ public class CertificateRenewalResource implements PluginRestResource {
         this.nodeService = nodeService;
     }
 
-    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId, String cert) {}
+    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId, String certValidUntil) {}
 
     @GET
     // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
     public List<DataNode> listDataNodes() {
         // Nodes are not filtered right now so that you can manually initiate a renewal for every node available
-        return certRenewalService.findNodesAndCertificates().stream().map(pair -> {
-            final var n = pair.getKey();
-            final var cert = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(pair.getValue().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        return certRenewalService.findNodes().stream().map(triple -> {
+            final var n = triple.getLeft();
+            final var certValidUntil = triple.getRight() != null ? DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(triple.getRight().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()) : null;
             return new DataNode(n.getNodeId(),
                     n.getType(),
                     transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
-                    null, null,
+                    triple.getMiddle().state(),
+                    triple.getMiddle().errorMsg(),
                     n.getHostname(),
-                    n.getShortNodeId(), cert);
+                    n.getShortNodeId(),
+                    certValidUntil);
         }).toList();
     }
 

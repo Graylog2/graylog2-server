@@ -18,6 +18,7 @@ package org.graylog.security.certutil;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -169,29 +170,28 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         try {
             return Pair.of(node, keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret).orElse(null));
         } catch (KeyStoreStorageException e) {
-            LOG.error("Could not read keystore for DataNode: {}", e.getMessage());
-            return null;
+            return Pair.of(node, null);
         }
     }
 
     private Pair<Node, X509Certificate> getCertificateForNode(Pair<Node, KeyStore> pair) {
+        if(pair.getRight() == null) {
+            return Pair.of(pair.getLeft(), null);
+        }
+
         try {
             return Pair.of(pair.getLeft(), (X509Certificate)pair.getRight().getCertificate(CertConstants.DATANODE_KEY_ALIAS));
         } catch (KeyStoreException e) {
-            LOG.error("Could not read certificate for DataNode: {}", e.getMessage());
-            return null;
+            return Pair.of(pair.getLeft(), null);
         }
     }
 
-    @Override
-    public List<Pair<Node, X509Certificate>> findNodesAndCertificates() {
+    private List<Pair<Node, X509Certificate>> findNodesAndCertificates() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         return activeDataNodes.values().stream()
                 .map(this::loadKeyStoreForNode)
-                .filter(Objects::nonNull)
-                .filter(p -> p.getRight() != null)
                 .map(this::getCertificateForNode)
-                .filter(Objects::nonNull)
+                .filter(p -> p.getRight() != null)
                 .toList();
     }
 
@@ -207,6 +207,20 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
         var config = dataNodeProvisioningService.getPreflightConfigFor(nodeId);
         dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
+    }
+
+    @Override
+    public List<Triple<Node, DataNodeProvisioningConfig, X509Certificate>> findNodes() {
+        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        return activeDataNodes.values().stream()
+                .map(this::loadKeyStoreForNode)
+                .map(this::getCertificateForNode)
+                .map(this::addDataNodeProvisioningConfig)
+                .toList();
+    }
+
+    private Triple<Node, DataNodeProvisioningConfig, X509Certificate> addDataNodeProvisioningConfig(Pair<Node, X509Certificate> pair) {
+        return Triple.of(pair.getKey(), dataNodeProvisioningService.getPreflightConfigFor(pair.getKey().getNodeId()), pair.getValue());
     }
 
     private void notifyManualRenewalForNode(final List<Node> nodes) {

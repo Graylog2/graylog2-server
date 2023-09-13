@@ -17,7 +17,9 @@
 package org.graylog.security.certutil;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.graylog2.cluster.Node;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -25,5 +27,5 @@ import java.util.List;
 public interface CertRenewalService {
     void checkCertificatesForRenewal();
     void initiateRenewalForNode(String nodeId);
-    List<Pair<Node, X509Certificate>> findNodesAndCertificates();
+    List<Triple<Node, DataNodeProvisioningConfig, X509Certificate>> findNodes();
 }
