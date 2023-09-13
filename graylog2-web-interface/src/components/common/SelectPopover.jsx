@@ -195,15 +195,15 @@ class SelectPopover extends React.Component {
       <Popover id={id}
                title={title}
                placement={placement}
-               className={style.customPopover}
-               data-event-element={title}>
+               className={style.customPopover}>
         {displayDataFilter && this.renderDataFilter(items)}
         {selectedItems.length > 0 && this.renderClearSelectionItem()}
         <IsolatedScroll className={style.scrollableList}>
           <ListGroup>
             {filteredItems.map((item) => (
               <ListGroupItem key={item}
-                             onClick={disabled ? () => {} : this.handleItemSelection(item)}
+                             onClick={disabled ? () => {
+                             } : this.handleItemSelection(item)}
                              active={selectedItems.includes(item)}
                              disabled={disabled}>
                 {itemFormatter(item)}
@@ -215,7 +215,9 @@ class SelectPopover extends React.Component {
     );
 
     return (
-      <OverlayTrigger ref={(c) => { this.overlay = c; }}
+      <OverlayTrigger ref={(c) => {
+        this.overlay = c;
+      }}
                       trigger={triggerAction}
                       placement={placement}
                       overlay={popover}

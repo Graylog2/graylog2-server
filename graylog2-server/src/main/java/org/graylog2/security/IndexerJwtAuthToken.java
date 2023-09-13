@@ -14,10 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.security;
 
-import { singleton } from 'logic/singleton';
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-const ThemeModeContext = React.createContext<{} | undefined>(undefined);
-
-export default singleton('contexts.ThemeModeContext', () => ThemeModeContext);
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER, ElementType.TYPE })
+@Qualifier
+public @interface IndexerJwtAuthToken {
+}

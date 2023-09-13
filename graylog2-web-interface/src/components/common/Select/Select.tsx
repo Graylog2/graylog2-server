@@ -23,7 +23,6 @@ import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
 
-import { themePropTypes } from 'theme';
 import CustomMenuList from 'components/common/Select/CustomMenuList';
 import Icon from 'components/common/Icon';
 import { INPUT_BORDER_RADIUS } from 'theme/constants';
@@ -349,7 +348,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     /** Size of the select input. */
     size: PropTypes.oneOf(['normal', 'small']),
     /** @ignore */
-    theme: themePropTypes.isRequired,
+    theme: PropTypes.object.isRequired,
     /**
      * Value which can be the selected option or the value of the selected option.
      * If `multi` is enabled, it must be a string containing all values separated by the `delimiter`.

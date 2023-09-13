@@ -14,16 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PropTypeBreakpoints, PropTypeColors, PropTypeFonts, PropTypeSpacings, PropTypeUtils } from '@graylog/sawmill';
-import PropTypes from 'prop-types';
+import type { ColorScheme, ThemeBaseColors } from '@graylog/sawmill';
+import type { DeepPartial } from 'utility-types';
 
-export type ColorVariants = 'danger' | 'default' | 'info' | 'primary' | 'success' | 'warning';
-const ThemePropTypes = PropTypes.shape({
-  breakpoints: PropTypeBreakpoints,
-  colors: PropTypeColors,
-  fonts: PropTypeFonts,
-  utils: PropTypeUtils,
-  spacings: PropTypeSpacings,
-});
-
-export default ThemePropTypes;
+export type ThemesColors = Record<ColorScheme, DeepPartial<ThemeBaseColors>>
