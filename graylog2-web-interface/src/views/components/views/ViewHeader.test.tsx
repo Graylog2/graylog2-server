@@ -16,12 +16,23 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import OriginalViewHeader from 'views/components/views/ViewHeader';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import { createSearch } from 'fixtures/searches';
 import View from 'views/logic/views/View';
+import onSaveView from 'views/logic/views/OnSaveViewAction';
+import { updateView } from 'views/logic/slices/viewSlice';
+import asMock from 'helpers/mocking/AsMock';
+
+jest.mock('views/logic/views/OnSaveViewAction');
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  updateView: jest.fn(),
+}));
 
 const view = createSearch()
   .toBuilder()
@@ -37,6 +48,11 @@ const ViewHeader = () => (
 );
 
 describe('ViewHeader', () => {
+  beforeEach(() => {
+    asMock(onSaveView).mockReturnValue(async () => {});
+    asMock(updateView).mockReturnValue(async () => {});
+  });
+
   beforeAll(loadViewsPlugin);
 
   afterAll(unloadViewsPlugin);
@@ -48,12 +64,21 @@ describe('ViewHeader', () => {
     await screen.findByText('Some view');
   });
 
-  it('Show edit modal on click', async () => {
+  it('Updates view with new title', async () => {
     render(<ViewHeader />);
 
     const editButton = await screen.findByTitle('Edit dashboard Some view metadata');
 
     fireEvent.click(editButton);
     await screen.findByText('Editing saved dashboard', { exact: false });
+
+    const titleInput = await screen.findByRole('textbox', { name: /title/i, hidden: true });
+    await userEvent.type(titleInput, ' updated');
+
+    const saveButton = await screen.findByRole('button', { name: /save dashboard/i, hidden: true });
+    await userEvent.click(saveButton);
+
+    expect(onSaveView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));
+    expect(updateView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));
   });
 });
