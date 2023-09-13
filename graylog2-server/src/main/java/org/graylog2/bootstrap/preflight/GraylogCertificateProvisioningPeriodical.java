@@ -16,9 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import com.google.common.base.Splitter;
 import okhttp3.Call;
-import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -39,6 +37,7 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
+import org.graylog2.security.IndexerJwtAuthToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +47,6 @@ import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -59,8 +56,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
@@ -78,6 +73,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final String passwordSecret;
     private final ClusterEventBus clusterEventBus;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
+    private final String jwtBearerToken;
 
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
@@ -88,7 +84,9 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final NodeService nodeService,
                                                     final CsrSigner csrSigner,
                                                     final ClusterConfigService clusterConfigService,
-                                                    final @Named("password_secret") String passwordSecret, ClusterEventBus clusterEventBus) {
+                                                    final @Named("password_secret") String passwordSecret,
+                                                    @IndexerJwtAuthToken String jwtBearerToken,
+                                                    ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -99,10 +97,11 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = clusterEventBus;
+        this.jwtBearerToken = jwtBearerToken;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
-    private Optional<OkHttpClient> buildTempHttpClient() {
+    private Optional<OkHttpClient> buildConnectivityCheckOkHttpClient() {
         try {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             try {
@@ -147,7 +146,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 }
 
                 if (okHttpClient.isEmpty()) {
-                    okHttpClient = buildTempHttpClient();
+                    okHttpClient = buildConnectivityCheckOkHttpClient();
                 }
 
                 KeyStore caKeystore = optKey.get();
@@ -203,18 +202,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         Request request = new Request.Builder().url(node.getTransportAddress()).build();
         if(okHttpClient.isPresent()) {
             OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
-            try {
-                URI uri = new URI(node.getTransportAddress());
-                if (!isNullOrEmpty(uri.getUserInfo())) {
-                    var list = Splitter.on(":").limit(2).splitToList(uri.getUserInfo());
-                    builder.authenticator((route, response) -> {
-                        String credential = Credentials.basic(list.get(0), list.get(1));
-                        return response.request().newBuilder().header("Authorization", credential).build();
-                    });
-                }
-            } catch (URISyntaxException ex) {
-                return false;
-            }
+            builder.authenticator((route, response) -> response.request().newBuilder().header("Authorization", jwtBearerToken).build());
             Call call = builder.build().newCall(request);
             try(Response response = call.execute()) {
                 return response.isSuccessful();

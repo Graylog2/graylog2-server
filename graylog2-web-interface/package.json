@@ -48,7 +48,6 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@graylog/sawmill": "^2.0.0",
     "@mantine/core": "^6.0.4",
     "@mantine/dropzone": "^6.0.10",
     "@mantine/hooks": "^6.0.4",
@@ -61,7 +60,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "@tanstack/query-sync-storage-persister": "^4.33.0",
     "@tanstack/react-query-persist-client": "^4.33.0",
-    "ace-builds": "1.24.1",
+    "ace-builds": "1.24.2",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
     "buffer": "^6.0.3",
@@ -79,7 +78,7 @@
     "intersection-observer": "^0.12.0",
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
-    "marked": "^8.0.0",
+    "marked": "^9.0.0",
     "md5": "^2.2.1",
     "moment-duration-format": "2.3.2",
     "moment-precise-range-plugin": "^1.3.0",
@@ -181,6 +180,7 @@
     "webpack-merge": "^4.2.2"
   },
   "resolutions": {
+    "@types/react": "18.0.28",
     "immer": "9.0.6",
     "nth-check": "2.0.1",
     "glob-parent": "5.1.2",
