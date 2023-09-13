@@ -37,6 +37,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -59,7 +60,7 @@ public class CertificateRenewalResource implements PluginRestResource {
         this.nodeService = nodeService;
     }
 
-    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId, String certValidUntil) {}
+    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId, LocalDateTime certValidUntil) {}
 
     @GET
     // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
@@ -68,7 +69,7 @@ public class CertificateRenewalResource implements PluginRestResource {
         // Nodes are not filtered right now so that you can manually initiate a renewal for every node available
         return certRenewalService.findNodes().stream().map(triple -> {
             final var n = triple.getLeft();
-            final var certValidUntil = triple.getRight() != null ? DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(triple.getRight().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()) : null;
+            final var certValidUntil = triple.getRight().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
             return new DataNode(n.getNodeId(),
                     n.getType(),
                     transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
