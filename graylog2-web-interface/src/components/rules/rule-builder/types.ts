@@ -48,6 +48,7 @@ export interface RuleBlock extends ObjectWithErrors {
 
 export interface RuleBuilderType extends ObjectWithErrors {
   errors?: Array<string>,
+  operator?: 'AND'|'OR',
   conditions: Array<RuleBlock>,
   actions: Array<RuleBlock>
 }

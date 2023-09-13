@@ -20,7 +20,7 @@ import ObjectID from 'bson-objectid';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import { Row, Col, Button, Panel } from 'components/bootstrap';
+import { Row, Col, Button, Panel, Radio } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 import { ConfirmDialog, FormSubmit } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -52,8 +52,18 @@ const StyledPanel = styled(Panel)`
 `;
 
 const StyledPanelHeading = styled(Panel.Heading)`
+  display: flex;
+  justify-content: space-between;
   background-color: #f5f5f5 !important;
   border: 0;
+`;
+
+const WhenOperator = styled.div`
+  display: flex;
+
+  .radio {
+    margin: 0px 8px;
+  }
 `;
 
 const StyledPanelBody = styled(Panel.Body)`
@@ -86,7 +96,7 @@ const RuleBuilder = () => {
   const [rule, setRule] = useState<RuleBuilderRule>({
     description: '',
     title: '',
-    rule_builder: { conditions: [], actions: [] },
+    rule_builder: { operator: 'AND', conditions: [], actions: [] },
   });
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
@@ -131,8 +141,21 @@ const RuleBuilder = () => {
     }
   }).catch(() => setRule(ruleToValidate));
 
+  const updateWhenOperator = async (operator: 'AND'|'OR') => {
+    const newOperatorRule: RuleBuilderRule = {
+      ...rule,
+      rule_builder: {
+        ...rule.rule_builder,
+        operator,
+      },
+    };
+
+    await validateAndSaveRuleBuilder(newOperatorRule);
+    await simulateRule(rawMessageToSimulate, newOperatorRule);
+  };
+
   const addBlock = async (type: BlockType, block: RuleBlock, orderIndex?: number) => {
-    let ruleToAdd;
+    let ruleToAdd: RuleBuilderRule;
     const blockId = new ObjectID().toString();
 
     if (type === 'condition') {
@@ -165,7 +188,7 @@ const RuleBuilder = () => {
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
-    let ruleToUpdate;
+    let ruleToUpdate: RuleBuilderRule;
 
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
@@ -196,7 +219,7 @@ const RuleBuilder = () => {
   };
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
-    let ruleToDelete;
+    let ruleToDelete: RuleBuilderRule;
 
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
@@ -293,9 +316,19 @@ const RuleBuilder = () => {
               <Col xs={8}>
                 <StyledPanel expanded={conditionsExpanded}>
                   <StyledPanelHeading>
-                    <Panel.Title toggle title="The logical AND operator is used here to combine the conditions">
-                      When (and)
+                    <Panel.Title toggle>
+                      When
                     </Panel.Title>
+                    <WhenOperator>
+                      <Radio checked={rule.rule_builder.operator === 'AND'}
+                             onChange={() => updateWhenOperator('AND')}>
+                        and
+                      </Radio>
+                      <Radio checked={rule.rule_builder.operator === 'OR'}
+                             onChange={() => updateWhenOperator('OR')}>
+                        or
+                      </Radio>
+                    </WhenOperator>
                   </StyledPanelHeading>
                   <Panel.Collapse>
                     <StyledPanelBody>
