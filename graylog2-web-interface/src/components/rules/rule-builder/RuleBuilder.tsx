@@ -30,8 +30,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import RuleBuilderProvider from './RuleBuilderProvider';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
-import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
-import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
+import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule } from './types';
+import { RuleBuilderTypes } from './types';
 import {
   getDictForFunction,
 } from './helpers';
@@ -120,7 +120,7 @@ const RuleBuilder = () => {
     const blockDict = getDictForFunction(actionsDict, block.function);
 
     if (
-      (RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict?.return_type)
+      blockDict?.return_type !== RuleBuilderTypes.Void
       && !newBlock.outputvariable
     ) {
       newBlock.outputvariable = `output_${outputIndex}`;

@@ -95,26 +95,10 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
 
   const readableReturnType = (_type: RuleBuilderTypes): string | undefined => {
     switch (_type) {
-      case RuleBuilderTypes.Boolean:
-        return 'boolean';
-      case RuleBuilderTypes.Message:
-        return 'message';
       case RuleBuilderTypes.Number:
-        return 'number';
-      case RuleBuilderTypes.Object:
-        return 'object';
-      case RuleBuilderTypes.String:
-        return 'string';
-      case RuleBuilderTypes.Void:
-        return 'void';
-      case RuleBuilderTypes.DateTime:
-        return 'date_time';
-      case RuleBuilderTypes.DateTimeZone:
-        return 'date_time_zone';
-      case RuleBuilderTypes.DateTimeFormatter:
-        return 'date_time_formatter';
+        return 'Number';
       default:
-        return undefined;
+        return _type?.slice((_type?.lastIndexOf('.') || 0) + 1);
     }
   };
 
