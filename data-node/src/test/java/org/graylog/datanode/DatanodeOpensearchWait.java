@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLHandshakeException;
 import java.net.SocketException;
 import java.security.KeyStore;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -46,13 +48,12 @@ import java.util.function.Predicate;
 
 public class DatanodeOpensearchWait {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeOpensearchWait.class);
     private static final int ATTEMPTS_COUNT = 160;
 
     private final int opensearchPort;
     private KeyStore truststore;
-    private String username;
-    private String password;
+    private String jwtToken;
     private String lastRecordedResponse;
 
     private DatanodeOpensearchWait(int opensearchPort) {
@@ -68,9 +69,8 @@ public class DatanodeOpensearchWait {
         return this;
     }
 
-    public DatanodeOpensearchWait withBasicAuth(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public DatanodeOpensearchWait withJwtAuth(String jwtToken) {
+        this.jwtToken = jwtToken;
         return this;
     }
 
@@ -90,6 +90,11 @@ public class DatanodeOpensearchWait {
 
     @SafeVarargs
     private ValidatableResponse waitForOpensearch(Predicate<ValidatableResponse>... predicates) throws ExecutionException, RetryException {
+
+        if(LOG.isInfoEnabled()) {
+            LOG.info("cURL request: " + formatCurlConnectionInfo());
+        }
+
         //noinspection UnstableApiUsage
         final RetryerBuilder<ValidatableResponse> builder = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
@@ -122,8 +127,8 @@ public class DatanodeOpensearchWait {
 
                 Optional.ofNullable(truststore).ifPresent(ts -> req.trustStore(truststore));
 
-                if (username != null && password != null) {
-                    req.auth().basic(username, password);
+                if (jwtToken != null) {
+                    req.header( "Authorization", "Bearer " + jwtToken);
                 }
 
                 return req.get(formatClusterHeathUrl())
@@ -138,6 +143,16 @@ public class DatanodeOpensearchWait {
         }
     }
 
+    private String formatCurlConnectionInfo() {
+        List<String> builder = new LinkedList<>();
+        builder.add("curl -k"); // trust self-signed certs
+        if(jwtToken != null) {
+            builder.add("-H \"Authorization: Bearer " + jwtToken + "\"");
+        }
+        builder.add(formatClusterHeathUrl());
+        return String.join(" ", builder);
+    }
+
     private void printShardsInfo() {
         try {
             final RequestSpecification req = RestAssured.given()
@@ -145,8 +160,8 @@ public class DatanodeOpensearchWait {
 
             Optional.ofNullable(truststore).ifPresent(ts -> req.trustStore(truststore));
 
-            if (username != null && password != null) {
-                req.auth().basic(username, password);
+            if (jwtToken != null) {
+                req.header( "Authorization", "Bearer " + jwtToken);
             }
 
             final String shardsResponse = req.get("https://localhost:" + opensearchPort + "/_cat/shards?v=true&h=index,shard,prirep,state,node,unassigned.reason&s=state")

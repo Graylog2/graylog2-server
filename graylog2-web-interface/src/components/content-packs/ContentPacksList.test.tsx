@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount, shallow } from 'wrappedEnzyme';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import 'helpers/mocking/react-dom_mock';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
 describe('<ContentPacksList />', () => {
   const contentPacks = [
-    { id: '1', rev: 1, title: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles', version: '1.0' },
+    { id: '1', rev: 1, title: 'UFW Grok Patterns', summary: 'Content Pack: Grok Patterns to extract informations from UFW logfiles', version: '1.0' },
     { id: '2', rev: 1, title: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', version: '2.1' },
     { id: '3', rev: 1, title: 'Backup Content Pack', summary: '', version: '3.0' },
     { id: '4', rev: 1, title: 'SSH Archive', summary: 'A crypted backup over ssh.', version: '3.4' },
@@ -39,47 +39,41 @@ describe('<ContentPacksList />', () => {
     { id: '15', rev: 1, title: 'FTP Backup', summary: 'Fast but insecure backup', version: '1.0' },
   ];
 
-  it('should render with empty content packs', () => {
-    const wrapper = mount(<ContentPacksList contentPacks={[]} />);
+  it('should render with empty content packs', async () => {
+    render(<ContentPacksList contentPacks={[]} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('No content packs found. Please create or upload one');
   });
 
-  it('should render with content packs', () => {
+  it('should render with content packs', async () => {
     const metadata = {
       1: { 1: { installation_count: 1 } },
       2: { 5: { installation_count: 2 } },
     };
-    const wrapper = mount(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
+    render(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Content Pack: Grok Patterns to extract informations from UFW logfiles');
   });
 
-  it('should do pagination', () => {
-    const NEXT_PAGE = 2;
-    const wrapper = shallow(<ContentPacksList contentPacks={contentPacks} />);
-    const onChangePageSpy = jest.spyOn(wrapper.instance(), '_onChangePage');
-    const beforeFilter = wrapper.find('.content-packs-summary').length;
+  it('should do pagination', async () => {
+    render(<ContentPacksList contentPacks={contentPacks} />);
 
-    expect(beforeFilter).toBe(10);
+    expect(await screen.findAllByText(/Latest Version:/)).toHaveLength(10);
 
-    wrapper.instance()._onChangePage(NEXT_PAGE);
+    userEvent.click((await screen.findAllByRole('button', { name: /open page 2/i }))[0]);
 
-    const afterFilter = wrapper.find('.content-packs-summary').length;
+    const activePage = (await screen.findAllByTitle('Active page'))[0];
 
-    expect(onChangePageSpy).toHaveBeenCalledWith(NEXT_PAGE);
-    expect(afterFilter).toBe(5);
+    expect(within(activePage).getByText(2)).toBeInTheDocument();
+    expect(await screen.findAllByText(/Latest Version:/)).toHaveLength(5);
   });
 
-  it('should delete a content pack', () => {
-    const deleteFn = jest.fn((token) => {
-      expect(token).toEqual('1');
-    });
-    const wrapper = mount(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
+  it('should delete a content pack', async () => {
+    const deleteFn = jest.fn();
+    render(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
 
-    const menuItem = wrapper.findWhere((node) => node.type() === 'a' && node.text() === 'Delete All Versions').at(0);
-    menuItem.simulate('click');
+    userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
 
-    expect(deleteFn.mock.calls.length).toBe(1);
+    expect(deleteFn).toHaveBeenCalledTimes(1);
   });
 });

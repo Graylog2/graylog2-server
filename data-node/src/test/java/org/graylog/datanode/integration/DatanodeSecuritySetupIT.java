@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.integration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
@@ -28,6 +29,7 @@ import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.shared.utilities.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -86,6 +89,7 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");
             datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", transportCert.passwordAsString());
             datanodeContainer.withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "false");
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
 
             // configure http security
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE", "datanode-https-certificates.p12");
@@ -115,24 +119,24 @@ public class DatanodeSecuritySetupIT {
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
+        final String jwtAuthToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), backend.getOpensearchRestPort(), trustStore);
 
         try {
-            given()
-                .auth().basic(httpUsername, httpPassword)
-                .trustStore(trustStore)
-                .get("https://localhost:" + backend.getOpensearchRestPort())
-                .then().assertThat()
-                .body("name", Matchers.equalTo(containerHostname))
-                .body("cluster_name", Matchers.equalTo("datanode-cluster"));
+            given().header( "Authorization", "Bearer " + jwtAuthToken)
+                    .trustStore(trustStore)
+                    .get("https://localhost:" + backend.getOpensearchRestPort())
+                    .then().assertThat()
+                    .body("name", Matchers.equalTo(containerHostname))
+                    .body("cluster_name", Matchers.equalTo("datanode-cluster"));
         } catch (Exception ex) {
             LOG.error("Error connecting to OpenSearch in the DataNode, showing logs:\n{}", backend.getLogs());
             throw ex;
         }
     }
 
-    private void waitForOpensearchAvailableStatus(Integer datanodeRestPort, KeyStore trustStore) throws ExecutionException, RetryException {
+    private void waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final Integer opensearchPort, final KeyStore trustStore) throws ExecutionException, RetryException {
         final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
@@ -145,11 +149,13 @@ public class DatanodeSecuritySetupIT {
 
         try {
             var hostname = Tools.getLocalCanonicalHostname();
-            var url = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
-            LOG.info("Trying to connect to: {}", url);
+            var rest = StringUtils.f("https://%s:%d", hostname, datanodeRestPort);
+            var os = StringUtils.f("https://%s:%d", hostname, opensearchPort);
+            LOG.info("Trying to connect to REST API at: {}, OpenSearch is at: {}", rest, os);
             retryer.call(() -> RestAssured.given()
+                    .auth().basic(httpUsername, httpPassword)
                     .trustStore(trustStore)
-                    .get(url)
+                    .get(rest)
                     .then());
         } catch (Exception ex) {
             LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
