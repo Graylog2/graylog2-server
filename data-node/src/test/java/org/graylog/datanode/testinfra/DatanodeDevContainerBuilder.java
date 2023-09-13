@@ -174,7 +174,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         return new ImageFromDockerfile("local/graylog-datanode:latest", false)
                 // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
                 // be later used by the ADD command
-                .withFileFromPath(opensearchTarArchive, Path.of("target", "downloads", opensearchTarArchive))
+                .withFileFromPath(opensearchTarArchive, Path.of("..", "data-node", "target", "downloads", opensearchTarArchive))
                 .withDockerfileFromBuilder(builder ->
                         builder.from("eclipse-temurin:17-jre-jammy")
                                 .workDir(IMAGE_WORKING_DIR)
