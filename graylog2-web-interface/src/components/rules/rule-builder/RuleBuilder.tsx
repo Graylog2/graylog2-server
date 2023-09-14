@@ -88,7 +88,6 @@ const RuleBuilder = () => {
   } = useRuleBuilder();
 
   const {
-    rawMessageToSimulate,
     simulateRule,
     setRuleSimulationResult,
   } = useContext(PipelineRulesContext);
@@ -108,8 +107,9 @@ const RuleBuilder = () => {
     if (initialRule) {
       setRule(initialRule);
       setLastOutputIndex(getLastOutputIndexFromRule(initialRule));
+      simulateRule(initialRule);
     }
-  }, [initialRule]);
+  }, [initialRule, simulateRule]);
 
   const history = useHistory();
   const { pathname } = useLocation();
@@ -160,7 +160,7 @@ const RuleBuilder = () => {
     };
 
     await validateAndSaveRuleBuilder(newOperatorRule);
-    await simulateRule(rawMessageToSimulate, newOperatorRule);
+    await simulateRule(newOperatorRule);
   };
 
   const addBlock = async (type: BlockType, block: RuleBlock, orderIndex?: number) => {
@@ -193,7 +193,7 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToAdd);
-    await simulateRule(rawMessageToSimulate, ruleToAdd);
+    await simulateRule(ruleToAdd);
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
@@ -224,7 +224,7 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToUpdate);
-    await simulateRule(rawMessageToSimulate, ruleToUpdate);
+    await simulateRule(ruleToUpdate);
   };
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
@@ -253,7 +253,7 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToDelete);
-    await simulateRule(rawMessageToSimulate, ruleToDelete);
+    await simulateRule(ruleToDelete);
   };
 
   const handleCancel = () => {

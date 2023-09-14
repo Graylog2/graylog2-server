@@ -109,10 +109,10 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     }
   };
 
-  const simulateRule = useCallback((messageString: string, _rule: RuleType, callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult) => {
+  const simulateRule = useCallback((_rule: RuleType, messageString: string = rawMessageToSimulate, callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult) => {
     const messageToSimulate = jsonifyText(messageString);
     RulesActions.simulate(messageToSimulate, _rule, callback);
-  }, []);
+  }, [rawMessageToSimulate, setRuleSimulationResult]);
 
   useEffect(() => {
     if (ruleSourceRef?.current) {

@@ -93,8 +93,8 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
     onSaveMessage(rawMessageToSimulate);
 
     simulateRule(
-      rawMessageToSimulate,
       currentRule || rule,
+      rawMessageToSimulate,
       setRuleSimulationResult,
     );
   };
