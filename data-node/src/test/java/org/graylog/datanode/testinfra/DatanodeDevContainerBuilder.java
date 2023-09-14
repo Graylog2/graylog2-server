@@ -20,7 +20,8 @@ import com.google.common.base.Suppliers;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.testing.PropertyLoader;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
-import org.graylog.testing.graylognode.MavenPackager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
@@ -38,6 +39,7 @@ import java.util.function.Supplier;
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 
 public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode.DatanodeDevContainerBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevContainerBuilder.class);
     private static final Supplier<ImageFromDockerfile> imageSupplier = Suppliers.memoize(DatanodeDevContainerBuilder::createImage);
 
     private String passwordSecret;
@@ -117,7 +119,19 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     public GenericContainer<?> build() {
         final Path graylog = getPath().resolve("graylog-datanode-" + getDatanodeVersion() + ".jar");
         if(!Files.exists(graylog)) {
-            throw new RuntimeException("Failed to link graylog-datanode.jar to the datanode docker image, path " + graylog.toAbsolutePath() + " does not exist!");
+            LOG.info("Searching for {} failed.", graylog.toAbsolutePath());
+            LOG.info("Project repos path: {}, absolute path: {}", getProjectReposPath(), getProjectReposPath().toAbsolutePath());
+            if(Files.exists(getPath())) {
+                LOG.info("contents of base path {}:", getPath());
+                try(var files = Files.list(getPath())) {
+                    files.forEach(file -> LOG.info("{}", file.toString()));
+                } catch (IOException ex) {
+                    LOG.info("listing files failed with exception: {}", ex.getMessage());
+                }
+            } else {
+                LOG.info("Base path {} does not exist.", getPath());
+            }
+            throw new RuntimeException("Failed to link graylog-datanode.jar to the datanode docker image, path " + graylog.toAbsolutePath() + " does not exist! Basepath, it was resolved from is: " + getProjectReposPath());
         }
 
         GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
