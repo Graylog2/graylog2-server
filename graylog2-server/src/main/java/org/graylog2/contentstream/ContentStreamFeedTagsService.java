@@ -14,29 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.enterprise;
+package org.graylog2.contentstream;
 
-import org.graylog2.database.MongoConnection;
+import org.graylog.enterprise.EnterpriseService;
 
 import javax.inject.Inject;
+import java.util.List;
 
-public class EnterpriseService {
-    private final MongoConnection mongoConnection;
+public class ContentStreamFeedTagsService implements ContentStreamFeedTags {
+    private final EnterpriseService enterpriseService;
 
     @Inject
-    public EnterpriseService(MongoConnection mongoConnection) {
-        this.mongoConnection = mongoConnection;
+    public ContentStreamFeedTagsService(EnterpriseService enterpriseService) {
+        this.enterpriseService = enterpriseService;
     }
 
-
-    public boolean hasLicenseInstalled() {
-        return mongoConnection.getMongoDatabase().getCollection("licenses").countDocuments() > 0;
-    }
-
-    public EnterpriseLicenseInfo licenseInfo() {
-        if (hasLicenseInstalled()) {
-            return EnterpriseLicenseInfo.installed();
+    @Override
+    public List<String> getTags() {
+        if (enterpriseService.hasLicenseInstalled()) {
+            return List.of(FeedTags.ENTERPRISE.toString());
+        } else {
+            return List.of(FeedTags.OPEN.toString());
         }
-        return EnterpriseLicenseInfo.absent();
     }
 }
