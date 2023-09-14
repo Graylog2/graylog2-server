@@ -22,19 +22,26 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.graylog2.configuration.ConfigurationHelper.DEFAULT_PATH_DIR;
+import static org.graylog2.configuration.ConfigurationHelper.DATA_DIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class PathConfigurationTest {
 
+    public static final String BIN_PATH = "bin";
+    public static final String PLUGINS_PATH = "plugins";
+
     @Test
     public void testBaseConfiguration() throws ValidationException, RepositoryException {
-        PathConfiguration configuration = ConfigurationHelper.initPathConfig(new PathConfiguration());
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put("bin_dir", BIN_PATH);
+        properties.put("plugin_dir", PLUGINS_PATH);
+        PathConfiguration configuration = ConfigurationHelper.initPathConfig(new PathConfiguration(), properties);
 
-        assertEquals(DEFAULT_PATH_DIR, configuration.getBinDir());
-        assertEquals(DEFAULT_PATH_DIR, configuration.getDataDir());
-        assertEquals(DEFAULT_PATH_DIR, configuration.getPluginDir());
+
+        assertEquals(BIN_PATH, configuration.getBinDir().toString());
+        assertEquals(DATA_DIR, configuration.getDataDir());
+        assertEquals(PLUGINS_PATH, configuration.getPluginDir().toString());
         assertTrue(configuration.getAllowedAuxiliaryPaths().isEmpty());
     }
 

@@ -4,8 +4,7 @@ Upgrading to Graylog 5.2.x
 ## New Functionality
 
 ## Breaking Changes
-- Default values for `bin_dir`, `data_dir` and `plugin_dir` configuration options have been removed and must be
-  specified in `graylog.conf`
+- Default value for `data_dir` configuration option has been removed and must be specified in `graylog.conf`
 
 ## Deprecation and Change in Functionality of GreyNoise Data Adapters
 

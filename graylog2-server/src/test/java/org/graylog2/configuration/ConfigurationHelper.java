@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationHelper {
-    public final static Path DEFAULT_PATH_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+    public final static Path DATA_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
 
     public static <T extends PathConfiguration> T initPathConfig(T config) throws ValidationException, RepositoryException {
         return initPathConfig(config, new HashMap<>());
@@ -49,9 +49,7 @@ public class ConfigurationHelper {
 
     public static <T extends PathConfiguration> T initPathConfig(T config, Map<String, String> properties) throws RepositoryException, ValidationException {
         Map<String, String> props = new HashMap<>();
-        props.put("bin_dir", DEFAULT_PATH_DIR.toString());
-        props.put("data_dir", DEFAULT_PATH_DIR.toString());
-        props.put("plugin_dir", DEFAULT_PATH_DIR.toString());
+        props.put("data_dir", DATA_DIR.toString());
         props.putAll(properties);
 
         final JadConfig jadConfig = new JadConfig(new InMemoryRepository(props), config);

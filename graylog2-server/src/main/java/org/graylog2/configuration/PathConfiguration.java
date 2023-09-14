@@ -17,11 +17,11 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
 import com.github.joschi.jadconfig.validators.DirectoryPathWritableValidator;
 import org.graylog2.configuration.converters.SortedPathSetConverter;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
@@ -29,14 +29,17 @@ import java.util.SortedSet;
 public class PathConfiguration {
     public static final String ALLOWED_AUXILIARY_PATHS = "allowed_auxiliary_paths";
 
-    @Parameter(value = "bin_dir", required = true, validators = DirectoryPathReadableValidator.class)
-    private Path binDir;
+    protected static final Path DEFAULT_BIN_DIR = Paths.get("bin");
+    protected static final Path DEFAULT_PLUGIN_DIR = Paths.get("plugin");
+
+    @Parameter(value = "bin_dir", required = true)
+    private Path binDir = DEFAULT_BIN_DIR;
 
     @Parameter(value = "data_dir", required = true, validators = DirectoryPathWritableValidator.class)
     private Path dataDir;
 
     @Parameter(value = "plugin_dir", required = true)
-    private Path pluginDir;
+    private Path pluginDir = DEFAULT_PLUGIN_DIR;
 
     /**
      * Optional allowed paths for Graylog data files.
