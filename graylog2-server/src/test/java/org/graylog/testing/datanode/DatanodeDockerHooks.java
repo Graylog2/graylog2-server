@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog.testing.datanode;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog2.storage.SearchVersion;
+import org.testcontainers.containers.GenericContainer;
 
-public class DatanodeInstanceBuilder extends SearchServerBuilder<DatanodeInstance> {
-    public DatanodeInstanceBuilder(SearchVersion version) {
-        super(version);
-    }
-
-    @Override
-    protected DatanodeInstance instantiate() {
-        return new DatanodeInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getRootPasswordSha2(), getHeapSize(), getFeatureFlags()).init();
-    }
+public interface DatanodeDockerHooks {
+    void onContainer(GenericContainer<?> datanodeContainer);
 }
