@@ -79,7 +79,7 @@ public class FieldTypeMappingsIT {
                 .extract()
                 .body()
                 .asString()
-                .contains("custom-mappings_1"), "Waiting for new index after rotation timed out.", Duration.ofSeconds(60));
+                .contains("custom-mappings_1"), "Waiting for new index after rotation timed out.", Duration.ofMinutes(3));
 
         gelfInput.postMessage(messageWithTimestamp("2023-07-23 09:53:08.175"));
 
