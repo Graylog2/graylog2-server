@@ -80,7 +80,7 @@ public class LookupValue extends AbstractFunction<Object> {
                 .returnType(Object.class)
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Lookup single value")
-                .ruleBuilderTitle("Lookup single value in '${lookup_table}' using '${value}'<#if $default??> (default: '${default}')</#if>")
+                .ruleBuilderTitle("Lookup single value in '${lookup_table}' using '${key}'<#if $default??> (default: '${default}')</#if>")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
