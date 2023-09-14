@@ -1,0 +1,6 @@
+{
+  "plan": "unauthenticated",
+  "rate-limit": "100-lookups/day",
+  "plan_url": "https://greynoise.io/pricing",
+  "message": "You have hit your daily rate limit of 100 requests per day. Please create a free account or upgrade your plan at https://greynoise.io/pricing."
+}

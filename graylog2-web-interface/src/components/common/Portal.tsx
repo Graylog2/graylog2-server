@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
+import * as React from 'react';
 import { createPortal } from 'react-dom';
 
 type Props = {
@@ -25,7 +25,7 @@ type Props = {
 /**
  * Simple wrapper component for ReactDOMs native portal functionality.
  */
-const Portal = ({ children, container }: Props) => createPortal(children, container);
+const Portal = ({ children, container }: Props) => (<>{createPortal(children, container)}</>);
 
 Portal.defaultProps = {
   container: document.body,

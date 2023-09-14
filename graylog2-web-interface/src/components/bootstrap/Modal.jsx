@@ -18,11 +18,9 @@
 import { Modal as BootstrapModal } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import withModalTelemetry from 'components/common/withModalTelemetry';
-
 const Dialog = css`
   margin-top: 55px;
-  
+
   .modal-content {
     background-color: ${({ theme }) => theme.colors.global.contentBackground};
     border-color: ${({ theme }) => theme.colors.variant.light.default};
@@ -32,7 +30,7 @@ const Dialog = css`
 
 const Header = css`
   border-bottom-color: ${({ theme }) => theme.colors.variant.light.default};
-      
+
   button.close {
     color: currentColor;
   }
@@ -52,16 +50,16 @@ const Body = css`
   }
 `;
 
-const Modal = styled(withModalTelemetry(BootstrapModal))`
+const Modal = styled(BootstrapModal)`
   .modal-backdrop {
-    height: 100000%;  /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
+    height: 100000%; /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
     z-index: 1030;
   }
 
   form {
     margin-bottom: 0;
   }
-  
+
   .modal-dialog {
     ${Dialog}
   }

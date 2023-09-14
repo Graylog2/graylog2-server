@@ -28,14 +28,15 @@ import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 import org.graylog2.bootstrap.CliCommand;
 
+import java.nio.file.Path;
 import java.util.List;
 
 
 @Command(name = "csr", description = "Create CSR", groupNames = {"certutil"})
 public class CertutilCsr implements CliCommand {
 
-    @Option(name = "--privateKey", description = "Keystore with private key")
-    protected String privateKeyFilename = "csr-private-key.key";
+    @Option(name = "--privateKey", description = "Keystore with private key", typeConverterProvider = PathTypeConverterProvider.class )
+    protected Path privateKeyFilename = Path.of("csr-private-key.key");
 
     @Option(name = "--csrFile", description = "Keystore with private key")
     protected String csrFilename = "csr.csr";
@@ -45,6 +46,8 @@ public class CertutilCsr implements CliCommand {
     private final CsrStorage csrStorage;
     private final CsrGenerator csrGenerator;
 
+    public static final CommandLineConsole.Prompt PROMPT_ENTER_PASSWORD_TO_PROTECT_YOUR_PRIVATE_KEY = CommandLineConsole.prompt("Enter password to protect your private key : ");
+
     public CertutilCsr() {
         this.console = new SystemConsole();
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(privateKeyFilename);
@@ -52,7 +55,7 @@ public class CertutilCsr implements CliCommand {
         this.csrGenerator = new CsrGenerator();
     }
 
-    public CertutilCsr(final String privateKeyFilename,
+    public CertutilCsr(final Path privateKeyFilename,
                        final String csrFilename,
                        final CommandLineConsole console) {
         this.privateKeyFilename = privateKeyFilename;
@@ -66,7 +69,7 @@ public class CertutilCsr implements CliCommand {
     @Override
     public void run() {
         console.printLine("This tool will generate a CSR for the datanode");
-        char[] privKeyPassword = this.console.readPassword("Enter password to protect your private key : ");
+        char[] privKeyPassword = this.console.readPassword(PROMPT_ENTER_PASSWORD_TO_PROTECT_YOUR_PRIVATE_KEY);
 
         try {
             console.printLine("Generating CSR for the datanode");

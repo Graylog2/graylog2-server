@@ -45,6 +45,7 @@ public abstract class RuleBuilderStep {
     public abstract String id();
 
     @JsonProperty(FIELD_FUNCTION)
+    @Nullable
     public abstract String function();
 
     @JsonProperty(FIELD_PARAMETERS)
@@ -76,7 +77,7 @@ public abstract class RuleBuilderStep {
 
     @JsonCreator
     public static RuleBuilderStep create(@JsonProperty(FIELD_ID) @Nullable String id,
-                                         @JsonProperty(FIELD_FUNCTION) String function,
+                                         @JsonProperty(FIELD_FUNCTION) @Nullable String function,
                                          @JsonProperty(FIELD_PARAMETERS) @Nullable Map<String, Object> parameters,
                                          @JsonProperty(FIELD_OUTPUT) @Nullable String outputvariable,
                                          @JsonProperty(FIELD_NEGATE) @Nullable boolean negate,

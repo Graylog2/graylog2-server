@@ -48,6 +48,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -190,7 +191,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     private List<String> getEnabledFeatureFlags(Lifecycle lifecycle, Set<Class<?>> annotatedClasses) {
         return annotatedClasses.stream()
                 .map(zclass -> getEnabledFeatureFlags(lifecycle, zclass))
-                .flatMap(list -> list.stream())
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 

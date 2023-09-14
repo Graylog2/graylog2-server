@@ -30,7 +30,8 @@ class ContentPackInstallations extends React.Component {
 
   static defaultProps = {
     installations: [],
-    onUninstall: () => {},
+    onUninstall: () => {
+    },
   };
 
   constructor(props) {
@@ -55,9 +56,7 @@ class ContentPackInstallations extends React.Component {
     const installModal = (
       <BootstrapModalWrapper showModal={this.state.showInstallModal}
                              onHide={closeShowModal}
-                             bsSize="large"
-                             data-app-section="content_pack_installations"
-                             data-event-element="View Installation">
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>View Installation</Modal.Title>
         </Modal.Header>
@@ -81,7 +80,9 @@ class ContentPackInstallations extends React.Component {
             <ButtonToolbar>
               <Button bsStyle="primary"
                       bsSize="small"
-                      onClick={() => { onUninstall(item.content_pack_id, item._id); }}>
+                      onClick={() => {
+                        onUninstall(item.content_pack_id, item._id);
+                      }}>
                 Uninstall
               </Button>
               <Button bsStyle="info"

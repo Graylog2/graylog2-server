@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
-import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
+import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, RelativeTime, SearchForm, Spinner } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import 'components/event-definitions/event-definition-types';
@@ -36,11 +36,16 @@ import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
 import { ENTITY_TABLE_ID, DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from '../constants';
 
-const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
+const customColumnRenderers = (refetchEventDefinitions: () => void): ColumnRenderers<EventDefinition> => ({
   attributes: {
     title: {
       renderCell: (title: string, eventDefinition) => (
         <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{title}</Link>
+      ),
+    },
+    matched_at: {
+      renderCell: (_matched_at: string, eventDefinition) => (
+        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never'
       ),
     },
     scheduling: {
@@ -50,7 +55,7 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     },
     status: {
       renderCell: (_status: string, eventDefinition) => (
-        <StatusCell status={eventDefinition?.state} />
+        <StatusCell eventDefinition={eventDefinition} refetchEventDefinitions={refetchEventDefinitions} />
       ),
       staticWidth: 100,
     },
@@ -76,7 +81,7 @@ const EventDefinitionsContainer = () => {
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
   });
-  const columnRenderers = customColumnRenderers();
+  const columnRenderers = customColumnRenderers(refetchEventDefinitions);
   const columnDefinitions = useMemo(
     () => ([...(paginatedEventDefinitions?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
     [paginatedEventDefinitions?.attributes],
@@ -143,7 +148,7 @@ const EventDefinitionsContainer = () => {
                                             onSortChange={onSortChange}
                                             onPageSizeChange={onPageSizeChange}
                                             pageSize={layoutConfig.pageSize}
-                                            bulkActions={renderBulkActions}
+                                            bulkSelection={{ actions: renderBulkActions }}
                                             activeSort={layoutConfig.sort}
                                             actionsCellWidth={160}
                                             rowActions={renderEventDefinitionActions}

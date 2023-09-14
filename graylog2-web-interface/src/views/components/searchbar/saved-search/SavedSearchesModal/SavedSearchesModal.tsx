@@ -32,9 +32,7 @@ const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchI
   <Modal show
          title="Saved searches"
          bsSize="large"
-         data-app-section="saved_searches"
-         onHide={toggleModal}
-         data-event-element="Saved Searches List">
+         onHide={toggleModal}>
     <Modal.Header closeButton>
       <Modal.Title>Saved Searches</Modal.Title>
     </Modal.Header>

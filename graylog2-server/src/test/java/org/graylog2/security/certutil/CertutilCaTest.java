@@ -48,7 +48,7 @@ class CertutilCaTest {
         final Path certPath = tempDir.resolve("test-ca.p12");
 
         final TestableConsole input = TestableConsole.empty()
-                .register("Enter CA password", "password");
+                .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, "password");
 
         final CertutilCa command = new CertutilCa(certPath.toAbsolutePath().toString(), input);
         command.run();

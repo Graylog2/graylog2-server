@@ -99,12 +99,14 @@
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.412</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.20.61</aws-java-sdk-2.version>
+        <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>1.1.7</aws-msk-iam-auth.version>
         <bouncycastle.version>1.69</bouncycastle.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.157</classgraph.version>
         <commons-codec.version>1.14</commons-codec.version>
+        <commons-csv.version>1.7</commons-csv.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-validator.version>1.6</commons-validator.version>
@@ -159,7 +161,7 @@
         <protobuf.version>3.17.3</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
-        <scala.version>2.13.4</scala.version>
+        <scala.version>2.13.12</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.12.0</shiro.version>
         <oshi.version>5.3.7</oshi.version>
@@ -178,6 +180,7 @@
         <cron-utils.version>9.1.6</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <commons-net.version>3.6</commons-net.version>
+        <jjwt.version>0.11.5</jjwt.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
@@ -192,7 +195,7 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.17.6</testcontainers.version>
+        <testcontainers.version>1.19.0</testcontainers.version>
         <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -313,6 +316,21 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
