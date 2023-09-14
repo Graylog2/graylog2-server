@@ -37,6 +37,8 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
+import static org.graylog.testing.completebackend.DefaultPluginJarsProvider.getProjectReposPath;
+import static org.graylog.testing.completebackend.DefaultPluginJarsProvider.getProjectVersion;
 
 public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode.DatanodeDevContainerBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevContainerBuilder.class);
@@ -53,10 +55,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private Network network;
 
     private static final String PROPERTIES_FILE = "api-it-tests.properties";
-
-    protected static Path getProjectReposPath() {
-        return new File(PropertyLoader.get(PROPERTIES_FILE, "project_repos_dir")).toPath();
-    }
 
     protected static Path getPath() {
         return getProjectReposPath().resolve(Path.of("graylog2-server", "data-node", "target"));
@@ -117,7 +115,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     }
 
     public GenericContainer<?> build() {
-        final Path graylog = getPath().resolve("graylog-datanode-" + getDatanodeVersion() + ".jar");
+        final Path graylog = getPath().resolve("graylog-datanode-" + getProjectVersion() + ".jar");
         if(!Files.exists(graylog)) {
             LOG.info("Searching for {} failed.", graylog.toAbsolutePath());
             LOG.info("Project repos path: {}, absolute path: {}", getProjectReposPath(), getProjectReposPath().toAbsolutePath());
@@ -173,16 +171,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/");
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
-    }
-
-    private String getDatanodeVersion() {
-        try {
-            final Properties props = new Properties();
-            props.load(getClass().getResourceAsStream("/version.properties"));
-            return props.getProperty("project.version");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static String getOpensearchVersion() {
