@@ -35,7 +35,7 @@ public class V20230502164900_AddSidecarManagerAndReaderRole extends Migration {
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2018-03-23T15:00:00Z");
+        return ZonedDateTime.parse("2023-05-02T16:49:00Z");
     }
 
     @Override
