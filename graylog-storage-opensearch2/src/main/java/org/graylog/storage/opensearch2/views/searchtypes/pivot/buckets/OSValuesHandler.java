@@ -123,11 +123,11 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private Script scriptForPivots(Collection<String> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
                 .map(bucket -> """
-                        (doc.containsKey('%1$s') && doc['%1$s'].size() > 0)
+                        (doc.containsKey('%1$s') && doc['%1$s'].size() > 0
                         ? doc['%1$s'].size() > 1
                             ? doc['%1$s']
                             : String.valueOf(doc['%1$s'].value)
-                        : "%2$s"
+                        : "%2$s")
                         """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
