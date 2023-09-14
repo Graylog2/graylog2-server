@@ -22,21 +22,19 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.DatanodeOpensearchWait;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
-import javax.net.ssl.SSLHandshakeException;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
@@ -60,7 +58,7 @@ public class DatanodeClusterIT {
     private String initialAdminPassword;
     private KeystoreInformation ca;
     private Network network;
-    private GenericContainer<?> mongodbContainer;
+    private MongoDBTestService mongoDBTestService;
 
     @BeforeEach
     void setUp() throws GeneralSecurityException, IOException {
@@ -77,12 +75,12 @@ public class DatanodeClusterIT {
         initialAdminPassword = RandomStringUtils.randomAlphabetic(10);
 
         this.network = Network.newNetwork();
-        this.mongodbContainer = DatanodeContainerizedBackend.createMongodbContainer(network);
-        this.mongodbContainer.start();
+        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, network);
+        this.mongoDBTestService.start();
 
         nodeA = createDatanodeContainer(
                 network,
-                mongodbContainer,
+                mongoDBTestService,
                 hostnameNodeA,
                 transportNodeA,
                 httpNodeA,
@@ -97,7 +95,7 @@ public class DatanodeClusterIT {
 
         nodeB = createDatanodeContainer(
                 network,
-                mongodbContainer,
+                mongoDBTestService,
                 hostnameNodeB,
                 transportNodeB,
                 httpNodeB,
@@ -112,7 +110,7 @@ public class DatanodeClusterIT {
     void tearDown() {
         nodeB.stop();
         nodeA.stop();
-        mongodbContainer.stop();
+        mongoDBTestService.close();
         network.close();
     }
 
@@ -129,7 +127,7 @@ public class DatanodeClusterIT {
         final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
 
         final DatanodeContainerizedBackend nodeC = createDatanodeContainer(
-                nodeA.getNetwork(), nodeA.getMongodbContainer(),
+                network, mongoDBTestService,
                 hostnameNodeC,
                 transportNodeC,
                 httpNodeC,
@@ -144,12 +142,19 @@ public class DatanodeClusterIT {
     }
 
     @NotNull
-    private DatanodeContainerizedBackend createDatanodeContainer(Network network, GenericContainer<?> mongodb, String hostname, KeystoreInformation transportKeystore, KeystoreInformation httpKeystore, String restUsername, String restPassword) {
+    private DatanodeContainerizedBackend createDatanodeContainer(Network network,
+                                                                 MongoDBTestService mongodb,
+                                                                 String hostname,
+                                                                 KeystoreInformation transportKeystore,
+                                                                 KeystoreInformation httpKeystore,
+                                                                 String restUsername,
+                                                                 String restPassword) {
         return new DatanodeContainerizedBackend(
                 network,
                 mongodb,
                 hostname,
                 datanodeContainer -> {
+                    datanodeContainer.withNetwork(network);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", hostnameNodeA);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", hostnameNodeA + ":9300");
@@ -178,6 +183,7 @@ public class DatanodeClusterIT {
                     // container and docker network, where we do the hostname validation.
                     datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(hostname));
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", hostname);
+                    datanodeContainer.withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongodb.internalUri());
                 });
     }
 

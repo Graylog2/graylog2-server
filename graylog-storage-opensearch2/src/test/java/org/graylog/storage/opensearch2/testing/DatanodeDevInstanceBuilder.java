@@ -19,13 +19,13 @@ package org.graylog.storage.opensearch2.testing;
 import org.graylog.testing.completebackend.SearchServerBuilder;
 import org.graylog2.storage.SearchVersion;
 
-public class DatanodeInstanceBuilder extends SearchServerBuilder<DatanodeInstance> {
-    public DatanodeInstanceBuilder(SearchVersion version) {
+public class DatanodeDevInstanceBuilder extends SearchServerBuilder<DatanodeDevInstance> {
+    public DatanodeDevInstanceBuilder(SearchVersion version) {
         super(version);
     }
 
     @Override
-    protected DatanodeInstance instantiate() {
-        return new DatanodeInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getRootPasswordSha2(), getHeapSize(), getFeatureFlags()).init();
+    protected DatanodeDevInstance instantiate() {
+        return new DatanodeDevInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getRootPasswordSha2(), getHeapSize(), getFeatureFlags()).init();
     }
 }

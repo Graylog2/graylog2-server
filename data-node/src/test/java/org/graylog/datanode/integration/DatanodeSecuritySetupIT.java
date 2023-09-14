@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 import static io.restassured.RestAssured.given;
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 
-
 public class DatanodeSecuritySetupIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
 
