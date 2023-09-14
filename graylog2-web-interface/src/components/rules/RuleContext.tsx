@@ -58,6 +58,10 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     setRuleSource(savedSourceCode || rule?.source);
     setDescription(rule?.description);
     removeSavedRuleSourceCode();
+
+    if (rule?.simulator_message) {
+      setRawMessageToSimulate(rule?.simulator_message);
+    }
   }, [rule]);
 
   const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
@@ -195,6 +199,7 @@ PipelineRulesProvider.propTypes = {
     title: PropTypes.string,
     description: PropTypes.string,
     source: PropTypes.string,
+    simulator_message: PropTypes.string,
   }),
 };
 
@@ -203,5 +208,6 @@ PipelineRulesProvider.defaultProps = {
   rule: {
     description: '',
     source: '',
+    simulator_message: DEFAULT_SIMULATOR_JSON_MESSAGE,
   },
 };

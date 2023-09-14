@@ -73,11 +73,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
 
   useEffect(() => () => {
     setRuleSimulationResult(null);
-
-    if (currentRule?.simulator_message) {
-      setRawMessageToSimulate(currentRule?.simulator_message);
-    }
-  }, [setRuleSimulationResult, setRawMessageToSimulate, currentRule?.simulator_message]);
+  }, [setRuleSimulationResult]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
   const errorMessage = currentRule?.rule_builder?.errors?.length > 0 ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
