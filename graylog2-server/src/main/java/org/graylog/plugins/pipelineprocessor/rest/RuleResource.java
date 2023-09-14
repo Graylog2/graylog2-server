@@ -304,6 +304,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 )
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .ruleBuilder(normalizedRuleBuilder.orElse(update.ruleBuilder()))
+                .simulatorMessage(update.simulatorMessage())
                 .build();
 
         final RuleDao savedRule;
