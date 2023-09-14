@@ -23,18 +23,24 @@ import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
 
-const contentStreamSettings = {
+const mockContentStreamSettings = {
   contentStreamSettings: {
     contentStreamTopics: [],
     releasesSectionEnabled: true,
     contentStreamEnabled: true,
+  },
+  contenStreamTags: {
+    currentTag: 'open-feed',
+    isLoadingTags: false,
+    refetchContentStreamTag: () => Promise.resolve(),
+    contentStreamTagError: undefined,
   },
   isLoadingContentStreamSettings: false,
   refetchContentStream: () => Promise.resolve(),
   onSaveContentStreamSetting: () => Promise.resolve(),
 };
 
-jest.mock('components/content-stream/hook/useContentStreamSettings', () => jest.fn(() => contentStreamSettings));
+jest.mock('components/content-stream/hook/useContentStreamSettings', () => jest.fn(() => mockContentStreamSettings));
 
 jest.mock('util/AppConfig', () => ({
   gl2DevMode: jest.fn(() => false),
@@ -66,7 +72,7 @@ describe('<ContentStreamSection>', () => {
 
   it('Hide ContentStream', async () => {
     asMock(useContentStreamSettings).mockReturnValue({
-      ...contentStreamSettings,
+      ...mockContentStreamSettings,
       contentStreamSettings: {
         releasesSectionEnabled: false,
         contentStreamEnabled: false,
