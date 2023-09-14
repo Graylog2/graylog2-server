@@ -36,6 +36,7 @@ export type RuleType = {
   modified_at: string,
   rule_builder: RuleBuilderType,
   errors?: [],
+  simulator_message?: string,
 };
 export type MetricsConfigType = {
   metrics_enabled: boolean,

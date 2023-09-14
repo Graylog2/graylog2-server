@@ -30,6 +30,7 @@ export type RuleBuilderRule = {
   source?: string,
   title: string,
   modified_at?: string,
+  simulator_message?: string,
 }
 
 export type RuleBlockField = {
