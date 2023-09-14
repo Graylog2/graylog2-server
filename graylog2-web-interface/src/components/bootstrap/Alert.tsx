@@ -49,6 +49,9 @@ const iconNameForType = (bsStyle: ColorVariant) => {
 
 const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props) => {
   const theme = useMantineTheme();
+  const displayCloseButton = typeof onDismiss === 'function';
+  const iconName = iconNameForType(bsStyle);
+
   const alertStyles = () => ({
     message: {
       fontSize: theme.fontSizes.md,
@@ -57,7 +60,6 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
       fontSize: theme.fontSizes.md,
     },
   });
-  const iconName = iconNameForType(bsStyle);
 
   return (
     <StyledAlert className={className}
@@ -67,7 +69,8 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
                  onClose={onDismiss}
                  title={title}
                  icon={<Icon name={iconName} />}
-                 withCloseButton={typeof onDismiss === 'function'}>
+                 closeButtonLabel={displayCloseButton && 'Close alert'}
+                 withCloseButton={displayCloseButton}>
       {children}
     </StyledAlert>
   );
