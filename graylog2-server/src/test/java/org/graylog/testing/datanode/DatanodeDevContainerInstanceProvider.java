@@ -14,20 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog.testing.datanode;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
 import org.graylog2.storage.SearchVersion;
 
-import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
+import java.util.Optional;
+import java.util.ServiceLoader;
 
-public class DatanodeInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder getBuilderFor(final SearchVersion version) {
-        if(version.satisfies(DATANODE, "^5.1.0")) {
-            return new DatanodeInstanceBuilder(version);
+public class DatanodeDevContainerInstanceProvider {
+    private static ServiceLoader<DatanodeDevContainerInterfaceProvider> loader = ServiceLoader.load(DatanodeDevContainerInterfaceProvider.class);
+
+    public static Optional<DatanodeDevContainerBuilder> getBuilderFor(SearchVersion searchVersion) {
+        for (DatanodeDevContainerInterfaceProvider provider : loader) {
+            DatanodeDevContainerBuilder container = provider.getBuilderFor(searchVersion);
+            if (container != null) {
+                return Optional.of(container);
+            }
         }
-        return null;
+        return Optional.empty();
     }
 }

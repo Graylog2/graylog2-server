@@ -87,6 +87,7 @@
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
+        <opensearch.shaded.version>2.9.0-1</opensearch.shaded.version>
         <airline.version>2.7.2</airline.version>
         <amqp-client.version>5.8.0</amqp-client.version>
         <antlr.version>4.8-1</antlr.version>
@@ -123,7 +124,7 @@
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
         <hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
         <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.13.4.20221013</jackson.version>
+        <jackson.version>2.15.2</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -145,8 +146,8 @@
         <lucene.version>9.1.0</lucene.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>4.8.1</mongodb-driver.version>
-        <mongojack.version>2.10.1.2</mongojack.version>
-        <mongojack4.version>4.8.0-0</mongojack4.version>
+        <mongojack.version>2.10.1.3</mongojack.version>
+        <mongojack4.version>4.8.0-1</mongojack4.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.91.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.59.Final</netty-tcnative-boringssl-static.version>
@@ -161,9 +162,10 @@
         <protobuf.version>3.17.3</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
-        <scala.version>2.13.4</scala.version>
+        <scala.version>2.13.12</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.12.0</shiro.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <oshi.version>5.3.7</oshi.version>
         <siv-mode.version>1.4.1</siv-mode.version>
         <slf4j.version>1.7.30</slf4j.version>
@@ -233,9 +235,9 @@
         </repository>
     </repositories>
 
+    <!-- Ensure consistent versions across dependencies and transitive dependencies -->
     <dependencyManagement>
         <dependencies>
-            <!-- Ensure consistent httpclient/httpcore versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
@@ -261,7 +263,6 @@
                 <artifactId>httpcore-nio</artifactId>
                 <version>${apache-httpcore.version}</version>
             </dependency>
-            <!-- Ensure consistent Netty versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
@@ -288,25 +289,21 @@
                 <version>${netty-tcnative-boringssl-static.version}</version>
                 <classifier>linux-x86_64</classifier>
             </dependency>
-            <!-- Ensure consistent commons-lang3 versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
-            <!-- Ensure consistent zstd-jni versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>com.github.luben</groupId>
                 <artifactId>zstd-jni</artifactId>
                 <version>${zstd.version}</version>
             </dependency>
-            <!-- Ensure consistent json-path versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
             </dependency>
-            <!-- Ensure consistent asm versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
@@ -316,6 +313,18 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
