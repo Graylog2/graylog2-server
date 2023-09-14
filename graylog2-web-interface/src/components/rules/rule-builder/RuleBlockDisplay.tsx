@@ -124,6 +124,8 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
       )));
   };
 
+  const errorMessage = block?.errors?.join(', ');
+
   return (
     <StyledRow onMouseEnter={() => setShowActions(true)}
                onMouseLeave={() => setShowActions(false)}
@@ -138,7 +140,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
                 highlightedRuleTitle(highlightedOutput, block?.step_title)
               ) : block?.step_title}
               {block?.errors?.length > 0 && (
-                <ErrorMessage>{block.errors.join(', ')}</ErrorMessage>
+                <ErrorMessage title={errorMessage}>{errorMessage}</ErrorMessage>
               )}
             </BlockTitle>
           </Col>
