@@ -225,6 +225,7 @@ const RuleBlockForm = ({
                   ),
                   )}
 
+                  <Errors objectWithErrors={existingBlock} />
                   <FormSubmit bsSize="small"
                               disabledSubmit={!isValid}
                               submitButtonText={existingBlock ? 'Update' : 'Add'}
@@ -239,7 +240,6 @@ const RuleBlockForm = ({
             </Form>
           )}
         </Formik>
-        <Errors objectWithErrors={existingBlock} />
       </Col>
     </Row>
   );
