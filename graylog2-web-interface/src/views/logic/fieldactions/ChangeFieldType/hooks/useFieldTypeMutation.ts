@@ -31,18 +31,18 @@ const putFiledType = async ({
   field,
 }: ChangeFieldTypeBody) => {
   const url = qualifyUrl(urlPrefix);
-  const body = {
+  const body: ChangeFieldTypeBodyJson = {
     index_sets: indexSetSelection,
     type: newFieldType,
     rotate: rotated,
     field: field,
   };
 
-  return fetch<ChangeFieldTypeBodyJson>('PUT', url, body);
+  return fetch('PUT', url, body);
 };
 
 const usePutFiledTypeMutation = () => {
-  const { mutateAsync, isLoading } = useMutation(putFiledType, {
+  const put = useMutation(putFiledType, {
     onError: (errorThrown) => {
       UserNotification.error(`Changing the field type failed with status: ${errorThrown}`,
         'Could not change the field type');
@@ -52,7 +52,7 @@ const usePutFiledTypeMutation = () => {
     },
   });
 
-  return { putFiledTypeMutation: mutateAsync, isLoading };
+  return { putFiledTypeMutation: put.mutateAsync, isLoading: put.isLoading };
 };
 
 export default usePutFiledTypeMutation;

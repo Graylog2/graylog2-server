@@ -17,16 +17,10 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import asMock from 'helpers/mocking/AsMock';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
-import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFiledTypeUsages';
-import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
 import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
-import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
-import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 const onClose = jest.fn();
 const renderChangeTypeAction = ({
@@ -39,84 +33,11 @@ const renderChangeTypeAction = ({
     <ChangeFieldType onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
   </TestStoreProvider>,
 );
-const attributes = [
-  {
-    id: 'index_set_id',
-    title: 'Index Set Id',
-    type: 'STRING',
-    sortable: true,
-    hidden: true,
-  },
-  {
-    id: 'index_set_title',
-    title: 'Index Set Title',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'stream_titles',
-    title: 'Stream Titles',
-    type: 'STRING',
-    sortable: false,
-  },
-  {
-    id: 'types',
-    title: 'Field Type History',
-    type: 'STRING',
-    sortable: false,
-  },
-];
-const paginatedFieldUsage = (usage: FieldTypeUsage = {
-  id: 'id',
-  indexSetTitle: 'Index Title',
-  streamTitles: ['Stream Title'],
-  types: ['string'],
-}) => ({
-  data: {
-    list: [usage],
-    pagination: {
-      total: 1,
-      page: 1,
-      perPage: 5,
-      count: 1,
-    },
-    attributes,
-  },
-  refetch: () => {},
-  isInitialLoading: false,
-  isFirsLoaded: true,
-});
-
-const fieldTypes = {
-  data: {
-    fieldTypes: {
-      string: 'String type',
-    },
-  },
-  isLoading: false,
-};
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
-
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFiledTypeUsages', () => jest.fn());
-jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 describe('ChangeFieldType', () => {
-  beforeEach(() => {
-    asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFiledTypeMutation: () => {} });
-    asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage());
-    asMock(useFieldTypes).mockReturnValue(fieldTypes);
+  beforeAll(loadViewsPlugin);
 
-    asMock(useUserLayoutPreferences).mockReturnValue({
-      data: {
-        ...layoutPreferences,
-        displayedAttributes: ['index_set_title',
-          'stream_titles',
-          'types'],
-      },
-      isInitialLoading: false,
-    });
-  });
+  afterAll(unloadViewsPlugin);
 
   it('Shows modal', async () => {
     renderChangeTypeAction({});

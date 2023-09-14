@@ -18,8 +18,6 @@ import React, { useCallback, useState } from 'react';
 
 import type { ActionComponentProps, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
-import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
-import type { ChangeFieldTypeFormValues } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import isReservedField from 'views/logic/IsReservedField';
 import type User from 'logic/users/User';
@@ -31,25 +29,12 @@ const ChangeFieldType = ({
 }: ActionComponentProps) => {
   const [show, setShow] = useState(true);
 
-  const { putFiledTypeMutation } = usePutFiledTypeMutation();
   const handleOnClose = useCallback(() => {
     setShow(false);
     onClose();
   }, [onClose]);
-  const onSubmit = useCallback(({
-    indexSetSelection,
-    newFieldType,
-    rotated,
-  }: ChangeFieldTypeFormValues) => {
-    putFiledTypeMutation({
-      indexSetSelection,
-      newFieldType,
-      rotated,
-      field,
-    }).then(() => handleOnClose());
-  }, [field, handleOnClose, putFiledTypeMutation]);
 
-  return show ? <ChangeFieldTypeModal onSubmit={onSubmit} field={field} onClose={handleOnClose} show={show} /> : null;
+  return show ? <ChangeFieldTypeModal field={field} onClose={handleOnClose} show={show} /> : null;
 };
 
 const hasMappingPermission = (currentUser: User) => currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');

@@ -39,7 +39,7 @@ const useFiledTypeOptions = (): {
 } => {
   const { data, isLoading } = useQuery(
     ['fieldTypeOptions'],
-    () => fetchFieldTypes(),
+    fetchFieldTypes,
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading field type options failed with status: ${errorThrown}`,

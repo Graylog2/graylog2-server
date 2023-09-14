@@ -26,9 +26,7 @@ export type FieldTypeUsage = {
   types: Array<TypeHistoryItem>
 }
 
-export type FieldTypes = { fieldTypes: { [name: string]: string} };
-
-export type ChangeFieldTypeFormValues = { indexSetSelection: Array<string>, newFieldType: string, rotated: boolean }
+export type FieldTypes = { [name: string]: string};
 
 export type ChangeFieldTypeBodyJson = {
   index_sets: Array<string>,

@@ -22,9 +22,9 @@ import {
   Select,
 } from 'components/common';
 import { BootstrapModalForm, Alert, Input } from 'components/bootstrap';
-import type { ChangeFieldTypeFormValues } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
+import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -34,29 +34,39 @@ const StyledSelect = styled(Select)`
 type Props = {
   show: boolean,
   field: string,
-  onSubmit: (formValues: ChangeFieldTypeFormValues) => void,
   onClose: () => void }
 
-const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
+const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const [rotated, setRotated] = useState(false);
   const [newFieldType, setNewFieldType] = useState(null);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
-  const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes).map(([id, label]) => ({
-    id,
+  const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes).map(([value, label]) => ({
+    value,
     label,
   })), [fieldTypes]);
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
-  const _onSubmit = useCallback((e) => {
+  const { putFiledTypeMutation } = usePutFiledTypeMutation();
+  const onSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ indexSetSelection, newFieldType, rotated });
-  }, [indexSetSelection, newFieldType, onSubmit, rotated]);
+
+    putFiledTypeMutation({
+      indexSetSelection,
+      newFieldType,
+      rotated,
+      field,
+    }).then(() => onClose());
+  }, [field, indexSetSelection, newFieldType, onClose, putFiledTypeMutation, rotated]);
+
+  const onChangeFieldType = useCallback((value: string) => {
+    setNewFieldType(value);
+  }, []);
 
   return (
     <BootstrapModalForm title={`Change ${field} field type`}
                         submitButtonText="Change field type"
-                        onSubmitForm={_onSubmit}
+                        onSubmitForm={onSubmit}
                         onCancel={onClose}
                         show={show}
                         bsSize="large">
@@ -66,13 +76,12 @@ const ChangeFieldTypeModal = ({ show, onClose, onSubmit, field }: Props) => {
           Text about how bad to change this value and how you ca brake everything
         </Alert>
         <StyledSelect inputId="field_type"
-                      valueKey="id"
                       options={fieldTypeOptions}
                       value={newFieldType}
-                      onChange={(value) => setNewFieldType(value)}
+                      onChange={onChangeFieldType}
                       placeholder="Select field type"
                       disabled={isOptionsLoading}
-                      required />
+                      inputProps={{ 'aria-label': 'Select field type' }} />
         <Alert bsStyle="info">
           <Icon name="info-circle" />&nbsp;
           By default the type will be changed in all possible indexes. But you can choose in which index sets you would like to make the change
