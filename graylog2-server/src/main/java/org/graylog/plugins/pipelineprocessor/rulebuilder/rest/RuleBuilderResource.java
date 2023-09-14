@@ -29,6 +29,7 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRuleService;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
@@ -102,7 +103,6 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         final RuleSource stored = ruleResource.createFromParser(ruleSource);
         return ruleBuilderDto.toBuilder()
                 .id(stored.id())
-                .ruleBuilder(ruleBuilderParser.generateTitles(ruleBuilderDto.ruleBuilder()))
                 .build();
     }
 
@@ -117,7 +117,6 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         final RuleSource stored = ruleResource.update(id, ruleSource);
         return ruleBuilderDto.toBuilder()
                 .id(stored.id())
-                .ruleBuilder(ruleBuilderParser.generateTitles(ruleBuilderDto.ruleBuilder()))
                 .build();
     }
 
@@ -176,11 +175,12 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     }
 
     private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto, boolean generateSimulatorFields) {
+        final RuleBuilder ruleBuilder = ruleBuilderDto.ruleBuilder().normalize();
         return RuleSource.builder()
                 .title(ruleBuilderDto.title())
                 .description(ruleBuilderDto.description())
-                .ruleBuilder(ruleBuilderDto.ruleBuilder())
-                .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilderDto.ruleBuilder(), generateSimulatorFields))
+                .ruleBuilder(ruleBuilderParser.generateTitles(ruleBuilder))
+                .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilder, generateSimulatorFields))
                 .simulatorMessage(ruleBuilderDto.simulatorMessage())
                 .build();
     }

@@ -36,7 +36,6 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -74,7 +73,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -135,18 +133,15 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), false);
-        final Optional<RuleBuilder> normalizedRuleBuilder = ruleSource.ruleBuilder().normalize();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
                 .description(ruleSource.description())
-                .source(normalizedRuleBuilder.isPresent() ?
-                        ruleBuilderService.generateRuleSource(ruleSource.title(), normalizedRuleBuilder.get(), false)
-                        : ruleSource.source()
+                .source(ruleSource.source()
                 )
                 .createdAt(now)
                 .modifiedAt(now)
-                .ruleBuilder(normalizedRuleBuilder.orElse(ruleSource.ruleBuilder()))
+                .ruleBuilder(ruleSource.ruleBuilder())
                 .simulatorMessage(ruleSource.simulatorMessage())
                 .build();
 
@@ -294,16 +289,12 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
         final RuleDao ruleDao = ruleService.load(id);
         final Rule rule = pipelineRuleService.parseRuleOrThrow(id, update.source(), false);
-        final Optional<RuleBuilder> normalizedRuleBuilder = update.ruleBuilder().normalize();
         final RuleDao toSave = ruleDao.toBuilder()
                 .title(rule.name())
                 .description(update.description())
-                .source(normalizedRuleBuilder.isPresent() ?
-                        ruleBuilderService.generateRuleSource(update.title(), normalizedRuleBuilder.get(), false)
-                        : update.source()
-                )
+                .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
-                .ruleBuilder(normalizedRuleBuilder.orElse(update.ruleBuilder()))
+                .ruleBuilder(update.ruleBuilder())
                 .simulatorMessage(update.simulatorMessage())
                 .build();
 

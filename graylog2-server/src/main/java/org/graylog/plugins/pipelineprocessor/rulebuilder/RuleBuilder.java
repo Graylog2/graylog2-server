@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @AutoValue
 public abstract class RuleBuilder {
@@ -73,7 +72,7 @@ public abstract class RuleBuilder {
     /**
      * Normalize data post-editing
      */
-    public Optional<RuleBuilder> normalize() {
+    public RuleBuilder normalize() {
         // Renumber generated output variables
         Map<Integer, Integer> varMapping = new HashMap<>();
         List<RuleBuilderStep> normalizedOutputs = new ArrayList<>();
@@ -89,7 +88,7 @@ public abstract class RuleBuilder {
         }
 
         if (newIndex == 1) {
-            return Optional.empty(); // no renumbering required
+            return this; // no renumbering required
         }
 
         // Renumber parameters that are generated output variables.
@@ -101,7 +100,7 @@ public abstract class RuleBuilder {
                 if (entry.getValue() instanceof String valueString) {
                     int paramIndex = action.generatedParameterIndex(valueString);
                     if (paramIndex > 0) {
-                        updatedParams.put(entry.getKey(), action.generateParam(paramIndex));
+                        updatedParams.put(entry.getKey(), action.generateParam(varMapping.get(paramIndex)));
                     } else {
                         updatedParams.put(entry.getKey(), entry.getValue());
                     }
@@ -112,9 +111,9 @@ public abstract class RuleBuilder {
             normalizedOutputsAndParams.add(action.toBuilder().parameters(updatedParams).build());
         }
 
-        return Optional.of(toBuilder()
+        return toBuilder()
                 .actions(normalizedOutputsAndParams)
-                .build());
+                .build();
     }
 
     @AutoValue.Builder
