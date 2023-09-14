@@ -69,12 +69,10 @@ Added fields:
 `event_source_product`: Contains the static value `microsoft_defender_endpoint`.
 
 Changed fields:
-
 - `message`: Now contains the full message payload.
 - `source`: Now contains the `detectionSource` log value.
 
 Removed fields:
-
 - `alert_signature`
 - `alert_signature_id`
 - `event_start`
