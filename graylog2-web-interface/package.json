@@ -181,9 +181,6 @@
   },
   "resolutions": {
     "@types/react": "18.0.28",
-    "immer": "9.0.6",
-    "nth-check": "2.0.1",
-    "glob-parent": "5.1.2",
-    "@emotion/utils": "1.2.0"
+    "nth-check": "2.0.1"
   }
 }
