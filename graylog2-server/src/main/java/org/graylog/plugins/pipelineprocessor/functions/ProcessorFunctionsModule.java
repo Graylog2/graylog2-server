@@ -78,6 +78,7 @@ import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.ListGet;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
@@ -284,6 +285,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LookupRemoveStringList.NAME, LookupRemoveStringList.class);
         addMessageProcessorFunction(LookupStringListContains.NAME, LookupStringListContains.class);
         addMessageProcessorFunction(LookupAssignTtl.NAME, LookupAssignTtl.class);
+        addMessageProcessorFunction(ListGet.NAME, ListGet.class);
 
         // Maps
         addMessageProcessorFunction(MapRemove.NAME, MapRemove.class);

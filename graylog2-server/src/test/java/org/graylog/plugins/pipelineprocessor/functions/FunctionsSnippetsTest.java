@@ -86,6 +86,7 @@ import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.ListGet;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
@@ -387,6 +388,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(MapRemove.NAME, new MapRemove());
         functions.put(MapSet.NAME, new MapSet());
         functions.put(MapGet.NAME, new MapGet());
+
+        functions.put(ListGet.NAME, new ListGet());
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1401,6 +1404,16 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule, message);
 
         assertThat(message.getField("k1")).isNull();
+    }
+
+    @Test
+    public void listGet() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("idx0")).isEqualTo("v1");
+        assertThat(message.getField("idx1")).isNull();
     }
 
     @Test
