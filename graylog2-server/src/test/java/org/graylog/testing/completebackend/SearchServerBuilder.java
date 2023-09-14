@@ -109,9 +109,6 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
     protected abstract T instantiate();
 
     public T build() {
-        if(network == null) {
-            network = Network.newNetwork();
-        }
         return instantiate();
     }
 }
