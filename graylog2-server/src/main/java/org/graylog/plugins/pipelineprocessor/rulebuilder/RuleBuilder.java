@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @AutoValue
 public abstract class RuleBuilder {
@@ -73,6 +74,8 @@ public abstract class RuleBuilder {
      * Normalize data post-editing
      */
     public RuleBuilder normalize() {
+        if (Objects.isNull(actions()))
+            return this;
         // Renumber generated output variables
         Map<Integer, Integer> varMapping = new HashMap<>();
         List<RuleBuilderStep> normalizedOutputs = new ArrayList<>();
