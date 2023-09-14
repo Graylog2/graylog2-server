@@ -60,7 +60,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "@tanstack/query-sync-storage-persister": "^4.33.0",
     "@tanstack/react-query-persist-client": "^4.33.0",
-    "ace-builds": "1.24.2",
+    "ace-builds": "1.25.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
     "buffer": "^6.0.3",
@@ -78,7 +78,7 @@
     "intersection-observer": "^0.12.0",
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
-    "marked": "^8.0.0",
+    "marked": "^9.0.0",
     "md5": "^2.2.1",
     "moment-duration-format": "2.3.2",
     "moment-precise-range-plugin": "^1.3.0",
@@ -115,7 +115,7 @@
     "twix": "^1.1.4",
     "typeahead.js": "^0.11.1",
     "urijs": "^1.19.6",
-    "uuid": "9.0.0",
+    "uuid": "9.0.1",
     "whatwg-fetch": "^3.6.2"
   },
   "devDependencies": {
@@ -180,9 +180,7 @@
     "webpack-merge": "^4.2.2"
   },
   "resolutions": {
-    "immer": "9.0.6",
-    "nth-check": "2.0.1",
-    "glob-parent": "5.1.2",
-    "@emotion/utils": "1.2.0"
+    "@types/react": "18.0.28",
+    "nth-check": "2.0.1"
   }
 }
