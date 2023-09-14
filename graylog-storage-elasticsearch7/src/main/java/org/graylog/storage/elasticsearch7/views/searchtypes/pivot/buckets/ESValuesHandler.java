@@ -83,13 +83,6 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         return createScriptedTerms(valueBuckets, ordering, limit);
     }
 
-    private TermsAggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {
-        return AggregationBuilders.terms(AGG_NAME)
-                .field(field)
-                .order(ordering)
-                .size(limit);
-    }
-
     private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
