@@ -169,8 +169,16 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
                          name={param.name}
                          label={labelText(param)}
                          required={!param.optional}
-                         help={param.description}
-                         error={!filteredOutputVariableList().length ? `No previous action returns type ${param.type.slice(param.type.lastIndexOf('.') + 1)}` : undefined}
+                         help={
+                          (!filteredOutputVariableList().length && param.optional)
+                            ? `No previous action returns type ${param.type.slice(param.type.lastIndexOf('.') + 1)}`
+                            : param.description
+                         }
+                         error={
+                           (!filteredOutputVariableList().length && !param.optional)
+                             ? `No previous action returns type ${param.type.slice(param.type.lastIndexOf('.') + 1)}`
+                             : undefined
+                         }
                          {...field}>
           <option key="placeholder" value="">Select output from list</option>
           {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
