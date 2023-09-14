@@ -52,9 +52,10 @@ const StyledFormGroup = styled(FormGroup)(({ theme }) => css`
 
 type Props = {
   rule?: RuleType | RuleBuilderRule,
+  onSaveMessage?: (message: string) => void,
 };
 
-const RuleSimulation = ({ rule: currentRule }: Props) => {
+const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   const {
     rule,
     simulateRule,
@@ -72,7 +73,11 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
 
   useEffect(() => () => {
     setRuleSimulationResult(null);
-  }, [setRuleSimulationResult]);
+
+    if (currentRule?.simulator_message) {
+      setRawMessageToSimulate(currentRule?.simulator_message);
+    }
+  }, [setRuleSimulationResult, setRawMessageToSimulate, currentRule?.simulator_message]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
   const errorMessage = currentRule?.rule_builder?.errors?.length > 0 ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
@@ -88,6 +93,8 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
       app_action_value: 'run-rule-simulation-button',
       event_details: { is_rule_builder },
     });
+
+    onSaveMessage(rawMessageToSimulate);
 
     simulateRule(
       rawMessageToSimulate,
@@ -171,10 +178,12 @@ const RuleSimulation = ({ rule: currentRule }: Props) => {
 
 RuleSimulation.propTypes = {
   rule: PropTypes.object,
+  onSaveMessage: PropTypes.func,
 };
 
 RuleSimulation.defaultProps = {
   rule: undefined,
+  onSaveMessage: undefined,
 };
 
 export default RuleSimulation;

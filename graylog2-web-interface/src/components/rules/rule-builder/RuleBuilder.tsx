@@ -141,6 +141,15 @@ const RuleBuilder = () => {
     }
   }).catch(() => setRule(ruleToValidate));
 
+  const saveSimulatorMessage = async (simulator_message: string) => {
+    const newOperatorRule: RuleBuilderRule = {
+      ...rule,
+      simulator_message,
+    };
+
+    await validateAndSaveRuleBuilder(newOperatorRule);
+  };
+
   const updateWhenOperator = async (operator: 'AND'|'OR') => {
     const newOperatorRule: RuleBuilderRule = {
       ...rule,
@@ -388,7 +397,7 @@ const RuleBuilder = () => {
                 </StyledPanel>
               </Col>
               <Col xs={4}>
-                <RuleSimulation rule={rule} />
+                <RuleSimulation rule={rule} onSaveMessage={saveSimulatorMessage} />
               </Col>
             </Row>
           </Col>
