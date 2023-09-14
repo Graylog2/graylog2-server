@@ -22,7 +22,7 @@ import { FormikFormGroup, InputOptionalInfo } from 'components/common';
 import { Button, ControlLabel } from 'components/bootstrap';
 
 import { RuleBuilderTypes, outputVariablesPropType } from './types';
-import type { OutputVariables, BlockFieldDict } from './types';
+import type { OutputVariables, BlockFieldDict, BlockType } from './types';
 
 type Props = {
   param: BlockFieldDict,
@@ -30,10 +30,11 @@ type Props = {
   blockId: string,
   order: number,
   outputVariableList?: OutputVariables,
+  blockType: BlockType,
   resetField: (fieldName: string) => void;
 }
 
-const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList, resetField }: Props) => {
+const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList, blockType, resetField }: Props) => {
   const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
   const [field, fieldMeta] = useField(param.name);
 
@@ -122,6 +123,8 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
     );
   }
 
+  const typeNotFoundErrorMessage = `No previous action returns type ${param.type.slice(param.type.lastIndexOf('.') + 1)}`;
+
   switch (param.type) {
     case RuleBuilderTypes.String:
     case RuleBuilderTypes.Object:
@@ -163,29 +166,33 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
         </>
       );
     default:
-      return (
-        <FormikFormGroup type="select"
-                         key={`${functionName}_${param.name}`}
-                         name={param.name}
-                         label={labelText(param)}
-                         required={!param.optional}
-                         help={
-                          (!filteredOutputVariableList().length && param.optional)
-                            ? `No previous action returns type ${param.type.slice(param.type.lastIndexOf('.') + 1)}`
-                            : param.description
-                         }
-                         error={
-                           (!filteredOutputVariableList().length && !param.optional)
-                             ? `No previous action returns type ${param.type.slice(param.type.lastIndexOf('.') + 1)}`
-                             : undefined
-                         }
-                         {...field}>
-          <option key="placeholder" value="">Select output from list</option>
-          {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-            <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
-          )}
-        </FormikFormGroup>
-      );
+      if (blockType === 'action') {
+        return (
+          <FormikFormGroup type="select"
+                           key={`${functionName}_${param.name}`}
+                           name={param.name}
+                           label={labelText(param)}
+                           required={!param.optional}
+                           help={
+                            (!filteredOutputVariableList().length && param.optional)
+                              ? typeNotFoundErrorMessage
+                              : param.description
+                           }
+                           error={
+                             (!filteredOutputVariableList().length && !param.optional)
+                               ? typeNotFoundErrorMessage
+                               : undefined
+                           }
+                           {...field}>
+            <option key="placeholder" value="">Select output from list</option>
+            {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
+              <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
+            )}
+          </FormikFormGroup>
+        );
+      }
+
+      return null;
   }
 };
 

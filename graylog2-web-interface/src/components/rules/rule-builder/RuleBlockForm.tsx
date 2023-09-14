@@ -219,6 +219,7 @@ const RuleBlockForm = ({
                                           order={order}
                                           blockId={existingBlock?.id}
                                           outputVariableList={outputVariableList}
+                                          blockType={type}
                                           resetField={(fieldName) => resetField(fieldName, setFieldValue)} />
                     </Row>
                   ),
