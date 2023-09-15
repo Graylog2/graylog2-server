@@ -34,6 +34,8 @@ type Props = {
   resetField: (fieldName: string) => void;
 }
 
+const SupportedFieldTypes = [RuleBuilderTypes.String, RuleBuilderTypes.Object, RuleBuilderTypes.Number, RuleBuilderTypes.Boolean];
+
 const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList, blockType, resetField }: Props) => {
   const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
   const [field, fieldMeta] = useField(param.name);
@@ -89,6 +91,8 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
     if (!shouldHandlePrimaryParam()) return false;
 
     if (filteredOutputVariableList().length <= 0) return false;
+
+    if (!SupportedFieldTypes.includes(param.type)) return false;
 
     if (primaryInputToggle === 'select') return true;
 
