@@ -81,9 +81,9 @@ public class IndexFieldTypesServiceTest {
         dbService.save(createDto("graylog_5", "index_set_id", Set.of(FieldTypeDTO.create("field_changing_type", "long"))));
 
         List<String> typeHistory = dbService.fieldTypeHistory("index_set_id", "field_changing_type", true);
-        assertThat(typeHistory).isEqualTo(List.of("long", "text", "double", "long"));
+        assertThat(typeHistory).isEqualTo(List.of("long", "string_fts", "double", "long"));
         typeHistory = dbService.fieldTypeHistory("index_set_id", "field_changing_type", false);
-        assertThat(typeHistory).isEqualTo(List.of("long", "text", "text", "double", "long", "long"));
+        assertThat(typeHistory).isEqualTo(List.of("long", "string_fts", "string_fts", "double", "long", "long"));
 
     }
 
@@ -93,9 +93,9 @@ public class IndexFieldTypesServiceTest {
         dbService.save(createDto("graylog_1", "index_set_id", Set.of()));
 
         List<String> typeHistory = dbService.fieldTypeHistory("index_set_id", "message", true);
-        assertThat(typeHistory).isEqualTo(List.of("text"));
+        assertThat(typeHistory).isEqualTo(List.of("string_fts"));
         typeHistory = dbService.fieldTypeHistory("index_set_id", "message", false);
-        assertThat(typeHistory).isEqualTo(List.of("text", "text"));
+        assertThat(typeHistory).isEqualTo(List.of("string_fts", "string_fts"));
     }
 
     @Test
