@@ -133,6 +133,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout = 2000;
 
+    @Parameter(value = "root_password_sha2")
+    private String rootPasswordSha2;
+
     @Parameter(value = "user_password_default_algorithm")
     private String userPasswordDefaultAlgorithm = "bcrypt";
 
@@ -576,5 +579,9 @@ public class Configuration extends BaseConfiguration {
 
     public String getHostname() {
         return hostname;
+    }
+
+    public String getRootPasswordSha2() {
+        return rootPasswordSha2;
     }
 }

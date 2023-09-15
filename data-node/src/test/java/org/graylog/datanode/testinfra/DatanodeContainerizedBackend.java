@@ -16,28 +16,14 @@
  */
 package org.graylog.datanode.testinfra;
 
-import com.google.common.base.Suppliers;
-import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
-import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.graylog.testing.graylognode.MavenPackager;
-import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.images.builder.ImageFromDockerfile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.Properties;
-import java.util.function.Supplier;
 
 public class DatanodeContainerizedBackend {
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
