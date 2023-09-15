@@ -34,7 +34,6 @@ import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/ho
 import type { Sort } from 'stores/PaginationTypes';
 import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
-import QueryHelper from 'components/common/QueryHelper';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import { ActionContext } from 'views/logic/ActionContext';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
@@ -151,7 +150,6 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
                              useQueryParameter={false}>
                 <div style={{ marginBottom: 5 }}>
                   <SearchForm onSearch={onSearch}
-                              queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
                               onReset={onResetSearch}
                               query={query}
                               topMargin={0} />
