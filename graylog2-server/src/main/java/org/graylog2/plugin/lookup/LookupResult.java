@@ -45,12 +45,12 @@ import java.util.Map;
 @AutoValue
 public abstract class LookupResult {
     private static final long NO_TTL = Long.MAX_VALUE;
+
     // Cache erroneous results with a shorter TTL
     private static final long ERROR_CACHE_TTL = Duration.ofSeconds(5).toMillis();
-    private static final long EMPTY_CACHE_TTL = Duration.ofMinutes(5).toMillis();
 
     private static final LookupResult EMPTY_LOOKUP_RESULT = builder()
-            .cacheTTL(EMPTY_CACHE_TTL)
+            .cacheTTL(NO_TTL)
             .build();
 
     private static final LookupResult DEFAULT_ERROR_LOOKUP_RESULT = builder()
