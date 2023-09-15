@@ -24,6 +24,7 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
@@ -87,7 +88,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
             .id("index-set-1")
             .title("Index set 1")
             .description("For testing")
-            .indexPrefix("graylog")
+            .indexPrefix("test_index_set")
             .creationDate(ZonedDateTime.now())
             .shards(1)
             .replicas(0)
@@ -103,7 +104,6 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     protected static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
     private final Set<String> indicesToCleanUp = new HashSet<>();
     protected Indices indices;
-    @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
@@ -111,17 +111,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         super(elasticsearch);
     }
 
-    protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
-        return ImmutableMap.of(
-                "template", indexWildcard,
-                "mappings", mapping
-        );
-
-    }
-
     @BeforeEach
     public void setUp() {
-        //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(searchServer().adapters().nodeAdapter());
         final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(node,
@@ -274,9 +265,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
     @ContainerMatrixTest
     public void indexRangeStatsThrowsExceptionIfIndexDoesNotExists() {
-        assertThrows(IndexNotFoundException.class, () -> {
-            indices.indexRangeStatsOfIndex("does-not-exist");
-        });
+        assertThrows(IndexNotFoundException.class, () -> indices.indexRangeStatsOfIndex("does-not-exist"));
     }
 
     @ContainerMatrixTest
@@ -306,7 +295,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 "properties", ImmutableMap.of("message",
                         ImmutableMap.of("type", "text")));
 
-        final Map<String, Object> templateSource = createTemplateFor(indexSet.getIndexWildcard(), beforeMapping);
+        var templateSource = Template.create(indexSet.getIndexWildcard(), new Template.Mappings(beforeMapping), 1L, new Template.Settings(Map.of()));
 
         client().putTemplate(templateName, templateSource);
 
@@ -409,7 +398,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
         try {
             indices.deleteIndexTemplate(indexSet);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         assertThat(client().templateExists(templateName)).isFalse();
@@ -651,7 +640,6 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         assertThat(indices.exists(index1)).isTrue();
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     public static final class IndicesEventListener {
         final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
         final List<IndicesDeletedEvent> indicesDeletedEvents = Collections.synchronizedList(new ArrayList<>());

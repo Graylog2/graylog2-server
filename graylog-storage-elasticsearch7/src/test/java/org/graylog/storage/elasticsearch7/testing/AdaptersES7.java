@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7.testing;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.storage.elasticsearch7.ComposableIndexTemplateAdapter;
 import org.graylog.storage.elasticsearch7.CountsAdapterES7;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.IndexFieldTypePollerAdapterES7;
@@ -68,7 +69,9 @@ public class AdaptersES7 implements Adapters {
                 client,
                 new StatsApi(objectMapper, client),
                 new CatApi(objectMapper, client),
-                new ClusterStateApi(objectMapper, client)
+                new ClusterStateApi(objectMapper, client),
+                objectMapper,
+                new ComposableIndexTemplateAdapter(client, objectMapper)
         );
     }
 

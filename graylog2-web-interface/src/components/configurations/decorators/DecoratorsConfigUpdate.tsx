@@ -99,9 +99,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
 
   return (
     <BootstrapModalWrapper showModal={show}
-                           onHide={_onCancel}
-                           data-app-section="configurations_decorators"
-                           data-event-element={modalTitle}>
+                           onHide={_onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>

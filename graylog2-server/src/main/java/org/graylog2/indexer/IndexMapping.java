@@ -19,9 +19,9 @@ package org.graylog2.indexer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.Message;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     public static final String TYPE_MESSAGE = "message";
 
     @Override
-    public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
+    public Template toTemplate(IndexSetConfig indexSetConfig, String indexPattern, Long order) {
         return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order);
     }
 
@@ -43,26 +43,23 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "filter", "lowercase"));
     }
 
-    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
-        final Map<String, Object> settings = Collections.singletonMap(
-                "analysis", Collections.singletonMap("analyzer", analyzerKeyword())
-                );
-        final Map<String, Object> mappings = mapping(analyzer);
+    public Template messageTemplate(final String indexPattern, final String analyzer, final Long order) {
+        var settings = new Template.Settings(Map.of(
+                "index", Map.of(
+                        "analysis", Map.of("analyzer", analyzerKeyword())
+                )
+        ));
+        var mappings = mapping(analyzer);
 
-        return createTemplate(template, order, settings, mappings);
+        return createTemplate(indexPattern, order, settings, mappings);
     }
 
-    Map<String, Object> createTemplate(String template, int order, Map<String, Object> settings, Map<String, Object> mappings) {
-        return ImmutableMap.of(
-                "template", template,
-                "order", order,
-                "settings", settings,
-                "mappings", mappings
-        );
+    Template createTemplate(String indexPattern, Long order, Template.Settings settings, Template.Mappings mappings) {
+        return Template.create(indexPattern, mappings, order, settings);
     }
 
-    protected Map<String, Object> mapping(String analyzer) {
-        return ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
+    protected Template.Mappings mapping(String analyzer) {
+        return new Template.Mappings(ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer)));
     }
 
     protected Map<String, Object> messageMapping(final String analyzer) {

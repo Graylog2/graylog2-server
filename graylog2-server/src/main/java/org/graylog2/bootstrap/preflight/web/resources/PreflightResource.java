@@ -42,6 +42,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -98,7 +100,7 @@ public class PreflightResource {
     @POST
     @Path("/ca/create")
     @NoAuditEvent("No Audit Event needed")
-    public void createCA() throws CACreationException, KeyStoreStorageException {
+    public void createCA() throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
         // TODO: get validity from preflight UI
         caService.create(CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
     }

@@ -27,9 +27,11 @@ import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
@@ -40,24 +42,26 @@ import java.util.Optional;
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
 
-
     private final Configuration localConfiguration;
     private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
     private final MongoCertSecureConfiguration mongoCertSecureConfiguration;
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
+    private final byte[] signingKey;
 
     @Inject
     public OpensearchConfigurationProvider(Configuration localConfiguration,
                                            DatanodeConfiguration datanodeConfiguration,
                                            UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
                                            MongoCertSecureConfiguration mongoCertSecureConfiguration,
-                                           InSecureConfiguration inSecureConfiguration) {
+                                           InSecureConfiguration inSecureConfiguration,
+                                           final @Named("password_secret") String passwordSecret) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
         this.mongoCertSecureConfiguration = mongoCertSecureConfiguration;
         this.inSecureConfiguration = inSecureConfiguration;
+        this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
@@ -82,7 +86,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             if (chosenSecurityConfigurationVariant.isPresent()) {
                 securityConfiguration = chosenSecurityConfigurationVariant.get()
                         .build()
-                        .configure(localConfiguration);
+                        .configure(localConfiguration, signingKey);
                 opensearchProperties.putAll(securityConfiguration.getProperties());
             }
 
@@ -93,8 +97,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
-                    localConfiguration.getRestApiUsername(),
-                    localConfiguration.getRestApiPassword(),
                     "datanode-cluster",
                     localConfiguration.getDatanodeNodeName(),
                     Collections.emptyList(),
@@ -122,6 +124,10 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");
+        //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
+
+        // Uncomment the following line to get DEBUG logs for the underlying Opensearch
+        //config.put("logger.org.opensearch", "debug");
 
         return config.build();
     }

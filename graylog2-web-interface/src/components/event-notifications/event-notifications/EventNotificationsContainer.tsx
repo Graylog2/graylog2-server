@@ -153,7 +153,7 @@ const EventNotificationsContainer = () => {
                                               columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                               onColumnsChange={onColumnsChange}
                                               onSortChange={onSortChange}
-                                              bulkActions={renderBulkActions}
+                                              bulkSelection={{ actions: renderBulkActions }}
                                               activeSort={layoutConfig.sort}
                                               onPageSizeChange={onPageSizeChange}
                                               pageSize={layoutConfig.pageSize}

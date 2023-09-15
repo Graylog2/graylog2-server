@@ -32,7 +32,7 @@ public interface ManagableProcess<T> {
 
     void onEvent(ProcessEvent event);
 
-    void setStateMachineTracer(StateMachineTracer stateMachineTracer);
+    void addStateMachineTracer(StateMachineTracer stateMachineTracer);
 
     boolean isInState(ProcessState state);
 }

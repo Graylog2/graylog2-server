@@ -17,13 +17,14 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.indexer.indices.Template;
 
 import java.util.Map;
 
 public class IndexMapping7 extends IndexMapping {
     @Override
-    protected Map<String, Object> mapping(String analyzer) {
-        return messageMapping(analyzer);
+    protected Template.Mappings mapping(String analyzer) {
+        return new Template.Mappings(messageMapping(analyzer));
     }
 
     @Override
@@ -35,13 +36,8 @@ public class IndexMapping7 extends IndexMapping {
     }
 
     @Override
-    Map<String, Object> createTemplate(String template, int order, Map<String, Object> settings, Map<String, Object> mappings) {
-        return ImmutableMap.of(
-                "index_patterns", template,
-                "order", order,
-                "settings", settings,
-                "mappings", mappings
-        );
+    Template createTemplate(String indexPattern, Long order, Template.Settings settings, Template.Mappings mappings) {
+        return Template.create(indexPattern, mappings, order, settings);
     }
 
     @Override

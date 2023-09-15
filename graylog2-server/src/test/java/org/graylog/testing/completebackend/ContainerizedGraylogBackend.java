@@ -16,11 +16,11 @@
  */
 package org.graylog.testing.completebackend;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog.testing.graylognode.ExecutableNotFoundException;
+import org.graylog.testing.graylognode.MavenPackager;
+import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.storage.SearchVersion;
@@ -33,37 +33,43 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
+    public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdran";
+    public static final String ROOT_PASSWORD_SHA_2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+
     private Network network;
     private SearchServerInstance searchServer;
     private MongoDBInstance mongodb;
     private MailServerContainer emailServerInstance;
     private NodeInstance node;
 
-    private ContainerizedGraylogBackend() {
+    private ContainerizedGraylogBackend() {}
+
+    public synchronized static ContainerizedGraylogBackend createStarted(final SearchVersion version,
+                                                                         final MongodbServer mongodbVersion,
+                                                                         final int[] extraPorts,
+                                                                         final List<URL> mongoDBFixtures,
+                                                                         final PluginJarsProvider pluginJarsProvider,
+                                                                         final MavenProjectDirProvider mavenProjectDirProvider,
+                                                                         final List<String> enabledFeatureFlags,
+                                                                         final boolean preImportLicense,
+                                                                         final boolean withMailServerEnabled) {
+
+        return new ContainerizedGraylogBackend().create(version, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withMailServerEnabled);
     }
 
-    public static ContainerizedGraylogBackend createStarted(SearchVersion version, MongodbServer mongodbVersion,
-                                                            int[] extraPorts, List<URL> mongoDBFixtures,
-                                                            PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
-                                                            final List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
-
-        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend();
-        backend.create(version, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withMailServerEnabled);
-        return backend;
-    }
-
-    private void create(final SearchVersion version, MongodbServer mongodbVersion,
-                        int[] extraPorts, List<URL> mongoDBFixtures,
-                        PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
-                        List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
+    private ContainerizedGraylogBackend create(final SearchVersion version,
+                                        final MongodbServer mongodbVersion,
+                                        final int[] extraPorts,
+                                        final List<URL> mongoDBFixtures,
+                                        final PluginJarsProvider pluginJarsProvider,
+                                        final MavenProjectDirProvider mavenProjectDirProvider,
+                                        final List<String> enabledFeatureFlags,
+                                        final boolean preImportLicense,
+                                        final boolean withMailServerEnabled) {
         final var network = Network.newNetwork();
         final var builder = SearchServerInstanceProvider.getBuilderFor(version).orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
 
@@ -74,21 +80,23 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         mongoDB.dropDatabase();
         mongoDB.importFixtures(mongoDBFixtures);
 
-        SearchServerInstance searchServer = builder.network(network).featureFlags(enabledFeatureFlags).build();
+        MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
+
+        SearchServerInstance searchServer = builder
+                .network(network)
+                .mongoDbUri(mongoDB.internalUri())
+                .passwordSecret(PASSWORD_SECRET)
+                .rootPasswordSha2(ROOT_PASSWORD_SHA_2)
+                .featureFlags(enabledFeatureFlags)
+                .build();
 
         if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
         try {
-            NodeInstance node = NodeInstance.createStarted(
-                    network,
-                    MongoDBInstance.internalUri(),
-                    searchServer.internalUri(),
-                    searchServer.version(),
-                    extraPorts,
-                    pluginJarsProvider, mavenProjectDirProvider,
-                    enabledFeatureFlags);
+            var nodeContainerConfig = new NodeContainerConfig(network, mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags);
+            NodeInstance node = NodeInstance.createStarted(nodeContainerConfig);
             this.network = network;
             this.searchServer = searchServer;
             this.mongodb = mongoDB;
@@ -103,6 +111,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
             LOG.error("------------------------------ Search Server logs: --------------------------------------\n{}", searchServer.getLogs());
             throw ex;
         }
+        return this;
     }
 
     private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {
@@ -160,8 +169,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public void close() {
         node.close();
-        mongodb.close();
         searchServer.close();
+        mongodb.close();
 
         if (emailServerInstance != null) {
             emailServerInstance.close();

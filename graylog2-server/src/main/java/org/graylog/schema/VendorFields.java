@@ -37,4 +37,5 @@ public class VendorFields {
     public static final String VENDOR_TRANSACTION_ID = "vendor_transaction_id";
     public static final String VENDOR_TRANSACTION_TYPE = "vendor_transaction_type";
     public static final String VENDOR_USER_TYPE = "vendor_user_type";
+    public static final String VENDOR_VERSION = "vendor_version";
 }

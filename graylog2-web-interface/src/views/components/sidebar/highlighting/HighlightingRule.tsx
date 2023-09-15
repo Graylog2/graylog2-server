@@ -44,7 +44,7 @@ export const Container = styled.div<{ $displayBorder?: boolean }>(({ theme, $dis
 `);
 
 const RightCol = styled.div`
-  flex: 1
+  flex: 1;
 `;
 
 const ButtonContainer = styled.div`

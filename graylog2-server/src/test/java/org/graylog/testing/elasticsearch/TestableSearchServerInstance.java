@@ -42,11 +42,14 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     private static final Map<ContainerCacheKey, GenericContainer<?>> containersByVersion = new ConcurrentHashMap<>();
 
     protected static final int OPENSEARCH_PORT = 9200;
-    protected static final String NETWORK_ALIAS = "elasticsearch";
 
     private final SearchVersion version;
     protected final String heapSize;
-    protected final GenericContainer<?> container;
+    protected final Network network;
+    protected final String hostname;
+    protected GenericContainer<?> container;
+
+    protected static volatile boolean isFirstContainerStart = true;
 
     @Override
     public abstract Client client();
@@ -54,13 +57,18 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public abstract FixtureImporter fixtureImporter();
 
-    protected TestableSearchServerInstance(final SearchVersion version, final Network network, final String heapSize) {
+    protected TestableSearchServerInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize) {
         this.version = version;
         this.heapSize = heapSize;
-        this.container = createContainer(version, network, heapSize);
+        this.network = network;
+        this.hostname = hostname;
     }
 
     protected abstract String imageName();
+
+    public void createContainer() {
+        this.container = createContainer(version, network, heapSize);
+    }
 
     @Override
     public GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize) {
@@ -71,9 +79,11 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
             GenericContainer<?> container = buildContainer(image, network);
             container.start();
             if (LOG.isDebugEnabled()) {
-                container.followOutput(new Slf4jLogConsumer(LOG));
+                container.followOutput(new Slf4jLogConsumer(LOG).withPrefix(image));
             }
             containersByVersion.put(cacheKey, container);
+        } else {
+            isFirstContainerStart = false;
         }
         return containersByVersion.get(cacheKey);
     }
@@ -100,7 +110,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     @Override
     public String internalUri() {
-        return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, OPENSEARCH_PORT);
+        return String.format(Locale.US, "http://%s:%d", hostname, OPENSEARCH_PORT);
     }
 
     @Override
@@ -132,4 +142,8 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         return this.container.getHost() + ":" + this.container.getMappedPort(9200);
     }
 
+    public TestableSearchServerInstance init() {
+        createContainer();
+        return this;
+    }
 }

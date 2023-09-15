@@ -16,6 +16,13 @@
  */
 import trim from 'lodash/trim';
 
+import {
+  isKeywordOperator,
+  isTypeString,
+  isTypeKeyword,
+  isTypeText,
+} from 'views/components/searchbar/completions/token-helper';
+
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 import type { CompletionResult, Token } from '../queryinput/ace-types';
 
@@ -49,8 +56,14 @@ const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Toke
 
 class OperatorCompletion implements Completer {
   // eslint-disable-next-line class-methods-use-this
-  getCompletions = ({ currentToken, lastToken, prefix, tokens, currentTokenIdx }: CompleterContext): Array<CompletionResult> => {
-    if (currentToken?.type === 'keyword') {
+  getCompletions = ({ currentToken, prevToken, prefix, tokens, currentTokenIdx }: CompleterContext): Array<CompletionResult> => {
+    if (
+      isTypeKeyword(currentToken)
+      || isTypeString(currentToken)
+      || !tokens?.length
+      || !prefix
+      || (isKeywordOperator(prevToken) && prevToken.value === 'NOT')
+    ) {
       return [];
     }
 
@@ -62,7 +75,7 @@ class OperatorCompletion implements Completer {
       return operators.filter(matchesFieldName);
     }
 
-    if (lastToken && (lastToken.type === 'string' || lastToken.type === 'text')) {
+    if (prevToken && (isTypeString(prevToken) || isTypeText(prevToken))) {
       const matchesFieldName = _matchesFieldName(prefix);
 
       return [...combiningOperators, ...operators].filter(matchesFieldName);

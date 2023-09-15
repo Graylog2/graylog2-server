@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import type { SelectProps } from '@mantine/core';
 import { Select as MantineSelect } from '@mantine/core';
-import { ThemeContext } from 'styled-components';
+import { useTheme } from 'styled-components';
 
 const Select = ({ children, ...otherProps }: SelectProps) => {
-  const theme = useContext(ThemeContext);
+  const theme = useTheme();
   const SelectStyles = () => ({
     input: {
       color: theme.colors.input.color,
