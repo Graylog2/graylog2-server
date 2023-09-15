@@ -31,7 +31,8 @@ public enum RuleBuilderFunctionGroup {
     LOOKUP("Lookup Table Functions", 37),
     ENCODING("Encoding/Decoding Functions", 38),
     HASH("Hash Functions", 39),
-    EXTRACTORS("Extractor Functions", 40),
+    SYSLOG("Syslog Functions", 40),
+    EXTRACTORS("Extractor Functions", 50),
     OTHER("Other", 999);
 
     private String name;
