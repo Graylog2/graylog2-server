@@ -256,7 +256,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @Timed
     @Path("/configurations")
     @ApiOperation(value = "Assign configurations to sidecars")
-    @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
+    @RequiresPermissions({SidecarRestPermissions.SIDECARS_READ, SidecarRestPermissions.SIDECARS_UPDATE})
     @AuditEvent(type = SidecarAuditEventTypes.SIDECAR_UPDATE)
     public Response assignConfiguration(@ApiParam(name = "JSON body", required = true)
                                         @Valid @NotNull NodeConfigurationRequest request) throws NotFoundException {
