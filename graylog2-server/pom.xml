@@ -620,7 +620,6 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
-            <version>${protobuf.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
