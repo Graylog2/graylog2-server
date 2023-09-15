@@ -18,6 +18,7 @@ package org.graylog2.indexer.retention.strategies;
 
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -271,7 +272,8 @@ public class AbstractIndexRetentionStrategyTest {
                 ZonedDateTime.now(ZoneId.systemDefault()),
                 null, null, null,
                 1, true,
-                Duration.standardSeconds(5));
+                Duration.standardSeconds(5),
+                new CustomFieldMappings());
     }
 
     private IndexSetConfig createTimeBased(int minDays, int maxDays) {
@@ -290,6 +292,7 @@ public class AbstractIndexRetentionStrategyTest {
                 ZonedDateTime.now(ZoneId.systemDefault()),
                 null, null, null,
                 1, true,
-                Duration.standardSeconds(5));
+                Duration.standardSeconds(5),
+                new CustomFieldMappings());
     }
 }

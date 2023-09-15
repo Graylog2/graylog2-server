@@ -107,7 +107,7 @@ import org.graylog2.telemetry.rest.TelemetryResource;
 public class RestResourcesModule extends Graylog2Module {
     private final Configuration configuration;
 
-    public RestResourcesModule(Configuration configuration) {
+    public RestResourcesModule(final Configuration configuration) {
         this.configuration = configuration;
     }
 

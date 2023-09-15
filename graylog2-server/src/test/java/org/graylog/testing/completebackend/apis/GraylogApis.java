@@ -37,7 +37,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.CoreMatchers.not;
 
-public class GraylogApis {
+public class GraylogApis implements GraylogRestApi {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogApis.class);
 
     ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
