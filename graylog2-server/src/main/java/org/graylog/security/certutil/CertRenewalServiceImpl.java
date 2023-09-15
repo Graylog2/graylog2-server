@@ -55,7 +55,6 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 

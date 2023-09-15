@@ -23,12 +23,9 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.utilities.uri.TransportAddressSanitizer;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -37,9 +34,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Api(value = "Certificates")
