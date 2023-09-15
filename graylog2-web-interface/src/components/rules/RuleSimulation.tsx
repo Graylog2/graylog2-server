@@ -65,8 +65,8 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
     setRuleSimulationResult,
   } = useContext(PipelineRulesContext);
 
-  const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {}).sort();
-  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort();
+  const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {}).sort((a, b) => Number(a) - Number(b));
+  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort((a, b) => Number(a) - Number(b));
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
