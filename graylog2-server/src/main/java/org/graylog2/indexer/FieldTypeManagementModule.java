@@ -16,8 +16,14 @@
  */
 package org.graylog2.indexer;
 
-public class Constants {
-    public static final String COMPOSABLE_INDEX_TEMPLATES_FEATURE = "composable_index_templates";
-    public static final String FIELD_TYPES_MANAGEMENT_FEATURE = "field_types_management";
-    public static final String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
+import org.graylog2.migrations.V20230905081400_CreateFieldTypeMappingsManagerRole;
+import org.graylog2.plugin.PluginModule;
+import org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource;
+
+public class FieldTypeManagementModule extends PluginModule {
+    @Override
+    protected void configure() {
+        addSystemRestResource(FieldTypeMappingsResource.class);
+        addMigration(V20230905081400_CreateFieldTypeMappingsManagerRole.class);
+    }
 }
