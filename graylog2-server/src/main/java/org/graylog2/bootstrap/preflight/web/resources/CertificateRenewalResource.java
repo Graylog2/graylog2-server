@@ -69,7 +69,7 @@ public class CertificateRenewalResource implements PluginRestResource {
         // Nodes are not filtered right now so that you can manually initiate a renewal for every node available
         return certRenewalService.findNodes().stream().map(triple -> {
             final var n = triple.getLeft();
-            final var certValidUntil = triple.getRight().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            final var certValidUntil = triple.getRight() != null ? triple.getRight().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() : null;
             return new DataNode(n.getNodeId(),
                     n.getType(),
                     transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
