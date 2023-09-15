@@ -54,8 +54,6 @@ public class DatanodeClusterIT {
     static Path tempDir;
     private String hostnameNodeA;
     private KeyStore trustStore;
-    private String initialAdminUsername;
-    private String initialAdminPassword;
     private KeystoreInformation ca;
     private Network network;
     private MongoDBTestService mongoDBTestService;
@@ -71,8 +69,6 @@ public class DatanodeClusterIT {
         hostnameNodeA = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         final KeystoreInformation transportNodeA = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeA);
         final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
-        initialAdminUsername = RandomStringUtils.randomAlphabetic(10);
-        initialAdminPassword = RandomStringUtils.randomAlphabetic(10);
 
         this.network = Network.newNetwork();
         this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, network);
@@ -83,9 +79,7 @@ public class DatanodeClusterIT {
                 mongoDBTestService,
                 hostnameNodeA,
                 transportNodeA,
-                httpNodeA,
-                initialAdminUsername,
-                initialAdminPassword
+                httpNodeA
         );
 
 
@@ -98,9 +92,7 @@ public class DatanodeClusterIT {
                 mongoDBTestService,
                 hostnameNodeB,
                 transportNodeB,
-                httpNodeB,
-                initialAdminUsername,
-                initialAdminPassword
+                httpNodeB
         );
 
         Stream.of(nodeA, nodeB).parallel().forEach(DatanodeContainerizedBackend::start);
@@ -130,9 +122,7 @@ public class DatanodeClusterIT {
                 network, mongoDBTestService,
                 hostnameNodeC,
                 transportNodeC,
-                httpNodeC,
-                initialAdminUsername,
-                initialAdminPassword
+                httpNodeC
         );
 
         nodeC.start();
@@ -146,9 +136,7 @@ public class DatanodeClusterIT {
                                                                  MongoDBTestService mongodb,
                                                                  String hostname,
                                                                  KeystoreInformation transportKeystore,
-                                                                 KeystoreInformation httpKeystore,
-                                                                 String restUsername,
-                                                                 String restPassword) {
+                                                                 KeystoreInformation httpKeystore) {
         return new DatanodeContainerizedBackend(
                 network,
                 mongodb,
@@ -170,10 +158,6 @@ public class DatanodeClusterIT {
                     // configure http security
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE", "datanode-https-certificates.p12");
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", httpKeystore.passwordAsString());
-
-                    // configure initial admin username and password for Opensearch REST
-                    datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", restUsername);
-                    datanodeContainer.withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", restPassword);
 
                     // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
                     // to be able to reach opensearch from outside the container and docker network (true?)

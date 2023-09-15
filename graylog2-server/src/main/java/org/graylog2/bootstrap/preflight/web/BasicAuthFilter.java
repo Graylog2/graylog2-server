@@ -60,7 +60,7 @@ public class BasicAuthFilter implements ContainerRequestFilter {
 
         if (authorization == null || authorization.isEmpty()) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("You cannot access this resource")
+                    .entity("You cannot access this resource, missing authorization header!")
                     .type(MediaType.TEXT_PLAIN_TYPE)
                     .header("WWW-Authenticate", "Basic realm=" + this.realm)
                     .build());
@@ -77,8 +77,9 @@ public class BasicAuthFilter implements ContainerRequestFilter {
 
         if (!isUserMatching(username, password)) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("You cannot access this resource")
-                    .header("WWW-Authenticate", "Basic realm=preflight-config")
+                    .entity("You cannot access this resource, invalid username/password combination!")
+                    .type(MediaType.TEXT_PLAIN_TYPE)
+                    .header("WWW-Authenticate", "Basic realm=" + this.realm)
                     .build());
         }
     }
