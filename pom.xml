@@ -117,7 +117,7 @@
         <gelfclient.version>1.5.0</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
-        <grpc.version>1.48.1</grpc.version>
+        <grpc.version>1.58.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>31.0.1-jre</guava.version>
         <guice.version>5.0.1</guice.version>
@@ -159,7 +159,7 @@
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.5</pkts.version>
         <prometheus-client.version>0.11.0</prometheus-client.version>
-        <protobuf.version>3.17.3</protobuf.version>
+        <protobuf.version>3.24.3</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -345,6 +345,20 @@
                 <groupId>org.xerial.snappy</groupId>
                 <artifactId>snappy-java</artifactId>
                 <version>${snappy-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-bom</artifactId>
+                <version>${protobuf.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>${grpc.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
