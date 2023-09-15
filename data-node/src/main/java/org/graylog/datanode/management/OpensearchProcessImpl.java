@@ -24,10 +24,10 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchInfo;
 import org.graylog.datanode.process.ProcessEvent;
+import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
-import org.graylog.security.certutil.CaService;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -42,6 +42,7 @@ import java.util.Queue;
 class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
+    private final StateMachineTracerAggregator tracerAggregator;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<OpensearchConfiguration> configuration = Optional.empty();
@@ -62,13 +63,15 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = ProcessStateMachine.createNew();
+        tracerAggregator = new StateMachineTracerAggregator();
+        this.processState.setTrace(tracerAggregator);
         this.stdout = new CircularFifoQueue<>(logsCacheSize);
         this.stderr = new CircularFifoQueue<>(logsCacheSize);
         this.trustManager = trustManager;
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
-        return OpensearchRestClient.build(configuration, trustManager);
+        return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
     }
 
     @Override
@@ -86,7 +89,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(datanodeConfiguration.nodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess.processInfo());
+        return new OpensearchInfo(datanodeConfiguration.nodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
@@ -95,8 +98,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 .map(httpHost -> new URIBuilder()
                         .setHost(httpHost.getHostName())
                         .setPort(httpHost.getPort())
-                        .setScheme(httpHost.getSchemeName())
-                        .setUserInfo(configuration.get().authUsername(), configuration.get().authPassword()).toString())
+                        .setScheme(httpHost.getSchemeName()).toString())
                 .orElse(""); // TODO: will this cause problems in the nodeservice?
         return URI.create(baseUrl);
     }
@@ -107,8 +109,8 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     @Override
-    public void setStateMachineTracer(StateMachineTracer stateMachineTracer) {
-        this.processState.setTrace(stateMachineTracer);
+    public void addStateMachineTracer(StateMachineTracer stateMachineTracer) {
+        this.tracerAggregator.addTracer(stateMachineTracer);
     }
 
     public void setLeaderNode(boolean isLeaderNode) {

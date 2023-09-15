@@ -67,9 +67,7 @@ const SavedSearchForm = (props: Props) => {
       <Position placement="left"
                 target={target}>
         <Popover title="Name of search"
-                 id="saved-search-popover"
-                 data-app-section="saved_search_form"
-                 data-event-element="Name of search">
+                 id="saved-search-popover">
           <StyledForm onSubmit={stopEvent}>
             <FormGroup>
               <ControlLabel htmlFor="title">Title</ControlLabel>
@@ -79,7 +77,8 @@ const SavedSearchForm = (props: Props) => {
                            placeholder="Enter title"
                            onChange={onChangeTitle} />
             </FormGroup>
-            {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component && <Component key={id} disabledViewCreation={disableSaveAs} />))}
+            {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component
+              && <Component key={id} disabledViewCreation={disableSaveAs} />))}
             <ButtonToolbar>
               {!isCreateNew && (
                 <Button bsStyle="primary"

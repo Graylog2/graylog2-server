@@ -28,7 +28,7 @@ class ProcessWatchdogTracerTest {
     void testLifecycle() {
         final TestableProcess process = new TestableProcess();
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, 3);
-        process.setStateMachineTracer(watchdog);
+        process.addStateMachineTracer(watchdog);
         process.restart();
 
         // both process and watchdog are running now. Let's stop the process and see if the watchdog will restart it

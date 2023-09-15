@@ -31,8 +31,7 @@ const ErrorPopover = ({ errorText, title = 'Error', placement = 'bottom' }: Prop
   const overlay = (
     <Popover id="error-popover"
              title={title}
-             className={Styles.overlay}
-             data-event-element={title}>
+             className={Styles.overlay}>
       {errorText}
     </Popover>
   );

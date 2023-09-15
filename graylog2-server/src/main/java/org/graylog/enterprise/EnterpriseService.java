@@ -29,7 +29,7 @@ public class EnterpriseService {
     }
 
 
-    private boolean hasLicenseInstalled() {
+    public boolean hasLicenseInstalled() {
         return mongoConnection.getMongoDatabase().getCollection("licenses").countDocuments() > 0;
     }
 

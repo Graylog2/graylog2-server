@@ -15,26 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import 'styled-components';
+import type { ColorScheme } from '@graylog/sawmill';
+import type { StyledComponentsTheme } from '@graylog/sawmill/styled-components';
+import type { MantineTheme } from '@graylog/sawmill/mantine';
 
 declare module 'styled-components' {
-  // We need to define the theme interface here and can't use relative
-  // paths, because otherwise the paths do not get resolved properly
-  // when importing core components which are using the theme, in plugins.
-  import type { Colors } from 'src/theme/colors';
-  import type { Fonts } from 'src/theme/fonts';
-  import type { Utils } from 'src/theme/utils';
-  import type { ThemeMode } from 'src/theme/constants';
-  import type { Spacings } from 'src/theme/spacings';
-  import type { Breakpoints } from 'src/theme/breakpoints';
-
-  export interface DefaultTheme {
-    breakpoints: Breakpoints,
-    colors: Colors,
-    fonts: Fonts,
-    utils: Utils,
-    mode: ThemeMode,
-    spacings: Spacings,
-    changeMode: (string) => void,
-    components: { [component: string]: any }
+  export interface DefaultTheme extends StyledComponentsTheme {
+    changeMode: (newColorScheme: ColorScheme) => void,
+    mantine: MantineTheme
   }
 }

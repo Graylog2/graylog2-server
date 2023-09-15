@@ -16,10 +16,11 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { XMLParser } from 'fast-xml-parser';
+import { useCallback } from 'react';
 
-import usePluginEntities from 'hooks/usePluginEntities';
 import { DEFAULT_FEED } from 'components/content-stream/Constants';
 import AppConfig from 'util/AppConfig';
+import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
 
 export type FeedMediaContent = {
   'media:title'?: {
@@ -74,7 +75,6 @@ type RssFeed = {
     }
   }
 }
-const getDefaultTag = () => DEFAULT_FEED;
 
 const parseXML = (text: string): Array<FeedITem> => {
   const options = {
@@ -97,10 +97,18 @@ export const fetchNewsFeed = (rssUrl: string) => rssUrl && window.fetch(rssUrl, 
 export const CONTENT_STREAM_CONTENT_KEY = ['content-stream', 'content'];
 
 const useContentStream = (path?: string): { isLoadingFeed: boolean, feedList: Array<FeedITem>, error: Error } => {
+  const { contenStreamTags: { currentTag, isLoadingTags, contentStreamTagError } } = useContentStreamSettings();
   const { rss_url } = AppConfig.contentStream() || {};
-  const contentStreamPlugin = usePluginEntities('content-stream')[0];
-  const getPath = contentStreamPlugin?.hooks?.useContentStreamTag || getDefaultTag;
-  const rssUrl = rss_url && `${rss_url}/${path || getPath()}/feed`;
+
+  const getDefaultTag = useCallback(() => {
+    if (isLoadingTags || contentStreamTagError || !currentTag) {
+      return DEFAULT_FEED;
+    }
+
+    return currentTag;
+  }, [contentStreamTagError, currentTag, isLoadingTags]);
+
+  const rssUrl = rss_url && `${rss_url}/${path || getDefaultTag()}/feed`;
 
   const {
     data,

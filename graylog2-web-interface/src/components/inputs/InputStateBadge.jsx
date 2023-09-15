@@ -100,15 +100,19 @@ const InputStateBadge = createReactClass({
       });
     }
 
-    const sorted = Object.keys(sortedInputStates).sort(this.comparator.compare.bind(this.comparator)).map((state) => ({ state: state, count: sortedInputStates[state].length }));
+    const sorted = Object.keys(sortedInputStates).sort(this.comparator.compare.bind(this.comparator)).map((state) => ({
+      state: state,
+      count: sortedInputStates[state].length,
+    }));
 
     if (sorted.length > 0) {
-      const popOverText = sorted.map((state) => sortedInputStates[state.state].map((node) => <small><LinkToNode nodeId={node} />: {state.state}<br /></small>));
+      const popOverText = sorted.map((state) => sortedInputStates[state.state].map((node) => (
+        <small><LinkToNode nodeId={node} />: {state.state}<br />
+        </small>
+      )));
       const popover = (
         <Popover id="inputstate-badge-details"
-                 title={`Input States for ${input.title}`}
-                 data-app-section="input_state_badge"
-                 data-event-element="Input States">
+                 title={`Input States for ${input.title}`}>
           {popOverText}
         </Popover>
       );

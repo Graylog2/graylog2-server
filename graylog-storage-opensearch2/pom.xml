@@ -35,7 +35,6 @@
     <description>Graylog Storage Module for OpenSearch 2</description>
 
     <properties>
-        <opensearch.version>2.2.0-1</opensearch.version>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
@@ -53,8 +52,8 @@
         </dependency>
         <dependency>
             <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch22-rest-high-level-client</artifactId>
-            <version>${opensearch.version}</version>
+            <artifactId>opensearch2-rest-high-level-client</artifactId>
+            <version>${opensearch.shaded.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -64,14 +63,27 @@
         </dependency>
         <dependency>
             <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch22-rest-client-sniffer</artifactId>
-            <version>${opensearch.version}</version>
+            <artifactId>opensearch2-rest-client-sniffer</artifactId>
+            <version>${opensearch.shaded.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.opensearch</groupId>

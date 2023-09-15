@@ -29,6 +29,8 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
+import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.security.IndexerJwtAuthToken;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -55,16 +57,23 @@ public class VersionProbe {
     private final OkHttpClient okHttpClient;
     private final int connectionAttempts;
     private final Duration delayBetweenAttempts;
+    private final boolean isJwtAuthentication;
+    private final String jwtBearerToken;
 
     @Inject
     public VersionProbe(ObjectMapper objectMapper,
                         OkHttpClient okHttpClient,
                         @Named("elasticsearch_version_probe_attempts") int elasticsearchVersionProbeAttempts,
-                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay) {
+                        @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay,
+                        @RunsWithDataNode Boolean runsWithDataNode,
+                        @Named("indexer_use_jwt_authentication") boolean opensearchUseJwtAuthentication,
+                        @IndexerJwtAuthToken String jwtBearerToken) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
         this.connectionAttempts = elasticsearchVersionProbeAttempts;
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
+        this.isJwtAuthentication = runsWithDataNode || opensearchUseJwtAuthentication;
+        this.jwtBearerToken = jwtBearerToken;
     }
 
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
@@ -83,9 +92,9 @@ public class VersionProbe {
                                 }
                             }
                             if (connectionAttempts == 0) {
-                                LOG.info("Elasticsearch is not available. Retry #{}", attempt.getAttemptNumber());
+                                LOG.info("OpenSearch/Elasticsearch is not available. Retry #{}", attempt.getAttemptNumber());
                             } else {
-                                LOG.info("Elasticsearch is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
+                                LOG.info("OpenSearch/Elasticsearch is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
                             }
                         }
                     })
@@ -93,7 +102,7 @@ public class VersionProbe {
                     .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
                     .build().call(() -> this.probeAllHosts(hosts));
         } catch (ExecutionException | RetryException e) {
-            LOG.error("Unable to retrieve version from Elasticsearch node: ", e);
+            LOG.error("Unable to retrieve version from OpenSearch/Elasticsearch node: ", e);
         }
         return Optional.empty();
     }
@@ -126,9 +135,9 @@ public class VersionProbe {
         final Consumer<ResponseBody> errorLogger = (responseBody) -> {
             try {
                 final ErrorResponse errorResponse = errorResponseConverter.convert(responseBody);
-                LOG.error("Unable to retrieve version from Elasticsearch node {}:{}: {}", host.getHost(), host.getPort(), errorResponse);
+                LOG.error("Unable to retrieve version from OpenSearch/Elasticsearch node {}:{}: {}", host.getHost(), host.getPort(), errorResponse);
             } catch (IOException e) {
-                LOG.error("Unable to retrieve version from Elasticsearch node {}:{}: unknown error - an exception occurred while deserializing error response: {}", host.getHost(), host.getPort(), e);
+                LOG.error("Unable to retrieve version from OpenSearch/Elasticsearch node {}:{}: unknown error - an exception occurred while deserializing error response: {}", host.getHost(), host.getPort(), e);
             }
         };
 
@@ -138,17 +147,27 @@ public class VersionProbe {
                 .flatMap(this::parseVersion);
     }
 
-    private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
-        if (Strings.emptyToNull(host.getUserInfo()) != null) {
+    private Optional<String> getAuthToken(final URI host, final boolean useJWT) {
+        if(useJWT) {
+            return Optional.of(jwtBearerToken);
+        } else if (Strings.emptyToNull(host.getUserInfo()) != null) {
             final String[] credentials = host.getUserInfo().split(":");
             final String username = credentials[0];
             final String password = credentials[1];
-            final String authToken = Credentials.basic(username, password);
+            return Optional.of(Credentials.basic(username, password));
+        }
 
+        return Optional.empty();
+    }
+
+    private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
+        final Optional<String> authToken = getAuthToken(host, isJwtAuthentication);
+
+        if(authToken.isPresent()) {
             return okHttpClient.newBuilder()
                     .addInterceptor(chain -> {
                         final Request originalRequest = chain.request();
-                        final Request.Builder builder = originalRequest.newBuilder().header("Authorization", authToken);
+                        final Request.Builder builder = originalRequest.newBuilder().header("Authorization", authToken.get());
                         final Request newRequest = builder.build();
                         return chain.proceed(newRequest);
                     })

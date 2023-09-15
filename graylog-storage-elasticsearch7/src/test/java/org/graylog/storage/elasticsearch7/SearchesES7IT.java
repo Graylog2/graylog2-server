@@ -18,7 +18,6 @@ package org.graylog.storage.elasticsearch7;
 
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesIT;
 import org.junit.Rule;
 

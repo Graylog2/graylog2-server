@@ -1,0 +1,5 @@
+type = "added"
+message = "Added event definition title as a summary to Microsoft Teams notifications."
+
+issues = ["Graylog2/graylog-plugin-integrations#1341"]
+pulls = ["Graylog2/graylog-plugin-integrations#1343"]

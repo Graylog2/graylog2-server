@@ -17,6 +17,7 @@
 package org.graylog.testing.elasticsearch;
 
 import org.graylog2.indexer.MessageIndexTemplateProvider;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -55,15 +56,15 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
         addIndexTemplates(getGraylogDefaultMessageTemplates(searchServer().version()));
     }
 
-    private static Map<String, Map<String, Object>> getGraylogDefaultMessageTemplates(SearchVersion version) {
-        final Map<String, Object> template =
+    private static Map<String, Template> getGraylogDefaultMessageTemplates(SearchVersion version) {
+        var template =
                 new MessageIndexTemplateProvider().create(version, null)
-                        .messageTemplate("*", "standard", -1);
+                        .messageTemplate("*", "standard", 100L, null);
         return Collections.singletonMap("graylog-test-internal", template);
     }
 
-    private void addIndexTemplates(Map<String, Map<String, Object>> templates) {
-        for (Map.Entry<String, Map<String, Object>> template : templates.entrySet()) {
+    private void addIndexTemplates(Map<String, Template> templates) {
+        for (var template : templates.entrySet()) {
             final String templateName = template.getKey();
 
             searchServer().client().putTemplate(templateName, template.getValue());

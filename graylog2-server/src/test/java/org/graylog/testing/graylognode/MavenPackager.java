@@ -17,6 +17,7 @@
 package org.graylog.testing.graylognode;
 
 import com.google.common.base.Stopwatch;
+import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class MavenPackager {
         return includeFrontend ? MVN_COMMAND : MVN_COMMAND + EXCLUDE_FE;
     }
 
-    public static void packageJarIfNecessary(NodeContainerConfig config) {
+    public static synchronized void packageJarIfNecessary(final MavenProjectDirProvider mavenProjectDirProvider) {
         if (isRunFromMaven()) {
             LOG.info("Running from Maven. Assuming jars are current.");
         } else if (jarHasBeenPackagedInThisRun) {
@@ -49,7 +50,7 @@ public class MavenPackager {
         } else {
             LOG.info("Running from outside Maven. Packaging server jar now...");
             makeSureExecutableIsFound("mvn");
-            packageJar(config);
+            packageJar(mavenProjectDirProvider);
         }
     }
 
@@ -58,9 +59,9 @@ public class MavenPackager {
         return System.getProperty("surefire.test.class.path") != null;
     }
 
-    public static void packageJar(NodeContainerConfig config) {
-        Path pomDir = config.mavenProjectDirProvider.getProjectDir();
-        boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
+    public static void packageJar(final MavenProjectDirProvider mavenProjectDirProvider) {
+        Path pomDir = mavenProjectDirProvider.getProjectDir();
+        boolean includeFrontend = mavenProjectDirProvider.includeFrontend();
 
         Process p = startProcess(pomDir, includeFrontend);
 
