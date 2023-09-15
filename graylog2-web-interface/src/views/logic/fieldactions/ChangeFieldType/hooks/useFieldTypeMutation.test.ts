@@ -44,7 +44,7 @@ describe('useFieldTypeMutation', () => {
   });
 
   describe('putFiledTypeMutation', () => {
-    const putUrl = qualifyUrl(`${urlPrefix}/111`);
+    const putUrl = qualifyUrl(`${urlPrefix}`);
     const requestBody = { rotated: true, field: 'field', newFieldType: 'int', indexSetSelection: ['001'] };
 
     const requestBodyJSON = {
@@ -62,11 +62,9 @@ describe('useFieldTypeMutation', () => {
         result.current.putFiledTypeMutation(requestBody);
       });
 
-      await waitFor(() => expect(fetch)
-        .toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith(
-        'The field type changed successfully'));
+      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('The field type changed successfully'));
     });
 
     it('should display notification on fail', async () => {
