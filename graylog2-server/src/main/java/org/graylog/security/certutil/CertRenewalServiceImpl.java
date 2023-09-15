@@ -34,6 +34,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.utilities.uri.TransportAddressSanitizer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -71,6 +72,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final JobSchedulerClock clock;
     private final CaService caService;
     private final char[] passwordSecret;
+    private final TransportAddressSanitizer transportAddressSanitizer;
 
     // TODO: convert to config?
     private long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
@@ -84,7 +86,8 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final DBJobTriggerService jobTriggerService,
                                   final CaService caService,
                                   final JobSchedulerClock clock,
-                                  final @Named("password_secret") String passwordSecret) {
+                                  final @Named("password_secret") String passwordSecret,
+                                  final TransportAddressSanitizer transportAddressSanitizer) {
         this.clusterConfigService = clusterConfigService;
         this.keystoreMongoStorage = keystoreMongoStorage;
         this.nodeService = nodeService;
@@ -94,11 +97,12 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.clock = clock;
         this.caService = caService;
         this.passwordSecret = passwordSecret.toCharArray();
+        this.transportAddressSanitizer = transportAddressSanitizer;
     }
 
     @VisibleForTesting
     CertRenewalServiceImpl(final JobSchedulerClock clock) {
-        this(null, null, null, null, null, null, null, clock, "dummy");
+        this(null, null, null, null, null, null, null, clock, "dummy", null);
     }
 
     private RenewalPolicy getRenewalPolicy() {
@@ -210,12 +214,24 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     @Override
-    public List<Triple<Node, DataNodeProvisioningConfig, X509Certificate>> findNodes() {
+    public List<DataNode> findNodes() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
         return activeDataNodes.values().stream()
                 .map(this::loadKeyStoreForNode)
                 .map(this::getCertificateForNode)
                 .map(this::addDataNodeProvisioningConfig)
+                .map(triple -> {
+                    final var n = triple.getLeft();
+                    final var certValidUntil = triple.getRight() != null ? triple.getRight().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() : null;
+                    return new DataNode(n.getNodeId(),
+                            n.getType(),
+                            transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
+                            triple.getMiddle().state(),
+                            triple.getMiddle().errorMsg(),
+                            n.getHostname(),
+                            n.getShortNodeId(),
+                            certValidUntil);
+                })
                 .toList();
     }
 

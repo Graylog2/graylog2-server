@@ -47,38 +47,22 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CertificateRenewalResource implements PluginRestResource {
-    private final TransportAddressSanitizer transportAddressSanitizer;
     private final CertRenewalService certRenewalService;
     private final NodeService nodeService;
 
     @Inject
-    public CertificateRenewalResource(final TransportAddressSanitizer transportAddressSanitizer,
-                                      final CertRenewalService certRenewalService,
+    public CertificateRenewalResource(final CertRenewalService certRenewalService,
                                       final NodeService nodeService) {
-        this.transportAddressSanitizer = transportAddressSanitizer;
         this.certRenewalService = certRenewalService;
         this.nodeService = nodeService;
     }
 
-    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId, LocalDateTime certValidUntil) {}
-
     @GET
     // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
-    public List<DataNode> listDataNodes() {
+    public List<CertRenewalService.DataNode> listDataNodes() {
         // Nodes are not filtered right now so that you can manually initiate a renewal for every node available
-        return certRenewalService.findNodes().stream().map(triple -> {
-            final var n = triple.getLeft();
-            final var certValidUntil = triple.getRight() != null ? triple.getRight().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() : null;
-            return new DataNode(n.getNodeId(),
-                    n.getType(),
-                    transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
-                    triple.getMiddle().state(),
-                    triple.getMiddle().errorMsg(),
-                    n.getHostname(),
-                    n.getShortNodeId(),
-                    certValidUntil);
-        }).toList();
+        return certRenewalService.findNodes();
     }
 
     @POST
