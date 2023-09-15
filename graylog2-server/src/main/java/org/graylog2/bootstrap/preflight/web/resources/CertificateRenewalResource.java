@@ -23,7 +23,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -42,13 +41,10 @@ import java.util.List;
 @RequiresAuthentication
 public class CertificateRenewalResource implements PluginRestResource {
     private final CertRenewalService certRenewalService;
-    private final NodeService nodeService;
 
     @Inject
-    public CertificateRenewalResource(final CertRenewalService certRenewalService,
-                                      final NodeService nodeService) {
+    public CertificateRenewalResource(final CertRenewalService certRenewalService) {
         this.certRenewalService = certRenewalService;
-        this.nodeService = nodeService;
     }
 
     @GET
