@@ -228,7 +228,7 @@ public class JerseyService extends AbstractIdleService {
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
 
         if(isSecuredInstance) {
-            resourceConfig.register(new BasicAuthFilter("datanode", configuration.getRootPasswordSha2(), "Datanode"));
+            resourceConfig.register(new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode"));
         }
 
         final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(

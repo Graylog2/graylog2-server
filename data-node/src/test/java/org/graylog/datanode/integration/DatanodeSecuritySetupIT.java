@@ -52,9 +52,12 @@ public class DatanodeSecuritySetupIT {
     private DatanodeContainerizedBackend backend;
     private KeyStore trustStore;
     private String containerHostname;
+    private String restAdminUsername;
 
     @BeforeEach
     void setUp() throws IOException, GeneralSecurityException {
+
+        restAdminUsername = RandomStringUtils.randomAlphanumeric(10);
 
         containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
@@ -90,6 +93,8 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
 
             datanodeContainer.withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true");
+
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", restAdminUsername);
         }).start();
     }
 
@@ -102,7 +107,7 @@ public class DatanodeSecuritySetupIT {
     void testSecuredSetup() throws ExecutionException, RetryException {
         final String jwtAuthToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
 
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), backend.getOpensearchRestPort(), trustStore);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore, restAdminUsername, ROOT_PASSWORD_PLAINTEXT);
 
         try {
             given().header( "Authorization", "Bearer " + jwtAuthToken)
@@ -117,12 +122,12 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private ValidatableResponse waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final Integer opensearchPort, final KeyStore trustStore) throws ExecutionException, RetryException {
+    private ValidatableResponse waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore, String authUsername, String authPassword) throws ExecutionException, RetryException {
 
         try {
             return DatanodeRestApiWait.onPort(datanodeRestPort)
                     .withTruststore(trustStore)
-                    .withBasicAuth("datanode", ROOT_PASSWORD_PLAINTEXT)
+                    .withBasicAuth(authUsername, authPassword)
                     .waitForAvailableStatus();
         } catch (Exception ex) {
             LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());
