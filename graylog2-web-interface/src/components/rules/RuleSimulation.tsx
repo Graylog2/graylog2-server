@@ -179,7 +179,7 @@ RuleSimulation.propTypes = {
 
 RuleSimulation.defaultProps = {
   rule: undefined,
-  onSaveMessage: undefined,
+  onSaveMessage: () => {},
 };
 
 export default RuleSimulation;
