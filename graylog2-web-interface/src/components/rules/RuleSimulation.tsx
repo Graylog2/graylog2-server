@@ -80,6 +80,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRawMessageToSimulate(event.target.value);
+    onSaveMessage(event.target.value);
   };
 
   const handleRunRuleSimulation = () => {
@@ -89,8 +90,6 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
       app_action_value: 'run-rule-simulation-button',
       event_details: { is_rule_builder },
     });
-
-    onSaveMessage(rawMessageToSimulate);
 
     simulateRule(
       currentRule || rule,
@@ -108,6 +107,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
     });
 
     setRawMessageToSimulate('');
+    onSaveMessage(null);
     setRuleSimulationResult(null);
   };
 
