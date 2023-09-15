@@ -194,7 +194,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         final Map<String, Indexable> messageMap = request.stream()
                 .map(IndexingRequest::message)
                 .distinct()
-                .collect(Collectors.toMap(Indexable::getId, Function.identity()));
+                .collect(Collectors.toMap(Indexable::getId, Function.identity(), (a, b) -> a));
 
         return IndexingResults.create(indexingSuccessFrom(successes, messageMap), indexingErrorsFrom(failures, messageMap));
     }

@@ -52,6 +52,9 @@ public class ContentStreamServiceWithDbTest {
     UserService userService;
 
     @Mock
+    ContentStreamFeedTags contentStreamFeedTags;
+
+    @Mock
     User user1, user2;
 
     ContentStreamService contentStreamService;
@@ -61,6 +64,7 @@ public class ContentStreamServiceWithDbTest {
         MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
         contentStreamService = new ContentStreamService(
                 new DBContentStreamUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
+                contentStreamFeedTags,
                 eventBus
         );
         lenient().when(user1.getId()).thenReturn("id1");

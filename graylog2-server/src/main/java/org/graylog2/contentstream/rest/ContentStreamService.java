@@ -18,6 +18,7 @@ package org.graylog2.contentstream.rest;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.graylog2.contentstream.ContentStreamFeedTags;
 import org.graylog2.contentstream.db.ContentStreamUserSettings;
 import org.graylog2.contentstream.db.DBContentStreamUserSettingsService;
 import org.graylog2.plugin.database.users.User;
@@ -25,17 +26,30 @@ import org.graylog2.users.events.UserDeletedEvent;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class ContentStreamService {
     private final DBContentStreamUserSettingsService dbContentStreamUserSettingsService;
+    private final ContentStreamFeedTags contentStreamFeedTags;
 
     @Inject
     public ContentStreamService(
             DBContentStreamUserSettingsService dbContentStreamUserSettingsService,
+            ContentStreamFeedTags contentStreamFeedTags,
             EventBus eventBus) {
         this.dbContentStreamUserSettingsService = dbContentStreamUserSettingsService;
+        this.contentStreamFeedTags = contentStreamFeedTags;
         eventBus.register(this);
+    }
+
+    /**
+     * Determine set of valid feed tags based on license
+     *
+     * @return list of feed tags
+     */
+    public List<String> getTags() {
+        return contentStreamFeedTags.getTags();
     }
 
     public ContentStreamSettings getUserSettings(User user) {

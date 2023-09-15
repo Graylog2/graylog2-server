@@ -45,13 +45,12 @@ public record LastOpenedForUserDTO(
          * always have at least an empty list, avoid null
          * @Nullable is necessary to reduce problems if someone manually edits in MongoDB
          */
-        if(items == null) {
+        if (items == null) {
             items = new ArrayList<>();
         }
     }
 
-    public LastOpenedForUserDTO(@JsonProperty(FIELD_USER_ID) String userId,
-                               @Nullable @JsonProperty(FIELD_ITEMS) List<LastOpenedDTO> items) {
+    public LastOpenedForUserDTO(String userId, @Nullable List<LastOpenedDTO> items) {
         this(null, userId, items);
     }
 }
