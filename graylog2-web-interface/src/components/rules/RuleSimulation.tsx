@@ -147,7 +147,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
                     <label htmlFor="simulation_conditions_output">Conditions Output</label>
                     {conditionsOutputKeys.map((conditionsOutputKey) => (
                       <OutputText key={conditionsOutputKey}>
-                        <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_condition_variables[conditionsOutputKey])}
+                        <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>: {JSON.stringify(ruleSimulationResult?.simulator_condition_variables[conditionsOutputKey])}
                       </OutputText>
                     ))}
                   </div>
@@ -157,8 +157,8 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
                   <div data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
                     {actionsOutputKeys.map((actionsOutputKey) => (
-                      <OutputText key={actionsOutputKey}>
-                        <ActionOutputIndex>{actionsOutputKey}</ActionOutputIndex>: {String(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
+                      <OutputText key={actionsOutputKey} title={JSON.stringify(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}>
+                        <ActionOutputIndex>{actionsOutputKey}</ActionOutputIndex>: {JSON.stringify(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
                       </OutputText>
                     ))}
                   </div>
