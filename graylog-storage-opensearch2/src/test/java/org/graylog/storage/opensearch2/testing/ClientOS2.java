@@ -54,7 +54,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealt
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
-import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentBuilder;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
