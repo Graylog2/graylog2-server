@@ -31,6 +31,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -57,6 +58,9 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     private final MongoDBTestService service;
 
     private MongoDBFixtureImporter fixtureImporter;
+    // if we create a network in this instance with 'Network.newNetwork()', we have to close it, too
+    private final boolean closeNetwork;
+    private Optional<Network> network = Optional.empty();
 
     /**
      * Creates a new MongoDB instance that is shared for all test methods in a test class.
@@ -64,15 +68,16 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
      * @return the MongoDB instance
      */
     public static MongoDBInstance createForClass() {
-        return createWithDefaults(Network.newNetwork(), Lifecycle.CLASS);
+        // if we create a network in this instance with 'Network.newNetwork()', we have to close it, too
+        return createWithDefaults(Network.newNetwork(), Lifecycle.CLASS, true);
     }
 
-    public static MongoDBInstance createWithDefaults(Network network, Lifecycle lifecycle) {
-        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongodbServer.DEFAULT_VERSION, network);
+    public static MongoDBInstance createWithDefaults(Network network, Lifecycle lifecycle, final boolean closeNetwork) {
+        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongodbServer.DEFAULT_VERSION, network, closeNetwork);
     }
 
     private static MongoDBInstance createWithNameAndVersion(Network network, Lifecycle lifecycle, String name, MongodbServer version) {
-        return new MongoDBInstance(name, lifecycle, version, network);
+        return new MongoDBInstance(name, lifecycle, version, network, false);
     }
 
     public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle, MongodbServer version) {
@@ -87,8 +92,10 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         return mongoDb;
     }
 
-    private MongoDBInstance(String instanceName, Lifecycle lifecycle, MongodbServer version, Network network) {
+    private MongoDBInstance(String instanceName, Lifecycle lifecycle, MongodbServer version, Network network, final boolean closeNetwork) {
         this.lifecycle = lifecycle;
+        this.closeNetwork = closeNetwork;
+        this.network = Optional.of(network);
 
         switch (lifecycle) {
             case VM:
@@ -162,6 +169,9 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     public void close() {
         try {
             service.close();
+            if(closeNetwork) {
+                network.ifPresent(Network::close);
+            }
         } catch (Exception e) {
             LOG.error("Error closing service", e);
         }

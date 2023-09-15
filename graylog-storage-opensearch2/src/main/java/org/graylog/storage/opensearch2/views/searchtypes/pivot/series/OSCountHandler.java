@@ -20,7 +20,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
