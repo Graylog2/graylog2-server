@@ -23,7 +23,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.time.Duration;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,7 +44,7 @@ public class LookupResultTest {
         assertThat(node.isNull()).isFalse();
         assertThat(node.path("single_value").isNull()).isTrue();
         assertThat(node.path("multi_value").isNull()).isTrue();
-        assertThat(node.path("ttl").asLong()).isEqualTo(Duration.ofMinutes(5).toMillis());
+        assertThat(node.path("ttl").asLong()).isEqualTo(Long.MAX_VALUE);
     }
 
     @Test
