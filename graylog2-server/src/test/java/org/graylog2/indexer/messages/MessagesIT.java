@@ -28,6 +28,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -178,6 +179,25 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(results.errors()).hasSize(1);
 
         verify(failureSubmissionService).submitIndexingErrors(argThat(arg -> arg.size() == 1));
+    }
+
+    @Test
+    public void messagesWithTheSameIdCanBeIngestedIntoMultipleIndices() {
+        final Message message1 = new Message(Map.of("_id", "1234", "message", "One message", "source", "loghost-a", "timestamp", now()));
+        final Message message2 = new Message(Map.of("_id", "1234", "message", "One message", "source", "loghost-a", "timestamp", now()));
+
+        final TestIndexSet indexSet2 = new TestIndexSet(indexSet.getConfig().toBuilder().indexPrefix("message_it2").build());
+        client().createIndex("message_it2_deflector");
+        client().waitForGreenStatus("message_it2_deflector");
+
+        final List<MessageWithIndex> messageBatch = List.of(
+                new MessageWithIndex(message1, indexSet),
+                new MessageWithIndex(message2, indexSet2)
+        );
+        var results = this.messages.bulkIndex(messageBatch);
+
+        assertThat(results.errors()).hasSize(0);
+        assertThat(results.successes()).hasSize(2);
     }
 
     @Test

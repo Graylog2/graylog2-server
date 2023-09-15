@@ -45,7 +45,6 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opensearch.version>2.9.0</opensearch.version>
-        <opensearch.rest.client.version>2.9.0-1</opensearch.rest.client.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -375,7 +374,7 @@
         <dependency>
             <groupId>org.graylog.shaded</groupId>
             <artifactId>opensearch2-rest-high-level-client</artifactId>
-            <version>${opensearch.rest.client.version}</version>
+            <version>${opensearch.shaded.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -386,7 +385,7 @@
         <dependency>
             <groupId>org.graylog.shaded</groupId>
             <artifactId>opensearch2-rest-client-sniffer</artifactId>
-            <version>${opensearch.rest.client.version}</version>
+            <version>${opensearch.shaded.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -478,6 +477,17 @@
 
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
