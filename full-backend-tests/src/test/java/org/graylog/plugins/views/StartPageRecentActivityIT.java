@@ -22,7 +22,6 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.plugin.streams.StreamRuleType;
 
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class StartPageRecentActivityIT {
     @ContainerMatrixTest
     void testCreateRecentActivity() {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
-        var stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
+        var stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));
 
         var validatableResponse = api.get("/startpage/recentActivity", Users.LOCAL_ADMIN, Map.of(), 200);
         validatableResponse.assertThat().body("recentActivity[0].item_grn", containsString(stream1Id));
