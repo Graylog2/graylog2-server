@@ -22,7 +22,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
+import org.graylog2.plugin.streams.StreamRuleType;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +45,12 @@ public final class Streams implements GraylogRestApi {
     public record StreamRule(@JsonProperty("type") int type,
                              @JsonProperty("value") String value,
                              @JsonProperty("field") String field,
-                             @JsonProperty("inverted") boolean inverted) {}
+                             @JsonProperty("inverted") boolean inverted) {
+        public static StreamRule exact(String value, String field, boolean inverted) {
+            return new StreamRule(StreamRuleType.EXACT.toInteger(), value, field, inverted);
+        }
+    }
+
     record CreateStreamRequest(@JsonProperty("title") String title,
                                @JsonProperty("rules") Collection<StreamRule> streamRules,
                                @JsonProperty("index_set_id") String indexSetId,

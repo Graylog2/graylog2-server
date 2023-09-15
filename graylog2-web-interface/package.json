@@ -60,7 +60,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "@tanstack/query-sync-storage-persister": "^4.33.0",
     "@tanstack/react-query-persist-client": "^4.33.0",
-    "ace-builds": "1.24.2",
+    "ace-builds": "1.25.1",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
     "buffer": "^6.0.3",
@@ -181,9 +181,6 @@
   },
   "resolutions": {
     "@types/react": "18.0.28",
-    "immer": "9.0.6",
-    "nth-check": "2.0.1",
-    "glob-parent": "5.1.2",
-    "@emotion/utils": "1.2.0"
+    "nth-check": "2.0.1"
   }
 }

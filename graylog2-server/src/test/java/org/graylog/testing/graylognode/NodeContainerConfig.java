@@ -35,6 +35,8 @@ public class NodeContainerConfig {
 
     public final Network network;
     public final String mongoDbUri;
+    public final String passwordSecret;
+    public final String rootPasswordSha2;
     public final SearchVersion elasticsearchVersion;
     public final String elasticsearchUri;
     public final int[] extraPorts;
@@ -47,6 +49,8 @@ public class NodeContainerConfig {
 
     public NodeContainerConfig(Network network,
                                String mongoDbUri,
+                               final String passwordSecret,
+                               final String rootPasswordSha2,
                                String elasticsearchUri,
                                SearchVersion elasticsearchVersion,
                                int[] extraPorts,
@@ -55,6 +59,8 @@ public class NodeContainerConfig {
                                List<String> enabledFeatureFlags) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
+        this.passwordSecret = passwordSecret;
+        this.rootPasswordSha2 = rootPasswordSha2;
         this.elasticsearchUri = elasticsearchUri;
         this.elasticsearchVersion = elasticsearchVersion;
         this.extraPorts = extraPorts == null ? new int[0] : extraPorts;

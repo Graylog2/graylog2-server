@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -67,6 +68,8 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
 
     private Admin adminClient = null;
 
+    private final Network network;
+
     /**
      * Returns a new instance using the default Kafka version.
      *
@@ -88,6 +91,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
     @SuppressWarnings("resource")
     private KafkaContainer(Version version, Network network) {
         super(DockerImageName.parse(f("bitnami/kafka:%s", version.getVersion())));
+        this.network = network;
 
         withExposedPorts(9092);
         withNetwork(requireNonNull(network, "network cannot be null"));
@@ -214,5 +218,11 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
      */
     public Admin adminClient() {
         return requireNonNull(adminClient, "adminClient is not initialized yet");
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        network.close();
     }
 }

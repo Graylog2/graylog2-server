@@ -62,7 +62,7 @@ public class FieldTypeMapper {
     /**
      * A map from Elasticsearch types to Graylog logical types.
      */
-    private static final ImmutableMap<String, FieldTypes.Type> TYPE_MAP = ImmutableMap.<String, FieldTypes.Type>builder()
+    public static final Map<String, FieldTypes.Type> TYPE_MAP = ImmutableMap.<String, FieldTypes.Type>builder()
             .put("keyword", STRING_TYPE) // since ES 5.x
             .put("text", STRING_FTS_TYPE) // since ES 5.x
             .put("long", LONG_TYPE)

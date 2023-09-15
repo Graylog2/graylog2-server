@@ -57,7 +57,7 @@ public class IndexerClusterCheckerThread extends Periodical {
 
     @Override
     public void doRun() {
-        if (!cluster.health().isPresent()) {
+        if (cluster.health().isEmpty()) {
             LOG.info("Indexer not fully initialized yet. Skipping periodic cluster check.");
             return;
         }
@@ -231,7 +231,7 @@ public class IndexerClusterCheckerThread extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return 0;
+        return 5;
     }
 
     @Override
