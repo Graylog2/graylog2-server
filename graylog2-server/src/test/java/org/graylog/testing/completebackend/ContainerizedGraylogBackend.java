@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.completebackend;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
@@ -38,7 +39,8 @@ import java.util.stream.Collectors;
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
     public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdran";
-    public static final String ROOT_PASSWORD_SHA_2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+    public static final String ROOT_PASSWORD_PLAINTEXT = "admin";
+    public static final String ROOT_PASSWORD_SHA_2 = DigestUtils.sha256Hex(ROOT_PASSWORD_PLAINTEXT);
 
     private Network network;
     private SearchServerInstance searchServer;
