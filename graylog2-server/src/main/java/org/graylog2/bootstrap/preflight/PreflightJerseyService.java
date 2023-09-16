@@ -34,7 +34,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
-import org.graylog2.bootstrap.preflight.web.PreflightAuthFilter;
+import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
@@ -60,7 +60,7 @@ public class PreflightJerseyService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PreflightJerseyService.class);
 
     private final HttpConfiguration configuration;
-    private final PreflightAuthFilter preflightAuthFilter;
+    private final BasicAuthFilter basicAuthFilter;
     private final Set<Class<?>> systemRestResources;
 
     private final ObjectMapper objectMapper;
@@ -70,12 +70,12 @@ public class PreflightJerseyService extends AbstractIdleService {
 
     @Inject
     public PreflightJerseyService(final HttpConfiguration configuration,
-                                 final PreflightAuthFilter preflightAuthFilter,
+                                 final BasicAuthFilter basicAuthFilter,
                                   @PreflightRestResourcesBinding final Set<Class<?>> systemRestResources,
                                   ObjectMapper objectMapper,
                                   MetricRegistry metricRegistry) {
         this.configuration = requireNonNull(configuration, "configuration");
-        this.preflightAuthFilter = requireNonNull(preflightAuthFilter, "preflightAuthFilter");
+        this.basicAuthFilter = requireNonNull(basicAuthFilter, "preflightAuthFilter");
         this.systemRestResources = systemRestResources;
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
@@ -152,7 +152,7 @@ public class PreflightJerseyService extends AbstractIdleService {
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
                 .registerResources(additionalResources)
-                .register(preflightAuthFilter);
+                .register(basicAuthFilter);
 
         return rc;
     }
