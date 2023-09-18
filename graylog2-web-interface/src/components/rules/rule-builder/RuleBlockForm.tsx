@@ -126,7 +126,7 @@ const RuleBlockForm = ({
   }, [selectedBlockDict, existingBlock]);
 
   const handleChange = (option: string, resetForm: () => void) => {
-    sendTelemetry('select', {
+    sendTelemetry(`Pipeline RuleBuilder New ${type} Selected`, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `select-${type}`,
@@ -142,7 +142,7 @@ const RuleBlockForm = ({
   };
 
   const onSubmit = (values: { [key: string]: any }) => {
-    sendTelemetry('click', {
+    sendTelemetry(`Pipeline RuleBuilder ${existingBlock ? 'Update' : 'Add'} ${type} Clicked`, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `${existingBlock ? 'update' : 'add'}-${type}-button`,

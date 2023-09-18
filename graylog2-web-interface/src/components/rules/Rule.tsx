@@ -61,7 +61,7 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
                     <Button bsStyle="success"
                             bsSize="small"
                             onClick={() => {
-                              sendTelemetry('click', {
+                              sendTelemetry('Pipeline RuleBuilder Use Source Code Editor Clicked', {
                                 app_pathname: getPathnameWithoutId(pathname),
                                 app_section: 'pipeline-rules',
                                 app_action_value: 'source-code-editor-button',
@@ -100,10 +100,24 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
         <BootstrapModalConfirm showModal
                                title="Switch to Source Code Editor"
                                onConfirm={() => {
+                                 sendTelemetry('Pipeline RuleBuilder Switch to Source Code Editor Confirm Clicked', {
+                                   app_pathname: getPathnameWithoutId(pathname),
+                                   app_section: 'pipeline-rules',
+                                   app_action_value: 'confirm-button',
+                                 });
+
                                  history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
                                  setShowConfirmSourceCodeEditor(false);
                                }}
-                               onCancel={() => setShowConfirmSourceCodeEditor(false)}>
+                               onCancel={() => {
+                                 sendTelemetry('Pipeline RuleBuilder Switch to Source Code Editor Cancel Clicked', {
+                                   app_pathname: getPathnameWithoutId(pathname),
+                                   app_section: 'pipeline-rules',
+                                   app_action_value: 'cancel-button',
+                                 });
+
+                                 setShowConfirmSourceCodeEditor(false);
+                               }}>
           <div>You are about to leave this page and go to Source Code Editor.</div>
           <div>Make sure you have no unsaved changes.</div>
         </BootstrapModalConfirm>

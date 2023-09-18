@@ -84,7 +84,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   };
 
   const handleRunRuleSimulation = () => {
-    sendTelemetry('click', {
+    sendTelemetry('Pipeline Run Rule Simulation Clicked', {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-simulation',
       app_action_value: 'run-rule-simulation-button',
@@ -99,7 +99,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   };
 
   const handleResetRuleSimulation = () => {
-    sendTelemetry('click', {
+    sendTelemetry('Pipeline Reset Rule Simulation Clicked', {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-simulation',
       app_action_value: 'reset-rule-simulation-button',

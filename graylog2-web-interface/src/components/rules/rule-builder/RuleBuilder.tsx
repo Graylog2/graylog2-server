@@ -151,6 +151,12 @@ const RuleBuilder = () => {
   };
 
   const updateWhenOperator = async (operator: 'AND'|'OR') => {
+    sendTelemetry(`Pipeline RuleBuilder Operator ${operator} Clicked`, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'pipeline-rules',
+      app_action_value: 'cancel-button',
+    });
+
     const newOperatorRule: RuleBuilderRule = {
       ...rule,
       rule_builder: {
@@ -257,7 +263,7 @@ const RuleBuilder = () => {
   };
 
   const handleCancel = () => {
-    sendTelemetry('click', {
+    sendTelemetry('Pipeline RuleBuilder Cancel Clicked', {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rules',
       app_action_value: 'cancel-button',
@@ -270,7 +276,7 @@ const RuleBuilder = () => {
     event?.preventDefault();
 
     if (initialRule) {
-      sendTelemetry('click', {
+      sendTelemetry(`Pipeline RuleBuilder Update Rule${closeAfter ? ' and Close' : ''} Clicked`, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'pipeline-rules',
         app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
@@ -279,7 +285,7 @@ const RuleBuilder = () => {
       await updateRule(rule);
       if (closeAfter) handleCancel();
     } else {
-      sendTelemetry('click', {
+      sendTelemetry('Pipeline RuleBuilder Add Rule Clicked', {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'pipeline-rules',
         app_action_value: 'add-rule-button',
@@ -412,7 +418,7 @@ const RuleBuilder = () => {
                           <Button bsStyle="info"
                                   title="Convert Rule Builder to Source Code"
                                   onClick={() => {
-                                    sendTelemetry('click', {
+                                    sendTelemetry('Pipeline RuleBuilder Convert to Source Code Clicked', {
                                       app_pathname: getPathnameWithoutId(pathname),
                                       app_section: 'pipeline-rules',
                                       app_action_value: 'convert-rule-builder-to-source-code-button',

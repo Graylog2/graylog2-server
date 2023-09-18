@@ -66,7 +66,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
         <Button type="button"
                 bsStyle="success"
                 onClick={() => {
-                  sendTelemetry('click', {
+                  sendTelemetry('Pipeline RuleBuilder Create New Rule From Code Clicked', {
                     app_pathname: getPathnameWithoutId(pathname),
                     app_section: 'convert-rule-builder-to-source-code-modal',
                     app_action_value: 'create-new-rule-from-code-button',
@@ -80,7 +80,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
         <Button type="button"
                 bsStyle="info"
                 onClick={() => {
-                  sendTelemetry('click', {
+                  sendTelemetry('Pipeline RuleBuilder Code Copy & Close Clicked', {
                     app_pathname: getPathnameWithoutId(pathname),
                     app_section: 'convert-rule-builder-to-source-code-modal',
                     app_action_value: 'copy-rule-code-and-close-button',

@@ -112,7 +112,7 @@ const RulesPage = () => {
     <ButtonToolbar className="pull-right">
       <Button bsStyle="success"
               onClick={() => {
-                sendTelemetry('click', {
+                sendTelemetry('Pipeline Create Rule Clicked', {
                   app_pathname: getPathnameWithoutId(pathname),
                   app_section: 'pipeline-rules',
                   app_action_value: 'create-rule-button',
