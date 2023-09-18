@@ -150,7 +150,8 @@
         <natty.version>0.13</natty.version>
         <netty.version>4.1.91.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.59.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>3.14.6</okhttp.version>
+        <okhttp.version>4.11.0</okhttp.version>
+        <okio.version>3.5.0</okio.version>
         <okta-sdk.version>8.2.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.24.0</opentelemetry.version>
@@ -363,6 +364,22 @@
                 <groupId>com.cronutils</groupId>
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-tls</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <!-- Explicitly manage okio to fix CVE-2023-3635. Can probably be removed with next okhttp update -->
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>${okio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
