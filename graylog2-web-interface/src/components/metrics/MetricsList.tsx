@@ -57,6 +57,7 @@ const MetricListWrap = styled.ul(({ theme }) => css`
 `);
 
 export type MetricInfo = {
+  type: string,
   full_name: string,
 }
 type Props = {

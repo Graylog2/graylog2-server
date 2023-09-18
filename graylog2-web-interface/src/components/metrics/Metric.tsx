@@ -19,6 +19,7 @@ import React, { useCallback, useState } from 'react';
 
 import { MetricDetails } from 'components/metrics';
 import { Icon } from 'components/common';
+import type { MetricInfo } from 'components/metrics/MetricsList';
 
 const iconMapping = {
   timer: 'clock',
@@ -29,9 +30,9 @@ const iconMapping = {
   unknown: 'question-circle',
 };
 
-const _formatIcon = (type) => iconMapping[type] ?? iconMapping.unknown;
+const _formatIcon = (type: string) => iconMapping[type] ?? iconMapping.unknown;
 
-const _formatName = (metricName, namespace) => {
+const _formatName = (metricName: string, namespace: string) => {
   const split = metricName.split(namespace);
   const unqualifiedMetricName = split.slice(1).join(namespace);
 
@@ -43,7 +44,13 @@ const _formatName = (metricName, namespace) => {
   );
 };
 
-const Metric = ({ metric, namespace, nodeId }) => {
+type Props = {
+  metric: MetricInfo,
+  namespace: string,
+  nodeId: string,
+}
+
+const Metric = ({ metric, namespace, nodeId }: Props) => {
   const [expanded, setExpanded] = useState(false);
   const _showDetails = useCallback((e) => {
     e.preventDefault();
