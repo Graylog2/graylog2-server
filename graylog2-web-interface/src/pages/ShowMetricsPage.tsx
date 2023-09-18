@@ -21,12 +21,13 @@ import { ClusterNodeMetrics } from '@graylog/server-api';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 import { MetricsStore } from 'stores/metrics/MetricsStore';
+import type { NodesStoreState } from 'stores/nodes/NodesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import useQueryParameters from 'routing/useQuery';
 import useParams from 'routing/useParams';
 
-const useNodeId = (nodes) => {
+const useNodeId = (nodes: NodesStoreState['nodes']) => {
   const { nodeId } = useParams();
 
   // "leader" node ID is a placeholder for leader node, get first leader node ID
