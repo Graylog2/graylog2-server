@@ -1,0 +1,6 @@
+type = "removed"
+message = "Removed Edit Event Definition button on events that are scoped as immutable."
+
+issues = ["15916"]
+pulls = ["16515"]
+
