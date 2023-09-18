@@ -81,7 +81,8 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                       onChange={onChangeFieldType}
                       placeholder="Select field type"
                       disabled={isOptionsLoading}
-                      inputProps={{ 'aria-label': 'Select field type' }} />
+                      inputProps={{ 'aria-label': 'Select field type' }}
+                      required />
         <Alert bsStyle="info">
           <Icon name="info-circle" />&nbsp;
           By default the type will be changed in all possible indexes. But you can choose in which index sets you would like to make the change
