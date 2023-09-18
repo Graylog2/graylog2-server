@@ -14,33 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import { FormControl } from 'components/bootstrap';
 
-class MetricsFilterInput extends React.Component {
-  static propTypes = {
-    filter: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
+const MetricsFilterInput = ({ filter, onChange }) => {
+  const handleChange = useCallback((event) => onChange(event.target.value), []);
 
-  handleChange = (event) => {
-    this.props.onChange(event.target.value);
-  };
+  return (
+    <FormControl type="text"
+                 className="metrics-filter"
+                 bsSize="large"
+                 placeholder="Type a metric name to filter&hellip;"
+                 value={filter}
+                 onChange={handleChange} />
+  );
+};
 
-  render() {
-    const { filter } = this.props;
-
-    return (
-      <FormControl type="text"
-                   className="metrics-filter"
-                   bsSize="large"
-                   placeholder="Type a metric name to filter&hellip;"
-                   value={filter}
-                   onChange={this.handleChange} />
-    );
-  }
-}
+MetricsFilterInput.propTypes = {
+  filter: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default MetricsFilterInput;
