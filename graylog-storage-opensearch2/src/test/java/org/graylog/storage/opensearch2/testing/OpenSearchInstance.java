@@ -165,7 +165,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 null,
                 false,
                 false,
-                "maybe_want_jwt_here")
+                null)
                 .get();
     }
 
