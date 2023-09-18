@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.CollectorStatus;
 import org.graylog.plugins.sidecar.rest.models.CollectorStatusList;
@@ -34,6 +35,8 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -57,6 +60,8 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
     private static final String COLLECTION_NAME = "sidecars";
     private final CollectorService collectorService;
     private final ConfigurationService configurationService;
+    private final NotificationService notificationService;
+
 
     private final Validator validator;
 
@@ -65,10 +70,12 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                           ConfigurationService configurationService,
                           MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
+                          NotificationService notificationService,
                           Validator validator) {
         super(mongoConnection, mapper, Sidecar.class, COLLECTION_NAME);
         this.collectorService = collectorService;
         this.configurationService = configurationService;
+        this.notificationService = notificationService;
         this.validator = validator;
 
         db.createIndex(new BasicDBObject(Sidecar.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
@@ -211,6 +218,9 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                                     .nodeDetails(nodeDetailsToSave)
                                     .build();
                             save(toSave);
+
+                            createSystemNotification(message, toSave);
+
                             return 1;
 
                         }
@@ -220,6 +230,21 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
         }
 
         return count;
+    }
+
+    private void createSystemNotification(String message, Sidecar toSave) {
+        Notification notification = notificationService.buildNow();
+        notification.addType(Notification.Type.SIDECAR_STATUS_UNKNOWN);
+        notification.addSeverity(Notification.Severity.NORMAL);
+        notification.addKey(toSave.nodeId());
+        notification.addDetail("message", message);
+        notification.addDetail("sidecar_name", toSave.nodeName());
+        notification.addDetail("sidecar_id", toSave.nodeId());
+        try {
+            notificationService.createSystemEvent(notification);
+        } catch (EventProcessorException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Sidecar fromRequest(String nodeId, RegistrationRequest request, String collectorVersion) {

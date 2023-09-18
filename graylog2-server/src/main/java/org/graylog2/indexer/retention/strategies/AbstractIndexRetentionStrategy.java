@@ -19,7 +19,6 @@ package org.graylog2.indexer.retention.strategies;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -72,14 +71,12 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
     private void retainTimeBased(IndexSet indexSet, TimeBasedSizeOptimizingStrategyConfig timeBasedConfig) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
-        final IndicesBlockStatus indicesBlocksStatus = indices.getIndicesBlocksStatus(deflectorIndices.keySet().stream().toList());
         // Account for DST and time zones in determining age
         final DateTime now = clock.nowUTC();
         final long cutoffSoft = now.minus(timeBasedConfig.indexLifetimeMin()).getMillis();
         final long cutoffHard = now.minus(timeBasedConfig.indexLifetimeMax()).getMillis();
         final int removeCount = (int)deflectorIndices.keySet()
                 .stream()
-                .filter(indexName -> indexIsReadOnly(indicesBlocksStatus, indexName))
                 .filter(indexName -> !indices.isReopened(indexName))
                 .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
                 .filter(indexName -> exceedsAgeLimit(indexName, cutoffSoft, cutoffHard))
@@ -92,10 +89,6 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
             runRetention(indexSet, deflectorIndices, removeCount);
         }
-    }
-
-    private boolean indexIsReadOnly(IndicesBlockStatus blockStatus, String index) {
-        return Optional.ofNullable(blockStatus.getIndexBlocks(index)).map(b -> b.contains("index.blocks.write")).orElse(false);
     }
 
     private boolean exceedsAgeLimit(String indexName, long cutoffSoft, long cutoffHard) {
