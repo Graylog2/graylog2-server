@@ -56,14 +56,23 @@ const MetricListWrap = styled.ul(({ theme }) => css`
   }
 `);
 
-class MetricsList extends React.Component {
+export type MetricInfo = {
+  full_name: string,
+}
+type Props = {
+  namespace: string,
+  nodeId: string,
+  names: Array<MetricInfo>,
+}
+
+class MetricsList extends React.Component<Props> {
   static propTypes = {
     names: PropTypes.arrayOf(PropTypes.object).isRequired,
     namespace: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,
   };
 
-  _formatMetric = (metric) => {
+  _formatMetric = (metric: MetricInfo) => {
     const { namespace, nodeId } = this.props;
 
     return (

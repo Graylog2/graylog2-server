@@ -21,6 +21,7 @@ import styled from 'styled-components';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { MetricsFilterInput, MetricsList } from 'components/metrics';
+import {MetricInfo} from 'components/metrics/MetricsList';
 
 const StyledWarningDiv = styled.div(({ theme }) => `
   height: 20px;
@@ -28,7 +29,17 @@ const StyledWarningDiv = styled.div(({ theme }) => `
   color: ${theme.colors.variant.dark.danger};
 `);
 
-class MetricsComponent extends React.Component {
+type Props = {
+  names: Array<MetricInfo>,
+  namespace: string,
+  nodeId: string,
+  filter?: string,
+  error?: {
+    responseMessage: string,
+    status: number,
+  }
+};
+class MetricsComponent extends React.Component<Props> {
   static propTypes = {
     names: PropTypes.arrayOf(PropTypes.object),
     namespace: PropTypes.string.isRequired,
@@ -48,13 +59,13 @@ class MetricsComponent extends React.Component {
 
   state = { filter: this.props.filter };
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (nextProps.filter !== this.props.filter) {
       this.setState({ filter: nextProps.filter });
     }
   }
 
-  onFilterChange = (nextFilter) => {
+  onFilterChange = (nextFilter: string) => {
     this.setState({ filter: nextFilter });
   };
 
