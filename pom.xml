@@ -110,7 +110,7 @@
         <commons-csv.version>1.7</commons-csv.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
-        <commons-validator.version>1.6</commons-validator.version>
+        <commons-validator.version>1.7</commons-validator.version>
         <commons-io.version>2.6</commons-io.version>
         <disruptor.version>3.4.2</disruptor.version>
         <freemarker.version>2.3.31</freemarker.version>
