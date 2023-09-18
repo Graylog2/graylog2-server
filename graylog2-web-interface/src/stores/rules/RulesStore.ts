@@ -209,6 +209,7 @@ export const RulesStore = singletonStore(
         title: ruleSource.title,
         description: ruleSource.description,
         source: ruleSource.source,
+        simulator_message: ruleSource.simulator_message,
       };
       const promise = fetch('POST', url, rule);
 
@@ -236,6 +237,7 @@ export const RulesStore = singletonStore(
         title: ruleSource.title,
         description: ruleSource.description,
         source: ruleSource.source,
+        simulator_message: ruleSource.simulator_message,
       };
       const promise = fetch('PUT', url, rule);
 

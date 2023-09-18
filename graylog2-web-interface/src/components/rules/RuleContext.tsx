@@ -74,11 +74,12 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     const nextRule = {
       ...rule,
       source: ruleSourceRef?.current?.editor?.getSession().getValue(),
+      simulator_message: rawMessageToSimulate,
       description,
     };
 
     RulesActions.parse(nextRule, callback);
-  }, [rule, description]);
+  }, [rule, description, rawMessageToSimulate]);
 
   const jsonifyText = (text: string): string => {
     try {
@@ -125,6 +126,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       const savedRule = {
         ...rule,
         source: ruleSourceRef?.current?.editor?.getSession().getValue(),
+        simulator_message: rawMessageToSimulate,
         description,
       };
 
@@ -157,6 +159,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
         ...rule,
         description,
         source: ruleSource,
+        simulator_message: rawMessageToSimulate,
       },
       description,
       handleDescription: setDescription,
