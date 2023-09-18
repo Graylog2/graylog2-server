@@ -27,6 +27,8 @@ import { useStore } from 'stores/connect';
 import useQueryParameters from 'routing/useQuery';
 import useParams from 'routing/useParams';
 
+const metricsNamespace = MetricsStore.namespace;
+
 const useNodeId = (nodes: NodesStoreState['nodes']) => {
   const { nodeId } = useParams();
 
@@ -50,7 +52,7 @@ const ShowMetricsPage = () => {
   const nodeId = useNodeId(nodes);
   const { data: names, isLoading } = useQuery(
     ['metrics', 'names', nodeId],
-    () => ClusterNodeMetrics.byNamespace(nodeId, MetricsStore.namespace).then(({ metrics }) => metrics),
+    () => ClusterNodeMetrics.byNamespace(nodeId, metricsNamespace).then(({ metrics }) => metrics),
     { enabled: nodeId !== undefined });
 
   const { filter } = useQueryParameters();
@@ -61,7 +63,6 @@ const ShowMetricsPage = () => {
 
   const node = nodes[nodeId];
   const title = <span>Metrics of node {node.short_node_id} / {node.hostname}</span>;
-  const { namespace } = MetricsStore;
 
   return (
     <DocumentTitle title={`Metrics of node ${node.short_node_id} / ${node.hostname}`}>
@@ -74,7 +75,7 @@ const ShowMetricsPage = () => {
           </span>
         </PageHeader>
 
-        <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} />
+        <MetricsComponent names={names} namespace={metricsNamespace} nodeId={nodeId} filter={filter} />
       </span>
     </DocumentTitle>
   );
