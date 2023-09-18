@@ -22,6 +22,7 @@ import asMock from 'helpers/mocking/AsMock';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 
 import RuleBuilder from './RuleBuilder';
+import { jsonifyText } from './helpers';
 
 import { PipelineRulesContext } from '../RuleContext';
 
@@ -203,5 +204,24 @@ describe('RuleBuilder', () => {
     expect(conditionOutputContainer).toContainHTML(conditionOutput1);
     expect(actionOutputContainer).toContainHTML(actionOutput1);
     expect(actionOutputContainer).toContainHTML(actionOutput2);
+  });
+
+  it('simulator parser should support JSON', () => {
+    const json = '{ "message": "test", "source": "unknown" }';
+
+    expect(jsonifyText(json)).toEqual(json);
+  });
+
+  it('simulator parser should convert KeyValue pairs to JSON', () => {
+    const keyValuePairs = 'a=a a a a\nb=b,b,b,b\n\n   "d    :    d"   \nc=`c`\ne:\n   f   =\n';
+    const keyValuePairsAsJson = '{"a":"a a a a","b":"b,b,b,b","d":"d","c":"c"}';
+
+    expect(jsonifyText(keyValuePairs)).toEqual(keyValuePairsAsJson);
+  });
+
+  it('simulator parser should support raw message string', () => {
+    const rawMessageString = 'long raw message string bla bla bla';
+
+    expect(jsonifyText(rawMessageString)).toEqual(rawMessageString);
   });
 });
