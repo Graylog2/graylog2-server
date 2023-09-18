@@ -393,6 +393,26 @@ public class MessageTest {
     }
 
     @Test
+    public void testCleanKey() throws Exception {
+        // Valid keys
+        assertEquals("foo123",Message.cleanKey("foo123"));
+        assertEquals("foo-bar123",Message.cleanKey("foo-bar123"));
+        assertEquals("foo_bar123",Message.cleanKey("foo_bar123"));
+        assertEquals("foo.bar123",Message.cleanKey("foo.bar123"));
+        assertEquals("foo@bar",Message.cleanKey("foo@bar"));
+        assertEquals("123",Message.cleanKey("123"));
+        assertEquals("",Message.cleanKey(""));
+
+        assertEquals("foo_bar",Message.cleanKey("foo bar"));
+        assertEquals("foo_bar",Message.cleanKey("foo+bar"));
+        assertEquals("foo_bar",Message.cleanKey("foo$bar"));
+        assertEquals("foo_bar",Message.cleanKey("foo{bar"));
+        assertEquals("foo_bar",Message.cleanKey("foo,bar"));
+        assertEquals("foo_bar",Message.cleanKey("foo?bar"));
+        assertEquals("_",Message.cleanKey(" "));
+    }
+
+    @Test
     public void testToElasticSearchObject() throws Exception {
         message.addField("field1", "wat");
         message.addField("field2", "that");
