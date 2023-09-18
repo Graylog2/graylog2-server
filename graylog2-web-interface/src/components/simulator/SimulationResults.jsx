@@ -121,8 +121,7 @@ class SimulationResults extends React.Component {
 
     const errorMessage = error
       ? (
-        <Alert bsStyle="danger">
-          <p><strong>Error simulating message processing</strong></p>
+        <Alert bsStyle="danger" title="Error simulating message processing">
           <p>
             Could not simulate processing of message <em>{originalMessage.id}</em> in stream{' '}
             <em>{stream.title}</em>.

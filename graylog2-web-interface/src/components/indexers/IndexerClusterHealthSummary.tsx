@@ -19,7 +19,6 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 
@@ -64,18 +63,9 @@ const IndexerClusterHealthSummary = ({ health, name }: {
     }
   }, [formattedHealthStatus, name]);
 
-  const iconNameForHealth = () => {
-    switch (formattedHealthStatus) {
-      case 'green': return 'check-circle';
-      case 'yellow': return 'exclamation-triangle';
-      case 'red': return 'ambulance';
-      default: return 'check-circle';
-    }
-  };
-
   return (
     <ESClusterStatus bsStyle={alertClassForHealth()}>
-      <Icon name={iconNameForHealth()} /> &nbsp;{formattedTextForHealth}{' '}
+      {formattedTextForHealth}{' '}
       Shards:{' '}
       {health.shards.active} active,{' '}
       {health.shards.initializing} initializing,{' '}

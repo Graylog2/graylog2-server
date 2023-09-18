@@ -19,7 +19,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
-import { Icon, SortableList } from 'components/common';
+import { SortableList } from 'components/common';
 
 import DecoratorStyles from './decoratorStyles.css';
 
@@ -65,7 +65,7 @@ class DecoratorList extends React.Component<Props> {
       return (
         <AlertContainer>
           <Alert bsStyle="info" className={DecoratorStyles.noDecoratorsAlert}>
-            <Icon name="info-circle" />&nbsp;No decorators configured.
+            No decorators configured.
           </Alert>
         </AlertContainer>
       );
