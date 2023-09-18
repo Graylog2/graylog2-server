@@ -79,8 +79,8 @@ public class MaintenanceStrategiesHelper {
             case TimeBasedSizeOptimizingStrategy.NAME -> {
                 return ImmutablePair.of(TimeBasedSizeOptimizingStrategy.class.getCanonicalName(),
                         TimeBasedSizeOptimizingStrategyConfig.builder()
-                                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMinLifeTime())
-                                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMaxLifeTime())
+                                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinLifeTime())
+                                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLifeTime())
                                 .build());
             }
             default -> {
