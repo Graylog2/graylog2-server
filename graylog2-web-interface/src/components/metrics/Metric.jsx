@@ -15,78 +15,58 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
+import React, { useCallback, useState } from 'react';
 
 import { MetricDetails } from 'components/metrics';
 import { Icon } from 'components/common';
 
-const Metric = createReactClass({
-  displayName: 'Metric',
+const iconMapping = {
+  timer: 'clock',
+  histogram: 'signal',
+  meter: 'play-circle',
+  gauge: 'tachometer-alt',
+  counter: 'circle',
+  unknown: 'question-circle',
+};
 
-  propTypes: {
-    metric: PropTypes.object.isRequired,
-    namespace: PropTypes.string.isRequired,
-    nodeId: PropTypes.string.isRequired,
-  },
+const _formatIcon = (type) => iconMapping[type] ?? iconMapping.unknown;
 
-  getInitialState() {
-    return {
-      expanded: false,
-    };
-  },
+const _formatName = (metricName, namespace) => {
+  const split = metricName.split(namespace);
+  const unqualifiedMetricName = split.slice(1).join(namespace);
 
-  iconMapping: {
-    timer: 'clock',
-    histogram: 'signal',
-    meter: 'play-circle',
-    gauge: 'tachometer-alt',
-    counter: 'circle',
-    unknown: 'question-circle',
-  },
+  return (
+    <span>
+      <span className="prefix">{namespace}</span>
+      {unqualifiedMetricName}
+    </span>
+  );
+};
 
-  _formatIcon(type) {
-    const icon = this.iconMapping[type];
+const Metric = ({ metric, namespace, nodeId }) => {
+  const [expanded, setExpanded] = useState(false);
+  const _showDetails = useCallback((e) => {
+    e.preventDefault();
+    setExpanded((_expanded) => !_expanded);
+  }, []);
 
-    if (icon) {
-      return icon;
-    }
+  const details = expanded ? <MetricDetails nodeId={nodeId} metric={metric} /> : null;
 
-    return this.iconMapping.unknown;
-  },
+  return (
+    <span>
+      <div className="name">
+        <Icon name={_formatIcon(metric.type)} />{' '}
+        <a className="open" href="#" onClick={_showDetails}>{_formatName(metric.full_name, namespace)}</a>
+      </div>
+      {details}
+    </span>
+  );
+};
 
-  _formatName(metricName) {
-    const { namespace } = this.props;
-    const split = metricName.split(namespace);
-    const unqualifiedMetricName = split.slice(1).join(namespace);
-
-    return (
-      <span>
-        <span className="prefix">{namespace}</span>
-        {unqualifiedMetricName}
-      </span>
-    );
-  },
-
-  _showDetails(event) {
-    event.preventDefault();
-    this.setState({ expanded: !this.state.expanded });
-  },
-
-  render() {
-    const { metric } = this.props;
-    const details = this.state.expanded ? <MetricDetails nodeId={this.props.nodeId} metric={this.props.metric} /> : null;
-
-    return (
-      <span>
-        <div className="name">
-          <Icon name={this._formatIcon(metric.type)} />{' '}
-          <a className="open" href="#" onClick={this._showDetails}>{this._formatName(metric.full_name)}</a>
-        </div>
-        {details}
-      </span>
-    );
-  },
-});
+Metric.propTypes = {
+  metric: PropTypes.object.isRequired,
+  namespace: PropTypes.string.isRequired,
+  nodeId: PropTypes.string.isRequired,
+};
 
 export default Metric;
