@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import { ClusterNodeMetrics } from '@graylog/server-api';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 import { MetricsStore } from 'stores/metrics/MetricsStore';
@@ -24,15 +25,6 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import useQueryParameters from 'routing/useQuery';
 import useParams from 'routing/useParams';
-import * as URLUtils from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
-
-const fetchMetricNames = (nodeId) => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, MetricsStore.namespace).url);
-
-  return fetch('GET', url).then(({ metrics }) => metrics);
-};
 
 const useNodeId = (nodes) => {
   const { nodeId } = useParams();
@@ -55,7 +47,10 @@ const useNodeId = (nodes) => {
 const ShowMetricsPage = () => {
   const nodes = useStore(NodesStore, (state) => state.nodes);
   const nodeId = useNodeId(nodes);
-  const { data: names, isLoading } = useQuery(['metrics', 'names', nodeId], () => fetchMetricNames(nodeId), { enabled: nodeId !== undefined });
+  const { data: names, isLoading } = useQuery(
+    ['metrics', 'names', nodeId],
+    () => ClusterNodeMetrics.byNamespace(nodeId, MetricsStore.namespace).then(({ metrics }) => metrics),
+    { enabled: nodeId !== undefined });
 
   const { filter } = useQueryParameters();
 
