@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import debounce from 'lodash/debounce';
 
 import { FormControl } from 'components/bootstrap';
 
@@ -26,14 +27,15 @@ type Props = {
 }
 
 const MetricsFilterInput = ({ filter, onChange }: Props) => {
-  const handleChange = useCallback((event) => onChange(event.target.value), [onChange]);
+  const debouncedOnChange = useMemo(() => debounce(onChange, 1000), [onChange]);
+  const handleChange = useCallback((event) => debouncedOnChange(event.target.value), [debouncedOnChange]);
 
   return (
     <FormControl type="text"
                  className="metrics-filter"
                  bsSize="large"
                  placeholder="Type a metric name to filter&hellip;"
-                 value={filter}
+                 defaultValue={filter}
                  onChange={handleChange} />
   );
 };
