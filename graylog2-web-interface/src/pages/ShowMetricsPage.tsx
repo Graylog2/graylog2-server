@@ -26,6 +26,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import useQueryParameters from 'routing/useQuery';
 import useParams from 'routing/useParams';
+import {MetricInfo} from 'components/metrics/MetricsList';
 
 const metricsNamespace = MetricsStore.namespace;
 
@@ -52,10 +53,10 @@ const ShowMetricsPage = () => {
   const nodeId = useNodeId(nodes);
   const { data: names, isLoading } = useQuery(
     ['metrics', 'names', nodeId],
-    () => ClusterNodeMetrics.byNamespace(nodeId, metricsNamespace).then(({ metrics }) => metrics),
+    () => ClusterNodeMetrics.byNamespace(nodeId, metricsNamespace).then(({ metrics }) => metrics as MetricInfo[]),
     { enabled: nodeId !== undefined });
 
-  const { filter } = useQueryParameters();
+  const { filter } = useQueryParameters() as { filter: string };
 
   if (!nodes || isLoading) {
     return <Spinner />;
