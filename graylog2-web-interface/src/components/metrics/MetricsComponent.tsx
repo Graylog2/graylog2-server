@@ -39,6 +39,17 @@ type Props = {
     status: number,
   }
 };
+
+const safelyFilterNames = (filter: string, names: Array<MetricInfo>) => {
+  try {
+    const filterRegex = new RegExp(filter, 'i');
+
+    return names.filter((metric) => String(metric.full_name).match(filterRegex));
+  } catch (e) {
+    return [];
+  }
+};
+
 class MetricsComponent extends React.Component<Props> {
   static propTypes = {
     names: PropTypes.arrayOf(PropTypes.object),
@@ -93,15 +104,7 @@ class MetricsComponent extends React.Component<Props> {
       );
     }
 
-    let filteredNames;
-
-    try {
-      const filterRegex = new RegExp(filter, 'i');
-
-      filteredNames = names.filter((metric) => String(metric.full_name).match(filterRegex));
-    } catch (e) {
-      filteredNames = [];
-    }
+    const filteredNames = safelyFilterNames(filter, names);
 
     return (
       <Row className="content">
