@@ -129,13 +129,13 @@ public class ElasticsearchConfiguration {
     private Size timeSizeOptimizingRotationMaxShardSize = Size.gigabytes(50);
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME)
-    private Period timeSizeOptimizingRetentionMinLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MIN;
+    private Period timeSizeOptimizingRotationMinLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MIN;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME)
-    private Period timeSizeOptimizingRetentionMaxLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MAX;
+    private Period timeSizeOptimizingRotationMaxLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MAX;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY)
-    private Period timeSizeOptimizingRetentionFixedLeeway;
+    private Period timeSizeOptimizingRotationFixedLeeway;
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -261,17 +261,17 @@ public class ElasticsearchConfiguration {
         return timeSizeOptimizingRotationMaxShardSize;
     }
 
-    public Period getTimeSizeOptimizingRetentionMinLifeTime() {
-        return timeSizeOptimizingRetentionMinLifeTime;
+    public Period getTimeSizeOptimizingRotationMinLifeTime() {
+        return timeSizeOptimizingRotationMinLifeTime;
     }
 
-    public Period getTimeSizeOptimizingRetentionMaxLifeTime() {
-        return timeSizeOptimizingRetentionMaxLifeTime;
+    public Period getTimeSizeOptimizingRotationMaxLifeTime() {
+        return timeSizeOptimizingRotationMaxLifeTime;
     }
 
     @Nullable
-    public Period getTimeSizeOptimizingRetentionFixedLeeway() {
-        return timeSizeOptimizingRetentionFixedLeeway;
+    public Period getTimeSizeOptimizingRotationFixedLeeway() {
+        return timeSizeOptimizingRotationFixedLeeway;
     }
 
     public boolean isDisableVersionCheck() {
@@ -307,22 +307,22 @@ public class ElasticsearchConfiguration {
                     TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE, getTimeSizeOptimizingRotationMaxShardSize())
             );
         }
-        Seconds timeSizeOptimizingRotationMaxLifeTimeSeconds = getTimeSizeOptimizingRetentionMaxLifeTime().toStandardSeconds();
-        Seconds timeSizeOptimizingRotationMinLifeTimeSeconds = getTimeSizeOptimizingRetentionMinLifeTime().toStandardSeconds();
+        Seconds timeSizeOptimizingRotationMaxLifeTimeSeconds = getTimeSizeOptimizingRotationMaxLifeTime().toStandardSeconds();
+        Seconds timeSizeOptimizingRotationMinLifeTimeSeconds = getTimeSizeOptimizingRotationMinLifeTime().toStandardSeconds();
         if (timeSizeOptimizingRotationMaxLifeTimeSeconds.compareTo(timeSizeOptimizingRotationMinLifeTimeSeconds) <= 0) {
             throw new ValidationException(f("\"%s=%s\" needs to be larger than \"%s=%s\"",
-                    TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME, getTimeSizeOptimizingRetentionMaxLifeTime(),
-                    TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME, getTimeSizeOptimizingRetentionMinLifeTime())
+                    TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME, getTimeSizeOptimizingRotationMaxLifeTime(),
+                    TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME, getTimeSizeOptimizingRotationMinLifeTime())
             );
         }
 
         Seconds calculatedLeeway = timeSizeOptimizingRotationMaxLifeTimeSeconds.minus(timeSizeOptimizingRotationMinLifeTimeSeconds);
-        if (getTimeSizeOptimizingRetentionFixedLeeway() != null &&
-                calculatedLeeway.isLessThan(getTimeSizeOptimizingRetentionFixedLeeway().toStandardSeconds())) {
+        if (getTimeSizeOptimizingRotationFixedLeeway() != null &&
+                calculatedLeeway.isLessThan(getTimeSizeOptimizingRotationFixedLeeway().toStandardSeconds())) {
             throw new ValidationException(f("\"%s=%s\" and \"%s=%s\" leeway cannot be less than \"%s=%s\"",
-                    TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME, getTimeSizeOptimizingRetentionMinLifeTime(),
-                    TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME, getTimeSizeOptimizingRetentionMaxLifeTime(),
-                    TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY, getTimeSizeOptimizingRetentionFixedLeeway())
+                    TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME, getTimeSizeOptimizingRotationMinLifeTime(),
+                    TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME, getTimeSizeOptimizingRotationMaxLifeTime(),
+                    TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY, getTimeSizeOptimizingRotationFixedLeeway())
             );
         }
 
@@ -332,7 +332,7 @@ public class ElasticsearchConfiguration {
                 getMaxIndexRetentionPeriod().toStandardSeconds().isLessThan(
                         timeSizeOptimizingRotationMinLifeTimeSeconds.plus(calculatedLeeway))) {
             throw new ValidationException(f("\"%s=%s\" plus leeway=%s cannot to be larger than \"%s=%s\"",
-                    TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME, getTimeSizeOptimizingRetentionMinLifeTime(),
+                    TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME, getTimeSizeOptimizingRotationMinLifeTime(),
                     new Period(calculatedLeeway),
                     MAX_INDEX_RETENTION_PERIOD + " + leeway", getMaxIndexRetentionPeriod().plus(calculatedLeeway))
             );

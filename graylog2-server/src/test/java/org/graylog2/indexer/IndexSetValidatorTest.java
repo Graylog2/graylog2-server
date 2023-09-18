@@ -218,7 +218,7 @@ public class IndexSetValidatorTest {
     @Test
     public void timeBasedSizeOptimizingHonorsFixedLeeWay() {
         when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(10));
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationFixedLeeway()).thenReturn(Period.days(10));
 
         when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
         final IndexSetConfig failingConfig = testIndexSetConfig().toBuilder()
