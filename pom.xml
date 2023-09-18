@@ -110,6 +110,7 @@
         <commons-csv.version>1.7</commons-csv.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-net.version>3.9.0</commons-net.version>
         <commons-validator.version>1.7</commons-validator.version>
         <commons-io.version>2.13.0</commons-io.version>
         <disruptor.version>3.4.2</disruptor.version>
@@ -181,7 +182,6 @@
         <zstd.version>1.5.4-1</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
-        <commons-net.version>3.6</commons-net.version>
         <jjwt.version>0.11.5</jjwt.version>
 
         <!-- Test dependencies -->
@@ -380,6 +380,11 @@
                 <groupId>com.squareup.okio</groupId>
                 <artifactId>okio</artifactId>
                 <version>${okio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commons-net.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
