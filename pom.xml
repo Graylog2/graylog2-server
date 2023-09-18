@@ -122,7 +122,7 @@
         <guava.version>31.0.1-jre</guava.version>
         <guice.version>5.0.1</guice.version>
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
-        <hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
+        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
         <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.15.2</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
