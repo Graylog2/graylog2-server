@@ -20,8 +20,13 @@ import PropTypes from 'prop-types';
 
 import { FormControl } from 'components/bootstrap';
 
-const MetricsFilterInput = ({ filter, onChange }) => {
-  const handleChange = useCallback((event) => onChange(event.target.value), []);
+type Props = {
+  filter?: string,
+  onChange: (newFilter: string) => void,
+}
+
+const MetricsFilterInput = ({ filter, onChange }: Props) => {
+  const handleChange = useCallback((event) => onChange(event.target.value), [onChange]);
 
   return (
     <FormControl type="text"
