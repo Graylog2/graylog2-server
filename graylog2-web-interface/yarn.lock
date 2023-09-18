@@ -11347,9 +11347,9 @@ mapbox-gl@1.10.1:
     vt-pbf "^3.1.1"
 
 marked@^9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-9.0.0.tgz#d812a4a452d219330561f6e0e4b669b784889303"
-  integrity sha512-37yoTpjU+TSXb9OBYY5n78z/CqXh76KiQj9xsKxEdztzU9fRLmbWO5YqKxgCVGKlNdexppnbKTkwB3RipVri8w==
+  version "9.0.2"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-9.0.2.tgz#e12365ecbd8e487c2405dd8b99bbf8194c7ad3e5"
+  integrity sha512-VRTR4AamWVw+wNl0PfT9zJpCHWIQZ4QLyiXVmpgrempuXeue883HH/97oVuY6uk7SSOJE6F73i62JrAIBAdc0Q==
 
 material-colors@^1.2.1:
   version "1.2.6"
