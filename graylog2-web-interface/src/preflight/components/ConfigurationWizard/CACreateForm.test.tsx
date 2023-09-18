@@ -73,16 +73,12 @@ describe('CACreateForm', () => {
       </DefaultQueryClientProvider>
     ));
 
-    await fillOutForm();
     await submitForm();
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
       expect.stringContaining('/api/ca/create'),
-      {
-        'input-1': 'input 1 content',
-        'input-2': 'input 2 content',
-      },
+      {},
       false,
     ));
 
