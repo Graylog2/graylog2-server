@@ -509,11 +509,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
         </dependency>

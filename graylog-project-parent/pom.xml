@@ -462,11 +462,6 @@
                 <version>${swagger.version}</version>
             </dependency>
             <dependency>
-                <groupId>javax.el</groupId>
-                <artifactId>javax.el-api</artifactId>
-                <version>${javax.el-api.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.squareup.retrofit2</groupId>
                 <artifactId>retrofit</artifactId>
                 <version>${retrofit.version}</version>
