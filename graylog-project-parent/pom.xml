@@ -819,7 +819,8 @@
                         <bundledSignature>jdk-reflection</bundledSignature>
                         <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                         <bundledSignature>jdk-non-portable</bundledSignature>
-                        <bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature>
+                        <!-- Workaround until signatures for ${commons-io.version} are released: -->
+                        <bundledSignature>commons-io-unsafe-2.11.0</bundledSignature>
                     </bundledSignatures>
                     <signaturesFiles>
                         <signaturesFile>${project.basedir}/../config/forbidden-apis/netty3.txt</signaturesFile>
