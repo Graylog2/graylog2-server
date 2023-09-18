@@ -74,4 +74,6 @@ public interface Client {
     Map<String, Object> getMapping(String index);
 
     String getClusterSetting(String setting);
+
+    void putFieldMapping(final String index, final String field, final String type);
 }
