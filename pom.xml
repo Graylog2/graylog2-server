@@ -201,7 +201,7 @@
         <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v18.17.1</nodejs.version>
+        <nodejs.version>v18.18.0</nodejs.version>
         <yarn.version>v1.22.19</yarn.version>
 
         <!-- Plugin versions -->
