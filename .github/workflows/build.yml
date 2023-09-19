@@ -1,6 +1,6 @@
-name: Build the repository
+name: Build the project
 
-on: 
+on:
   pull_request:
 
 # Cancel running build when new ref gets pushed.
@@ -15,15 +15,44 @@ jobs:
       matrix:
         java-version: [ 17 ]
     steps:
+      - name: Check if PR author is part of Org
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # This script checks if the PR author is a member of the organization
+          script: |
+            const prAuthor = context.payload.pull_request.user.login;
+            
+            const isMember = await github.rest.orgs.checkMembershipForUser({
+              org: 'Graylog2',
+              username: prAuthor,
+            });
+            
+            if (isMember.status === 204) {
+              console.log(`PR author ${prAuthor} is a Graylog member.`);
+            } else {
+              console.log(`PR author ${prAuthor} is not a Graylog member, skipping project build.`);
+              core.setFailed('Skipping run because author is not a Graylog member.');
+            }
       - uses: actions/checkout@v4
+        with:
+          repository: Graylog2/graylog-project-internal
+          token: ${{ secrets.GH_PAT }}
       - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
           cache: maven
-      - name: License check
-        run: mvn -B --fail-fast license:check
+      - name: Setup graylog-project binary
+        run: |
+          wget -q -O /usr/local/bin/graylog-project https://github.com/Graylog2/graylog-project-cli/releases/download/0.38.1/graylog-project.linux
+          chmod +x /usr/local/bin/graylog-project
+      - name: Checkout project
+        run: |
+          graylog-project checkout -p $GITHUB_REF manifests/master.json
+
       - name: Build with Maven
         run: mvn -B --fail-fast -Pedantic -Dspotbugs.skip -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 verify javadoc:javadoc
         env:
