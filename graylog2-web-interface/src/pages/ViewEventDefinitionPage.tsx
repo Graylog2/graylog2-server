@@ -16,14 +16,14 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useStore } from 'stores/connect';
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, IfPermitted, PageHeader, Spinner, ConfirmDialog } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
@@ -31,14 +31,21 @@ import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitio
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 const ViewEventDefinitionPage = () => {
-  const params = useParams<{definitionId?: string}>();
+  const params = useParams<{ definitionId?: string }>();
   const currentUser = useCurrentUser();
-  const [eventDefinition, setEventDefinition] = useState<{ title: string } | undefined>();
+  const [eventDefinition, setEventDefinition] = useState<EventDefinition | undefined>();
   const [isMutable, setIsMutable] = useState<boolean>(true);
+  const [showDialog, setShowDialog] = useState(false);
   const { all: notifications } = useStore(EventNotificationsStore);
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
+  const navigate = useNavigate();
+
+  const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
 
   useEffect(() => {
     if (currentUser && isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`)) {
@@ -65,6 +72,17 @@ const ViewEventDefinitionPage = () => {
     }
   }, [currentUser, history, params]);
 
+  const handleDuplicateEvent = () => {
+    sendTelemetry('click', {
+      app_pathname: 'event-definition',
+      app_action_value: 'event-definition-action-copy',
+    });
+
+    EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent) => {
+      navigate(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
+    });
+  };
+
   if (!eventDefinition || !notifications) {
     return (
       <DocumentTitle title="View Event Definition">
@@ -84,11 +102,18 @@ const ViewEventDefinitionPage = () => {
                   actions={(
                     <ButtonToolbar>
                       {isMutable && (
-                      <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
-                        <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
-                          <Button bsStyle="success">Edit Event Definition</Button>
-                        </LinkContainer>
-                      </IfPermitted>
+                        <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
+                          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
+                            <Button bsStyle="success">Edit Event Definition</Button>
+                          </LinkContainer>
+                        </IfPermitted>
+                      )}
+                      {!isSystemEventDefinition() && (
+                        <IfPermitted permissions="eventdefinitions:create">
+                          <Button onClick={() => setShowDialog(true)} bsStyle="success">Duplicate Event
+                            Definition
+                          </Button>
+                        </IfPermitted>
                       )}
                     </ButtonToolbar>
                   )}
@@ -108,6 +133,14 @@ const ViewEventDefinitionPage = () => {
                                   notifications={notifications} />
         </Col>
       </Row>
+      {showDialog && (
+        <ConfirmDialog title="Copy Event Definition"
+                       show
+                       onConfirm={() => handleDuplicateEvent()}
+                       onCancel={() => setShowDialog(false)}>
+          {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
+        </ConfirmDialog>
+      )}
     </DocumentTitle>
   );
 };
