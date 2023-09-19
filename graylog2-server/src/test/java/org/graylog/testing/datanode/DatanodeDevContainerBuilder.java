@@ -27,6 +27,8 @@ public interface DatanodeDevContainerBuilder {
     DatanodeDevContainerBuilder passwordSecret(final String passwordSecret);
     DatanodeDevContainerBuilder rootPasswordSha2(final String rootPasswordSha2);
 
+    DatanodeDevContainerBuilder rootUsername(String rootUsername);
+
     DatanodeDevContainerBuilder restPort(int restPort);
 
     DatanodeDevContainerBuilder openSearchHttpPort(int openSearchHttpPort);
