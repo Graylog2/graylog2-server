@@ -112,8 +112,8 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                 )
                 .description("Extracts key/value pairs from a string")
                 .ruleBuilderEnabled()
-                .ruleBuilderName("Convert key=value to map")
-                .ruleBuilderTitle("Convert key=value string '${value}' to map")
+                .ruleBuilderName("Convert key/value to map")
+                .ruleBuilderTitle("Convert key/value string '${value}' to map")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }

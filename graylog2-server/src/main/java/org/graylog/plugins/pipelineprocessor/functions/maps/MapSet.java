@@ -24,6 +24,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -56,8 +58,9 @@ public class MapSet extends AbstractFunction<Map> {
             return mapValue;
         }
 
-        mapValue.put(keyValue, valueValue);
-        return mapValue;
+        HashMap<String, Object> newMap = new HashMap<>(mapValue);
+        newMap.put(keyValue, valueValue);
+        return Collections.unmodifiableMap(newMap);
     }
 
     @Override
@@ -69,7 +72,7 @@ public class MapSet extends AbstractFunction<Map> {
                 .description("Set a key in the map")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Set key in map")
-                .ruleBuilderTitle("Update '${keyValue}' in map")
+                .ruleBuilderTitle("Update '${key}' in map")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.OTHER)
                 .build();
     }

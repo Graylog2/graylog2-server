@@ -24,6 +24,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -54,8 +56,9 @@ public class MapRemove extends AbstractFunction<Map> {
             return mapValue;
         }
 
-        mapValue.remove(keyValue);
-        return mapValue;
+        HashMap<String, Object> newMap = new HashMap<>(mapValue);
+        newMap.remove(keyValue);
+        return Collections.unmodifiableMap(newMap);
     }
 
     @Override
@@ -67,7 +70,7 @@ public class MapRemove extends AbstractFunction<Map> {
                 .description("Removes a key from the map")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Remove from map")
-                .ruleBuilderTitle("Remove '${keyValue}' from map")
+                .ruleBuilderTitle("Remove '${key}' from map")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.OTHER)
                 .build();
     }
