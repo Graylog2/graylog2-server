@@ -107,9 +107,8 @@ const RuleBuilder = () => {
     if (initialRule) {
       setRule(initialRule);
       setLastOutputIndex(getLastOutputIndexFromRule(initialRule));
-      simulateRule(initialRule);
     }
-  }, [initialRule, simulateRule]);
+  }, [initialRule]);
 
   const history = useHistory();
   const { pathname } = useLocation();
