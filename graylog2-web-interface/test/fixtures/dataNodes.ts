@@ -27,6 +27,7 @@ export const dataNodes = [
     transport_address: 'http://localhost:9200',
     type: 'DATANODE',
     status: 'UNCONFIGURED',
+    cert_valid_until: '2020-02-10T20:40:00.000Z',
   },
   {
     hostname: '192.168.0.11',
@@ -39,6 +40,7 @@ export const dataNodes = [
     transport_address: 'http://localhost:9201',
     type: 'DATANODE',
     status: 'UNCONFIGURED',
+    cert_valid_until: '2020-02-10T20:40:00.000Z',
   },
   {
     hostname: '192.168.0.12',
@@ -51,5 +53,6 @@ export const dataNodes = [
     transport_address: 'http://localhost:9202',
     type: 'DATANODE',
     status: 'UNCONFIGURED',
+    cert_valid_until: '2020-02-10T20:40:00.000Z',
   },
 ];

@@ -14,6 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import CertificateRenewal from './CertificateRenewal';
+import DataNodeConfiguration from './DataNodeConfiguration';
 
-export default CertificateRenewal;
+export default DataNodeConfiguration;
