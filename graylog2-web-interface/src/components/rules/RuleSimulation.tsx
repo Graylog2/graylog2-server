@@ -80,8 +80,16 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
     setRuleSimulationResult(null);
   }, [setRuleSimulationResult]);
 
+  useEffect(() => {
+    if (currentRule?.rule_builder?.errors?.length) {
+      setRuleSimulationResult(null);
+    } else {
+      simulateRule(currentRule);
+    }
+  }, [currentRule, setRuleSimulationResult, simulateRule]);
+
   const is_rule_builder = Boolean(currentRule?.rule_builder);
-  const errorMessage = currentRule?.rule_builder?.errors?.length > 0 ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
+  const errorMessage = currentRule?.rule_builder?.errors?.length ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRawMessageToSimulate(event.target.value);
@@ -96,11 +104,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
       event_details: { is_rule_builder },
     });
 
-    simulateRule(
-      currentRule || rule,
-      rawMessageToSimulate,
-      setRuleSimulationResult,
-    );
+    simulateRule(currentRule || rule);
   };
 
   const handleResetRuleSimulation = () => {

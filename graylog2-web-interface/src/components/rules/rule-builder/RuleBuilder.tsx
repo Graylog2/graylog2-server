@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ObjectID from 'bson-objectid';
 
@@ -38,7 +38,6 @@ import {
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
 
 import RuleSimulation from '../RuleSimulation';
-import { PipelineRulesContext } from '../RuleContext';
 
 const ActionsCol = styled(Col)`
   margin-top: 50px;
@@ -87,11 +86,6 @@ const RuleBuilder = () => {
     fetchValidateRule,
   } = useRuleBuilder();
 
-  const {
-    simulateRule,
-    setRuleSimulationResult,
-  } = useContext(PipelineRulesContext);
-
   const [rule, setRule] = useState<RuleBuilderRule>({
     description: '',
     title: '',
@@ -134,10 +128,6 @@ const RuleBuilder = () => {
 
   const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
     setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder, source: ruleValidated.source });
-
-    if (ruleValidated.rule_builder?.errors?.length > 0) {
-      setRuleSimulationResult(null);
-    }
   }).catch(() => setRule(ruleToValidate));
 
   const saveSimulatorMessage = async (simulator_message: string) => {
@@ -165,7 +155,6 @@ const RuleBuilder = () => {
     };
 
     await validateAndSaveRuleBuilder(newOperatorRule);
-    await simulateRule(newOperatorRule);
   };
 
   const addBlock = async (type: BlockType, block: RuleBlock, orderIndex?: number) => {
@@ -198,7 +187,6 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToAdd);
-    await simulateRule(ruleToAdd);
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
@@ -229,7 +217,6 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToUpdate);
-    await simulateRule(ruleToUpdate);
   };
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
@@ -258,7 +245,6 @@ const RuleBuilder = () => {
     }
 
     await validateAndSaveRuleBuilder(ruleToDelete);
-    await simulateRule(ruleToDelete);
   };
 
   const handleCancel = () => {
