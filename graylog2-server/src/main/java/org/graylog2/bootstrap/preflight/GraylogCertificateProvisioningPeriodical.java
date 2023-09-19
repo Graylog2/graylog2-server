@@ -87,6 +87,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final ClusterConfigService clusterConfigService,
                                                     final @Named("password_secret") String passwordSecret,
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
+                                                    final PreflightConfigService preflightConfigService,
                                                     final ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
