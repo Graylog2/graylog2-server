@@ -27,6 +27,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 
 import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
+import { useRuleBuilder } from './rule-builder/RuleBuilderContext';
 
 const ResetButton = styled(Button)(({ theme }) => css`
   margin-left: ${theme.spacings.xs};
@@ -36,15 +37,17 @@ const MessageShowContainer = styled.div(({ theme }) => css`
   padding: ${theme.spacings.md};
 `);
 
-const ActionOutputIndex = styled.b`
+const ActionOutputIndex = styled.span`
   color: #aaa;
 `;
 
-const OutputText = styled.div`
+const OutputText = styled.div<{ $highlighted?: boolean }>(({ $highlighted, theme }) => css`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-`;
+  color: ${$highlighted ? theme.colors.variant.info : 'inherit'};
+  font-weight: ${$highlighted ? 'bold' : 'inherit'};
+`);
 
 const StyledFormGroup = styled(FormGroup)(({ theme }) => css`
   margin-bottom: ${theme.spacings.xl};
@@ -64,6 +67,8 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
     ruleSimulationResult,
     setRuleSimulationResult,
   } = useContext(PipelineRulesContext);
+
+  const [highlightedOutput] = useRuleBuilder().useHighlightedOutput;
 
   const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {}).sort((a, b) => Number(a) - Number(b));
   const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort((a, b) => Number(a) - Number(b));
@@ -157,8 +162,10 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
                   <div data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
                     {actionsOutputKeys.map((actionsOutputKey) => (
-                      <OutputText key={actionsOutputKey} title={JSON.stringify(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}>
-                        <ActionOutputIndex>{actionsOutputKey}</ActionOutputIndex>: {JSON.stringify(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
+                      <OutputText key={actionsOutputKey}
+                                  $highlighted={highlightedOutput === `output_${actionsOutputKey}`}
+                                  title={JSON.stringify(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}>
+                        <ActionOutputIndex>$output_{actionsOutputKey}</ActionOutputIndex>: {JSON.stringify(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
                       </OutputText>
                     ))}
                   </div>
