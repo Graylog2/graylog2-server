@@ -27,13 +27,17 @@ export type RuleBuilderContextType = {
 const RuleBuilderContext = React.createContext<RuleBuilderContextType | null>(null);
 
 const useRuleBuilder = (): RuleBuilderContextType => {
-  const context = useContext(RuleBuilderContext);
+  try {
+    const context = useContext(RuleBuilderContext);
 
-  if (!context) {
-    throw new Error('useRuleBuilder must be used within a RuleBuilderProvider');
+    if (!context) {
+      throw new Error('useRuleBuilder must be used within a RuleBuilderProvider');
+    }
+
+    return context;
+  } catch {
+    return { useHighlightedOutput: ['', () => {}] };
   }
-
-  return context;
 };
 
 export { useRuleBuilder };
