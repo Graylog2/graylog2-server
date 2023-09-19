@@ -115,7 +115,7 @@
         <commons-io.version>2.13.0</commons-io.version>
         <disruptor.version>3.4.2</disruptor.version>
         <freemarker.version>2.3.32</freemarker.version>
-        <gelfclient.version>1.5.0</gelfclient.version>
+        <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
         <grpc.version>1.58.0</grpc.version>
