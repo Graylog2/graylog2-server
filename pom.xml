@@ -94,7 +94,7 @@
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpasyncclient.version>4.1.4</apache-httpasyncclient.version>
         <apache-httpclient.version>4.5.13</apache-httpclient.version>
-        <apache-httpcore.version>4.4.14</apache-httpcore.version>
+        <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
