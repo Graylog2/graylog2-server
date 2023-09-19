@@ -20,9 +20,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.junit.Ignore;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -35,6 +35,7 @@ import static org.graylog2.indexer.Constants.FIELD_TYPES_MANAGEMENT_FEATURE;
 
 @ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, enabledFeatureFlags = FIELD_TYPES_MANAGEMENT_FEATURE)
 public class FieldTypeMappingsIT {
+    private static final String INDEX_PREFIX = "custom-mappings";
     private final GraylogApis api;
 
     public FieldTypeMappingsIT(GraylogApis api) {
@@ -52,11 +53,12 @@ public class FieldTypeMappingsIT {
 
     }
 
-    @Ignore("Disabling test for now as it seems to be flaky.")
+    @ContainerMatrixTest
     void changeFieldTypeFromStringToIp() {
-        var indexSet = api.indices().createIndexSet("Field Type Mappings Test", "Testing custom field type mapping", "custom-mappings");
+        var indexSet = api.indices().createIndexSet("Field Type Mappings Test", "Testing custom field type mapping", INDEX_PREFIX);
         var stream = api.streams().createStream("Field Type Mappings Stream", indexSet, Streams.StreamRule.exact("field-type-mappings-test", "test-id", false));
         var gelfInput = api.gelf().createGelfHttpInput();
+        waitForNewIndex(indexSet, INDEX_PREFIX + "_0");
 
         gelfInput.postMessage(messageWithTimestamp("2019-07-23 09:53:08.175"));
 
@@ -64,7 +66,6 @@ public class FieldTypeMappingsIT {
         var previousType = new ArrayList<>(api.fieldTypes().waitForFieldTypeDefinitions("source_ip"));
         assertThat(previousType.get(0)).isNotNull()
                 .satisfies(fieldType -> assertThat(fieldType.type()).isEqualTo(FieldTypeMapper.STRING_TYPE));
-
 
         given()
                 .config(api.withGraylogBackendFailureConfig())
@@ -75,11 +76,7 @@ public class FieldTypeMappingsIT {
                 .then()
                 .statusCode(200);
 
-        api.waitFor(() -> api.get("/system/indexer/indices/" + indexSet + "/list ", 200)
-                .extract()
-                .body()
-                .asString()
-                .contains("custom-mappings_1"), "Waiting for new index after rotation timed out.", Duration.ofMinutes(3));
+        waitForNewIndex(indexSet, INDEX_PREFIX + "_1");
 
         gelfInput.postMessage(messageWithTimestamp("2023-07-23 09:53:08.175"));
 
@@ -89,6 +86,14 @@ public class FieldTypeMappingsIT {
 
             return sourceIpField.map(type -> type.type().type().equals("ip")).orElse(false);
         }, "Waiting for field type to change to `ip` timed out.", Duration.ofSeconds(60));
+    }
+
+    private void waitForNewIndex(String indexSetId, String indexName) {
+        api.waitFor(() -> api.get("/system/indexer/indices/" + indexSetId + "/list ", 200)
+                .extract()
+                .body()
+                .asString()
+                .contains(indexName), "Waiting for new index after rotation timed out.", Duration.ofMinutes(3));
     }
 
     public String messageWithTimestamp(String timestamp) {

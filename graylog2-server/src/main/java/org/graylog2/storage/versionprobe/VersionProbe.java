@@ -30,7 +30,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.security.IndexerJwtAuthToken;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class VersionProbe {
     private final int connectionAttempts;
     private final Duration delayBetweenAttempts;
     private final boolean isJwtAuthentication;
-    private final String jwtBearerToken;
+    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
 
     @Inject
     public VersionProbe(ObjectMapper objectMapper,
@@ -67,13 +67,13 @@ public class VersionProbe {
                         @Named("elasticsearch_version_probe_delay") Duration elasticsearchVersionProbeDelay,
                         @RunsWithDataNode Boolean runsWithDataNode,
                         @Named("indexer_use_jwt_authentication") boolean opensearchUseJwtAuthentication,
-                        @IndexerJwtAuthToken String jwtBearerToken) {
+                        IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
         this.connectionAttempts = elasticsearchVersionProbeAttempts;
         this.delayBetweenAttempts = elasticsearchVersionProbeDelay;
         this.isJwtAuthentication = runsWithDataNode || opensearchUseJwtAuthentication;
-        this.jwtBearerToken = jwtBearerToken;
+        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
     }
 
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
@@ -147,10 +147,8 @@ public class VersionProbe {
                 .flatMap(this::parseVersion);
     }
 
-    private Optional<String> getAuthToken(final URI host, final boolean useJWT) {
-        if(useJWT) {
-            return Optional.of(jwtBearerToken);
-        } else if (Strings.emptyToNull(host.getUserInfo()) != null) {
+    private Optional<String> getAuthToken(final URI host) {
+        if (Strings.emptyToNull(host.getUserInfo()) != null) {
             final String[] credentials = host.getUserInfo().split(":");
             final String username = credentials[0];
             final String password = credentials[1];
@@ -161,13 +159,13 @@ public class VersionProbe {
     }
 
     private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
-        final Optional<String> authToken = getAuthToken(host, isJwtAuthentication);
+        final Optional<String> authToken = getAuthToken(host);
 
-        if(authToken.isPresent()) {
+        if(isJwtAuthentication || authToken.isPresent()) {
             return okHttpClient.newBuilder()
                     .addInterceptor(chain -> {
                         final Request originalRequest = chain.request();
-                        final Request.Builder builder = originalRequest.newBuilder().header("Authorization", authToken.get());
+                        final Request.Builder builder = originalRequest.newBuilder().header("Authorization", isJwtAuthentication ? indexerJwtAuthTokenProvider.get() : authToken.get());
                         final Request newRequest = builder.build();
                         return chain.proceed(newRequest);
                     })
