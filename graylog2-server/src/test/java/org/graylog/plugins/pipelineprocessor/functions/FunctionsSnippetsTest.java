@@ -81,6 +81,7 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IpAnonymize;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
@@ -390,6 +391,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(MapGet.NAME, new MapGet());
 
         functions.put(ListGet.NAME, new ListGet());
+        functions.put(IpAnonymize.NAME, new IpAnonymize());
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1414,6 +1416,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         assertThat(message.getField("idx0")).isEqualTo("v1");
         assertThat(message.getField("idx1")).isNull();
+    }
+
+    @Test
+    public void ipAnonymize() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("ip4").toString()).isEqualTo("111.122.133.0");
     }
 
     @Test
