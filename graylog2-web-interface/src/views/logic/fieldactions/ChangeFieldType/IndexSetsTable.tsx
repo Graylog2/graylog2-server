@@ -135,7 +135,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
 
   return (
     <>
-      <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
+      <Button label={showDetails ? 'Hide index sets' : 'Show index sets'} bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
         <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
         {showDetails ? 'Hide index sets' : 'Show index sets'}
       </Button>

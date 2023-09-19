@@ -43,7 +43,7 @@ const fetchFieldTypeUsages = async ({ field, streams }: { field: string, streams
     searchParams.query,
     { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
-  return fetch<PaginatedFieldTypeUsagesResponse>('POST', qualifyUrl(url), { field, streams }).then(
+  return fetch<PaginatedFieldTypeUsagesResponse>('POST', qualifyUrl(url), { field, streams: streams.length ? streams : undefined }).then(
     ({ elements, total, count, page, per_page: perPage, attributes }) => ({
       list: elements
         .map(({
