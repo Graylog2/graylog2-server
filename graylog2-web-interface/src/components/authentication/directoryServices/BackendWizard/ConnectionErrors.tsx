@@ -42,8 +42,7 @@ type Props = {
 };
 
 const ConnectionErrors = ({ errors, message }: Props) => (
-  <NotificationContainer bsStyle="danger">
-    <Title>{message}</Title>
+  <NotificationContainer bsStyle="danger" title={message}>
     <ErrorsList>
       {errors.map((error) => <li key={String(error)}>{String(error)}</li>)}
     </ErrorsList>

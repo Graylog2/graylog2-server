@@ -20,7 +20,6 @@ import styled, { css } from 'styled-components';
 
 import { SystemJob } from 'components/systemjobs';
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
 
 const SystemJobWrap = styled.div(({ theme }) => css`
   margin-top: 10px;
@@ -58,8 +57,7 @@ const SystemJobsList = ({ jobs }): React.ReactElement => {
     (formattedJobs.length === 0)
       ? (
         <StyledAlert bsStyle="info">
-          <Icon name="info-circle" />{' '}
-          &nbsp;No active system jobs.
+          No active system jobs.
         </StyledAlert>
       )
       : (

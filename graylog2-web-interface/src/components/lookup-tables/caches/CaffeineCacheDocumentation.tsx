@@ -24,8 +24,7 @@ const CaffeineCacheDocumentation = () => (
     <p>The in-memory cache maintains recently used values from data adapters.</p>
     <p>Please make sure your Graylog servers have enough heap to accomodate the cached entries and monitor the cache efficiency.</p>
 
-    <Alert style={{ marginBottom: 10 }} bsStyle="info">
-      <h4 style={{ marginBottom: 10 }}>Implementation details</h4>
+    <Alert style={{ marginBottom: 10 }} bsStyle="info" title="Implementation details">
       <p>The cache is local to each Graylog server, they do not share the entries.</p>
       <p>For example, if you have two servers, they will maintain a completely independent cache from each other.</p>
     </Alert>

@@ -30,7 +30,7 @@ import {
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
 } from 'stores/indices/IndicesStore';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
-import { Icon, Select } from 'components/common';
+import { Select } from 'components/common';
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
@@ -194,24 +194,24 @@ const IndexMaintenanceStrategiesConfiguration = ({
       <StyledH3>{title}</StyledH3>
       {description && (
         <StyledAlert>
-          <Icon name="info-circle" />{' '} {description}
+          {description}
         </StyledAlert>
       )}
       {helpText && (
         <StyledAlert>
-          <Icon name="info-circle" />{' '} {helpText}
+          {helpText}
         </StyledAlert>
       )}
       {shouldShowMaxRetentionWarning && (
         <StyledAlert bsStyle="warning">
-          <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the
+          The effective retention period value calculated from the
           <b>Rotation period</b> and the <b>max number of indices</b> should not be greater than the
           <b>Max retention period </b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
         </StyledAlert>
       )}
       {shouldShowInvalidRetentionWarning() && (
         <StyledAlert bsStyle="danger">
-          <Icon name="exclamation-triangle" />{' '} {getDisplayName()} strategy was deactivated.
+          {getDisplayName()} strategy was deactivated.
           Please configure a valid retention strategy.
         </StyledAlert>
       )}

@@ -54,6 +54,7 @@ public class CaffeineLookupCache extends LookupCache {
     // Use the old GuavaLookupCache name, so we don't have to deal with migrations
     public static final String NAME = "guava_cache";
     private final Cache<LookupCacheKey, LookupResult> cache;
+    private final Config config;
 
     @Inject
     public CaffeineLookupCache(@Assisted("id") String id,
@@ -62,7 +63,7 @@ public class CaffeineLookupCache extends LookupCache {
                                @Named("processbuffer_processors") int processorCount,
                                MetricRegistry metricRegistry) {
         super(id, name, c, metricRegistry);
-        Config config = (Config) c;
+        config = (Config) c;
         Caffeine<Object, Object> builder = Caffeine.newBuilder();
 
         builder.recordStats(() -> new MetricStatsCounter(this));
@@ -115,17 +116,26 @@ public class CaffeineLookupCache extends LookupCache {
 
     @Override
     protected void doStart() throws Exception {
+        // no action required
     }
 
     @Override
     protected void doStop() throws Exception {
+        // no action required
     }
 
     @Override
     public LookupResult get(LookupCacheKey key, Callable<LookupResult> loader) {
         final Function<LookupCacheKey, LookupResult> mapFunction = unused -> {
             try {
-                return loader.call();
+                final LookupResult result = loader.call();
+                if (ignoreResult(result, config.ignoreNull())) {
+                    LOG.debug("Ignoring failed lookup for key {}", key);
+                        return LookupResult.builder()
+                                .cacheTTL(0L)
+                                .build();
+                }
+                return result;
             } catch (Exception e) {
                 LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
                 return LookupResult.withError(
@@ -135,6 +145,14 @@ public class CaffeineLookupCache extends LookupCache {
         try (final Timer.Context ignored = lookupTimer()) {
             return cache.get(key, mapFunction);
         }
+    }
+
+    private boolean ignoreResult(LookupResult result, Boolean ignoreNull) {
+        if (ignoreNull == null || !ignoreNull) {
+            return false;
+        }
+        return (result == null ||
+                (result.singleValue() == null && result.multiValue() == null && result.stringListValue() == null));
     }
 
     @Override
@@ -186,6 +204,7 @@ public class CaffeineLookupCache extends LookupCache {
                     .expireAfterAccess(60)
                     .expireAfterAccessUnit(TimeUnit.SECONDS)
                     .expireAfterWrite(0)
+                    .ignoreNull(false)
                     .build();
         }
     }
@@ -217,6 +236,10 @@ public class CaffeineLookupCache extends LookupCache {
         @JsonProperty("expire_after_write_unit")
         public abstract TimeUnit expireAfterWriteUnit();
 
+        @Nullable
+        @JsonProperty("ignore_null")
+        public abstract Boolean ignoreNull();
+
         public static Builder builder() {
             return new AutoValue_CaffeineLookupCache_Config.Builder();
         }
@@ -240,6 +263,9 @@ public class CaffeineLookupCache extends LookupCache {
 
             @JsonProperty("expire_after_write_unit")
             public abstract Builder expireAfterWriteUnit(@Nullable TimeUnit expireAfterWriteUnit);
+
+            @JsonProperty("ignore_null")
+            public abstract Builder ignoreNull(@Nullable Boolean ignoreNull);
 
             public abstract Config build();
         }
@@ -265,13 +291,19 @@ public class CaffeineLookupCache extends LookupCache {
         }
 
         @Override
-        public void recordLoadSuccess(long loadTime) {}
+        public void recordLoadSuccess(long loadTime) {
+            // not tracking this metric
+        }
 
         @Override
-        public void recordLoadFailure(long loadTime) {}
+        public void recordLoadFailure(long loadTime) {
+            // not tracking this metric
+        }
 
         @Override
-        public void recordEviction() {}
+        public void recordEviction() {
+            // not tracking this metric
+        }
 
         @Override
         public @NonNull CacheStats snapshot() {
