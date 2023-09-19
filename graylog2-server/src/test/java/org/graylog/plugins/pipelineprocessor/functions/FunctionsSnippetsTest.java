@@ -368,8 +368,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         when(grokPatternService.loadByName("GREEDY")).thenReturn(Optional.of(greedyPattern));
         final EventBus clusterBus = new EventBus();
         final GrokPatternRegistry grokPatternRegistry = new GrokPatternRegistry(clusterBus,
-                                                                                grokPatternService,
-                                                                                Executors.newScheduledThreadPool(1));
+                grokPatternService,
+                Executors.newScheduledThreadPool(1));
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
@@ -390,7 +390,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void stringConcat(){
+    public void stringConcat() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
 
@@ -1103,7 +1103,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message).isNotNull();
             assertThat(message.getField("interval"))
                     .isInstanceOf(Duration.class)
-                    .matches(o -> ((Duration)o).isEqual(Duration.standardDays(1)), "Exactly one day difference");
+                    .matches(o -> ((Duration) o).isEqual(Duration.standardDays(1)), "Exactly one day difference");
             assertThat(message.getField("years")).isEqualTo(Period.years(2));
             assertThat(message.getField("months")).isEqualTo(Period.months(2));
             assertThat(message.getField("weeks")).isEqualTo(Period.weeks(2));
