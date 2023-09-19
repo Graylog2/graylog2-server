@@ -87,6 +87,7 @@ import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.ListCount;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.ListGet;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
@@ -391,6 +392,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(MapGet.NAME, new MapGet());
 
         functions.put(ListGet.NAME, new ListGet());
+        functions.put(ListCount.NAME, new ListCount());
         functions.put(IpAnonymize.NAME, new IpAnonymize());
 
         functionRegistry = new FunctionRegistry(functions);
@@ -1425,6 +1427,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule, message);
 
         assertThat(message.getField("ip4").toString()).isEqualTo("111.122.133.0");
+    }
+
+    @Test
+    public void listCount() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("count")).isEqualTo(4L);
     }
 
     @Test
