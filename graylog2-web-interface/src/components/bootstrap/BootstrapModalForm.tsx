@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import $ from 'jquery';
+import isString from 'lodash/isString';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
@@ -34,6 +35,7 @@ type Props = {
   onCancel: () => void,
   title: string | React.ReactNode,
   children: React.ReactNode,
+  htmlModalTitle?: string | undefined,
 };
 
 /**
@@ -51,6 +53,7 @@ const BootstrapModalForm = ({
   onCancel,
   title,
   children,
+  htmlModalTitle,
   ...restProps
 }: Props) => {
   const form = useRef(null);
@@ -78,11 +81,14 @@ const BootstrapModalForm = ({
     </div>
   );
 
+  const modalTitle = useMemo<string | undefined>(() => (isString(title) ? title : htmlModalTitle), [htmlModalTitle, title]);
+
   return (
     <BootstrapModalWrapper bsSize={bsSize}
                            showModal={show}
                            backdrop={backdrop}
                            onHide={onCancel}
+                           title={modalTitle}
                            {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
@@ -131,6 +137,7 @@ BootstrapModalForm.defaultProps = {
   submitButtonDisabled: false,
   onSubmitForm: undefined,
   bsSize: undefined,
+  htmlModalTitle: undefined,
 };
 
 export default BootstrapModalForm;
