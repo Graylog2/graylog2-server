@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -110,6 +111,10 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                         trimValueCharactersParam
                 )
                 .description("Extracts key/value pairs from a string")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Convert key=value to map")
+                .ruleBuilderTitle("Convert key=value string '${value}' to map")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 

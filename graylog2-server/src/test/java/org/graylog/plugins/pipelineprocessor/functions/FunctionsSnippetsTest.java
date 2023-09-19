@@ -29,6 +29,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
@@ -176,6 +177,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -390,6 +392,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(MapRemove.NAME, new MapRemove());
         functions.put(MapSet.NAME, new MapSet());
         functions.put(MapGet.NAME, new MapGet());
+        functions.put(CsvMapConversion.NAME, new CsvMapConversion());
 
         functions.put(ListGet.NAME, new ListGet());
         functions.put(ListCount.NAME, new ListCount());
@@ -1436,6 +1439,24 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule, message);
 
         assertThat(message.getField("count")).isEqualTo(4L);
+    }
+
+    @Test
+    public void csvMap() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        IntStream.range(1, 5).forEach(i -> {
+            assertThat(message.getField("test" + i + "_k1")).as("Test%s k1", i).isEqualTo("v1");
+            assertThat(message.getField("test" + i + "_k2")).as("Test%s k1", i).isEqualTo("v2");
+            assertThat(message.getField("test" + i + "_k3")).as("Test%s k1", i).isEqualTo("v3");
+        });
+
+        assertThat(message.getField("test99_k1")).isEqualTo("v1");
+        assertThat(message.getField("test99_k2")).isEqualTo("v,2");
+        assertThat(message.getField("test99_k3")).isEqualTo("v3");
+
     }
 
     @Test
