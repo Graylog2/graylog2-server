@@ -147,7 +147,7 @@ const RuleBuilder = () => {
       simulator_message,
     };
 
-    await validateAndSaveRuleBuilder(newOperatorRule);
+    setRule(newOperatorRule);
   };
 
   const updateWhenOperator = async (operator: 'AND'|'OR') => {
