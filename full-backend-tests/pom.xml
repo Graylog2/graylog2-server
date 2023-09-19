@@ -47,6 +47,7 @@
             <artifactId>graylog2-server</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
@@ -140,11 +141,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_3</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <scope>test</scope>
@@ -208,4 +204,29 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>datanode</id>
+            <activation>
+                <property>
+                    <name>!skip.datanode</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.graylog2</groupId>
+                    <artifactId>data-node</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.graylog2</groupId>
+                    <artifactId>data-node</artifactId>
+                    <version>${project.version}</version>
+                    <type>test-jar</type>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

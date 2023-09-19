@@ -24,6 +24,7 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;

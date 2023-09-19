@@ -193,8 +193,7 @@ class EventNotificationForm extends React.Component {
                   </Button>
                 </FormControl.Static>
                 {testResult.message && (
-                  <Alert bsStyle={testResult.error ? 'danger' : 'success'}>
-                    <b>{testResult.error ? 'Error: ' : 'Success: '}</b>
+                  <Alert bsStyle={testResult.error ? 'danger' : 'success'} title={testResult.error ? 'Error: ' : 'Success: '}>
                     {testResult.message}
                   </Alert>
                 )}

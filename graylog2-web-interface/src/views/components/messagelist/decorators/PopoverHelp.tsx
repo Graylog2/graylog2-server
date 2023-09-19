@@ -26,9 +26,7 @@ import DecoratorStyles from './decoratorStyles.css';
 const PopoverHelp = () => {
   const popoverHelp = (
     <Popover id="decorators-help"
-             className={DecoratorStyles.helpPopover}
-             data-app-section="add_decorator_button"
-             data-event-element="Decorators">
+             className={DecoratorStyles.helpPopover}>
       <p className="description">
         Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only
         shown in the search results. Decorator config is stored <strong>per stream</strong>.
@@ -37,7 +35,8 @@ const PopoverHelp = () => {
         Use drag and drop to modify the order in which decorators are processed.
       </p>
       <p>
-        Read more about message decorators in the <DocumentationLink page={DocsHelper.PAGES.DECORATORS} text="documentation" />.
+        Read more about message decorators in the <DocumentationLink page={DocsHelper.PAGES.DECORATORS}
+                                                                     text="documentation" />.
       </p>
     </Popover>
   );

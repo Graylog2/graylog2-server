@@ -46,6 +46,15 @@ updates:
       fontawesome:
         patterns:
           - "@fortawesome/*"
+      mantine:
+        patterns:
+          - "@mantine/*"
+      openfonts:
+        patterns:
+          - "@openfonts/*"
+      tanstack:
+        patterns:
+          - "@tanstack/*"
 
   - package-ecosystem: npm
     directory: "/graylog2-web-interface/packages/babel-preset-graylog"

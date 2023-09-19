@@ -17,25 +17,16 @@
 
 import * as React from 'react';
 import { Formik, Form } from 'formik';
-import styled from 'styled-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Button, FormikInput, Space } from 'preflight/components/common';
+import { Button, Space } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
-type FormValues = {
-
-}
-
-const StyledForm = styled(Form)`
-  > div:not(:last-child) {
-    margin-bottom: 10px;
-  }
-`;
+type FormValues = {}
 
 const createCA = (caData: FormValues) => fetch(
   'POST',
@@ -60,24 +51,19 @@ const CACreateForm = () => {
   return (
     <div>
       <p>
-        Here you can quickly create a new certificate authority. It should only be used to secure your Graylog data
-        nodes.
+        Here you can quickly create a new certificate authority.
+        All you need to do is to click on the &ldquo;Create CA&rdquo; button.
+        The CA should only be used to secure your Graylog data nodes.
       </p>
-      <Space h="sm" />
-      <Formik initialValues={{ 'input-1': '', 'input-2': '' }} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
+      <Space h="xs" />
+      <Formik initialValues={{}} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
         {({ isSubmitting, isValid }) => (
-          <StyledForm>
-            <FormikInput placeholder="Input 1 placeholder"
-                         name="input-1"
-                         label="Input 1" />
-            <FormikInput placeholder="Input 2 placeholder"
-                         name="input-2"
-                         label="Input 2" />
+          <Form>
             <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
             <Button disabled={isSubmitting || !isValid} type="submit">
               {isSubmitting ? 'Creating CA...' : 'Create CA'}
             </Button>
-          </StyledForm>
+          </Form>
         )}
       </Formik>
     </div>

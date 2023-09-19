@@ -41,8 +41,7 @@ class AbuseChRansomAdapterSummary extends React.Component {
           <dt>Update interval</dt>
           <dd><TimeUnit value={config.refresh_interval} unit={config.refresh_interval_unit} /></dd>
         </dl>
-        <Alert style={{ marginBottom: 10 }} bsStyle="warning">
-          <h4 style={{ marginBottom: 10 }}>Deprecation Warning</h4>
+        <Alert style={{ marginBottom: 10 }} bsStyle="warning" title="Deprecation Warning">
           <p>The abuse.ch Ransomware Tracker was shut down on 2019-12-08. This Data Adapter should not be used.</p>
         </Alert>
       </div>

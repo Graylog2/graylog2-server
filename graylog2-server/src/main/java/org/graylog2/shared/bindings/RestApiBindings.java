@@ -30,8 +30,8 @@ import javax.ws.rs.container.DynamicFeature;
 
 public class RestApiBindings extends PluginModule {
     private final Configuration configuration;
-
-    public RestApiBindings(Configuration configuration) {
+    
+    public RestApiBindings(final Configuration configuration) {
         this.configuration = configuration;
     }
 

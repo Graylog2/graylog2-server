@@ -80,16 +80,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
 
     private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
-        return valueBuckets.size() > 1
-                ? createScriptedTerms(valueBuckets, ordering, limit)
-                : createSimpleTerms(valueBuckets.get(0), ordering, limit);
-    }
-
-    private TermsAggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {
-        return AggregationBuilders.terms(AGG_NAME)
-                .field(field)
-                .order(ordering)
-                .size(limit);
+        return createScriptedTerms(valueBuckets, ordering, limit);
     }
 
     private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
@@ -102,7 +93,11 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     private Script scriptForPivots(Collection<String> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
                 .map(bucket -> """
-                        String.valueOf((doc.containsKey('%1$s') && doc['%1$s'].size() > 0) ? doc['%1$s'].value : "%2$s")
+                        (doc.containsKey('%1$s') && doc['%1$s'].size() > 0
+                        ? doc['%1$s'].size() > 1
+                            ? doc['%1$s']
+                            : String.valueOf(doc['%1$s'].value)
+                        : "%2$s")
                         """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);

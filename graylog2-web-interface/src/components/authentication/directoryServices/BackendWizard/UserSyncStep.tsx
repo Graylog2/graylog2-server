@@ -23,7 +23,7 @@ import styled from 'styled-components';
 
 import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
-import { Icon, FormikFormGroup, Select, InputList } from 'components/common';
+import { FormikFormGroup, Select, InputList } from 'components/common';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel, Input } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -190,7 +190,6 @@ const UserSyncStep = ({
           <Row>
             <Col sm={9} smOffset={3}>
               <Alert bsStyle="info">
-                <Icon name="info-circle" />{' '}
                 We recommend you test your user login in the sidebar panel to verify your settings.
               </Alert>
             </Col>

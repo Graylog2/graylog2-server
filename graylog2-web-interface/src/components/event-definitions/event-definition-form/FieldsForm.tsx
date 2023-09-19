@@ -123,8 +123,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
             </p>
 
             {errors.length > 0 && (
-              <Alert bsStyle="danger" className={commonStyles.validationSummary}>
-                <h4>Fields with errors</h4>
+              <Alert bsStyle="danger" className={commonStyles.validationSummary} title="Fields with errors">
                 <p>Please correct the following errors before saving this Event Definition:</p>
                 <ul>
                   {errors.map((error) => <li key={error}>{error}</li>)}

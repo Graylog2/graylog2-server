@@ -27,7 +27,11 @@ import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
 const _renderConfigList = (configurations) => (
   <ul className={ConfigurationHelperStyle.ulStyle}>
-    {configurations.map((conf) => <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a></li>)}
+    {configurations.map((conf) => (
+      <li key={conf.id}>
+        <a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a>
+      </li>
+    ))}
   </ul>
 );
 
@@ -175,11 +179,11 @@ class ConfigurationVariablesHelper extends React.Component {
         </div>
 
         <BootstrapModalWrapper showModal={showModal}
-                               onHide={this._closeErrorModal}
-                               data-app-section="collector_configuration_form"
-                               data-event-element="Error deleting configuration variable">
+                               onHide={this._closeErrorModal}>
           <Modal.Header>
-            <Modal.Title>Error deleting configuration variable <strong>$&#123;user.{variableToDelete.name}&#125;</strong></Modal.Title>
+            <Modal.Title>Error deleting configuration
+              variable <strong>$&#123;user.{variableToDelete.name}&#125;</strong>
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Alert bsStyle="warning">

@@ -48,10 +48,6 @@ const LongContent = styled.div<{ $visible: boolean}>(({ $visible }) => css`
 const StyledAlert = styled(Alert)`
   margin-bottom: 6px;
   padding-right: 9px;
-  
-  &.alert-dismissable .close {
-    right: 12px;
-  }
 `;
 
 const Wrapper = styled.div`
@@ -98,8 +94,7 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
     const _dismiss = () => onDismissPublicNotification(notificationId);
 
     return (
-      <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title}>
-        {!hiddenTitle && (<h3>{title}</h3>)}
+      <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title} title={!hiddenTitle && title}>
         <FlexWrap>
           <ShortContent>{shortMessage}</ShortContent>
           {longMessage && <Button bsStyle="link" onClick={toggleReadMore}>Read {showReadMore === notificationId ? 'Less' : 'More'}</Button>}

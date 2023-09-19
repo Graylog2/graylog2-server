@@ -54,13 +54,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>${jackson.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.glassfish.jersey</groupId>
                 <artifactId>jersey-bom</artifactId>
                 <version>${jersey.version}</version>
@@ -168,16 +161,6 @@
                 <artifactId>reflections</artifactId>
                 <version>${reflections.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
-                <version>${okhttp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-tls</artifactId>
-                <version>${okhttp.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.graylog2</groupId>
@@ -251,11 +234,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.scala-lang</groupId>
-                <artifactId>scala-library</artifactId>
-                <version>${scala.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.graylog.shaded</groupId>
                 <artifactId>kafka09_2.11</artifactId>
                 <version>${kafka09.version}</version>
@@ -284,30 +262,8 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_2.13</artifactId>
+                <artifactId>kafka-clients</artifactId>
                 <version>${kafka.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.sun.jmx</groupId>
-                        <artifactId>jmxri</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.sun.jdmk</groupId>
-                        <artifactId>jmxtools</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.jms</groupId>
-                        <artifactId>jms</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
@@ -342,12 +298,6 @@
                 <groupId>com.rabbitmq</groupId>
                 <artifactId>amqp-client</artifactId>
                 <version>${amqp-client.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${protobuf.version}</version>
             </dependency>
 
             <dependency>
@@ -500,11 +450,6 @@
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
                 <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.el</groupId>
-                <artifactId>javax.el-api</artifactId>
-                <version>${javax.el-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.retrofit2</groupId>
@@ -732,12 +677,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.opensearch</groupId>
-                <artifactId>opensearch-testcontainers-bom</artifactId>
-                <version>${testcontainers.opensearch.version}</version>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.jukito</groupId>
                 <artifactId>jukito</artifactId>
                 <version>${jukito.version}</version>
@@ -870,7 +809,8 @@
                         <bundledSignature>jdk-reflection</bundledSignature>
                         <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                         <bundledSignature>jdk-non-portable</bundledSignature>
-                        <bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature>
+                        <!-- Workaround until signatures for ${commons-io.version} are released: -->
+                        <bundledSignature>commons-io-unsafe-2.11.0</bundledSignature>
                     </bundledSignatures>
                     <signaturesFiles>
                         <signaturesFile>${project.basedir}/../config/forbidden-apis/netty3.txt</signaturesFile>
