@@ -15,9 +15,30 @@ jobs:
       matrix:
         java-version: [ 17 ]
     steps:
+      - name: Check if PR author is part of Org
+        uses: actions/github-script@v6
+        with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            # This script checks if the PR author is a member of the organization
+            script: |
+              const prAuthor = context.payload.pull_request.user.login;
+              
+              const isMember = await github.rest.orgs.checkMembershipForUser({
+                org: 'Graylog2',
+                username: prAuthor,
+              });
+              
+              if (isMember.status === 204) {
+                console.log(`PR author ${prAuthor} is a Graylog member.`);
+              } else {
+                console.log(`PR author ${prAuthor} is not a Graylog member, skipping project build.`);
+                core.setFailed('Skipping run because author is not a Graylog member.');
+              }
       - uses: actions/checkout@v4
         with:
           repository: Graylog2/graylog-project-internal
+          token: ${{ secrets.GH_PAT }}
       - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v3
         with:
