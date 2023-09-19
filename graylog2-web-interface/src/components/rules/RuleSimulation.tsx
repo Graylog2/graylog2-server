@@ -83,7 +83,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   useEffect(() => {
     if (currentRule?.rule_builder?.errors?.length) {
       setRuleSimulationResult(null);
-    } else {
+    } else if (currentRule) {
       simulateRule(currentRule);
     }
   }, [currentRule, setRuleSimulationResult, simulateRule]);
