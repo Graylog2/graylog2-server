@@ -22,6 +22,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
@@ -73,11 +74,13 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IpAnonymize;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.ListCount;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.ListGet;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
@@ -147,6 +150,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LongConversion.NAME, LongConversion.class);
         addMessageProcessorFunction(StringConversion.NAME, StringConversion.class);
         addMessageProcessorFunction(MapConversion.NAME, MapConversion.class);
+        addMessageProcessorFunction(CsvMapConversion.NAME, CsvMapConversion.class);
 
         // Comparison functions
         addMessageProcessorFunction(IsBoolean.NAME, IsBoolean.class);
@@ -257,6 +261,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         // ip handling
         addMessageProcessorFunction(CidrMatch.NAME, CidrMatch.class);
         addMessageProcessorFunction(IpAddressConversion.NAME, IpAddressConversion.class);
+        addMessageProcessorFunction(IpAnonymize.NAME, IpAnonymize.class);
 
         // null support
         addMessageProcessorFunction(IsNull.NAME, IsNull.class);
@@ -286,6 +291,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LookupStringListContains.NAME, LookupStringListContains.class);
         addMessageProcessorFunction(LookupAssignTtl.NAME, LookupAssignTtl.class);
         addMessageProcessorFunction(ListGet.NAME, ListGet.class);
+        addMessageProcessorFunction(ListCount.NAME, ListCount.class);
 
         // Maps
         addMessageProcessorFunction(MapRemove.NAME, MapRemove.class);

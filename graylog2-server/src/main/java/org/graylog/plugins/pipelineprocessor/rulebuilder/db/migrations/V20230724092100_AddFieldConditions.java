@@ -58,9 +58,9 @@ public class V20230724092100_AddFieldConditions extends Migration {
             log.debug("Migration already completed!");
 //            return;
         }
-        String[] noConversionTypes = {"collection", "ip", "list", "not_null", "null", "number", "period"};
+        String[] noConversionTypes = {"collection", "list", "not_null", "null"};
         Arrays.stream(noConversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeNoConversion(type)));
-        String[] conversionTypes = {"bool", "double", "long", "map", "string", "url"};
+        String[] conversionTypes = {"bool", "double", "long", "map", "string", "url", "ip"};
         Arrays.stream(conversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldType(type)));
         ruleFragmentService.upsert(createCheckDateField());
         ruleFragmentService.upsert(createCIDRMatchField());

@@ -64,7 +64,7 @@ public class UrlConversion extends AbstractFunction<URL> {
                 .description("Converts a value to a valid URL using its string representation")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to URL")
-                .ruleBuilderTitle("Convert '${value}' to URL")
+                .ruleBuilderTitle("Convert '${url}' to URL")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }

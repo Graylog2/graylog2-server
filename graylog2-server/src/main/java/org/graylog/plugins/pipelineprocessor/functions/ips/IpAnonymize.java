@@ -52,7 +52,7 @@ public class IpAnonymize extends AbstractFunction<IpAddress> {
                 .description("Anonymize an IPAddress by setting the last octet to 0")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Anonymize IP")
-                .ruleBuilderTitle("Anonymize IP '${value}'")
+                .ruleBuilderTitle("Anonymize IP '${ip}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.OTHER)
                 .build();
     }
