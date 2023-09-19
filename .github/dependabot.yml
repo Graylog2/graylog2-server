@@ -6,9 +6,10 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 25
     labels:
       - dependencies
+      - maven
     rebase-strategy: "disabled"
 
   - package-ecosystem: npm

@@ -84,7 +84,6 @@ describe('Aggregation Widget', () => {
 
   beforeEach(() => {
     jest.useFakeTimers()
-      // @ts-expect-error
       .setSystemTime(mockedUnixTime);
   });
 

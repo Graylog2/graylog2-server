@@ -60,7 +60,7 @@ describe('<DropdownField>', () => {
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     expect(select).toBeInTheDocument();
-    expect(select).not.toHaveValue();
+    expect(select).not.toHaveValue(undefined);
   });
 
   it('should render a required field', () => {
@@ -72,7 +72,7 @@ describe('<DropdownField>', () => {
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     expect(select).toBeInTheDocument();
-    expect(select).not.toHaveValue();
+    expect(select).not.toHaveValue(undefined);
     expect(select).toBeRequired();
   });
 

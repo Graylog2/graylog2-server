@@ -33,7 +33,7 @@ describe('<TitleField>', () => {
 
     expect(titleField).toBeInTheDocument();
     expect(titleField).toHaveAttribute('required');
-    expect(titleField).not.toHaveValue();
+    expect(titleField).not.toHaveValue(undefined);
   });
 
   it('should render a field with value', () => {
