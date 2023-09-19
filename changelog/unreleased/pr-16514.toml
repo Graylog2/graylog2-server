@@ -1,7 +1,7 @@
 type = "a"
 message = "Added ability to clean field names for set_field and set_fields pipeline functions"
 
-issues = ["7137", "graylog-plugin-enterprise/5794"]
+issues = ["7137", "graylog-plugin-enterprise#5794"]
 pulls = ["16514"]
 
 details.user = """
