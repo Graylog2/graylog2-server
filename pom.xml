@@ -103,6 +103,7 @@
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>1.1.7</aws-msk-iam-auth.version>
         <bouncycastle.version>1.76</bouncycastle.version>
+        <byte-buddy.version>1.14.8</byte-buddy.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.157</classgraph.version>
@@ -193,7 +194,7 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
-        <mockito.version>3.4.4</mockito.version>
+        <mockito.version>5.5.0</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
@@ -385,6 +386,25 @@
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
+            </dependency>
+
+            <!-- test -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-bom</artifactId>
+                <version>${mockito.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byte-buddy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
