@@ -25,6 +25,7 @@ import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
+import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
@@ -35,6 +36,7 @@ import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
+import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -42,10 +44,19 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
+import org.graylog2.shared.initializers.PeriodicalsService;
+
+import static java.util.Objects.requireNonNull;
 
 public class PreflightWebModule extends Graylog2Module {
 
     public static final String FEATURE_FLAG_PREFLIGHT_WEB_ENABLED = "preflight_web";
+
+    private final Configuration configuration;
+
+    public PreflightWebModule(Configuration configuration) {
+        this.configuration = requireNonNull(configuration);
+    }
 
     @Override
     protected void configure() {
@@ -70,7 +81,9 @@ public class PreflightWebModule extends Graylog2Module {
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);
-        serviceBinder.addBinding().to(PreflightPeriodicalsService.class);
+        serviceBinder.addBinding().to(PeriodicalsService.class);
+
+        install(new LeaderElectionModule(configuration));
 
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
 

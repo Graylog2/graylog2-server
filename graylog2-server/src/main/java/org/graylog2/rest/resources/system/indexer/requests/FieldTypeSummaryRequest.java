@@ -18,11 +18,12 @@ package org.graylog2.rest.resources.system.indexer.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
-public record FieldTypeSummaryRequest(@NotNull @NotEmpty
+public record FieldTypeSummaryRequest(@Nullable
                                       @JsonProperty("streams")
                                       Set<String> streamsIds,
                                       @NotNull @NotEmpty

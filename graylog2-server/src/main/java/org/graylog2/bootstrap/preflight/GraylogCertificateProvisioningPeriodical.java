@@ -243,7 +243,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
 
     @Override
     public boolean leaderOnly() {
-        return false;
+        return true;
     }
 
     @Override
