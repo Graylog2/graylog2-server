@@ -17,8 +17,6 @@
 package org.graylog.security.certutil;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -34,7 +32,6 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.utilities.uri.TransportAddressSanitizer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -55,6 +52,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
@@ -71,7 +70,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     private final JobSchedulerClock clock;
     private final CaService caService;
     private final char[] passwordSecret;
-    private final TransportAddressSanitizer transportAddressSanitizer;
 
     // TODO: convert to config?
     private long CERT_RENEWAL_THRESHOLD_PERCENTAGE = 10;
@@ -85,8 +83,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                                   final DBJobTriggerService jobTriggerService,
                                   final CaService caService,
                                   final JobSchedulerClock clock,
-                                  final @Named("password_secret") String passwordSecret,
-                                  final TransportAddressSanitizer transportAddressSanitizer) {
+                                  final @Named("password_secret") String passwordSecret) {
         this.clusterConfigService = clusterConfigService;
         this.keystoreMongoStorage = keystoreMongoStorage;
         this.nodeService = nodeService;
@@ -96,12 +93,11 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         this.clock = clock;
         this.caService = caService;
         this.passwordSecret = passwordSecret.toCharArray();
-        this.transportAddressSanitizer = transportAddressSanitizer;
     }
 
     @VisibleForTesting
     CertRenewalServiceImpl(final JobSchedulerClock clock) {
-        this(null, null, null, null, null, null, null, clock, "dummy", null);
+        this(null, null, null, null, null, null, null, clock, "dummy");
     }
 
     private RenewalPolicy getRenewalPolicy() {
@@ -169,40 +165,33 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
-    private Pair<Node, KeyStore> loadKeyStoreForNode(Node node) {
+    private Optional<KeyStore> loadKeyStoreForNode(Node node) {
         try {
-            return Pair.of(node, keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret).orElse(null));
+            return keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret);
         } catch (KeyStoreStorageException e) {
-            return Pair.of(node, null);
+            return Optional.empty();
         }
     }
 
-    private Pair<Node, X509Certificate> getCertificateForNode(Pair<Node, KeyStore> pair) {
-        if(pair.getRight() == null) {
-            return Pair.of(pair.getLeft(), null);
-        }
-
+    private Optional<X509Certificate> getCertificateForNode(KeyStore keyStore) {
         try {
-            return Pair.of(pair.getLeft(), (X509Certificate)pair.getRight().getCertificate(CertConstants.DATANODE_KEY_ALIAS));
+            return Optional.of((X509Certificate)keyStore.getCertificate(CertConstants.DATANODE_KEY_ALIAS));
         } catch (KeyStoreException e) {
-            return Pair.of(pair.getLeft(), null);
+            return Optional.empty();
         }
-    }
-
-    private List<Pair<Node, X509Certificate>> findNodesAndCertificates() {
-        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        return activeDataNodes.values().stream()
-                .map(this::loadKeyStoreForNode)
-                .map(this::getCertificateForNode)
-                .filter(p -> p.getRight() != null)
-                .toList();
     }
 
     protected List<Node> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
         final var nextRenewal = getNextRenewal();
-        return findNodesAndCertificates().stream()
-                .filter(p -> needsRenewal(nextRenewal, renewalPolicy, p.getRight()))
-                .map(Pair::getLeft).toList();
+        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        return activeDataNodes.values().stream().map(node -> {
+            final var keystore = loadKeyStoreForNode(node);
+            final var certificate = keystore.flatMap(this::getCertificateForNode);
+            if(certificate.isPresent() && needsRenewal(nextRenewal, renewalPolicy, certificate.get())) {
+                return node;
+            }
+            return null;
+        }).filter(Objects::nonNull).toList();
     }
 
     @Override
@@ -215,27 +204,24 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     @Override
     public List<DataNode> findNodes() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        return activeDataNodes.values().stream()
-                .map(this::loadKeyStoreForNode)
-                .map(this::getCertificateForNode)
-                .map(this::addDataNodeProvisioningConfig)
-                .map(triple -> {
-                    final var n = triple.getLeft();
-                    final var certValidUntil = triple.getRight() != null ? triple.getRight().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() : null;
-                    return new DataNode(n.getNodeId(),
-                            n.getType(),
-                            transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
-                            triple.getMiddle().state(),
-                            triple.getMiddle().errorMsg(),
-                            n.getHostname(),
-                            n.getShortNodeId(),
-                            certValidUntil);
-                })
-                .toList();
+        return activeDataNodes.values().stream().map(node -> {
+            final var keystore = loadKeyStoreForNode(node);
+            final var certificate = keystore.flatMap(this::getCertificateForNode);
+            final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            final var config = getDataNodeProvisioningConfig(node);
+            return new DataNode(node.getNodeId(),
+                    node.getType(),
+                    node.getTransportAddress(),
+                    config.state(),
+                    config.errorMsg(),
+                    node.getHostname(),
+                    node.getShortNodeId(),
+                    certValidUntil.orElse(null));
+        }).toList();
     }
 
-    private Triple<Node, DataNodeProvisioningConfig, X509Certificate> addDataNodeProvisioningConfig(Pair<Node, X509Certificate> pair) {
-        return Triple.of(pair.getKey(), dataNodeProvisioningService.getPreflightConfigFor(pair.getKey().getNodeId()), pair.getValue());
+    private DataNodeProvisioningConfig getDataNodeProvisioningConfig(final Node node) {
+        return dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId());
     }
 
     private void notifyManualRenewalForNode(final List<Node> nodes) {
