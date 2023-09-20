@@ -55,7 +55,7 @@ public class RuleBuilderSimulatorResponse extends Message {
                     matcher.find();
                     int actionIndex = Integer.parseInt(matcher.group(1));
                     String variableName = matcher.group(2);
-                    this.simulatorActionVariables.add(actionIndex, new ImmutablePair<>(variableName, e.getValue()));
+                    this.simulatorActionVariables.set(actionIndex, new ImmutablePair<>(variableName, e.getValue()));
                     this.removeField(e.getKey());
                 });
         Iterables.removeIf(simulatorActionVariables, Predicates.isNull());
