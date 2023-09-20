@@ -93,7 +93,7 @@
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpasyncclient.version>4.1.5</apache-httpasyncclient.version>
-        <apache-httpclient.version>4.5.13</apache-httpclient.version>
+        <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
         <auto-value.version>1.7.4</auto-value.version>
@@ -106,7 +106,7 @@
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.157</classgraph.version>
-        <commons-codec.version>1.14</commons-codec.version>
+        <commons-codec.version>1.16.0</commons-codec.version>
         <commons-csv.version>1.7</commons-csv.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -430,7 +430,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.4</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
