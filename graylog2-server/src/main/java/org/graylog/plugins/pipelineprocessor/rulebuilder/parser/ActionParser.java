@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -49,10 +50,11 @@ public class ActionParser {
     }
 
     public String generate(List<RuleBuilderStep> actions, boolean generateSimulatorFields) {
-        return actions.stream().map(s -> generateAction(s, generateSimulatorFields)).collect(Collectors.joining(NL));
+        AtomicInteger index = new AtomicInteger(1);
+        return actions.stream().map(s -> generateAction(s, generateSimulatorFields, index.getAndIncrement())).collect(Collectors.joining(NL));
     }
 
-    String generateAction(RuleBuilderStep step, boolean generateSimulatorFields) {
+    String generateAction(RuleBuilderStep step, boolean generateSimulatorFields, int index) {
         final RuleFragment ruleFragment = actions.get(step.function());
         if (Objects.isNull(ruleFragment)) {
             return "";
@@ -86,7 +88,7 @@ public class ActionParser {
         // generate message fields for simulator
         if (generateSimulatorFields && Objects.nonNull(step.outputvariable())) {
             syntax += NL;
-            syntax += "  set_field(\"gl2_simulator_" + step.outputvariable() + "\", " + step.outputvariable() + ");";
+            syntax += "  set_field(\"gl2_simulator_step_" + index + "_" + step.outputvariable() + "\", " + step.outputvariable() + ");";
         }
 
         return syntax;

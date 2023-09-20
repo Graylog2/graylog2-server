@@ -175,7 +175,8 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     }
 
     private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto, boolean generateSimulatorFields) {
-        final RuleBuilder ruleBuilder = ruleBuilderDto.ruleBuilder().normalize();
+        final RuleBuilder ruleBuilder = (generateSimulatorFields) ? ruleBuilderDto.ruleBuilder() :
+                ruleBuilderDto.ruleBuilder().normalize();
         return RuleSource.builder()
                 .title(ruleBuilderDto.title())
                 .description(ruleBuilderDto.description())
