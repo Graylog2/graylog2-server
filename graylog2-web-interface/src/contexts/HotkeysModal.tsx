@@ -17,7 +17,7 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import { Modal, Label } from 'components/bootstrap';
+import { KeyboardKey, Modal } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import useHotkeys from 'hooks/useHotkeys';
 import type { ScopeName, HotkeyCollection } from 'contexts/HotkeysContext';
@@ -55,13 +55,13 @@ const Key = ({ description, keys, combinationKey, isEnabled }: { description: st
 
   return (
     <>
-      <b>{description}:</b>
+      {description}
       <StyledKeysList>{keysArray.map((key, index) => {
         const isLast = index === keysArray.length - 1;
 
         return (
           <>
-            <Label bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key)}</Label>
+            <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key)}</KeyboardKey>
             {!isLast && <span>+</span>}
           </>
         );
@@ -119,11 +119,9 @@ const HotkeysModal = () => {
       <Modal.Body>
         <Content>
           <SectionGrid>
-            {
-          Object.entries(hotKeysCollection).map(([scope, collection]: [ScopeName, HotkeyCollection]) => (
-            <HotkeyCollectionSection scope={scope} collection={collection} />
-          ))
-          }
+            {Object.entries(hotKeysCollection).map(([scope, collection]: [ScopeName, HotkeyCollection]) => (
+              <HotkeyCollectionSection scope={scope} collection={collection} />
+            ))}
           </SectionGrid>
         </Content>
       </Modal.Body>
