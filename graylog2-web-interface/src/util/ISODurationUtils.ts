@@ -18,38 +18,20 @@ import moment from 'moment';
 import 'moment-duration-format';
 
 const ISODurationUtils = {
-  isValidDuration(duration, validator) {
+  isValidDuration(duration: string, validator: (milliseconds: number, duration: string) => boolean) {
     return validator(moment.duration(duration).asMilliseconds(), duration);
   },
 
-  durationStyle(duration, validator, errorClass) {
-    let className = errorClass;
-
-    if (!className) {
-      className = 'error';
-    }
-
-    return this.isValidDuration(duration, validator) ? null : className;
+  durationStyle(duration: string, validator: (milliseconds: number, duration: string) => boolean, errorClass: string = 'error') {
+    return this.isValidDuration(duration, validator) ? null : errorClass;
   },
 
-  formatDuration(duration, validator, errorText) {
-    let text = errorText;
-
-    if (!text) {
-      text = 'error';
-    }
-
-    return this.isValidDuration(duration, validator) ? moment.duration(duration).format() : text;
+  formatDuration(duration: string, validator: (milliseconds: number, duration: string) => boolean, errorText: string = 'error') {
+    return this.isValidDuration(duration, validator) ? moment.duration(duration).format() : errorText;
   },
 
-  humanizeDuration(duration, validator, errorText) {
-    let text = errorText;
-
-    if (!text) {
-      text = 'error';
-    }
-
-    return this.isValidDuration(duration, validator) ? moment.duration(duration).humanize() : text;
+  humanizeDuration(duration: string, validator: (milliseconds: number, duration: string) => boolean, errorText: string = 'error') {
+    return this.isValidDuration(duration, validator) ? moment.duration(duration).humanize() : errorText;
   },
 };
 
