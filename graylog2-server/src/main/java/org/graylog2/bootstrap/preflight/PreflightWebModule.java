@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.TypeLiteral;
@@ -25,6 +26,7 @@ import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
+import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
@@ -35,17 +37,30 @@ import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
+import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.events.ClusterEventCleanupPeriodical;
+import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
+import org.graylog2.shared.initializers.PeriodicalsService;
+
+import static java.util.Objects.requireNonNull;
 
 public class PreflightWebModule extends Graylog2Module {
 
     public static final String FEATURE_FLAG_PREFLIGHT_WEB_ENABLED = "preflight_web";
+
+    private final Configuration configuration;
+
+    public PreflightWebModule(Configuration configuration) {
+        this.configuration = requireNonNull(configuration);
+    }
 
     @Override
     protected void configure() {
@@ -67,12 +82,17 @@ public class PreflightWebModule extends Graylog2Module {
 
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
+        periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
+        periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);
-        serviceBinder.addBinding().to(PreflightPeriodicalsService.class);
+        serviceBinder.addBinding().to(PeriodicalsService.class);
+
+        install(new LeaderElectionModule(configuration));
 
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
+        bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
 
         // needed for the ObjectMapperModule
         MapBinder.newMapBinder(binder(),

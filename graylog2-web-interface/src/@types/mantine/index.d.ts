@@ -14,16 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security;
+import type { MantineTheme as CustomMantineTheme } from '@graylog/sawmill/mantine';
 
-import javax.inject.Qualifier;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER, ElementType.TYPE })
-@Qualifier
-public @interface IndexerJwtAuthToken {
+declare module '@mantine/core' {
+  export interface MantineTheme extends CustomMantineTheme {}
 }
