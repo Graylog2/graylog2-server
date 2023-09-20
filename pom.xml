@@ -174,7 +174,7 @@
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.2.0</ulid.version>
-        <unboundid-ldap.version>5.1.1</unboundid-ldap.version>
+        <unboundid-ldap.version>6.0.9</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.11</zkclient.version>
