@@ -69,10 +69,6 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   } = useContext(PipelineRulesContext);
 
   const [highlightedOutput] = useRuleBuilder().useHighlightedOutput;
-
-  const actionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_action_variables || {}).sort((a, b) => Number(a) - Number(b));
-  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort((a, b) => Number(a) - Number(b));
-
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
@@ -90,6 +86,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
   const errorMessage = currentRule?.rule_builder?.errors?.length ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
+  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort((a, b) => Number(a) - Number(b));
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRawMessageToSimulate(event.target.value);
@@ -162,16 +159,20 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
                   </div>
                 )}
                 <br />
-                {actionsOutputKeys.length > 0 && (
+                {ruleSimulationResult?.simulator_action_variables?.length > 0 && (
                   <div data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
-                    {actionsOutputKeys.map((actionsOutputKey) => (
-                      <OutputText key={actionsOutputKey}
-                                  $highlighted={highlightedOutput === `output_${actionsOutputKey}`}
-                                  title={JSON.stringify(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}>
-                        <ActionOutputIndex>$output_{actionsOutputKey}</ActionOutputIndex>: {JSON.stringify(ruleSimulationResult?.simulator_action_variables[actionsOutputKey])}
-                      </OutputText>
-                    ))}
+                    {ruleSimulationResult?.simulator_action_variables?.map((actionOutputKeyValue) => {
+                      const keyValue = Object.entries(actionOutputKeyValue)[0];
+
+                      return (
+                        <OutputText key={keyValue[0]}
+                                    $highlighted={highlightedOutput === keyValue[0]}
+                                    title={JSON.stringify(keyValue[1])}>
+                          <ActionOutputIndex>${keyValue[0]}</ActionOutputIndex>: {JSON.stringify(keyValue[1])}
+                        </OutputText>
+                      );
+                    })}
                   </div>
                 )}
               </>
