@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
-import ISODurationUtils from 'util/ISODurationUtils';
+import * as ISODurationUtils from 'util/ISODurationUtils';
 
 /**
  * Displays an `Input` component for ISO8601 durations.

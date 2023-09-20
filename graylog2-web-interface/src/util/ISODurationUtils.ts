@@ -17,22 +17,10 @@
 import moment from 'moment';
 import 'moment-duration-format';
 
-const ISODurationUtils = {
-  isValidDuration<T>(duration: string, validator: (milliseconds: number, duration: string) => T) {
-    return validator(moment.duration(duration).asMilliseconds(), duration);
-  },
+export const isValidDuration = <T>(duration: string, validator: (milliseconds: number, duration: string) => T) => validator(moment.duration(duration).asMilliseconds(), duration);
 
-  durationStyle(duration: string, validator: (milliseconds: number, duration: string) => boolean, errorClass: string = 'error') {
-    return this.isValidDuration(duration, validator) ? null : errorClass;
-  },
+export const durationStyle = (duration: string, validator: (milliseconds: number, duration: string) => boolean, errorClass: string = 'error') => (isValidDuration(duration, validator) ? null : errorClass);
 
-  formatDuration(duration: string, validator: (milliseconds: number, duration: string) => boolean, errorText: string = 'error') {
-    return this.isValidDuration(duration, validator) ? moment.duration(duration).format() : errorText;
-  },
+export const formatDuration = (duration: string, validator: (milliseconds: number, duration: string) => boolean, errorText: string = 'error') => (isValidDuration(duration, validator) ? moment.duration(duration).format() : errorText);
 
-  humanizeDuration(duration: string, validator: (milliseconds: number, duration: string) => boolean, errorText: string = 'error') {
-    return this.isValidDuration(duration, validator) ? moment.duration(duration).humanize() : errorText;
-  },
-};
-
-export default ISODurationUtils;
+export const humanizeDuration = (duration: string, validator: (milliseconds: number, duration: string) => boolean, errorText: string = 'error') => (isValidDuration(duration, validator) ? moment.duration(duration).humanize() : errorText);

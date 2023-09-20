@@ -25,7 +25,7 @@ import { ConfigurationType } from 'components/configurations/ConfigurationTypes'
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
 import Spinner from 'components/common/Spinner';
-import ISODurationUtils from 'util/ISODurationUtils';
+import * as ISODurationUtils from 'util/ISODurationUtils';
 import { getValueFromInput } from 'util/FormsUtils';
 import StringUtils from 'util/StringUtils';
 
