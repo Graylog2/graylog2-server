@@ -32,7 +32,7 @@ import HotkeysContext from 'contexts/HotkeysContext';
 import HotkeysModal from 'contexts/HotkeysModal';
 
 export const hotKeysCollection: HotkeyCollections = {
-  view: {
+  general: {
     title: 'General',
     description: 'Main hot keys',
     actions: {

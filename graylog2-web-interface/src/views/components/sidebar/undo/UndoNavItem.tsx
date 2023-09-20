@@ -29,7 +29,7 @@ const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(undo()), [dispatch]);
-  useHotkeys('UNDO', () => dispatch(undo()), { scopes: 'view' });
+  useHotkeys('UNDO', () => dispatch(undo()), { scopes: 'general' });
 
   return (
     <NavItem disabled={!isUndoAvailable}

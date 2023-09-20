@@ -29,7 +29,7 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(redo()), [dispatch]);
-  useHotkeys('REDO', () => dispatch(redo()), { scopes: 'view' });
+  useHotkeys('REDO', () => dispatch(redo()), { scopes: 'general' });
 
   return (
     <NavItem disabled={!isRedoAvailable}

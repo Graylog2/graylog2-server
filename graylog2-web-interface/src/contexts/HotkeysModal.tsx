@@ -106,7 +106,7 @@ const HotkeysModal = () => {
   const onHide = useCallback(() => setShow(false), []);
   const onToggle = useCallback(() => setShow((cur) => !cur), []);
   const { hotKeysCollection } = useHotkeysContext();
-  useHotkeys('SHOW_HELPER', onToggle, { scopes: 'view' });
+  useHotkeys('SHOW_HELPER', onToggle, { scopes: 'general' });
 
   return show && (
     <Modal show={show}

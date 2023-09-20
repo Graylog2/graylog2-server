@@ -44,7 +44,8 @@ const useHotkeys = <T extends HTMLElement>(
   dependencies?: Array<unknown>,
 ) => {
   const {
-    hotKeysCollection, addActiveHotkey,
+    hotKeysCollection,
+    addActiveHotkey,
     removeActiveHotkey,
   } = useHotkeysContext();
   // const scope = options?.scopes ?? '*';
