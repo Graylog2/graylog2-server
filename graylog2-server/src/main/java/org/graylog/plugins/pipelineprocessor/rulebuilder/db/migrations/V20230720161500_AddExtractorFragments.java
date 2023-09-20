@@ -56,7 +56,7 @@ public class V20230720161500_AddExtractorFragments extends Migration {
         log.debug("Adding extractor fragments via migration");
         if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
             log.debug("Migration already completed!");
-//            return;
+            return;
         }
 
         ruleFragmentService.upsert(createCopyFieldExtractor());

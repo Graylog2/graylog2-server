@@ -56,7 +56,7 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
         log.debug("Adding implicit to_string fragments via migration");
         if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
             log.debug("Migration already completed!");
-//            return;
+            return;
         }
 
         ruleFragmentService.upsert(createSubstringFragment());

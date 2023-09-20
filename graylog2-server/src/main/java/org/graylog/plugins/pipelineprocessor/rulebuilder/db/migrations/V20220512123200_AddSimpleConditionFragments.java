@@ -55,7 +55,7 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
         log.debug("Migrating simple condition fragments for the rule builder ui");
         if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
             log.debug("Migration already completed!");
-//            return;
+            return;
         }
 
         ruleFragmentService.upsert(createHasFieldEqualsFragment());

@@ -36,7 +36,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 
 public class V20230724092100_AddFieldConditions extends Migration {
 
-    private static final Logger log = LoggerFactory.getLogger(V20230613154400_AddImplicitToStringFragments.class);
+    private static final Logger log = LoggerFactory.getLogger(V20230724092100_AddFieldConditions.class);
     private final RuleFragmentService ruleFragmentService;
     private final ClusterConfigService clusterConfigService;
 
@@ -56,7 +56,7 @@ public class V20230724092100_AddFieldConditions extends Migration {
         log.debug("Adding field condition fragments via migration");
         if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
             log.debug("Migration already completed!");
-//            return;
+            return;
         }
         String[] noConversionTypes = {"collection", "list", "not_null", "null"};
         Arrays.stream(noConversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeNoConversion(type)));

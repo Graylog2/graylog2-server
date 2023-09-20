@@ -38,7 +38,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 
 public class V20230915095200_AddSimpleRegex extends Migration {
 
-    private static final Logger log = LoggerFactory.getLogger(V20230613154400_AddImplicitToStringFragments.class);
+    private static final Logger log = LoggerFactory.getLogger(V20230915095200_AddSimpleRegex.class);
     private final RuleFragmentService ruleFragmentService;
     private final ClusterConfigService clusterConfigService;
 
@@ -58,7 +58,7 @@ public class V20230915095200_AddSimpleRegex extends Migration {
         log.debug("Adding simple regex fragments via migration");
         if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
             log.debug("Migration already completed!");
-//            return;
+            return;
         }
 
         ruleFragmentService.upsert(createSimpleRegex());
