@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.TypeLiteral;
@@ -39,10 +40,13 @@ import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.events.ClusterEventCleanupPeriodical;
+import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import org.graylog2.shared.initializers.PeriodicalsService;
 
@@ -78,6 +82,8 @@ public class PreflightWebModule extends Graylog2Module {
 
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
+        periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
+        periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);
@@ -86,6 +92,7 @@ public class PreflightWebModule extends Graylog2Module {
         install(new LeaderElectionModule(configuration));
 
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
+        bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
 
         // needed for the ObjectMapperModule
         MapBinder.newMapBinder(binder(),

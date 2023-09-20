@@ -92,7 +92,7 @@
         <amqp-client.version>5.8.0</amqp-client.version>
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
-        <apache-httpclient.version>4.5.13</apache-httpclient.version>
+        <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
         <auto-value.version>1.7.4</auto-value.version>
@@ -102,10 +102,11 @@
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>1.1.7</aws-msk-iam-auth.version>
         <bouncycastle.version>1.76</bouncycastle.version>
+        <byte-buddy.version>1.14.8</byte-buddy.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.157</classgraph.version>
-        <commons-codec.version>1.14</commons-codec.version>
+        <commons-codec.version>1.16.0</commons-codec.version>
         <commons-csv.version>1.7</commons-csv.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -141,7 +142,7 @@
         <json-path.version>2.8.0</json-path.version>
         <kafka.version>3.5.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.17.1</log4j.version>
+        <log4j.version>2.20.0</log4j.version>
         <lucene.version>9.1.0</lucene.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>4.8.1</mongodb-driver.version>
@@ -168,7 +169,7 @@
         <snappy-java.version>1.1.10.3</snappy-java.version>
         <oshi.version>5.3.7</oshi.version>
         <siv-mode.version>1.4.1</siv-mode.version>
-        <slf4j.version>1.7.30</slf4j.version>
+        <slf4j.version>2.0.9</slf4j.version>
         <streamex.version>0.7.2</streamex.version>
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
@@ -176,8 +177,6 @@
         <unboundid-ldap.version>5.1.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
-        <zkclient.version>0.11</zkclient.version>
-        <zookeeper.version>3.5.7</zookeeper.version>
         <zstd.version>1.5.4-1</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
@@ -192,7 +191,7 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
-        <mockito.version>3.4.4</mockito.version>
+        <mockito.version>5.5.0</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
@@ -380,6 +379,25 @@
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
             </dependency>
+
+            <!-- test -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-bom</artifactId>
+                <version>${mockito.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -424,7 +442,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.4</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -550,6 +568,8 @@
                                         <exclude>org.slf4j:slf4j-simple</exclude>
                                         <!-- Newer asm versions are published under the org.ow2.asm groupId. Avoid conflicts by banning the old one.  -->
                                         <exclude>asm:asm</exclude>
+                                        <!-- Mockito should by now have all the features we need. -->
+                                        <exclude>org.powermock</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>

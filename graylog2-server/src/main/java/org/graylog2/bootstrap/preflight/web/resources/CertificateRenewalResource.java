@@ -23,9 +23,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -36,8 +33,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Api(value = "Certificates")
@@ -46,32 +41,18 @@ import java.util.List;
 @RequiresAuthentication
 public class CertificateRenewalResource implements PluginRestResource {
     private final CertRenewalService certRenewalService;
-    private final NodeService nodeService;
 
     @Inject
-    public CertificateRenewalResource(final CertRenewalService certRenewalService,
-                                      final NodeService nodeService) {
+    public CertificateRenewalResource(final CertRenewalService certRenewalService) {
         this.certRenewalService = certRenewalService;
-        this.nodeService = nodeService;
     }
-
-    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId, String cert) {}
 
     @GET
     // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
-    public List<DataNode> listDataNodes() {
+    public List<CertRenewalService.DataNode> listDataNodes() {
         // Nodes are not filtered right now so that you can manually initiate a renewal for every node available
-        return certRenewalService.findNodesAndCertificates().stream().map(pair -> {
-            final var n = pair.getKey();
-            final var cert = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(pair.getValue().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            return new DataNode(n.getNodeId(),
-                    n.getType(),
-                    n.getTransportAddress(),
-                    null, null,
-                    n.getHostname(),
-                    n.getShortNodeId(), cert);
-        }).toList();
+        return certRenewalService.findNodes();
     }
 
     @POST

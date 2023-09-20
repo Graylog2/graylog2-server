@@ -101,6 +101,8 @@ public class SearchResourceExecutionTest {
                 return currentUser;
             }
         };
+
+        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of("Default Stream"));
     }
 
     @Test
@@ -112,7 +114,7 @@ public class SearchResourceExecutionTest {
 
         final Response response = this.searchResource.executeQuery(search.id(), ExecutionState.empty(), searchUser);
 
-        final SearchJob searchJob = (SearchJob)response.getEntity();
+        final SearchJob searchJob = (SearchJob) response.getEntity();
 
         assertThat(searchJob.getOwner()).isEqualTo(username);
     }
@@ -203,7 +205,7 @@ public class SearchResourceExecutionTest {
 
         final Response response = this.searchResource.executeSyncJob(search, 100, searchUser);
 
-        final SearchJobDTO responseSearchJob = (SearchJobDTO)response.getEntity();
+        final SearchJobDTO responseSearchJob = (SearchJobDTO) response.getEntity();
         assertThat(responseSearchJob.owner()).isEqualTo("peterchen");
     }
 
