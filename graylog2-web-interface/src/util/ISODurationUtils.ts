@@ -18,7 +18,7 @@ import moment from 'moment';
 import 'moment-duration-format';
 
 const ISODurationUtils = {
-  isValidDuration(duration: string, validator: (milliseconds: number, duration: string) => boolean) {
+  isValidDuration<T>(duration: string, validator: (milliseconds: number, duration: string) => T) {
     return validator(moment.duration(duration).asMilliseconds(), duration);
   },
 
