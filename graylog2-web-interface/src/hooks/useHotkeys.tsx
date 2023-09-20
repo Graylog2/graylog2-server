@@ -19,7 +19,7 @@ import type { HotkeyCallback, Options } from 'react-hotkeys-hook';
 import { useHotkeys as originalUseHotkeys } from 'react-hotkeys-hook';
 import { useEffect, useMemo } from 'react';
 
-import type { ScopeName } from 'contexts/HotkeysContext';
+import type { ScopeName, HotkeyCollections } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 
 const defaultOptions: Options = {
@@ -37,6 +37,16 @@ const defaultOptions: Options = {
   ignoreModifiers: false,
 };
 
+const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, scope: ScopeName) => {
+  if (!hotKeysCollections[scope]) {
+    throw Error(`Scope "${scope}" does not exist in hotkeys collection.`);
+  }
+
+  if (!hotKeysCollections[scope].actions[actionKey]) {
+    throw Error(`Action "${actionKey}" does not exist in hotkeys collection of "${scope}" scope.`);
+  }
+};
+
 const useHotkeys = <T extends HTMLElement>(
   actionKey: string,
   callback: HotkeyCallback,
@@ -48,6 +58,9 @@ const useHotkeys = <T extends HTMLElement>(
     addActiveHotkey,
     removeActiveHotkey,
   } = useHotkeysContext();
+
+  catchErrors(hotKeysCollection, actionKey, options.scopes);
+
   // const scope = options?.scopes ?? '*';
   // const scopes = isArray(scope) ? scope : [scope];
   const mergedOptions = useMemo(() => ({

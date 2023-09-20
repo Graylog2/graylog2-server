@@ -22,14 +22,17 @@ import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import useHotkeys from 'hooks/useHotkeys';
+import useViewType from 'views/hooks/useViewType';
+import type { ViewType } from 'views/logic/views/View';
 
 const TITLE = 'Undo';
 
 const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
+  const viewType = useViewType();
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(undo()), [dispatch]);
-  useHotkeys('UNDO', () => dispatch(undo()), { scopes: 'general' });
+  useHotkeys('UNDO', () => dispatch(undo()), { scopes: viewType.toLowerCase() as Lowercase<ViewType> });
 
   return (
     <NavItem disabled={!isUndoAvailable}

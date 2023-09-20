@@ -22,14 +22,17 @@ import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { redo } from 'views/logic/slices/undoRedoActions';
 import useHotkeys from 'hooks/useHotkeys';
+import useViewType from 'views/hooks/useViewType';
+import type { ViewType } from 'views/logic/views/View';
 
 const TITLE = 'Redo';
 
 const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
+  const viewType = useViewType();
   const dispatch = useAppDispatch();
   const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(redo()), [dispatch]);
-  useHotkeys('REDO', () => dispatch(redo()), { scopes: 'general' });
+  useHotkeys('REDO', () => dispatch(redo()), { scopes: viewType.toLowerCase() as Lowercase<ViewType> });
 
   return (
     <NavItem disabled={!isRedoAvailable}

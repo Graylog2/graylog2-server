@@ -31,13 +31,16 @@ import type { ScopeName, ScopeParam, ActiveHotkeys, HotkeyCollections } from 'co
 import HotkeysContext from 'contexts/HotkeysContext';
 import HotkeysModal from 'contexts/HotkeysModal';
 
+const viewActions = {
+  UNDO: { keys: 'mod+z', description: 'Undo last action' },
+  REDO: { keys: 'mod+y', description: 'Redo last action' },
+};
+
 export const hotKeysCollection: HotkeyCollections = {
   general: {
     title: 'General',
     description: 'Main hot keys',
     actions: {
-      UNDO: { keys: 'mod+z', description: 'Undo last action' },
-      REDO: { keys: 'mod+y', description: 'Redo last action' },
       SHOW_HELPER: { keys: 'shift+?', description: 'Show hotkeys helper' },
     },
   },
@@ -45,6 +48,7 @@ export const hotKeysCollection: HotkeyCollections = {
     title: 'Search',
     description: 'Hot keys for search page',
     actions: {
+      ...viewActions,
       SAVE: { keys: 'mod+s', description: 'Save search' },
       SAVE_AS: { keys: 'shift+mod+s', description: 'Save search as' },
     },
@@ -53,6 +57,7 @@ export const hotKeysCollection: HotkeyCollections = {
     title: 'Dashboard',
     description: 'Hot keys for dashboard page',
     actions: {
+      ...viewActions,
       SAVE: { keys: 'mod+s', description: 'Save dashboard' },
     },
   },
