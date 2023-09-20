@@ -31,7 +31,7 @@ import type { ScopeName, ScopeParam, ActiveHotkeys, HotkeyCollections } from 'co
 import HotkeysContext from 'contexts/HotkeysContext';
 import HotkeysModal from 'contexts/HotkeysModal';
 
-export const defaultHotKeysCollection: HotkeyCollections = {
+export const hotKeysCollection: HotkeyCollections = {
   view: {
     title: 'General',
     description: 'Main hot keys',
@@ -60,7 +60,6 @@ export const defaultHotKeysCollection: HotkeyCollections = {
 
 const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   // const [activeScopes, setActiveScopes] = useState<Immutable.Set<ScopeName>>(Immutable.Set(['*']));
-  const [hotKeysCollection] = useState<HotkeyCollections>(defaultHotKeysCollection);
   const [activeHotkeys, setActiveHotkeys] = useState<ActiveHotkeys>(Immutable.Map());
   const { enabledScopes, hotkeys, disableScope, toggleScope, enableScope } = useOriginalHotkeysContext();
   const _enableScope = useCallback((scopes: ScopeParam) => {
@@ -89,7 +88,6 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const value = useMemo(() => ({
-
     disableScope: _disableScope,
     enableScope: _enableScope,
     setActiveScopes,
