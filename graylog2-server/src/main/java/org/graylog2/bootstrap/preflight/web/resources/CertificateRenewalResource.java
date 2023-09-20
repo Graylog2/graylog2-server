@@ -28,7 +28,6 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.utilities.uri.TransportAddressSanitizer;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -46,15 +45,12 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CertificateRenewalResource implements PluginRestResource {
-    private final TransportAddressSanitizer transportAddressSanitizer;
     private final CertRenewalService certRenewalService;
     private final NodeService nodeService;
 
     @Inject
-    public CertificateRenewalResource(final TransportAddressSanitizer transportAddressSanitizer,
-                                      final CertRenewalService certRenewalService,
+    public CertificateRenewalResource(final CertRenewalService certRenewalService,
                                       final NodeService nodeService) {
-        this.transportAddressSanitizer = transportAddressSanitizer;
         this.certRenewalService = certRenewalService;
         this.nodeService = nodeService;
     }
@@ -71,7 +67,7 @@ public class CertificateRenewalResource implements PluginRestResource {
             final var cert = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(pair.getValue().getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
             return new DataNode(n.getNodeId(),
                     n.getType(),
-                    transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
+                    n.getTransportAddress(),
                     null, null,
                     n.getHostname(),
                     n.getShortNodeId(), cert);
