@@ -722,7 +722,6 @@
                             joptsimple.internal.**
                             org.testcontainers.shaded.**
                             edu.emory.mathcs.backport.java.util.**
-                            net.fortuna.ical4j.util.**
                             org.apache.directory.api.util.**
                             org.apache.groovy.util.**
                             org.apache.logging.log4j.util.**
