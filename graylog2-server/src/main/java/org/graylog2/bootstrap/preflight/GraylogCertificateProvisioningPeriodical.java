@@ -73,6 +73,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final String passwordSecret;
     private final ClusterEventBus clusterEventBus;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
+    private final PreflightConfigService preflightConfigService;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
 
     @Inject
@@ -86,6 +87,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final ClusterConfigService clusterConfigService,
                                                     final @Named("password_secret") String passwordSecret,
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
+                                                    final PreflightConfigService preflightConfigService,
                                                     final ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
@@ -97,6 +99,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = clusterEventBus;
+        this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
     }
 
@@ -154,6 +157,17 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 
                 var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+
+                // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
+                preflightConfigService.getPersistedConfig().ifPresent(cfg -> {
+                    if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC) && cfg.result().equals(PreflightConfigResult.FINISHED)) {
+                        nodes.stream()
+                                .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
+                                .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
+                                        .state(DataNodeProvisioningConfig.State.CONFIGURED)
+                                        .build()));
+                    }
+                });
 
                 nodes.stream()
                         .filter(c -> DataNodeProvisioningConfig.State.CSR.equals(c.state()))
