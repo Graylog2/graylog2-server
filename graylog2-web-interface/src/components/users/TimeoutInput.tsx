@@ -28,7 +28,7 @@ type Props = {
   onChange: (value: number) => void;
 };
 
-const _estimateUnit = (value: number) => {
+const _estimateUnit = (value: number): number => {
   if (value === 0) {
     return MS_SECOND;
   }
@@ -69,7 +69,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
     }
   };
 
-  const _onChangeUnit = (newUnit: string) => {
+  const _onChangeUnit = (newUnit: number) => {
     setUnit(newUnit);
 
     if (onChange) {

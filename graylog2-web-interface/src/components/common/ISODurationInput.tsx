@@ -23,7 +23,27 @@ import ISODurationUtils from 'util/ISODurationUtils';
 /**
  * Displays an `Input` component for ISO8601 durations.
  */
-class ISODurationInput extends React.Component {
+type Props = {
+  id: string,
+  duration: string,
+  update: (newDuration: string) => void,
+  label: string,
+  help: string,
+  validator?: (newDuration: number) => boolean,
+  errorText?: string,
+  autoFocus?: boolean,
+  required?: boolean,
+  disabled?: boolean,
+}
+type State = {
+  duration: string,
+}
+
+interface DurationInput {
+  getValue(): string;
+}
+
+class ISODurationInput extends React.Component<Props, State> {
   static propTypes = {
     /** Input id */
     id: PropTypes.string.isRequired,
@@ -50,6 +70,8 @@ class ISODurationInput extends React.Component {
     /** Specify that the Input is disabled or not */
     disabled: PropTypes.bool,
   };
+
+  private isoDuration: DurationInput;
 
   static defaultProps = {
     label: 'Duration',
@@ -88,7 +110,7 @@ class ISODurationInput extends React.Component {
     return (
       <Input id={this.props.id}
              type="text"
-             ref={(isoDuration) => { this.isoDuration = isoDuration; }}
+             ref={(isoDuration: DurationInput) => { this.isoDuration = isoDuration; }}
              label={this.props.label}
              onChange={this._onUpdate}
              value={this.state.duration}
