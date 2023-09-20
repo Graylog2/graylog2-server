@@ -177,8 +177,6 @@
         <unboundid-ldap.version>5.1.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
-        <zkclient.version>0.11</zkclient.version>
-        <zookeeper.version>3.5.7</zookeeper.version>
         <zstd.version>1.5.4-1</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
