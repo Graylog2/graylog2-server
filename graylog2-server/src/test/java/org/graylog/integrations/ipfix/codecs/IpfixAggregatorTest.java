@@ -23,7 +23,6 @@ import io.netty.buffer.Unpooled;
 import io.pkts.Pcap;
 import io.pkts.packet.UDPPacket;
 import io.pkts.protocol.Protocol;
-import org.assertj.core.util.Lists;
 import org.graylog.integrations.ipfix.InformationElementDefinitions;
 import org.graylog.integrations.ipfix.IpfixMessage;
 import org.graylog.integrations.ipfix.IpfixParser;
@@ -44,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -143,7 +143,7 @@ public class IpfixAggregatorTest {
         final IpfixAggregator ipfixAggregator = new IpfixAggregator();
         final Map<String, Object> configMap = getIxiaConfigmap();
         final IpfixCodec codec = new IpfixCodec(new Configuration(configMap), ipfixAggregator);
-        final List<Message> messages = Lists.newArrayList();
+        final List<Message> messages = new ArrayList<>();
 
         // ixflow.pcap contains 4 packets, the first has the data templates and option templates
         // followed by three data sets. two sets have subtemplateList data, the third has only empty lists for domain information

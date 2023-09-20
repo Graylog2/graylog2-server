@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.apache.logging.log4j.util.Strings;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -390,7 +389,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(indices.toArray(new String[]{}))
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(Strings.EMPTY_ARRAY);
+                .names(new String[]{});
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
