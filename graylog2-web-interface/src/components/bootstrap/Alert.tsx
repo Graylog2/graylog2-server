@@ -23,7 +23,7 @@ import { Alert as MantineAlert, useMantineTheme } from '@mantine/core';
 import Icon from 'components/common/Icon';
 
 type Props = {
-  bsStyle: ColorVariant,
+  bsStyle?: ColorVariant,
   children: React.ReactNode,
   className?: string,
   onDismiss?: () => void,
@@ -58,6 +58,7 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
     },
     title: {
       fontSize: theme.fontSizes.md,
+      color: theme.others.colors.global.textDefault,
     },
   });
 
@@ -81,6 +82,7 @@ Alert.defaultProps = {
   onDismiss: undefined,
   style: undefined,
   title: undefined,
+  bsStyle: 'default',
 };
 
 export default Alert;
