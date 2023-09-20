@@ -22,26 +22,17 @@ import type Immutable from 'immutable';
 import { singleton } from 'logic/singleton';
 
 export type ScopeName = 'view' | 'search' | 'dashboard';
-
 export type ScopeParam = Array<ScopeName> | ScopeName
-
 export type ActiveHotkey = {
   options?: Options & { scopes: ScopeName },
 }
-
 export type ActiveHotkeys = Immutable.Map<`${ScopeName}.${string}`, ActiveHotkey>
-
 export type HotkeyCollection = {
   title: string,
   description: string,
-  actions: {
-    [name: string]: { keys: string, description: string }
-  }
+  actions: Record<string, { keys: string, description: string }>,
 }
-
-export type HotkeyCollections = {
-  [key in ScopeName]: HotkeyCollection
-}
+export type HotkeyCollections = Record<ScopeName, HotkeyCollection>
 
 type HotkeysContextType = {
   disableScope: (scopes: ScopeParam) => void,
