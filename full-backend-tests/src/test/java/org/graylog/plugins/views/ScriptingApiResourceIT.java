@@ -42,6 +42,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -401,7 +402,7 @@ public class ScriptingApiResourceIT {
         final CSVParser csvParser = new CSVParser(',', '"');
         final List<String[]> lines = new ArrayList<>();
 
-        try (final var reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        try (final var reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             while (reader.ready()) {
                 lines.add(csvParser.parseLine(reader.readLine()));
             }
