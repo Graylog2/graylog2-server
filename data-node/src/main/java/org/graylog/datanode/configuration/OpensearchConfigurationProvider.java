@@ -116,11 +116,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
         config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        if (localConfiguration.isSingleNodeOnly()) {
-            config.put("discovery.type", "single-node");
-        } else {
-            config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
-        }
+        config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");

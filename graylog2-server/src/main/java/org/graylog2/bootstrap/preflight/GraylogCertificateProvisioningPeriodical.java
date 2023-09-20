@@ -37,7 +37,7 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
-import org.graylog2.security.IndexerJwtAuthToken;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +73,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final String passwordSecret;
     private final ClusterEventBus clusterEventBus;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
-    private final String jwtBearerToken;
+    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
 
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
@@ -85,8 +85,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final CsrSigner csrSigner,
                                                     final ClusterConfigService clusterConfigService,
                                                     final @Named("password_secret") String passwordSecret,
-                                                    @IndexerJwtAuthToken String jwtBearerToken,
-                                                    ClusterEventBus clusterEventBus) {
+                                                    final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
+                                                    final ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -97,7 +97,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = clusterEventBus;
-        this.jwtBearerToken = jwtBearerToken;
+        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -202,7 +202,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         Request request = new Request.Builder().url(node.getTransportAddress()).build();
         if(okHttpClient.isPresent()) {
             OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
-            builder.authenticator((route, response) -> response.request().newBuilder().header("Authorization", jwtBearerToken).build());
+            builder.authenticator((route, response) -> response.request().newBuilder().header("Authorization", indexerJwtAuthTokenProvider.get()).build());
             Call call = builder.build().newCall(request);
             try(Response response = call.execute()) {
                 return response.isSuccessful();
