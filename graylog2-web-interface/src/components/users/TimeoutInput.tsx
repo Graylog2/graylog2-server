@@ -28,7 +28,7 @@ type Props = {
   onChange: (value: number) => void;
 };
 
-const _estimateUnit = (value) => {
+const _estimateUnit = (value: number) => {
   if (value === 0) {
     return MS_SECOND;
   }
@@ -53,7 +53,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
 
-  const _onClick = (evt) => {
+  const _onClick = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setSessionTimeoutNever(evt.target.checked);
 
     if (onChange && evt.target.checked) {
@@ -61,11 +61,11 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
     }
   };
 
-  const _onChangeValue = (evt) => {
-    setValue(evt.target.value);
+  const _onChangeValue = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(Number(evt.target.value));
 
     if (onChange) {
-      onChange(evt.target.value * Number(unit));
+      onChange(Number(evt.target.value) * Number(unit));
     }
   };
 
@@ -115,7 +115,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
           </Col>
           <Col xs={4}>
             <TimeoutUnitSelect disabled={sessionTimeoutNever}
-                               value={unit}
+                               value={String(unit)}
                                onChange={_onChangeUnit} />
           </Col>
           <Row className="no-bm">
