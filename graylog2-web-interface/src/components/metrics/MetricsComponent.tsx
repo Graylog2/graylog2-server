@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { MetricsFilterInput, MetricsList } from 'components/metrics';
-import {MetricInfo} from 'components/metrics/MetricsList';
+import type { MetricInfo } from 'components/metrics/MetricsList';
 
 const StyledWarningDiv = styled.div(({ theme }) => `
   height: 20px;
@@ -50,7 +50,11 @@ const safelyFilterNames = (filter: string, names: Array<MetricInfo>) => {
   }
 };
 
-class MetricsComponent extends React.Component<Props> {
+type State = {
+  filter: string,
+}
+
+class MetricsComponent extends React.Component<Props, State> {
   static propTypes = {
     names: PropTypes.arrayOf(PropTypes.object),
     namespace: PropTypes.string.isRequired,
@@ -68,7 +72,10 @@ class MetricsComponent extends React.Component<Props> {
     error: undefined,
   };
 
-  state = { filter: this.props.filter };
+  constructor(props: Props) {
+    super(props);
+    this.state = { filter: props.filter };
+  }
 
   UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (nextProps.filter !== this.props.filter) {

@@ -26,7 +26,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import useQueryParameters from 'routing/useQuery';
 import useParams from 'routing/useParams';
-import {MetricInfo} from 'components/metrics/MetricsList';
+import type { MetricInfo } from 'components/metrics/MetricsList';
 
 const metricsNamespace = MetricsStore.namespace;
 
