@@ -88,10 +88,17 @@ public class ActionParser {
         // generate message fields for simulator
         if (generateSimulatorFields && Objects.nonNull(step.outputvariable())) {
             syntax += NL;
-            syntax += "  set_field(\"gl2_simulator_step_" + index + "_" + step.outputvariable() + "\", " + step.outputvariable() + ");";
+            syntax += "  set_field(\"gl2_simulator_step_" + index + "_" + step.outputvariable() + "\", " + cloneVarIfNecessary(step.outputvariable(), function.returnType()) + ");";
         }
 
         return syntax;
+    }
+
+    private String cloneVarIfNecessary(String outputvariable, Class<?> returnType) {
+        if (returnType == Map.class) {
+            return "map_copy(" + outputvariable + ")";
+        }
+        return outputvariable;
     }
 
 }
