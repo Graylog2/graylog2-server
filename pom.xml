@@ -724,7 +724,7 @@
                             edu.emory.mathcs.backport.java.util.**
                             org.apache.directory.api.util.**
                             org.apache.groovy.util.**
-                            org.apache.logging.log4j.util.**
+                            org.apache.logging.log4j.util.Strings
                             org.graylog.shaded.kafka09.joptsimple.**
                             org.assertj.core.util.**
                             org.bouncycastle.util.Strings
