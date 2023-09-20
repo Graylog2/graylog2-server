@@ -78,8 +78,7 @@ public class FieldTypeMappingsResource extends RestResource {
     @NoAuditEvent("No audit for field type changes")
     public Response changeFieldType(@ApiParam(name = "request")
                                     @Valid
-                                    @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request
-    ) {
+                                    @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request) {
         checkPermissionsForCreation(request.indexSetsIds());
 
         //TODO: more complex validation of request
