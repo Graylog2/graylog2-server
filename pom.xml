@@ -93,7 +93,7 @@
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpasyncclient.version>4.1.5</apache-httpasyncclient.version>
-        <apache-httpclient.version>4.5.13</apache-httpclient.version>
+        <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
         <auto-value.version>1.7.4</auto-value.version>
