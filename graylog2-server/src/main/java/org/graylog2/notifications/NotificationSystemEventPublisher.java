@@ -100,7 +100,8 @@ public class NotificationSystemEventPublisher extends AbstractExecutionThreadSer
             // The shutdown task will interrupt the thread to unblock it, if it got stuck. Because the interrupt
             // exception is handled in the event publishing code, we have to break out of the run loop manually,
             // which is what we do here.
-            if (shutdownTask.get() != null && shutdownTask.get().isDone()) {
+            final var task = shutdownTask.get();
+            if (task != null && task.isDone()) {
                 return;
             }
 
