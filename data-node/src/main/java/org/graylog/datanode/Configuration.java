@@ -97,13 +97,13 @@ public class Configuration extends BaseConfiguration {
 
 
     @Parameter(value = "node_name")
-    private String datanodeNodeName = "node1";
+    private String datanodeNodeName;
 
     /**
      * Comma separated list of opensearch nodes that are eligible as manager nodes.
      */
     @Parameter(value = "cluster_initial_manager_nodes")
-    private String initialManagerNodes = "node1";
+    private String initialManagerNodes;
 
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;

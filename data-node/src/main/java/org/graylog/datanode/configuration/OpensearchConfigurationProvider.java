@@ -25,6 +25,7 @@ import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,6 +49,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
+    private final String nodeName;
+    private final String initialManagerNodes;
 
     @Inject
     public OpensearchConfigurationProvider(Configuration localConfiguration,
@@ -55,13 +58,16 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
                                            MongoCertSecureConfiguration mongoCertSecureConfiguration,
                                            InSecureConfiguration inSecureConfiguration,
-                                           final @Named("password_secret") String passwordSecret) {
+                                           final @Named("password_secret") String passwordSecret,
+                                           final NodeId nodeId) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
         this.mongoCertSecureConfiguration = mongoCertSecureConfiguration;
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
+        this.nodeName = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getDatanodeNodeName(), nodeId);
+        this.initialManagerNodes = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getInitialManagerNodes(), nodeId);
     }
 
     @Override
@@ -98,7 +104,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
                     "datanode-cluster",
-                    localConfiguration.getDatanodeNodeName(),
+                    nodeName,
                     Collections.emptyList(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
@@ -114,9 +120,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
         localConfiguration.getOpensearchNetworkHostHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
+        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
+        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
+        config.put("cluster.initial_master_nodes", initialManagerNodes);
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");

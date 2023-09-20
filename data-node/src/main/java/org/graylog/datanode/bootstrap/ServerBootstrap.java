@@ -156,7 +156,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new DatanodeConfigurationBindings()
-
         );
     }
 

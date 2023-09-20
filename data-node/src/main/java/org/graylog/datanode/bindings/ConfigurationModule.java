@@ -19,6 +19,8 @@ package org.graylog.datanode.bindings;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.graylog.datanode.Configuration;
+import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
+import org.graylog2.plugin.system.NodeId;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,6 +33,7 @@ public class ConfigurationModule implements Module {
 
     @Override
     public void configure(Binder binder) {
+        binder.bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         binder.bind(Configuration.class).toInstance(configuration);
     }
 }
