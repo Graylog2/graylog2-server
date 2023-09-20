@@ -48,7 +48,7 @@ const usePutFiledTypeMutation = () => {
         'Could not change the field type');
     },
     onSuccess: () => {
-      UserNotification.success('The field type changed successfully');
+      UserNotification.success('The field type changed successfully', 'Success!');
     },
   });
 

@@ -91,7 +91,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
         <Input type="checkbox"
                id="rotate"
                name="rotate"
-               label="Rotating indexes"
+               label="Rotate affected indices after change"
                onChange={() => setRotated((cur) => !cur)}
                checked={rotated} />
       </div>
