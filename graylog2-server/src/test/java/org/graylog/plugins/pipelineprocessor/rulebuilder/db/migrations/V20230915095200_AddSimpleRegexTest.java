@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
-import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
@@ -40,7 +39,7 @@ public class V20230915095200_AddSimpleRegexTest extends BaseFragmentTest {
     public void testSimpleRegex() {
         RuleFragment fragment = V20230915095200_AddSimpleRegex.createSimpleRegex();
         Map<String, Object> params = Map.of("pattern", "^([a-zA-z]+)\\\\s(\\\\d+)$", "value", "Answer 42");
-        Rule rule = super.createFragmentSource(fragment, params);
+        createFragmentSource(fragment, params);
     }
 
 }
