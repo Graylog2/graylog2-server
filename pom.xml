@@ -576,6 +576,8 @@
                                         <exclude>org.slf4j:slf4j-simple</exclude>
                                         <!-- Newer asm versions are published under the org.ow2.asm groupId. Avoid conflicts by banning the old one.  -->
                                         <exclude>asm:asm</exclude>
+                                        <!-- Mockito should by now have all the features we need. -->
+                                        <exclude>org.powermock</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
