@@ -58,7 +58,7 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
     },
     title: {
       fontSize: theme.fontSizes.md,
-      color: theme.others.colors.global.textDefault,
+      color: theme.other.colors.global.textDefault,
     },
   });
 
