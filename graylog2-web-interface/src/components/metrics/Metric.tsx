@@ -63,6 +63,7 @@ const Metric = ({ metric, namespace, nodeId }: Props) => {
     <span>
       <div className="name">
         <Icon name={_formatIcon(metric.type)} />{' '}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a className="open" href="#" onClick={_showDetails}>{_formatName(metric.full_name, namespace)}</a>
       </div>
       {details}
