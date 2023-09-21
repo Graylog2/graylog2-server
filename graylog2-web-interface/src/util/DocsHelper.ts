@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-class DocsHelper {
-  PAGES = {
+const docsHelper = {
+  PAGES: {
     ALERTS: 'alerts',
     AUDIT_LOG: 'auditlog',
     AUTHENTICATORS: 'permission-management#authentication',
@@ -62,25 +62,19 @@ class DocsHelper {
     UPGRADE_GUIDE: 'upgrading-graylog',
     USERS_ROLES: 'permission-management',
     WELCOME: '', // Welcome page to the documentation
-  };
+  },
 
-  DOCS_URL = 'https://docs.graylog.org/docs';
+  DOCS_URL: 'https://docs.graylog.org/docs',
 
-  toString(path) {
+  toString(path: string) {
     const baseUrl = this.DOCS_URL;
 
     return path === '' ? baseUrl : `${baseUrl}/${path}`;
-  }
-
-  toLink(path, title) {
-    return `<a href="${this.toString(path)}" target="_blank">${title}</a>`;
-  }
+  },
 
   versionedDocsHomePage() {
     return this.toString('');
-  }
-}
-
-const docsHelper = new DocsHelper();
+  },
+} as const;
 
 export default docsHelper;
