@@ -174,6 +174,7 @@ describe('RuleBuilder', () => {
     const conditionOutput1 = 'condition_output_1';
     const actionOutput1 = 'action_output_1';
     const actionOutput2 = 'action_output_2';
+    const rawMessageToSimulate = 'test';
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title, description, rule_builder },
@@ -182,10 +183,11 @@ describe('RuleBuilder', () => {
     const { getByText, getByTestId } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
         ruleSimulationResult: {
-          fields: { message: 'test' },
+          fields: { message: rawMessageToSimulate },
           simulator_condition_variables: { 1: conditionOutput1 },
           simulator_action_variables: [{ output_1: actionOutput1 }, { output_2: actionOutput2 }],
         },
+        rawMessageToSimulate,
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
