@@ -184,7 +184,7 @@ describe('RuleBuilder', () => {
         ruleSimulationResult: {
           fields: { message: 'test' },
           simulator_condition_variables: { 1: conditionOutput1 },
-          simulator_action_variables: { 1: actionOutput1, 2: actionOutput2 },
+          simulator_action_variables: [{ output_1: actionOutput1 }, { output_2: actionOutput2 }],
         },
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
