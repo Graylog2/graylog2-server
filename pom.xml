@@ -611,7 +611,7 @@
                     <dependency>
                         <groupId>org.codehaus.plexus</groupId>
                         <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.11.1</version>
+                        <version>2.13.0</version>
                     </dependency>
                     <dependency>
                         <groupId>com.google.errorprone</groupId>
