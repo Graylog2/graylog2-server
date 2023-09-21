@@ -20,21 +20,27 @@ import styled from 'styled-components';
 import {
   Icon,
   Select,
+  Spinner
 } from 'components/common';
+import StreamLink from 'components/streams/StreamLink';
 import { BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
 import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
+import useStream from 'components/streams/hooks/useStream';
 
 const StyledSelect = styled(Select)`
   width: 400px;
   margin-bottom: 20px;
 `;
 
+const failureStreamId = '000000000000000000000004';
+
 type Props = {
   show: boolean,
   field: string,
-  onClose: () => void }
+  onClose: () => void
+}
 
 const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const [rotated, setRotated] = useState(false);
@@ -44,6 +50,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
     value,
     label,
   })), [fieldTypes]);
+  const { data: failureStream, isFetching: failureStreamLoading } = useStream(failureStreamId)
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
@@ -72,8 +79,10 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                         bsSize="large">
       <div>
         <Alert bsStyle="warning">
-          <Icon name="info-circle" />&nbsp;
-          Text about how bad to change this value and how you ca brake everything
+          Changing the type of the field can have a significant impact on the ingestion of future log messages.
+          If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
+          ingestion errors. It is recommended to enable &quot;Failure Processing&quot; and watch
+          the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
         <StyledSelect inputId="field_type"
                       options={fieldTypeOptions}
@@ -84,7 +93,6 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                       inputProps={{ 'aria-label': 'Select field type' }}
                       required />
         <Alert bsStyle="info">
-          <Icon name="info-circle" />&nbsp;
           By default the type will be changed in all possible indexes. But you can choose in which index sets you would like to make the change
         </Alert>
         <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} />
