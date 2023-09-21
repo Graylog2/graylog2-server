@@ -17,11 +17,7 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import {
-  Icon,
-  Select,
-  Spinner
-} from 'components/common';
+import { Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
 import { BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
