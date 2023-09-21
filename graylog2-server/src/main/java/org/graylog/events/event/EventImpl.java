@@ -22,7 +22,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.apache.logging.log4j.util.Strings;
 import org.graylog.events.fields.FieldValue;
 import org.graylog2.jackson.TypeReferences;
 import org.joda.time.DateTime;
@@ -187,16 +186,16 @@ public class EventImpl implements Event {
     @Override
     public void addSourceStream(String sourceStream) {
         this.sourceStreams = ImmutableSet.<String>builder()
-            .addAll(sourceStreams)
-            .add(sourceStream)
-            .build();
+                .addAll(sourceStreams)
+                .add(sourceStream)
+                .build();
     }
 
     @Override
     public void removeSourceStream(String sourceStream) {
         this.sourceStreams = ImmutableSet.<String>builder()
-            .addAll(sourceStreams.stream().filter(s -> !s.equals(sourceStream)).collect(Collectors.toSet()))
-            .build();
+                .addAll(sourceStreams.stream().filter(s -> !s.equals(sourceStream)).collect(Collectors.toSet()))
+                .build();
     }
 
     @Override
@@ -315,7 +314,7 @@ public class EventImpl implements Event {
                 .message(getMessage())
                 .source(getSource())
                 .keyTuple(getKeyTuple())
-                .key(Strings.join(getKeyTuple(), '|'))
+                .key(String.join("|", getKeyTuple()))
                 .priority(getPriority())
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))

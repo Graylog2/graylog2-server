@@ -171,7 +171,7 @@ const SearchForm = ({
     }
   };
 
-  const onChange = (e) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const newQuery = e.target.value;
