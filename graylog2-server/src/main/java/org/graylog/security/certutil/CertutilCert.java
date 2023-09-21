@@ -18,7 +18,7 @@ package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog2.bootstrap.CliCommand;
@@ -104,7 +104,7 @@ public class CertutilCert implements CliCommand {
 
             final String alternativeNames = console.readLine(PROMPT_ENTER_CERT_ALTERNATIVE_NAMES);
             Arrays.stream(alternativeNames.split(","))
-                    .filter(Strings::isNotBlank)
+                    .filter(StringUtils::isNotBlank)
                     .forEach(req::withSubjectAlternativeName);
 
             KeyPair nodePair = CertificateGenerator.generate(req);
@@ -124,7 +124,7 @@ public class CertutilCert implements CliCommand {
                 console.printLine("Private key and certificate for this datanode successfully saved into " + nodeKeystorePath.toAbsolutePath());
             }
 
-        // TODO: provide good user-friendly error message for each exception type!
+            // TODO: provide good user-friendly error message for each exception type!
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException |
                  UnrecoverableKeyException e) {
             throw new RuntimeException(e);
