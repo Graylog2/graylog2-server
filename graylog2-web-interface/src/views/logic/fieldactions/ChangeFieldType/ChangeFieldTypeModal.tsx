@@ -48,7 +48,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
     value,
     label,
   })), [fieldTypes]);
-  const { data: failureStream, isFetching: failureStreamLoading } = useStream(failureStreamId)
+  const { data: failureStream, isFetching: failureStreamLoading } = useStream(failureStreamId);
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
@@ -91,7 +91,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                       inputProps={{ 'aria-label': 'Select field type' }}
                       required />
         <Alert bsStyle="info">
-          By default the type will be changed in all possible indexes. But you can choose in which index sets you would like to make the change
+          By default the type will be changed in all index sets of the current message/search. By expanding the next section, you can select for which index sets you would like to make the change.
         </Alert>
         <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} />
         <Input type="checkbox"
