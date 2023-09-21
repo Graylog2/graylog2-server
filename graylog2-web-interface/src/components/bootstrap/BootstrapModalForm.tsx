@@ -35,7 +35,7 @@ type Props = {
   onCancel: () => void,
   title: string | React.ReactNode,
   children: React.ReactNode,
-  htmlModalTitle?: string | undefined,
+  modalTitle?: string | undefined,
 };
 
 /**
@@ -53,7 +53,7 @@ const BootstrapModalForm = ({
   onCancel,
   title,
   children,
-  htmlModalTitle,
+  modalTitle,
   ...restProps
 }: Props) => {
   const form = useRef(null);
@@ -81,14 +81,14 @@ const BootstrapModalForm = ({
     </div>
   );
 
-  const modalTitle = useMemo<string | undefined>(() => (isString(title) ? title : htmlModalTitle), [htmlModalTitle, title]);
+  const _title = useMemo<string | undefined>(() => (isString(title) ? title : modalTitle), [modalTitle, title]);
 
   return (
     <BootstrapModalWrapper bsSize={bsSize}
                            showModal={show}
                            backdrop={backdrop}
                            onHide={onCancel}
-                           title={modalTitle}
+                           title={_title}
                            {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
@@ -137,7 +137,7 @@ BootstrapModalForm.defaultProps = {
   submitButtonDisabled: false,
   onSubmitForm: undefined,
   bsSize: undefined,
-  htmlModalTitle: undefined,
+  modalTitle: undefined,
 };
 
 export default BootstrapModalForm;
