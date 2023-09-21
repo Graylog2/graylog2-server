@@ -19,9 +19,7 @@ import styled from 'styled-components';
 
 import {
   PaginatedList,
-  SearchForm,
   Spinner,
-  NoSearchResult,
   NoEntitiesExist,
   EntityDataTable,
   Icon,
@@ -38,6 +36,9 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import { ActionContext } from 'views/logic/ActionContext';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
+import { useStore } from 'stores/connect';
+import type { Stream } from 'views/stores/StreamsStore';
+import { StreamsStore } from 'views/stores/StreamsStore';
 
 const Container = styled.div`
   margin-top: 20px;
@@ -56,13 +57,14 @@ const renderBulkActions = (
   <BulkActionsDropdown selectedEntities={selectedDashboardIds} setSelectedEntities={setSelectedDashboardIds} />
 );
 
+const streamsMapper = ({ streams }) => streams.map((stream: Stream) => ({ indexSet: stream.index_set_id, id: stream.id }));
+
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
-  const [query, setQuery] = useState('');
   const [showDetails, setShowDetails] = useState(false);
   const [activePage, setActivePage] = useState(1);
   const { widget, message } = useContext(ActionContext);
   const currentQuery = useCurrentQuery();
-  const currentStreams = useMemo(() => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS(), [message?.fields?.streams, currentQuery.filter, widget?.streams]);
+  const currentStreams = useMemo(() => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS() ?? [], [message?.fields?.streams, currentQuery.filter, widget?.streams]);
 
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -70,15 +72,19 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
     defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
     defaultSort: DEFAULT_LAYOUT.sort,
   });
-
+  const availableStreams: Array<{ indexSet: string, id: string }> = useStore(StreamsStore, streamsMapper);
   const searchParams = useMemo(() => ({
-    query,
     page: activePage,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
-  }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
+  }), [activePage, layoutConfig.pageSize, layoutConfig.sort]);
   const { data: { list, attributes, pagination }, isFirsLoaded } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
-  const initialSelection = useMemo(() => list.map(({ id }) => id), [list]);
+  const initialSelection = useMemo(() => {
+    const currentStreamSet = new Set(currentStreams);
+    const filterFn = currentStreamSet.size > 0 ? ({ id }) => currentStreamSet.has(id) : () => true;
+
+    return availableStreams.filter(filterFn).map(({ indexSet }) => indexSet);
+  }, [availableStreams, currentStreams]);
 
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
@@ -107,13 +113,6 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
     setActivePage(1);
     updateTableLayout({ sort: newSort });
   }, [updateTableLayout]);
-
-  const onSearch = useCallback((newQuery: string) => {
-    setActivePage(1);
-    setQuery(newQuery);
-  }, []);
-
-  const onResetSearch = useCallback(() => onSearch(''), [onSearch]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });
@@ -148,19 +147,10 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
                              activePage={activePage}
                              showPageSizeSelect={false}
                              useQueryParameter={false}>
-                <div style={{ marginBottom: 5 }}>
-                  <SearchForm onSearch={onSearch}
-                              onReset={onResetSearch}
-                              query={query}
-                              topMargin={0} />
-                </div>
-                {!list?.length && !query && (
+                {!list?.length && (
                   <NoEntitiesExist>
                     No index sets have been found.
                   </NoEntitiesExist>
-                )}
-                {!list?.length && query && (
-                  <NoSearchResult>No index sets have been found.</NoSearchResult>
                 )}
                 {list.length && (
                   <EntityDataTable<FieldTypeUsage> activeSort={layoutConfig.sort}

@@ -17,11 +17,9 @@
 import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
-import type { SearchParams, Attribute } from 'stores/PaginationTypes';
-import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
-import type { FieldTypeUsage, PaginatedFieldTypeUsagesResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
-import fetch from 'logic/rest/FetchProvider';
+import type { Attribute } from 'stores/PaginationTypes';
+import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
+import { SystemIndexSetsTypes } from '@graylog/server-api';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -33,18 +31,22 @@ type Options = {
   enabled: boolean,
 }
 
-const fieldTypeUsagesUrl = qualifyUrl('/system/indices/index_sets/types');
+type SearchParams = {
+    page: number,
+    pageSize: number,
+    sort: {
+        attributeId?: 'index_set_id' | 'index_set_title',
+        direction: 'asc' | 'desc'
+    }
+}
 
 const fetchFieldTypeUsages = async ({ field, streams }: { field: string, streams: Array<string>}, searchParams: SearchParams) => {
-  const url = PaginationURL(
-    fieldTypeUsagesUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+  const { sort: { attributeId, direction }, page, pageSize } = searchParams;
+  const body = { field, streams: streams.length ? streams : undefined };
 
-  return fetch<PaginatedFieldTypeUsagesResponse>('POST', qualifyUrl(url), { field, streams: streams.length ? streams : undefined }).then(
-    ({ elements, total, count, page, per_page: perPage, attributes }) => ({
+  return SystemIndexSetsTypes.fieldTypeSummaries(
+    body, attributeId, page, pageSize, direction).then(
+    ({ elements, total, attributes }) => ({
       list: elements
         .map(({
           stream_titles,
@@ -57,7 +59,7 @@ const fetchFieldTypeUsages = async ({ field, streams }: { field: string, streams
           id: index_set_id,
           indexSetTitle: index_set_title,
         })),
-      pagination: { total, count, page, perPage },
+      pagination: { total },
       attributes,
     }),
   );
