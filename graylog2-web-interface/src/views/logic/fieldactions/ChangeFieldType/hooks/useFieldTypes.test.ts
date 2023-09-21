@@ -18,11 +18,10 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
-import { qualifyUrl } from 'util/URLUtils';
 import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import { SystemFieldTypes } from '@graylog/server-api';
 
 const mockFieldType = {
   string: 'String',
@@ -35,8 +34,13 @@ const expectedState = {
     int: 'Number(int)',
   },
 };
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
+
+jest.mock('@graylog/server-api', () => ({
+  SystemFieldTypes: {
+    getAllFieldTypes: jest.fn(() => Promise.resolve()),
+  },
+}));
 
 const renderUseFieldTypeHook = () => renderHook(() => useFieldTypes());
 
@@ -46,19 +50,19 @@ describe('useFieldType custom hook', () => {
   });
 
   it('Test return initial data and take from fetch', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve(mockFieldType));
+    asMock(SystemFieldTypes.getAllFieldTypes).mockImplementation(() => Promise.resolve(mockFieldType));
     const { result, waitFor } = renderUseFieldTypeHook();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/mappings/types'));
+    expect(SystemFieldTypes.getAllFieldTypes).toHaveBeenCalledWith();
 
     expect(result.current.data).toEqual(expectedState);
   });
 
   it('Test trigger notification on fail', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(SystemFieldTypes.getAllFieldTypes).mockImplementation(() => Promise.reject(new Error('Error')));
 
     const { result, waitFor } = renderUseFieldTypeHook();
 

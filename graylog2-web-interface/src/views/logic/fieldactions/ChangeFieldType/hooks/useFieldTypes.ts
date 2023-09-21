@@ -17,18 +17,15 @@
 import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
-import { qualifyUrl } from 'util/URLUtils';
 import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
-import fetch from 'logic/rest/FetchProvider';
+import { SystemFieldTypes } from '@graylog/server-api';
 
 const INITIAL_DATA = {
   fieldTypes: {},
 };
 
-const fieldTypeUsagesUrl = qualifyUrl('/system/indices/mappings/types');
-
 const fetchFieldTypes = async () => {
-  const fieldTypes = await fetch('GET', fieldTypeUsagesUrl);
+  const fieldTypes = await SystemFieldTypes.getAllFieldTypes();
 
   return ({ fieldTypes });
 };
