@@ -139,7 +139,12 @@ const HotkeysModal = () => {
   const { hotKeysCollections } = useHotkeysContext();
   const isMacOS = _isMacOS();
 
-  useHotkey('SHOW_HELPER', onToggle, { scopes: 'general' });
+  useHotkey({
+    actionKey: 'show-hotkeys-modal',
+    callback: onToggle,
+    telemetryAppPathname: 'search',
+    options: { scopes: 'general' },
+  });
 
   return show && (
     <Modal show={show}

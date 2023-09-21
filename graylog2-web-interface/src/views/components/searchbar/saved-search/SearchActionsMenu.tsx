@@ -165,13 +165,20 @@ const SearchActionsMenu = () => {
 
   const isDirty = useIsDirty();
 
-  useHotkey('SAVE', () => {
-    saveSearch(title);
-  }, { scopes: 'search', enabled: (isDirty && loaded) }, [loaded, isDirty, saveSearch, title]);
+  useHotkey({
+    actionKey: 'save',
+    callback: () => saveSearch(title),
+    telemetryAppPathname: 'search',
+    options: { scopes: 'search', enabled: (isDirty && loaded) },
+    dependencies: [loaded, isDirty, saveSearch, title],
+  });
 
-  useHotkey('SAVE_AS', () => {
-    openFormModal();
-  }, { scopes: 'search', enabled: (isDirty && loaded) || !loaded });
+  useHotkey({
+    actionKey: 'save-as',
+    callback: () => openFormModal(),
+    telemetryAppPathname: 'search',
+    options: { scopes: 'search', enabled: (isDirty && loaded) || !loaded },
+  });
 
   return (
     <Container aria-label="Search Meta Buttons">

@@ -32,7 +32,13 @@ const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(undo()), [dispatch]);
-  useHotkey('UNDO', () => dispatch(undo()), { scopes: viewType.toLowerCase() as Lowercase<ViewType> });
+
+  useHotkey({
+    actionKey: 'undo',
+    callback: () => dispatch(undo()),
+    telemetryAppPathname: 'search',
+    options: { scopes: viewType.toLowerCase() as Lowercase<ViewType> },
+  });
 
   return (
     <NavItem disabled={!isUndoAvailable}

@@ -33,8 +33,8 @@ import HotkeysModal from 'contexts/HotkeysModal';
 import useFeature from 'hooks/useFeature';
 
 const viewActions = {
-  UNDO: { keys: 'mod+z', description: 'Undo last action' },
-  REDO: { keys: 'mod+y', description: 'Redo last action' },
+  undo: { keys: 'mod+z', description: 'Undo last action' },
+  redo: { keys: 'mod+y', description: 'Redo last action' },
 };
 
 export const hotKeysCollections: HotkeyCollections = {
@@ -42,7 +42,7 @@ export const hotKeysCollections: HotkeyCollections = {
     title: 'General',
     description: 'General keyboard shortcuts',
     actions: {
-      SHOW_HELPER: { keys: 'shift+?', description: 'Show available keyboard shorts' },
+      'show-hotkeys-modal': { keys: 'shift+?', description: 'Show available keyboard shorts' },
     },
   },
   search: {
@@ -50,8 +50,8 @@ export const hotKeysCollections: HotkeyCollections = {
     description: 'Keyboard shortcuts for search page',
     actions: {
       ...viewActions,
-      SAVE: { keys: 'mod+s', description: 'Save search' },
-      SAVE_AS: { keys: 'shift+mod+s', description: 'Save search as' },
+      save: { keys: 'mod+s', description: 'Save search' },
+      'save-as': { keys: 'shift+mod+s', description: 'Save search as' },
     },
   },
   dashboard: {
@@ -59,7 +59,7 @@ export const hotKeysCollections: HotkeyCollections = {
     description: 'Keyboard shortcuts for dashboard page',
     actions: {
       ...viewActions,
-      SAVE: { keys: 'mod+s', description: 'Save dashboard' },
+      save: { keys: 'mod+s', description: 'Save dashboard' },
     },
   },
 };

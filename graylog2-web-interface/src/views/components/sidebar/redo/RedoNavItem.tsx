@@ -32,7 +32,13 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(redo()), [dispatch]);
-  useHotkey('REDO', () => dispatch(redo()), { scopes: viewType.toLowerCase() as Lowercase<ViewType> });
+
+  useHotkey({
+    actionKey: 'redo',
+    callback: () => dispatch(redo()),
+    telemetryAppPathname: 'search',
+    options: { scopes: viewType.toLowerCase() as Lowercase<ViewType> },
+  });
 
   return (
     <NavItem disabled={!isRedoAvailable}

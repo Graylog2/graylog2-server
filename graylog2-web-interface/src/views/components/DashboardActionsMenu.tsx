@@ -110,7 +110,12 @@ const DashboardActionsMenu = () => {
   const _onSaveView = useCallback(() => dispatch(OnSaveViewAction(view)), [dispatch, view]);
   const _onUpdateView = useCallback((updatedView) => dispatch(updateView(updatedView)), [dispatch]);
 
-  useHotkey('SAVE', _onSaveView, { scopes: 'dashboard' });
+  useHotkey({
+    actionKey: 'save',
+    callback: _onSaveView,
+    telemetryAppPathname: 'search',
+    options: { scopes: 'dashboard' },
+  });
 
   return (
     <ButtonGroup>
