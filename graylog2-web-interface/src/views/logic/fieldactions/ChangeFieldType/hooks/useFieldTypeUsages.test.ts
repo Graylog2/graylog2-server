@@ -18,11 +18,10 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
-import { qualifyUrl } from 'util/URLUtils';
 import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import { SystemIndexSetsTypes } from '@graylog/server-api';
 
 const mockFieldTypeUsages = {
   attributes: [],
@@ -32,6 +31,12 @@ const mockFieldTypeUsages = {
     count: 1,
     page: 1,
     per_page: 10,
+  },
+  defaults: {
+    sort: {
+      id: 'index_set_id',
+      direction: 'ASC',
+    } as { id: string, direction: 'ASC' | 'DESC'},
   },
   total: 1,
   sort: 'index_set_title',
@@ -68,10 +73,15 @@ const expectedState = {
     total: 1,
   },
 };
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 
-const renderUseFieldTypeUsagesHook = () => renderHook(() => useFieldTypeUsages({ streams: ['001'], field: 'field' }, { query: '', page: 1, pageSize: 10, sort: { attributeId: '', direction: 'asc' } }));
+jest.mock('@graylog/server-api', () => ({
+  SystemIndexSetsTypes: {
+    fieldTypeSummaries: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+const renderUseFieldTypeUsagesHook = () => renderHook(() => useFieldTypeUsages({ streams: ['001'], field: 'field' }, { page: 1, pageSize: 10, sort: { attributeId: 'index_set_title', direction: 'asc' } }));
 
 describe('useFieldTypeUsages custom hook', () => {
   afterEach(() => {
@@ -79,22 +89,22 @@ describe('useFieldTypeUsages custom hook', () => {
   });
 
   it('Test return initial data and take from fetch', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve(mockFieldTypeUsages));
+    asMock(SystemIndexSetsTypes.fieldTypeSummaries).mockImplementation(() => Promise.resolve(mockFieldTypeUsages));
     const { result, waitFor } = renderUseFieldTypeUsagesHook();
 
     await waitFor(() => !result.current.isFirsLoaded);
     await waitFor(() => result.current.isFirsLoaded);
 
-    expect(fetch).toHaveBeenCalledWith('POST', qualifyUrl('/system/indices/index_sets/types?page=1&per_page=10&sort=&order=asc'), {
+    expect(SystemIndexSetsTypes.fieldTypeSummaries).toHaveBeenCalledWith({
       field: 'field',
       streams: ['001'],
-    });
+    }, 'index_set_title', 1, 10, 'asc');
 
     expect(result.current.data).toEqual(expectedState);
   });
 
   it('Test trigger notification on fail', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(SystemIndexSetsTypes.fieldTypeSummaries).mockImplementation(() => Promise.reject(new Error('Error')));
 
     const { result, waitFor } = renderUseFieldTypeUsagesHook();
 

@@ -20,7 +20,7 @@ import type { Sort } from 'stores/PaginationTypes';
 export const ENTITY_TABLE_ID = 'field-type';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
-  sort: { attributeId: 'indexSetTitle', direction: 'asc' } as Sort,
+  sort: { attributeId: 'index_set_title', direction: 'asc' } as Sort,
   displayedColumns: ['index_set_title', 'stream_titles', 'types'],
   columnsOrder: ['index_set_title', 'stream_titles', 'types'],
 };
