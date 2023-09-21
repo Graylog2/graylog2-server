@@ -17,95 +17,128 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import { KeyboardKey, Modal } from 'components/bootstrap';
+import { KeyboardKey, Modal, Button } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import useHotkeys from 'hooks/useHotkeys';
 import type { ScopeName, HotkeyCollection } from 'contexts/HotkeysContext';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { LinkButton } from 'components/common';
 import SectionGrid from 'components/common/Section/SectionGrid';
-
-const StyledKeysList = styled.div`
-  display: inline-flex;
-  gap: 5px;
-`;
-
-const StyledGrid = styled.div`
-  display: grid;
-  grid-template-columns: auto auto;
-  grid-template-rows: auto;
-  align-items: center;
-  gap: 10px;
-`;
+import { isMacOS as _isMacOS } from 'util/OSUtils';
+import StringUtils from 'util/StringUtils';
+import { Link } from 'components/common/router';
 
 const Content = styled.div`
   padding: 20px;
 `;
 
-const keyMapper = (key: string) => {
+const Footer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ShortcutList = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ShortcutListItem = styled.div`
+  display: flex;
+  gap: 5px;
+  justify-content: space-between;
+
+  &:not(:last-child) {
+    margin-bottom: 3px;
+  }
+`;
+
+const KeysList = styled.div`
+  display: inline-flex;
+  gap: 5px;
+  justify-content: right;
+`;
+
+const KeySeparator = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const keyMapper = (key: string, isMacOS: boolean) => {
   const keyMap = {
-    mod: 'command',
+    mod: isMacOS ? '⌘' : 'Ctrl',
   };
 
-  return keyMap[key] || key;
+  return keyMap[key] || StringUtils.capitalizeFirstLetter(key);
 };
 
-const Key = ({ description, keys, combinationKey, isEnabled }: { description: string, keys: string, combinationKey: string, isEnabled: boolean}) => {
+type KeyProps = {
+  combinationKey: string,
+  description: string,
+  isEnabled: boolean,
+  isMacOS: boolean,
+  keys: string,
+}
+
+const Key = ({ description, keys, combinationKey, isEnabled, isMacOS }: KeyProps) => {
   const keysArray = keys.split(combinationKey);
 
   return (
-    <>
+    <ShortcutListItem>
       {description}
-      <StyledKeysList>{keysArray.map((key, index) => {
-        const isLast = index === keysArray.length - 1;
+      <KeysList>
+        {keysArray.map((key, index) => {
+          const isLast = index === keysArray.length - 1;
 
-        return (
-          <>
-            <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key)}</KeyboardKey>
-            {!isLast && <span>+</span>}
-          </>
-        );
-      })}
-      </StyledKeysList>
-    </>
+          return (
+            <>
+              <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key, isMacOS)}</KeyboardKey>
+              {!isLast && <KeySeparator>+</KeySeparator>}
+            </>
+          );
+        })}
+      </KeysList>
+    </ShortcutListItem>
   );
 };
 
-const HotkeyCollectionSection = ({ collection, scope }: { collection: HotkeyCollection, scope: ScopeName }) => {
+const HotkeyCollectionSection = ({ collection, scope, isMacOS }: { collection: HotkeyCollection, scope: ScopeName, isMacOS: boolean }) => {
   const { title, description, actions } = collection;
   const { activeHotkeys } = useHotkeysContext();
   const filtratedActions = Object.entries(actions).filter(([actionKey]) => activeHotkeys.has(`${scope}.${actionKey}`),
     // && (activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled !== false);
   );
-  if (!filtratedActions.length) return null;
+
+  if (!filtratedActions.length) {
+    return null;
+  }
 
   return (
     <SectionComponent title={title}>
       <p className="description">{description}</p>
-      <StyledGrid>
-        {
-        filtratedActions.map(([actionKey, { description: keyDescription, keys }]) => {
+      <ShortcutList>
+        {filtratedActions.map(([actionKey, { description: keyDescription, keys }]) => {
           const isEnabled = (activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled !== false);
 
           return (
             <Key description={keyDescription}
                  keys={keys}
                  combinationKey="+"
-                 isEnabled={isEnabled} />
+                 isEnabled={isEnabled}
+                 isMacOS={isMacOS} />
           );
-        })
-      }
-      </StyledGrid>
+        })}
+      </ShortcutList>
     </SectionComponent>
   );
 };
 
 const HotkeysModal = () => {
   const [show, setShow] = useState(false);
-
   const onHide = useCallback(() => setShow(false), []);
   const onToggle = useCallback(() => setShow((cur) => !cur), []);
   const { hotKeysCollection } = useHotkeysContext();
+  const isMacOS = _isMacOS();
+
   useHotkeys('SHOW_HELPER', onToggle, { scopes: 'general' });
 
   return show && (
@@ -120,13 +153,16 @@ const HotkeysModal = () => {
         <Content>
           <SectionGrid>
             {Object.entries(hotKeysCollection).map(([scope, collection]: [ScopeName, HotkeyCollection]) => (
-              <HotkeyCollectionSection scope={scope} collection={collection} />
+              <HotkeyCollectionSection scope={scope} collection={collection} isMacOS={isMacOS} />
             ))}
           </SectionGrid>
         </Content>
       </Modal.Body>
       <Modal.Footer>
-        <LinkButton bsStyle="primary" to="/" target="_blank">Show all hot keys</LinkButton>
+        <Footer>
+          <Link to="/" target="_blank">View all hotkeys</Link>
+          <Button onClick={() => onHide()}>Close</Button>
+        </Footer>
       </Modal.Footer>
     </Modal>
   );
