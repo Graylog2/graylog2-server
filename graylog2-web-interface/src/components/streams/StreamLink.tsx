@@ -18,14 +18,16 @@ import React from 'react';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import type { Stream } from 'views/stores/StreamsStore';
 
-class StreamLink extends React.Component {
-  render() {
-    const { stream } = this.props;
-    const route = Routes.stream_search(stream.id);
+type Props = {
+  stream: Stream,
+};
 
-    return <Link to={route}>{stream.title}</Link>;
-  }
-}
+const StreamLink = ({ stream }: Props) => {
+  const route = Routes.stream_search(stream.id);
+
+  return <Link to={route}>{stream.title}</Link>;
+};
 
 export default StreamLink;
