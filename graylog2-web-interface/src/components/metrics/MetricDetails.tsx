@@ -26,23 +26,23 @@ import HistogramDetails from 'components/metrics/HistogramDetails';
 import MeterDetails from 'components/metrics/MeterDetails';
 import TimerDetails from 'components/metrics/TimerDetails';
 import { useStore } from 'stores/connect';
+import type { Metric } from 'stores/metrics/MetricsStore';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import type { MetricInfo } from 'components/metrics/MetricsList';
 
-const DetailsForType = ({ type, metric }: { type: string, metric: MetricInfo }) => {
-  switch (type) {
-    case 'Counter':
+const DetailsForType = ({ metric }: { metric: Metric }) => {
+  switch (metric.type) {
+    case 'counter':
       return <CounterDetails metric={metric} />;
-    case 'Gauge':
+    case 'gauge':
       return <GaugeDetails metric={metric} />;
-    case 'Histogram':
+    case 'histogram':
       return <HistogramDetails metric={metric} />;
-    case 'Meter':
+    case 'meter':
       return <MeterDetails metric={metric} />;
-    case 'Timer':
+    case 'timer':
       return <TimerDetails metric={metric} />;
     default:
-      return <i>Invalid metric type: {type}</i>;
+      return <i>Invalid metric type: {metric}</i>;
   }
 };
 
@@ -75,7 +75,7 @@ const StyledMetricDetail = styled.div`
 `;
 
 type Props = {
-  metric: MetricInfo,
+  metric: Metric,
   nodeId: string,
 }
 
@@ -95,7 +95,7 @@ const MetricDetails = ({ nodeId, metric, metric: { full_name: metricName } }: Pr
     <div className="metric">
       <h3>{type}</h3>
       <StyledMetricDetail>
-        <DetailsForType type={type} metric={currentMetric} />
+        <DetailsForType metric={currentMetric} />
       </StyledMetricDetail>
     </div>
   );

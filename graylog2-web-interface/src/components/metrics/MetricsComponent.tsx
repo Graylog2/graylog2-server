@@ -21,8 +21,8 @@ import styled from 'styled-components';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { MetricsList } from 'components/metrics';
-import type { MetricInfo } from 'components/metrics/MetricsList';
 import SearchForm from 'components/common/SearchForm';
+import type { Metric } from 'stores/metrics/MetricsStore';
 
 const StyledWarningDiv = styled.div(({ theme }) => `
   height: 20px;
@@ -31,7 +31,7 @@ const StyledWarningDiv = styled.div(({ theme }) => `
 `);
 
 type Props = {
-  names: Array<MetricInfo>,
+  names: Array<Metric>,
   namespace: string,
   nodeId: string,
   filter?: string,
@@ -41,7 +41,7 @@ type Props = {
   }
 };
 
-const safelyFilterNames = (filter: string, names: Array<MetricInfo>) => {
+const safelyFilterNames = (filter: string, names: Array<Metric>) => {
   try {
     const filterRegex = new RegExp(filter, 'i');
 

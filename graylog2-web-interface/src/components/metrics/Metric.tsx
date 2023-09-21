@@ -19,7 +19,7 @@ import React, { useCallback, useState } from 'react';
 
 import { MetricDetails } from 'components/metrics';
 import { Icon } from 'components/common';
-import type { MetricInfo } from 'components/metrics/MetricsList';
+import type { Metric as MetricType } from 'stores/metrics/MetricsStore';
 
 const iconMapping = {
   timer: 'clock',
@@ -45,7 +45,7 @@ const _formatName = (metricName: string, namespace: string) => {
 };
 
 type Props = {
-  metric: MetricInfo,
+  metric: MetricType,
   namespace: string,
   nodeId: string,
 }

@@ -48,7 +48,7 @@ export const MetricsActions = singletonActions(
   }),
 );
 
-type CounterMetric = {
+export type CounterMetric = {
   metric: {
     count: number,
   },
@@ -62,34 +62,60 @@ export type GaugeMetric = {
   type: 'gauge',
 };
 
-type MeterMetric = {
-  metric: {
-    rate: {
-      total: number,
-    },
+type Rate = {
+  rate: {
+    total: number,
+    mean: number,
+    one_minute: number,
+    five_minute: number,
+    fifteen_minute: number,
   },
+  rate_unit: string,
+};
+
+export type MeterMetric = {
+  metric: Rate,
   type: 'meter',
 };
 
-type TimerMetric = {
-  metric: {
-    rate: {
-      total: number,
-    },
+type Timing = {
+  '95th_percentile': number,
+  '98th_percentile': number,
+  '99th_percentile': number,
+  'std_dev': number,
+  mean: number,
+  min: number,
+  max: number,
+};
+
+export type TimerMetric = {
+  metric: Rate & {
+    time: Timing,
   },
   type: 'timer',
 };
+
+export type HistogramMetric = {
+  metric: {
+    time: Timing,
+    count: number,
+  }
+  type: 'histogram',
+}
 
 type BaseMetric<T> = {
   full_name: string,
   name: string,
 } & T;
 
+export type Metric = BaseMetric<CounterMetric>
+  | BaseMetric<GaugeMetric>
+  | BaseMetric<MeterMetric>
+  | BaseMetric<TimerMetric>
+  | BaseMetric<HistogramMetric>;
+
 export type NodeMetric = {
-  [metricName: string]: BaseMetric<CounterMetric>
-    | BaseMetric<GaugeMetric>
-    | BaseMetric<MeterMetric>
-    | BaseMetric<TimerMetric>,
+  [metricName: string]: Metric,
 };
 
 export type ClusterMetric = {

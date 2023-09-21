@@ -19,6 +19,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Metric } from 'components/metrics';
+import type { Metric as MetricType } from 'stores/metrics/MetricsStore';
 
 const MetricListWrap = styled.ul(({ theme }) => css`
   padding: 0;
@@ -63,7 +64,7 @@ export type MetricInfo = {
 type Props = {
   namespace: string,
   nodeId: string,
-  names: Array<MetricInfo>,
+  names: Array<MetricType>,
 }
 
 class MetricsList extends React.Component<Props> {
@@ -73,7 +74,7 @@ class MetricsList extends React.Component<Props> {
     nodeId: PropTypes.string.isRequired,
   };
 
-  _formatMetric = (metric: MetricInfo) => {
+  _formatMetric = (metric: MetricType) => {
     const { namespace, nodeId } = this.props;
 
     return (
