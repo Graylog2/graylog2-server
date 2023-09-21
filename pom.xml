@@ -503,7 +503,7 @@
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>
                     <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>6.17</version>
+                    <version>6.26</version>
                     <configuration>
                         <skip>true</skip>
                     </configuration>
