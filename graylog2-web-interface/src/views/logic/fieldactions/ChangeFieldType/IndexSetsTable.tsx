@@ -29,7 +29,7 @@ import {
 import { Button } from 'components/bootstrap';
 import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/logic/fieldactions/ChangeFieldType/Constants';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import useFiledTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFiledTypeUsages';
+import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import type { Sort } from 'stores/PaginationTypes';
 import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
@@ -77,7 +77,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
   }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
-  const { data: { list, attributes, pagination }, isFirsLoaded } = useFiledTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
+  const { data: { list, attributes, pagination }, isFirsLoaded } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
   const initialSelection = useMemo(() => list.map(({ id }) => id), [list]);
 
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);

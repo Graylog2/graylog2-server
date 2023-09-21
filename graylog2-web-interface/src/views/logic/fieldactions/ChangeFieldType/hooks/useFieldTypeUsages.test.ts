@@ -22,7 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import { qualifyUrl } from 'util/URLUtils';
-import useFiledTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFiledTypeUsages';
+import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 
 const mockFieldTypeUsages = {
   attributes: [],
@@ -71,7 +71,7 @@ const expectedState = {
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 
-const renderUseFieldTypeUsagesHook = () => renderHook(() => useFiledTypeUsages({ streams: ['001'], field: 'field' }, { query: '', page: 1, pageSize: 10, sort: { attributeId: '', direction: 'asc' } }));
+const renderUseFieldTypeUsagesHook = () => renderHook(() => useFieldTypeUsages({ streams: ['001'], field: 'field' }, { query: '', page: 1, pageSize: 10, sort: { attributeId: '', direction: 'asc' } }));
 
 describe('useFieldTypeUsages custom hook', () => {
   afterEach(() => {

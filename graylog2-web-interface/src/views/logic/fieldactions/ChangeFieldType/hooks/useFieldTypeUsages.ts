@@ -63,7 +63,7 @@ const fetchFieldTypeUsages = async ({ field, streams }: { field: string, streams
   );
 };
 
-const useFiledTypeUsages = ({ streams, field }: { streams: Array<string>, field: string }, searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useFieldTypeUsages = ({ streams, field }: { streams: Array<string>, field: string }, searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
     list: Readonly<Array<FieldTypeUsage>>,
     pagination: { total: number },
@@ -94,4 +94,4 @@ const useFiledTypeUsages = ({ streams, field }: { streams: Array<string>, field:
   });
 };
 
-export default useFiledTypeUsages;
+export default useFieldTypeUsages;

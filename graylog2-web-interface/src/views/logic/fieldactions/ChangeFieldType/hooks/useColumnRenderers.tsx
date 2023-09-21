@@ -28,17 +28,11 @@ const RestTypesContainer = styled.i(({ theme }) => css`
   margin-top: 5px;
 `);
 
-const FlexContainer = styled.div`
-  display: inline-flex;
-  gap: 5px;
-  flex-wrap: wrap;
-`;
-
 export const useColumnRenderers = (fieldTypes: FieldTypes) => {
   const customColumnRenderers: ColumnRenderers<FieldTypeUsage> = useMemo(() => ({
     attributes: {
       streamTitles: {
-        renderCell: (streams: Array<string>) => <FlexContainer>{streams.map((stream) => <span>{stream}</span>)}</FlexContainer>,
+        renderCell: (streams: Array<string>) => streams.join(', '),
       },
       types: {
         renderCell: (items: Array<TypeHistoryItem>) => {
@@ -52,9 +46,8 @@ export const useColumnRenderers = (fieldTypes: FieldTypes) => {
               {!!rest.length && (
               <RestTypesContainer>
                 (previous values:
-                <FlexContainer>
-                  {rest.map((item) => <span>{item}</span>)}
-                </FlexContainer>
+                  {' '}
+                  {rest.join(', ')}
                 )
               </RestTypesContainer>
               )}
