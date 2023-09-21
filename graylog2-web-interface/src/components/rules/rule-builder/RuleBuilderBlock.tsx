@@ -26,7 +26,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { Modal } from 'components/bootstrap';
 
 import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
-import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
+import { ruleBlockPropType, blockDictPropType, outputVariablesPropType } from './types';
 import { getDictForFunction } from './helpers';
 
 const BlockContainer = styled.div(({ theme }) => css`
@@ -203,12 +203,7 @@ const RuleBuilderBlock = ({
     setInsertBlockDict(blockDict.find(((b) => b.name === option)));
   };
 
-  const isBlockNegatable = (): boolean => (
-    type === 'condition' && (
-      currentBlockDict?.return_type === RuleBuilderTypes.Boolean
-      || currentBlockDict?.rule_builder_function_group === 'Boolean Functions'
-    )
-  );
+  const isBlockNegatable = (): boolean => type === 'condition';
 
   const options = blockDict.map(({ name, description, rule_builder_name }) => ({ label: rule_builder_name, value: name, description: description }));
 
