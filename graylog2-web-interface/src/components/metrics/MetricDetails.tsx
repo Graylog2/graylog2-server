@@ -20,7 +20,11 @@ import PropTypes from 'prop-types';
 import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 
-import { CounterDetails, GaugeDetails, HistogramDetails, MeterDetails, TimerDetails } from 'components/metrics';
+import CounterDetails from 'components/metrics/CounterDetails';
+import GaugeDetails from 'components/metrics/GaugeDetails';
+import HistogramDetails from 'components/metrics/HistogramDetails';
+import MeterDetails from 'components/metrics/MeterDetails';
+import TimerDetails from 'components/metrics/TimerDetails';
 import { useStore } from 'stores/connect';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import type { MetricInfo } from 'components/metrics/MetricsList';
