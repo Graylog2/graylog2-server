@@ -48,7 +48,7 @@ public class Split extends AbstractFunction<List<String>> {
                 .transform(Pattern::compile)
                 .description("The regular expression to split by, uses Java regex syntax")
                 .build();
-        value = ParameterDescriptor.string("value").primary()
+        value = ParameterDescriptor.string("value").ruleBuilderVariable()
                 .description("The string to be split")
                 .build();
         limit = ParameterDescriptor.integer("limit", Integer.class)

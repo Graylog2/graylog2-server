@@ -38,7 +38,7 @@ public class MapRemove extends AbstractFunction<Map> {
     private final ParameterDescriptor<String, String> keyParam;
 
     public MapRemove() {
-        mapParam = type(MAPARG, Map.class).primary().description("A map").build();
+        mapParam = type(MAPARG, Map.class).ruleBuilderVariable().description("A map").build();
         keyParam = string(KEYARG).description("Remove this key from map").build();
     }
 

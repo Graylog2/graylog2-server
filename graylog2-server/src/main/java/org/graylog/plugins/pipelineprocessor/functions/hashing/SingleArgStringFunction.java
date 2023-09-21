@@ -32,7 +32,7 @@ abstract class SingleArgStringFunction extends AbstractFunction<String> {
     private final ParameterDescriptor<String, String> valueParam;
 
     SingleArgStringFunction() {
-        valueParam = ParameterDescriptor.string("value").primary().description("The value to hash").build();
+        valueParam = ParameterDescriptor.string("value").ruleBuilderVariable().description("The value to hash").build();
     }
 
     @Override

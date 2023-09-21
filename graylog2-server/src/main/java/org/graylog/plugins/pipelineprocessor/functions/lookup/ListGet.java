@@ -38,7 +38,7 @@ public class ListGet extends AbstractFunction<Object> {
 
     public ListGet() {
         listParam = type(LISTARG, List.class).description("A list").build();
-        indexParam = integer(IDXARG).primary().description("Get the value for this index in list").build();
+        indexParam = integer(IDXARG).ruleBuilderVariable().description("Get the value for this index in list").build();
     }
 
     @Override

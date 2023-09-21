@@ -44,7 +44,7 @@ public class LookupValue extends AbstractFunction<Object> {
                 .description("The existing lookup table to use to lookup the given key")
                 .transform(tableName -> lookupTableService.newBuilder().lookupTable(tableName).build())
                 .build();
-        keyParam = object("key").primary()
+        keyParam = object("key").ruleBuilderVariable()
                 .description("The key to lookup in the table")
                 .build();
         defaultParam = object("default")

@@ -50,7 +50,7 @@ public class LookupAddStringList extends AbstractFunction<Object> {
         keyParam = object("key")
                 .description("The key to add in the lookup table")
                 .build();
-        valueParam = ParameterDescriptor.type("value", List.class).primary()
+        valueParam = ParameterDescriptor.type("value", List.class).ruleBuilderVariable()
                 .description("The list value that should be added into the lookup table")
                 .build();
         keepDuplicates = bool("keep_duplicates")

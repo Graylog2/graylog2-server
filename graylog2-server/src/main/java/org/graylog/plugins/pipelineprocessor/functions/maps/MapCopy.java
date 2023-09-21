@@ -36,7 +36,7 @@ public class MapCopy extends AbstractFunction<Map> {
     private final ParameterDescriptor<Map, Map> mapParam;
 
     public MapCopy() {
-        mapParam = type(MAPARG, Map.class).primary().description("A map").build();
+        mapParam = type(MAPARG, Map.class).ruleBuilderVariable().description("A map").build();
     }
 
     @Override

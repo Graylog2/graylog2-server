@@ -31,7 +31,7 @@ abstract class BaseEncodingSingleArgStringFunction extends AbstractFunction<Stri
     private final ParameterDescriptor<Boolean, Boolean> omitPaddingParam;
 
     BaseEncodingSingleArgStringFunction() {
-        valueParam = ParameterDescriptor.string("value").primary().description("The value to encode with " + getEncodingName()).build();
+        valueParam = ParameterDescriptor.string("value").ruleBuilderVariable().description("The value to encode with " + getEncodingName()).build();
         omitPaddingParam = ParameterDescriptor.bool("omit_padding").optional().description("Omit any padding characters as specified by RFC 4648 section 3.2").build();
     }
 

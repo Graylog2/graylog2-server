@@ -26,10 +26,14 @@ public interface RuleFragmentService {
 
     Optional<RuleFragment> get(String name);
 
+    long count(String name);
+
     Collection<RuleFragment> all();
 
     default RuleFragment upsert(RuleFragment ruleFragment) {
-        this.get(ruleFragment.getName()).ifPresent(fragment -> this.delete(fragment.getName()));
+        if (this.count(ruleFragment.getName()) > 0) {
+            this.delete(ruleFragment.getName());
+        }
         return this.save(ruleFragment);
     }
 

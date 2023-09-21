@@ -39,7 +39,7 @@ public class LookupAssignTtl extends AbstractFunction<Object> {
 
     @Inject
     public LookupAssignTtl(LookupTableService lookupTableService) {
-        lookupTableParam = string("lookup_table", LookupTableService.Function.class).primary()
+        lookupTableParam = string("lookup_table", LookupTableService.Function.class).ruleBuilderVariable()
                 .description("The existing lookup table to use to add/update a ttl to the given key")
                 .transform(tableName -> lookupTableService.newBuilder().lookupTable(tableName).build())
                 .build();

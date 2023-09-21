@@ -53,7 +53,7 @@ public class CsvMapConversion extends AbstractFunction<Map> {
 
 
     public CsvMapConversion() {
-        this.valueParam = string(VALUE).primary().description("Map-like value to convert").build();
+        this.valueParam = string(VALUE).ruleBuilderVariable().description("Map-like value to convert").build();
         this.fieldsParam = string("fieldNames").description("Comma-separated list of field names").build();
         this.separatorParam = string("separator", Character.class).optional().transform(this::getFirstChar).description("Character to split lines by, will be shortened to first character").build();
         this.quoteCharParam = string("quoteChar", Character.class).optional().transform(this::getFirstChar).description("Character used to quote fields").build();

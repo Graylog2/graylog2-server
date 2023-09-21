@@ -22,7 +22,6 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,6 @@ import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -40,12 +38,10 @@ public class V20230915095200_AddSimpleRegex extends Migration {
 
     private static final Logger log = LoggerFactory.getLogger(V20230915095200_AddSimpleRegex.class);
     private final RuleFragmentService ruleFragmentService;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V20230915095200_AddSimpleRegex(RuleFragmentService ruleFragmentService, ClusterConfigService clusterConfigService) {
+    public V20230915095200_AddSimpleRegex(RuleFragmentService ruleFragmentService) {
         this.ruleFragmentService = ruleFragmentService;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -56,14 +52,9 @@ public class V20230915095200_AddSimpleRegex extends Migration {
     @Override
     public void upgrade() {
         log.debug("Adding simple regex fragments via migration");
-        if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
-            log.debug("Migration already completed!");
-            return;
-        }
 
         ruleFragmentService.upsert(createSimpleRegex());
 
-        clusterConfigService.write(new MigrationCompleted());
         log.debug("simple regex fragments were successfully added");
     }
 
@@ -81,7 +72,7 @@ public class V20230915095200_AddSimpleRegex extends Migration {
                         .name("regex_groups")
                         .params(ImmutableList.of(
                                 string("pattern", Pattern.class).transform(Pattern::compile).description("The regular expression to match against 'value', uses Java regex syntax").build(),
-                                string("value").primary().description("The string to match the pattern against").build(),
+                                string("value").ruleBuilderVariable().description("The string to match the pattern against").build(),
                                 type("group_names", List.class).optional().description("List of names to use for matcher groups").build()
                         ))
                         .returnType(Map.class)
@@ -94,7 +85,5 @@ public class V20230915095200_AddSimpleRegex extends Migration {
                 .fragmentOutputVariable(resultvariable)
                 .build();
     }
-
-    public record MigrationCompleted() {}
 
 }

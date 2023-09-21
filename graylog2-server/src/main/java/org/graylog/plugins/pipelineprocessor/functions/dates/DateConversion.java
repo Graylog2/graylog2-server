@@ -33,7 +33,7 @@ public class DateConversion extends TimezoneAwareFunction {
     private final ParameterDescriptor<Object, Object> value;
 
     public DateConversion() {
-        value = ParameterDescriptor.object("value").primary().description("The value to convert to a date").build();
+        value = ParameterDescriptor.object("value").ruleBuilderVariable().description("The value to convert to a date").build();
     }
 
     @Override

@@ -35,7 +35,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
 
 
     public BooleanConversion() {
-        valueParam = object("value").primary().description("Value to convert").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to convert").build();
         defaultParam = bool("default").optional().description("Used when 'value' is null, defaults to false").build();
     }
 

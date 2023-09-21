@@ -43,7 +43,7 @@ public class SetFields extends AbstractFunction<Void> {
     private final ParameterDescriptor<Boolean, Boolean> cleanFields;
 
     public SetFields() {
-        fieldsParam = type("fields", Map.class).primary().description("The map of new fields to set").build();
+        fieldsParam = type("fields", Map.class).ruleBuilderVariable().description("The map of new fields to set").build();
         prefixParam = string("prefix").optional().description("The prefix for the field names").build();
         suffixParam = string("suffix").optional().description("The suffix for the field names").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();

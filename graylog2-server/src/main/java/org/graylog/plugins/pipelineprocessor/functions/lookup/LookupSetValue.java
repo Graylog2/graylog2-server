@@ -48,7 +48,7 @@ public class LookupSetValue extends AbstractFunction<Object> {
         keyParam = object("key")
                 .description("The key to set in the lookup table")
                 .build();
-        valueParam = object("value").primary()
+        valueParam = object("value").ruleBuilderVariable()
                 .description("The single value that should be set into the lookup table")
                 .build();
         ttlSecondsParam = ParameterDescriptor.integer("ttl")

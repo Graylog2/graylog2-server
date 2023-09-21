@@ -36,7 +36,7 @@ public class Length extends AbstractFunction<Long> {
     private final ParameterDescriptor<Boolean, Boolean> bytesParam;
 
     public Length() {
-        valueParam = ParameterDescriptor.string(VALUE).primary().description("The input string").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("The input string").build();
         bytesParam = ParameterDescriptor.bool(BYTES)
                 .description("If true, count the bytes of the UTF-8 string instead of the characters")
                 .optional().build();

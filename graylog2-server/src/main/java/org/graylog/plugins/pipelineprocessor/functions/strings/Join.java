@@ -40,7 +40,7 @@ public class Join extends AbstractFunction<String> {
 
     public Join() {
         elementsParam = ParameterDescriptor.type("elements", Object.class, List.class)
-                .primary()
+                .ruleBuilderVariable()
                 .transform(Join::toList)
                 .description("The list of strings to join together, may be null")
                 .build();

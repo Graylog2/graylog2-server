@@ -39,7 +39,7 @@ public class MapGet extends AbstractFunction<Object> {
 
     public MapGet() {
         mapParam = type(MAPARG, Map.class).description("A map").build();
-        keyParam = string(KEYARG).primary().description("Get the value for this key in map").build();
+        keyParam = string(KEYARG).ruleBuilderVariable().description("Get the value for this key in map").build();
     }
 
     @Override

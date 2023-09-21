@@ -46,7 +46,6 @@ import static org.mockito.Mockito.when;
 
 public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest {
 
-    V20230720161500_AddExtractorFragments migration;
 
     private static LookupTableService lookupTableService;
     private static LookupTableService.Function lookupServiceFunction;
