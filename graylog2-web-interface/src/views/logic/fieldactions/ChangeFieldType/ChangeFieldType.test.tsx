@@ -22,6 +22,7 @@ import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFiel
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection', () => jest.fn());
 const onClose = jest.fn();
 const renderChangeTypeAction = ({
   queryId = 'query-id',

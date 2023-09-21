@@ -92,8 +92,8 @@ describe('useFieldTypeUsages custom hook', () => {
     asMock(SystemIndexSetsTypes.fieldTypeSummaries).mockImplementation(() => Promise.resolve(mockFieldTypeUsages));
     const { result, waitFor } = renderUseFieldTypeUsagesHook();
 
-    await waitFor(() => !result.current.isFirsLoaded);
-    await waitFor(() => result.current.isFirsLoaded);
+    await waitFor(() => result.current.isLoading);
+    await waitFor(() => !result.current.isLoading);
 
     expect(SystemIndexSetsTypes.fieldTypeSummaries).toHaveBeenCalledWith({
       field: 'field',
@@ -109,8 +109,8 @@ describe('useFieldTypeUsages custom hook', () => {
     const { result, waitFor } = renderUseFieldTypeUsagesHook();
 
     await suppressConsole(async () => {
-      await waitFor(() => !result.current.isFirsLoaded);
-      await waitFor(() => result.current.isFirsLoaded);
+      await waitFor(() => result.current.isLoading);
+      await waitFor(() => !result.current.isLoading);
     });
 
     expect(UserNotification.error).toHaveBeenCalledWith(

@@ -30,14 +30,15 @@ const INITIAL_DATA = {
 type Options = {
   enabled: boolean,
 }
+export type Sort = {
+    attributeId: 'index_set_id' | 'index_set_title',
+    direction: 'asc' | 'desc'
+}
 
-type SearchParams = {
+export type SearchParams = {
     page: number,
     pageSize: number,
-    sort: {
-        attributeId?: 'index_set_id' | 'index_set_title',
-        direction: 'asc' | 'desc'
-    }
+    sort: Sort
 }
 
 const fetchFieldTypeUsages = async ({ field, streams }: { field: string, streams: Array<string>}, searchParams: SearchParams) => {
@@ -73,7 +74,7 @@ const useFieldTypeUsages = ({ streams, field }: { streams: Array<string>, field:
   },
   refetch: () => void,
   isInitialLoading: boolean,
-  isFirsLoaded: boolean,
+  isLoading: boolean,
 } => {
   const { data, refetch, isInitialLoading, isLoading } = useQuery(
     ['fieldTypeUsages', field, searchParams],
@@ -92,7 +93,7 @@ const useFieldTypeUsages = ({ streams, field }: { streams: Array<string>, field:
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
-    isFirsLoaded: !isLoading,
+    isLoading,
   });
 };
 

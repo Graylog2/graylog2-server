@@ -29,6 +29,8 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import type { Attributes } from 'stores/PaginationTypes';
+import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
+import suppressConsole from 'helpers/suppressConsole';
 
 const onCloseMock = jest.fn();
 const renderChangeFieldTypeModal = ({
@@ -96,7 +98,7 @@ const paginatedFieldUsage = ({
   refetch: () => {
   },
   isInitialLoading: false,
-  isFirsLoaded: true,
+  isLoading: false,
 });
 
 const fieldTypes: {
@@ -113,8 +115,10 @@ const fieldTypes: {
 };
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFiledTypeUsages', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection', () => jest.fn());
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 describe('ChangeFieldTypeModal', () => {
@@ -128,6 +132,7 @@ describe('ChangeFieldTypeModal', () => {
     asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFiledTypeMutation: putFiledTypeMutationMock });
     asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
     asMock(useFieldTypes).mockReturnValue(fieldTypes);
+    asMock(useInitialSelection).mockReturnValue(['id-1', 'id-2']);
 
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
@@ -143,14 +148,16 @@ describe('ChangeFieldTypeModal', () => {
   it('Shows rotating indexes', async () => {
     renderChangeFieldTypeModal({});
 
-    await screen.findByText('Rotating indexes');
+    await screen.findByText('Rotate affected indices after change');
   });
 
   it('Shows type options', async () => {
     renderChangeFieldTypeModal({});
 
-    const typeSelect = await screen.findByText(/select field type/i);
-    selectEvent.openMenu(typeSelect);
+    await suppressConsole(async () => {
+      const typeSelect = await screen.findByText(/select field type/i);
+      selectEvent.openMenu(typeSelect);
+    });
 
     await screen.findByText('String type');
     await screen.findByText('Number(int)');

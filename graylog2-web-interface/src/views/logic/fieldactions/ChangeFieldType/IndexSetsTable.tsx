@@ -27,18 +27,16 @@ import {
 import { Button } from 'components/bootstrap';
 import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/logic/fieldactions/ChangeFieldType/Constants';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import type { SearchParams, Sort } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import type { Sort } from 'stores/PaginationTypes';
 import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import { ActionContext } from 'views/logic/ActionContext';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
-import { useStore } from 'stores/connect';
-import type { Stream } from 'views/stores/StreamsStore';
-import { StreamsStore } from 'views/stores/StreamsStore';
+import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 
 const Container = styled.div`
   margin-top: 20px;
@@ -57,8 +55,6 @@ const renderBulkActions = (
   <BulkActionsDropdown selectedEntities={selectedDashboardIds} setSelectedEntities={setSelectedDashboardIds} />
 );
 
-const streamsMapper = ({ streams }) => streams.map((stream: Stream) => ({ indexSet: stream.index_set_id, id: stream.id }));
-
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
   const [showDetails, setShowDetails] = useState(false);
   const [activePage, setActivePage] = useState(1);
@@ -72,19 +68,14 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
     defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
     defaultSort: DEFAULT_LAYOUT.sort,
   });
-  const availableStreams: Array<{ indexSet: string, id: string }> = useStore(StreamsStore, streamsMapper);
-  const searchParams = useMemo(() => ({
+
+  const searchParams: SearchParams = useMemo(() => ({
     page: activePage,
     pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
+    sort: layoutConfig.sort as Sort,
   }), [activePage, layoutConfig.pageSize, layoutConfig.sort]);
-  const { data: { list, attributes, pagination }, isFirsLoaded } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
-  const initialSelection = useMemo(() => {
-    const currentStreamSet = new Set(currentStreams);
-    const filterFn = currentStreamSet.size > 0 ? ({ id }) => currentStreamSet.has(id) : () => true;
-
-    return availableStreams.filter(filterFn).map(({ indexSet }) => indexSet);
-  }, [availableStreams, currentStreams]);
+  const { data: { list, attributes, pagination }, isLoading } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
+  const initialSelection = useInitialSelection(currentStreams);
 
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
@@ -128,7 +119,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes }: Props) => {
     setShowDetails((cur) => !cur);
   }, []);
 
-  if (isLoadingLayoutPreferences || !isFirsLoaded) {
+  if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
 
