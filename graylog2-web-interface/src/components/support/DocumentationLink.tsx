@@ -18,6 +18,7 @@ import * as React from 'react';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
+import { getMajorAndMinorVersion } from 'util/Version';
 import DocsHelper from 'util/DocsHelper';
 
 import Icon from '../common/Icon';
@@ -35,18 +36,24 @@ type Props = {
   page: string;
   text: ReactNode;
   title?: string;
+  appVersion?: string;
   displayIcon?: boolean
 }
 
-const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => (
-  <Container href={DocsHelper.toString(page)} title={title} target="_blank">
-    {text}
-    {displayIcon && <StyledIcon name="lightbulb" type="regular" size="lg" />}
-  </Container>
-);
+const DocumentationLink = ({ page, title = '', text, appVersion, displayIcon }: Props) => {
+  const version = appVersion === 'current' ? getMajorAndMinorVersion() : appVersion;
+
+  return (
+    <Container href={DocsHelper.toString(page, version)} title={title} target="_blank">
+      {text}
+      {displayIcon && <StyledIcon name="lightbulb" type="regular" size="lg" />}
+    </Container>
+  );
+};
 
 DocumentationLink.defaultProps = {
   title: '',
+  appVersion: undefined,
   displayIcon: false,
 };
 

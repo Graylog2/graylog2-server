@@ -106,7 +106,7 @@ type Props = {
   lifecycle?: 'experimental' | 'legacy',
   lifecycleMessage?: React.ReactNode,
   subpage: boolean,
-  documentationLink?: { title: string, path: string }
+  documentationLink?: { title: string, path: string, appVersion?: string }
 };
 
 /**
@@ -127,7 +127,7 @@ const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, 
             </h1>
             {(documentationLink || topActions) && (
               <TopActions $hasMultipleChildren={!!documentationLink && !!topActions}>
-                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
+                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} appVersion={documentationLink.appVersion} displayIcon />}
                 {topActions}
               </TopActions>
             )}
