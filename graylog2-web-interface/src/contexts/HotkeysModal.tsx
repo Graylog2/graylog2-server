@@ -136,7 +136,7 @@ const HotkeysModal = () => {
   const [show, setShow] = useState(false);
   const onHide = useCallback(() => setShow(false), []);
   const onToggle = useCallback(() => setShow((cur) => !cur), []);
-  const { hotKeysCollection } = useHotkeysContext();
+  const { hotKeysCollections } = useHotkeysContext();
   const isMacOS = _isMacOS();
 
   useHotkeys('SHOW_HELPER', onToggle, { scopes: 'general' });
@@ -152,7 +152,7 @@ const HotkeysModal = () => {
       <Modal.Body>
         <Content>
           <SectionGrid>
-            {Object.entries(hotKeysCollection).map(([scope, collection]: [ScopeName, HotkeyCollection]) => (
+            {Object.entries(hotKeysCollections).map(([scope, collection]: [ScopeName, HotkeyCollection]) => (
               <HotkeyCollectionSection scope={scope} collection={collection} isMacOS={isMacOS} />
             ))}
           </SectionGrid>

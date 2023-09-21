@@ -41,7 +41,7 @@ type HotkeysContextType = {
   hotkeys: readonly Hotkey[],
   toggleScope: (scopes: ScopeName) => void,
   enabledScopes: Array<ScopeName>,
-  hotKeysCollection: HotkeyCollections,
+  hotKeysCollections: HotkeyCollections,
   activeHotkeys: ActiveHotkeys,
   addActiveHotkey: (props: { scope: ScopeName, actionKey: string, options: Options & { scopes: ScopeName } }) => void,
   removeActiveHotkey: (props: { scope: ScopeName, actionKey: string }) => void,

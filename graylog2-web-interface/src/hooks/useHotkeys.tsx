@@ -54,12 +54,12 @@ const useHotkeys = <T extends HTMLElement>(
   dependencies?: Array<unknown>,
 ) => {
   const {
-    hotKeysCollection,
+    hotKeysCollections,
     addActiveHotkey,
     removeActiveHotkey,
   } = useHotkeysContext();
 
-  catchErrors(hotKeysCollection, actionKey, options.scopes);
+  catchErrors(hotKeysCollections, actionKey, options.scopes);
 
   // const scope = options?.scopes ?? '*';
   // const scopes = isArray(scope) ? scope : [scope];
@@ -93,7 +93,7 @@ const useHotkeys = <T extends HTMLElement>(
     return () => removeActiveHotkey({ scope: options.scopes, actionKey });
   }, [actionKey, addActiveHotkey, options.combinationKey, options.enabled, options.scopes, removeActiveHotkey]);
 
-  const keys = hotKeysCollection?.[options?.scopes]?.actions?.[actionKey]?.keys;
+  const keys = hotKeysCollections?.[options?.scopes]?.actions?.[actionKey]?.keys;
 
   return originalUseHotkeys<T>(keys, callback, mergedOptions, dependencies);
 };

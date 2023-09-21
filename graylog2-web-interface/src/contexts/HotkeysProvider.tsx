@@ -36,7 +36,7 @@ const viewActions = {
   REDO: { keys: 'mod+y', description: 'Redo last action' },
 };
 
-export const hotKeysCollection: HotkeyCollections = {
+export const hotKeysCollections: HotkeyCollections = {
   general: {
     title: 'General',
     description: 'General keyboard shortcuts',
@@ -99,11 +99,21 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
     hotkeys,
     toggleScope,
     enabledScopes: enabledScopes as Array<ScopeName>,
-    hotKeysCollection,
+    hotKeysCollections,
     activeHotkeys,
     addActiveHotkey,
     removeActiveHotkey,
-  }), [_disableScope, _enableScope, activeHotkeys, addActiveHotkey, enabledScopes, hotKeysCollection, hotkeys, removeActiveHotkey, setActiveScopes, toggleScope]);
+  }), [
+    _disableScope,
+    _enableScope,
+    activeHotkeys,
+    addActiveHotkey,
+    enabledScopes,
+    hotkeys,
+    removeActiveHotkey,
+    setActiveScopes,
+    toggleScope,
+  ]);
 
   return (
     <HotkeysContext.Provider value={value}>
