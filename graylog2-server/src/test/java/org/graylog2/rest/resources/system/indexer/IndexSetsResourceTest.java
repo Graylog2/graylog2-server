@@ -70,7 +70,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class IndexSetsResourceTest {
@@ -201,7 +200,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.get("id");
         } finally {
-            verifyZeroInteractions(indexSetService);
+            verifyNoMoreInteractions(indexSetService);
         }
     }
 
@@ -241,7 +240,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.indexSetStatistics("id");
         } finally {
-            verifyZeroInteractions(indexSetRegistry);
+            verifyNoMoreInteractions(indexSetRegistry);
         }
     }
 
@@ -309,7 +308,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.save(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
         } finally {
-            verifyZeroInteractions(indexSetService);
+            verifyNoMoreInteractions(indexSetService);
         }
     }
 
@@ -366,7 +365,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.update("wrong-id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
         } finally {
-            verifyZeroInteractions(indexSetService);
+            verifyNoMoreInteractions(indexSetService);
         }
     }
 
@@ -374,23 +373,23 @@ public class IndexSetsResourceTest {
     public void updateFailsWhenDefaultSetIsSetReadOnly() throws Exception {
         final String defaultIndexSetId = "defaultIndexSet";
         final IndexSetConfig defaultIndexSetConfig = IndexSetConfig.create(
-            defaultIndexSetId,
-            "title",
-            "description",
-            true, true,
-            "prefix",
-            1,
-            0,
-            MessageCountRotationStrategy.class.getCanonicalName(),
-            MessageCountRotationStrategyConfig.create(1000),
-            NoopRetentionStrategy.class.getCanonicalName(),
-            NoopRetentionStrategyConfig.create(1),
-            ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-            "standard",
-            "index-template",
-            null,
-            1,
-            false
+                defaultIndexSetId,
+                "title",
+                "description",
+                true, true,
+                "prefix",
+                1,
+                0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(1),
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                null,
+                1,
+                false
         );
 
         when(indexSetService.getDefault()).thenReturn(defaultIndexSetConfig);
@@ -481,7 +480,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.delete("id", false);
         } finally {
-            verifyZeroInteractions(indexSetService);
+            verifyNoMoreInteractions(indexSetService);
         }
     }
 
@@ -551,7 +550,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.globalStats();
         } finally {
-            verifyZeroInteractions(indexSetService);
+            verifyNoMoreInteractions(indexSetService);
         }
     }
 
@@ -560,23 +559,23 @@ public class IndexSetsResourceTest {
         final String indexSetId = "newDefaultIndexSetId";
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
-            indexSetId,
-            "title",
-            "description",
-            true, true,
-            "prefix",
-            1,
-            0,
-            MessageCountRotationStrategy.class.getCanonicalName(),
-            MessageCountRotationStrategyConfig.create(1000),
-            NoopRetentionStrategy.class.getCanonicalName(),
-            NoopRetentionStrategyConfig.create(1),
-            ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-            "standard",
-            "index-template",
-            null,
-            1,
-            false
+                indexSetId,
+                "title",
+                "description",
+                true, true,
+                "prefix",
+                1,
+                0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(1),
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                null,
+                1,
+                false
         );
 
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
@@ -602,8 +601,8 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.setDefault("someIndexSetId");
         } finally {
-            verifyZeroInteractions(indexSetService);
-            verifyZeroInteractions(clusterConfigService);
+            verifyNoMoreInteractions(indexSetService);
+            verifyNoMoreInteractions(clusterConfigService);
         }
     }
 
@@ -619,7 +618,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.setDefault(nonExistingIndexSetId);
         } finally {
-            verifyZeroInteractions(clusterConfigService);
+            verifyNoMoreInteractions(clusterConfigService);
         }
     }
 
@@ -628,23 +627,23 @@ public class IndexSetsResourceTest {
         final String readOnlyIndexSetId = "newDefaultIndexSetId";
         final IndexSet readOnlyIndexSet = mock(IndexSet.class);
         final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
-            readOnlyIndexSetId,
-            "title",
-            "description",
-            false, true,
-            "prefix",
-            1,
-            0,
-            MessageCountRotationStrategy.class.getCanonicalName(),
-            MessageCountRotationStrategyConfig.create(1000),
-            NoopRetentionStrategy.class.getCanonicalName(),
-            NoopRetentionStrategyConfig.create(1),
-            ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-            "standard",
-            "index-template",
-            null,
-            1,
-            false
+                readOnlyIndexSetId,
+                "title",
+                "description",
+                false, true,
+                "prefix",
+                1,
+                0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(1),
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                null,
+                1,
+                false
         );
 
         when(readOnlyIndexSet.getConfig()).thenReturn(readOnlyIndexSetConfig);
@@ -656,7 +655,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.setDefault(readOnlyIndexSetId);
         } finally {
-            verifyZeroInteractions(clusterConfigService);
+            verifyNoMoreInteractions(clusterConfigService);
         }
     }
 
@@ -693,7 +692,7 @@ public class IndexSetsResourceTest {
         try {
             indexSetsResource.setDefault(readOnlyIndexSetId);
         } finally {
-            verifyZeroInteractions(clusterConfigService);
+            verifyNoMoreInteractions(clusterConfigService);
         }
     }
 

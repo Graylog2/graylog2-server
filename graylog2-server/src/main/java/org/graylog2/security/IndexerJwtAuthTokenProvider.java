@@ -70,7 +70,8 @@ public class IndexerJwtAuthTokenProvider implements Provider<String> {
                 .setExpiration(new Date(nowMillis + tokenExpirationDuration.toMilliseconds()))
                 .signWith(signingKey, signatureAlgorithm);
 
-        return builder.compact();
+        final var token =  builder.compact();
+        return token;
     }
 
     @Override

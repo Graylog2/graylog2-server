@@ -18,21 +18,20 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
-class CounterDetails extends React.Component {
-  static propTypes = {
-    metric: PropTypes.object.isRequired,
-  };
+import type { CounterMetric } from 'stores/metrics/MetricsStore';
 
-  render() {
-    const { metric } = this.props.metric;
-
-    return (
-      <dl className="metric-def metric-counter">
-        <dt>Value:</dt>
-        <dd><span className="number-format">{numeral(metric.count).format('0,0')}</span></dd>
-      </dl>
-    );
-  }
+type Props = {
+  metric: CounterMetric,
 }
+const CounterDetails = ({ metric: { metric } }: Props) => (
+  <dl className="metric-def metric-counter">
+    <dt>Value:</dt>
+    <dd><span className="number-format">{numeral(metric.count).format('0,0')}</span></dd>
+  </dl>
+);
+
+CounterDetails.propTypes = {
+  metric: PropTypes.object.isRequired,
+};
 
 export default CounterDetails;

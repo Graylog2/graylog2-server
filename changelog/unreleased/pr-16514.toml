@@ -1,0 +1,13 @@
+type = "a"
+message = "Added ability to clean field names for set_field and set_fields pipeline functions"
+
+issues = ["7137", "graylog-plugin-enterprise#5794"]
+pulls = ["16514"]
+
+details.user = """
+Add optional parameters to the following pipeline functions that can be used to replace invalid field name characters
+with underscores. Both default to `false`.
+
+* `set_field` pipeline function: New parameter: `clean_field`
+* `set_fields` pipeline function: New parameter: `clean_fields`
+"""
