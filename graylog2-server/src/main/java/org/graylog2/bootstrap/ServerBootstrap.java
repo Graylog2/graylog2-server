@@ -171,7 +171,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private void runPreflightWeb(List<Module> preflightCheckModules) {
         List<Module> modules = new ArrayList<>(preflightCheckModules);
         modules.add(new DataNodeProvisioningBindings());
-        modules.add(new PreflightWebModule());
+        modules.add(new PreflightWebModule(configuration));
         modules.add(new ObjectMapperModule(chainingClassLoader));
         modules.add(new SchedulerBindings());
         modules.add((binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));

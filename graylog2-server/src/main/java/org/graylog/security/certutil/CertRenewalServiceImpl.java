@@ -17,7 +17,6 @@
 package org.graylog.security.certutil;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.commons.lang3.tuple.Pair;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -54,6 +53,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
@@ -165,41 +165,33 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
-    private Pair<Node, KeyStore> loadKeyStoreForNode(Node node) {
+    private Optional<KeyStore> loadKeyStoreForNode(Node node) {
         try {
-            return Pair.of(node, keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret).orElse(null));
+            return keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret);
         } catch (KeyStoreStorageException e) {
-            LOG.error("Could not read keystore for DataNode: {}", e.getMessage());
-            return null;
+            return Optional.empty();
         }
     }
 
-    private Pair<Node, X509Certificate> getCertificateForNode(Pair<Node, KeyStore> pair) {
+    private Optional<X509Certificate> getCertificateForNode(KeyStore keyStore) {
         try {
-            return Pair.of(pair.getLeft(), (X509Certificate)pair.getRight().getCertificate(CertConstants.DATANODE_KEY_ALIAS));
+            return Optional.of((X509Certificate)keyStore.getCertificate(CertConstants.DATANODE_KEY_ALIAS));
         } catch (KeyStoreException e) {
-            LOG.error("Could not read certificate for DataNode: {}", e.getMessage());
-            return null;
+            return Optional.empty();
         }
-    }
-
-    @Override
-    public List<Pair<Node, X509Certificate>> findNodesAndCertificates() {
-        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        return activeDataNodes.values().stream()
-                .map(this::loadKeyStoreForNode)
-                .filter(Objects::nonNull)
-                .filter(p -> p.getRight() != null)
-                .map(this::getCertificateForNode)
-                .filter(Objects::nonNull)
-                .toList();
     }
 
     protected List<Node> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
         final var nextRenewal = getNextRenewal();
-        return findNodesAndCertificates().stream()
-                .filter(p -> needsRenewal(nextRenewal, renewalPolicy, p.getRight()))
-                .map(Pair::getLeft).toList();
+        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        return activeDataNodes.values().stream().map(node -> {
+            final var keystore = loadKeyStoreForNode(node);
+            final var certificate = keystore.flatMap(this::getCertificateForNode);
+            if(certificate.isPresent() && needsRenewal(nextRenewal, renewalPolicy, certificate.get())) {
+                return node;
+            }
+            return null;
+        }).filter(Objects::nonNull).toList();
     }
 
     @Override
@@ -207,6 +199,29 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
         var config = dataNodeProvisioningService.getPreflightConfigFor(nodeId);
         dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
+    }
+
+    @Override
+    public List<DataNode> findNodes() {
+        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        return activeDataNodes.values().stream().map(node -> {
+            final var keystore = loadKeyStoreForNode(node);
+            final var certificate = keystore.flatMap(this::getCertificateForNode);
+            final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            final var config = getDataNodeProvisioningConfig(node);
+            return new DataNode(node.getNodeId(),
+                    node.getType(),
+                    node.getTransportAddress(),
+                    config.state(),
+                    config.errorMsg(),
+                    node.getHostname(),
+                    node.getShortNodeId(),
+                    certValidUntil.orElse(null));
+        }).toList();
+    }
+
+    private DataNodeProvisioningConfig getDataNodeProvisioningConfig(final Node node) {
+        return dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId());
     }
 
     private void notifyManualRenewalForNode(final List<Node> nodes) {

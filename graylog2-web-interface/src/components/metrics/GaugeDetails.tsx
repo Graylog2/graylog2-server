@@ -14,19 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.system.indexer.requests;
+import PropTypes from 'prop-types';
+import React from 'react';
+import numeral from 'numeral';
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import type { GaugeMetric } from 'stores/metrics/MetricsStore';
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.Set;
-
-public record FieldTypeSummaryRequest(@Nullable
-                                      @JsonProperty("streams")
-                                      Set<String> streamsIds,
-                                      @NotNull @NotEmpty
-                                      @JsonProperty("field")
-                                      String fieldName) {
+type Props = {
+  metric: GaugeMetric,
 }
+const GaugeDetails = ({ metric: { metric: gauge } }: Props) => (
+  <dl className="metric-def metric-gauge">
+    <dt>Value:</dt>
+    <dd><span className="number-format">{numeral(gauge.value).format('0,0')}</span></dd>
+  </dl>
+);
+
+GaugeDetails.propTypes = {
+  metric: PropTypes.object.isRequired,
+};
+
+export default GaugeDetails;

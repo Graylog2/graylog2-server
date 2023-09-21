@@ -14,19 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.system.indexer.requests;
+import type { MantineTheme as CustomMantineTheme } from '@graylog/sawmill/mantine';
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.Set;
-
-public record FieldTypeSummaryRequest(@Nullable
-                                      @JsonProperty("streams")
-                                      Set<String> streamsIds,
-                                      @NotNull @NotEmpty
-                                      @JsonProperty("field")
-                                      String fieldName) {
+declare module '@mantine/core' {
+  export interface MantineTheme extends CustomMantineTheme {}
 }

@@ -16,7 +16,6 @@
  */
 package org.graylog2.notifications;
 
-import org.graylog.events.processor.EventProcessorException;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.PersistedService;
 
@@ -51,6 +50,4 @@ public interface NotificationService extends PersistedService {
     int destroyAllByType(Notification.Type type);
 
     int destroyAllByTypeAndKey(Notification.Type type, @Nullable String key);
-
-    void createSystemEvent(Notification notification) throws EventProcessorException;
 }
