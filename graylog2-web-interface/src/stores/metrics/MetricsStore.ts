@@ -225,6 +225,7 @@ export const MetricsStore = singletonStore(
     },
     names() {
       if (!this.nodes) {
+        // eslint-disable-next-line no-console
         console.warn('Node list not yet available, not fetching metrics.');
 
         return;
@@ -233,9 +234,10 @@ export const MetricsStore = singletonStore(
       const promise = this._allResults(Object.keys(this.nodes).map((nodeId) => {
         const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
 
-        return fetch('GET', url).then((response) => ({ nodeId: nodeId, names: response.metrics }), (error) =>
-        // When fetching metrics fails, keep previous available metrics around, letting user see them
-          ({ nodeId: nodeId, names: this.metricsNames[nodeId], error: error }),
+        return fetch('GET', url).then(
+          (response) => ({ nodeId: nodeId, names: response.metrics }),
+          // When fetching metrics fails, keep previous available metrics around, letting user see them
+          (error) => ({ nodeId: nodeId, names: this.metricsNames[nodeId], error: error }),
         );
       })).then((responses) => {
         const metricsNames = {};
