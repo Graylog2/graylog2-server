@@ -114,7 +114,7 @@ If you still run any of those inputs, please configure the alternative "Kinesis/
 
 ## CrowdStrike input log parsing changes
 
-Several log parsing changes have been made to the CrowdStrike input.
+Several log parsing changes have been made to the CrowdStrike input in Graylog release 5.1.6.
 
 Added fields:
 `event_created`: Contains the `metadata.eventCreationTime` log value.
