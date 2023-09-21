@@ -53,11 +53,17 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
   const iconName = iconNameForType(bsStyle);
 
   const alertStyles = () => ({
+    root: {
+      border: `1px solid ${theme.other.shades.lighter(bsStyle)}`,
+    },
     message: {
       fontSize: theme.fontSizes.md,
     },
     title: {
       fontSize: theme.fontSizes.md,
+      color: theme.other.colors.global.textDefault,
+    },
+    closeButton: {
       color: theme.other.colors.global.textDefault,
     },
   });
