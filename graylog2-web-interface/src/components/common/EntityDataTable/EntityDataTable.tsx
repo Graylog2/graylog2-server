@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { SetStateAction } from 'react';
 import { useMemo, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
@@ -252,7 +251,7 @@ const EntityDataTable = <Entity extends EntityBase>({
 
       return [...cur, itemId];
     }));
-  }, [_setSelectedEntities]);
+  }, [setSelectedEntities]);
 
   return (
     <ExpandedSectionsProvider>
