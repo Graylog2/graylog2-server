@@ -20,8 +20,9 @@ import styled from 'styled-components';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import { MetricsFilterInput, MetricsList } from 'components/metrics';
+import { MetricsList } from 'components/metrics';
 import type { MetricInfo } from 'components/metrics/MetricsList';
+import SearchForm from 'components/common/SearchForm';
 
 const StyledWarningDiv = styled.div(({ theme }) => `
   height: 20px;
@@ -53,6 +54,11 @@ const safelyFilterNames = (filter: string, names: Array<MetricInfo>) => {
 type State = {
   filter: string,
 }
+
+const MetricsListContainer = styled.div`
+  padding-top: 10px;
+  width: 100%;
+`;
 
 class MetricsComponent extends React.Component<Props, State> {
   static propTypes = {
@@ -125,8 +131,14 @@ class MetricsComponent extends React.Component<Props, State> {
               </>
             )}
           </StyledWarningDiv>
-          <MetricsFilterInput filter={filter} onChange={this.onFilterChange} />
-          <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
+          <SearchForm query={filter}
+                      onSearch={this.onFilterChange}
+                      queryWidth={300}
+                      placeholder="Type a metric name to filter&hellip;">
+            <MetricsListContainer>
+              <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
+            </MetricsListContainer>
+          </SearchForm>
         </Col>
       </Row>
     );
