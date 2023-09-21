@@ -21,6 +21,7 @@ import { useEffect, useMemo } from 'react';
 
 import type { ScopeName, HotkeyCollections } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
+import useFeature from 'hooks/useFeature';
 
 const defaultOptions: Options = {
   preventDefault: true,
@@ -53,16 +54,25 @@ const useHotkey = <T extends HTMLElement>(
   options?: Options & { scopes: ScopeName },
   dependencies?: Array<unknown>,
 ) => {
+  const hasHotkeysFeatureFlag = useFeature('frontend_hotkeys');
+
+  if (!hasHotkeysFeatureFlag) {
+    return null;
+  }
+
   const {
     hotKeysCollections,
     addActiveHotkey,
     removeActiveHotkey,
+    // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useHotkeysContext();
 
   catchErrors(hotKeysCollections, actionKey, options.scopes);
 
   // const scope = options?.scopes ?? '*';
   // const scopes = isArray(scope) ? scope : [scope];
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const mergedOptions = useMemo(() => ({
     ...defaultOptions,
     ...options,
@@ -79,6 +89,7 @@ const useHotkey = <T extends HTMLElement>(
     });
   }, [keys, options?.description, scopes, setHotKeysCollection]);
 */
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     addActiveHotkey({
       scope: options.scopes,
