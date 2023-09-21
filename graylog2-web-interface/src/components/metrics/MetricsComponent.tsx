@@ -20,7 +20,9 @@ import styled from 'styled-components';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import { MetricsFilterInput, MetricsList } from 'components/metrics';
+import { MetricsList } from 'components/metrics';
+import SearchForm from 'components/common/SearchForm';
+import type { Metric } from 'stores/metrics/MetricsStore';
 
 const StyledWarningDiv = styled.div(({ theme }) => `
   height: 20px;
@@ -28,7 +30,37 @@ const StyledWarningDiv = styled.div(({ theme }) => `
   color: ${theme.colors.variant.dark.danger};
 `);
 
-class MetricsComponent extends React.Component {
+type Props = {
+  names: Array<Metric>,
+  namespace: string,
+  nodeId: string,
+  filter?: string,
+  error?: {
+    responseMessage: string,
+    status: number,
+  }
+};
+
+const safelyFilterNames = (filter: string, names: Array<Metric>) => {
+  try {
+    const filterRegex = new RegExp(filter, 'i');
+
+    return names.filter((metric) => String(metric.full_name).match(filterRegex));
+  } catch (e) {
+    return [];
+  }
+};
+
+type State = {
+  filter: string,
+}
+
+const MetricsListContainer = styled.div`
+  padding-top: 10px;
+  width: 100%;
+`;
+
+class MetricsComponent extends React.Component<Props, State> {
   static propTypes = {
     names: PropTypes.arrayOf(PropTypes.object),
     namespace: PropTypes.string.isRequired,
@@ -46,15 +78,18 @@ class MetricsComponent extends React.Component {
     error: undefined,
   };
 
-  state = { filter: this.props.filter };
+  constructor(props: Props) {
+    super(props);
+    this.state = { filter: props.filter };
+  }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (nextProps.filter !== this.props.filter) {
       this.setState({ filter: nextProps.filter });
     }
   }
 
-  onFilterChange = (nextFilter) => {
+  onFilterChange = (nextFilter: string) => {
     this.setState({ filter: nextFilter });
   };
 
@@ -82,15 +117,7 @@ class MetricsComponent extends React.Component {
       );
     }
 
-    let filteredNames;
-
-    try {
-      const filterRegex = new RegExp(filter, 'i');
-
-      filteredNames = names.filter((metric) => String(metric.full_name).match(filterRegex));
-    } catch (e) {
-      filteredNames = [];
-    }
+    const filteredNames = safelyFilterNames(filter, names);
 
     return (
       <Row className="content">
@@ -104,8 +131,14 @@ class MetricsComponent extends React.Component {
               </>
             )}
           </StyledWarningDiv>
-          <MetricsFilterInput filter={filter} onChange={this.onFilterChange} />
-          <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
+          <SearchForm query={filter}
+                      onSearch={this.onFilterChange}
+                      queryWidth={300}
+                      placeholder="Type a metric name to filter&hellip;">
+            <MetricsListContainer>
+              <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
+            </MetricsListContainer>
+          </SearchForm>
         </Col>
       </Row>
     );

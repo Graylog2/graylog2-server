@@ -17,7 +17,6 @@
 package org.graylog.integrations.pagerduty;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.util.Lists;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;
 import org.graylog.events.notifications.PermanentEventNotificationException;
@@ -36,12 +35,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -145,7 +144,7 @@ public class PagerDutyNotificationTest {
 
     private void givenPagerDutyClientSucceeds() throws Exception {
         PagerDutyResponse response = mock(PagerDutyResponse.class);
-        given(response.getErrors()).willReturn(Lists.emptyList());
+        given(response.getErrors()).willReturn(List.of());
         given(mockPagerDutyClient.enqueue(any(String.class))).willReturn(response);
     }
 

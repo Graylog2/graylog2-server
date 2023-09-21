@@ -43,7 +43,7 @@
         <auto-service.version>1.0-rc4</auto-service.version>
 
         <!-- Plugin versions -->
-        <jdeb.version>1.7</jdeb.version>
+        <jdeb.version>1.10</jdeb.version>
         <rpm-maven.version>2.2.0</rpm-maven.version>
     </properties>
 

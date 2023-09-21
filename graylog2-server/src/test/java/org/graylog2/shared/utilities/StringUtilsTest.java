@@ -24,8 +24,29 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog2.shared.utilities.StringUtils.toLowerCase;
+import static org.graylog2.shared.utilities.StringUtils.toUpperCase;
 
 public class StringUtilsTest {
+    @Test
+    public void testToUpperCase() {
+        //noinspection DataFlowIssue
+        assertThatThrownBy(() -> toUpperCase(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(toUpperCase("")).isEqualTo("");
+        assertThat(toUpperCase(" ")).isEqualTo(" ");
+        assertThat(toUpperCase("Hello")).isEqualTo("HELLO");
+    }
+
+    @Test
+    public void testToLowerCase() {
+        //noinspection DataFlowIssue
+        assertThatThrownBy(() -> toLowerCase(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(toLowerCase("")).isEqualTo("");
+        assertThat(toLowerCase(" ")).isEqualTo(" ");
+        assertThat(toLowerCase("Hello")).isEqualTo("hello");
+    }
+
     @Test
     public void testHumanReadable() {
         assertThat(StringUtils.humanReadableByteCount(1024L * 1024L * 1024L * 5L + 1024L * 1024L * 512L)).isEqualTo("5.5 GiB");

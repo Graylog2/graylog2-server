@@ -92,7 +92,6 @@
         <amqp-client.version>5.8.0</amqp-client.version>
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
-        <apache-httpasyncclient.version>4.1.5</apache-httpasyncclient.version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
@@ -124,6 +123,7 @@
         <guava.version>32.1.2-jre</guava.version>
         <guice.version>5.0.1</guice.version>
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
+        <hamcrest.version>2.2</hamcrest.version>
         <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
         <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.15.2</jackson.version>
@@ -174,7 +174,7 @@
         <streamex.version>0.7.2</streamex.version>
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
-        <ulid.version>8.2.0</ulid.version>
+        <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>5.1.1</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
@@ -187,13 +187,12 @@
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
         <assertj-core.version>3.24.2</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
-        <awaitility.version>3.1.3</awaitility.version>
+        <awaitility.version>4.2.0</awaitility.version>
         <equalsverifier.version>3.15.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <mockito.version>5.5.0</mockito.version>
-        <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.19.0</testcontainers.version>
@@ -246,11 +245,6 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
                 <version>${apache-httpclient.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpasyncclient</artifactId>
-                <version>${apache-httpasyncclient.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -395,6 +389,12 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>${hamcrest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
                 <version>${byte-buddy.version}</version>
@@ -403,6 +403,11 @@
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy-agent</artifactId>
                 <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -493,20 +498,12 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.3</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
                     <version>1.9.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.alexcojocaru</groupId>
-                    <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>6.17</version>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.antlr</groupId>
@@ -594,9 +591,161 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+                <configuration>
+                    <suppressAnnotations>
+                        <suppressAnnotation>org.graylog2.shared.SuppressForbidden</suppressAnnotation>
+                    </suppressAnnotations>
+                    <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                    <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                    <failOnViolation>true</failOnViolation>
+                    <bundledSignatures>
+                        <!-- We want to allow String#formatted without charset. -->
+                        <bundledSignature>jdk-unsafe-14</bundledSignature>
+                        <!-- This will automatically choose the right signatures based on 'maven.compiler.target': -->
+                        <bundledSignature>jdk-deprecated</bundledSignature>
+                        <bundledSignature>jdk-reflection</bundledSignature>
+                        <!-- disallow undocumented classes like sun.misc.Unsafe: -->
+                        <bundledSignature>jdk-non-portable</bundledSignature>
+                        <!-- Workaround until signatures for ${commons-io.version} are released: -->
+                        <bundledSignature>commons-io-unsafe-2.11.0</bundledSignature>
+                    </bundledSignatures>
+                    <signatures>
+                        <![CDATA[
+                            org.jboss.netty.** @ Migrate to Netty 4.x
+
+                            @defaultMessage Use a custom thread factory to ensure proper thread naming.
+                            java.util.concurrent.Executors#defaultThreadFactory()
+                            java.util.concurrent.Executors#newCachedThreadPool()
+                            java.util.concurrent.Executors#newFixedThreadPool(int)
+                            java.util.concurrent.Executors#newScheduledThreadPool(int)
+                            java.util.concurrent.Executors#newSingleThreadExecutor()
+                            java.util.concurrent.Executors#newSingleThreadScheduledExecutor()
+                            java.util.concurrent.Executors#privilegedThreadFactory()
+
+                            @defaultMessage Constructing a DateTime without a time zone is dangerous
+                            org.joda.time.DateTime#<init>()
+                            org.joda.time.DateTime#<init>(long)
+                            org.joda.time.DateTime#<init>(int, int, int, int, int)
+                            org.joda.time.DateTime#<init>(int, int, int, int, int, int)
+                            org.joda.time.DateTime#<init>(int, int, int, int, int, int, int)
+                            org.joda.time.DateTime#now()
+                            org.joda.time.DateTimeZone#getDefault()
+
+                            @defaultMessage Please do not try to stop the world
+                            java.lang.System#gc()
+
+                            java.lang.Character#codePointBefore(char[],int) @ Implicit start offset is error-prone when the char[] is a buffer and the first chars are random chars
+                            java.lang.Character#codePointAt(char[],int) @ Implicit end offset is error-prone when the char[] is a buffer and the last chars are random chars
+
+                            @defaultMessage Only use wait / notify when really needed try to use concurrency primitives, latches or callbacks instead.
+                            java.lang.Object#wait()
+                            java.lang.Object#wait(long)
+                            java.lang.Object#wait(long,int)
+                            java.lang.Object#notify()
+                            java.lang.Object#notifyAll()
+
+                            @defaultMessage Beware of the behavior of this method on MIN_VALUE
+                            java.lang.Math#abs(int)
+                            java.lang.Math#abs(long)
+
+                            @defaultMessage Use Channels.* methods to write to channels. Do not read/write directly.
+                            java.nio.channels.WritableByteChannel#write(java.nio.ByteBuffer)
+                            java.nio.channels.FileChannel#write(java.nio.ByteBuffer, long)
+                            java.nio.channels.GatheringByteChannel#write(java.nio.ByteBuffer[], int, int)
+                            java.nio.channels.GatheringByteChannel#write(java.nio.ByteBuffer[])
+                            java.nio.channels.ReadableByteChannel#read(java.nio.ByteBuffer)
+                            java.nio.channels.ScatteringByteChannel#read(java.nio.ByteBuffer[])
+                            java.nio.channels.ScatteringByteChannel#read(java.nio.ByteBuffer[], int, int)
+                            java.nio.channels.FileChannel#read(java.nio.ByteBuffer, long)
+
+                            @defaultMessage Convert to URI
+                            java.net.URL#getPath()
+                            java.net.URL#getFile()
+
+                            @defaultMessage Use java.nio.file instead of java.io.File API
+                            # java.util.jar.JarFile
+                            # java.util.zip.ZipFile
+                            # java.io.File
+                            # java.io.FileInputStream
+                            # java.io.FileOutputStream
+                            java.io.PrintStream#<init>(java.lang.String,java.lang.String)
+                            java.io.PrintWriter#<init>(java.lang.String,java.lang.String)
+                            java.util.Formatter#<init>(java.lang.String,java.lang.String,java.util.Locale)
+                            java.io.RandomAccessFile
+                            # java.nio.file.Path#toFile()
+
+                            @defaultMessage Specify a location for the temp file/directory instead.
+                            java.nio.file.Files#createTempDirectory(java.lang.String,java.nio.file.attribute.FileAttribute[])
+                            java.nio.file.Files#createTempFile(java.lang.String,java.lang.String,java.nio.file.attribute.FileAttribute[])
+
+                            com.google.common.collect.Iterators#emptyIterator() @ Use Collections.emptyIterator instead
+
+                            @defaultMessage Don't use java serialization - this can break BWC without noticing it
+                            java.io.ObjectOutputStream
+                            java.io.ObjectOutput
+                            java.io.ObjectInputStream
+                            java.io.ObjectInput
+
+                            @defaultMessage avoid DNS lookups by accident: if you have a valid reason, then use SuppressWarnings with that reason so its completely clear
+                            java.net.InetAddress#getHostName()
+                            java.net.InetAddress#getCanonicalHostName()
+
+                            java.net.InetSocketAddress#getHostName() @ Use getHostString() instead, which avoids a DNS lookup
+
+                            @defaultMessage Avoid unchecked warnings by using Collections#empty(List|Map|Set) methods
+                            java.util.Collections#EMPTY_LIST
+                            java.util.Collections#EMPTY_MAP
+                            java.util.Collections#EMPTY_SET
+
+                            java.util.Collections#shuffle(java.util.List) @ Use java.util.Collections#shuffle(java.util.List, java.util.Random) with a reproducible source of randomness
+
+                            com.google.common.base.Charsets @ Use java.nio.charset.StandardCharsets
+
+                            @defaultMessage Don't use imports from shaded or denied dependencies
+                            joptsimple.internal.**
+                            org.testcontainers.shaded.**
+                            edu.emory.mathcs.backport.java.util.**
+                            org.apache.directory.api.util.**
+                            org.apache.groovy.util.**
+                            org.apache.logging.log4j.util.Strings
+                            org.graylog.shaded.kafka09.joptsimple.**
+                            org.assertj.core.util.**
+                            org.bouncycastle.util.Strings
+                            org.junit.jupiter.params.shadow.**
+                            org.apache.http.util.**
+
+                            @defaultMessage Prefer using javax.inject.
+                            com.google.inject.Inject
+                            com.google.inject.Scope
+                            com.google.inject.Singleton
+                            com.google.inject.Provider
+                            com.google.inject.name.Named
+                        ]]>
+                    </signatures>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>forbidden-apis-src</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>forbidden-apis-test</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCheck</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.11.0</version>
                 <configuration>
                     <release>17</release>
                     <showWarnings>true</showWarnings>

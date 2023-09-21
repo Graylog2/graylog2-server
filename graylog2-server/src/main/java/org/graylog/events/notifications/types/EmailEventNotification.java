@@ -17,7 +17,6 @@
 package org.graylog.events.notifications.types;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.logging.log4j.util.Strings;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationService;
@@ -94,8 +93,8 @@ public class EmailEventNotification implements EventNotification {
         }
 
         LOG.debug("Sending email to addresses <{}> and users <{}> using notification <{}>",
-                Strings.join(config.emailRecipients(), ','),
-                Strings.join(config.userRecipients(), ','),
+                String.join(",", config.emailRecipients()),
+                String.join(",", config.userRecipients()),
                 ctx.notificationId());
     }
 }

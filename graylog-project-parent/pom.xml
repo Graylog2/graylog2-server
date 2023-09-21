@@ -624,12 +624,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.lordofthejars</groupId>
-                <artifactId>nosqlunit-elasticsearch2</artifactId>
-                <version>${nosqlunit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>${testcontainers.version}</version>
@@ -640,12 +634,6 @@
                 <groupId>org.jukito</groupId>
                 <artifactId>jukito</artifactId>
                 <version>${jukito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitility.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -753,48 +741,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>de.thetaphi</groupId>
-                <artifactId>forbiddenapis</artifactId>
-                <configuration>
-                    <suppressAnnotations>
-                        <suppressAnnotation>org.graylog2.shared.SuppressForbidden</suppressAnnotation>
-                    </suppressAnnotations>
-                    <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                    <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                    <failOnViolation>true</failOnViolation>
-                    <bundledSignatures>
-                        <!-- This will automatically choose the right signatures based on 'maven.compiler.target': -->
-                        <bundledSignature>jdk-unsafe</bundledSignature>
-                        <bundledSignature>jdk-deprecated</bundledSignature>
-                        <bundledSignature>jdk-reflection</bundledSignature>
-                        <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                        <bundledSignature>jdk-non-portable</bundledSignature>
-                        <!-- Workaround until signatures for ${commons-io.version} are released: -->
-                        <bundledSignature>commons-io-unsafe-2.11.0</bundledSignature>
-                    </bundledSignatures>
-                    <signaturesFiles>
-                        <signaturesFile>${project.basedir}/../config/forbidden-apis/netty3.txt</signaturesFile>
-                        <signaturesFile>${project.basedir}/../config/forbidden-apis/signatures.txt</signaturesFile>
-                    </signaturesFiles>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>forbidden-apis-src</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>forbidden-apis-test</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCheck</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
@@ -833,7 +779,7 @@
                                 <plugin>
                                     <groupId>com.h3xstream.findsecbugs</groupId>
                                     <artifactId>findsecbugs-plugin</artifactId>
-                                    <version>1.11.0</version>
+                                    <version>1.12.0</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
