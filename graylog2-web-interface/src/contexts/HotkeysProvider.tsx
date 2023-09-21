@@ -39,14 +39,14 @@ const viewActions = {
 export const hotKeysCollection: HotkeyCollections = {
   general: {
     title: 'General',
-    description: 'Main hot keys',
+    description: 'General keyboard shortcuts',
     actions: {
-      SHOW_HELPER: { keys: 'shift+?', description: 'Show hotkeys helper' },
+      SHOW_HELPER: { keys: 'shift+?', description: 'Show available keyboard shorts' },
     },
   },
   search: {
     title: 'Search',
-    description: 'Hot keys for search page',
+    description: 'Keyboard shortcuts for search page',
     actions: {
       ...viewActions,
       SAVE: { keys: 'mod+s', description: 'Save search' },
@@ -55,7 +55,7 @@ export const hotKeysCollection: HotkeyCollections = {
   },
   dashboard: {
     title: 'Dashboard',
-    description: 'Hot keys for dashboard page',
+    description: 'Keyboard shortcuts for dashboard page',
     actions: {
       ...viewActions,
       SAVE: { keys: 'mod+s', description: 'Save dashboard' },

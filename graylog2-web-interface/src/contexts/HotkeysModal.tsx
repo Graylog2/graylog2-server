@@ -146,7 +146,7 @@ const HotkeysModal = () => {
            onHide={onHide}
            bsSize="large">
       <Modal.Header closeButton>
-        <Modal.Title>Hotkeys</Modal.Title>
+        <Modal.Title>Keyboard shortcuts</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -160,7 +160,7 @@ const HotkeysModal = () => {
       </Modal.Body>
       <Modal.Footer>
         <Footer>
-          <Link to="/" target="_blank">View all hotkeys</Link>
+          <Link to="/" target="_blank">View all keyboard shortcuts</Link>
           <Button onClick={() => onHide()}>Close</Button>
         </Footer>
       </Modal.Footer>
