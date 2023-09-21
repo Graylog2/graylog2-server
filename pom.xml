@@ -193,7 +193,7 @@
         <junit.version>4.13.1</junit.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <mockito.version>5.5.0</mockito.version>
-        <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
+        <nosqlunit.version>1.0.0</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.19.0</testcontainers.version>
