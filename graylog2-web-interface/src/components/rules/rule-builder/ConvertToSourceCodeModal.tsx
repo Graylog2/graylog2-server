@@ -40,10 +40,11 @@ const SourceCodeContainer = styled.div`
 type Props = {
   show: boolean,
   onHide: () => void,
+  onNavigateAway: (rule: RuleBuilderRule) => void,
   rule: RuleBuilderRule,
 };
 
-const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
+const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props) => {
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -65,7 +66,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
       <Modal.Footer>
         <Button type="button"
                 bsStyle="success"
-                onClick={() => {
+                onClick={async () => {
                   sendTelemetry('Pipeline RuleBuilder Create New Rule From Code Clicked', {
                     app_pathname: getPathnameWithoutId(pathname),
                     app_section: 'convert-rule-builder-to-source-code-modal',
@@ -73,6 +74,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
                   });
 
                   saveRuleSourceCode(rule.source || '');
+                  await onNavigateAway(rule);
                   history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
                 }}>
           Create new Rule from Code

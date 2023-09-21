@@ -398,6 +398,7 @@ const RuleBuilder = () => {
                           </Button>
                           <Button bsStyle="info"
                                   title="Convert Rule Builder to Source Code"
+                                  disabled={hasRuleBuilderErrors()}
                                   onClick={() => {
                                     sendTelemetry('Pipeline RuleBuilder Convert to Source Code Clicked', {
                                       app_pathname: getPathnameWithoutId(pathname),
@@ -427,6 +428,7 @@ const RuleBuilder = () => {
         )}
         {ruleSourceCodeToShow && (
         <ConvertToSourceCodeModal show
+                                  onNavigateAway={updateRule}
                                   onHide={() => setRuleSourceCodeToShow(null)}
                                   rule={ruleSourceCodeToShow} />
         )}
