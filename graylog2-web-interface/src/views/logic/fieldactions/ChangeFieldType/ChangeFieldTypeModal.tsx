@@ -24,6 +24,8 @@ import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFie
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
 import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import useStream from 'components/streams/hooks/useStream';
+import { DocumentationLink } from 'components/support';
+import DocsHelper from 'util/DocsHelper';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -77,7 +79,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
         <Alert bsStyle="warning">
           Changing the type of the field can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
-          ingestion errors. It is recommended to enable &quot;Failure Processing&quot; and watch
+          ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
         <StyledSelect inputId="field_type"
