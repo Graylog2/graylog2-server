@@ -21,7 +21,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { undo } from 'views/logic/slices/undoRedoActions';
-import useHotkeys from 'hooks/useHotkeys';
+import useHotkey from 'hooks/useHotkey';
 import useViewType from 'views/hooks/useViewType';
 import type { ViewType } from 'views/logic/views/View';
 
@@ -32,7 +32,7 @@ const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(undo()), [dispatch]);
-  useHotkeys('UNDO', () => dispatch(undo()), { scopes: viewType.toLowerCase() as Lowercase<ViewType> });
+  useHotkey('UNDO', () => dispatch(undo()), { scopes: viewType.toLowerCase() as Lowercase<ViewType> });
 
   return (
     <NavItem disabled={!isUndoAvailable}

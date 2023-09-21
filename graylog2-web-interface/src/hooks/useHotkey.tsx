@@ -47,7 +47,7 @@ const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, s
   }
 };
 
-const useHotkeys = <T extends HTMLElement>(
+const useHotkey = <T extends HTMLElement>(
   actionKey: string,
   callback: HotkeyCallback,
   options?: Options & { scopes: ScopeName },
@@ -98,4 +98,4 @@ const useHotkeys = <T extends HTMLElement>(
   return originalUseHotkeys<T>(keys, callback, mergedOptions, dependencies);
 };
 
-export default useHotkeys;
+export default useHotkey;

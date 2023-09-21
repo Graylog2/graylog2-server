@@ -49,7 +49,7 @@ import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
 import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
-import useHotkeys from 'hooks/useHotkeys';
+import useHotkey from 'hooks/useHotkey';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -165,11 +165,11 @@ const SearchActionsMenu = () => {
 
   const isDirty = useIsDirty();
 
-  useHotkeys('SAVE', () => {
+  useHotkey('SAVE', () => {
     saveSearch(title);
   }, { scopes: 'search', enabled: (isDirty && loaded) }, [loaded, isDirty, saveSearch, title]);
 
-  useHotkeys('SAVE_AS', () => {
+  useHotkey('SAVE_AS', () => {
     openFormModal();
   }, { scopes: 'search', enabled: (isDirty && loaded) || !loaded });
 

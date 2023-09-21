@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { KeyboardKey, Modal, Button } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
-import useHotkeys from 'hooks/useHotkeys';
+import useHotkey from 'hooks/useHotkey';
 import type { ScopeName, HotkeyCollection } from 'contexts/HotkeysContext';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import SectionGrid from 'components/common/Section/SectionGrid';
@@ -139,7 +139,7 @@ const HotkeysModal = () => {
   const { hotKeysCollections } = useHotkeysContext();
   const isMacOS = _isMacOS();
 
-  useHotkeys('SHOW_HELPER', onToggle, { scopes: 'general' });
+  useHotkey('SHOW_HELPER', onToggle, { scopes: 'general' });
 
   return show && (
     <Modal show={show}
