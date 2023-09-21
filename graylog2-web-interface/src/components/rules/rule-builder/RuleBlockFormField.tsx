@@ -51,7 +51,7 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
     typeof paramValue === 'string' && paramValue.startsWith('$'));
 
   const shouldHandlePrimaryParam = () => {
-    if (!param.primary) return false;
+    if (!param.rule_builder_variable) return false;
     if ((order === 0)) return false;
 
     return true;
@@ -206,7 +206,7 @@ RuleBlockFormField.propTypes = {
     transformed_type: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     optional: PropTypes.bool.isRequired,
-    primary: PropTypes.bool.isRequired,
+    rule_builder_variable: PropTypes.bool.isRequired,
     description: PropTypes.string,
   }).isRequired,
   blockId: PropTypes.string,

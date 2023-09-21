@@ -80,7 +80,7 @@ export type BlockFieldDict = {
   transformed_type: RuleBuilderTypes,
   name: string,
   optional: boolean,
-  primary: boolean,
+  rule_builder_variable: boolean,
   allow_negatives: boolean,
   description: string | null
 }
@@ -129,7 +129,7 @@ export const blockDictPropType = PropTypes.shape({
     transformed_type: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     optional: PropTypes.bool.isRequired,
-    primary: PropTypes.bool.isRequired,
+    rule_builder_variable: PropTypes.bool.isRequired,
     description: PropTypes.string,
   })).isRequired,
   description: PropTypes.string,
