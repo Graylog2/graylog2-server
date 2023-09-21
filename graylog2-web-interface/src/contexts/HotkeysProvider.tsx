@@ -64,7 +64,6 @@ export const hotKeysCollections: HotkeyCollections = {
 };
 
 const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
-  // const [activeScopes, setActiveScopes] = useState<Immutable.Set<ScopeName>>(Immutable.Set(['*']));
   const [activeHotkeys, setActiveHotkeys] = useState<ActiveHotkeys>(Immutable.Map());
   const { enabledScopes, hotkeys, disableScope, toggleScope, enableScope } = useOriginalHotkeysContext();
   const _enableScope = useCallback((scopes: ScopeParam) => {
