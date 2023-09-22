@@ -168,7 +168,6 @@ const SearchActionsMenu = () => {
   useHotkey({
     actionKey: 'save',
     callback: () => saveSearch(title),
-    telemetryAppPathname: 'search',
     options: { scopes: 'search', enabled: (isDirty && loaded) },
     dependencies: [loaded, isDirty, saveSearch, title],
   });
@@ -176,7 +175,6 @@ const SearchActionsMenu = () => {
   useHotkey({
     actionKey: 'save-as',
     callback: () => openFormModal(),
-    telemetryAppPathname: 'search',
     options: { scopes: 'search', enabled: (isDirty && loaded) || !loaded },
   });
 

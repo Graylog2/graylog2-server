@@ -113,7 +113,6 @@ const DashboardActionsMenu = () => {
   useHotkey({
     actionKey: 'save',
     callback: _onSaveView,
-    telemetryAppPathname: 'search',
     options: { scopes: 'dashboard' },
   });
 

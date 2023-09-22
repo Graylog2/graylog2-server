@@ -36,7 +36,6 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   useHotkey({
     actionKey: 'redo',
     callback: () => dispatch(redo()),
-    telemetryAppPathname: 'search',
     options: { scopes: viewType.toLowerCase() as Lowercase<ViewType> },
   });
 

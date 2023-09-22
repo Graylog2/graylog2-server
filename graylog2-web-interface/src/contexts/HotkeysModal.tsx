@@ -143,7 +143,6 @@ const HotkeysModal = () => {
   useHotkey({
     actionKey: 'show-hotkeys-modal',
     callback: onToggle,
-    telemetryAppPathname: 'search',
     options: { scopes: 'general' },
   });
 

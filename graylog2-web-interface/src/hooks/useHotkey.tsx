@@ -18,10 +18,9 @@
 import { useHotkeys as originalUseHotkeys } from 'react-hotkeys-hook';
 import { useEffect, useMemo } from 'react';
 
-import type { ScopeName, HotkeyCollections, Options } from 'contexts/HotkeysContext';
+import type { ScopeName, HotkeyCollections, Options, HotkeyCallback } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import useFeature from 'hooks/useFeature';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const defaultOptions: Options = {
   preventDefault: true,
@@ -51,13 +50,11 @@ const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, s
 const useHotkey = <T extends HTMLElement>({
   actionKey,
   callback,
-  telemetryAppPathname,
   options,
   dependencies,
 }: {
   actionKey: string,
-  callback: () => unknown,
-  telemetryAppPathname: string,
+  callback: HotkeyCallback,
   options?: Options,
   dependencies?: Array<unknown>,
 }) => {
@@ -67,8 +64,6 @@ const useHotkey = <T extends HTMLElement>({
     return null;
   }
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const sendTelemetry = useSendTelemetry();
   const {
     hotKeysCollections,
     addActiveHotkey,
@@ -86,16 +81,6 @@ const useHotkey = <T extends HTMLElement>({
     ...defaultOptions,
     ...options,
   }), [options]);
-
-  const callbackWithTelemetry = () => {
-    sendTelemetry('hotkey_usage', {
-      app_pathname: telemetryAppPathname,
-      app_section: options.scopes,
-      app_action_value: actionKey,
-    });
-
-    callback();
-  };
 
   /*
   useEffect(() => {
@@ -125,7 +110,7 @@ const useHotkey = <T extends HTMLElement>({
 
   const keys = hotKeysCollections?.[options?.scopes]?.actions?.[actionKey]?.keys;
 
-  return originalUseHotkeys<T>(keys, callbackWithTelemetry, mergedOptions, dependencies);
+  return originalUseHotkeys<T>(keys, callback, mergedOptions, dependencies);
 };
 
 export default useHotkey;
