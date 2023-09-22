@@ -55,10 +55,11 @@ import static org.graylog.security.certutil.CertConstants.PKCS12;
 @Singleton
 public class CaServiceImpl implements CaService {
     private static final Logger LOG = LoggerFactory.getLogger(CaServiceImpl.class);
+
+    public final String KEYSTORE_ID = "GRAYLOG CA";
     private final SmartKeystoreStorage keystoreStorage;
     private final KeystoreMongoLocation mongoDbCaLocation;
     private final KeystoreFileLocation manuallyProvidedCALocation;
-    private final NodeId nodeId;
     private final CACreator caCreator;
     private final PemCaReader pemCaReader;
     private final CaConfiguration configuration;
@@ -70,19 +71,17 @@ public class CaServiceImpl implements CaService {
     @Inject
     public CaServiceImpl(final Configuration configuration,
                          final SmartKeystoreStorage keystoreStorage,
-                         final NodeId nodeId,
                          final CACreator caCreator,
                          final PemCaReader pemCaReader,
                          final CertificatesService certificatesService,
                          final @Named("password_secret") String passwordSecret, ClusterEventBus eventBus) {
         this.keystoreStorage = keystoreStorage;
-        this.nodeId = nodeId;
         this.caCreator = caCreator;
         this.pemCaReader = pemCaReader;
         this.configuration = configuration;
         this.certificatesService = certificatesService;
         this.passwordSecret = configuration.getCaPassword() != null ? configuration.getCaPassword() : passwordSecret;
-        this.mongoDbCaLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
+        this.mongoDbCaLocation = new KeystoreMongoLocation(KEYSTORE_ID, KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
         this.manuallyProvidedCALocation = new KeystoreFileLocation(configuration.getCaKeystoreFile());
         this.eventBus = eventBus;
     }
@@ -93,7 +92,7 @@ public class CaServiceImpl implements CaService {
             return new CA("local CA", CAType.LOCAL);
         } else {
             var keystore = keystoreStorage.readKeyStore(mongoDbCaLocation, passwordSecret.toCharArray());
-            return keystore.map(c -> new CA(nodeId.getNodeId(), CAType.GENERATED)).orElse(null);
+            return keystore.map(c -> new CA(KEYSTORE_ID, CAType.GENERATED)).orElse(null);
         }
     }
 
