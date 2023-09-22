@@ -14,25 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
-import numeral from 'numeral';
 
-class GaugeDetails extends React.Component {
-  static propTypes = {
-    metric: PropTypes.object.isRequired,
-  };
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
+import type { Stream } from 'views/stores/StreamsStore';
 
-  render() {
-    const gauge = this.props.metric.metric;
+type Props = {
+  stream: Stream,
+};
 
-    return (
-      <dl className="metric-def metric-gauge">
-        <dt>Value:</dt>
-        <dd><span className="number-format">{numeral(gauge.value).format('0,0')}</span></dd>
-      </dl>
-    );
-  }
-}
+const StreamLink = ({ stream }: Props) => {
+  const route = Routes.stream_search(stream.id);
 
-export default GaugeDetails;
+  return <Link to={route}>{stream.title}</Link>;
+};
+
+export default StreamLink;

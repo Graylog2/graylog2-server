@@ -33,6 +33,7 @@ export const StreamsActions = singletonActions(
 export type Stream = {
   id: string;
   title: string;
+  index_set_id?: string,
 };
 export type StreamsStoreState = {
   streams: Array<Stream>;
