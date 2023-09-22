@@ -18,7 +18,7 @@ package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -141,7 +141,7 @@ public class CertutilHttp implements CliCommand {
 
                 final String alternativeNames = console.readLine(PROMPT_ENTER_CERTIFICATE_ALTERNATIVE_NAMES);
                 Arrays.stream(alternativeNames.split(","))
-                        .filter(Strings::isNotBlank)
+                        .filter(StringUtils::isNotBlank)
                         .forEach(certificateRequest::withSubjectAlternativeName);
 
                 console.printLine(String.format(Locale.ROOT, "Generating certificate for CN=%s, with validity %d days and subject alternative names %s", cnName, certificateRequest.validity().toDays(), certificateRequest.subjectAlternativeNames()));
