@@ -143,6 +143,7 @@
         <joda-time.version>2.12.5</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-path.version>2.8.0</json-path.version>
+        <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
         <kafka.version>3.5.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.20.0</log4j.version>
@@ -377,6 +378,11 @@
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>${findbugs-jsr305.version}</version>
             </dependency>
 
             <!-- test -->
