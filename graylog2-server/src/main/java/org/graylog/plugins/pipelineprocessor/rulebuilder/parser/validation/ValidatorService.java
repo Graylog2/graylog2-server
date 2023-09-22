@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation;
 
+import io.jsonwebtoken.lang.Collections;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
@@ -55,13 +56,16 @@ public class ValidatorService {
         List<RuleBuilderStep> validatedConditions = validateWithResults(ruleBuilder.conditions(), conditionValidators);
         validationBuilder.conditions(validatedConditions);
 
-        String source = null;
 
+        String source = null;
         try {
             validationBuilder.errors(null);
             source = parseRule(ruleBuilderDto, validationBuilder.build());
         } catch (Exception exception) {
-            validationBuilder.errors(List.of(exception.getMessage()));
+            if (validatedConditions.stream().allMatch(step -> Collections.isEmpty(step.errors()))
+                    && validatedActions.stream().allMatch(step -> Collections.isEmpty(step.errors()))) {
+                validationBuilder.errors(List.of(exception.getMessage()));
+            }
         }
 
         RuleBuilder validatedRuleBuilder = validationBuilder.build();
