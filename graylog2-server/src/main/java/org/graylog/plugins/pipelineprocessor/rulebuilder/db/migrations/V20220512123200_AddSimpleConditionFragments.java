@@ -48,6 +48,7 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
 
     @Override
     public void upgrade() {
+        ruleFragmentService.deleteAll();
         log.debug("Migrating simple condition fragments for the rule builder ui");
 
         ruleFragmentService.upsert(createHasFieldEqualsFragment());

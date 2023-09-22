@@ -26,6 +26,8 @@ public interface RuleFragmentService {
 
     Optional<RuleFragment> get(String name);
 
+    void deleteAll();
+
     long count(String name);
 
     Collection<RuleFragment> all();
