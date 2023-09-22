@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { BlockDict } from './types';
+import type { BlockDict, RuleBuilderRule } from './types';
 
 const getDictForFunction = (dict: BlockDict[], functionName: string) : BlockDict | undefined => (
   dict?.find((entry) => entry.name === functionName)
@@ -49,4 +49,18 @@ const jsonifyText = (text: string): string => {
   }
 };
 
-export { getDictForFunction, jsonifyText };
+const hasRuleBuilderErrors = (rule: RuleBuilderRule): boolean => {
+  if (rule?.rule_builder?.errors?.length > 0) return true;
+
+  if (rule?.rule_builder?.actions?.some(((action) => action.errors?.length > 0))) {
+    return true;
+  }
+
+  if (rule?.rule_builder?.conditions?.some(((condition) => condition.errors?.length > 0))) {
+    return true;
+  }
+
+  return false;
+};
+
+export { getDictForFunction, jsonifyText, hasRuleBuilderErrors };

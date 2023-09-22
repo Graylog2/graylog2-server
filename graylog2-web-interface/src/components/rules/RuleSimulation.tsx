@@ -28,6 +28,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
 import { useRuleBuilder } from './rule-builder/RuleBuilderContext';
+import { hasRuleBuilderErrors } from './rule-builder/helpers';
 
 const ResetButton = styled(Button)(({ theme }) => css`
   margin-left: ${theme.spacings.xs};
@@ -81,7 +82,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   }, [setRuleSimulationResult]);
 
   useEffect(() => {
-    if (currentRule?.rule_builder?.errors?.length) {
+    if (hasRuleBuilderErrors(currentRule)) {
       setRuleSimulationResult(null);
     } else if (currentRule) {
       simulateRule(currentRule);
@@ -89,7 +90,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   }, [currentRule, setRuleSimulationResult, simulateRule]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
-  const errorMessage = currentRule?.rule_builder?.errors?.length ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
+  const errorMessage = hasRuleBuilderErrors(currentRule) ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
   const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort((a, b) => Number(a) - Number(b));
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {

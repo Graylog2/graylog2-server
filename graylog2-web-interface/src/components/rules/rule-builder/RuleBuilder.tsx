@@ -32,10 +32,9 @@ import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
 import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule } from './types';
 import { RuleBuilderTypes } from './types';
-import {
-  getDictForFunction,
-} from './helpers';
+import { getDictForFunction, hasRuleBuilderErrors } from './helpers';
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
+import Errors from './Errors';
 
 import RuleSimulation from '../RuleSimulation';
 
@@ -281,18 +280,6 @@ const RuleBuilder = () => {
     }
   };
 
-  const hasRuleBuilderErrors = (): boolean => {
-    if (rule.rule_builder.actions.some(((action) => action.errors?.length > 0))) {
-      return true;
-    }
-
-    if (rule.rule_builder.conditions.some(((condition) => condition.errors?.length > 0))) {
-      return true;
-    }
-
-    return false;
-  };
-
   const outputVariableList = () : OutputVariables => (
     rule.rule_builder.actions.map((block: RuleBlock, index) => ({
       variableName: block.outputvariable ? `$${block.outputvariable}` : null,
@@ -384,21 +371,22 @@ const RuleBuilder = () => {
                 </StyledPanelBody>
               </Panel.Collapse>
             </StyledPanel>
+            <Errors objectWithErrors={rule.rule_builder} />
           </Col>
           <Col xs={4}>
             <RuleSimulation rule={rule} onSaveMessage={saveSimulatorMessage} />
           </Col>
           <ActionsCol xs={12}>
-            <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
+            <FormSubmit disabledSubmit={hasRuleBuilderErrors(rule)}
                         submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
                         centerCol={initialRule && (
                         <>
-                          <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
+                          <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors(rule)}>
                             Update rule
                           </Button>
                           <Button bsStyle="info"
                                   title="Convert Rule Builder to Source Code"
-                                  disabled={hasRuleBuilderErrors()}
+                                  disabled={hasRuleBuilderErrors(rule)}
                                   onClick={() => {
                                     sendTelemetry('Pipeline RuleBuilder Convert to Source Code Clicked', {
                                       app_pathname: getPathnameWithoutId(pathname),
