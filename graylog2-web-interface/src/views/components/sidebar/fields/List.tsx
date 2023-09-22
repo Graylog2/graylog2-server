@@ -19,10 +19,10 @@ import { FixedSizeList } from 'react-window';
 import type { List as ImmutableList } from 'immutable';
 import styled from 'styled-components';
 
-import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import isReservedField from 'views/logic/IsReservedField';
 
 import ListItem from './ListItem';
 
@@ -38,8 +38,6 @@ type Props = {
   currentGroup: string,
   filter: string | undefined | null,
 };
-
-const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
 const _fieldsToShow = (fields, allFields, currentGroup = 'all'): ImmutableList<FieldTypeMapping> => {
   const isNotReservedField = (f) => !isReservedField(f.name);
