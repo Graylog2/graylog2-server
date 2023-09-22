@@ -143,7 +143,7 @@ const HotkeysModal = () => {
   useHotkey({
     actionKey: 'show-hotkeys-modal',
     callback: onToggle,
-    options: { scopes: 'general' },
+    scope: 'general',
   });
 
   const enabledCollection = useMemo(() => {

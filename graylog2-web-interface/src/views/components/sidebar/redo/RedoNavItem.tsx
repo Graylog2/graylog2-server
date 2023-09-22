@@ -36,7 +36,7 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   useHotkey({
     actionKey: 'redo',
     callback: () => dispatch(redo()),
-    options: { scopes: viewType.toLowerCase() as Lowercase<ViewType> },
+    scope: viewType.toLowerCase() as Lowercase<ViewType>,
   });
 
   return (

@@ -168,14 +168,16 @@ const SearchActionsMenu = () => {
   useHotkey({
     actionKey: 'save',
     callback: () => saveSearch(title),
-    options: { scopes: 'search', enabled: (isDirty && loaded) },
+    scope: 'search',
+    options: { enabled: (isDirty && loaded) },
     dependencies: [loaded, isDirty, saveSearch, title],
   });
 
   useHotkey({
     actionKey: 'save-as',
     callback: () => openFormModal(),
-    options: { scopes: 'search', enabled: (isDirty && loaded) || !loaded },
+    scope: 'search',
+    options: { enabled: (isDirty && loaded) || !loaded },
   });
 
   return (

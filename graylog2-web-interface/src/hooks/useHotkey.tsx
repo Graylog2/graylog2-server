@@ -29,7 +29,6 @@ const defaultOptions: Options = {
   enableOnContentEditable: false,
   combinationKey: '+',
   splitKey: ',',
-  scopes: undefined,
   keyup: undefined,
   keydown: true,
   description: undefined,
@@ -50,11 +49,13 @@ const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, s
 const useHotkey = <T extends HTMLElement>({
   actionKey,
   callback,
+  scope,
   options,
   dependencies,
 }: {
   actionKey: string,
   callback: HotkeyCallback,
+  scope: ScopeName,
   options?: Options,
   dependencies?: Array<unknown>,
 }) => {
@@ -71,7 +72,7 @@ const useHotkey = <T extends HTMLElement>({
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useHotkeysContext();
 
-  catchErrors(hotKeysCollections, actionKey, options.scopes);
+  catchErrors(hotKeysCollections, actionKey, scope);
 
   // const scope = options?.scopes ?? '*';
   // const scopes = isArray(scope) ? scope : [scope];
@@ -80,7 +81,8 @@ const useHotkey = <T extends HTMLElement>({
   const mergedOptions = useMemo(() => ({
     ...defaultOptions,
     ...options,
-  }), [options]);
+    scopes: scope,
+  }), [options, scope]);
 
   /*
   useEffect(() => {
@@ -96,19 +98,19 @@ const useHotkey = <T extends HTMLElement>({
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     addActiveHotkey({
-      scope: options.scopes,
+      scope,
       actionKey,
       options: {
-        scopes: options.scopes,
-        enabled: options.enabled,
-        combinationKey: options.combinationKey,
+        scope,
+        enabled: mergedOptions.enabled,
+        combinationKey: mergedOptions.combinationKey,
       },
     });
 
-    return () => removeActiveHotkey({ scope: options.scopes, actionKey });
-  }, [actionKey, addActiveHotkey, options.combinationKey, options.enabled, options.scopes, removeActiveHotkey]);
+    return () => removeActiveHotkey({ scope, actionKey });
+  }, [actionKey, addActiveHotkey, scope, removeActiveHotkey, mergedOptions.combinationKey, mergedOptions.enabled]);
 
-  const keys = hotKeysCollections?.[options?.scopes]?.actions?.[actionKey]?.keys;
+  const keys = hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys;
 
   return originalUseHotkeys<T>(keys, callback, mergedOptions, dependencies);
 };

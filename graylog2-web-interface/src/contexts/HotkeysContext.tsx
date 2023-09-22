@@ -49,7 +49,6 @@ export type Options = {
   ignoreEventWhen?: (e: KeyboardEvent) => boolean // Ignore evenets based on a condition (Default: undefined)
   combinationKey?: string // Character to split keys in hotkeys combinations. (Default: +)
   splitKey?: string // Character to separate different hotkeys. (Default: ,)
-  scopes: ScopeName, // Scope
   keyup?: boolean // Trigger on keyup event? (Default: undefined)
   keydown?: boolean // Trigger on keydown event? (Default: true)
   preventDefault?: Trigger // Prevent default browser behavior? (Default: false)
@@ -58,7 +57,7 @@ export type Options = {
   ignoreModifiers?: boolean // Ignore modifiers when matching hotkeys. (Default: false)
 }
 export type ActiveHotkey = {
-  options?: Options & { scopes: ScopeName },
+  options?: Options & { scope: ScopeName },
 }
 export type ActiveHotkeys = Immutable.Map<`${ScopeName}.${string}`, ActiveHotkey>
 export type HotkeyCollection = {
@@ -77,7 +76,7 @@ type HotkeysContextType = {
   enabledScopes: Array<ScopeName | DefaultScopeName>,
   hotKeysCollections: HotkeyCollections,
   activeHotkeys: ActiveHotkeys,
-  addActiveHotkey: (props: { scope: ScopeName, actionKey: string, options: Options & { scopes: ScopeName } }) => void,
+  addActiveHotkey: (props: { scope: ScopeName, actionKey: string, options: Options & { scope: ScopeName } }) => void,
   removeActiveHotkey: (props: { scope: ScopeName, actionKey: string }) => void,
 }
 

@@ -113,7 +113,7 @@ const DashboardActionsMenu = () => {
   useHotkey({
     actionKey: 'save',
     callback: _onSaveView,
-    options: { scopes: 'dashboard' },
+    scope: 'dashboard',
   });
 
   return (

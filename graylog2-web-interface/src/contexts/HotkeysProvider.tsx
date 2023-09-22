@@ -81,7 +81,7 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
     _enableScope(scopes);
   }, [_disableScope, _enableScope, enabledScopes]);
 
-  const addActiveHotkey = useCallback(({ scope, actionKey, options }: { scope: ScopeName, actionKey: string, options: Options }) => {
+  const addActiveHotkey = useCallback(({ scope, actionKey, options }: { scope: ScopeName, actionKey: string, options: Options & { scope: ScopeName } }) => {
     setActiveHotkeys((cur) => cur.set(`${scope}.${actionKey}`, { options }));
   }, []);
 
