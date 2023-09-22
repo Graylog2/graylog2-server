@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import pick from 'lodash/pick';
 
 import { KeyboardKey, Modal, Button } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
@@ -136,7 +137,7 @@ const HotkeysModal = () => {
   const [show, setShow] = useState(false);
   const onHide = useCallback(() => setShow(false), []);
   const onToggle = useCallback(() => setShow((cur) => !cur), []);
-  const { hotKeysCollections } = useHotkeysContext();
+  const { hotKeysCollections, enabledScopes } = useHotkeysContext();
   const isMacOS = _isMacOS();
 
   useHotkey({
@@ -145,6 +146,13 @@ const HotkeysModal = () => {
     telemetryAppPathname: 'search',
     options: { scopes: 'general' },
   });
+
+  const enabledCollection = useMemo(() => {
+    const allScopesEnabled = enabledScopes.length === 1 && enabledScopes[0] === '*';
+    const collection = allScopesEnabled ? hotKeysCollections : pick(hotKeysCollections, enabledScopes);
+
+    return Object.entries(collection);
+  }, [enabledScopes, hotKeysCollections]);
 
   return show && (
     <Modal show={show}
@@ -157,7 +165,7 @@ const HotkeysModal = () => {
       <Modal.Body>
         <Content>
           <SectionGrid>
-            {Object.entries(hotKeysCollections).map(([scope, collection]: [ScopeName, HotkeyCollection]) => (
+            {enabledCollection.map(([scope, collection]: [ScopeName, HotkeyCollection]) => (
               <HotkeyCollectionSection scope={scope} collection={collection} isMacOS={isMacOS} />
             ))}
           </SectionGrid>

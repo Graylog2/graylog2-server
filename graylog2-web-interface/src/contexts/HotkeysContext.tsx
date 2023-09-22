@@ -21,6 +21,7 @@ import type Immutable from 'immutable';
 
 import { singleton } from 'logic/singleton';
 
+export type DefaultScopeName = '*';
 export type ScopeName = 'general' | 'search' | 'dashboard';
 export type ScopeParam = Array<ScopeName> | ScopeName
 export type ActiveHotkey = {
@@ -40,7 +41,7 @@ type HotkeysContextType = {
   setActiveScopes: (scopes: ScopeParam) => void,
   hotkeys: readonly Hotkey[],
   toggleScope: (scopes: ScopeName) => void,
-  enabledScopes: Array<ScopeName>,
+  enabledScopes: Array<ScopeName | DefaultScopeName>,
   hotKeysCollections: HotkeyCollections,
   activeHotkeys: ActiveHotkeys,
   addActiveHotkey: (props: { scope: ScopeName, actionKey: string, options: Options & { scopes: ScopeName } }) => void,
