@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { Options } from 'react-hotkeys-hook';
 import { useHotkeys as originalUseHotkeys } from 'react-hotkeys-hook';
 import { useEffect, useMemo } from 'react';
 
-import type { ScopeName, HotkeyCollections } from 'contexts/HotkeysContext';
+import type { ScopeName, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -31,7 +30,7 @@ const defaultOptions: Options = {
   enableOnContentEditable: false,
   combinationKey: '+',
   splitKey: ',',
-  scopes: '*',
+  scopes: undefined,
   keyup: undefined,
   keydown: true,
   description: undefined,
@@ -59,7 +58,7 @@ const useHotkey = <T extends HTMLElement>({
   actionKey: string,
   callback: () => unknown,
   telemetryAppPathname: string,
-  options?: Options & { scopes: ScopeName },
+  options?: Options,
   dependencies?: Array<unknown>,
 }) => {
   const hasHotkeysFeatureFlag = useFeature('frontend_hotkeys');

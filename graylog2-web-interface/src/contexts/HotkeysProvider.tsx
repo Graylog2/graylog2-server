@@ -21,13 +21,10 @@ import {
   HotkeysProvider as OriginalHotkeysProvider,
   useHotkeysContext as useOriginalHotkeysContext,
 } from 'react-hotkeys-hook';
-import type {
-  Options,
-} from 'react-hotkeys-hook';
 import isArray from 'lodash/isArray';
 import Immutable from 'immutable';
 
-import type { ScopeName, ScopeParam, ActiveHotkeys, HotkeyCollections } from 'contexts/HotkeysContext';
+import type { ScopeName, ScopeParam, ActiveHotkeys, HotkeyCollections, Options, Hotkey } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
 import HotkeysModal from 'contexts/HotkeysModal';
 import useFeature from 'hooks/useFeature';
@@ -84,7 +81,7 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
     _enableScope(scopes);
   }, [_disableScope, _enableScope, enabledScopes]);
 
-  const addActiveHotkey = useCallback(({ scope, actionKey, options }: { scope: ScopeName, actionKey: string, options: Options & { scopes: ScopeName } }) => {
+  const addActiveHotkey = useCallback(({ scope, actionKey, options }: { scope: ScopeName, actionKey: string, options: Options }) => {
     setActiveHotkeys((cur) => cur.set(`${scope}.${actionKey}`, { options }));
   }, []);
 
@@ -96,7 +93,7 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
     disableScope: _disableScope,
     enableScope: _enableScope,
     setActiveScopes,
-    hotkeys,
+    hotkeys: hotkeys as Array<Hotkey>,
     toggleScope,
     enabledScopes: enabledScopes as Array<ScopeName>,
     hotKeysCollections,
