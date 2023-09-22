@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { Select, Spinner } from 'components/common';
@@ -26,6 +26,7 @@ import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/ho
 import useStream from 'components/streams/hooks/useStream';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -41,6 +42,7 @@ type Props = {
 }
 
 const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(false);
   const [newFieldType, setNewFieldType] = useState(null);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
@@ -61,18 +63,30 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
       newFieldType,
       rotated,
       field,
-    }).then(() => onClose());
-  }, [field, indexSetSelection, newFieldType, onClose, putFiledTypeMutation, rotated]);
+    }).then(() => {
+      sendTelemetry('form_submit', { app_pathname: 'search', app_action_value: 'change-field-type' });
+      onClose();
+    });
+  }, [field, indexSetSelection, newFieldType, onClose, putFiledTypeMutation, rotated, sendTelemetry]);
 
   const onChangeFieldType = useCallback((value: string) => {
     setNewFieldType(value);
   }, []);
 
+  useEffect(() => {
+    sendTelemetry('modal_open', { app_pathname: 'search', app_action_value: 'change-field-type' });
+  }, [sendTelemetry]);
+
+  const onCancel = useCallback(() => {
+    sendTelemetry('modal_close', { app_pathname: 'search', app_action_value: 'change-field-type' });
+    onClose();
+  }, [onClose, sendTelemetry]);
+
   return (
     <BootstrapModalForm title={`Change ${field} field type`}
                         submitButtonText="Change field type"
                         onSubmitForm={onSubmit}
-                        onCancel={onClose}
+                        onCancel={onCancel}
                         show={show}
                         bsSize="large">
       <div>
