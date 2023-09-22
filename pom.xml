@@ -113,7 +113,7 @@
         <commons-net.version>3.9.0</commons-net.version>
         <commons-validator.version>1.7</commons-validator.version>
         <commons-io.version>2.13.0</commons-io.version>
-        <disruptor.version>3.4.2</disruptor.version>
+        <disruptor.version>3.4.4</disruptor.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
