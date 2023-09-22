@@ -32,7 +32,7 @@ public class IpAnonymize extends AbstractFunction<IpAddress> {
     private final ParameterDescriptor<Object, IpAddress> ipParam;
 
     public IpAnonymize() {
-        ipParam = ParameterDescriptor.object("ip", IpAddress.class).description("Value to convert").build();
+        ipParam = ParameterDescriptor.object("ip", IpAddress.class).ruleBuilderVariable().description("Value to convert").build();
     }
 
     @Override
