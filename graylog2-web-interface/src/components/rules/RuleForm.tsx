@@ -36,6 +36,10 @@ const StyledContainer = styled.div`
     border: 1px solid #d4d5d7;
     border-radius: 0 0 5px 5px;
   }
+
+  & .ace_tooltip.ace-graylog {
+    background-color: #f5f5f5;
+  }
 `;
 
 const RuleForm = ({ create }: Props) => {
@@ -54,7 +58,7 @@ const RuleForm = ({ create }: Props) => {
   const history = useHistory();
 
   const handleError = (error) => {
-    if (error.responseMessage.includes('duplicate key error')) {
+    if (error?.responseMessage?.includes('duplicate key error')) {
       const duplicatedTitle = error.responseMessage.match(/title: "(.*)"/i)[1];
       setErrorMessage(`Rule title "${duplicatedTitle}" already exists!`);
     }
