@@ -94,7 +94,7 @@ public class IndexToolsAdapterES7 implements IndexToolsAdapter {
 
         for (ParsedDateHistogram.ParsedBucket bucket : histogramBuckets) {
             final ZonedDateTime zonedDateTime = (ZonedDateTime) bucket.getKey();
-            final DateTime date = new DateTime(zonedDateTime.toInstant().toEpochMilli()).toDateTime(DateTimeZone.UTC);
+            final DateTime date = new DateTime(zonedDateTime.toInstant().toEpochMilli(), DateTimeZone.UTC);
 
             final Terms sourceFieldAgg = bucket.getAggregations().get(AGG_MESSAGE_FIELD);
             final List<? extends Terms.Bucket> termBuckets = sourceFieldAgg.getBuckets();

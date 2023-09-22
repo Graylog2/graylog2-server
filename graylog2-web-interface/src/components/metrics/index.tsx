@@ -14,25 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
-import numeral from 'numeral';
-
-class CounterDetails extends React.Component {
-  static propTypes = {
-    metric: PropTypes.object.isRequired,
-  };
-
-  render() {
-    const { metric } = this.props.metric;
-
-    return (
-      <dl className="metric-def metric-counter">
-        <dt>Value:</dt>
-        <dd><span className="number-format">{numeral(metric.count).format('0,0')}</span></dd>
-      </dl>
-    );
-  }
-}
-
-export default CounterDetails;
+export { default as CounterRate } from './CounterRate';
+export { default as Metric } from './Metric';
+export { default as MetricContainer } from './MetricContainer';
+export { default as MetricDetails } from './MetricDetails';
+export { default as MetricsComponent } from './MetricsComponent';
+export { default as MetricsList } from './MetricsList';
+export { default as MetricsMapper } from './MetricsMapper';

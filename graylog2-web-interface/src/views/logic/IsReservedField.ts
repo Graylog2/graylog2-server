@@ -14,18 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
+const isReservedField = (fieldName: string) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
-class StreamLink extends React.Component {
-  render() {
-    const { stream } = this.props;
-    const route = Routes.stream_search(stream.id);
-
-    return <Link to={route}>{stream.title}</Link>;
-  }
-}
-
-export default StreamLink;
+export default isReservedField;

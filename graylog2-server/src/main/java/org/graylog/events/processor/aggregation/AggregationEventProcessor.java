@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
-import org.apache.logging.log4j.util.Strings;
 import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
@@ -316,7 +315,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 continue;
             }
 
-            final String keyString = Strings.join(keyResult.key(), '|');
+            final String keyString = String.join("|", keyResult.key());
             final String eventMessage = createEventMessageString(keyString, keyResult);
 
             // Extract event time and range from the key result or use query time range as fallback.
