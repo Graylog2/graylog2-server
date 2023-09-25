@@ -90,7 +90,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   }, [currentRule, setRuleSimulationResult, simulateRule]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
-  const errorMessage = hasRuleBuilderErrors(currentRule) ? 'Could not run simulation. Please fix rule builder errors.' : undefined;
+  const errorMessage = hasRuleBuilderErrors(currentRule) ? 'Could not run the rule simulation. Please fix the rule builder errors.' : undefined;
   const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort((a, b) => Number(a) - Number(b));
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {

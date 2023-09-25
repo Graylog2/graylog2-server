@@ -118,7 +118,7 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
 
                                  setShowConfirmSourceCodeEditor(false);
                                }}>
-          <div>You are about to leave this page and go to Source Code Editor.</div>
+          <div>You are about to leave this page and go to the Source Code Editor.</div>
           <div>Make sure you have no unsaved changes.</div>
         </BootstrapModalConfirm>
       )}
