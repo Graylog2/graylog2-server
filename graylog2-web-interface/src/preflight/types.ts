@@ -29,6 +29,7 @@ export type DataNode = {
   transport_address: string,
   type: string,
   status: DataNodeStatus
+  cert_valid_until: string | null,
 }
 
 export type DataNodes = Array<DataNode>;

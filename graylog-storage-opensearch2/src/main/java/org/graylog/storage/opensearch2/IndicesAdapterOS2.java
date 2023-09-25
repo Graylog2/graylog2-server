@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.apache.logging.log4j.util.Strings;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -390,7 +389,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(indices.toArray(new String[]{}))
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(Strings.EMPTY_ARRAY);
+                .names(new String[]{});
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
@@ -501,10 +500,10 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         }
 
         final Min minAgg = f.getAggregations().get("ts_min");
-        final long minUnixTime = new Double(minAgg.getValue()).longValue();
+        final long minUnixTime = Double.valueOf(minAgg.getValue()).longValue();
         final DateTime min = new DateTime(minUnixTime, DateTimeZone.UTC);
         final Max maxAgg = f.getAggregations().get("ts_max");
-        final long maxUnixTime = new Double(maxAgg.getValue()).longValue();
+        final long maxUnixTime = Double.valueOf(maxAgg.getValue()).longValue();
         final DateTime max = new DateTime(maxUnixTime, DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.

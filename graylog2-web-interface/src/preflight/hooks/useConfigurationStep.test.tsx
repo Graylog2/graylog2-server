@@ -129,6 +129,7 @@ describe('useConfigurationStep', () => {
         transport_address: 'http://localhost:9200',
         type: 'DATANODE',
         status: 'UNCONFIGURED',
+        cert_valid_until: '2020-02-10T20:40:00.000Z',
       }],
     });
 
@@ -191,6 +192,7 @@ describe('useConfigurationStep', () => {
         transport_address: 'http://localhost:9200',
         type: 'DATANODE',
         status: 'CONNECTED',
+        cert_valid_until: '2020-02-10T20:40:00.000Z',
       }],
     });
 

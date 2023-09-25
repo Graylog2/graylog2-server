@@ -18,6 +18,8 @@ package org.graylog.datanode.configuration;
 
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.OpensearchDistribution;
+import org.graylog2.plugin.Tools;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -31,13 +33,19 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     private final DatanodeConfiguration datanodeConfiguration;
 
     @Inject
-    public DatanodeConfigurationProvider(final Configuration localConfiguration) throws IOException {
+    public DatanodeConfigurationProvider(final Configuration localConfiguration, IndexerJwtAuthTokenProvider jwtTokenProvider) throws IOException {
         final OpensearchDistribution opensearchDistribution = detectOpensearchDistribution(localConfiguration);
         datanodeConfiguration = new DatanodeConfiguration(
                 opensearchDistribution,
-                localConfiguration.getDatanodeNodeName(),
-                localConfiguration.getProcessLogsBufferSize()
+                getNodesFromConfig(localConfiguration.getDatanodeNodeName()),
+                localConfiguration.getProcessLogsBufferSize(),
+                jwtTokenProvider
         );
+    }
+
+    public static String getNodesFromConfig(final String configProperty) {
+        if(configProperty != null) return configProperty;
+        return Tools.getLocalCanonicalHostname();
     }
 
     @Override

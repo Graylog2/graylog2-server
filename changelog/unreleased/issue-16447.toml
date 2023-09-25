@@ -1,0 +1,5 @@
+type = "a"
+message = "Enable basic auth for datanode rest API if security is enabled"
+
+issues = ["16447"]
+pulls = ["16446"]

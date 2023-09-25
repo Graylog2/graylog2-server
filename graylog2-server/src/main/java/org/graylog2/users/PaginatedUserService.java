@@ -16,6 +16,7 @@
  */
 package org.graylog2.users;
 
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -29,7 +30,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.apache.http.util.TextUtils.isBlank;
 
 public class PaginatedUserService extends PaginatedDbService<UserOverviewDTO> {
     private static final String COLLECTION_NAME = "users";
@@ -75,7 +75,7 @@ public class PaginatedUserService extends PaginatedDbService<UserOverviewDTO> {
                                                                             String sortField,
                                                                             String order,
                                                                             String authServiceBackendId) {
-        checkArgument(!isBlank(authServiceBackendId), "authServiceBackendId cannot be blank");
+        checkArgument(!StringUtils.isBlank(authServiceBackendId), "authServiceBackendId cannot be blank");
 
         final DBQuery.Query query = DBQuery.and(
                 DBQuery.is(UserImpl.AUTH_SERVICE_ID, Optional.of(authServiceBackendId)),

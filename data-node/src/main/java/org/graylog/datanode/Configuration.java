@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
@@ -96,13 +97,13 @@ public class Configuration extends BaseConfiguration {
 
 
     @Parameter(value = "node_name")
-    private String datanodeNodeName = "node1";
+    private String datanodeNodeName;
 
     /**
      * Comma separated list of opensearch nodes that are eligible as manager nodes.
      */
     @Parameter(value = "cluster_initial_manager_nodes")
-    private String initialManagerNodes = "node1";
+    private String initialManagerNodes;
 
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
@@ -131,6 +132,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout = 2000;
+
+    @Parameter(value = "root_password_sha2")
+    private String rootPasswordSha2;
 
     @Parameter(value = "user_password_default_algorithm")
     private String userPasswordDefaultAlgorithm = "bcrypt";
@@ -190,11 +194,26 @@ public class Configuration extends BaseConfiguration {
         return opensearchProcessLogsBufferSize;
     }
 
-    @Parameter(value = "rest_api_username")
-    private String restApiUsername;
-
     @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
     private String passwordSecret;
+
+    public String getPasswordSecret() {
+        return passwordSecret;
+    }
+
+    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
+    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
+
+    public Duration getIndexerJwtAuthTokenCachingDuration() {
+        return indexerJwtAuthTokenCachingDuration;
+    }
+
+    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
+    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
+
+    public Duration getIndexerJwtAuthTokenExpirationDuration() {
+        return indexerJwtAuthTokenExpirationDuration;
+    }
 
     @ValidatorMethod
     @SuppressWarnings("unused")
@@ -203,9 +222,6 @@ public class Configuration extends BaseConfiguration {
             throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
         }
     }
-
-    @Parameter(value = "rest_api_password")
-    private String restApiPassword;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "data/node-id";
@@ -218,9 +234,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "root_email")
     private String rootEmail = "";
-
-    @Parameter(value = "single_node_only")
-    private boolean singleNodeOnly = false;
 
     public String getNodeIdFile() {
         return nodeIdFile;
@@ -274,22 +287,8 @@ public class Configuration extends BaseConfiguration {
         return datanodeHttpCertificatePassword;
     }
 
-
-    public String getRestApiUsername() {
-        return restApiUsername;
-    }
-
-    public String getRestApiPassword() {
-        return restApiPassword;
-    }
-
-
     public Optional<String> getOpensearchNetworkHostHost() {
         return Optional.ofNullable(opensearchNetworkHostHost);
-    }
-
-    public boolean isSingleNodeOnly() {
-        return singleNodeOnly;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
@@ -573,5 +572,9 @@ public class Configuration extends BaseConfiguration {
 
     public String getHostname() {
         return hostname;
+    }
+
+    public String getRootPasswordSha2() {
+        return rootPasswordSha2;
     }
 }

@@ -78,6 +78,7 @@ import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.indexer.FieldTypeManagementModule;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
@@ -116,6 +117,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_INITIATE;
+import static org.graylog2.indexer.Constants.FIELD_TYPES_MANAGEMENT_FEATURE;
 import static org.graylog2.plugin.ServerStatus.Capability.CLOUD;
 import static org.graylog2.plugin.ServerStatus.Capability.MASTER;
 import static org.graylog2.plugin.ServerStatus.Capability.SERVER;
@@ -205,6 +207,10 @@ public class Server extends ServerBootstrap {
                 new StreamsModule(),
                 new TracingModule()
         );
+
+        if (featureFlags.isOn(FIELD_TYPES_MANAGEMENT_FEATURE)) {
+            modules.add(new FieldTypeManagementModule());
+        }
         return modules.build();
     }
 

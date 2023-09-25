@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.jersey;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
@@ -47,6 +48,7 @@ public class ModelIdParamConverterTest extends JerseyTest {
 
     @Override
     protected Application configure() {
+        forceSet(TestProperties.CONTAINER_PORT, "0");
         return new ResourceConfig(Resource.class, ModelIdParamConverter.Provider.class);
     }
 

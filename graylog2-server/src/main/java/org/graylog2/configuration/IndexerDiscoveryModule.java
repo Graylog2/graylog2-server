@@ -32,6 +32,7 @@ public class IndexerDiscoveryModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(new TypeLiteral<List<URI>>() {}).annotatedWith(IndexerHosts.class).toProvider(IndexerDiscoveryProvider.class).asEagerSingleton();
+        bind(Boolean.class).annotatedWith(RunsWithDataNode.class).toProvider(RunsWithDataNodeDiscoveryProvider.class).asEagerSingleton();
         bind(NodeService.class).to(NodeServiceImpl.class);
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);

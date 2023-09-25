@@ -357,13 +357,13 @@ public class MessageTest {
         final DateTime dateTime = new DateTime(2015, 9, 8, 0, 0, DateTimeZone.UTC);
 
         message.addField(Message.FIELD_TIMESTAMP,
-                         dateTime.toDate());
+                dateTime.toDate());
 
         final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
         assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
-                     Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
+                Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
     }
 
     @Test
@@ -390,6 +390,26 @@ public class MessageTest {
         assertFalse(Message.validKey("foo+bar"));
         assertFalse(Message.validKey("foo$bar"));
         assertFalse(Message.validKey(" "));
+    }
+
+    @Test
+    public void testCleanKey() throws Exception {
+        // Valid keys
+        assertEquals("foo123", Message.cleanKey("foo123"));
+        assertEquals("foo-bar123", Message.cleanKey("foo-bar123"));
+        assertEquals("foo_bar123", Message.cleanKey("foo_bar123"));
+        assertEquals("foo.bar123", Message.cleanKey("foo.bar123"));
+        assertEquals("foo@bar", Message.cleanKey("foo@bar"));
+        assertEquals("123", Message.cleanKey("123"));
+        assertEquals("", Message.cleanKey(""));
+
+        assertEquals("foo_bar", Message.cleanKey("foo bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo+bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo$bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo{bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo,bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo?bar"));
+        assertEquals("_", Message.cleanKey(" "));
     }
 
     @Test
@@ -604,9 +624,9 @@ public class MessageTest {
     @Test
     public void fieldTest() {
         assertThat(Message.sizeForField("", true)).isEqualTo(4);
-        assertThat(Message.sizeForField("", (byte)1)).isEqualTo(1);
-        assertThat(Message.sizeForField("", (char)1)).isEqualTo(2);
-        assertThat(Message.sizeForField("", (short)1)).isEqualTo(2);
+        assertThat(Message.sizeForField("", (byte) 1)).isEqualTo(1);
+        assertThat(Message.sizeForField("", (char) 1)).isEqualTo(2);
+        assertThat(Message.sizeForField("", (short) 1)).isEqualTo(2);
         assertThat(Message.sizeForField("", 1)).isEqualTo(4);
         assertThat(Message.sizeForField("", 1L)).isEqualTo(8);
         assertThat(Message.sizeForField("", 1.0f)).isEqualTo(4);

@@ -62,14 +62,20 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
-    private final OpenSearchClient openSearchClient;
-    private final Client client;
-    private final FixtureImporter fixtureImporter;
-    private final Adapters adapters;
+    private OpenSearchClient openSearchClient;
+    private Client client;
+    private FixtureImporter fixtureImporter;
+    private Adapters adapters;
+    private List<String> featureFlags;
 
-    public OpenSearchInstance(final SearchVersion version, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(version, network, heapSize);
+    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(version, hostname, network, heapSize);
+        this.featureFlags = featureFlags;
+    }
 
+    @Override
+    public OpenSearchInstance init() {
+        super.init();
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
@@ -79,6 +85,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         if(isFirstContainerStart) {
             afterContainerCreated();
         }
+        return this;
     }
 
     public static OpenSearchInstance create() {
@@ -155,6 +162,9 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 false,
                 false,
                 new BasicCredentialsProvider(),
+                null,
+                false,
+                false,
                 null)
                 .get();
     }
@@ -185,7 +195,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS);
+                .withNetworkAliases(hostname);
 
         // disabling the performance plugin in 2.0.1 consistently created errors during CI runs, but keeping it running
         // in later versions sometimes created errors on CI, too.

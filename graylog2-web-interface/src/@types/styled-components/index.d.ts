@@ -17,9 +17,11 @@
 import 'styled-components';
 import type { ColorScheme } from '@graylog/sawmill';
 import type { StyledComponentsTheme } from '@graylog/sawmill/styled-components';
+import type { MantineTheme } from '@graylog/sawmill/mantine';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends StyledComponentsTheme {
     changeMode: (newColorScheme: ColorScheme) => void,
+    mantine: MantineTheme
   }
 }

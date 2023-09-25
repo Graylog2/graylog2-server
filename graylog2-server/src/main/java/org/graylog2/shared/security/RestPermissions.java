@@ -144,6 +144,11 @@ public class RestPermissions implements PluginPermissions {
     public static final String THREADS_DUMP = "threads:dump";
     public static final String PROCESSBUFFER_DUMP = "processbuffer:dump";
     public static final String THROUGHPUT_READ = "throughput:read";
+
+    public static final String TYPE_MAPPINGS_CREATE = "typemappings:create";
+    public static final String TYPE_MAPPINGS_DELETE = "typemappings:delete";
+    public static final String TYPE_MAPPINGS_EDIT = "typemappings:edit";
+    public static final String TYPE_MAPPINGS_READ = "typemappings:read";
     public static final String URL_WHITELIST_READ = "urlwhitelist:read";
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";

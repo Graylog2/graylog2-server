@@ -23,8 +23,6 @@ import { Spinner, ExternalLink } from 'components/common';
 import ContentStreamNewsItem from 'components/content-stream/news/ContentStreamNewsItem';
 import { Alert } from 'components/bootstrap';
 
-import Icon from '../common/Icon';
-
 const ContentStreamNews = () => {
   const { feedList, isLoadingFeed, error } = useContentStream();
 
@@ -36,7 +34,7 @@ const ContentStreamNews = () => {
     return (
       <Alert bsStyle="info">
         <p>
-          <Icon name="exclamation-triangle" /> Unable to load RSS feed at the moment ! You can read more
+          Unable to load RSS feed at the moment ! You can read more
           on {' '}
           <ExternalLink href="https://www.graylog.org/blog/">
             Graylog
