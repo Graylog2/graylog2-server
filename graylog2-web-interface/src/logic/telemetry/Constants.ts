@@ -148,6 +148,34 @@ export const TELEMETRY_EVENT_TYPE = {
     CREATE_CLICKED: 'EventDefinition Summary Create Clicked',
     UPDATE_CLICKED: 'EventDefinition Summary Update Clicked',
   },
+
+  CONTENTSTREAM: {
+    PREV_ARROW_CLICKED: 'Content Stream Left Arrow Clicked',
+    NEXT_ARROW_CLICKED: 'Content Stream Right Arrow Clicked',
+    READ_MORE_CLICKED: 'Content Stream Read More Clicked',
+    ARTICLE_CLICKED: 'Content Stream Article Clicked',
+    NEWS_OPT_IN_TOGGLED: 'Content Stream News Opt-In Clicked',
+    RELEASE_OPT_IN_TOGGLED: 'Content Stream Release Opt-In Clicked',
+  },
+  STREAMS: {
+    CREATE_FORM_MODAL_OPENED: 'Stream Create Form Modal Opened',
+    NEW_STREAM_CREATED: 'Stream New Stream Created',
+    STREAM_ITEM_UPDATED: 'Stream Item Updated',
+    STREAM_ITEM_STATUS_TOGGLED: 'Stream Item Status Toggled',
+    STREAM_ITEM_SHARE_MODAL_OPENED: 'Stream Item Share Modal Opened',
+    STREAM_ITEM_UPDATE_MODAL_OPENED: 'Stream Item Update Modal Opened',
+    STREAM_ITEM_CLONE_MODAL_OPENED: 'Stream Item Clone Modal Opened',
+    STREAM_ITEM_RULE_MODAL_OPENED: 'Stream Item Rule Modal Opened',
+    STREAM_ITEM_DELETED: 'Stream Item Deleted',
+  },
+  ENTITYSHARE: {
+    ENTITY_STREAM_SHARED: 'Entity Share: Entity Stream Shared',
+    ENTITY_SEARCH_SHARED: 'Entity Share: Entity Search Shared',
+    ENTITY_SEARCH_FILTER_SHARED: 'Entity Share: Entity Filter Shared',
+    ENTITY_EVENT_DEFINITION_SHARED: 'Entity Share: Event Definition Shared',
+    ENTITY_NOTIFICATION_SHARED: 'Entity Share: Notification Shared',
+    ENTITY_DASHBOARD_SHARED: 'Entity Share: Dashboard Shared',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {

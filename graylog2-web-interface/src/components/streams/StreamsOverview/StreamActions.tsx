@@ -34,6 +34,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import StreamModal from '../StreamModal';
 
@@ -62,9 +63,12 @@ const StreamActions = ({
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
   const onToggleStreamStatus = useCallback(async () => {
-    sendTelemetry('input_button_toggle', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_STATUS_TOGGLED, {
       app_pathname: 'streams',
       app_action_value: ' stream-item-status',
+      event_details: {
+        enabled: !stream.disabled,
+      },
     });
 
     setChangingStatus(true);
@@ -82,34 +86,31 @@ const StreamActions = ({
   }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
 
   const toggleEntityShareModal = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_SHARE_MODAL_OPENED, {
       app_pathname: 'streams',
-      app_action_value: 'stream-item-share',
     });
 
     setShowEntityShareModal((cur) => !cur);
   }, [sendTelemetry]);
 
   const toggleUpdateModal = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_UPDATE_MODAL_OPENED, {
       app_pathname: 'streams',
-      app_action_value: 'stream-item-update',
     });
 
     setShowUpdateModal((cur) => !cur);
   }, [sendTelemetry]);
 
   const toggleCloneModal = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_CLONE_MODAL_OPENED, {
       app_pathname: 'streams',
-      app_action_value: 'stream-item-clone',
     });
 
     setShowCloneModal((cur) => !cur);
   }, [sendTelemetry]);
 
   const toggleStreamRuleModal = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_RULE_MODAL_OPENED, {
       app_pathname: 'streams',
       app_action_value: 'stream-item-rule',
     });
@@ -118,7 +119,7 @@ const StreamActions = ({
   }, [sendTelemetry]);
 
   const onDelete = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DELETED, {
       app_pathname: 'streams',
       app_action_value: 'stream-item-delete',
     });
