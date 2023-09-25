@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
+import org.jetbrains.annotations.NotNull;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -40,7 +41,7 @@ import static org.graylog2.shared.security.RestPermissions.DECORATORS_READ;
 @DbEntity(collection = "decorators",
           titleField = NO_TITLE,
           readPermission = DECORATORS_READ)
-public abstract class DecoratorImpl implements Decorator, Comparable {
+public abstract class DecoratorImpl implements Decorator, Comparable<DecoratorImpl> {
     static final String FIELD_ID = "id";
     static final String FIELD_TYPE = "type";
     static final String FIELD_CONFIG = "config";
@@ -48,12 +49,8 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
     static final String FIELD_ORDER = "order";
 
     @Override
-    public int compareTo(Object o) {
-        if (o instanceof Decorator) {
-            Decorator decorator = (Decorator)o;
-            return order() - decorator.order();
-        }
-        return 0;
+    public int compareTo(@NotNull DecoratorImpl o) {
+        return order() - o.order();
     }
 
     @JsonProperty(FIELD_ID)
@@ -94,7 +91,7 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
                 .config(config)
                 .stream(stream)
                 .order(order)
-            .build();
+                .build();
     }
 
     public static Decorator create(@JsonProperty(FIELD_TYPE) String type,
@@ -113,10 +110,15 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder id(String id);
+
         abstract Builder type(String type);
+
         abstract Builder config(Map<String, Object> config);
+
         abstract Builder stream(Optional<String> stream);
+
         abstract Builder order(int order);
+
         public abstract DecoratorImpl build();
     }
 }
