@@ -57,7 +57,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
   };
 
   const handlePriorityChange = (nextPriority) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS_PRIORITY_CHANGED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.PRIORITY_CHANGED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-details',
       app_action_value: 'priority-select',

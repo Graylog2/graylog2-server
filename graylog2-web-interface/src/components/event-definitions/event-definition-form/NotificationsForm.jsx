@@ -46,7 +46,7 @@ class NotificationsForm extends React.Component {
   }
 
   toggleAddNotificationForm = () => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS_ADD_CLICKED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.ADD_CLICKED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-notifications',
       app_action_value: 'add-notification-button',

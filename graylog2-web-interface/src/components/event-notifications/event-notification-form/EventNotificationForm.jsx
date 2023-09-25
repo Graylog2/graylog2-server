@@ -105,7 +105,7 @@ class EventNotificationForm extends React.Component {
   handleTypeChange = (nextType) => {
     const { sendTelemetry } = this.props;
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS_NOTIFICATION_TYPE_SELECTED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_TYPE_SELECTED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-notifications',
       app_action_value: 'notification-type-select',

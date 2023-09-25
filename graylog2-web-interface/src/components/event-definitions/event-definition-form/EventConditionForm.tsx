@@ -82,7 +82,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
     .map((type) => ({ label: type.displayName, value: type.type }));
 
   const handleEventDefinitionTypeChange = (nextType: string) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_TYPE_SELECTED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.TYPE_SELECTED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-condition',
       app_action_value: 'type-select',

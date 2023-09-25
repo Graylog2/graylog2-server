@@ -133,7 +133,7 @@ class FieldForm extends React.Component {
   };
 
   handleSubmit = () => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS_DONE_CLICKED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.DONE_CLICKED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-fields',
       app_action_value: 'done-button',
@@ -148,7 +148,7 @@ class FieldForm extends React.Component {
   };
 
   handleCancel = () => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS_CANCEL_CLICKED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-fields',
       app_action_value: 'cancel-button',
@@ -170,8 +170,8 @@ class FieldForm extends React.Component {
   handleProviderTypeChange = (nextProvider) => {
     this.props.sendTelemetry(
       (nextProvider === 'lookup-v1')
-        ? TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS_SET_VALUE_FROM_LOOKUP_TABLE_SELECTED
-        : TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS_SET_VALUE_FROM_TEMPLATE_SELECTED, {
+        ? TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_LOOKUP_TABLE_SELECTED
+        : TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_TEMPLATE_SELECTED, {
         app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_section: 'event-definition-fields',
         app_action_value: 'set-value-from-select',
@@ -201,7 +201,7 @@ class FieldForm extends React.Component {
   toggleKey = (event) => {
     const checked = FormsUtils.getValueFromInput(event.target);
 
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS_AS_EVENT_KEY_TOGGLED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.AS_EVENT_KEY_TOGGLED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-fields',
       app_action_value: 'event-key-checkbox',

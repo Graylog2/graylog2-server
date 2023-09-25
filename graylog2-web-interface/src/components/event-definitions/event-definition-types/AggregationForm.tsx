@@ -72,7 +72,7 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
   const handleGroupByChange = useCallback((selected: string) => {
     const nextValue = selected === '' ? [] : selected.split(',');
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_AGGREGATION_GROUP_BY_FIELD_SELECTED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.AGGREGATION_GROUP_BY_FIELD_SELECTED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-condition',
       app_action_value: 'group-by-field-select',

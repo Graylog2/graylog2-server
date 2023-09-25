@@ -62,7 +62,7 @@ class FieldsList extends React.Component {
   };
 
   handleAddFieldClick = () => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS_ADD_CUSTOM_FIELD_CLICKED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.ADD_CUSTOM_FIELD_CLICKED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-fields',
       app_action_value: 'add-custom-field-button',

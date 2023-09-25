@@ -52,7 +52,7 @@ class AddNotificationForm extends React.Component {
   }
 
   handleNewNotificationSubmit = (promise) => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS_DONE_CLICKED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.DONE_CLICKED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-notifications',
       app_action_value: 'done-button',
@@ -64,7 +64,7 @@ class AddNotificationForm extends React.Component {
   };
 
   handleSubmit = () => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS_DONE_CLICKED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.DONE_CLICKED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-notifications',
       app_action_value: 'done-button',
@@ -77,7 +77,7 @@ class AddNotificationForm extends React.Component {
   };
 
   handleCancel = () => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS_CANCEL_CLICKED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-notifications',
       app_action_value: 'cancel-button',
@@ -88,7 +88,7 @@ class AddNotificationForm extends React.Component {
 
   handleSelectNotificationChange = (nextNotificationId) => {
     if (nextNotificationId === 'create') {
-      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS_CREATE_NEW_CLICKED, {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.CREATE_NEW_CLICKED, {
         app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_section: 'event-definition-notifications',
         app_action_value: 'create-new-option',
@@ -99,7 +99,7 @@ class AddNotificationForm extends React.Component {
       return;
     }
 
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS_NOTIFICATION_SELECTED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_SELECTED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-notifications',
       app_action_value: 'existing-notification-option',

@@ -87,7 +87,7 @@ class FilterAggregationForm extends React.Component {
     const value = FormsUtils.getValueFromInput(event.target);
 
     if (name === 'event_limit') {
-      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_EVENT_LIMIT_CHANGED, {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EVENT_LIMIT_CHANGED, {
         app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_section: 'event-definition-condition',
         app_action_value: 'event-limit-input',
@@ -127,7 +127,7 @@ class FilterAggregationForm extends React.Component {
 
       this.propagateConfigChange(nextConfig);
     } else {
-      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_AGGREGATION_TOGGLED, {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.AGGREGATION_TOGGLED, {
         app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_section: 'event-definition-condition',
         app_action_value: 'aggregation-radio-button',

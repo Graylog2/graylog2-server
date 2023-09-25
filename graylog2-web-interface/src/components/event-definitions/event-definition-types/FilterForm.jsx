@@ -206,7 +206,7 @@ class FilterForm extends React.Component {
     const value = FormsUtils.getValueFromInput(event.target);
 
     if (name === '_is_scheduled') {
-      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
         app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_section: 'event-definition-condition',
         app_action_value: 'enable-checkbox',
@@ -218,7 +218,7 @@ class FilterForm extends React.Component {
   };
 
   handleStreamsChange = (nextValue) => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_STREAM_SELECTED, {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
       app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_section: 'event-definition-condition',
       app_action_value: 'stream-select',
@@ -231,14 +231,14 @@ class FilterForm extends React.Component {
     const { searchWithinMsUnit, executeEveryMsUnit } = this.state;
 
     if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
-      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
         app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_section: 'event-definition-condition',
         app_action_value: 'searchWithinMsUnit-select',
         new_unit: nextUnit,
       });
     } else if (fieldName === 'execute_every_ms' && nextUnit !== executeEveryMsUnit) {
-      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION_FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
         app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_section: 'event-definition-condition',
         app_action_value: 'executeEveryMsUnit-select',

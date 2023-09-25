@@ -144,7 +144,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
 
   const handleSubmit = () => {
     if (action === 'create') {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY_CREATE_CLICKED, {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CREATE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'new-event-definition',
         app_action_value: 'create-event-definition-button',
@@ -153,7 +153,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
       EventDefinitionsActions.create(eventDefinition)
         .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     } else {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY_UPDATE_CLICKED, {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'edit-event-definition',
         app_action_value: 'update-event-definition-button',
@@ -165,7 +165,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   };
 
   const handleCancel = () => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY_CANCEL_CLICKED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'cancel-button',
