@@ -57,4 +57,9 @@ public class EnterpriseMetadataSummary extends PluginMetadataSummary {
     public boolean equals(Object obj) {
         return obj instanceof EnterpriseMetadataSummary;
     }
+
+    @Override
+    public int hashCode() {
+        return 42;
+    }
 }
