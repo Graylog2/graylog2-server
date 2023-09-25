@@ -189,7 +189,7 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
             <dd><i>{lifetimeExplanation}</i></dd>
           </StyledDefList>
 
-          <p>
+          <p className="no-bm">
             <IfPermitted permissions="indices:changestate">
               <Button bsStyle="info"
                       bsSize="xs"
