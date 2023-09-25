@@ -108,11 +108,11 @@ const DashboardActionsMenu = () => {
     return dispatch(onSaveNewDashboard(newDashboard, history));
   }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, view.id]);
   const _onSaveView = useCallback(() => dispatch(OnSaveViewAction(view)), [dispatch, view]);
-  const _onUpdateView = useCallback((updatedView) => dispatch(updateView(updatedView)), [dispatch]);
+  const _onUpdateView = useCallback((updatedView: View) => dispatch(updateView(updatedView)), [dispatch]);
 
   useHotkey({
     actionKey: 'save',
-    callback: _onSaveView,
+    callback: () => _onSaveView(),
     scope: 'dashboard',
   });
 

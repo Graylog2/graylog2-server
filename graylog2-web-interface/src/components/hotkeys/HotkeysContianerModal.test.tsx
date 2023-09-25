@@ -25,7 +25,11 @@ jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'fr
 
 describe('HotkeysModalContainer', () => {
   it('should render hotkeys modal after pressing keyboard shortcut', async () => {
-    render(<HotkeysProvider><HotkeysModalContainer /></HotkeysProvider>);
+    render(
+      <HotkeysProvider>
+        <HotkeysModalContainer />
+      </HotkeysProvider>,
+    );
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
     act(() => {
