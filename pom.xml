@@ -98,7 +98,7 @@
         <auto-value.version>1.7.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.412</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.20.152</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.20.153</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>1.1.9</aws-msk-iam-auth.version>
         <bouncycastle.version>1.76</bouncycastle.version>
@@ -176,7 +176,7 @@
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>5.1.1</unboundid-ldap.version>
+        <unboundid-ldap.version>6.0.10</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zstd.version>1.5.5-5</zstd.version>
@@ -189,7 +189,7 @@
         <assertj-core.version>3.24.2</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <equalsverifier.version>3.15.1</equalsverifier.version>
+        <equalsverifier.version>3.15.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
@@ -477,7 +477,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

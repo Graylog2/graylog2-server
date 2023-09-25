@@ -33,7 +33,7 @@ import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
-import CertificateRenewal from 'components/configurations/CertificateRenewal/CertificateRenewal';
+import DataNodeConfiguration from 'components/configurations/DataNodeConfiguration/DataNodeConfiguration';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -142,10 +142,10 @@ const ConfigurationsPage = () => {
       },
     },
     {
-      name: 'Certificate Renewal',
+      name: 'Data Node',
       SectionComponent: ConfigurationSection,
       props: {
-        ConfigurationComponent: CertificateRenewal,
+        ConfigurationComponent: DataNodeConfiguration,
         title: 'Certificate Renewal Policy',
       },
     },

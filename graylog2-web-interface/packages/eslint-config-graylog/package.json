@@ -17,7 +17,7 @@
     "@tanstack/eslint-plugin-query": "4.34.1",
     "@typescript-eslint/eslint-plugin": "6.7.2",
     "@typescript-eslint/parser": "6.7.2",
-    "eslint": "8.49.0",
+    "eslint": "8.50.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-import-resolver-webpack": "0.13.7",
     "eslint-plugin-compat": "4.2.0",
@@ -29,6 +29,6 @@
     "eslint-plugin-jsx-a11y": "6.7.1",
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-react-hooks": "4.6.0",
-    "eslint-plugin-testing-library": "6.0.1"
+    "eslint-plugin-testing-library": "6.0.2"
   }
 }
