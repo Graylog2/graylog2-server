@@ -167,9 +167,8 @@ const SearchActionsMenu = () => {
 
   useHotkey({
     actionKey: 'save',
-    callback: () => saveSearch(title),
+    callback: () => (loaded ? saveSearch(title) : openFormModal()),
     scope: 'search',
-    options: { enabled: (isDirty && loaded) },
     dependencies: [loaded, isDirty, saveSearch, title],
   });
 
