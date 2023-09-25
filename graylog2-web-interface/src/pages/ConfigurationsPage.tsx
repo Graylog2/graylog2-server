@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import { Navigate, Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
+import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -53,10 +54,31 @@ const SubNavIconOpen = styled(Icon)`
   margin-left: 5px;
 `;
 
+type SectionLinkProps = {
+  name: string,
+  showCaret: boolean,
+}
+
+const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
+  const absolutePath = useResolvedPath(name);
+  const location = useLocation();
+
+  const isActive = URI(location.pathname).equals(absolutePath.pathname)
+    || location.pathname.startsWith(absolutePath.pathname);
+
+  return (
+    <LinkContainer key={`nav-${name}`} to={name}>
+      <NavItem title={name} active={isActive}>
+        {name}
+        {showCaret && (isActive ? <SubNavIconClosed name="caret-right" /> : <SubNavIconOpen name="caret-down" />)}
+      </NavItem>
+    </LinkContainer>
+  );
+};
+
 const ConfigurationsPage = () => {
   const currentUser = useCurrentUser();
   const isCloud = AppConfig.isCloud();
-  const { pathname } = useLocation();
 
   const configurationSections: Array<{
     name: string,
@@ -157,8 +179,6 @@ const ConfigurationsPage = () => {
     },
   ].filter(({ hide }) => !hide), [currentUser?.permissions, isCloud]);
 
-  const activeKey = useMemo(() => configurationSections.findIndex(({ name }) => pathname.endsWith(name)) + 1, [configurationSections, pathname]);
-
   return (
     <DocumentTitle title="Configurations">
       <PageHeader title="Configurations">
@@ -169,14 +189,9 @@ const ConfigurationsPage = () => {
 
       <ConfigletRow className="content">
         <Col md={2}>
-          <Nav bsStyle="pills" stacked activeKey={activeKey}>
+          <Nav bsStyle="pills" stacked>
             {configurationSections.map(({ name, showCaret }) => (
-              <LinkContainer key={`nav-${name}`} to={name}>
-                <NavItem title={name} active>
-                  {name}
-                  {showCaret && <SubNavIconClosed name="caret-right" />}
-                </NavItem>
-              </LinkContainer>
+              <SectionLink key={`nav-${name}`} name={name} showCaret={showCaret} />
             ))}
           </Nav>
         </Col>
