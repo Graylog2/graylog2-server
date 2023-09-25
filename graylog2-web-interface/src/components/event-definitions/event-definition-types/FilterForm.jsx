@@ -159,7 +159,7 @@ class FilterForm extends React.Component {
   _syncParamsWithQuery = (paramsInQuery) => {
     const { eventDefinition, onChange } = this.props;
     const config = cloneDeep(eventDefinition.config);
-    const queryParameters = config.query_parameters;
+    const queryParameters = config?.query_parameters || [];
     const keptParameters = [];
     const staleParameters = {};
 
@@ -260,10 +260,10 @@ class FilterForm extends React.Component {
 
   renderQueryParameters = () => {
     const { eventDefinition, onChange, lookupTables, validation } = this.props;
-    const { query_parameters: queryParameters } = eventDefinition.config;
+    const queryParameters = eventDefinition?.config?.query_parameters || [];
 
     const onChangeQueryParameters = (newQueryParameters) => {
-      const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters };
+      const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
 
       return onChange('config', newConfig);
     };

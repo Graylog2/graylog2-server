@@ -30,7 +30,7 @@ import generateId from 'logic/generateId';
 import FilterPreview from './FilterPreview';
 
 const isPermittedToSeePreview = (currentUser, config) => {
-  const missingPermissions = config.streams.some((stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`));
+  const missingPermissions = config?.streams?.some((stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`));
 
   return !missingPermissions;
 };
@@ -45,12 +45,12 @@ class FilterPreviewContainer extends React.Component {
 
     const { queryId, searchTypeId } = this.state;
 
-    const formattedStreams = config.streams.map((stream) => ({ type: 'stream', id: stream }));
+    const formattedStreams = config?.streams?.map((stream) => ({ type: 'stream', id: stream })) || [];
 
     const queryBuilder = Query.builder()
       .id(queryId)
-      .query({ type: 'elasticsearch', query_string: config.query || '*' })
-      .timerange({ type: 'relative', range: config.search_within_ms / 1000 })
+      .query({ type: 'elasticsearch', query_string: config?.query || '*' })
+      .timerange({ type: 'relative', range: config?.search_within_ms / 1000 })
       .filter(formattedStreams.length === 0 ? null : { type: 'or', filters: formattedStreams })
       .searchTypes([{
         id: searchTypeId,
@@ -62,7 +62,7 @@ class FilterPreviewContainer extends React.Component {
     const query = queryBuilder.build();
 
     const search = Search.create().toBuilder()
-      .parameters(config.query_parameters.filter((param) => (!param.embryonic)))
+      .parameters(config?.query_parameters?.filter((param) => (!param.embryonic)) || [])
       .queries([query])
       .build();
 
