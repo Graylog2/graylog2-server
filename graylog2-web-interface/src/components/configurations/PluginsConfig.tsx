@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { Navigate, Routes, Route } from 'react-router-dom';
 
 import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 import { useStore } from 'stores/connect';
@@ -26,6 +27,34 @@ import { getConfig } from 'components/configurations/helpers';
 import { PluginConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
+import { LinkContainer } from 'components/common/router';
+
+const pluginDisplayNames = [
+  {
+    configType: PluginConfigurationType.COLLECTORS_SYSTEM,
+    displayName: 'Collectors System',
+  },
+  {
+    configType: PluginConfigurationType.AWS,
+    displayName: 'AWS',
+  },
+  {
+    configType: PluginConfigurationType.THREAT_INTEL,
+    displayName: 'Threat Intelligence Lookup',
+  },
+  {
+    configType: PluginConfigurationType.FAILURE_PROCESSING,
+    displayName: 'Failure Processing',
+  },
+  {
+    configType: PluginConfigurationType.TRAFFIC_LIMIT_VIOLATION,
+    displayName: 'Traffic Limit Violation',
+  },
+  {
+    configType: PluginConfigurationType.GEO_LOCATION,
+    displayName: 'Geo-Location Processor',
+  },
+];
 
 const PluginsConfig = () => {
   const [activeSectionKey, setActiveSectionKey] = useState(1);
@@ -42,33 +71,6 @@ const PluginsConfig = () => {
     });
   }, [configuration, pluginSystemConfigs]);
 
-  const pluginDisplayNames = [
-    {
-      configType: PluginConfigurationType.COLLECTORS_SYSTEM,
-      displayName: 'Collectors System',
-    },
-    {
-      configType: PluginConfigurationType.AWS,
-      displayName: 'AWS',
-    },
-    {
-      configType: PluginConfigurationType.THREAT_INTEL,
-      displayName: 'Threat Intelligence Lookup',
-    },
-    {
-      configType: PluginConfigurationType.FAILURE_PROCESSING,
-      displayName: 'Failure Processing',
-    },
-    {
-      configType: PluginConfigurationType.TRAFFIC_LIMIT_VIOLATION,
-      displayName: 'Traffic Limit Violation',
-    },
-    {
-      configType: PluginConfigurationType.GEO_LOCATION,
-      displayName: 'Geo-Location Processor',
-    },
-  ];
-
   const onUpdate = (configType: string) => (config) => ConfigurationsActions.update(configType, config);
 
   if (!isLoaded || !pluginSystemConfigs) {
@@ -84,27 +86,35 @@ const PluginsConfig = () => {
              onSelect={setActiveSectionKey}>
           {pluginSystemConfigs.map(({ configType }, index) => {
             const obj = pluginDisplayNames.find((entry) => entry.configType === configType);
-            const displayName = obj ? obj.displayName : configType;
+            const displayName = obj?.displayName ?? configType;
 
             return (
-              <NavItem key={`plugin-nav-${configType}`} eventKey={index + 1} title={displayName}>
-                {displayName}
-              </NavItem>
+              <LinkContainer to={configType}>
+
+                <NavItem key={`plugin-nav-${configType}`} eventKey={index + 1} title={displayName}>
+                  {displayName}
+                </NavItem>
+              </LinkContainer>
             );
           })}
         </Nav>
       </Col>
       <Col md={8} lg={5}>
-        {pluginSystemConfigs
-          .map(({ component: SystemConfigComponent, configType }, index) => (
-            (index + 1 === activeSectionKey) && (
-              <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
-                <SystemConfigComponent key={`system-configuration-${configType}`}
-                                       config={getConfig(configType, configuration) ?? undefined}
-                                       updateConfig={onUpdate(configType)} />
-              </ConfigletContainer>
-            )
-          ))}
+        <Routes>
+          <Route path="/" element={<Navigate to={pluginSystemConfigs[0].configType} />} />
+          {pluginSystemConfigs
+            .map(({ component: SystemConfigComponent, configType }) => (
+              <Route path={configType}
+                     key={configType}
+                     element={(
+                       <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
+                         <SystemConfigComponent key={`system-configuration-${configType}`}
+                                                config={getConfig(configType, configuration) ?? undefined}
+                                                updateConfig={onUpdate(configType)} />
+                       </ConfigletContainer>
+              )} />
+            ))}
+        </Routes>
       </Col>
     </>
   );
