@@ -89,10 +89,10 @@ const Key = ({ description, keys, combinationKey, isEnabled, isMacOS }: KeyProps
           const isLast = index === keysArray.length - 1;
 
           return (
-            <>
+            <React.Fragment key={key}>
               <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key, isMacOS)}</KeyboardKey>
               {!isLast && <KeySeparator>{combinationKey}</KeySeparator>}
-            </>
+            </React.Fragment>
           );
         })}
       </KeysList>
@@ -127,7 +127,8 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectio
                  keys={keys}
                  combinationKey="+"
                  isEnabled={isEnabled}
-                 isMacOS={isMacOS} />
+                 isMacOS={isMacOS}
+                 key={keys} />
           );
         })}
       </ShortcutList>
@@ -163,7 +164,7 @@ const HotkeysModal = ({ onToggle }: Props) => {
         <Content>
           <SectionGrid>
             {enabledCollection.map(([scope, collection]: [ScopeName, HotkeyCollection]) => (
-              <HotkeyCollectionSection scope={scope} collection={collection} isMacOS={isMacOS} />
+              <HotkeyCollectionSection scope={scope} collection={collection} isMacOS={isMacOS} key={scope} />
             ))}
           </SectionGrid>
         </Content>

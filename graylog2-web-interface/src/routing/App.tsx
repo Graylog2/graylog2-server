@@ -31,6 +31,7 @@ import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 import 'stylesheets/typeahead.less';
 import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 import HotkeysProvider from 'contexts/HotkeysProvider';
+import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 
 const AppLayout = styled.div`
   display: flex;
@@ -74,20 +75,23 @@ const App = () => (
           <ScratchpadProvider loginName={currentUser.username}>
             <NavigationTelemetry />
             <HotkeysProvider>
-              <AppLayout>
-                <Navigation />
-                <ScrollToHint id="scroll-to-hint">
-                  <Icon name="arrow-up" />
-                </ScrollToHint>
-                <Scratchpad />
-                <ReportedErrorBoundary>
-                  <RuntimeErrorBoundary>
-                    <PageContent>
-                      <Outlet />
-                    </PageContent>
-                  </RuntimeErrorBoundary>
-                </ReportedErrorBoundary>
-              </AppLayout>
+              <>
+                <AppLayout>
+                  <Navigation />
+                  <ScrollToHint id="scroll-to-hint">
+                    <Icon name="arrow-up" />
+                  </ScrollToHint>
+                  <Scratchpad />
+                  <ReportedErrorBoundary>
+                    <RuntimeErrorBoundary>
+                      <PageContent>
+                        <Outlet />
+                      </PageContent>
+                    </RuntimeErrorBoundary>
+                  </ReportedErrorBoundary>
+                </AppLayout>
+                <HotkeysModalContainer />
+              </>
             </HotkeysProvider>
           </ScratchpadProvider>
         );
