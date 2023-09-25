@@ -114,6 +114,7 @@
         <commons-validator.version>1.7</commons-validator.version>
         <commons-io.version>2.13.0</commons-io.version>
         <disruptor.version>3.4.4</disruptor.version>
+        <error-prone.version>2.21.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
@@ -773,24 +774,24 @@
                     <release>17</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
-                    <compilerId>javac-with-errorprone</compilerId>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                    <annotationProcessors>
-                        <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
-                    </annotationProcessors>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>-Xplugin:ErrorProne</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error-prone.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.value</groupId>
+                            <artifactId>auto-value</artifactId>
+                            <version>${auto-value.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.11.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_core</artifactId>
-                        <version>2.13.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
