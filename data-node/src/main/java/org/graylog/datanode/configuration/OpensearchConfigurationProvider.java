@@ -48,6 +48,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
+    private final String nodeName;
+    private final String initialManagerNodes;
 
     @Inject
     public OpensearchConfigurationProvider(Configuration localConfiguration,
@@ -62,6 +64,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.mongoCertSecureConfiguration = mongoCertSecureConfiguration;
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
+        this.nodeName = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getDatanodeNodeName());
+        this.initialManagerNodes = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getInitialManagerNodes());
     }
 
     @Override
@@ -98,7 +102,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
                     "datanode-cluster",
-                    localConfiguration.getDatanodeNodeName(),
+                    nodeName,
                     Collections.emptyList(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
@@ -114,9 +118,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
         localConfiguration.getOpensearchNetworkHostHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
-        config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
+        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
+        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
+        config.put("cluster.initial_master_nodes", initialManagerNodes);
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");

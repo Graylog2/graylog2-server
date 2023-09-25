@@ -14,22 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createSelector } from '@reduxjs/toolkit';
 
-import useAppSelector from 'stores/useAppSelector';
-import { selectActiveQuery, selectView } from 'views/logic/slices/viewSelectors';
-import type View from 'views/logic/views/View';
+import type { Sort } from 'stores/PaginationTypes';
 
-const selectViewMetadata = createSelector(selectActiveQuery, selectView, (activeQuery: string, view: View) => (view
-  ? {
-    id: view?.id,
-    title: view?.title,
-    description: view?.description,
-    summary: view?.summary,
-    activeQuery,
-  }
-  : {}));
-
-const useViewMetadata = () => useAppSelector(selectViewMetadata);
-
-export default useViewMetadata;
+export const ENTITY_TABLE_ID = 'field-type';
+export const DEFAULT_LAYOUT = {
+  pageSize: 20,
+  sort: { attributeId: 'index_set_title', direction: 'asc' } as Sort,
+  displayedColumns: ['index_set_title', 'stream_titles', 'types'],
+  columnsOrder: ['index_set_title', 'stream_titles', 'types'],
+};

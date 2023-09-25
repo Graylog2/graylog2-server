@@ -239,6 +239,10 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
         final var nodes = findNodesThatNeedCertificateRenewal(renewalPolicy);
+        if(nodes.isEmpty()) {
+            return;
+        }
+
         if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
             nodes.forEach(node -> initiateRenewalForNode(node.getNodeId()));
         } else {

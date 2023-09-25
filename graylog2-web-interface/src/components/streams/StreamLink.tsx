@@ -14,22 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createSelector } from '@reduxjs/toolkit';
+import React from 'react';
 
-import useAppSelector from 'stores/useAppSelector';
-import { selectActiveQuery, selectView } from 'views/logic/slices/viewSelectors';
-import type View from 'views/logic/views/View';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
+import type { Stream } from 'views/stores/StreamsStore';
 
-const selectViewMetadata = createSelector(selectActiveQuery, selectView, (activeQuery: string, view: View) => (view
-  ? {
-    id: view?.id,
-    title: view?.title,
-    description: view?.description,
-    summary: view?.summary,
-    activeQuery,
-  }
-  : {}));
+type Props = {
+  stream: Stream,
+};
 
-const useViewMetadata = () => useAppSelector(selectViewMetadata);
+const StreamLink = ({ stream }: Props) => {
+  const route = Routes.stream_search(stream.id);
 
-export default useViewMetadata;
+  return <Link to={route}>{stream.title}</Link>;
+};
+
+export default StreamLink;
