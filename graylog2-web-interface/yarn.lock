@@ -3704,9 +3704,9 @@
   integrity sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==
 
 "@types/express-formidable@^1.0.4":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@types/express-formidable/-/express-formidable-1.2.0.tgz#53e59618a07118e48597d4d8345c49d9769e8d6f"
-  integrity sha512-nmqjkWllce71jVB0dWilJHyv676GmYESDtY12gcxgUwwl6J55FaOEAfn9bcShnydxj4f+AWIN1gEF4ItXyubUA==
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@types/express-formidable/-/express-formidable-1.2.1.tgz#c461f590c39bb53813bc09956a06e691bbdd49c4"
+  integrity sha512-76gerrS5n76r/n1uw4XgQknuvHGR0ExV9Dhf2gixOCBJdtw9/9zAlLALzGl7hjJsenVSMoB4h0Ro6L7xSky60w==
   dependencies:
     "@types/express" "*"
     "@types/formidable" "*"
