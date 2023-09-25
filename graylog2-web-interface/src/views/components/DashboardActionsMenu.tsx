@@ -114,6 +114,7 @@ const DashboardActionsMenu = () => {
     actionKey: 'save',
     callback: () => _onSaveView(),
     scope: 'dashboard',
+    telemetryAppPathname: 'search',
   });
 
   return (

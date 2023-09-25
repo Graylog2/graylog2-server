@@ -170,12 +170,14 @@ const SearchActionsMenu = () => {
     callback: () => (loaded ? saveSearch(title) : openFormModal()),
     scope: 'search',
     dependencies: [loaded, isDirty, saveSearch, title],
+    telemetryAppPathname: 'search',
   });
 
   useHotkey({
     actionKey: 'save-as',
     callback: () => openFormModal(),
     scope: 'search',
+    telemetryAppPathname: 'search',
   });
 
   return (

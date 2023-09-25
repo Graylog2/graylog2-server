@@ -37,6 +37,7 @@ const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
     actionKey: 'undo',
     callback: () => dispatch(undo()),
     scope: viewType.toLowerCase() as Lowercase<ViewType>,
+    telemetryAppPathname: 'search',
   });
 
   return (

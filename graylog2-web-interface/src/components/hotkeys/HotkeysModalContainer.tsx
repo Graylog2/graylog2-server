@@ -28,6 +28,7 @@ const HotkeysModalContainer = () => {
     actionKey: 'show-hotkeys-modal',
     callback: toggleModal,
     scope: 'general',
+    telemetryAppPathname: 'general',
   });
 
   if (!show) {

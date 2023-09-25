@@ -17,11 +17,12 @@
 
 import type { Options as ReactHotKeysHookOptions } from 'react-hotkeys-hook';
 import { useHotkeys as originalUseHotkeys } from 'react-hotkeys-hook';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 
-import type { ScopeName, HotkeyCollections, HotkeyCallback, Options } from 'contexts/HotkeysContext';
+import type { ScopeName, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import useFeature from 'hooks/useFeature';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const defaultOptions: ReactHotKeysHookOptions = {
   preventDefault: true,
@@ -53,18 +54,23 @@ const useHotkey = <T extends HTMLElement>({
   scope,
   options,
   dependencies,
+  telemetryAppPathname,
 }: {
   actionKey: string,
-  callback: HotkeyCallback,
+  callback: () => unknown,
   scope: ScopeName,
   options?: Options,
   dependencies?: Array<unknown>,
+  telemetryAppPathname: string,
 }) => {
   const hasHotkeysFeatureFlag = useFeature('frontend_hotkeys');
 
   if (!hasHotkeysFeatureFlag) {
     return null;
   }
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const sendTelemetry = useSendTelemetry();
 
   const {
     hotKeysCollections,
@@ -83,6 +89,17 @@ const useHotkey = <T extends HTMLElement>({
   }), [options, scope]);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const callbackWithTelemetry = useCallback(() => {
+    sendTelemetry('hotkey_usage', {
+      app_pathname: telemetryAppPathname,
+      app_section: scope,
+      app_action_value: actionKey,
+    });
+
+    callback();
+  }, [actionKey, callback, scope, sendTelemetry, telemetryAppPathname]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     addActiveHotkey({
       scope,
@@ -99,7 +116,7 @@ const useHotkey = <T extends HTMLElement>({
 
   const keys = hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys;
 
-  return originalUseHotkeys<T>(keys, callback, mergedOptions, dependencies);
+  return originalUseHotkeys<T>(keys, callbackWithTelemetry, mergedOptions, dependencies);
 };
 
 export default useHotkey;
