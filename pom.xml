@@ -114,7 +114,7 @@
         <commons-validator.version>1.7</commons-validator.version>
         <commons-io.version>2.13.0</commons-io.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <error-prone.version>2.21.1</error-prone.version>
+        <error-prone.version>2.22.0</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
@@ -451,6 +451,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>3.3.1</version>
                 </plugin>
@@ -769,7 +774,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
                 <configuration>
                     <release>17</release>
                     <showWarnings>true</showWarnings>
