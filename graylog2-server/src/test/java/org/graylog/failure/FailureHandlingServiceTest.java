@@ -20,7 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.awaitility.Awaitility;
-import org.awaitility.Duration;
+import org.awaitility.Durations;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -75,7 +75,7 @@ public class FailureHandlingServiceTest {
         //when
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         //then
@@ -107,7 +107,7 @@ public class FailureHandlingServiceTest {
         //when
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         //then
@@ -140,7 +140,7 @@ public class FailureHandlingServiceTest {
         // when
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
@@ -170,7 +170,7 @@ public class FailureHandlingServiceTest {
         failureSubmissionQueue.submitBlocking(indexingFailureBatch2);
         failureSubmissionQueue.submitBlocking(indexingFailureBatch1);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
@@ -199,7 +199,7 @@ public class FailureHandlingServiceTest {
 
         failureSubmissionQueue.submitBlocking(processingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
@@ -224,7 +224,7 @@ public class FailureHandlingServiceTest {
 
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
 
-        Awaitility.waitAtMost(Duration.ONE_SECOND)
+        Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then

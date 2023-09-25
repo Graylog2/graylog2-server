@@ -29,7 +29,6 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
-import org.graylog2.utilities.uri.TransportAddressSanitizer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,19 +55,16 @@ public class PreflightResource {
     private final NodeService nodeService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final CaService caService;
-    private final TransportAddressSanitizer transportAddressSanitizer;
     private final String passwordSecret;
 
     @Inject
     public PreflightResource(final NodeService nodeService,
                              final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
-                             final TransportAddressSanitizer transportAddressSanitizer,
                              final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
-        this.transportAddressSanitizer = transportAddressSanitizer;
         this.passwordSecret = passwordSecret;
     }
 
@@ -84,7 +80,7 @@ public class PreflightResource {
             final var preflight = preflightDataNodes.get(n.getNodeId());
             return new DataNode(n.getNodeId(),
                     n.getType(),
-                    transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
+                    n.getTransportAddress(),
                     preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null,
                     n.getHostname(),
                     n.getShortNodeId());

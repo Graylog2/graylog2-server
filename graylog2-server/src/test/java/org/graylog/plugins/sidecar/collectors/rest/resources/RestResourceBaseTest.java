@@ -53,7 +53,7 @@ public class RestResourceBaseTest {
         @Override
         protected Subject getSubject() {
             final Subject mock = mock(Subject.class);
-            when(mock.isPermitted((String[]) any())).thenReturn(new boolean[]{false, false});
+            when(mock.isPermitted(any(String[].class))).thenReturn(new boolean[]{false, false});
             return mock;
         }
 
@@ -66,7 +66,7 @@ public class RestResourceBaseTest {
         @Override
         protected Subject getSubject() {
             final Subject mock = mock(Subject.class);
-            when(mock.isPermitted((String[]) any())).thenReturn(new boolean[]{true, true});
+            when(mock.isPermitted(any(String[].class))).thenReturn(new boolean[]{true, true});
             return mock;
         }
 
@@ -79,7 +79,7 @@ public class RestResourceBaseTest {
         @Override
         protected Subject getSubject() {
             final Subject mock = mock(Subject.class);
-            when(mock.isPermitted((String[]) any())).thenReturn(new boolean[]{false, true});
+            when(mock.isPermitted(any(String[].class))).thenReturn(new boolean[]{false, true});
             return mock;
         }
 

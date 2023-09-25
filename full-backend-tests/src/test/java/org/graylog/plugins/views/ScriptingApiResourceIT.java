@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views;
 
+import au.com.bytecode.opencsv.CSVParser;
 import io.restassured.http.Header;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
@@ -36,11 +37,12 @@ import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvParser;
 
 import javax.ws.rs.core.MediaType;
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -101,13 +103,13 @@ public class ScriptingApiResourceIT {
                         """);
 
         api.search().waitForMessagesCount(3);
-        api.fieldTypes().waitForFieldTypeDefinitions( "source", "facility", "level");
+        api.fieldTypes().waitForFieldTypeDefinitions("source", "facility", "level");
     }
 
     @ContainerMatrixTest
     void testAggregationByStream() {
         final ValidatableResponse validatableResponse =
-                api.post("/search/aggregate","""
+                api.post("/search/aggregate", """
                          {
                            "group_by": [
                              {
@@ -133,7 +135,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testStdDevSorting() {
         final GraylogApiResponse responseDesc =
-                new GraylogApiResponse(api.post("/search/aggregate","""
+                new GraylogApiResponse(api.post("/search/aggregate", """
                         {
                         	"group_by": [
                         		{
@@ -159,7 +161,7 @@ public class ScriptingApiResourceIT {
                 .containsExactly(0.5, 0.0);
 
         final GraylogApiResponse responseAsc =
-                new GraylogApiResponse(api.post("/search/aggregate","""
+                new GraylogApiResponse(api.post("/search/aggregate", """
                         {
                         	"group_by": [
                         		{
@@ -185,7 +187,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testAggregationByStreamTitle() {
         final ValidatableResponse validatableResponse =
-                api.post("/search/aggregate","""
+                api.post("/search/aggregate", """
                          {
                            "group_by": [
                              {
@@ -360,7 +362,7 @@ public class ScriptingApiResourceIT {
     }
 
     @ContainerMatrixTest
-    void testCsvRender() {
+    void testCsvRender() throws Exception {
         final InputStream response = given()
                 .spec(api.requestSpecification())
                 .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
@@ -386,10 +388,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(200)
                 .extract().body().asInputStream();
 
-        final CsvParser csvParser = new CsvParser(Csv.parseRfc4180());
-        final List<String[]> lines = csvParser.parseAll(response);
-
-
+        final List<String[]> lines = parseCsvLines(response);
 
         // headers
         Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
@@ -399,8 +398,21 @@ public class ScriptingApiResourceIT {
         Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
     }
 
+    private List<String[]> parseCsvLines(InputStream inputStream) throws Exception {
+        final CSVParser csvParser = new CSVParser(',', '"');
+        final List<String[]> lines = new ArrayList<>();
+
+        try (final var reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            while (reader.ready()) {
+                lines.add(csvParser.parseLine(reader.readLine()));
+            }
+        }
+
+        return lines;
+    }
+
     @ContainerMatrixTest
-    void testGetRequestCsv() {
+    void testGetRequestCsv() throws Exception {
 
         final InputStream response = given()
                 .spec(api.requestSpecification())
@@ -413,8 +425,7 @@ public class ScriptingApiResourceIT {
                 .extract().body().asInputStream();
 
 
-        final CsvParser csvParser = new CsvParser(Csv.parseRfc4180());
-        final List<String[]> lines = csvParser.parseAll(response);
+        final List<String[]> lines = parseCsvLines(response);
 
         // headers
         Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});

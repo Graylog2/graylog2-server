@@ -34,7 +34,7 @@ styles.map((style, i) => {
 ```tsx
 import Icon from 'components/common/Icon';
 
-<Alert onClose={() => window.alert('You clicked on the alert close icon.')}>
+<Alert onDismiss={() => window.alert('You clicked on the alert close icon.')}>
   Lorem ipsum dolor sit amet consectetur adipisicing elit.
 </Alert>
 ```

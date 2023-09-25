@@ -200,7 +200,11 @@ public class Message implements Messages, Indexable {
     @Deprecated
     public static final String FIELD_GL2_SOURCE_RADIO_INPUT = "gl2_source_radio_input";
 
+    // Matches whole field names containing a-z, A-Z, 0-9, period char, -, or @.
     private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
+    // Same as above, but matches only the invalid (non-indicated) characters.
+    // [^ ... ] around the pattern inverts the match.
+    private static final Pattern INVALID_KEY_CHARS = Pattern.compile("[^\\w\\.\\-@]");
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
@@ -636,6 +640,10 @@ public class Message implements Messages, Indexable {
 
     public static boolean validKey(final String key) {
         return VALID_KEY_CHARS.matcher(key).matches();
+    }
+
+    public static String cleanKey(final String key) {
+        return INVALID_KEY_CHARS.matcher(key).replaceAll(String.valueOf(KEY_REPLACEMENT_CHAR));
     }
 
     public void addFields(final Map<String, Object> fields) {

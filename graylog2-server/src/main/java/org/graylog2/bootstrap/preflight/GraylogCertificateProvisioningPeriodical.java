@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import com.google.common.eventbus.EventBus;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -71,8 +72,9 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
-    private final ClusterEventBus clusterEventBus;
+    private final EventBus serverEventBus;
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
+    private final PreflightConfigService preflightConfigService;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
 
     @Inject
@@ -86,7 +88,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final ClusterConfigService clusterConfigService,
                                                     final @Named("password_secret") String passwordSecret,
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
-                                                    final ClusterEventBus clusterEventBus) {
+                                                    final PreflightConfigService preflightConfigService,
+                                                    final EventBus serverEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -96,7 +99,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.nodeService = nodeService;
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
-        this.clusterEventBus = clusterEventBus;
+        this.serverEventBus = serverEventBus;
+        this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
     }
 
@@ -106,7 +110,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
             try {
                 var sslContext = SSLContext.getInstance("TLS");
-                var tm = new CustomCAX509TrustManager(caService, clusterEventBus);
+                var tm = new CustomCAX509TrustManager(caService, serverEventBus);
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
                 clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
             } catch (NoSuchAlgorithmException ex) {
@@ -154,6 +158,17 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
 
                 var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+
+                // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
+                preflightConfigService.getPersistedConfig().ifPresent(cfg -> {
+                    if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC) && cfg.result().equals(PreflightConfigResult.FINISHED)) {
+                        nodes.stream()
+                                .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
+                                .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
+                                        .state(DataNodeProvisioningConfig.State.CONFIGURED)
+                                        .build()));
+                    }
+                });
 
                 nodes.stream()
                         .filter(c -> DataNodeProvisioningConfig.State.CSR.equals(c.state()))
@@ -229,7 +244,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
 
     @Override
     public boolean leaderOnly() {
-        return false;
+        return true;
     }
 
     @Override
