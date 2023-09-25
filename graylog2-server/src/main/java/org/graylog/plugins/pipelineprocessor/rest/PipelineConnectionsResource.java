@@ -141,7 +141,6 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
 
             final Set<String> pipelines = updatedConnection.pipelineIds();
             pipelines.add(pipelineId);
-            updatedConnection.toBuilder().pipelineIds(pipelines).build();
 
             updatedConnections.add(updatedConnection);
             connectionsService.save(updatedConnection);
