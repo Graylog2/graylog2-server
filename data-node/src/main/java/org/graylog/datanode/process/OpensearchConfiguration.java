@@ -67,6 +67,9 @@ public record OpensearchConfiguration(
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
             config.put("discovery.seed_hosts", toValuesList(discoverySeedHosts));
         }
+
+        config.put("discovery.seed_providers", "file");
+
         config.putAll(additionalConfiguration);
         return config;
     }
