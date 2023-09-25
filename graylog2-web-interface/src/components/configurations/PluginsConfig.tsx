@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Navigate, Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
+import URI from 'urijs';
 
 import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 import { useStore } from 'stores/connect';
@@ -28,6 +29,7 @@ import { PluginConfigurationType } from 'components/configurations/Configuration
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import { LinkContainer } from 'components/common/router';
+import useLocation from 'routing/useLocation';
 
 const pluginDisplayNames = [
   {
@@ -55,6 +57,27 @@ const pluginDisplayNames = [
     displayName: 'Geo-Location Processor',
   },
 ];
+
+type PluginSectionLinkProps = {
+  configType: string,
+  displayName: string,
+}
+
+const PluginSectionLink = ({ configType, displayName }: PluginSectionLinkProps) => {
+  const absolutePath = useResolvedPath(configType);
+  const location = useLocation();
+
+  const isActive = URI(location.pathname).equals(absolutePath.pathname)
+    || location.pathname.startsWith(absolutePath.pathname);
+
+  return (
+    <LinkContainer key={`plugin-nav-${configType}`} to={configType}>
+      <NavItem title={displayName} active={isActive}>
+        {displayName}
+      </NavItem>
+    </LinkContainer>
+  );
+};
 
 const PluginsConfig = () => {
   const [activeSectionKey, setActiveSectionKey] = useState(1);
@@ -84,18 +107,11 @@ const PluginsConfig = () => {
              stacked
              activeKey={activeSectionKey}
              onSelect={setActiveSectionKey}>
-          {pluginSystemConfigs.map(({ configType }, index) => {
+          {pluginSystemConfigs.map(({ configType }) => {
             const obj = pluginDisplayNames.find((entry) => entry.configType === configType);
             const displayName = obj?.displayName ?? configType;
 
-            return (
-              <LinkContainer to={configType}>
-
-                <NavItem key={`plugin-nav-${configType}`} eventKey={index + 1} title={displayName}>
-                  {displayName}
-                </NavItem>
-              </LinkContainer>
-            );
+            return <PluginSectionLink configType={configType} displayName={displayName} />;
           })}
         </Nav>
       </Col>
