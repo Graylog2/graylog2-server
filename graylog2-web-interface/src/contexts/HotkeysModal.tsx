@@ -105,9 +105,7 @@ const Key = ({ description, keys, combinationKey, isEnabled, isMacOS }: KeyProps
 const HotkeyCollectionSection = ({ collection, scope, isMacOS }: { collection: HotkeyCollection, scope: ScopeName, isMacOS: boolean }) => {
   const { title, description, actions } = collection;
   const { activeHotkeys } = useHotkeysContext();
-  const filtratedActions = Object.entries(actions).filter(([actionKey]) => activeHotkeys.has(`${scope}.${actionKey}`),
-    // && (activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled !== false);
-  );
+  const filtratedActions = Object.entries(actions).filter(([actionKey]) => activeHotkeys.has(`${scope}.${actionKey}`));
 
   if (!filtratedActions.length) {
     return null;
@@ -118,7 +116,7 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: { collection: H
       <p className="description">{description}</p>
       <ShortcutList>
         {filtratedActions.map(([actionKey, { description: keyDescription, keys }]) => {
-          const isEnabled = (activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled !== false);
+          const isEnabled = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled !== false;
 
           return (
             <Key description={keyDescription}

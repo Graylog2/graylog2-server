@@ -21,10 +21,9 @@ import {
   HotkeysProvider as OriginalHotkeysProvider,
   useHotkeysContext as useOriginalHotkeysContext,
 } from 'react-hotkeys-hook';
-import isArray from 'lodash/isArray';
 import Immutable from 'immutable';
 
-import type { ScopeName, ScopeParam, ActiveHotkeys, HotkeyCollections, Options, Hotkey } from 'contexts/HotkeysContext';
+import type { ScopeName, ActiveHotkeys, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
 import HotkeysModal from 'contexts/HotkeysModal';
 import useFeature from 'hooks/useFeature';
@@ -63,25 +62,13 @@ export const hotKeysCollections: HotkeyCollections = {
 
 const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   const [activeHotkeys, setActiveHotkeys] = useState<ActiveHotkeys>(Immutable.Map());
-  const { enabledScopes, hotkeys, disableScope, toggleScope, enableScope } = useOriginalHotkeysContext();
-  const _enableScope = useCallback((scopes: ScopeParam) => {
-    const newScopes = isArray(scopes) ? scopes : [scopes];
-    newScopes.forEach((scope) => enableScope(scope));
-  }, [enableScope]);
+  const { enabledScopes } = useOriginalHotkeysContext();
 
-  const _disableScope = useCallback((scopes: ScopeParam) => {
-    const toDisableScopes = isArray(scopes) ? scopes : [scopes];
-    toDisableScopes.forEach((scope) => disableScope(scope));
-  }, [disableScope]);
-
-  const setActiveScopes = useCallback((scopes: ScopeParam) => {
-    const scopeToDisable = (enabledScopes as Array<ScopeName>).filter((item) => (isArray(scopes) ? scopes : [scopes]).includes(item));
-    _disableScope(scopeToDisable);
-
-    _enableScope(scopes);
-  }, [_disableScope, _enableScope, enabledScopes]);
-
-  const addActiveHotkey = useCallback(({ scope, actionKey, options }: { scope: ScopeName, actionKey: string, options: Options & { scope: ScopeName } }) => {
+  const addActiveHotkey = useCallback(({ scope, actionKey, options }: {
+    scope: ScopeName,
+    actionKey: string,
+    options: Options & { scope: ScopeName }
+  }) => {
     setActiveHotkeys((cur) => cur.set(`${scope}.${actionKey}`, { options }));
   }, []);
 
@@ -90,26 +77,16 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const value = useMemo(() => ({
-    disableScope: _disableScope,
-    enableScope: _enableScope,
-    setActiveScopes,
-    hotkeys: hotkeys as Array<Hotkey>,
-    toggleScope,
     enabledScopes: enabledScopes as Array<ScopeName>,
     hotKeysCollections,
     activeHotkeys,
     addActiveHotkey,
     removeActiveHotkey,
   }), [
-    _disableScope,
-    _enableScope,
     activeHotkeys,
     addActiveHotkey,
     enabledScopes,
-    hotkeys,
     removeActiveHotkey,
-    setActiveScopes,
-    toggleScope,
   ]);
 
   return (

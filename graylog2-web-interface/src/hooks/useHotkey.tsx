@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { Options as ReactHotKeysHookOptions } from 'react-hotkeys-hook';
 import { useHotkeys as originalUseHotkeys } from 'react-hotkeys-hook';
 import { useEffect, useMemo } from 'react';
 
-import type { ScopeName, HotkeyCollections, Options, HotkeyCallback } from 'contexts/HotkeysContext';
+import type { ScopeName, HotkeyCollections, HotkeyCallback, Options } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import useFeature from 'hooks/useFeature';
 
-const defaultOptions: Options = {
+const defaultOptions: ReactHotKeysHookOptions = {
   preventDefault: true,
   enabled: true,
   enableOnFormTags: false,
@@ -74,9 +75,6 @@ const useHotkey = <T extends HTMLElement>({
 
   catchErrors(hotKeysCollections, actionKey, scope);
 
-  // const scope = options?.scopes ?? '*';
-  // const scopes = isArray(scope) ? scope : [scope];
-
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const mergedOptions = useMemo(() => ({
     ...defaultOptions,
@@ -84,17 +82,6 @@ const useHotkey = <T extends HTMLElement>({
     scopes: scope,
   }), [options, scope]);
 
-  /*
-  useEffect(() => {
-    setHotKeysCollection((cur) => {
-      const newState = { ...cur };
-
-      scopes.forEach((curScope) => {
-        set(newState, curScope, { keys, description: options?.description });
-      });
-    });
-  }, [keys, options?.description, scopes, setHotKeysCollection]);
-*/
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     addActiveHotkey({
