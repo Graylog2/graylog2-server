@@ -35,7 +35,7 @@ const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
 
   useHotkey({
     actionKey: 'undo',
-    callback: () => { console.log('undo'); },
+    callback: () => dispatch(undo()),
     scope: viewType.toLowerCase() as Lowercase<ViewType>,
   });
 

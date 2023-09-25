@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import pick from 'lodash/pick';
 
 import { KeyboardKey, Modal, Button } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
-import useHotkey from 'hooks/useHotkey';
 import type { ScopeName, HotkeyCollection } from 'contexts/HotkeysContext';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import { isMacOS as _isMacOS } from 'util/OSUtils';
 import StringUtils from 'util/StringUtils';
-import { Link } from 'components/common/router';
 
 const Content = styled.div`
   padding: 20px;
@@ -34,7 +32,7 @@ const Content = styled.div`
 
 const Footer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: right;
   align-items: center;
 `;
 
@@ -93,7 +91,7 @@ const Key = ({ description, keys, combinationKey, isEnabled, isMacOS }: KeyProps
           return (
             <>
               <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key, isMacOS)}</KeyboardKey>
-              {!isLast && <KeySeparator>+</KeySeparator>}
+              {!isLast && <KeySeparator>{combinationKey}</KeySeparator>}
             </>
           );
         })}
@@ -102,9 +100,15 @@ const Key = ({ description, keys, combinationKey, isEnabled, isMacOS }: KeyProps
   );
 };
 
-const HotkeyCollectionSection = ({ collection, scope, isMacOS }: { collection: HotkeyCollection, scope: ScopeName, isMacOS: boolean }) => {
-  const { title, description, actions } = collection;
+type HotkeyCollectionSectionProps = {
+  collection: HotkeyCollection,
+  scope: ScopeName,
+  isMacOS: boolean
+}
+
+const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectionSectionProps) => {
   const { activeHotkeys } = useHotkeysContext();
+  const { title, description, actions } = collection;
   const filtratedActions = Object.entries(actions).filter(([actionKey]) => activeHotkeys.has(`${scope}.${actionKey}`));
 
   if (!filtratedActions.length) {
@@ -131,29 +135,25 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: { collection: H
   );
 };
 
-const HotkeysModal = () => {
-  const [show, setShow] = useState(false);
-  const onHide = useCallback(() => setShow(false), []);
-  const onToggle = useCallback(() => setShow((cur) => !cur), []);
+const useEnabledCollections = () => {
   const { hotKeysCollections, enabledScopes } = useHotkeysContext();
+  const allScopesEnabled = enabledScopes.length === 1 && enabledScopes[0] === '*';
+  const collection = allScopesEnabled ? hotKeysCollections : pick(hotKeysCollections, enabledScopes);
+
+  return Object.entries(collection);
+};
+
+type Props = {
+  onToggle: () => void,
+}
+
+const HotkeysModal = ({ onToggle }: Props) => {
   const isMacOS = _isMacOS();
+  const enabledCollection = useEnabledCollections();
 
-  useHotkey({
-    actionKey: 'show-hotkeys-modal',
-    callback: onToggle,
-    scope: 'general',
-  });
-
-  const enabledCollection = useMemo(() => {
-    const allScopesEnabled = enabledScopes.length === 1 && enabledScopes[0] === '*';
-    const collection = allScopesEnabled ? hotKeysCollections : pick(hotKeysCollections, enabledScopes);
-
-    return Object.entries(collection);
-  }, [enabledScopes, hotKeysCollections]);
-
-  return show && (
-    <Modal show={show}
-           onHide={onHide}
+  return (
+    <Modal onHide={onToggle}
+           show
            bsSize="large">
       <Modal.Header closeButton>
         <Modal.Title>Keyboard shortcuts</Modal.Title>
@@ -170,8 +170,8 @@ const HotkeysModal = () => {
       </Modal.Body>
       <Modal.Footer>
         <Footer>
-          <Link to="/" target="_blank">View all keyboard shortcuts</Link>
-          <Button onClick={() => onHide()}>Close</Button>
+          {/* <Link to="/" target="_blank">View all keyboard shortcuts</Link> */}
+          <Button onClick={() => onToggle()}>Close</Button>
         </Footer>
       </Modal.Footer>
     </Modal>

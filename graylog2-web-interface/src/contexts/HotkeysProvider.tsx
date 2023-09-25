@@ -25,7 +25,7 @@ import Immutable from 'immutable';
 
 import type { ScopeName, ActiveHotkeys, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
-import HotkeysModal from 'contexts/HotkeysModal';
+import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 import useFeature from 'hooks/useFeature';
 
 const viewActions = {
@@ -111,7 +111,7 @@ const HotkeysProvider = ({ children }: Props) => {
     <OriginalHotkeysProvider>
       <CustomHotkeysProvider>
         {children}
-        <HotkeysModal />
+        <HotkeysModalContainer />
       </CustomHotkeysProvider>
     </OriginalHotkeysProvider>
   );
