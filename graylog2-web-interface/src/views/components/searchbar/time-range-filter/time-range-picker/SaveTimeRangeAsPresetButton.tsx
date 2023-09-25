@@ -128,7 +128,7 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target }: Prop
   );
 };
 
-const TimeRangeAddToQuickListButton = () => {
+const SaveTimeRangeAsPresetButton = () => {
   const { userTimezone } = useUserDateTime();
   const { values: { timeRangeTabs, activeTab }, errors } = useFormikContext<TimeRangePickerFormValues>();
   const formTarget = useRef();
@@ -193,4 +193,4 @@ const TimeRangeAddToQuickListButton = () => {
   );
 };
 
-export default TimeRangeAddToQuickListButton;
+export default SaveTimeRangeAsPresetButton;
