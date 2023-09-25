@@ -188,7 +188,7 @@
         <assertj-core.version>3.24.2</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <equalsverifier.version>3.15.1</equalsverifier.version>
+        <equalsverifier.version>3.15.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
@@ -483,7 +483,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
