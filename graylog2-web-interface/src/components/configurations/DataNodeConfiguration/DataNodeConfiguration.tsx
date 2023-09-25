@@ -23,7 +23,7 @@ import CertificateRenewal from './CertificateRenewal';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px
+  gap: 20px;
 `;
 
 const DataNodeConfiguration = () => (
