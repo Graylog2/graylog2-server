@@ -176,7 +176,6 @@ const SearchActionsMenu = () => {
     actionKey: 'save-as',
     callback: () => openFormModal(),
     scope: 'search',
-    options: { enabled: (isDirty && loaded) || !loaded },
   });
 
   return (
