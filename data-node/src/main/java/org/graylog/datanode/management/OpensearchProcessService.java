@@ -57,11 +57,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.nodeService = nodeService;
         this.configuration = configuration;
         this.eventBus = eventBus;
-        this.process = createOpensearchProcess(datanodeConfiguration);
+        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
         eventBus.register(this);
     }
 
-    private OpensearchProcess createOpensearchProcess(DatanodeConfiguration datanodeConfiguration) {
+    private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService nodeService) {
         final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
