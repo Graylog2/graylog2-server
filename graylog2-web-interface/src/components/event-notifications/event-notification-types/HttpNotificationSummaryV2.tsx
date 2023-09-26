@@ -20,30 +20,19 @@ import CommonNotificationSummary from './CommonNotificationSummary';
 
 type Props = {
   type: string,
-  notification?: any,
+  notification: any,
   definitionNotification: any,
 };
 
-const HttpNotificationSummaryV2 = ({type, notification, definitionNotification} : Props) => {
-
-    return (
-      <CommonNotificationSummary type={type}
-                                 notification={notification}
-                                 definitionNotification={definitionNotification}>
-        <>
-          <tr>
-            <td>URL</td>
-            <td><code>{notification.config.url}</code></td>
-          </tr>
-        </>
-      </CommonNotificationSummary>
-    );
-}
-
-HttpNotificationSummaryV2.defaultProps = {
-  type: '',
-  notification: undefined,
-  definitionNotification: undefined
-};
+const HttpNotificationSummaryV2 = ({ type, notification, definitionNotification } : Props) => (
+  <CommonNotificationSummary type={type}
+                             notification={notification}
+                             definitionNotification={definitionNotification}>
+    <tr>
+      <td>URL</td>
+      <td><code>{notification.config.url}</code></td>
+    </tr>
+  </CommonNotificationSummary>
+);
 
 export default HttpNotificationSummaryV2;

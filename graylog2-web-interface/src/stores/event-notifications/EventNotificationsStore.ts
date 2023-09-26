@@ -44,26 +44,6 @@ export type EventNotification = {
   },
 };
 
-export type HttpEventNotificationV2 = EventNotification & {
-  config: HttpEventNotificationConfigV2,
-};
-
-export type EncryptedValue = {
-  is_set?: boolean,
-  set_value?: string,
-  keep_value?: boolean,
-  delete_value?: boolean
-};
-
-export type HttpEventNotificationConfigV2 = {
-  type: 'http-notification-v2',
-  url: string,
-  basic_auth?: EncryptedValue,
-  api_key?: string,
-  api_secret?: EncryptedValue,
-  skip_tls_verification: boolean,
-};
-
 export type LegacyEventNotification = {
   name: string,
   configuration: {}

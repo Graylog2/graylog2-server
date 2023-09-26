@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { SyntheticEvent } from 'react';
 import React from 'react';
-import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import styled from 'styled-components';
@@ -23,6 +23,7 @@ import styled from 'styled-components';
 import { Select, SourceCodeEditor, TimezoneSelect, URLWhiteListInput } from 'components/common';
 import { Button, Checkbox, Col, ControlLabel, FormGroup, HelpBlock, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
+import type { HttpNotificationConfigV2, HttpNotificationValidationV2 } from 'components/event-notifications/types';
 
 const StyledButton = styled(Button)`
   clear: both;
@@ -30,14 +31,14 @@ const StyledButton = styled(Button)`
   margin-bottom: 15px;
 `;
 
-class HttpNotificationFormV2 extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    validation: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    setIsSubmitEnabled: PropTypes.func,
-  };
+type Props = {
+  config: HttpNotificationConfigV2,
+  validation: HttpNotificationValidationV2
+  onChange: any,
+  setIsSubmitEnabled: any,
+};
 
+class HttpNotificationFormV2 extends React.Component<Props, any> {
   static defaultConfig = {
     url: '',
     api_key: '',
@@ -49,8 +50,8 @@ class HttpNotificationFormV2 extends React.Component {
     json_body_template: '',
   };
 
-  constructor() {
-    super();
+  constructor(props: Props) {
+    super(props);
 
     this.state = {
       api_secret: '',
@@ -75,7 +76,7 @@ class HttpNotificationFormV2 extends React.Component {
     this.setState({ api_secret: config.api_secret.is_set ? '******' : '' });
   }
 
-  propagateChange = (key, value) => {
+  propagateChange = (key: string, value: any) => {
     const { config, onChange } = this.props;
     const nextConfig = cloneDeep(config);
 
@@ -83,26 +84,31 @@ class HttpNotificationFormV2 extends React.Component {
     onChange(nextConfig);
   };
 
-  handleChange = (event) => {
+  handleChange = (event: { target: { name: string }}) => {
     const { name } = event.target;
     const inputValue = FormsUtils.getValueFromInput(event.target);
 
     this.propagateChange(name, inputValue);
   };
 
-  handleTimeZoneChange = (nextValue) => {
+  handleUrlChange = (event: SyntheticEvent<EventTarget>) => {
+    const target = event.target as HTMLInputElement;
+    this.propagateChange('url', target.value);
+  };
+
+  handleTimeZoneChange = (nextValue: string) => {
     this.propagateChange('time_zone', nextValue);
   };
 
-  handleJsonBodyTemplateChange = (nextValue) => {
+  handleJsonBodyTemplateChange = (nextValue: string) => {
     this.propagateChange('json_body_template', nextValue);
   };
 
-  handleMethodChange = (nextValue) => {
+  handleMethodChange = (nextValue: string) => {
     this.propagateChange('method', nextValue);
   };
 
-  handleSecretInputChange = (event) => {
+  handleSecretInputChange = (event: { target: { name: string }}) => {
     const { name } = event.target;
     const inputValue = FormsUtils.getValueFromInput(event.target);
     const value = inputValue.length === 0 ? { delete_value: true } : { set_value: inputValue };
@@ -111,13 +117,13 @@ class HttpNotificationFormV2 extends React.Component {
     this.propagateChange(name, value);
   };
 
-  onValidationChange = (validationState) => {
+  onValidationChange = (validationState: string) => {
     const { setIsSubmitEnabled } = this.props;
 
     setIsSubmitEnabled(validationState !== 'error');
   };
 
-  resetSecret = (attribute) => {
+  resetSecret = (attribute: string) => {
     const { reset } = this.state;
     reset[attribute] = true;
     this.setState({ reset });
@@ -126,7 +132,7 @@ class HttpNotificationFormV2 extends React.Component {
     this.setState({ [attribute]: '' });
   };
 
-  undoResetSecret = (attribute) => {
+  undoResetSecret = (attribute: string) => {
     const { reset } = this.state;
     reset[attribute] = false;
     this.setState({ reset });
@@ -147,7 +153,7 @@ class HttpNotificationFormV2 extends React.Component {
     return (
       <>
         <URLWhiteListInput label="URL"
-                           onChange={this.handleChange}
+                           onChange={this.handleUrlChange}
                            validationState={validation.errors.url ? 'error' : null}
                            validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
                            onValidationChange={this.onValidationChange}
@@ -262,9 +268,5 @@ class HttpNotificationFormV2 extends React.Component {
     );
   }
 }
-
-HttpNotificationFormV2.defaultProps = {
-  setIsSubmitEnabled: () => {},
-};
 
 export default HttpNotificationFormV2;

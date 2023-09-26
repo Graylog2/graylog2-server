@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { ReadOnlyFormGroup } from 'components/common';
-import { HttpEventNotificationV2 } from 'stores/event-notifications/EventNotificationsStore';
+import type { HttpEventNotificationV2 } from 'components/event-notifications/types';
 
 type Props = {
   notification: HttpEventNotificationV2,
@@ -31,9 +31,5 @@ const HttpNotificationDetailsV2 = ({ notification } : Props) => (
     <ReadOnlyFormGroup label="API Secret" value={notification.config.api_secret?.is_set ? '******' : null} />
   </>
 );
-
-HttpNotificationDetailsV2.defaultProps = {
-  notification: undefined,
-};
 
 export default HttpNotificationDetailsV2;
