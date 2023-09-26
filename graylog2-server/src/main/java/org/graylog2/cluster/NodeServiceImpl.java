@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -71,17 +72,27 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         return Node.Type.SERVER;
     }
 
+    private Map<String, Object> addClusterUriToMap(final Map<String, Object> orig, final URI clusterUri) {
+        if(clusterUri == null) {
+            return orig;
+        }
+        var newMap = new HashMap<>(orig);
+        newMap.put("cluster_address", clusterUri.toString());
+        return Map.copyOf(newMap);
+    }
+
     @Override
     public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, URI clusterUri, String hostname) {
+        final var params = addClusterUriToMap(Map.of(
+                "node_id", nodeId,
+                "type", type().toString(),
+                "is_leader", isLeader,
+                "transport_address", httpPublishUri.toString(),
+                "hostname", hostname
+        ), clusterUri);
+
         final Map<String, Object> fields = Map.of(
-                "$set", Map.of(
-                        "node_id", nodeId,
-                        "type", type().toString(),
-                        "is_leader", isLeader,
-                        "transport_address", httpPublishUri.toString(),
-                        "cluster_address", clusterUri != null ? clusterUri.toString() : null,
-                        "hostname", hostname
-                ),
+                "$set", params,
                 "$currentDate", lastSeenFieldDefinition
         );
 
@@ -172,13 +183,13 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
      */
     public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, URI clusterAddress) throws NodeNotFoundException {
         BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
+        final var params = addClusterUriToMap(Map.of(
+                "is_leader", isLeader,
+                "transport_address", restTransportAddress.toString()
+        ), clusterAddress);
 
         final BasicDBObject update = new BasicDBObject(Map.of(
-                "$set", Map.of(
-                        "is_leader", isLeader,
-                        "transport_address", restTransportAddress.toString(),
-                        "cluster_address", clusterAddress != null ? clusterAddress.toString() : null
-                ),
+                "$set", params,
                 "$currentDate", lastSeenFieldDefinition
         ));
 
