@@ -148,7 +148,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 }
 
                 final var renewalPolicy = getRenewalPolicy();
-                if(renewalPolicy == null) {
+                if (renewalPolicy == null) {
                     LOG.warn("No renewal policy available.");
                     return;
                 }
