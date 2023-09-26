@@ -50,7 +50,7 @@ class FilterPreviewContainer extends React.Component {
     const queryBuilder = Query.builder()
       .id(queryId)
       .query({ type: 'elasticsearch', query_string: config?.query || '*' })
-      .timerange({ type: 'relative', range: config?.search_within_ms / 1000 })
+      .timerange({ type: 'relative', range: (config?.search_within_ms || 0) / 1000 })
       .filter(formattedStreams.length === 0 ? null : { type: 'or', filters: formattedStreams })
       .searchTypes([{
         id: searchTypeId,

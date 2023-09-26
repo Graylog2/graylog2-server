@@ -65,6 +65,10 @@ Expression.propTypes = {
   series: PropTypes.array.isRequired,
 };
 
+Expression.defaultProps = {
+  expression: null,
+};
+
 const AggregationConditionSummary = ({ conditions, series }) => <Expression expression={conditions?.expression} series={series} />;
 
 AggregationConditionSummary.propTypes = {
