@@ -54,10 +54,10 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final Configuration configuration) {
         this.configurationProvider = configurationProvider;
         this.trustManager = trustManager;
-        this.process = createOpensearchProcess(datanodeConfiguration);
         this.nodeService = nodeService;
         this.configuration = configuration;
         this.eventBus = eventBus;
+        this.process = createOpensearchProcess(datanodeConfiguration);
         eventBus.register(this);
     }
 
