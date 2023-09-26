@@ -35,7 +35,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
 
 
     public BooleanConversion() {
-        valueParam = object("value").primary().description("Value to convert").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to convert").build();
         defaultParam = bool("default").optional().description("Used when 'value' is null, defaults to false").build();
     }
 
@@ -55,7 +55,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(of(valueParam, defaultParam))
                 .description("Converts a value to a boolean value using its string representation")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to boolean")
                 .ruleBuilderTitle("Convert '${value}' to boolean")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)

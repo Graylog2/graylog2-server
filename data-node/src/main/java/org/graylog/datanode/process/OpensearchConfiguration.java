@@ -67,6 +67,9 @@ public record OpensearchConfiguration(
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
             config.put("discovery.seed_hosts", toValuesList(discoverySeedHosts));
         }
+
+        config.put("discovery.seed_providers", "file");
+
         config.putAll(additionalConfiguration);
         return config;
     }
@@ -84,6 +87,11 @@ public record OpensearchConfiguration(
     public HttpHost getRestBaseUrl() {
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
         return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
+    }
+
+    public HttpHost getClusterBaseUrl() {
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        return new HttpHost(hostname(), transportPort(), sslEnabled ? "https" : "http");
     }
 
     public boolean securityConfigured() {

@@ -44,7 +44,7 @@ public class LookupValue extends AbstractFunction<Object> {
                 .description("The existing lookup table to use to lookup the given key")
                 .transform(tableName -> lookupTableService.newBuilder().lookupTable(tableName).build())
                 .build();
-        keyParam = object("key").primary()
+        keyParam = object("key").ruleBuilderVariable()
                 .description("The key to lookup in the table")
                 .build();
         defaultParam = object("default")
@@ -80,7 +80,7 @@ public class LookupValue extends AbstractFunction<Object> {
                 .returnType(Object.class)
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Lookup single value")
-                .ruleBuilderTitle("Lookup single value in '${lookup_table}' using '${value}'<#if $default??> (default: '${default}')</#if>")
+                .ruleBuilderTitle("Lookup single value in '${lookup_table}' using '${key}'<#if $default??> (default: '${default}')</#if>")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }

@@ -22,6 +22,7 @@ import asMock from 'helpers/mocking/AsMock';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 
 import RuleBuilder from './RuleBuilder';
+import { jsonifyText } from './helpers';
 
 import { PipelineRulesContext } from '../RuleContext';
 
@@ -29,14 +30,23 @@ jest.mock('hooks/useRuleBuilder');
 
 describe('RuleBuilder', () => {
   beforeAll(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation((message) => {
+      if (!JSON.stringify(message || '').includes('Warning: validateDOMNesting')) {
+        // eslint-disable-next-line no-console
+        console.error(message);
+      }
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('should save Title and Description', () => {
     const createRule = jest.fn();
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: null,
@@ -45,9 +55,9 @@ describe('RuleBuilder', () => {
 
     const { getByLabelText, getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
+        simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
@@ -71,7 +81,7 @@ describe('RuleBuilder', () => {
     const updateRule = jest.fn();
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title: '', description: '', rule_builder },
@@ -80,9 +90,9 @@ describe('RuleBuilder', () => {
 
     const { getByLabelText, getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
+        simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
@@ -105,7 +115,7 @@ describe('RuleBuilder', () => {
   it('should be able to convert Rule Builder to Source Code', () => {
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title, description, rule_builder },
@@ -113,9 +123,9 @@ describe('RuleBuilder', () => {
 
     const { getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
+        simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
@@ -134,25 +144,21 @@ describe('RuleBuilder', () => {
   it('should show simulator', () => {
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByTitle, getByText, getByRole } = renderWithDataRouter((
+    const { getByText, getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));
-
-    const showSimulatorSwitch = getByTitle('Show Simulator');
-    userEvent.click(showSimulatorSwitch);
 
     const ruleSimulationLabel = getByText('Rule Simulation');
     const runRuleSimulation = getByRole('button', { name: 'Run rule simulation' });
@@ -164,33 +170,31 @@ describe('RuleBuilder', () => {
   it('should show simulator with conditions and actions output', () => {
     const title = 'title';
     const description = 'description';
-    const rule_builder = { actions: [], conditions: [] };
+    const rule_builder = { actions: [], conditions: [], operator: 'AND' };
     const conditionOutput1 = 'condition_output_1';
     const actionOutput1 = 'action_output_1';
     const actionOutput2 = 'action_output_2';
+    const rawMessageToSimulate = 'test';
 
     asMock(useRuleBuilder).mockReturnValue({
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByTitle, getByText, getByTestId } = renderWithDataRouter((
+    const { getByText, getByTestId } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
         ruleSimulationResult: {
-          fields: { message: 'test' },
+          fields: { message: rawMessageToSimulate },
           simulator_condition_variables: { 1: conditionOutput1 },
-          simulator_action_variables: { 1: actionOutput1, 2: actionOutput2 },
+          simulator_action_variables: [{ output_1: actionOutput1 }, { output_2: actionOutput2 }],
         },
+        rawMessageToSimulate,
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
         setRuleSimulationResult: () => {},
-        setStartRuleSimulation: () => {},
       }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));
-
-    const showSimulatorSwitch = getByTitle('Show Simulator');
-    userEvent.click(showSimulatorSwitch);
 
     const conditionOutputs = getByText('Conditions Output');
     const actionOutputs = getByText('Actions Output');
@@ -202,5 +206,24 @@ describe('RuleBuilder', () => {
     expect(conditionOutputContainer).toContainHTML(conditionOutput1);
     expect(actionOutputContainer).toContainHTML(actionOutput1);
     expect(actionOutputContainer).toContainHTML(actionOutput2);
+  });
+
+  it('simulator parser should support JSON', () => {
+    const json = '{ "message": "test", "source": "unknown" }';
+
+    expect(jsonifyText(json)).toEqual(json);
+  });
+
+  it('simulator parser should convert KeyValue pairs to JSON', () => {
+    const keyValuePairs = 'a=a a a a\nb=b,b,b,b\n\n   "d    :    d"   \nc=`c`\ne:\n   f   =\n';
+    const keyValuePairsAsJson = '{"a":"a a a a","b":"b,b,b,b","d":"d","c":"c"}';
+
+    expect(jsonifyText(keyValuePairs)).toEqual(keyValuePairsAsJson);
+  });
+
+  it('simulator parser should support raw message string', () => {
+    const rawMessageString = 'long raw message string bla bla bla';
+
+    expect(jsonifyText(rawMessageString)).toEqual(rawMessageString);
   });
 });

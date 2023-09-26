@@ -77,6 +77,17 @@ public class MongoDBRuleFragmentService implements RuleFragmentService {
     }
 
     @Override
+    public void deleteAll() {
+        dbCollection.remove(DBQuery.empty());
+    }
+
+
+    @Override
+    public long count(String name) {
+        return dbCollection.getCount(DBQuery.is("name", name));
+    }
+
+    @Override
     public Optional<RuleFragment> get(String name) {
         return Optional.ofNullable(dbCollection.findOne(DBQuery.is("name", name)));
     }

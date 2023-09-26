@@ -93,7 +93,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     protected void afterContainerCreated() {
-        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.9.0")) {
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.9.0")) {
             fixNumberOfReplicaForMlPlugin();
         }
     }

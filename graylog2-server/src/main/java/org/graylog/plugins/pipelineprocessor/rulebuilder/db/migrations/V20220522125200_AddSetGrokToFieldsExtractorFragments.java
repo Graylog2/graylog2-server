@@ -22,13 +22,11 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -36,12 +34,10 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migration {
     private static final Logger log = LoggerFactory.getLogger(V20220522125200_AddSetGrokToFieldsExtractorFragments.class);
     private final RuleFragmentService ruleFragmentService;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V20220522125200_AddSetGrokToFieldsExtractorFragments(RuleFragmentService ruleFragmentService, ClusterConfigService clusterConfigService) {
+    public V20220522125200_AddSetGrokToFieldsExtractorFragments(RuleFragmentService ruleFragmentService) {
         this.ruleFragmentService = ruleFragmentService;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -52,15 +48,9 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
     @Override
     public void upgrade() {
         log.debug("Adding set_grok_to_fields extractor fragments via migration");
-        if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
-            log.debug("Migration already completed!");
-//            return;
-
-        }
 
         ruleFragmentService.upsert(createSetGrokToFieldsFragment());
 
-        clusterConfigService.write(new MigrationCompleted());
         log.debug("set_grok_to_fields fragment was successfully added");
     }
 
@@ -96,5 +86,4 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragments extends Migrat
                 .build();
     }
 
-    public record MigrationCompleted() {}
 }

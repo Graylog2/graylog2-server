@@ -43,19 +43,21 @@ class NodeImplTest {
         fields.put("type", Node.Type.SERVER.toString());
         fields.put("is_leader", true);
         fields.put("transport_address", "http://127.0.0.1:9000/api/");
+        fields.put("cluster_address", "http://127.0.0.1:9300");
         fields.put("hostname", "graylog.local");
 
         final NodeImpl node = new NodeImpl(new ObjectId("61b9c2861448530c3e061283"), fields);
 
         final JsonNode jsonNode = mapper.readTree(mapper.writeValueAsString(node));
 
-        assertThat(jsonNode.size()).isEqualTo(9);
+        assertThat(jsonNode.size()).isEqualTo(10);
 
         assertThat(ZonedDateTime.parse(jsonNode.path("last_seen").asText())).isEqualTo(lastSeen);
         assertThat(jsonNode.path("node_id").asText()).isEqualTo("2d4cff7a-b9c4-440c-9c62-89ba1fb06211");
         assertThat(jsonNode.path("type").asText()).isEqualTo(Node.Type.SERVER.toString());
         assertThat(jsonNode.path("is_leader").asBoolean()).isEqualTo(true);
         assertThat(jsonNode.path("transport_address").asText()).isEqualTo("http://127.0.0.1:9000/api/");
+        assertThat(jsonNode.path("cluster_address").asText()).isEqualTo("http://127.0.0.1:9300");
         assertThat(jsonNode.path("hostname").asText()).isEqualTo("graylog.local");
 
         assertThat(jsonNode.path("id").asText()).isEqualTo("61b9c2861448530c3e061283");

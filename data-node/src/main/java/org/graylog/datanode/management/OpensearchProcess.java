@@ -36,4 +36,5 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     List<String> stdErrLogs();
 
     URI getOpensearchBaseUrl();
+    URI getOpensearchClusterUrl();
 }

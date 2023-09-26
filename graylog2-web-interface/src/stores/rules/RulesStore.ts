@@ -36,6 +36,7 @@ export type RuleType = {
   modified_at: string,
   rule_builder: RuleBuilderType,
   errors?: [],
+  simulator_message?: string,
 };
 export type MetricsConfigType = {
   metrics_enabled: boolean,
@@ -208,6 +209,7 @@ export const RulesStore = singletonStore(
         title: ruleSource.title,
         description: ruleSource.description,
         source: ruleSource.source,
+        simulator_message: ruleSource.simulator_message,
       };
       const promise = fetch('POST', url, rule);
 
@@ -235,6 +237,7 @@ export const RulesStore = singletonStore(
         title: ruleSource.title,
         description: ruleSource.description,
         source: ruleSource.source,
+        simulator_message: ruleSource.simulator_message,
       };
       const promise = fetch('PUT', url, rule);
 
@@ -315,11 +318,7 @@ export const RulesStore = singletonStore(
         };
       }
 
-      return fetch('POST', url, rule).then(callback,
-        (error) => {
-          UserNotification.error(`Couldn't load rule simulation result: ${error.message}`, "Couldn't load rule simulation result");
-        },
-      );
+      return fetch('POST', url, rule).then(callback, () => {});
     },
     multiple(ruleNames, callback) {
       const url = qualifyUrl(ApiRoutes.RulesController.multiple().url);
