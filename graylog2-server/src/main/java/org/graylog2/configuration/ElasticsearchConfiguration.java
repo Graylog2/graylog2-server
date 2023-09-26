@@ -326,10 +326,15 @@ public class ElasticsearchConfiguration {
             );
         }
 
-        if (getMaxIndexRetentionPeriod() != null && getMaxIndexRetentionPeriod().toStandardSeconds().compareTo(timeSizeOptimizingRotationMaxLifeTimeSeconds) < 0) {
-            throw new ValidationException(f("\"%s=%s\" cannot to be larger than \"%s=%s\"",
-                    TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME, getTimeSizeOptimizingRotationMaxLifeTime(),
-                    MAX_INDEX_RETENTION_PERIOD, getMaxIndexRetentionPeriod())
+        // If fixed leeway is defined, then calculated leeway is forced to that value by previous validation.
+        // We don't need to repeat the fixed leeway check here.
+        if (getMaxIndexRetentionPeriod() != null &&
+                getMaxIndexRetentionPeriod().toStandardSeconds().isLessThan(
+                        timeSizeOptimizingRotationMinLifeTimeSeconds.plus(calculatedLeeway))) {
+            throw new ValidationException(f("\"%s=%s\" plus leeway=%s cannot to be larger than \"%s=%s\"",
+                    TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME, getTimeSizeOptimizingRotationMinLifeTime(),
+                    new Period(calculatedLeeway),
+                    MAX_INDEX_RETENTION_PERIOD + " + leeway", getMaxIndexRetentionPeriod().plus(calculatedLeeway))
             );
         }
     }

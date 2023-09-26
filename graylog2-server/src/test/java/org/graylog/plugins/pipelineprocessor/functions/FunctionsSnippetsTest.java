@@ -363,8 +363,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         when(grokPatternService.loadByName("GREEDY")).thenReturn(Optional.of(greedyPattern));
         final EventBus clusterBus = new EventBus();
         final GrokPatternRegistry grokPatternRegistry = new GrokPatternRegistry(clusterBus,
-                                                                                grokPatternService,
-                                                                                Executors.newScheduledThreadPool(1));
+                grokPatternService,
+                Executors.newScheduledThreadPool(1));
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
@@ -376,7 +376,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupAddStringList.NAME, new LookupAddStringList(lookupTableService));
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
         functions.put(LookupHasValue.NAME, new LookupHasValue(lookupTableService));
-	functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
+        functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1351,5 +1351,43 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         Long manilaHour = (Long) message.getField("manilaHour");
         assertThat(utcHour).isEqualTo(10);
         assertThat(manilaHour).isEqualTo(18);
+    }
+
+    @Test
+    public void setField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isEqualTo("v1");
+        assertThat(message.getField("f_2")).isEqualTo("v_2");
+        assertThat(message.getField("f 3")).isNull();
+        assertThat(message.getField("f_3")).isNull();
+        assertThat(message.getField("f_4")).isEqualTo("will be added with clean field param");
+    }
+
+    @Test
+    public void setFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        message.addField("json_field_map", "{ " +
+                "  \"k1\": \"v1\", " +
+                "  \"k_2\": \"v_2\", " +
+                "  \"k 3\": \"will be skipped\" " +
+                "}");
+        message.addField("json_clean_field_map", "{ " +
+                "  \"k4\": \"v4\", " +
+                "  \"k_5\": \"v_5\", " +
+                "  \"k 6\": \"will be added with clean_fields param\" " +
+                "}");
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("k1")).isEqualTo("v1");
+        assertThat(message.getField("k_2")).isEqualTo("v_2");
+        assertThat(message.getField("k 3")).isNull();
+        assertThat(message.getField("k_3")).isNull();
+        assertThat(message.getField("k4")).isEqualTo("v4");
+        assertThat(message.getField("k_5")).isEqualTo("v_5");
+        assertThat(message.getField("k_6")).isEqualTo("will be added with clean_fields param");
     }
 }

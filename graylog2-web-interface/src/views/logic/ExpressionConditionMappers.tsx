@@ -15,14 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useEffect } from 'react';
-
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import type { ValueExpr } from 'hooks/useEventDefinition';
-import { createHighlightingRules } from 'views/logic/slices/highlightActions';
-import useAppDispatch from 'stores/useAppDispatch';
 import type { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 export const exprToConditionMapper: {[name: string]: Condition} = {
   '<': 'less',
@@ -39,22 +33,3 @@ export const conditionToExprMapper: {[name: string]: ValueExpr} = {
   greater: '>',
   equal: '==',
 };
-
-const useHighlightValuesForEventDefinition = () => {
-  const dispatch = useAppDispatch();
-  const { aggregations } = useAlertAndEventDefinitionData();
-
-  return useEffect(() => {
-    if (aggregations?.length) {
-      const valuesToHighlight = aggregations.map(({ fnSeries, value, expr }) => ({
-        value,
-        field: fnSeries,
-        color: randomColor(),
-        condition: exprToConditionMapper[expr],
-      }));
-      if (valuesToHighlight.length) dispatch(createHighlightingRules(valuesToHighlight));
-    }
-  }, [aggregations, dispatch]);
-};
-
-export default useHighlightValuesForEventDefinition;

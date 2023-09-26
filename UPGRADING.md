@@ -112,6 +112,34 @@ The following inputs are no longer available:
 The inputs were marked as deprecated since Graylog version `3.2.0`.
 If you still run any of those inputs, please configure the alternative "Kinesis/CloudWatch" input instead ahead of upgrading.
 
+## CrowdStrike input log parsing changes
+
+Several log parsing changes have been made to the CrowdStrike input in Graylog release 5.1.6.
+
+Added fields:
+`event_created`: Contains the `metadata.eventCreationTime` log value.
+`vendor_subtype`: Contains the `metadata.eventType` log value.
+`vendor_version`: Contains the `metadata.version` log value.
+`event_source_product`: Contains the static value `crowdstrike_falcon`.
+
+Changed fields:
+- `message`: Now contains the JSON content of the log `event` value, effectively the message payload.
+- The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `metadata.eventCreationTime` value.
+
+Removed fields:
+- `event_end`
+- `event_source`
+- `event_start`
+- `user_domain`
+- `user_id`
+- `vendor_event_description`
+- `FILE_NAME`
+- `FILE_PATH`
+- `OBJECTIVE`
+- `TECHNIQUE`
+
+Note that additional CrowdStrike message parsing is expected to be released in a future release of Graylog Illuminate.
+
 ## Java API Changes
 The following Java Code API changes have been made.
 
@@ -129,10 +157,17 @@ have been un-deprecated, as Graylog intends to maintain them going forward.
 
 ## REST API Endpoint Changes
 
-| Endpoint                                                                                                   | Description                                                                                                                                                                                                                                                                                                                                                                                                |
-|------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET /system/configuration`                                                                                | Key `gc_warning_threshold` has been removed from response object.                                                                                                                                                                                                                                                                                                                                          |                                                                                                
-| `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute.                                                                                                                                                                                                                                                                                                                                                              |
+| Endpoint                                                                                                   | Description                                                                                                                                      |
+|------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET /system/configuration`                                                                                | Key `gc_warning_threshold` has been removed from response object.                                                                                |                                                                                                
+| `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute.                                                                                                    |
+| `GET /streams/paginated`                                                                                   | Key `streams` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes. |
+| `GET /dashboards`                                                                                          | Key `views` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes.   |
+| `GET /search/saved`                                                                                        | Key `views` in response has been changed to `elements`. Attribute `pagination` has been added to response to bundle all pagination attributes.   |
+| `GET /events/definitions`                                                                                  | Endpoint has been deprecated in favor of `/events/definitions/paginated` (see below)                                                             |
+| `GET /events/definitions/paginated`                                                                        | Returns a paginated list of event definitions with request parameters and response format suited for the new entity data table                   |
+| `GET /events/notifications`                                                                                | Endpoint has been deprecated in favor of `/events/notifications/paginated` (see below)                                                           |
+| `GET /events/notifications/paginated`                                                                      | Returns a paginated list of event notifications with request parameters and response format suited for the new entity data table                 |
 
 ### Change to the format of `Input` entities in API responses
 

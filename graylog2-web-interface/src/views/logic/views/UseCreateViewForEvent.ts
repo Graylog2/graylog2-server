@@ -43,6 +43,9 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import Parameter from 'views/logic/parameters/Parameter';
 import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
+import HighlightingRule, { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
@@ -161,11 +164,14 @@ export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
 export const ViewStateGenerator = async ({ streams, aggregations, groupBy }: {groupBy: Array<string>, streams: string | string[] | undefined, aggregations: Array<any>}) => {
   const { titles, widgets, positions } = await WidgetsGenerator({ streams, aggregations, groupBy });
 
+  const highlightRules = aggregations?.map(({ fnSeries, value, expr }) => HighlightingRule.create(fnSeries, value, exprToConditionMapper[expr] || 'equal', randomColor()));
+
   return ViewState.create()
     .toBuilder()
     .titles(titles)
     .widgets(Immutable.List(widgets))
     .widgetPositions(positions)
+    .formatting(FormattingSettings.create(highlightRules))
     .build();
 };
 

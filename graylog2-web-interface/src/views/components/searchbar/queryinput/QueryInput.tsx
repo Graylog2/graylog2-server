@@ -64,7 +64,7 @@ const handleExecution = ({
 }) => {
   const execute = () => {
     if (editor?.completer && editor.completer.popup) {
-      editor.completer.popup.hide();
+      editor.completer.detach();
     }
 
     onExecute(value);
@@ -124,8 +124,33 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
   const editor = node && node.editor;
 
   if (editor) {
-    commands.forEach((command) => editor.commands.addCommand(command));
+    editor.commands.on('afterExec', () => {
+      if (editor.completer?.autoSelect) {
+        editor.completer.autoSelect = false;
+      }
 
+      const completerCommandKeyBinding = editor.completer?.keyboardHandler?.commandKeyBinding;
+
+      if (completerCommandKeyBinding?.tab && completerCommandKeyBinding.tab.name !== 'improved-tab') {
+        editor.completer.keyboardHandler.addCommand({
+          name: 'improved-tab',
+          bindKey: { win: 'Tab', mac: 'Tab' },
+          exec: (currentEditor: Editor) => {
+            const result = currentEditor.completer.insertMatch();
+
+            if (!result && !currentEditor.tabstopManager) {
+              currentEditor.completer.goTo('down');
+
+              return currentEditor.completer.insertMatch();
+            }
+
+            return result;
+          },
+        });
+      }
+    });
+
+    commands.forEach((command) => editor.commands.addCommand(command));
     editor.completers = [completer];
   }
 };

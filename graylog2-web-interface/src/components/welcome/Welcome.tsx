@@ -19,6 +19,9 @@ import styled from 'styled-components';
 
 import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
+import type { StartPage } from 'logic/users/User';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -31,16 +34,40 @@ const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
+type HelperProps = { readOnly: boolean, userId: string, startpage: StartPage}
+
+const ChangeStartPageHelper = ({ readOnly, userId, startpage }: HelperProps) => {
+  const defaultPageIsDefined = startpage !== null;
+
+  if (defaultPageIsDefined || readOnly) {
+    return (
+      <span>
+        This is your personal page, allowing easy access to the content most relevant for you.
+      </span>
+    );
+  }
+
+  return (
+    <>
+      <span>
+        This is your personal start page, allowing easy access to the content most relevant for you.
+      </span>
+      <span>
+        {' '}
+        You can change your personal start page on the <Link to={Routes.SYSTEM.USERS.edit(userId)}>edit profile</Link> page.
+      </span>
+    </>
+  );
+};
+
 const Welcome = () => {
-  const { permissions } = useCurrentUser();
+  const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
   const isAdmin = permissions.includes('*');
 
   return (
     <>
       <PageHeader title="Welcome to Graylog!">
-        <span>
-          This is your personal start page, allowing easy access to the content most relevant for you.
-        </span>
+        <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
       <SectionGrid>
         <StyledSectionComponent title="Last Opened">
