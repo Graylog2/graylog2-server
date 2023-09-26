@@ -78,7 +78,7 @@ public class CreateMessage extends AbstractFunction<Message> {
                         timestampParam
                 ))
                 .description("Creates a new message which will be evaluated by the entire processing pipeline. Any omitted parameters (message, source, timestamp) will inherit their values from the currently processed message. The timestamp will inherit the current timestamp.")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Create message")
                 .ruleBuilderTitle("Create a new message")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)

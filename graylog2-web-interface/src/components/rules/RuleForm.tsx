@@ -16,6 +16,7 @@
  */
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
@@ -29,6 +30,17 @@ import RuleSimulation from './RuleSimulation';
 type Props = {
   create: boolean,
 };
+
+const StyledContainer = styled.div`
+  & .react-resizable {
+    border: 1px solid #d4d5d7;
+    border-radius: 0 0 5px 5px;
+  }
+
+  & .ace_tooltip.ace-graylog {
+    background-color: #f5f5f5;
+  }
+`;
 
 const RuleForm = ({ create }: Props) => {
   const {
@@ -46,27 +58,29 @@ const RuleForm = ({ create }: Props) => {
   const history = useHistory();
 
   const handleError = (error) => {
-    if (error.responseMessage.includes('duplicate key error')) {
+    if (error?.responseMessage?.includes('duplicate key error')) {
       const duplicatedTitle = error.responseMessage.match(/title: "(.*)"/i)[1];
       setErrorMessage(`Rule title "${duplicatedTitle}" already exists!`);
     }
   };
 
+  const handleCancel = () => {
+    setErrorMessage('');
+    setIsDirty(false);
+    history.push(Routes.SYSTEM.PIPELINES.RULES);
+  };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    handleSavePipelineRule(() => {
-      setErrorMessage('');
-      setIsDirty(false);
-      history.goBack();
-    }, handleError);
+    handleSavePipelineRule(handleCancel, handleError);
   };
 
   const handleApply = () => {
     handleSavePipelineRule((rule) => {
       setErrorMessage('');
       setIsDirty(false);
-      history.replace(Routes.SYSTEM.PIPELINES.RULE(rule.id));
+      history.push(Routes.SYSTEM.PIPELINES.RULE(rule.id));
     }, handleError);
   };
 
@@ -79,10 +93,6 @@ const RuleForm = ({ create }: Props) => {
     setErrorMessage('');
     setIsDirty(true);
     onChangeSource(newSource);
-  };
-
-  const handleCancel = () => {
-    history.goBack();
   };
 
   return (
@@ -103,6 +113,7 @@ const RuleForm = ({ create }: Props) => {
                value={description}
                onChange={handleDescriptionChange}
                autoFocus
+               rows={1}
                help="Rule description (optional)." />
 
         <PipelinesUsingRule create={create} />
@@ -110,12 +121,14 @@ const RuleForm = ({ create }: Props) => {
         <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information." error={errorMessage}>
           {/* TODO: Figure out issue with props */}
           {/* @ts-ignore */}
-          <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
-                            mode="pipeline"
-                            onLoad={onAceLoaded}
-                            onChange={handleSourceChange}
-                            value={ruleSource}
-                            innerRef={ruleSourceRef} />
+          <StyledContainer>
+            <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
+                              mode="pipeline"
+                              onLoad={onAceLoaded}
+                              onChange={handleSourceChange}
+                              value={ruleSource}
+                              innerRef={ruleSourceRef} />
+          </StyledContainer>
         </Input>
 
         <RuleSimulation />

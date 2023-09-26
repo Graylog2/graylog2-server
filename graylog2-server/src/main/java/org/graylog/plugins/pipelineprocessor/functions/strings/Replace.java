@@ -35,7 +35,7 @@ public class Replace extends AbstractFunction<String> {
     private final ParameterDescriptor<Long, Integer> maxParam;
 
     public Replace() {
-        valueParam = ParameterDescriptor.string("value").primary().description("The text to search and replace in").build();
+        valueParam = ParameterDescriptor.string("value").ruleBuilderVariable().description("The text to search and replace in").build();
         searchParam = ParameterDescriptor.string("search").description("The string to search for").build();
         replacementParam = ParameterDescriptor.string("replacement").optional()
                 .description("The string to replace it with. Default: \"\"").build();

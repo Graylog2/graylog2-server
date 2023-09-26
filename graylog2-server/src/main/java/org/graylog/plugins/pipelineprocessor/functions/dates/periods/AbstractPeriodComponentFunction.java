@@ -31,7 +31,7 @@ public abstract class AbstractPeriodComponentFunction extends AbstractFunction<P
 
     private final ParameterDescriptor<Long, Period> value =
             ParameterDescriptor
-                    .integer("value", Period.class)
+                    .integer("value", Period.class).ruleBuilderVariable()
                     .transform(this::getPeriodOfInt)
                     .build();
 
@@ -55,7 +55,7 @@ public abstract class AbstractPeriodComponentFunction extends AbstractFunction<P
                 .pure(true)
                 .returnType(Period.class)
                 .params(value)
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName(getRuleBuilderName())
                 .ruleBuilderTitle(getRuleBuilderTitle())
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)

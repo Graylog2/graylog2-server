@@ -29,6 +29,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
@@ -81,11 +82,14 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IpAnonymize;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.ListCount;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.ListGet;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
@@ -93,6 +97,7 @@ import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
+import org.graylog.plugins.pipelineprocessor.functions.maps.MapGet;
 import org.graylog.plugins.pipelineprocessor.functions.maps.MapRemove;
 import org.graylog.plugins.pipelineprocessor.functions.maps.MapSet;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
@@ -172,6 +177,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -385,6 +391,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         functions.put(MapRemove.NAME, new MapRemove());
         functions.put(MapSet.NAME, new MapSet());
+        functions.put(MapGet.NAME, new MapGet());
+        functions.put(CsvMapConversion.NAME, new CsvMapConversion());
+
+        functions.put(ListGet.NAME, new ListGet());
+        functions.put(ListCount.NAME, new ListCount());
+        functions.put(IpAnonymize.NAME, new IpAnonymize());
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1382,12 +1394,69 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void mapGet() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("k1")).isEqualTo("v1");
+        assertThat(message.getField("k2")).isEqualTo(2L);
+        assertThat(message.getField("k3")).isNull();
+    }
+
+    @Test
     public void mapRemove() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
 
         assertThat(message.getField("k1")).isNull();
+    }
+
+    @Test
+    public void listGet() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("idx0")).isEqualTo("v1");
+        assertThat(message.getField("idx1")).isNull();
+    }
+
+    @Test
+    public void ipAnonymize() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("ip4").toString()).isEqualTo("111.122.133.0");
+    }
+
+    @Test
+    public void listCount() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("count")).isEqualTo(4L);
+    }
+
+    @Test
+    public void csvMap() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        IntStream.range(1, 5).forEach(i -> {
+            assertThat(message.getField("test" + i + "_k1")).as("Test%s k1", i).isEqualTo("v1");
+            assertThat(message.getField("test" + i + "_k2")).as("Test%s k1", i).isEqualTo("v2");
+            assertThat(message.getField("test" + i + "_k3")).as("Test%s k1", i).isEqualTo("v3");
+        });
+
+        assertThat(message.getField("test99_k1")).isEqualTo("v1");
+        assertThat(message.getField("test99_k2")).isEqualTo("v,2");
+        assertThat(message.getField("test99_k3")).isEqualTo("v3");
+
     }
 
     @Test
