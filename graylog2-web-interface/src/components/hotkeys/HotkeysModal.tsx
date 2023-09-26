@@ -24,7 +24,6 @@ import type { ScopeName, HotkeyCollection } from 'contexts/HotkeysContext';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import { isMacOS as _isMacOS } from 'util/OSUtils';
-import StringUtils from 'util/StringUtils';
 
 const Content = styled.div`
   padding: 20px;
@@ -67,7 +66,7 @@ const keyMapper = (key: string, isMacOS: boolean) => {
     mod: isMacOS ? '⌘' : 'Ctrl',
   };
 
-  return keyMap[key] || StringUtils.capitalizeFirstLetter(key);
+  return keyMap[key] || key;
 };
 
 type KeyProps = {
@@ -119,12 +118,12 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectio
     <SectionComponent title={title}>
       <p className="description">{description}</p>
       <ShortcutList>
-        {filtratedActions.map(([actionKey, { description: keyDescription, keys }]) => {
+        {filtratedActions.map(([actionKey, { description: keyDescription, keys, displayKeys }]) => {
           const isEnabled = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled !== false;
 
           return (
             <Key description={keyDescription}
-                 keys={keys}
+                 keys={displayKeys ?? keys}
                  combinationKey="+"
                  isEnabled={isEnabled}
                  isMacOS={isMacOS}

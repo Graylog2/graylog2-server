@@ -65,7 +65,7 @@ describe('<UndoNavItem />', () => {
 
   it('Call redo action when pressing related keyboard shortcut', async () => {
     render(<RedoNavItemComponent />);
-    userEvent.keyboard('{Meta>}z{/Meta}');
+    userEvent.keyboard('{Meta>}{Shift>}z{/Shift}{/Meta}');
     await waitFor(() => expect(undo).toHaveBeenCalledTimes(1));
   });
 });

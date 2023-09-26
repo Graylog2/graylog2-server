@@ -28,8 +28,8 @@ import HotkeysContext from 'contexts/HotkeysContext';
 import useFeature from 'hooks/useFeature';
 
 const viewActions = {
-  undo: { keys: 'mod+z', description: 'Undo last action' },
-  redo: { keys: 'mod+y', description: 'Redo last action' },
+  undo: { keys: 'mod+shift+z', description: 'Undo last action' },
+  redo: { keys: 'mod+shift+y', description: 'Redo last action' },
 };
 
 export const hotKeysCollections: HotkeyCollections = {
@@ -37,7 +37,7 @@ export const hotKeysCollections: HotkeyCollections = {
     title: 'General',
     description: 'General keyboard shortcuts',
     actions: {
-      'show-hotkeys-modal': { keys: 'shift+?', description: 'Show available keyboard shorts' },
+      'show-hotkeys-modal': { keys: 'shift+?', displayKeys: '?', description: 'Show available keyboard shorts' },
     },
   },
   search: {
@@ -46,7 +46,7 @@ export const hotKeysCollections: HotkeyCollections = {
     actions: {
       ...viewActions,
       save: { keys: 'mod+s', description: 'Save search' },
-      'save-as': { keys: 'shift+mod+s', description: 'Save search as' },
+      'save-as': { keys: 'mod+shift+s', description: 'Save search as' },
     },
   },
   dashboard: {

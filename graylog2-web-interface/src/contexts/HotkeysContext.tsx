@@ -56,7 +56,7 @@ export type ActiveHotkeys = Immutable.Map<`${ScopeName}.${string}`, ActiveHotkey
 export type HotkeyCollection = {
   title: string,
   description: string,
-  actions: Record<string, { keys: string, description: string }>,
+  actions: Record<string, { keys: string, description: string, displayKeys?: string }>,
 }
 export type HotkeyCollections = Record<ScopeName, HotkeyCollection>
 
