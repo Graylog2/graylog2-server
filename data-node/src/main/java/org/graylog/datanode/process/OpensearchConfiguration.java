@@ -89,6 +89,11 @@ public record OpensearchConfiguration(
         return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
     }
 
+    public HttpHost getClusterBaseUrl() {
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        return new HttpHost(hostname(), transportPort(), sslEnabled ? "https" : "http");
+    }
+
     public boolean securityConfigured() {
         return opensearchSecurityConfiguration() != null;
     }

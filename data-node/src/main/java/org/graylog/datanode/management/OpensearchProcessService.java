@@ -19,8 +19,10 @@ package org.graylog.datanode.management;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -40,21 +42,27 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final CustomCAX509TrustManager trustManager;
     private final EventBus eventBus;
+    private final NodeService nodeService;
+    private final Configuration configuration;
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
                                     final Provider<OpensearchConfiguration> configurationProvider,
                                     final EventBus eventBus,
-                                    final CustomCAX509TrustManager trustManager) {
+                                    final CustomCAX509TrustManager trustManager,
+                                    final NodeService nodeService,
+                                    final Configuration configuration) {
         this.configurationProvider = configurationProvider;
         this.trustManager = trustManager;
         this.process = createOpensearchProcess(datanodeConfiguration);
+        this.nodeService = nodeService;
+        this.configuration = configuration;
         this.eventBus = eventBus;
         eventBus.register(this);
     }
 
     private OpensearchProcess createOpensearchProcess(DatanodeConfiguration datanodeConfiguration) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager);
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());

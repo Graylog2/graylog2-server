@@ -26,7 +26,11 @@ import java.util.Map;
 public interface NodeService {
     Node.Type type();
 
-    boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname);
+    boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, URI clusterUri, String hostname);
+
+    default boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
+        return registerServer(nodeId, isLeader, httpPublishUri, null, hostname);
+    }
 
     Node byNodeId(String nodeId) throws NodeNotFoundException;
 
@@ -45,7 +49,10 @@ public interface NodeService {
 
     void dropOutdated();
 
-    void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException;
+    void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, URI clusterAddress) throws NodeNotFoundException;
+    default void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException {
+        markAsAlive(node, isLeader, restTransportAddress, null);
+    }
 
     boolean isOnlyLeader(NodeId nodeIde);
 

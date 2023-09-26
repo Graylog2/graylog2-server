@@ -48,8 +48,8 @@ public class TestNodeService implements NodeService {
     }
 
     @Override
-    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
-        return nodes.add(new NodeRecord(type, nodeId, isLeader, httpPublishUri.toString(), hostname, DateTime.now(DateTimeZone.UTC)));
+    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, URI clusterUri, String hostname) {
+        return nodes.add(new NodeRecord(type, nodeId, isLeader, httpPublishUri.toString(), clusterUri != null ? clusterUri.toString() : null, hostname, DateTime.now(DateTimeZone.UTC)));
     }
 
     @Override
@@ -94,11 +94,11 @@ public class TestNodeService implements NodeService {
     }
 
     @Override
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) {
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, URI clusterAddress) {
         throw new UnsupportedOperationException("Unsupported operation");
     }
 
-    record NodeRecord(Type type, String nodeId, boolean isLeader, String transportAddress, String hostname, DateTime lastSeen) implements Node {
+    record NodeRecord(Type type, String nodeId, boolean isLeader, String transportAddress, String clusterAddress, String hostname, DateTime lastSeen) implements Node {
 
         @Override
         public String getNodeId() {
@@ -113,6 +113,11 @@ public class TestNodeService implements NodeService {
         @Override
         public String getTransportAddress() {
             return transportAddress;
+        }
+
+        @Override
+        public String getClusterAddress() {
+            return clusterAddress;
         }
 
         @Override

@@ -72,13 +72,14 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
+    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, URI clusterUri, String hostname) {
         final Map<String, Object> fields = Map.of(
                 "$set", Map.of(
                         "node_id", nodeId,
                         "type", type().toString(),
                         "is_leader", isLeader,
                         "transport_address", httpPublishUri.toString(),
+                        "cluster_address", clusterUri != null ? clusterUri.toString() : null,
                         "hostname", hostname
                 ),
                 "$currentDate", lastSeenFieldDefinition
@@ -169,13 +170,14 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      */
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException {
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, URI clusterAddress) throws NodeNotFoundException {
         BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
 
         final BasicDBObject update = new BasicDBObject(Map.of(
                 "$set", Map.of(
                         "is_leader", isLeader,
-                        "transport_address", restTransportAddress.toString()
+                        "transport_address", restTransportAddress.toString(),
+                        "cluster_address", clusterAddress != null ? clusterAddress.toString() : null
                 ),
                 "$currentDate", lastSeenFieldDefinition
         ));
