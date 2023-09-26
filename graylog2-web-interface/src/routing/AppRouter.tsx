@@ -195,7 +195,7 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.import_extractors(':nodeId', ':inputId'), element: <ImportExtractorsPage /> },
             !isCloud && { path: RoutePaths.export_extractors(':nodeId', ':inputId'), element: <ExportExtractorsPage /> },
 
-            { path: RoutePaths.SYSTEM.CONFIGURATIONS, element: <ConfigurationsPage /> },
+            { path: `${RoutePaths.SYSTEM.CONFIGURATIONS}/*`, element: <ConfigurationsPage /> },
 
             { path: RoutePaths.SYSTEM.CONTENTPACKS.LIST, element: <ContentPacksPage /> },
             { path: RoutePaths.SYSTEM.CONTENTPACKS.CREATE, element: <CreateContentPackPage /> },
