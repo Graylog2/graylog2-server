@@ -163,13 +163,11 @@ const SearchActionsMenu = () => {
     loadAsDashboard(history, view);
   }, [history, view]);
 
-  const isDirty = useIsDirty();
-
   useHotkey({
     actionKey: 'save',
     callback: () => (loaded ? saveSearch(title) : openFormModal()),
     scope: 'search',
-    dependencies: [loaded, isDirty, saveSearch, title],
+    dependencies: [loaded, saveSearch, title],
     telemetryAppPathname: 'search',
   });
 
