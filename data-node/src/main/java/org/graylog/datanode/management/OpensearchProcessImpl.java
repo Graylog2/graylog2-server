@@ -163,7 +163,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         try {
             final Set<String> current = nodeService.allActive(Node.Type.DATANODE).values().stream().map(node -> {
                 try {
-                    return new URI(node.getTransportAddress()).getAuthority();
+                    return new URI(node.getClusterAddress()).getAuthority();
                 } catch (URISyntaxException ex) {
                     LOG.warn("Could not get host:port from {}", node);
                     return null;
