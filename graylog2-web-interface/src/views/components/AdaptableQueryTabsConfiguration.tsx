@@ -27,12 +27,11 @@ import TitleTypes from 'views/stores/TitleTypes';
 import EditableTitle from 'views/components/common/EditableTitle';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
-import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
-import useWidgetIds from 'views/components/useWidgetIds';
 import useAppDispatch from 'stores/useAppDispatch';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type ViewState from 'views/logic/views/ViewState';
 
 type PageListItem = {
   id: string,
@@ -75,12 +74,11 @@ type Props = {
   show: boolean,
   setShow: Dispatch<SetStateAction<boolean>>,
   queriesList: Immutable.OrderedSet<PageListItem>,
-  dashboardId: string,
   activeQueryId: string,
+  onRemove: (queryId: string) => Promise<ViewState | void>
 }
 
-const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboardId, activeQueryId }: Props) => {
-  const widgetIds = useWidgetIds();
+const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQueryId, onRemove }: Props) => {
   const { setDashboardPage } = useContext(DashboardPageContext);
   const [orderedQueriesList, setOrderedQueriesList] = useState<Immutable.OrderedSet<PageListItem>>(queriesList);
   const disablePageDelete = orderedQueriesList.size <= 1;
@@ -140,7 +138,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
       .toOrderedSet());
   }, []);
 
-  const onRemovePage = useCallback(async (id: string) => {
+  const removePage = useCallback(async (queryId: string) => {
     if (disablePageDelete) {
       return Promise.resolve();
     }
@@ -151,21 +149,19 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
       app_action_value: 'dashboard-page-configuration-remove-page',
     });
 
-    if (await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds)) {
+    return onRemove(queryId).then(() => {
       setOrderedQueriesList((currentQueries) => currentQueries
-        .filter((query) => query.id !== id).toOrderedSet());
-    }
-
-    return Promise.resolve();
-  }, [activeQueryId, dashboardId, disablePageDelete, sendTelemetry, widgetIds]);
+        .filter((query) => query.id !== queryId).toOrderedSet());
+    });
+  }, [disablePageDelete, onRemove]);
 
   // eslint-disable-next-line react/no-unused-prop-types
   const customListItemRender = useCallback(({ item }: { item: PageListItem }) => (
     <ListItem item={item}
               onUpdateTitle={onUpdateTitle}
-              onRemove={onRemovePage}
+              onRemove={removePage}
               disableDelete={disablePageDelete} />
-  ), [disablePageDelete, onRemovePage, onUpdateTitle]);
+  ), [disablePageDelete, removePage, onUpdateTitle]);
 
   return (
     <BootstrapModalConfirm showModal={show}

@@ -62,8 +62,14 @@ const QueryBar = () => {
     }
   }, [dispatch, setDashboardPage]);
 
-  const onRemove = useCallback((queryId: string) => onCloseTab(dashboardId, queryId, activeQueryId, queries, widgetIds, dispatch),
-    [dashboardId, activeQueryId, queries, widgetIds, dispatch]);
+  const onRemove = useCallback((queryId: string) => onCloseTab(
+    dashboardId,
+    queryId,
+    activeQueryId,
+    queries,
+    widgetIds,
+    dispatch),
+  [dashboardId, activeQueryId, queries, widgetIds, dispatch]);
 
   const _onTitleChange = useCallback((queryId: string, newTitle: string) => dispatch(setTitle(queryId, 'tab', 'title', newTitle)), [dispatch]);
 
