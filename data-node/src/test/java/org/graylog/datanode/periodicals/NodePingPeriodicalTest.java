@@ -47,7 +47,8 @@ class NodePingPeriodicalTest {
         Mockito.verify(nodeService).markAsAlive(
                 Mockito.eq(nodeID),
                 Mockito.eq(true),
-                Mockito.eq(uri));
+                Mockito.eq(uri),
+                Mockito.eq(cluster));
     }
 
 
@@ -76,6 +77,7 @@ class NodePingPeriodicalTest {
                 Mockito.eq(nodeID.getNodeId()),
                 Mockito.eq(true),
                 Mockito.eq(uri),
+                Mockito.eq(cluster),
                 Mockito.any()
         );
     }

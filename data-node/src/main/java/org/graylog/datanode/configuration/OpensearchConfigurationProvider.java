@@ -42,8 +42,6 @@ import java.util.Optional;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
-    private static List<String> DEFAULT_ROLES = List.of("cluster_manager", "data", "ingest");
-
     private final Configuration localConfiguration;
     private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
     private final MongoCertSecureConfiguration mongoCertSecureConfiguration;
@@ -103,7 +101,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchTransportPort(),
                     "datanode-cluster",
                     nodeName,
-                    DEFAULT_ROLES,
+                    List.of(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
                     opensearchProperties.build()
