@@ -41,6 +41,13 @@ class NotificationsFactory {
         };
       }
 
+      case 'data_node_needs_provisionign':
+        return {
+          value: {
+            DATA_NODE_CONFIGURATION: Routes.SYSTEM.configurationsSection('Data Node'),
+          },
+        };
+
       default:
         return undefined;
     }
