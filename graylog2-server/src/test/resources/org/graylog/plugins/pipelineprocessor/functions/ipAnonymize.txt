@@ -1,0 +1,6 @@
+rule "ipanonymize"
+when true
+then
+   let ip4 = to_ip("111.122.133.144");
+   set_field("ip4", anonymize_ip(ip4));
+end

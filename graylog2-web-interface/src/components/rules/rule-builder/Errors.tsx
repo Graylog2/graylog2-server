@@ -27,7 +27,7 @@ type Props = {
 }
 
 const ErrorsContainer = styled(Row)(({ theme }) => css`
-  margin-top: ${theme.spacings.sm};
+  margin-top: ${theme.spacings.xs};
 `);
 
 const Error = styled.p(({ theme }) => css`

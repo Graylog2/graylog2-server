@@ -47,22 +47,15 @@ type Props = {
   type: BlockType,
 }
 
-const FormTitle = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
-
-const BlockTitle = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
-`);
-
 const BlockDescription = styled.p(({ theme }) => css`
   color: ${theme.colors.gray[50]};
 `);
 
 const SelectedBlock = styled.div(({ theme }) => css`
-  border-left: 1px solid ${theme.colors.input.border};
-  border-right: 1px solid ${theme.colors.input.border};
-  border-bottom: 1px solid ${theme.colors.input.border};
+  border-left:  1px solid ${theme.colors.gray['90']};
+  border-right:  1px solid ${theme.colors.gray['90']};
+  border-bottom:  1px solid ${theme.colors.gray['90']};
+  border-radius: 0px 0px 10px 10px;
   padding: ${theme.spacings.md};
 `);
 
@@ -78,9 +71,18 @@ const OptionTitle = styled.p(({ theme }) => css`
   margin-bottom: ${theme.spacings.xxs};
 `);
 
+const SelectRow = styled(Row)(({ theme }) => css`
+  margin-top: ${theme.spacings.xxs};
+  margin-bottom: ${theme.spacings.xxs};
+`);
+
 const OptionDescription = styled.p<{ $isSelected: boolean }>(({ theme, $isSelected }) => css`
   color: ${$isSelected ? theme.colors.gray[90] : theme.colors.gray[50]};
   margin-bottom: ${theme.spacings.xxs};
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `);
 
 const RuleBlockForm = ({
@@ -124,7 +126,7 @@ const RuleBlockForm = ({
   }, [selectedBlockDict, existingBlock]);
 
   const handleChange = (option: string, resetForm: () => void) => {
-    sendTelemetry('select', {
+    sendTelemetry(`Pipeline RuleBuilder New ${type} Selected`, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `select-${type}`,
@@ -140,7 +142,7 @@ const RuleBlockForm = ({
   };
 
   const onSubmit = (values: { [key: string]: any }) => {
-    sendTelemetry('click', {
+    sendTelemetry(`Pipeline RuleBuilder ${existingBlock ? 'Update' : 'Add'} ${type} Clicked`, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `${existingBlock ? 'update' : 'add'}-${type}-button`,
@@ -170,29 +172,29 @@ const RuleBlockForm = ({
   return (
     <Row>
       <Col md={12}>
-        <FormTitle>{existingBlock ? `Edit ${type}` : `Add ${type}`}</FormTitle>
         <Formik enableReinitialize onSubmit={onSubmit} initialValues={initialValues}>
           {({ resetForm, setFieldValue, isValid }) => (
             <Form>
-              <Row>
+              <SelectRow>
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}
                           name={`existingBlock-select-${type}`}
-                          placeholder={`Select ${type}`}
+                          placeholder={`Add ${type}`}
                           options={options}
                           optionRenderer={optionRenderer}
                           clearable={false}
                           matchProp="label"
+                          autoFocus
                           onChange={(option: string) => handleChange(option, resetForm)}
                           value={selectedBlockDict?.name || ''} />
                 </Col>
-              </Row>
+              </SelectRow>
 
               {selectedBlockDict && (
                 <SelectedBlock>
                   <SelectedBlockInfo>
                     <Col md={12}>
-                      <BlockTitle>
+                      <h5>
                         {existingBlock?.step_title || selectedBlockDict.rule_builder_name}
                         <OverlayTrigger trigger="click"
                                         rootClose
@@ -205,7 +207,7 @@ const RuleBlockForm = ({
                                   data-testid="funcSyntaxHelpIcon" />
                           </Button>
                         </OverlayTrigger>
-                      </BlockTitle>
+                      </h5>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>
                   </SelectedBlockInfo>
@@ -217,11 +219,13 @@ const RuleBlockForm = ({
                                           order={order}
                                           blockId={existingBlock?.id}
                                           outputVariableList={outputVariableList}
+                                          blockType={type}
                                           resetField={(fieldName) => resetField(fieldName, setFieldValue)} />
                     </Row>
                   ),
                   )}
 
+                  <Errors objectWithErrors={existingBlock} />
                   <FormSubmit bsSize="small"
                               disabledSubmit={!isValid}
                               submitButtonText={existingBlock ? 'Update' : 'Add'}
@@ -236,7 +240,6 @@ const RuleBlockForm = ({
             </Form>
           )}
         </Formik>
-        <Errors objectWithErrors={existingBlock} />
       </Col>
     </Row>
   );
