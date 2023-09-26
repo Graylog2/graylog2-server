@@ -117,7 +117,7 @@ const PluginsConfig = () => {
       </Col>
       <Col md={8} lg={5}>
         <Routes>
-          <Route path="/" element={<Navigate to={pluginSystemConfigs[0].configType} />} />
+          <Route path="/" element={<Navigate to={pluginSystemConfigs[0].configType} replace />} />
           {pluginSystemConfigs
             .map(({ component: SystemConfigComponent, configType }) => (
               <Route path={configType}

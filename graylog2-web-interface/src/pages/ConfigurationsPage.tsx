@@ -197,7 +197,7 @@ const ConfigurationsPage = () => {
         </Col>
 
         <Routes>
-          <Route path="/" element={<Navigate to={configurationSections[0].name} />} />
+          <Route path="/" element={<Navigate to={configurationSections[0].name} replace />} />
           {configurationSections.flatMap(({ catchAll, name, props = {}, SectionComponent }) => (
             <Route path={catchAll ? `${name}/*` : name}
                    key={name}
