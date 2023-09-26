@@ -81,7 +81,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 .orElse(PreflightConfigResult.UNKNOWN);
 
         // if preflight is finished, we assume that there will be some datanode registered via node-service.
-        return preflightResult == PreflightConfigResult.FINISHED;
+        return preflightResult != PreflightConfigResult.FINISHED;
     }
 
     @Override
