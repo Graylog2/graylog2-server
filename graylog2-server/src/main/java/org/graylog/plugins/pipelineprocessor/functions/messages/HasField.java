@@ -36,7 +36,7 @@ public class HasField extends AbstractFunction<Boolean> {
 
     public HasField() {
         fieldParam = ParameterDescriptor.string(FIELD).description("The field to check").build();
-        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").primary().build();
+        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").ruleBuilderVariable().build();
     }
 
     @Override

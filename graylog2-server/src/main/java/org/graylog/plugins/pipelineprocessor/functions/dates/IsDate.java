@@ -34,7 +34,7 @@ public class IsDate extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsDate() {
-        valueParam = object("value").primary().description("Value to check").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
     }
 
     @Override

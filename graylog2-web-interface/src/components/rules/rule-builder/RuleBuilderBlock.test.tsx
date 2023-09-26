@@ -19,6 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import RuleBuilderBlock from './RuleBuilderBlock';
 import { actionsBlockDict, buildRuleBlock } from './fixtures';
+import RuleBuilderProvider from './RuleBuilderProvider';
 
 const block = buildRuleBlock();
 
@@ -31,17 +32,21 @@ describe('RuleBuilderBlock', () => {
                              updateBlock={jest.fn()}
                              deleteBlock={jest.fn()} />);
 
-    expect(screen.getByText(/Select action/i)).toBeInTheDocument();
+    expect(screen.getByText(/Add action/i)).toBeInTheDocument();
   });
 
   it('renders RuleBlockDisplay when a block exists', async () => {
-    render(<RuleBuilderBlock type="action"
-                             blockDict={actionsBlockDict}
-                             block={block}
-                             order={1}
-                             addBlock={jest.fn()}
-                             updateBlock={jest.fn()}
-                             deleteBlock={jest.fn()} />);
+    render(
+      <RuleBuilderProvider>
+        <RuleBuilderBlock type="action"
+                          blockDict={actionsBlockDict}
+                          block={block}
+                          order={1}
+                          addBlock={jest.fn()}
+                          updateBlock={jest.fn()}
+                          deleteBlock={jest.fn()} />
+      </RuleBuilderProvider>,
+    );
 
     expect(screen.getByText(/to_long "foo"/i)).toBeInTheDocument();
   });

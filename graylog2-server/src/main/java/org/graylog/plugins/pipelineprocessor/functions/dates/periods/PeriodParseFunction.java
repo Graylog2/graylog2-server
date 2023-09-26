@@ -29,7 +29,7 @@ public class PeriodParseFunction extends AbstractFunction<Period> {
     public static final String NAME = "period";
     private final ParameterDescriptor<String, Period> value =
             ParameterDescriptor
-                    .string("value", Period.class)
+                    .string("value", Period.class).ruleBuilderVariable()
                     .transform(Period::parse)
                     .build();
 
@@ -47,7 +47,7 @@ public class PeriodParseFunction extends AbstractFunction<Period> {
                 .pure(true)
                 .returnType(Period.class)
                 .params(value)
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Parse period")
                 .ruleBuilderTitle("Parse period from '${value}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)

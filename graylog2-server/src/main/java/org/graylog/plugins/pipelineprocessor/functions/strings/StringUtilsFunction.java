@@ -35,7 +35,7 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
     private final ParameterDescriptor<String, Locale> localeParam;
 
     public StringUtilsFunction() {
-        valueParam = ParameterDescriptor.string(VALUE).primary().description("The input string").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("The input string").build();
         localeParam = ParameterDescriptor.string(LOCALE, Locale.class)
                 .optional()
                 .transform(Locale::forLanguageTag)

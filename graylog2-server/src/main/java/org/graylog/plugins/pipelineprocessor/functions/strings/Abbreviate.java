@@ -36,7 +36,7 @@ public class Abbreviate extends AbstractFunction<String> {
     private final ParameterDescriptor<Long, Long> widthParam;
 
     public Abbreviate() {
-        valueParam = ParameterDescriptor.string(VALUE).primary().description("The string to abbreviate").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("The string to abbreviate").build();
         widthParam = ParameterDescriptor.integer(WIDTH).description("The maximum number of characters including the '...' (at least 4)").build();
     }
 

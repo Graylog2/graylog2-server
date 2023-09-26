@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 
 import javax.inject.Inject;
@@ -77,6 +78,10 @@ public class LookupRemoveStringList extends AbstractFunction<Object> {
                 .description("Remove the entries of the given string list from the named lookup table. Returns the updated list on success, null on failure.")
                 .params(lookupTableParam, keyParam, valueParam)
                 .returnType(List.class)
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Remove string list from lookup table")
+                .ruleBuilderTitle("Remove entries of string list from '${lookup_table}' using key '${key}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
 }
