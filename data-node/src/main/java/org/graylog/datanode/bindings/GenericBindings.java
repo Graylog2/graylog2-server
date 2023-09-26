@@ -34,6 +34,7 @@ public class GenericBindings extends Graylog2Module {
 
     @Override
     protected void configure() {
+        bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(CustomCAX509TrustManager.class).asEagerSingleton();
         bind(CaService.class).to(CaServiceImpl.class);
