@@ -103,7 +103,7 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
                 .fragment("""
                         ( has_field(${field}) &&
                         <#if caseInsensitive!false>
-                        lower(to_string($message.${field})) == lower(${fieldValue})
+                        lowercase(to_string($message.${field})) == lowercase(${fieldValue})
                         <#else>
                         to_string($message.${field}) == ${fieldValue}
                         </#if>
@@ -120,7 +120,7 @@ public class V20220512123200_AddSimpleConditionFragments extends Migration {
                         .description("Checks if the message has a field and if this field's string value is equal to the given fieldValue")
                         .ruleBuilderEnabled()
                         .ruleBuilderName("Field equals")
-                        .ruleBuilderTitle("Field '${field}' equals '${fieldValue}' <#if caseInsensitive??>(case insensitive: ${caseInsensitive})</#if>")
+                        .ruleBuilderTitle("Field '${field}' equals '${fieldValue}' <#if caseInsensitive??>(case insensitive: ${caseInsensitive?c})</#if>")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                         .build())
                 .isCondition()
