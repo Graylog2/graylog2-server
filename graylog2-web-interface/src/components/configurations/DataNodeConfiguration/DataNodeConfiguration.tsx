@@ -18,17 +18,19 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
-import DataNodesCertificateRenewal from './DataNodesCertificateRenewal';
+import CertificateRenewal from './CertificateRenewal';
 
-const StyledCertificateRenewalPolicyConfig = styled(CertificateRenewalPolicyConfig)`
-  margin-bottom: 20px;
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 `;
 
-const CertificateRenewal = () => (
-  <>
-    <StyledCertificateRenewalPolicyConfig />
-    <DataNodesCertificateRenewal />
-  </>
+const DataNodeConfiguration = () => (
+  <Container>
+    <CertificateRenewalPolicyConfig />
+    <CertificateRenewal />
+  </Container>
 );
 
-export default CertificateRenewal;
+export default DataNodeConfiguration;

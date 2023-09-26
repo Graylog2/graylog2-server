@@ -23,8 +23,10 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import type { DataNode } from 'preflight/types';
 import UserNotification from 'util/UserNotification';
-import { Spinner } from 'components/common';
+import { Spinner, Timestamp } from 'components/common';
 import { Alert, Badge, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
+import { defaultCompare } from 'logic/DefaultCompare';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const StyledList = styled(ListGroup)`
   max-width: 700px;
@@ -66,18 +68,54 @@ const useDataNodes = () => {
   });
 };
 
-const CertRenewalButton = ({ nodeId }: { nodeId: string }) => {
+const RightCol = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const renewalWording = {
+  buttonTitle: 'Renew certificate',
+  buttonLoadingTitle: 'Renewing certificate',
+  successActionTitle: 'renewed',
+  errorActionTitle: 'renewal',
+  telemetryAppSection: 'renewing-certificate',
+};
+
+const provisioningWording = {
+  buttonTitle: 'Provision certificate',
+  buttonLoadingTitle: 'Provisioning certificate...',
+  successActionTitle: 'provisioned',
+  errorActionTitle: 'provisioning',
+  telemetryAppSection: 'provisioning-certificate',
+};
+
+const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNode['status'] }) => {
+  const sendTelemetry = useSendTelemetry();
   const [isRenewing, setIsRenewing] = useState(false);
+  const {
+    buttonTitle,
+    buttonLoadingTitle,
+    successActionTitle,
+    errorActionTitle,
+    telemetryAppSection,
+  } = status === 'UNCONFIGURED' ? provisioningWording : renewalWording;
 
   const onCertificateRenewal = () => {
     setIsRenewing(true);
 
+    sendTelemetry('form_submit', {
+      app_pathname: 'configurations',
+      app_section: 'data-node',
+      app_action_value: telemetryAppSection,
+    });
+
     fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
       .then(() => {
-        UserNotification.success('Certificate renewed successfully');
+        UserNotification.success(`Certificate ${successActionTitle} successfully`);
       })
       .catch((error) => {
-        UserNotification.error(`Certificate renewal failed with error: ${error}`);
+        UserNotification.error(`Certificate ${errorActionTitle} failed with error: ${error}`);
       })
       .finally(() => {
         setIsRenewing(false);
@@ -86,28 +124,33 @@ const CertRenewalButton = ({ nodeId }: { nodeId: string }) => {
 
   return (
     <Button onClick={onCertificateRenewal} bsSize="xsmall">
-      {isRenewing ? 'Renewing certificate...' : 'Renew certificate'}
+      {isRenewing ? buttonLoadingTitle : buttonTitle}
     </Button>
   );
 };
 
-const DataNodesCertificateRenewal = () => {
+const CertificateRenewal = () => {
   const { data: dataNodes, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes();
+  const sortedDataNodes = dataNodes?.sort((d1, d2) => defaultCompare(d1.cert_valid_until, d2.cert_valid_until));
 
   return (
     <div>
-      <h2>Graylog Data Nodes Certificate Renewal</h2>
+      <h2>Certificate Renewal & Provisioning</h2>
       <p>
-        Here you can manually trigger the certificate renewal for Graylog data nodes.
+        Here you can manually trigger the certificate renewal or provisioning for Graylog data nodes.
+        It is only necessary to manually provision certificates when the renewal policy mode &quot;Manual&quot; is configured and
+        data nodes have been started after the initial certificate provisioning.
       </p>
 
-      {!!dataNodes?.length && (
+      {!!sortedDataNodes?.length && (
         <StyledList>
-            {dataNodes.map(({
+            {sortedDataNodes.map(({
               node_id,
               hostname,
               transport_address,
               short_node_id,
+              cert_valid_until,
+              status,
             }) => (
               <ListGroupItem key={short_node_id}>
                 <DataNodeInfos>
@@ -115,14 +158,17 @@ const DataNodesCertificateRenewal = () => {
                   <span title="Transport address">{transport_address}</span>{' – '}
                   <span title="Hostname">{hostname}</span>
                 </DataNodeInfos>
-                <CertRenewalButton nodeId={node_id} />
+                <RightCol>
+                  {cert_valid_until && (<span>valid until <Timestamp dateTime={cert_valid_until} />{' '}</span>)}
+                  <CertRenewalButton nodeId={node_id} status={status} />
+                </RightCol>
               </ListGroupItem>
             ))}
         </StyledList>
       )}
 
       {isInitialLoadingDataNodes && <Spinner />}
-      {(!dataNodes?.length && !isInitialLoadingDataNodes) && (
+      {(!sortedDataNodes?.length && !isInitialLoadingDataNodes) && (
         <Alert>
           No data nodes have been found.
         </Alert>
@@ -131,4 +177,4 @@ const DataNodesCertificateRenewal = () => {
   );
 };
 
-export default DataNodesCertificateRenewal;
+export default CertificateRenewal;
