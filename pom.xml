@@ -781,7 +781,7 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
-                        <arg>-Xplugin:ErrorProne</arg>
+                        <arg>-Xplugin:ErrorProne -Xep:DoNotMock:WARN</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
