@@ -95,6 +95,19 @@ export const TELEMETRY_EVENT_TYPE = {
     DASHBOARD_PAGE_CONFIGURATION_SORTING_UPDATED: 'Dashboard Page Configuration Sorting Updated',
     DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED: 'Dashboard Page Configuration Page Remove',
   },
+  EVENTDEFINITION_LIST: {
+    COLUMNS_CHANGED: 'EventDefinition List Columns Changed',
+    SORT_CHANGED: 'EventDefinition List Sort Changed',
+    PAGE_SIZE_CHANGED: 'EventDefinition List Page Size Changed',
+    BULK_ACTION_DELETE_CLICKED: 'EventDefinition List Bulk Delete Clicked',
+    BULK_ACTION_ENABLE_CLICKED: 'EventDefinition List Bulk Enable Clicked',
+    BULK_ACTION_DISABLE_CLICKED: 'EventDefinition List Bulk Disable Clicked',
+    ROW_ACTION_DELETE_CLICKED: 'EventDefinition List Row Delete Clicked',
+    ROW_ACTION_ENABLE_CLICKED: 'EventDefinition List Row Enable Clicked',
+    ROW_ACTION_DISABLE_CLICKED: 'EventDefinition List Row Disable Clicked',
+    ROW_ACTION_COPY_CLICKED: 'EventDefinition List Row Copy Clicked',
+    ROW_ACTION_SHARE_CLICKED: 'EventDefinition List Row Share Clicked',
+  },
   EVENTDEFINITION_CREATE_BUTTON_CLICKED: 'EventDefinition Create Button Clicked',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
@@ -148,7 +161,6 @@ export const TELEMETRY_EVENT_TYPE = {
     CREATE_CLICKED: 'EventDefinition Summary Create Clicked',
     UPDATE_CLICKED: 'EventDefinition Summary Update Clicked',
   },
-
   CONTENTSTREAM: {
     PREV_ARROW_CLICKED: 'Content Stream Left Arrow Clicked',
     NEXT_ARROW_CLICKED: 'Content Stream Right Arrow Clicked',
