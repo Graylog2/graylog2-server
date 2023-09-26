@@ -61,7 +61,7 @@ class NodePingPeriodicalTest {
 
         final NodeService nodeService = Mockito.mock(NodeService.class);
 
-        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri);
+        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri, cluster);
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
