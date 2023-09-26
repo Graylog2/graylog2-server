@@ -30,9 +30,11 @@ export type TestResult = {
   error?: boolean,
   message?: string,
 };
+
 export type TestResults ={
     [key: string]: TestResult
 };
+
 export type EventNotification = {
   id: string,
   title: string,
@@ -40,12 +42,32 @@ export type EventNotification = {
   config: {
     type?: string
   },
-}
+};
+
+export type HttpEventNotificationV2 = EventNotification & {
+  config: HttpEventNotificationConfigV2,
+};
+
+export type EncryptedValue = {
+  is_set?: boolean,
+  set_value?: string,
+  keep_value?: boolean,
+  delete_value?: boolean
+};
+
+export type HttpEventNotificationConfigV2 = {
+  type: 'http-notification-v2',
+  url: string,
+  basic_auth?: EncryptedValue,
+  api_key?: string,
+  api_secret?: EncryptedValue,
+  skip_tls_verification: boolean,
+};
 
 export type LegacyEventNotification = {
   name: string,
   configuration: {}
-}
+};
 
 type EventNotificationsActionsType = {
   listAll: () => Promise<{ notifications: Array<EventNotification> }>,
@@ -58,7 +80,8 @@ type EventNotificationsActionsType = {
   delete: (eventNotification: EventNotification) => Promise<void>,
   test: (eventNotification: EventNotification) => Promise<void>,
   testPersisted: (eventNotification: EventNotification) => Promise<void>,
-}
+};
+
 export const EventNotificationsActions = singletonActions(
   'core.EventNotifications',
   () => Reflux.createActions<EventNotificationsActionsType>({
@@ -87,7 +110,8 @@ type EventNotificationsStoreState = {
     total: number,
     grandTotal: number,
   }
-}
+};
+
 export const EventNotificationsStore = singletonStore(
   'core.EventNotifications',
   () => Reflux.createStore<EventNotificationsStoreState>({
