@@ -95,7 +95,7 @@
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
-        <auto-value.version>1.7.4</auto-value.version>
+        <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.556</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.20.155</aws-java-sdk-2.version>
@@ -139,7 +139,7 @@
         <jersey.version>2.37</jersey.version>
         <jmte.version>5.0.0</jmte.version>
         <joda-time.version>2.12.5</joda-time.version>
-        <jool.version>0.9.14</jool.version>
+        <jool.version>0.9.15</jool.version>
         <json-path.version>2.8.0</json-path.version>
         <kafka.version>3.5.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
@@ -190,10 +190,10 @@
         <awaitility.version>4.2.0</awaitility.version>
         <equalsverifier.version>3.15.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
-        <junit.version>4.13.1</junit.version>
+        <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <mockito.version>5.5.0</mockito.version>
-        <restassured.version>4.3.2</restassured.version>
+        <restassured.version>5.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.19.0</testcontainers.version>
         <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
