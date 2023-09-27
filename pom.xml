@@ -763,7 +763,12 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
-                        <arg>-Xplugin:ErrorProne -Xep:DoNotMock:WARN</arg>
+                        <arg>
+                            -Xplugin:ErrorProne
+                            -Xep:DoNotMock:WARN
+                            -XepDisableWarningsInGeneratedCode
+                            -XepExcludedPaths:.*/target/generated-sources/.*
+                        </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
