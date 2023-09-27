@@ -123,17 +123,9 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     @Override
-    public URI getOpensearchClusterUrl() {
-        final String baseUrl = opensearchConfiguration.map(OpensearchConfiguration::getClusterBaseUrl)
-                .map(httpHost -> new URIBuilder()
-                        .setHost(httpHost.getHostName())
-                        .setPort(httpHost.getPort())
-                        .setScheme(httpHost.getSchemeName()).toString())
-                .orElseGet( () -> {
-                    final var hostname = DatanodeConfigurationProvider.getNodesFromConfig(configuration.getDatanodeNodeName());
-                    return URI.create("http://" + hostname + ":" + configuration.getOpensearchTransportPort()).toString();
-                });
-        return URI.create(baseUrl);
+    public String getOpensearchClusterUrl() {
+        final var hostname = DatanodeConfigurationProvider.getNodesFromConfig(configuration.getDatanodeNodeName());
+        return URI.create(hostname + ":" + configuration.getOpensearchTransportPort()).toString();
     }
 
     public void onEvent(ProcessEvent event) {
@@ -167,15 +159,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private void writeSeedHostsList() {
         try {
-            final Set<String> current = nodeService.allActive(Node.Type.DATANODE).values().stream().map(node -> {
-                try {
-                    return new URI(node.getClusterAddress()).getAuthority();
-                } catch (URISyntaxException ex) {
-                    LOG.warn("Could not get host:port from {}", node);
-                    return null;
-                }
-            }).filter(Objects::nonNull).collect(Collectors.toSet());
-
+            final Set<String> current = nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
             Files.write(hostsfile, current, Charset.defaultCharset(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } catch (IOException iox) {
             LOG.error("Could not write to file: {} - {}", hostsfile, iox.getMessage());
