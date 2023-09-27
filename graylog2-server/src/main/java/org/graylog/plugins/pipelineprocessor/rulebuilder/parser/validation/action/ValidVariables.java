@@ -50,6 +50,17 @@ public class ValidVariables implements Validator {
         FunctionDescriptor<?> functionDescriptor = ruleFragment.descriptor();
         Map<String, Object> stepParameters = step.parameters();
 
+        //Add output to map
+        String outputvariable = step.outputvariable();
+        if (StringUtils.isNotBlank(outputvariable)) {
+
+            if (functionDescriptor.returnType() == Void.class) {
+                return new ValidationResult(true, f("Return type is void. No output variable allowed", functionDescriptor.name()));
+            }
+
+            storeVariable(outputvariable, functionDescriptor.returnType());
+        }
+
         ImmutableList<ParameterDescriptor> parameterDescriptors = functionDescriptor.params();
         for(ParameterDescriptor parameterDescriptor: parameterDescriptors) {
             String parameterName = parameterDescriptor.name();
@@ -78,16 +89,6 @@ public class ValidVariables implements Validator {
             }
         }
 
-        //Add output to map
-        String outputvariable = step.outputvariable();
-        if (StringUtils.isNotBlank(outputvariable)) {
-
-            if (functionDescriptor.returnType() == Void.class) {
-                return new ValidationResult(true, f("Return typ is void. No out put variable allowed", functionDescriptor.name()));
-            }
-
-            storeVariable(outputvariable, functionDescriptor.returnType());
-        }
         return new ValidationResult(false, "");
     }
 

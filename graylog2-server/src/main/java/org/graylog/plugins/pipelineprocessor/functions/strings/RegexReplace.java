@@ -38,7 +38,7 @@ public class RegexReplace extends AbstractFunction<String> {
 
     public RegexReplace() {
         patternParam = ParameterDescriptor.string("pattern", Pattern.class).transform(Pattern::compile).description("The regular expression to which the \"value\" string is to be matched; uses Java regex syntax").build();
-        valueParam = ParameterDescriptor.string("value").primary().description("The string to match the pattern against").build();
+        valueParam = ParameterDescriptor.string("value").ruleBuilderVariable().description("The string to match the pattern against").build();
         replacementParam = ParameterDescriptor.string("replacement").description("The string to be substituted for the first or all matches").build();
         replaceAllParam = ParameterDescriptor.bool("replace_all").optional().description("Replace all matches if \"true\", otherwise only replace the first match. Default: true").build();
     }

@@ -31,7 +31,7 @@ public class IsLong extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsLong() {
-        valueParam = object("value").primary().description("Value to check").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
     }
 
     @Override

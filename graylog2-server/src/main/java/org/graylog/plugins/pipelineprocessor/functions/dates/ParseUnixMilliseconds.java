@@ -33,7 +33,7 @@ public class ParseUnixMilliseconds extends TimezoneAwareFunction {
     private final ParameterDescriptor<Long, Long> valueParam;
 
     public ParseUnixMilliseconds() {
-        valueParam = ParameterDescriptor.integer(VALUE).primary().description("UNIX millisecond timestamp to parse").build();
+        valueParam = ParameterDescriptor.integer(VALUE).ruleBuilderVariable().description("UNIX millisecond timestamp to parse").build();
     }
 
     @Override

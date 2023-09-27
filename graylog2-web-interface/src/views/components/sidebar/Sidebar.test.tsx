@@ -36,6 +36,7 @@ jest.mock('util/AppConfig', () => ({
   rootTimeZone: jest.fn(() => 'America/Chicago'),
   gl2ServerUrl: jest.fn(() => undefined),
   isCloud: jest.fn(() => false),
+  isFeatureEnabled: jest.fn(() => false),
 }));
 
 jest.mock('views/hooks/useViewType');
@@ -89,6 +90,7 @@ describe('<Sidebar />', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
+    asMock(useViewType).mockReturnValue(View.Type.Search);
     asMock(useActiveQueryId).mockReturnValue(queryId);
     asMock(useViewMetadata).mockReturnValue(viewMetaData);
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());

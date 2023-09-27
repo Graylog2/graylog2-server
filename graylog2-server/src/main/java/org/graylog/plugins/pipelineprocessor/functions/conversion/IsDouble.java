@@ -31,7 +31,7 @@ public class IsDouble extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsDouble() {
-        valueParam = object("value").primary().description("Value to check").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
     }
 
     @Override

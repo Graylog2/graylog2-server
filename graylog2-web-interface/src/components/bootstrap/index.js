@@ -30,6 +30,7 @@ export { default as Input } from './Input';
 export { default as InputGroup } from './InputGroup';
 export { default as InputWrapper } from './InputWrapper';
 export { default as Jumbotron } from './Jumbotron';
+export { default as KeyboardKey } from './KeyboardKey';
 export { default as Label } from './Label';
 export { default as ListGroup } from './ListGroup';
 export { default as ListGroupItem } from './ListGroupItem';

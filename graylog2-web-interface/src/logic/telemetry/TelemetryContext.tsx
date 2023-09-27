@@ -32,6 +32,7 @@ export type TelemetryEventType =
   '$pageview'
   | 'view'
   | 'click'
+  | 'hotkey_usage'
   | 'form_submit'
   | 'popover_open'
   | 'popover_close'
@@ -44,7 +45,7 @@ export type TelemetryEventType =
   | 'navigate';
 
 type ContextType = {
-  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,
+  sendTelemetry: (eventType: TelemetryEventType|string, event: TelemetryEvent) => void,
 }
 const TelemetryContext = React.createContext<ContextType>({
   sendTelemetry: () => {},

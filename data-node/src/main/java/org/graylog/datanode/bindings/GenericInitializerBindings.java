@@ -26,11 +26,14 @@ import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.management.OpensearchProcessService;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
+import org.graylog2.bootstrap.preflight.PreflightConfigServiceImpl;
 
 public class GenericInitializerBindings extends AbstractModule {
     @Override
     protected void configure() {
 //        bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
+        bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(OpensearchConfiguration.class).toProvider(OpensearchConfigurationProvider.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);

@@ -480,11 +480,6 @@
                 <version>${opentelemetry.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-semconv</artifactId>
-                <version>${opentelemetry-semconv.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>software.amazon.msk</groupId>
                 <artifactId>aws-msk-iam-auth</artifactId>
                 <version>${aws-msk-iam-auth.version}</version>
@@ -492,53 +487,6 @@
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-
-            <!-- AWS plugin -->
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
-                <version>${aws-java-sdk-1.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-sqs</artifactId>
-                <version>${aws-java-sdk-1.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-ec2</artifactId>
-                <version>${aws-java-sdk-1.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-sts</artifactId>
-                <version>${aws-java-sdk-1.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

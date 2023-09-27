@@ -41,7 +41,7 @@ public class MapSet extends AbstractFunction<Map> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public MapSet() {
-        mapParam = type(MAPARG, Map.class).primary().description("A map").build();
+        mapParam = type(MAPARG, Map.class).ruleBuilderVariable().description("A map").build();
         keyParam = string(KEYARG).description("Set this key in map").build();
         valueParam = object(VALUEARG).description("New value").build();
     }
@@ -69,7 +69,7 @@ public class MapSet extends AbstractFunction<Map> {
                 .description("Set a key in the map")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Set key in map")
-                .ruleBuilderTitle("Update '${keyValue}' in map")
+                .ruleBuilderTitle("Update '${key}' in map")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.OTHER)
                 .build();
     }

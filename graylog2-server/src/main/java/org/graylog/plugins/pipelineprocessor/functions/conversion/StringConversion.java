@@ -53,7 +53,7 @@ public class StringConversion extends AbstractFunction<String> {
                 };
             }
         };
-        valueParam = object("value").primary().description("Value to convert").primary().build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to convert").ruleBuilderVariable().build();
         defaultParam = string("default").optional().description("Used when 'value' is null, defaults to \"\"").build();
     }
 
