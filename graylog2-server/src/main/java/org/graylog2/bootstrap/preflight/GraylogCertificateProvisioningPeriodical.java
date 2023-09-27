@@ -40,6 +40,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,13 +144,13 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 final var password = configuration.configuredCaExists() ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
                 Optional<KeyStore> optKey = caService.loadKeyStore();
                 if (optKey.isEmpty()) {
-                    LOG.warn("No keystore available.");
+                    LOG.debug("No keystore available.");
                     return;
                 }
 
                 final var renewalPolicy = getRenewalPolicy();
                 if (renewalPolicy == null) {
-                    LOG.warn("No renewal policy available.");
+                    LOG.debug("No renewal policy available.");
                     return;
                 }
 
@@ -246,6 +247,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         }
      }
 
+    @NotNull
     @Override
     protected Logger getLogger() {
         return LOG;
