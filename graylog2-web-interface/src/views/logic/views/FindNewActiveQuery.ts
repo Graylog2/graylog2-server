@@ -16,14 +16,13 @@
  */
 
 // Returns a new query ID, in case the active query gets deleted.
-import type { List } from 'immutable';
+import { List } from 'immutable';
 
-const FindNewActiveQueryId = (queryIds: List<string>, activeQueryId: string) => {
+const FindNewActiveQueryId = (queryIds: List<string>, activeQueryId: string, removedQueryIds: List<string> = List()) => {
   const currentQueryIdIndex = queryIds.indexOf(activeQueryId);
-  const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
+  const priorQueryIds = queryIds.slice(0, currentQueryIdIndex);
 
-  return queryIds.filter((queryId) => (queryId !== activeQueryId))
-    .get(newQueryIdIndex);
+  return priorQueryIds.reverse().find((queryId) => !removedQueryIds.includes(queryId));
 };
 
 export default FindNewActiveQueryId;
