@@ -31,7 +31,7 @@ class NodePingPeriodicalTest {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
-        final URI cluster = URI.create("http://localhost:9300");
+        final String cluster = "localhost:9300";
         final NodeService nodeService = Mockito.mock(NodeService.class);
 
         final NodePingPeriodical task = new NodePingPeriodical(
@@ -57,7 +57,7 @@ class NodePingPeriodicalTest {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
-        final URI cluster = URI.create("http://localhost:9300");
+        final String cluster = "localhost:9300";
 
         final NodeService nodeService = Mockito.mock(NodeService.class);
 

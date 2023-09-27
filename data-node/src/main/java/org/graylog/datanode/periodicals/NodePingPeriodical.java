@@ -36,7 +36,7 @@ public class NodePingPeriodical extends Periodical {
     private final NodeService nodeService;
     private final NodeId nodeId;
     private final Supplier<URI> opensearchBaseUri;
-    private final Supplier<URI> opensearchClusterUri;
+    private final Supplier<String> opensearchClusterUri;
     private final Supplier<Boolean> isLeader;
 
 
@@ -49,7 +49,7 @@ public class NodePingPeriodical extends Periodical {
             NodeService nodeService,
             NodeId nodeId,
             Supplier<URI> opensearchBaseUri,
-            Supplier<URI> opensearchClusterUri,
+            Supplier<String> opensearchClusterUri,
             Supplier<Boolean> isLeader
     ) {
         this.nodeService = nodeService;

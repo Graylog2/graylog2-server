@@ -72,17 +72,17 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         return Node.Type.SERVER;
     }
 
-    private Map<String, Object> addClusterUriToMap(final Map<String, Object> orig, final URI clusterUri) {
+    private Map<String, Object> addClusterUriToMap(final Map<String, Object> orig, final String clusterUri) {
         if(clusterUri == null) {
             return orig;
         }
         var newMap = new HashMap<>(orig);
-        newMap.put("cluster_address", clusterUri.toString());
+        newMap.put("cluster_address", clusterUri);
         return Map.copyOf(newMap);
     }
 
     @Override
-    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, URI clusterUri, String hostname) {
+    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
         final var params = addClusterUriToMap(Map.of(
                 "node_id", nodeId,
                 "type", type().toString(),
@@ -181,7 +181,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      */
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, URI clusterAddress) throws NodeNotFoundException {
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress) throws NodeNotFoundException {
         BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
         final var params = addClusterUriToMap(Map.of(
                 "is_leader", isLeader,
