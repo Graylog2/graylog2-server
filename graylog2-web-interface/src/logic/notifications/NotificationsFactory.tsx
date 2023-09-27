@@ -16,9 +16,10 @@
  */
 
 import Routes from 'routing/Routes';
+import type { NotificationType } from 'stores/notifications/NotificationsStore';
 
 class NotificationsFactory {
-  static getValuesForNotification(notification) {
+  static getValuesForNotification(notification: NotificationType) {
     switch (notification.type) {
       case 'legacy_ldap_config_migration': {
         const { auth_service_id: authServiceId } = notification.details;
@@ -40,6 +41,13 @@ class NotificationsFactory {
           },
         };
       }
+
+      case 'data_node_needs_provisioning':
+        return {
+          values: {
+            DATA_NODE_CONFIGURATION: Routes.SYSTEM.configurationsSection('Data Node'),
+          },
+        };
 
       default:
         return undefined;
