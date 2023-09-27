@@ -22,6 +22,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchInfo;
 import org.graylog.datanode.process.ProcessEvent;
@@ -56,7 +57,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final StateMachineTracerAggregator tracerAggregator;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<OpensearchConfiguration> configuration = Optional.empty();
+    private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<RestHighLevelClient> restClient = Optional.empty();
 
@@ -72,6 +73,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final CustomCAX509TrustManager trustManager;
     private final Path hostsfile;
     private final NodeService nodeService;
+    private final Configuration configuration;
 
 
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService nodeService) {
@@ -83,6 +85,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.stderr = new CircularFifoQueue<>(logsCacheSize);
         this.trustManager = trustManager;
         this.nodeService = nodeService;
+        this.configuration = configuration;
         this.hostsfile = Path.of(configuration.getOpensearchConfigLocation()).resolve("opensearch").resolve("unicast_hosts.txt");
     }
 
@@ -110,7 +113,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public URI getOpensearchBaseUrl() {
-        final String baseUrl = configuration.map(OpensearchConfiguration::getRestBaseUrl)
+        final String baseUrl = opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl)
                 .map(httpHost -> new URIBuilder()
                         .setHost(httpHost.getHostName())
                         .setPort(httpHost.getPort())
@@ -121,12 +124,15 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public URI getOpensearchClusterUrl() {
-        final String baseUrl = configuration.map(OpensearchConfiguration::getClusterBaseUrl)
+        final String baseUrl = opensearchConfiguration.map(OpensearchConfiguration::getClusterBaseUrl)
                 .map(httpHost -> new URIBuilder()
                         .setHost(httpHost.getHostName())
                         .setPort(httpHost.getPort())
                         .setScheme(httpHost.getSchemeName()).toString())
-                .orElse(""); // TODO: will this cause problems in the nodeservice?
+                .orElseGet( () -> {
+                    final var hostname = DatanodeConfigurationProvider.getNodesFromConfig(configuration.getDatanodeNodeName());
+                    return URI.create("http://" + hostname + ":" + configuration.getOpensearchTransportPort()).toString();
+                });
         return URI.create(baseUrl);
     }
 
@@ -155,7 +161,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public void startWithConfig(OpensearchConfiguration configuration) {
-        this.configuration = Optional.of(configuration);
+        this.opensearchConfiguration = Optional.of(configuration);
         restart();
     }
 
@@ -178,7 +184,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
     @Override
     public synchronized void restart() {
-        configuration.ifPresentOrElse(
+        opensearchConfiguration.ifPresentOrElse(
                 (config -> {
                     stopProcess();
                     // refresh TM if the SSL certs changed
