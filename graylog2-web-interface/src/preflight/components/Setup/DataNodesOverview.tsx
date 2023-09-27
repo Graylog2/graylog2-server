@@ -41,9 +41,20 @@ type NodeProps = {
 };
 
 const isSecure = (address: string) => address?.toLocaleLowerCase().startsWith('https://');
-const Node = ({ nodeId, transportAddress }: NodeProps) => (isSecure(transportAddress)
-  ? <NodeId color="green" title="Short node id"><SecureIcon name="lock" />{nodeId}</NodeId>
-  : <NodeId title="Short node id">{nodeId}</NodeId>);
+
+const colorByState = (address: string) => {
+  if (!address) {
+    return 'grey';
+  }
+
+  return isSecure(address) ? 'green' : 'red';
+};
+
+const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'unlock');
+
+const Node = ({ nodeId, transportAddress }: NodeProps) => (
+  <NodeId color={colorByState(transportAddress)} title="Short node id"><SecureIcon name={lockIcon(transportAddress)} />{nodeId}</NodeId>
+);
 
 const DataNodesOverview = () => {
   const {
