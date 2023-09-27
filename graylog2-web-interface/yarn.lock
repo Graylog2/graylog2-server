@@ -7605,7 +7605,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.7"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-dd6a6929-3623-424e-81ce-dc1b819701ec-1695729942433/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.4.0"
     eslint-plugin-jest-dom "5.1.0"
@@ -9003,13 +9003,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.4"
     "@types/jquery" "3.5.19"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-f87f776f-62ab-4732-bd7b-73f5ab18baae-1695729942000/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-f87f776f-62ab-4732-bd7b-73f5ab18baae-1695729942000/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-f87f776f-62ab-4732-bd7b-73f5ab18baae-1695729942000/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -12972,10 +12972,10 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer-core@21.3.4:
-  version "21.3.4"
-  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-21.3.4.tgz#ca644b9d50b1d58f4d757939e223d890836dfbf9"
-  integrity sha512-iaG7ScTXOm9hlsBTBGGtr5dAAsA8IiWTx8E0Ghr0b5Ntl42bdcPS8EXjcERKocDhua2YqdlnFGs/cBxHY+VNyA==
+puppeteer-core@21.3.5:
+  version "21.3.5"
+  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-21.3.5.tgz#f9f592590ce2c3633725ff4a6f924bc66c420640"
+  integrity sha512-C/yVgvob/HbUVTedhnURDruFkJYHEqJWlb6YltJGj/T7yzWdG4ouQ0JER8aX5g2RS4DMQ0xMNuhUVYMqC2QfnQ==
   dependencies:
     "@puppeteer/browsers" "1.7.1"
     chromium-bidi "0.4.28"
@@ -12985,13 +12985,13 @@ puppeteer-core@21.3.4:
     ws "8.14.2"
 
 puppeteer@^21.0.3:
-  version "21.3.4"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-21.3.4.tgz#61de08e2833b17810ca96a913be1f5db7829c58f"
-  integrity sha512-kE67k1KR6hQs3g0Yf/i3GYOhTU8zC2dtcpHhtcSC9bGoVxRgqDo/hwVkDqlNKxJsJHuVX+qviWC7F0FdSjcFTA==
+  version "21.3.5"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-21.3.5.tgz#70e6900941104718ff765484d030bb472c4572a3"
+  integrity sha512-Lff7dgN7D1AHnPBgceZiZpcXVpKOcnSCtBy+TZlwqYBumGapOky3/rUPScd6I6poh5XpPNzya6gbipBasAs7xA==
   dependencies:
     "@puppeteer/browsers" "1.7.1"
     cosmiconfig "8.3.6"
-    puppeteer-core "21.3.4"
+    puppeteer-core "21.3.5"
 
 pure-rand@^6.0.0:
   version "6.0.1"
