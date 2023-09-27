@@ -21,6 +21,7 @@ import styled from 'styled-components';
 import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { Alert, Badge, List } from 'preflight/components/common';
+import Icon from 'preflight/components/common/Icon';
 
 const P = styled.p`
   max-width: 700px;
@@ -29,6 +30,20 @@ const P = styled.p`
 const NodeId = styled(Badge)`
   margin-right: 3px;
 `;
+
+const SecureIcon = styled(Icon)`
+  margin-right: 3px;
+`;
+
+type NodeProps = {
+  nodeId: string,
+  transportAddress: string,
+};
+
+const isSecure = (address: string) => address?.toLocaleLowerCase().startsWith('https://');
+const Node = ({ nodeId, transportAddress }: NodeProps) => (isSecure(transportAddress)
+  ? <NodeId color="green" title="Short node id"><SecureIcon name="lock" />{nodeId}</NodeId>
+  : <NodeId title="Short node id">{nodeId}</NodeId>);
 
 const DataNodesOverview = () => {
   const {
@@ -58,7 +73,7 @@ const DataNodesOverview = () => {
               short_node_id,
             }) => (
               <List.Item key={short_node_id}>
-                <NodeId title="Short node id">{short_node_id}</NodeId>
+                <Node nodeId={short_node_id} transportAddress={transport_address} />
                 <span title="Transport address">{transport_address}</span>{' – '}
                 <span title="Hostname">{hostname}</span>
               </List.Item>
