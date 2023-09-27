@@ -80,11 +80,11 @@ const ContentStreamNewsItem = ({ feed }: Props) => {
         </a>
 
         <StyledPanelBody>
-          {/* eslint-disable-next-line react/no-danger */}
           <a href={feed?.link}
              target="_blank"
              onClick={() => handleSendTelemetry()}
              rel="noreferrer">
+            {/* eslint-disable-next-line react/no-danger */}
             <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
           </a>
         </StyledPanelBody>
