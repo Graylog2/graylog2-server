@@ -52,10 +52,10 @@ const BlockDescription = styled.p(({ theme }) => css`
 `);
 
 const SelectedBlock = styled.div(({ theme }) => css`
-  border-left:  1px solid ${theme.colors.gray['90']};
-  border-right:  1px solid ${theme.colors.gray['90']};
-  border-bottom:  1px solid ${theme.colors.gray['90']};
-  border-radius: 0px 0px 10px 10px;
+  border-left: 1px solid ${theme.colors.gray['90']};
+  border-right: 1px solid ${theme.colors.gray['90']};
+  border-bottom: 1px solid ${theme.colors.gray['90']};
+  border-radius: 0 0 10px 10px;
   padding: ${theme.spacings.md};
 `);
 
