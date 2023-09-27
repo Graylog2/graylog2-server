@@ -25,10 +25,13 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-
+import useHotkey from 'hooks/useHotkey';
+import useViewType from 'views/hooks/useViewType';
+import type { ViewType } from 'views/logic/views/View';
 const TITLE = 'Redo';
 
 const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
+  const viewType = useViewType();
   const dispatch = useAppDispatch();
   const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const sendTelemetry = useSendTelemetry();
@@ -43,6 +46,12 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
     return dispatch(redo());
   }, [dispatch, location.pathname, sendTelemetry]);
 
+  useHotkey({
+    actionKey: 'redo',
+    callback: () => dispatch(redo()),
+    scope: viewType.toLowerCase() as Lowercase<ViewType>,
+    telemetryAppPathname: 'search',
+  });
   return (
     <NavItem disabled={!isRedoAvailable}
              onClick={onClick}

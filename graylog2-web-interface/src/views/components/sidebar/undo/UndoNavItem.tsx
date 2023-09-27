@@ -25,10 +25,14 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import useHotkey from 'hooks/useHotkey';
+import type { ViewType } from 'views/logic/views/View';
+import useViewType from 'views/hooks/useViewType';
 
 const TITLE = 'Undo';
 
 const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
+  const viewType = useViewType();
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const sendTelemetry = useSendTelemetry();
@@ -42,6 +46,13 @@ const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
 
     return dispatch(undo());
   }, [dispatch, location.pathname, sendTelemetry]);
+
+  useHotkey({
+    actionKey: 'undo',
+    callback: () => dispatch(undo()),
+    scope: viewType.toLowerCase() as Lowercase<ViewType>,
+    telemetryAppPathname: 'search',
+  });
 
   return (
     <NavItem disabled={!isUndoAvailable}

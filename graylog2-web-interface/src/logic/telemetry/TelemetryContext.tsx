@@ -31,6 +31,7 @@ export type TelemetryEventType =
   '$pageview'
   | 'view'
   | 'click'
+  | 'hotkey_usage'
   | 'form_submit'
   | 'popover_open'
   | 'popover_close'
