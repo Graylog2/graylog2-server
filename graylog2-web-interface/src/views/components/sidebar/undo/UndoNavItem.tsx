@@ -21,13 +21,24 @@ import useAppDispatch from 'stores/useAppDispatch';
 import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { undo } from 'views/logic/slices/undoRedoActions';
+import useHotkey from 'hooks/useHotkey';
+import useViewType from 'views/hooks/useViewType';
+import type { ViewType } from 'views/logic/views/View';
 
 const TITLE = 'Undo';
 
 const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
+  const viewType = useViewType();
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
   const onClick = useCallback(() => dispatch(undo()), [dispatch]);
+
+  useHotkey({
+    actionKey: 'undo',
+    callback: () => dispatch(undo()),
+    scope: viewType.toLowerCase() as Lowercase<ViewType>,
+    telemetryAppPathname: 'search',
+  });
 
   return (
     <NavItem disabled={!isUndoAvailable}
