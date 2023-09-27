@@ -18,18 +18,20 @@ import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { useState } from 'react';
+import moment from 'moment';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import type { DataNode } from 'preflight/types';
 import UserNotification from 'util/UserNotification';
-import { Spinner, Timestamp } from 'components/common';
+import { Spinner } from 'components/common';
 import { Alert, Badge, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
 import { defaultCompare } from 'logic/DefaultCompare';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import Icon from 'components/common/Icon';
 
 const StyledList = styled(ListGroup)`
-  max-width: 700px;
+  max-width: fit-content;
   
   .list-group-item {
     display: flex;
@@ -41,11 +43,41 @@ const DataNodeInfos = styled.div`
   display: flex;
   align-items: center;
   gap: 3px;
+  margin-right: 10px;
+`;
+
+const NodeIdColumn = styled.div`
+  width: 100px;
 `;
 
 const NodeId = styled(Badge)`
   margin-right: 3px;
 `;
+
+const SecureIcon = styled(Icon)`
+  margin-right: 3px;
+`;
+
+type NodeProps = {
+  nodeId: string,
+  transportAddress: string,
+};
+
+const isSecure = (address: string) => address?.toLocaleLowerCase().startsWith('https://');
+
+const badgeStyle = (address: string) => {
+  if (!address) {
+    return 'danger';
+  }
+
+  return isSecure(address) ? 'success' : 'primary';
+};
+
+const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'unlock');
+
+const Node = ({ nodeId, transportAddress }: NodeProps) => (
+  <NodeId bsStyle={badgeStyle(transportAddress)} title="Short node id"><SecureIcon name={lockIcon(transportAddress)} />{nodeId}</NodeId>
+);
 
 export const fetchDataNodes = () => fetchPeriodically<Array<DataNode>>('GET', qualifyUrl('/certrenewal'));
 
@@ -80,6 +112,7 @@ const renewalWording = {
   successActionTitle: 'renewed',
   errorActionTitle: 'renewal',
   telemetryAppSection: 'renewing-certificate',
+  buttonStyle: 'primary',
 };
 
 const provisioningWording = {
@@ -88,6 +121,7 @@ const provisioningWording = {
   successActionTitle: 'provisioned',
   errorActionTitle: 'provisioning',
   telemetryAppSection: 'provisioning-certificate',
+  buttonStyle: 'success',
 };
 
 const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNode['status'] }) => {
@@ -99,6 +133,7 @@ const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNod
     successActionTitle,
     errorActionTitle,
     telemetryAppSection,
+    buttonStyle,
   } = status === 'UNCONFIGURED' ? provisioningWording : renewalWording;
 
   const onCertificateRenewal = () => {
@@ -123,7 +158,7 @@ const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNod
   };
 
   return (
-    <Button onClick={onCertificateRenewal} bsSize="xsmall">
+    <Button onClick={onCertificateRenewal} bsSize="xsmall" bsStyle={buttonStyle}>
       {isRenewing ? buttonLoadingTitle : buttonTitle}
     </Button>
   );
@@ -153,13 +188,15 @@ const CertificateRenewal = () => {
               status,
             }) => (
               <ListGroupItem key={short_node_id}>
+                <NodeIdColumn>
+                  <Node nodeId={short_node_id} transportAddress={transport_address} />
+                </NodeIdColumn>
                 <DataNodeInfos>
-                  <NodeId title="Short node id" bsStyle="primary">{short_node_id}</NodeId>
                   <span title="Transport address">{transport_address}</span>{' – '}
                   <span title="Hostname">{hostname}</span>
                 </DataNodeInfos>
                 <RightCol>
-                  {cert_valid_until && (<span>valid until <Timestamp dateTime={cert_valid_until} />{' '}</span>)}
+                  {cert_valid_until && (<span title={cert_valid_until}>valid until {moment(cert_valid_until).from(moment())}{' '}</span>)}
                   <CertRenewalButton nodeId={node_id} status={status} />
                 </RightCol>
               </ListGroupItem>

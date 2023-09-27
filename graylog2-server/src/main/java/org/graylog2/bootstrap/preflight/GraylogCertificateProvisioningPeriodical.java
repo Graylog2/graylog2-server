@@ -33,7 +33,8 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
-import org.graylog2.events.ClusterEventBus;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -76,6 +77,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private Optional<OkHttpClient> okHttpClient = Optional.empty();
     private final PreflightConfigService preflightConfigService;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
+    private final NotificationService notificationService;
 
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
@@ -89,7 +91,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final @Named("password_secret") String passwordSecret,
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
                                                     final PreflightConfigService preflightConfigService,
-                                                    final EventBus serverEventBus) {
+                                                    final EventBus serverEventBus,
+                                                    final NotificationService notificationService) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -102,6 +105,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.serverEventBus = serverEventBus;
         this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
+        this.notificationService = notificationService;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -144,7 +148,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 }
 
                 final var renewalPolicy = getRenewalPolicy();
-                if(renewalPolicy == null) {
+                if (renewalPolicy == null) {
                     LOG.warn("No renewal policy available.");
                     return;
                 }
@@ -160,13 +164,28 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
 
                 // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
-                preflightConfigService.getPersistedConfig().ifPresent(cfg -> {
-                    if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC) && cfg.result().equals(PreflightConfigResult.FINISHED)) {
-                        nodes.stream()
-                                .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
-                                .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
-                                        .state(DataNodeProvisioningConfig.State.CONFIGURED)
-                                        .build()));
+                var preflightConfig = preflightConfigService.getPersistedConfig();
+                preflightConfig.ifPresent(cfg -> {
+                    if (cfg.result().equals(PreflightConfigResult.FINISHED)) {
+                        if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
+                            nodes.stream()
+                                    .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
+                                    .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
+                                            .state(DataNodeProvisioningConfig.State.CONFIGURED)
+                                            .build()));
+                        } else {
+                            var hasUnconfiguredNodes = nodes.stream()
+                                    .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
+                                    .findFirst();
+                            if (hasUnconfiguredNodes.isPresent()) {
+                                var notification = notificationService.buildNow()
+                                        .addType(Notification.Type.DATA_NODE_NEEDS_PROVISIONING)
+                                        .addSeverity(Notification.Severity.URGENT);
+                                notificationService.publishIfFirst(notification);
+                            } else {
+                                notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
+                            }
+                        }
                     }
                 });
 
