@@ -370,7 +370,7 @@ const AdaptableQueryTabs = ({
       {showConfigurationModal && (
         <AdaptableQueryTabsConfiguration show={showConfigurationModal}
                                          setShow={setShowConfigurationModal}
-                                         onRemove={onRemove}
+                                         dashboardId={dashboardId}
                                          queriesList={currentTabs.queriesList}
                                          activeQueryId={activeQueryId} />
       )}

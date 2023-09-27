@@ -31,7 +31,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type ViewState from 'views/logic/views/ViewState';
+import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
+import useWidgetIds from 'views/components/useWidgetIds';
 
 type PageListItem = {
   id: string,
@@ -75,11 +76,12 @@ type Props = {
   setShow: Dispatch<SetStateAction<boolean>>,
   queriesList: Immutable.OrderedSet<PageListItem>,
   activeQueryId: string,
-  onRemove: (queryId: string) => Promise<ViewState | void>
+  dashboardId: string,
 }
 
-const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQueryId, onRemove }: Props) => {
+const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQueryId, dashboardId }: Props) => {
   const { setDashboardPage } = useContext(DashboardPageContext);
+  const widgetIds = useWidgetIds();
   const [orderedQueriesList, setOrderedQueriesList] = useState<Immutable.OrderedSet<PageListItem>>(queriesList);
   const disablePageDelete = orderedQueriesList.size <= 1;
   const dispatch = useAppDispatch();
@@ -96,7 +98,6 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
     if (isActiveQueryDeleted) {
       const indexedQueryIds = queriesList.map(({ id }) => id).toIndexedSeq();
       const newActiveQueryId = FindNewActiveQueryId(Immutable.List(indexedQueryIds), activeQueryId);
-
       setDashboardPage(newActiveQueryId);
     }
 
@@ -143,17 +144,19 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
       return Promise.resolve();
     }
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED, {
-      app_pathname: 'dashboard',
-      app_section: 'dashboard',
-      app_action_value: 'dashboard-page-configuration-remove-page',
-    });
+    if (await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds)) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED, {
+        app_pathname: 'dashboard',
+        app_section: 'dashboard',
+        app_action_value: 'dashboard-page-configuration-remove-page',
+      });
 
-    return onRemove(queryId).then(() => {
       setOrderedQueriesList((currentQueries) => currentQueries
         .filter((query) => query.id !== queryId).toOrderedSet());
-    });
-  }, [disablePageDelete, onRemove]);
+    }
+
+    return Promise.resolve();
+  }, [activeQueryId, dashboardId, disablePageDelete, sendTelemetry, widgetIds]);
 
   // eslint-disable-next-line react/no-unused-prop-types
   const customListItemRender = useCallback(({ item }: { item: PageListItem }) => (

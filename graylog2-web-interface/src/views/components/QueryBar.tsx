@@ -31,7 +31,7 @@ import { setTitle } from 'views/logic/slices/titlesActions';
 
 import QueryTabs from './QueryTabs';
 
-const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, dispatch: AppDispatch) => {
+const onRemovePage = async (dashboardId: string, queryId: string, activeQueryId: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, dispatch: AppDispatch) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
@@ -62,14 +62,17 @@ const QueryBar = () => {
     }
   }, [dispatch, setDashboardPage]);
 
-  const onRemove = useCallback((queryId: string) => onCloseTab(
-    dashboardId,
-    queryId,
-    activeQueryId,
-    queries,
-    widgetIds,
-    dispatch),
-  [dashboardId, activeQueryId, queries, widgetIds, dispatch]);
+  const removePage = useCallback(
+    (queryId: string) => onRemovePage(
+      dashboardId,
+      queryId,
+      activeQueryId,
+      queries,
+      widgetIds,
+      dispatch,
+    ),
+    [dashboardId, activeQueryId, queries, widgetIds, dispatch],
+  );
 
   const _onTitleChange = useCallback((queryId: string, newTitle: string) => dispatch(setTitle(queryId, 'tab', 'title', newTitle)), [dispatch]);
 
@@ -80,7 +83,7 @@ const QueryBar = () => {
                dashboardId={dashboardId}
                onSelect={onSelectPage}
                onTitleChange={_onTitleChange}
-               onRemove={onRemove} />
+               onRemove={removePage} />
   );
 };
 

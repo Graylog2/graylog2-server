@@ -161,8 +161,13 @@ export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async 
     .build();
 
   const searchAfterSave = await createSearch(newSearch);
+  const newViewState = view.state.filter((_state, queryId) => (
+    !!newQueries.find((query) => query.id === queryId)),
+  ).toMap();
+
   const newView = view.toBuilder()
     .search(searchAfterSave)
+    .state(newViewState)
     .build();
 
   return dispatch(updateView(newView));

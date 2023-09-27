@@ -53,7 +53,7 @@ describe('AdaptableQueryTabsConfiguration', () => {
       <AdaptableQueryTabsConfiguration show
                                        setShow={() => {}}
                                        activeQueryId="queryId-1"
-                                       onRemove={() => Promise.resolve()}
+                                       dashboardId="dashboard-id"
                                        queriesList={OrderedSet(
                                          [
                                            { id: 'queryId-1', title: 'Query Title 1' },
