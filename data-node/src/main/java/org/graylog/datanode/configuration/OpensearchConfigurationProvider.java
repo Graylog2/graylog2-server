@@ -17,6 +17,7 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.InSecureConfiguration;
 import org.graylog.datanode.configuration.variants.MongoCertSecureConfiguration;
@@ -41,7 +42,6 @@ import java.util.Optional;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
-
     private final Configuration localConfiguration;
     private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
     private final MongoCertSecureConfiguration mongoCertSecureConfiguration;
@@ -49,7 +49,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
     private final String nodeName;
-    private final String initialManagerNodes;
 
     @Inject
     public OpensearchConfigurationProvider(Configuration localConfiguration,
@@ -65,7 +64,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeName = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getDatanodeNodeName());
-        this.initialManagerNodes = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getInitialManagerNodes());
     }
 
     @Override
@@ -103,7 +101,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchTransportPort(),
                     "datanode-cluster",
                     nodeName,
-                    Collections.emptyList(),
+                    List.of(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
                     opensearchProperties.build()
@@ -120,7 +118,10 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
         config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
-        config.put("cluster.initial_master_nodes", initialManagerNodes);
+
+        if(StringUtils.isNotBlank(localConfiguration.getInitialManagerNodes())) {
+            config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
+        }
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");

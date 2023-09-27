@@ -45,6 +45,7 @@ public interface Node {
     boolean isLeader();
 
     String getTransportAddress();
+    String getClusterAddress();
 
     DateTime getLastSeen();
 

@@ -46,7 +46,7 @@ const StyledPanel = styled(Panel)`
   background-color: #fff;
   border: 0;
   box-shadow: none;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 `;
 
 const StyledPanelHeading = styled(Panel.Heading)`
@@ -60,13 +60,13 @@ const WhenOperator = styled.div`
   display: flex;
 
   .radio {
-    margin: 0px 8px;
+    margin: 0 8px;
   }
 `;
 
 const StyledPanelBody = styled(Panel.Body)`
   border: 0;
-  padding: 0px;
+  padding: 0;
 `;
 
 const getLastOutputIndexFromRule = (rule: RuleBuilderRule): number => {

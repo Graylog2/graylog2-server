@@ -31,12 +31,14 @@ class NodePingPeriodicalTest {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
+        final URI cluster = URI.create("http://localhost:9300");
         final NodeService nodeService = Mockito.mock(NodeService.class);
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
                 () -> uri,
+                () -> cluster,
                 () -> true
         );
 
@@ -45,7 +47,8 @@ class NodePingPeriodicalTest {
         Mockito.verify(nodeService).markAsAlive(
                 Mockito.eq(nodeID),
                 Mockito.eq(true),
-                Mockito.eq(uri));
+                Mockito.eq(uri),
+                Mockito.eq(cluster));
     }
 
 
@@ -54,15 +57,17 @@ class NodePingPeriodicalTest {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
+        final URI cluster = URI.create("http://localhost:9300");
 
         final NodeService nodeService = Mockito.mock(NodeService.class);
 
-        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri);
+        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri, cluster);
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
                 () -> uri,
+                () -> cluster,
                 () -> true
         );
 
@@ -72,6 +77,7 @@ class NodePingPeriodicalTest {
                 Mockito.eq(nodeID.getNodeId()),
                 Mockito.eq(true),
                 Mockito.eq(uri),
+                Mockito.eq(cluster),
                 Mockito.any()
         );
     }
