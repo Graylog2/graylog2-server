@@ -219,6 +219,15 @@ export const TELEMETRY_EVENT_TYPE = {
     EDIT_CONDITION_CLICKED: 'Pipeline RuleBuilder Edit Condition Clicked',
     EDIT_ACTION_CLICKED: 'Pipeline RuleBuilder Edit Action Clicked',
   },
+  ILLUMINATE: {
+    BUNDLE_UPLOADED: 'Illuminate Bundle Uploaded',
+    BUNDLE_DOWNLOADED_AND_INSTALLED: 'Illuminate Bundle Downloaded and Installed',
+    PACK_ENABLE_MODAL_TOGGLED: 'Illuminate Pack Enable Modal Toggled',
+    PACK_DISABLE_MODAL_TOGGLED: 'Illuminate Pack Modal Toggled',
+    PACKS_BULK_UPDATED: 'Illuminate Packs Bulk Updated',
+    PACKS_OVERRIDE_FORM_OPENED: 'Illuminate Packs Override Form Opened',
+    PACKS_OVERRIDE_SAVED: 'Illuminate Packs Override Saved',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
