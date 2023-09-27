@@ -55,7 +55,7 @@ const QueryBar = () => {
 
   const onSelectPage = useCallback((pageId: string) => {
     if (pageId === 'new') {
-      dispatch(createQuery());
+      dispatch(createQuery()).then((newPageId) => setDashboardPage(newPageId));
     } else {
       setDashboardPage(pageId);
       dispatch(selectQuery(pageId));

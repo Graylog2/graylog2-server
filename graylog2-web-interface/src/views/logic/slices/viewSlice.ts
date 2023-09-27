@@ -181,7 +181,7 @@ export const addQuery = (query: Query, viewState: ViewStateType) => async (dispa
     .state(newViewStates)
     .build();
 
-  return dispatch(updateView(newView, true)).then(() => dispatch(selectQuery(query.id)));
+  return dispatch(updateView(newView, true)).then(() => dispatch(selectQuery(query.id))).then(() => query.id);
 };
 
 export const updateQuery = (queryId: QueryId, query: Query) => async (dispatch: AppDispatch, getState: () => RootState) => {
