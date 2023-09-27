@@ -96,52 +96,54 @@ const ViewEventDefinitionPage = () => {
   }
 
   return (
-    <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
-      <EventsPageNavigation />
-      <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
-                  actions={(
-                    <ButtonToolbar>
-                      {isMutable && (
+    <>
+      <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
+        <EventsPageNavigation />
+        <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
+                    actions={(
+                      <ButtonToolbar>
+                        {isMutable && (
                         <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                           <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
                             <Button bsStyle="success">Edit Event Definition</Button>
                           </LinkContainer>
                         </IfPermitted>
-                      )}
-                      {!isSystemEventDefinition() && (
+                        )}
+                        {!isSystemEventDefinition() && (
                         <IfPermitted permissions="eventdefinitions:create">
                           <Button onClick={() => setShowDialog(true)} bsStyle="success">Duplicate Event
                             Definition
                           </Button>
                         </IfPermitted>
-                      )}
-                    </ButtonToolbar>
+                        )}
+                      </ButtonToolbar>
                   )}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Event Definitions allow you to create Events from different Conditions and alert on them.
-        </span>
-      </PageHeader>
+                    documentationLink={{
+                      title: 'Alerts documentation',
+                      path: DocsHelper.PAGES.ALERTS,
+                    }}>
+          <span>
+            Event Definitions allow you to create Events from different Conditions and alert on them.
+          </span>
+        </PageHeader>
 
-      <Row className="content">
-        <Col md={12}>
-          <EventDefinitionSummary eventDefinition={eventDefinition}
-                                  currentUser={currentUser}
-                                  notifications={notifications} />
-        </Col>
-      </Row>
+        <Row className="content">
+          <Col md={12}>
+            <EventDefinitionSummary eventDefinition={eventDefinition}
+                                    currentUser={currentUser}
+                                    notifications={notifications} />
+          </Col>
+        </Row>
+      </DocumentTitle>
       {showDialog && (
-        <ConfirmDialog title="Copy Event Definition"
-                       show
-                       onConfirm={() => handleDuplicateEvent()}
-                       onCancel={() => setShowDialog(false)}>
-          {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
-        </ConfirmDialog>
+      <ConfirmDialog title="Copy Event Definition"
+                     show
+                     onConfirm={() => handleDuplicateEvent()}
+                     onCancel={() => setShowDialog(false)}>
+        {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
+      </ConfirmDialog>
       )}
-    </DocumentTitle>
+    </>
   );
 };
 
