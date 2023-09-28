@@ -221,7 +221,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                     dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTED).build());
                                 }
                             } catch (Exception e) {
-                                LOG.warn("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage() + ", retrying", e);
+                                LOG.info("Connectivity check for node {} failed with Exception {}, retrying. This is expected a couple of times during first time startup and provisioning. But if it persists, start from scratch and enable debug log level for this class.",  c.nodeId(), e.getMessage());
+                                LOG.debug("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
                             }
                         });
             }
