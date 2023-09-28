@@ -29,6 +29,8 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,16 +57,19 @@ public class PreflightResource {
     private final NodeService nodeService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final CaService caService;
+    private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
 
     @Inject
     public PreflightResource(final NodeService nodeService,
                              final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
+                             final ClusterConfigService clusterConfigService,
                              final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
+        this.clusterConfigService = clusterConfigService;
         this.passwordSecret = passwordSecret;
     }
 
@@ -115,6 +120,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void startOver() {
         caService.startOver();
+        clusterConfigService.remove(RenewalPolicy.class);
         dataNodeProvisioningService.deleteAll();
     }
 
