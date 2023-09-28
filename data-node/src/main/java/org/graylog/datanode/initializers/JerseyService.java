@@ -144,7 +144,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void shutDown() {
-        shutdownHttpServer(apiHttpServer, configuration.getHttpBindAddress());
+        shutdownHttpServer(apiHttpServer, HostAndPort.fromParts(configuration.getBindAddress(), configuration.getDatanodeHttpPort()));
     }
 
     private void shutdownHttpServer(HttpServer httpServer, HostAndPort bindAddress) {
@@ -155,13 +155,12 @@ public class JerseyService extends AbstractIdleService {
     }
 
     private void startUpApi(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
-        final HostAndPort bindAddress = configuration.getHttpBindAddress();
         final String contextPath = configuration.getHttpPublishUri().getPath();
         final URI listenUri = new URI(
                 configuration.getUriScheme(),
                 null,
-                bindAddress.getHost(),
-                bindAddress.getPort(),
+                configuration.getBindAddress(),
+                configuration.getDatanodeHttpPort(),
                 isNullOrEmpty(contextPath) ? "/" : contextPath,
                 null,
                 null
@@ -178,7 +177,7 @@ public class JerseyService extends AbstractIdleService {
 
         apiHttpServer.start();
 
-        LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
+        LOG.info("Started REST API at <{}:{}>", configuration.getBindAddress(), configuration.getDatanodeHttpPort());
     }
 
     private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {
