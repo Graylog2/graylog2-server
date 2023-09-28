@@ -28,6 +28,7 @@ import useLocation from 'routing/useLocation';
 import useHotkey from 'hooks/useHotkey';
 import useViewType from 'views/hooks/useViewType';
 import type { ViewType } from 'views/logic/views/View';
+
 const TITLE = 'Redo';
 
 const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
@@ -52,6 +53,7 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
     scope: viewType.toLowerCase() as Lowercase<ViewType>,
     telemetryAppPathname: 'search',
   });
+
   return (
     <NavItem disabled={!isRedoAvailable}
              onClick={onClick}

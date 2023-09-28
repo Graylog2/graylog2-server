@@ -45,6 +45,7 @@ import SaveViewButton from 'views/components/searchbar/SaveViewButton';
 import useHotkey from 'hooks/useHotkey';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
@@ -90,12 +91,18 @@ const DashboardActionsMenu = () => {
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
   const modalRefs = useRef({});
   const dashboardActions = useMemo(() => pluggableDashboardActions.map(({ component: PluggableDashboardAction, key }) => (
-    <PluggableDashboardAction key={`dashboard-action-${key}`} dashboard={view} modalRef={() => modalRefs.current[key]} />
+    <PluggableDashboardAction key={`dashboard-action-${key}`}
+                              dashboard={view}
+                              modalRef={() => modalRefs.current[key]} />
   )), [pluggableDashboardActions, view]);
   const dashboardActionModals = useMemo(() => pluggableDashboardActions
     .filter(({ modal }) => !!modal)
     .map(({ modal: ActionModal, key }) => (
-      <ActionModal key={`dashboard-action-modal-${key}`} dashboard={view} ref={(r) => { modalRefs.current[key] = r; }} />
+      <ActionModal key={`dashboard-action-modal-${key}`}
+                   dashboard={view}
+                   ref={(r) => {
+                     modalRefs.current[key] = r;
+                   }} />
     )), [pluggableDashboardActions, view]);
 
   const _onSaveNewDashboard = useCallback(async (newDashboard: View) => {
@@ -140,6 +147,7 @@ const DashboardActionsMenu = () => {
     scope: 'dashboard',
     telemetryAppPathname: 'search',
   });
+
   return (
     <ButtonGroup>
       {showSaveButton && (
