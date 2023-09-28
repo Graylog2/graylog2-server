@@ -41,5 +41,8 @@ public class RawMessageTest {
         assertNotNull(decodedMsg);
         assertArrayEquals("testmessage".getBytes(StandardCharsets.UTF_8), decodedMsg.getPayload());
         assertEquals("raw", decodedMsg.getCodecName());
+        assertEquals(1, decodedMsg.getSourceNodes().size());
+        assertEquals("inputid", decodedMsg.getSourceNodes().get(0).inputId);
+        assertEquals("5ca1ab1e-0000-4000-a000-000000000000", decodedMsg.getSourceNodes().get(0).nodeId);
     }
 }

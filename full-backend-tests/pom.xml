@@ -145,10 +145,6 @@
             <artifactId>commons-io</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value</artifactId>
-        </dependency>
 
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
