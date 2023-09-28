@@ -72,7 +72,7 @@ const StatusCell = ({ stream }: Props) => {
     if (!stream.disabled && window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
       await StreamsStore.pause(stream.id, (response) => response);
     }
-  }, [stream.disabled, stream.id, stream.title]);
+  }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
 
   return (
     <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'}
