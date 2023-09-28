@@ -95,6 +95,7 @@
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
+        <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.556</aws-java-sdk-1.version>
@@ -413,6 +414,21 @@
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>${awaitility.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service-annotations</artifactId>
+                <version>${auto-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value-annotations</artifactId>
+                <version>${auto-value.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog.autovalue</groupId>
+                <artifactId>auto-value-javabean</artifactId>
+                <version>${auto-value-javabean.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -774,6 +790,11 @@
                             <groupId>com.google.errorprone</groupId>
                             <artifactId>error_prone_core</artifactId>
                             <version>${error-prone.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto-service.version}</version>
                         </path>
                         <path>
                             <groupId>com.google.auto.value</groupId>
