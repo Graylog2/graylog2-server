@@ -145,7 +145,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
         config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
 
-        // listen on all interfaces
         config.put("network.bind_host", localConfiguration.getBindAddress());
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
