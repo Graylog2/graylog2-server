@@ -97,7 +97,8 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
 
     if (isActiveQueryDeleted) {
       const indexedQueryIds = queriesList.map(({ id }) => id).toList();
-      const removedQueryIds = indexedQueryIds.filter((queryId) => !nextQueriesList.find((query) => queryId === query.id)).toList();
+      const nextQueryIds = nextQueriesList.map(({ id }) => id).toArray();
+      const removedQueryIds = indexedQueryIds.filter((queryId) => !nextQueryIds.includes(queryId)).toList();
       const newActiveQueryId = FindNewActiveQueryId(indexedQueryIds, activeQueryId, removedQueryIds);
       setDashboardPage(newActiveQueryId);
     }
