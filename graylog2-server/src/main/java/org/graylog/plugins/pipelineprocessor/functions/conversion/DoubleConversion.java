@@ -39,7 +39,7 @@ public class DoubleConversion extends AbstractFunction<Double> {
     private final ParameterDescriptor<Double, Double> defaultParam;
 
     public DoubleConversion() {
-        valueParam = object(VALUE).primary().description("Value to convert").build();
+        valueParam = object(VALUE).ruleBuilderVariable().description("Value to convert").build();
         defaultParam = floating(DEFAULT).optional().allowNegatives(true).description("Used when 'value' is null, defaults to 0").build();
     }
 
@@ -68,7 +68,7 @@ public class DoubleConversion extends AbstractFunction<Double> {
                         defaultParam
                 ))
                 .description("Converts a value to a double value using its string representation")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to double")
                 .ruleBuilderTitle("Convert '${value}' to double")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)

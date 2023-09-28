@@ -95,9 +95,9 @@
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
-        <auto-value.version>1.7.4</auto-value.version>
+        <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <aws-java-sdk-1.version>1.12.412</aws-java-sdk-1.version>
+        <aws-java-sdk-1.version>1.12.556</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.20.153</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.5.2</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>1.1.9</aws-msk-iam-auth.version>
@@ -105,7 +105,7 @@
         <byte-buddy.version>1.14.8</byte-buddy.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.157</classgraph.version>
+        <classgraph.version>4.8.162</classgraph.version>
         <commons-codec.version>1.16.0</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-email.version>1.5</commons-email.version>
@@ -121,7 +121,7 @@
         <grpc.version>1.58.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>32.1.2-jre</guava.version>
-        <guice.version>5.0.1</guice.version>
+        <guice.version>6.0.0</guice.version>
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
         <hamcrest.version>2.2</hamcrest.version>
         <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
@@ -139,7 +139,7 @@
         <jersey.version>2.37</jersey.version>
         <jmte.version>5.0.0</jmte.version>
         <joda-time.version>2.12.5</joda-time.version>
-        <jool.version>0.9.14</jool.version>
+        <jool.version>0.9.15</jool.version>
         <json-path.version>2.8.0</json-path.version>
         <kafka.version>3.5.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
@@ -156,8 +156,7 @@
         <okio.version>3.5.0</okio.version>
         <okta-sdk.version>8.2.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.24.0</opentelemetry.version>
-        <opentelemetry-semconv.version>1.24.0-alpha</opentelemetry-semconv.version>
+        <opentelemetry.version>1.30.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
         <prometheus-client.version>0.11.0</prometheus-client.version>
@@ -167,9 +166,9 @@
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.12.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <snappy-java.version>1.1.10.3</snappy-java.version>
+        <snappy-java.version>1.1.10.5</snappy-java.version>
         <oshi.version>5.3.7</oshi.version>
-        <siv-mode.version>1.4.1</siv-mode.version>
+        <siv-mode.version>1.4.4</siv-mode.version>
         <slf4j.version>2.0.9</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
         <swagger.version>1.5.13</swagger.version>
@@ -190,10 +189,10 @@
         <awaitility.version>4.2.0</awaitility.version>
         <equalsverifier.version>3.15.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
-        <junit.version>4.13.1</junit.version>
+        <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <mockito.version>5.5.0</mockito.version>
-        <restassured.version>4.3.2</restassured.version>
+        <restassured.version>5.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.19.0</testcontainers.version>
         <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
@@ -207,31 +206,6 @@
         <download-maven-plugin.version>1.6.8</download-maven-plugin.version>
     </properties>
 
-    <repositories>
-        <!-- to make our snapshot releases work with Travis et al -->
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-nexus-releases</id>
-            <name>Sonatype Nexus Releases</name>
-            <url>https://oss.sonatype.org/content/repositories/releases</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <!-- Ensure consistent versions across dependencies and transitive dependencies -->
     <dependencyManagement>
@@ -290,6 +264,13 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
                 <version>${aws-java-sdk-2.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>${aws-java-sdk-1.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -481,12 +462,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
+                    <version>3.0.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -511,12 +492,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.11.0</version>
+                    <version>2.16.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.7.1.1</version>
+                    <version>4.7.3.6</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>

@@ -41,7 +41,7 @@ public class MapConversion extends AbstractFunction<Map> {
 
 
     public MapConversion() {
-        this.valueParam = object(VALUE).primary().description("Map-like value to convert").build();
+        this.valueParam = object(VALUE).ruleBuilderVariable().description("Map-like value to convert").build();
     }
 
     @Override

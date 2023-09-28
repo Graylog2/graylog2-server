@@ -41,7 +41,7 @@ public class ParseDate extends TimezoneAwareFunction {
     private final ParameterDescriptor<String, String> localeParam;
 
     public ParseDate() {
-        valueParam = ParameterDescriptor.string(VALUE).primary().description("Date string to parse").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("Date string to parse").build();
         patternParam = ParameterDescriptor.string(PATTERN).description("The pattern to parse the date with, see http://www.joda.org/joda-time/apidocs/org/joda/time/format/DateTimeFormat.html").build();
         localeParam = ParameterDescriptor.string(LOCALE).optional().description("The locale to parse the date with, see https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html").build();
     }

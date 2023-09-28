@@ -26,7 +26,7 @@ import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import type { TimeRange } from 'views/logic/queries/Query';
 
-import TimeRangeAddToQuickListButton from './TimeRangeAddToQuickListButton';
+import SaveTimeRangeAsPresetButton from './SaveTimeRangeAsPresetButton';
 
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 jest.mock('lodash/debounce', () => jest.fn());
@@ -49,11 +49,11 @@ jest.mock('stores/configurations/ConfigurationsStore', () => {
   });
 });
 
-describe('TimeRangeAddToQuickListButton', () => {
+describe('SaveTimeRangeAsPresetButton', () => {
   const SUT = ({ timeRange }: { timeRange: TimeRange }) => (
     <Formik initialValues={{ timeRangeTabs: { [timeRange.type]: timeRange }, activeTab: timeRange.type }} onSubmit={() => {}}>
       <Form>
-        <TimeRangeAddToQuickListButton />
+        <SaveTimeRangeAsPresetButton />
       </Form>
     </Formik>
   );
@@ -67,7 +67,7 @@ describe('TimeRangeAddToQuickListButton', () => {
     asMock(debounce as DebouncedFunc<(...args: any) => any>).mockImplementation((fn) => fn);
   });
 
-  const getOpenButton = () => screen.getByRole('button', {
+  const findOpenButton = () => screen.findByRole('button', {
     name: /save current time range as preset/i,
   });
 
@@ -78,7 +78,7 @@ describe('TimeRangeAddToQuickListButton', () => {
         from: 300,
       }} />);
 
-    const buttonIcon = await getOpenButton();
+    const buttonIcon = await findOpenButton();
 
     fireEvent.click(buttonIcon);
 
@@ -94,7 +94,7 @@ describe('TimeRangeAddToQuickListButton', () => {
         from: 50,
       }} />);
 
-    const buttonIcon = await getOpenButton();
+    const buttonIcon = await findOpenButton();
 
     fireEvent.click(buttonIcon);
 
@@ -108,7 +108,7 @@ describe('TimeRangeAddToQuickListButton', () => {
         from: 300,
       }} />);
 
-    const buttonIcon = await getOpenButton();
+    const buttonIcon = await findOpenButton();
 
     fireEvent.click(buttonIcon);
 
@@ -122,7 +122,7 @@ describe('TimeRangeAddToQuickListButton', () => {
         from: 500,
       }} />);
 
-    const buttonIcon = await getOpenButton();
+    const buttonIcon = await findOpenButton();
 
     fireEvent.click(buttonIcon);
 
@@ -163,11 +163,11 @@ describe('TimeRangeAddToQuickListButton', () => {
         from: 500,
       }} />);
 
-    const buttonIcon = await getOpenButton();
+    fireEvent.click(await findOpenButton());
 
-    fireEvent.click(buttonIcon);
-
-    const descriptionInput = await screen.findByLabelText('Time range description');
+    const descriptionInput = await screen.findByRole('textbox', {
+      name: /time range description/i,
+    });
     descriptionInput.focus();
 
     fireEvent.change(descriptionInput, { target: { value: '' } });
@@ -176,6 +176,8 @@ describe('TimeRangeAddToQuickListButton', () => {
       name: /save preset/i,
     });
 
-    await expect(submitButton).toHaveAttribute('disabled');
+    fireEvent.click(submitButton);
+
+    await waitFor(() => expect(submitButton).toHaveAttribute('disabled'));
   });
 });

@@ -41,12 +41,16 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useIsNew from 'views/hooks/useIsNew';
 import useHistory from 'routing/useHistory';
 import mockHistory from 'helpers/mocking/mockHistory';
+import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
+import HotkeysProvider from 'contexts/HotkeysProvider';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
+jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
+jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),
@@ -62,6 +66,15 @@ jest.mock('views/hooks/useView');
 jest.mock('views/hooks/useIsDirty');
 jest.mock('views/hooks/useIsNew');
 
+jest.mock('views/logic/slices/viewSlice', () => {
+  const originalModule = jest.requireActual('views/logic/slices/viewSlice');
+
+  return {
+    ...originalModule,
+    loadView: jest.fn(() => () => {}),
+  };
+});
+
 describe('SearchActionsMenu', () => {
   const createView = (id: string = undefined) => View.builder()
     .id(id)
@@ -69,7 +82,6 @@ describe('SearchActionsMenu', () => {
     .type(View.Type.Search)
     .description('description')
     .state(Immutable.Map())
-    .search(Search.create().toBuilder().id('id-beef').build())
     .owner('owningUser')
     .build();
 
@@ -91,13 +103,15 @@ describe('SearchActionsMenu', () => {
     ...props
   }: SimpleSearchActionsMenuProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
-        <ViewLoaderContext.Provider value={onLoadView}>
-          <NewViewLoaderContext.Provider value={loadNewView}>
-            <SearchActionsMenu {...props} />
-          </NewViewLoaderContext.Provider>
-        </ViewLoaderContext.Provider>
-      </FieldTypesContext.Provider>
+      <HotkeysProvider>
+        <FieldTypesContext.Provider value={fieldTypes}>
+          <ViewLoaderContext.Provider value={onLoadView}>
+            <NewViewLoaderContext.Provider value={loadNewView}>
+              <SearchActionsMenu {...props} />
+            </NewViewLoaderContext.Provider>
+          </ViewLoaderContext.Provider>
+        </FieldTypesContext.Provider>
+      </HotkeysProvider>
     </TestStoreProvider>
   );
 
@@ -262,6 +276,14 @@ describe('SearchActionsMenu', () => {
         .build();
 
       await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
+    });
+
+    it('should save search when pressing related keyboard shortcut', async () => {
+      asMock(useView).mockReturnValue(createView('some-id'));
+      render(<SimpleSearchActionsMenu />);
+      userEvent.keyboard('{Meta>}s{/Meta}');
+
+      await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
     });
 
     describe('has "Share" option', () => {

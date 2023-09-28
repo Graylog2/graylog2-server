@@ -38,7 +38,7 @@ public class FlexParseDate extends TimezoneAwareFunction {
     private final ParameterDescriptor<DateTime, DateTime> defaultParam;
 
     public FlexParseDate() {
-        valueParam = ParameterDescriptor.string(VALUE).primary().description("Date string to parse").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("Date string to parse").build();
         defaultParam = ParameterDescriptor.type(DEFAULT, DateTime.class).optional().description("Used when 'value' could not be parsed, 'null' otherwise").build();
     }
 
