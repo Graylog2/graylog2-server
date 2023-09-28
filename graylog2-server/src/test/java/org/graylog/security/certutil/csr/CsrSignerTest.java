@@ -51,19 +51,31 @@ class CsrSignerTest {
     private static final Instant fixedInstant = Instant.parse("2023-09-28T12:50:00Z");
     private static final Clock fixedClock = Clock.fixed(fixedInstant, UTC);
 
+
     @BeforeEach
     void setUp() {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    @Test
-    void testSigningCertWithSixMonthsLifetime() throws Exception {
+    private X509Certificate sign(String lifetime) throws Exception {
         var keyPair = createPrivateKey();
         var cert = createCert(keyPair);
         var privateKey = keyPair.getPrivate();
         var csr = createCSR(keyPair);
 
-        var result = new CsrSigner(fixedClock).sign(privateKey, cert, csr, new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, "P6M"));
+        return new CsrSigner(fixedClock).sign(privateKey, cert, csr, new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, lifetime));
+    }
+
+    @Test
+    void testSigningCertWithTwoHoursLifetime() throws Exception {
+        var result = sign("PT2H");
+        assertThat(result).isNotNull();
+        assertThat(result.getNotAfter()).isEqualTo(fixedInstant.plus(2, ChronoUnit.HOURS));
+    }
+
+    @Test
+    void testSigningCertWithSixMonthsLifetime() throws Exception {
+        var result = sign("P6M");
         assertThat(result).isNotNull();
         assertThat(result.getNotAfter()).isEqualTo(fixedInstant.plus(180, ChronoUnit.DAYS));
     }

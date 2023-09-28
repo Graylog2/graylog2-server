@@ -38,7 +38,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
-import java.time.temporal.ChronoUnit;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -66,14 +66,25 @@ public class CsrSigner {
         };
     }
 
-    private int periodToDays(Period period) {
-        return period.getYears() * 365 + period.getMonths() * 30 + period.getDays();
+    private Duration periodToDuration(Period period) {
+        return Duration.ofDays(period.getYears() * 365L + period.getMonths() * 30L + period.getDays());
+    }
+
+    private Duration safeParse(String duration) {
+        try {
+            return Duration.parse(duration);
+        } catch (DateTimeParseException ignored) {
+            return periodToDuration(Period.parse(duration));
+        }
+    }
+
+    private Instant plusIsoDuration(Instant validFrom, String duration) {
+        return validFrom.plus(safeParse(duration));
     }
 
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, RenewalPolicy renewalPolicy) throws Exception {
         Instant validFrom = Instant.now(clock);
-        final var lifetime = Period.parse(renewalPolicy.certificateLifetime());
-        var validUntil = validFrom.plus(periodToDays(lifetime), ChronoUnit.DAYS);
+        var validUntil = plusIsoDuration(validFrom, renewalPolicy.certificateLifetime());
 
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
     }
