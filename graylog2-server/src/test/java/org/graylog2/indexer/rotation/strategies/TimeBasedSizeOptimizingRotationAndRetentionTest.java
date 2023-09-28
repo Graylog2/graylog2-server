@@ -281,13 +281,15 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         public List<String> getIndicesNames() {
             return indices.stream().map(TestIndex::getName).toList();
         }
+
         public Optional<TestIndex> findByName(String name) {
             return indices.stream().filter(i -> i.name.equals(name)).findFirst();
         }
 
         public void deleteByName(String name) {
-            findByName(name).map(indices::remove);
+            findByName(name).ifPresent(indices::remove);
         }
+
         public void addNewIndex(int count, long size) {
             indices.add(new TestIndex(buildIndexName(count), clock.nowUTC(), null, size));
         }

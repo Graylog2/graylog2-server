@@ -79,8 +79,10 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void alreadyTaken(MongoDBTestService mongodb) {
-        new MongoLockService(otherNodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL).lock("test-resource", null)
-                .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
+        if (new MongoLockService(otherNodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL)
+                .lock("test-resource", null).isEmpty()) {
+            throw new IllegalStateException("Unable to create original lock.");
+        }
 
         final Optional<Lock> lock = lockService.lock("test-resource", null);
 
