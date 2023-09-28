@@ -71,6 +71,7 @@ const Routes = {
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
     CONFIGURATIONS: '/system/configurations',
+    configurationsSection: (section: string, pluginSection?: string) => `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
     CONTENTPACKS: {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',

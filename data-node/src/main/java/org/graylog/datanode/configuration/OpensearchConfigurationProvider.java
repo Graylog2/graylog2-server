@@ -17,7 +17,6 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.StringUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.InSecureConfiguration;
 import org.graylog.datanode.configuration.variants.MongoCertSecureConfiguration;
@@ -26,6 +25,11 @@ import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog2.bootstrap.preflight.PreflightConfig;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,7 +39,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,13 +52,17 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
     private final String nodeName;
+    private final NodeService nodeService;
+    private final PreflightConfigService preflightConfigService;
 
     @Inject
-    public OpensearchConfigurationProvider(Configuration localConfiguration,
-                                           DatanodeConfiguration datanodeConfiguration,
-                                           UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
-                                           MongoCertSecureConfiguration mongoCertSecureConfiguration,
-                                           InSecureConfiguration inSecureConfiguration,
+    public OpensearchConfigurationProvider(final Configuration localConfiguration,
+                                           final DatanodeConfiguration datanodeConfiguration,
+                                           final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
+                                           final MongoCertSecureConfiguration mongoCertSecureConfiguration,
+                                           final InSecureConfiguration inSecureConfiguration,
+                                           final NodeService nodeService,
+                                           final PreflightConfigService preflightConfigService,
                                            final @Named("password_secret") String passwordSecret) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
@@ -63,7 +70,18 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.mongoCertSecureConfiguration = mongoCertSecureConfiguration;
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
+        this.nodeService = nodeService;
+        this.preflightConfigService = preflightConfigService;
         this.nodeName = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getDatanodeNodeName());
+    }
+
+    private boolean isPreflight() {
+        final PreflightConfigResult preflightResult = preflightConfigService.getPersistedConfig()
+                .map(PreflightConfig::result)
+                .orElse(PreflightConfigResult.UNKNOWN);
+
+        // if preflight is finished, we assume that there will be some datanode registered via node-service.
+        return preflightResult != PreflightConfigResult.FINISHED;
     }
 
     @Override
@@ -83,7 +101,15 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         try {
             ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
+
+            if(localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
+                opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
+            } else if(isPreflight()) {
+                final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).toList());
+                opensearchProperties.put("cluster.initial_master_nodes", nodeList);
+            }
             opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
+
             OpensearchSecurityConfiguration securityConfiguration = null;
             if (chosenSecurityConfigurationVariant.isPresent()) {
                 securityConfiguration = chosenSecurityConfigurationVariant.get()
@@ -118,10 +144,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
         config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
-
-        if(StringUtils.isNotBlank(localConfiguration.getInitialManagerNodes())) {
-            config.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
-        }
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");

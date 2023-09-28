@@ -25,7 +25,6 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
-import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,7 +47,7 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
             Message result = new Message(
                     logEvent.message(),
                     source,
-                    new DateTime(logEvent.timestamp())
+                    logEvent.timestamp()
             );
             result.addField(FIELD_KINESIS_STREAM, logEvent.kinesisStream());
             result.addField(FIELD_LOG_GROUP, logEvent.logGroup());

@@ -88,16 +88,17 @@
 
         <!-- Dependencies -->
         <opensearch.shaded.version>2.9.0-1</opensearch.shaded.version>
-        <airline.version>2.7.2</airline.version>
+        <airline.version>2.9.0</airline.version>
         <amqp-client.version>5.8.0</amqp-client.version>
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.5</asm.version>
-        <auto-value.version>1.7.4</auto-value.version>
+        <auto-service.version>1.1.1</auto-service.version>
+        <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <aws-java-sdk-1.version>1.12.556</aws-java-sdk-1.version>
+        <aws-java-sdk-1.version>1.12.559</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.20.153</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>1.1.9</aws-msk-iam-auth.version>
@@ -105,7 +106,7 @@
         <byte-buddy.version>1.14.8</byte-buddy.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.157</classgraph.version>
+        <classgraph.version>4.8.162</classgraph.version>
         <commons-codec.version>1.16.0</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-email.version>1.5</commons-email.version>
@@ -114,6 +115,7 @@
         <commons-validator.version>1.7</commons-validator.version>
         <commons-io.version>2.13.0</commons-io.version>
         <disruptor.version>3.4.4</disruptor.version>
+        <error-prone.version>2.22.0</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
@@ -139,7 +141,7 @@
         <jersey.version>2.37</jersey.version>
         <jmte.version>5.0.0</jmte.version>
         <joda-time.version>2.12.5</joda-time.version>
-        <jool.version>0.9.14</jool.version>
+        <jool.version>0.9.15</jool.version>
         <json-path.version>2.8.0</json-path.version>
         <kafka.version>3.5.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
@@ -156,8 +158,7 @@
         <okio.version>3.5.0</okio.version>
         <okta-sdk.version>8.2.1</okta-sdk.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.24.0</opentelemetry.version>
-        <opentelemetry-semconv.version>1.24.0-alpha</opentelemetry-semconv.version>
+        <opentelemetry.version>1.30.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
         <prometheus-client.version>0.11.0</prometheus-client.version>
@@ -167,9 +168,9 @@
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.12.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <snappy-java.version>1.1.10.4</snappy-java.version>
-        <oshi.version>5.3.7</oshi.version>
-        <siv-mode.version>1.4.1</siv-mode.version>
+        <snappy-java.version>1.1.10.5</snappy-java.version>
+        <oshi.version>6.4.6</oshi.version>
+        <siv-mode.version>1.4.4</siv-mode.version>
         <slf4j.version>2.0.9</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
         <swagger.version>1.5.13</swagger.version>
@@ -190,10 +191,10 @@
         <awaitility.version>4.2.0</awaitility.version>
         <equalsverifier.version>3.15.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
-        <junit.version>4.13.1</junit.version>
-        <junit-jupiter.version>5.9.1</junit-jupiter.version>
+        <junit.version>4.13.2</junit.version>
+        <junit-jupiter.version>5.10.0</junit-jupiter.version>
         <mockito.version>5.5.0</mockito.version>
-        <restassured.version>4.3.2</restassured.version>
+        <restassured.version>5.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.19.0</testcontainers.version>
         <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
@@ -387,6 +388,13 @@
 
             <!-- test -->
             <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-bom</artifactId>
                 <version>${mockito.version}</version>
@@ -397,7 +405,6 @@
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest</artifactId>
                 <version>${hamcrest.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
@@ -414,6 +421,21 @@
                 <artifactId>awaitility</artifactId>
                 <version>${awaitility.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service-annotations</artifactId>
+                <version>${auto-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value-annotations</artifactId>
+                <version>${auto-value.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog.autovalue</groupId>
+                <artifactId>auto-value-javabean</artifactId>
+                <version>${auto-value-javabean.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -429,6 +451,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
                     <version>3.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -508,7 +535,7 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.9.1</version>
+                    <version>1.14.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.antlr</groupId>
@@ -750,29 +777,43 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
                 <configuration>
                     <release>17</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
-                    <compilerId>javac-with-errorprone</compilerId>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                    <annotationProcessors>
-                        <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
-                    </annotationProcessors>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>
+                            -Xplugin:ErrorProne
+                            -Xep:DoNotMock:WARN
+                            -XepDisableWarningsInGeneratedCode
+                            -XepExcludedPaths:.*/target/generated-sources/.*
+                        </arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error-prone.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto-service.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.value</groupId>
+                            <artifactId>auto-value</artifactId>
+                            <version>${auto-value.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.graylog.autovalue</groupId>
+                            <artifactId>auto-value-javabean</artifactId>
+                            <version>${auto-value-javabean.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.11.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_core</artifactId>
-                        <version>2.13.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

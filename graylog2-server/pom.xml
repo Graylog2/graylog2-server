@@ -74,10 +74,6 @@
             <groupId>io.opentelemetry.instrumentation</groupId>
             <artifactId>opentelemetry-instrumentation-annotations</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-semconv</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.github.rvesse</groupId>
@@ -712,14 +708,12 @@
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.graylog.autovalue</groupId>
             <artifactId>auto-value-javabean</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>info.leadinglight</groupId>

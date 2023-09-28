@@ -243,7 +243,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         return dbService.get(definitionId)
                 .map(eventDefinition -> ImmutableMap.of(
                         "event_definition", eventDefinition,
-                        "context", contextService.contextFor(eventDefinition)
+                        "context", contextService.contextFor(eventDefinition),
+                        "is_mutable", dbService.isMutable(eventDefinition)
                 ))
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
     }
