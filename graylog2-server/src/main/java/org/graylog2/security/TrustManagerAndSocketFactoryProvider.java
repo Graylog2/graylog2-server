@@ -33,7 +33,7 @@ public class TrustManagerAndSocketFactoryProvider {
     private final SSLContext sslContext;
 
     @Inject
-    public TrustManagerAndSocketFactoryProvider(CustomCAX509TrustManager trustManager) throws NoSuchAlgorithmException, KeyManagementException {
+    public TrustManagerAndSocketFactoryProvider(X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyManagementException {
         this.sslContext = SSLContext.getInstance("TLS");
         this.trustManager = trustManager;
         sslContext.init(null, new TrustManager[]{this.trustManager}, new SecureRandom());
