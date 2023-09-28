@@ -25,6 +25,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
@@ -34,11 +36,13 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
+import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,16 +73,27 @@ public class PreflightJerseyService extends AbstractIdleService {
     private HttpServer apiHttpServer = null;
 
     @Inject
-    public PreflightJerseyService(final HttpConfiguration configuration,
-                                 final BasicAuthFilter basicAuthFilter,
+    public PreflightJerseyService(final HttpConfiguration httpConfiguration,
+                                  final Configuration localConfiguration,
                                   @PreflightRestResourcesBinding final Set<Class<?>> systemRestResources,
                                   ObjectMapper objectMapper,
                                   MetricRegistry metricRegistry) {
-        this.configuration = requireNonNull(configuration, "configuration");
-        this.basicAuthFilter = requireNonNull(basicAuthFilter, "preflightAuthFilter");
+        this.configuration = requireNonNull(httpConfiguration, "configuration");
+        this.basicAuthFilter = createBasicAuthFilter(localConfiguration);
         this.systemRestResources = systemRestResources;
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
+    }
+
+    @NotNull
+    private static BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration) {
+        final String username = localConfiguration.getRootUsername();
+        final String randomHttpAuthPassword = RandomStringUtils.randomAlphabetic(10);
+        final String passwordHash = DigestUtils.sha256Hex(randomHttpAuthPassword);
+        LOG.info("========================================================");
+        LOG.info("Preflight web interface accessible with username '{}' and password '{}'", username, randomHttpAuthPassword);
+        LOG.info("========================================================");
+        return new BasicAuthFilter(username, passwordHash, "preflight-config");
     }
 
     @Override
