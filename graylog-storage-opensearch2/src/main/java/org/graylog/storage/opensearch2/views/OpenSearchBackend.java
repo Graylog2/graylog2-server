@@ -117,7 +117,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .forEach(boolQuery::filter);
 
         // add the optional root query filters
-        generateFilterClause(query.filter()).map(boolQuery::filter);
+        generateFilterClause(query.filter()).ifPresent(boolQuery::filter);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)
