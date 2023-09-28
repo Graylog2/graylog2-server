@@ -40,6 +40,7 @@ import {
   normalizeFromSearchBarForBackend,
 } from 'views/logic/queries/NormalizeTimeRange';
 import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type FormValues = {
   description: string
@@ -163,10 +164,9 @@ const SaveTimeRangeAsPresetButton = () => {
     });
 
     if (timeRangePreset) {
-      sendTelemetry('form_submit', {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_ADD_QUICK_ACCESS, {
         app_pathname: 'search',
         app_section: 'search-bar',
-        app_action_value: 'add_to_quick_access_timerange_presets',
         event_details: {
           timerange: timeRangePreset.timerange,
           id: timeRangePreset.id,

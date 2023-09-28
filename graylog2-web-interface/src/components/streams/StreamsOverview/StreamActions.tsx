@@ -94,39 +94,26 @@ const StreamActions = ({
   }, [sendTelemetry]);
 
   const toggleUpdateModal = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_UPDATE_MODAL_OPENED, {
-      app_pathname: 'streams',
-    });
-
     setShowUpdateModal((cur) => !cur);
-  }, [sendTelemetry]);
+  }, []);
 
   const toggleCloneModal = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_CLONE_MODAL_OPENED, {
-      app_pathname: 'streams',
-    });
-
     setShowCloneModal((cur) => !cur);
-  }, [sendTelemetry]);
+  }, []);
 
   const toggleStreamRuleModal = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_RULE_MODAL_OPENED, {
-      app_pathname: 'streams',
-      app_action_value: 'stream-item-rule',
-    });
-
     setShowStreamRuleModal((cur) => !cur);
-  }, [sendTelemetry]);
+  }, []);
 
   const onDelete = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DELETED, {
-      app_pathname: 'streams',
-      app_action_value: 'stream-item-delete',
-    });
-
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DELETED, {
+          app_pathname: 'streams',
+          app_action_value: 'stream-item-delete',
+        });
+
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
 
         return response;
@@ -136,19 +123,36 @@ const StreamActions = ({
     }
   }, [sendTelemetry, stream.id, stream.title]);
 
-  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success')), [stream.id]);
+  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(stream.id, streamRule, () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_RULE_SAVED, {
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-rule',
+    });
+
+    UserNotification.success('Stream rule was created successfully.', 'Success');
+  }), [sendTelemetry, stream.id]);
 
   const onUpdate = useCallback((newStream: Stream) => StreamsStore.update(stream.id, newStream, (response) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_UPDATED, {
+      app_pathname: 'streams',
+    });
+
     UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
 
     return response;
-  }), [stream.id]);
+  }), [sendTelemetry, stream.id]);
 
-  const onCloneSubmit = useCallback((newStream: Stream) => StreamsStore.cloneStream(stream.id, newStream, (response) => {
-    UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
+  const onCloneSubmit = useCallback((newStream: Stream) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_CLONED, {
+      app_pathname: 'streams',
+    });
 
-    return response;
-  }), [stream.id]);
+    return StreamsStore.cloneStream(stream.id, newStream, (response) => {
+      UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
+
+      return response;
+    });
+  }, [sendTelemetry, stream.id]);
 
   return (
     <ButtonToolbar>

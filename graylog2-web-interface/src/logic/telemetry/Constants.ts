@@ -26,6 +26,7 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_REFRESH_CONTROL_TOGGLED: 'Search Refresh Control Toggled',
   SEARCH_BUTTON_CLICKED: 'Search Button Clicked',
   SEARCH_FILTER_CREATE_CLICKED: 'Search Filter Create Clicked',
+  SEARCH_FILTER_CREATED: 'Search Filter Created',
   SEARCH_FILTER_LOAD_CLICKED: 'Search Filter Load Clicked',
   SEARCH_FILTER_LOADED: 'Search Filter Loaded',
   SEARCH_FILTER_ITEM_MENU_TOGGLED: 'Search Filter Item Menu Toggled',
@@ -37,6 +38,7 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_FILTER_ITEM_REFERENCE_REPLACED: 'Search Filter Item Reference Replaced',
   SEARCH_FILTER_ITEM_NEGATION_TOGGLED: 'Search Filter Item Negation Toggled',
   SEARCH_WIDGET_EXPORT_DOWNLOADED: 'Search Widget Export Downloaded',
+  SEARCH_TIMERANGE_PRESET_ADD_QUICK_ACCESS: 'Search TimeRange Preset Add Quick Access',
   SEARCH_WIDGET_ACTION: {
     FOCUSED: 'Search Widget Focused',
     DELETED: 'Search Widget Deleted',
@@ -176,8 +178,8 @@ export const TELEMETRY_EVENT_TYPE = {
     STREAM_ITEM_STATUS_TOGGLED: 'Stream Item Status Toggled',
     STREAM_ITEM_SHARE_MODAL_OPENED: 'Stream Item Share Modal Opened',
     STREAM_ITEM_UPDATE_MODAL_OPENED: 'Stream Item Update Modal Opened',
-    STREAM_ITEM_CLONE_MODAL_OPENED: 'Stream Item Clone Modal Opened',
-    STREAM_ITEM_RULE_MODAL_OPENED: 'Stream Item Rule Modal Opened',
+    STREAM_ITEM_CLONED: 'Stream Item Cloned',
+    STREAM_ITEM_RULE_SAVED: 'Stream Item Rule SAVED',
     STREAM_ITEM_DELETED: 'Stream Item Deleted',
   },
   ENTITYSHARE: {
