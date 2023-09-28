@@ -20,9 +20,13 @@ import { List } from 'immutable';
 
 const FindNewActiveQueryId = (queryIds: List<string>, activeQueryId: string, removedQueryIds: List<string> = List()) => {
   const currentQueryIdIndex = queryIds.indexOf(activeQueryId);
-  const priorQueryIds = queryIds.slice(0, currentQueryIdIndex);
+  const priorQueryIds = queryIds.slice(0, currentQueryIdIndex).toList();
 
-  return priorQueryIds.reverse().find((queryId) => !removedQueryIds.includes(queryId));
+  const listToPickNewIdFrom = priorQueryIds.isEmpty
+    ? queryIds
+    : priorQueryIds.reverse();
+
+  return listToPickNewIdFrom.find((queryId) => !removedQueryIds.includes(queryId));
 };
 
 export default FindNewActiveQueryId;
