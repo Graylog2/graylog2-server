@@ -209,6 +209,16 @@ public abstract class ServerBootstrap extends CmdLineTool {
         } finally {
             serviceManager.stopAsync().awaitStopped();
         }
+        try {
+            // give the leader node a headstart on resume so it can take care of mongo-collections etc.
+            // and we prevent problems that occured if all nodes started exactly at the same time
+            if (!configuration.isLeader())
+            {
+                Thread.sleep(5000);
+            }
+        } catch (InterruptedException e) {
+            LOG.warn("Tried to wait for a bit before resuming but got interrupted. Resuming anyway now. Error was: {}", e.getMessage());
+        }
     }
 
     private void runMongoPreflightCheck() {

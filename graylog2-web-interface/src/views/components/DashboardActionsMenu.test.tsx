@@ -30,11 +30,15 @@ import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
+import HotkeysProvider from 'contexts/HotkeysProvider';
 
 import DashboardActionsMenu from './DashboardActionsMenu';
 
+jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-dashboard-id'),
@@ -66,9 +70,11 @@ describe('DashboardActionsMenu', () => {
 
   const SUT = ({ providerOverrides, view }: { providerOverrides?: LayoutState, view?: View }) => (
     <TestStoreProvider view={view}>
-      <SearchPageLayoutContext.Provider value={providerOverrides}>
-        <DashboardActionsMenu />
-      </SearchPageLayoutContext.Provider>
+      <HotkeysProvider>
+        <SearchPageLayoutContext.Provider value={providerOverrides}>
+          <DashboardActionsMenu />
+        </SearchPageLayoutContext.Provider>
+      </HotkeysProvider>
     </TestStoreProvider>
   );
 
@@ -189,5 +195,11 @@ describe('DashboardActionsMenu', () => {
     expect(saveAsButton).not.toBeInTheDocument();
     expect(shareButton).not.toBeInTheDocument();
     expect(extrasButton).not.toBeInTheDocument();
+  });
+
+  it('should save view when pressing related keyboard shortcut', async () => {
+    render(<SUT />);
+    userEvent.keyboard('{Meta>}s{/Meta}');
+    await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
   });
 });
