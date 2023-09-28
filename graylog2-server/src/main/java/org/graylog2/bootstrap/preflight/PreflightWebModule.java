@@ -42,6 +42,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -74,6 +75,7 @@ public class PreflightWebModule extends Graylog2Module {
 
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();
+        bind(NotificationService.class).to(NullNotificationService.class);
 
         addPreflightRestResource(PreflightResource.class);
         addPreflightRestResource(CertificateRenewalPolicyResource.class);
