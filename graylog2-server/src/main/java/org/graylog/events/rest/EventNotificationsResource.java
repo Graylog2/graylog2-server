@@ -199,8 +199,9 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                            @ApiParam(name = "JSON Body") NotificationDto dto,
                            @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
-        dbNotificationService.get(notificationId)
-                .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+        if (dbNotificationService.get(notificationId).isEmpty()) {
+            throw new NotFoundException("Notification " + notificationId + " doesn't exist");
+        }
 
         if (!notificationId.equals(dto.id())) {
             throw new BadRequestException("Notification IDs don't match");
@@ -253,7 +254,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_DELETE, notificationId);
         dbNotificationService.get(notificationId).ifPresent(n ->
-            recentActivityService.delete(notificationId, GRNTypes.EVENT_NOTIFICATION, n.title(), userContext.getUser())
+                recentActivityService.delete(notificationId, GRNTypes.EVENT_NOTIFICATION, n.title(), userContext.getUser())
         );
         resourceHandler.delete(notificationId);
     }

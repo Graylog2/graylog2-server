@@ -97,6 +97,7 @@ public class Generator {
     private final String pluginPathPrefix;
     private final ObjectMapper mapper;
     private final boolean isCloud;
+
     public Generator(Set<Class<?>> resourceClasses, Map<Class<?>, String> pluginMapping,
                      String pluginPathPrefix, ObjectMapper mapper, boolean isCloud) {
         this.resourceClasses = resourceClasses;
@@ -355,7 +356,7 @@ public class Generator {
 
     private Type[] typeParameters(Type type) {
         if (type instanceof ParameterizedType) {
-            final ParameterizedType parameterizedType = (ParameterizedType)type;
+            final ParameterizedType parameterizedType = (ParameterizedType) type;
             return parameterizedType.getActualTypeArguments();
         }
         return new Type[0];
@@ -385,7 +386,7 @@ public class Generator {
 
             final String valueName;
             final Map<String, Object> modelItemsDefinition;
-            if (valueType instanceof Class && isPrimitive((Class<?>)valueType)) {
+            if (valueType instanceof Class && isPrimitive((Class<?>) valueType)) {
                 valueName = mapPrimitives(((Class<?>) valueType).getSimpleName());
                 modelItemsDefinition = Collections.singletonMap("additional_properties", valueName);
             } else {
@@ -421,7 +422,7 @@ public class Generator {
             final Map<String, Object> models = new HashMap<>();
             final String valueName;
             final Map<String, Object> modelItemsDefinition;
-            if (valueType instanceof Class && isPrimitive((Class<?>)valueType)) {
+            if (valueType instanceof Class && isPrimitive((Class<?>) valueType)) {
                 valueName = mapPrimitives(((Class<?>) valueType).getSimpleName());
                 modelItemsDefinition = Collections.singletonMap("items", valueName);
             } else {
@@ -465,17 +466,17 @@ public class Generator {
             if (genericTypeSchema.get("properties") instanceof Map) {
                 final Map<String, Object> properties = (Map<String, Object>) genericTypeSchema.get("properties");
                 final Map<String, Object> newProperties = properties.entrySet().stream().map(entry -> {
-                    final Map<String, Object> property = (Map<String, Object>) entry.getValue();
-                    final TypeSchema propertySchema = extractInlineModels(property);
-                    models.putAll(propertySchema.models());
-                    if (propertySchema.name() == null) {
-                        return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), propertySchema.type());
-                    }
-                    if (propertySchema.type() != null) {
-                        models.put(propertySchema.name(), propertySchema.type());
-                    }
-                    return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), Collections.singletonMap("$ref", propertySchema.name()));
-                })
+                            final Map<String, Object> property = (Map<String, Object>) entry.getValue();
+                            final TypeSchema propertySchema = extractInlineModels(property);
+                            models.putAll(propertySchema.models());
+                            if (propertySchema.name() == null) {
+                                return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), propertySchema.type());
+                            }
+                            if (propertySchema.type() != null) {
+                                models.put(propertySchema.name(), propertySchema.type());
+                            }
+                            return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), Collections.singletonMap("$ref", propertySchema.name()));
+                        })
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 newGenericTypeSchema.put("properties", newProperties);
             }
@@ -494,7 +495,7 @@ public class Generator {
             if (!genericTypeSchema.containsKey("properties")) {
                 newGenericTypeSchema.put("properties", Collections.emptyMap());
             }
-            final String id = shortenJsonSchemaURN((String)genericTypeSchema.get("id"));
+            final String id = shortenJsonSchemaURN((String) genericTypeSchema.get("id"));
             return createTypeSchema(id, newGenericTypeSchema, models);
         }
 
@@ -530,7 +531,7 @@ public class Generator {
 
     private static Optional<String> typeOfSchema(@Nullable Map<String, Object> typeSchema) {
         return Optional.ofNullable(typeSchema)
-            .map(schema -> Strings.emptyToNull((String)schema.get("type")));
+                .map(schema -> Strings.emptyToNull((String) schema.get("type")));
     }
 
     private static boolean isArraySchema(Map<String, Object> genericTypeSchema) {
@@ -579,8 +580,8 @@ public class Generator {
                     final ApiParam apiParam = (ApiParam) annotation;
                     final String name = Strings.isNullOrEmpty(apiParam.name())
                             ? Strings.isNullOrEmpty(apiParam.value())
-                                ? "arg" + i
-                                : apiParam.value()
+                            ? "arg" + i
+                            : apiParam.value()
                             : apiParam.name();
                     param.setName(name);
                     param.setDescription(apiParam.value());
@@ -610,21 +611,21 @@ public class Generator {
 
                 if (annotation instanceof QueryParam) {
                     paramKind = Parameter.Kind.QUERY;
-                    final String annotationValue = ((QueryParam)annotation).value();
+                    final String annotationValue = ((QueryParam) annotation).value();
                     param.setName(annotationValue);
                 } else if (annotation instanceof PathParam) {
-                    final String annotationValue = ((PathParam)annotation).value();
+                    final String annotationValue = ((PathParam) annotation).value();
                     if (!Strings.isNullOrEmpty(annotationValue)) {
                         param.setName(annotationValue);
                     }
                     paramKind = Parameter.Kind.PATH;
                 } else if (annotation instanceof HeaderParam) {
                     paramKind = Parameter.Kind.HEADER;
-                    final String annotationValue = ((HeaderParam)annotation).value();
+                    final String annotationValue = ((HeaderParam) annotation).value();
                     param.setName(annotationValue);
                 } else if (annotation instanceof FormParam) {
                     paramKind = Parameter.Kind.FORM;
-                    final String annotationValue = ((FormParam)annotation).value();
+                    final String annotationValue = ((FormParam) annotation).value();
                     param.setName(annotationValue);
                 }
             }
@@ -822,30 +823,31 @@ public class Generator {
             this.defaultValue = defaultValue;
         }
 
-        public void setAllowableValues(Collection<String> allowableValues) { this.allowableValues = allowableValues; }
+        public void setAllowableValues(Collection<String> allowableValues) {
+            this.allowableValues = allowableValues;
+        }
 
         @JsonValue
         public Map<String, Object> jsonValue() {
-            final HashMap<String, Object> result = new HashMap<String, Object>() {{
-                put("name", name);
-                put("description", description);
-                put("required", isRequired);
-                put("paramType", getKind());
+            final HashMap<String, Object> result = new HashMap<>();
+            result.put("name", name);
+            result.put("description", description);
+            result.put("required", isRequired);
+            result.put("paramType", getKind());
 
-                if (defaultValue != null) {
-                    put("defaultValue", defaultValue);
-                }
+            if (defaultValue != null) {
+                result.put("defaultValue", defaultValue);
+            }
 
-                if (allowableValues != null) {
-                    put("enum", allowableValues);
-                }
+            if (allowableValues != null) {
+                result.put("enum", allowableValues);
+            }
 
-                if (typeSchema.type() == null || isObjectSchema(typeSchema.type())) {
-                    put("type", typeSchema.name());
-                } else {
-                    putAll(typeSchema.type());
-                }
-            }};
+            if (typeSchema.type() == null || isObjectSchema(typeSchema.type())) {
+                result.put("type", typeSchema.name());
+            } else {
+                result.putAll(typeSchema.type());
+            }
 
             return ImmutableMap.copyOf(result);
         }
