@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
-import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity;
+import org.graylog.events.contentpack.entities.HttpEventNotificationConfigV2Entity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
@@ -47,7 +47,8 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
     public static final String FIELD_URL = "url";
     public static final String FIELD_METHOD = "method";
     public static final String FIELD_TIME_ZONE = "time_zone";
-    public static final String FIELD_JSON_BODY_TEMPLATE = "json_body_template";
+    public static final String FIELD_CONTENT_TYPE = "content_type";
+    public static final String FIELD_BODY_TEMPLATE = "body_template";
     public static final String FIELD_SKIP_TLS_VERIFICATION = "skip_tls_verification";
     private static final String FIELD_BASIC_AUTH = "basic_auth";
     private static final String FIELD_API_KEY = "api_key";
@@ -55,6 +56,10 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
 
     public enum HttpMethod {
         POST, PUT, GET
+    }
+
+    public enum ContentType {
+        JSON, FORM_DATA, PLAIN_TEXT
     }
 
     @JsonProperty(FIELD_BASIC_AUTH)
@@ -81,9 +86,13 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
     @JsonProperty(FIELD_TIME_ZONE)
     public abstract DateTimeZone timeZone();
 
-    @JsonProperty(FIELD_JSON_BODY_TEMPLATE)
+    @JsonProperty(FIELD_CONTENT_TYPE)
     @Nullable
-    public abstract String jsonBodyTemplate();
+    public abstract ContentType contentType();
+
+    @JsonProperty(FIELD_BODY_TEMPLATE)
+    @Nullable
+    public abstract String bodyTemplate();
 
     @Override
     @JsonIgnore
@@ -96,6 +105,7 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
     }
 
     public abstract Builder toBuilder();
+
     @Override
     @JsonIgnore
     public ValidationResult validate() {
@@ -177,16 +187,25 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
         @JsonProperty(FIELD_TIME_ZONE)
         public abstract Builder timeZone(DateTimeZone timeZone);
 
-        @JsonProperty(FIELD_JSON_BODY_TEMPLATE)
-        public abstract Builder jsonBodyTemplate(String bodyTemplate);
+        @JsonProperty(FIELD_CONTENT_TYPE)
+        public abstract Builder contentType(ContentType contentType);
+
+        @JsonProperty(FIELD_BODY_TEMPLATE)
+        public abstract Builder bodyTemplate(String bodyTemplate);
 
         public abstract HTTPEventNotificationConfigV2 build();
     }
 
     @Override
     public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        return HttpEventNotificationConfigEntity.builder()
+        // TODO: Clean this up
+        return HttpEventNotificationConfigV2Entity.builder()
                 .url(ValueReference.of(url()))
+                .skipTLSVerification(ValueReference.of(skipTLSVerification()))
+                .httpMethod(ValueReference.of(httpMethod()))
+                .timeZone(ValueReference.of(timeZone()))
+                .contentType(ValueReference.of(contentType()))
+                .bodyTemplate(ValueReference.of(bodyTemplate()))
                 .build();
     }
 }

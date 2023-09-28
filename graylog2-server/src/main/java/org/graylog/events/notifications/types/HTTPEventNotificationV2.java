@@ -16,7 +16,10 @@
  */
 package org.graylog.events.notifications.types;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -38,15 +41,19 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 public class HTTPEventNotificationV2 extends HTTPNotification implements EventNotification {
     public interface Factory extends EventNotification.Factory<HTTPEventNotificationV2> {
@@ -55,7 +62,6 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(HTTPEventNotificationV2.class);
-    private static final MediaType CONTENT_TYPE = MediaType.parse(APPLICATION_JSON);
 
     private final EventNotificationService notificationCallbackService;
     private final ObjectMapperProvider objectMapperProvider;
@@ -99,11 +105,19 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         addAuthHeader(builder, config.basicAuth());
         addApiKey(builder, httpUrl, config.apiKey(), config.apiSecret());
 
-        final String body = buildRequestBody(modelData, config.jsonBodyTemplate(), config.timeZone());
+        final String body;
+        try {
+            body = buildRequestBody(modelData, config);
+        } catch (JsonProcessingException processingErr) {
+            throw new PermanentEventNotificationException("Unable to serialize notification", processingErr);
+        } catch (UnsupportedEncodingException encodingErr) {
+            throw new PermanentEventNotificationException("Unable to URL encode notification body", encodingErr);
+        }
+
         switch (config.httpMethod()) {
             case GET -> builder.get();
-            case PUT -> builder.put(RequestBody.create(body, CONTENT_TYPE));
-            case POST -> builder.post(RequestBody.create(body, CONTENT_TYPE));
+            case PUT -> builder.put(RequestBody.create(body, getMediaType(config.contentType())));
+            case POST -> builder.post(RequestBody.create(body, getMediaType(config.contentType())));
         }
 
         LOG.debug("Requesting HTTP endpoint at <{}> in notification <{}>", config.url(), ctx.notificationId());
@@ -119,9 +133,40 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         }
     }
 
-    private String buildRequestBody(EventNotificationModelData modelData, String jsonBodyTemplate, DateTimeZone timeZone) {
-        final Map<String, Object> modelMap = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
-        return templateEngine.transform(jsonBodyTemplate, modelMap);
+    private MediaType getMediaType(HTTPEventNotificationConfigV2.ContentType contentType) {
+        switch (contentType) {
+            case FORM_DATA -> {
+                return MediaType.parse(APPLICATION_FORM_URLENCODED);
+            }
+            case JSON -> {
+                return MediaType.parse(APPLICATION_JSON);
+            }
+            case PLAIN_TEXT -> {
+                return MediaType.parse(TEXT_PLAIN);
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    private String buildRequestBody(EventNotificationModelData modelData, HTTPEventNotificationConfigV2 config) throws JsonProcessingException, UnsupportedEncodingException {
+        // If httpMethod is POST or PUT then contentType must be set for a valid config, but the second check removes
+        // linter warning of a potential null pointer
+        if (config.httpMethod().equals(HTTPEventNotificationConfigV2.HttpMethod.GET) || config.contentType() == null) {
+            return "";
+        }
+        final String body;
+        final String bodyTemplate = config.bodyTemplate();
+        final ObjectMapper objectMapper = objectMapperProvider.getForTimeZone(config.timeZone());
+        if (!Strings.isNullOrEmpty(bodyTemplate)) {
+            final Map<String, Object> modelMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+            body = templateEngine.transform(bodyTemplate, modelMap);
+        } else {
+            body = objectMapper.writeValueAsString(modelData);
+        }
+        return config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA) ?
+                URLEncoder.encode(body, StandardCharsets.UTF_8) : body;
     }
 
 }

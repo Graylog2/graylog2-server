@@ -48,8 +48,11 @@ public abstract class HttpEventNotificationConfigV2Entity implements EventNotifi
     @JsonProperty(HTTPEventNotificationConfigV2.FIELD_TIME_ZONE)
     public abstract ValueReference timeZone();
 
-    @JsonProperty(HTTPEventNotificationConfigV2.FIELD_JSON_BODY_TEMPLATE)
-    public abstract ValueReference jsonBodyTemplate();
+    @JsonProperty(HTTPEventNotificationConfigV2.FIELD_CONTENT_TYPE)
+    public abstract ValueReference contentType();
+
+    @JsonProperty(HTTPEventNotificationConfigV2.FIELD_BODY_TEMPLATE)
+    public abstract ValueReference bodyTemplate();
 
     public static Builder builder() {
         return Builder.create();
@@ -78,8 +81,11 @@ public abstract class HttpEventNotificationConfigV2Entity implements EventNotifi
         @JsonProperty(HTTPEventNotificationConfigV2.FIELD_TIME_ZONE)
         public abstract Builder timeZone(ValueReference timeZone);
 
-        @JsonProperty(HTTPEventNotificationConfigV2.FIELD_JSON_BODY_TEMPLATE)
-        public abstract Builder jsonBodyTemplate(ValueReference jsonBodyTemplate);
+        @JsonProperty(HTTPEventNotificationConfigV2.FIELD_CONTENT_TYPE)
+        public abstract Builder contentType(ValueReference contentType);
+
+        @JsonProperty(HTTPEventNotificationConfigV2.FIELD_BODY_TEMPLATE)
+        public abstract Builder bodyTemplate(ValueReference bodyTemplate);
 
         public abstract HttpEventNotificationConfigV2Entity build();
     }
@@ -91,7 +97,8 @@ public abstract class HttpEventNotificationConfigV2Entity implements EventNotifi
                 .skipTLSVerification(skipTLSVerification().asBoolean(parameters))
                 .httpMethod(HTTPEventNotificationConfigV2.HttpMethod.valueOf(httpMethod().asString(parameters)))
                 .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
-                .jsonBodyTemplate(jsonBodyTemplate().asString(parameters))
+                .contentType(HTTPEventNotificationConfigV2.ContentType.valueOf(contentType().asString(parameters)))
+                .bodyTemplate(bodyTemplate().asString(parameters))
                 .build();
     }
 }

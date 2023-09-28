@@ -34,7 +34,8 @@ export type HttpNotificationConfigV2 = {
   skip_tls_verification: boolean,
   time_zone?: string,
   method: string,
-  json_body_template?: string,
+  content_type?: string,
+  body_template?: string,
 };
 
 export type HttpNotificationValidationV2 = {

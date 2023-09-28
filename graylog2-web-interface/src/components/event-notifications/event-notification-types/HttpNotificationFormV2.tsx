@@ -47,7 +47,8 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     skip_tls_verification: false,
     method: 'POST',
     time_zone: 'UTC',
-    json_body_template: '',
+    body_template: '',
+    content_type: 'JSON'
   };
 
   constructor(props: Props) {
@@ -101,11 +102,25 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
   };
 
   handleJsonBodyTemplateChange = (nextValue: string) => {
-    this.propagateChange('json_body_template', nextValue);
+    this.propagateChange('body_template', nextValue);
   };
 
   handleMethodChange = (nextValue: string) => {
-    this.propagateChange('method', nextValue);
+    if (nextValue === 'GET') {
+      const { config, onChange } = this.props;
+      const nextConfig = cloneDeep(config);
+
+      nextConfig['method'] = nextValue;
+      nextConfig['body_template'] = '';
+      nextConfig['content_type'] = '';
+      onChange(nextConfig);
+    } else {
+      this.propagateChange('method', nextValue);
+    }
+  };
+
+  handleContentTypeChange = (nextValue: string) => {
+      this.propagateChange('content_type', nextValue);
   };
 
   handleSecretInputChange = (event: { target: { name: string }}) => {
@@ -147,15 +162,16 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     const { reset } = this.state;
 
     const httpMethods = [{ value: 'POST', label: 'POST' }, { value: 'GET', label: 'GET' }, { value: 'PUT', label: 'PUT' }];
+    const contentTypes = [{ value: 'JSON', label: 'application/json' }, { value: 'FORM_DATA', label: 'application/x-www-form-urlencoded' }, { value: 'PLAIN_TEXT', label: 'text/plain' }];
     const docsUrl = 'https://docs.graylog.org/docs/alerts#notifications';
-    const helpElement = <p>Custom POST/PUT body. See <a href={docsUrl} rel="noopener noreferrer" target="_blank">docs </a>for more details.</p>;
+    const helpElement = <p>Custom POST/PUT body. See <a href={docsUrl} rel="noopener noreferrer" target="_blank">docs </a>for more details. An empty POST/PUT body will send the full event details.</p>;
 
     return (
       <>
         <URLWhiteListInput label="URL"
                            onChange={this.handleUrlChange}
                            validationState={validation.errors.url ? 'error' : null}
-                           validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
+                           validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs')}
                            onValidationChange={this.onValidationChange}
                            url={config.url}
                            autofocus={false} />
@@ -181,7 +197,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                      type="password"
                      onChange={this.handleSecretInputChange}
                      value={this.state.basic_auth || ''}
-                     help="The Basic authentication string needs to follow this format: '<username>:<password>'."
+                     help="The Basic authentication string needs to follow this format: '<username>:<password>'"
                      buttonAfter={reset.basic_auth ? (
                        <Button type="button" onClick={() => { this.undoResetSecret('basic_auth'); }}>
                          Undo Reset
@@ -191,19 +207,17 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
           </Col>
         </Row>
         <Row>
-          <Col md={12}>
+          <Col md={6}>
             <Input id="api_key"
                    name="api_key"
                    label={<span>API Key <small className="text-muted">(Optional)</small></span>}
                    type="text"
                    onChange={this.handleChange}
                    bsStyle={validation.errors.api_key ? 'error' : null}
-                   help={get(validation, 'errors.api_key[0]', 'If an API secret is set, an API key must also be set.')}
+                   help={get(validation, 'errors.api_key[0]', 'Must be set if an API secret is set')}
                    value={config.api_key} />
           </Col>
-        </Row>
-        <Row>
-          <Col md={12}>
+          <Col md={6}>
             {api_secret?.keep_value ? (
               <>
                 <ControlLabel>API Secret</ControlLabel>
@@ -218,7 +232,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                      type="password"
                      onChange={this.handleSecretInputChange}
                      bsStyle={validation.errors.api_secret ? 'error' : null}
-                     help={get(validation, 'errors.api_secret[0]', 'If an API key is set, an API secret must also be set.')}
+                     help={get(validation, 'errors.api_secret[0]', 'Must be set if an API key is set')}
                      value={this.state.api_secret || ''}
                      buttonAfter={reset.api_secret ? (
                        <Button type="button" onClick={() => { this.undoResetSecret('api_secret'); }}>
@@ -228,17 +242,11 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
             )}
           </Col>
         </Row>
-        <Input id="notification-time-zone"
-               help="Time zone used for timestamps in the email body."
-               label={<>Time zone for date/time values <small className="text-muted">(Optional)</small></>}>
-          <TimezoneSelect className="timezone-select"
-                          name="time_zone"
-                          value={config.time_zone}
-                          onChange={this.handleTimeZoneChange} />
-        </Input>
         <Row>
-          <Col md={12}>
-            <ControlLabel>HTTP Method</ControlLabel>
+          <Col md={4}>
+            <Input help="HTTP method used for the notification"
+                   id="notification-method"
+                   label="HTTP Method">
             <Select id="method"
                     name="method"
                     clearable={false}
@@ -246,6 +254,31 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                     matchProp="label"
                     onChange={this.handleMethodChange}
                     value={config.method} />
+            </Input>
+          </Col>
+          <Col md={4}>
+            <Input help="HTTP content type used for POST/PUT notifications"
+                   id="notification-content-type"
+                   label="Content Type">
+            <Select id="content-type"
+                    name="content-type"
+                    options={contentTypes}
+                    matchProp="label"
+                    disabled={config.method === 'GET'}
+                    onChange={this.handleContentTypeChange}
+                    value={config.content_type} />
+            </Input>
+          </Col>
+          <Col md={4}>
+            <Input id="notification-time-zone"
+                   help="Time zone used for timestamps in the notification body"
+                   label={<>Time zone for date/time values</>}>
+              <TimezoneSelect className="timezone-select"
+                              name="time_zone"
+                              value={config.time_zone}
+                              clearable={false}
+                              onChange={this.handleTimeZoneChange} />
+            </Input>
           </Col>
         </Row>
         <Row>
@@ -256,10 +289,11 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
               <SourceCodeEditor id="notification-body-template"
                                 mode="text"
                                 theme="light"
-                                value={config.json_body_template || ''}
+                                value={config.body_template || ''}
+                                readOnly={config.method === 'GET'}
                                 onChange={this.handleJsonBodyTemplateChange} />
               <HelpBlock>
-                {get(validation, 'errors.json_body_template[0]', helpElement)}
+                {get(validation, 'errors.body_template[0]', helpElement)}
               </HelpBlock>
             </FormGroup>
           </Col>
