@@ -1,0 +1,6 @@
+type = "added"
+message = "Introduce telemetry custom event name"
+
+pulls = ["16317"]
+
+
