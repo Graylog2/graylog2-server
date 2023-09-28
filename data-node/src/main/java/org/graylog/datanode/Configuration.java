@@ -32,6 +32,7 @@ import com.google.common.net.HostAndPort;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -541,6 +542,7 @@ public class Configuration extends BaseConfiguration {
         return path != null && Files.isRegularFile(path) && Files.isReadable(path);
     }
 
+    @SuppressForbidden("Deliberate invocation of DNS lookup")
     public String getHostname() {
         if (hostname != null && !hostname.isBlank()) {
             // config setting always takes precedence
