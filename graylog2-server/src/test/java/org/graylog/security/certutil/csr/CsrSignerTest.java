@@ -22,14 +22,18 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CsrSignerTest {
     private static final X500Name subjectName = new X500Name("CN=Example Request");
+    private static final Instant fixedInstant = Instant.parse("2023-09-28T12:50:00Z");
+    private static final Clock fixedClock = Clock.fixed(fixedInstant, UTC);
 
     @BeforeEach
     void setUp() {
@@ -42,7 +46,10 @@ class CsrSignerTest {
         var cert = createCert(keyPair);
         var privateKey = keyPair.getPrivate();
         var csr = createCSR(keyPair);
-        assertThat(new CsrSigner().sign(privateKey, cert, csr, new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, "P6M"))).isNotNull();
+
+        var result = new CsrSigner(fixedClock).sign(privateKey, cert, csr, new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, "P6M"));
+        assertThat(result).isNotNull();
+        assertThat(result.getNotAfter()).isEqualTo(fixedInstant.plus(180, ChronoUnit.DAYS));
     }
 
     private PKCS10CertificationRequest createCSR(KeyPair keyPair) throws OperatorCreationException {

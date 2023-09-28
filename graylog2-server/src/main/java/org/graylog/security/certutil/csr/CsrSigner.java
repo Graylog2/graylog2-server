@@ -34,9 +34,11 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -47,6 +49,16 @@ import static org.bouncycastle.asn1.x509.GeneralName.rfc822Name;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CsrSigner {
+    private final Clock clock;
+
+    public CsrSigner() {
+        this.clock = Clock.systemDefaultZone();
+    }
+
+    public CsrSigner(Clock clock) {
+        this.clock = clock;
+    }
+
     private boolean isValidName(final int name) {
         return switch (name) {
             case dNSName, iPAddress, rfc822Name -> true;
@@ -54,16 +66,20 @@ public class CsrSigner {
         };
     }
 
+    private int periodToDays(Period period) {
+        return period.getYears() * 365 + period.getMonths() * 30 + period.getDays();
+    }
+
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, RenewalPolicy renewalPolicy) throws Exception {
-        Instant validFrom = Instant.now();
-        final var lifetime = Duration.parse(renewalPolicy.certificateLifetime());
-        var validUntil = validFrom.plus(lifetime);
+        Instant validFrom = Instant.now(clock);
+        final var lifetime = Period.parse(renewalPolicy.certificateLifetime());
+        var validUntil = validFrom.plus(periodToDays(lifetime), ChronoUnit.DAYS);
 
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
     }
 
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
-        Instant validFrom = Instant.now();
+        Instant validFrom = Instant.now(clock);
         Instant validUntil = validFrom.plus(Duration.ofDays(validityDays));
 
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
