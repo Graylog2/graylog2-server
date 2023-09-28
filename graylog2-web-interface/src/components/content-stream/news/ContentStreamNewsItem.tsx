@@ -21,12 +21,12 @@ import DOMPurify from 'dompurify';
 
 import { Carousel, Timestamp } from 'components/common';
 import { Panel } from 'components/bootstrap';
-import type { FeedITem, FeedMediaContent } from 'components/content-stream/hook/useContentStream';
+import type { FeedItem, FeedMediaContent } from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-  feed: FeedITem
+  feed: FeedItem
 }
 
 const StyledImage = styled.img(({ theme }: { theme: DefaultTheme }) => css`

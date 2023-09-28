@@ -22,7 +22,7 @@ import DOMPurify from 'dompurify';
 
 import { ListGroup, ListGroupItem, Label, Alert } from 'components/bootstrap';
 import { RelativeTime, Spinner, ExternalLink } from 'components/common';
-import type { FeedITem } from 'components/content-stream/hook/useContentStream';
+import type { FeedItem } from 'components/content-stream/hook/useContentStream';
 import useContentStream from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -48,8 +48,8 @@ const ContentStreamReleasesSection = () => {
   const { feedList, isLoadingFeed, error } = useContentStream(path);
   const sendTelemetry = useSendTelemetry();
 
-  const handleSendTelemetry = (feed: FeedITem) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.ARTICLE_CLICKED, {
+  const handleSendTelemetry = (feed: FeedItem) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.RELESE_ARTICLE_CLICKED, {
       app_pathname: 'welcome',
       app_section: 'content-stream',
       event_details: {

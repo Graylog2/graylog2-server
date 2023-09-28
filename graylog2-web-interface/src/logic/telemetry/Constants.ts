@@ -168,6 +168,7 @@ export const TELEMETRY_EVENT_TYPE = {
     NEXT_ARROW_CLICKED: 'Content Stream Right Arrow Clicked',
     READ_MORE_CLICKED: 'Content Stream Read More Clicked',
     ARTICLE_CLICKED: 'Content Stream Article Clicked',
+    RELESE_ARTICLE_CLICKED: 'Content Stream Release Article Clicked',
     NEWS_OPT_IN_TOGGLED: 'Content Stream News Opt-In Clicked',
     RELEASE_OPT_IN_TOGGLED: 'Content Stream Release Opt-In Clicked',
   },
