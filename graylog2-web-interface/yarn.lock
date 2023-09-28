@@ -4033,9 +4033,9 @@
     react-select "*"
 
 "@types/react-slider@^1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@types/react-slider/-/react-slider-1.3.1.tgz#a3816989eb4fc172e7df316930f242fec90690fc"
-  integrity sha512-4X2yK7RyCIy643YCFL+bc6XNmcnBtt8n88uuyihvcn5G7Lut23eNQU3q3KmwF7MWIfKfsW5NxCjw0SeDZRtgaA==
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@types/react-slider/-/react-slider-1.3.2.tgz#aa315b14e3a839949c49cf7ad6708ed4a6e40c98"
+  integrity sha512-JLerAdCPJdeF7LerrCfrNjLXucNo20rCaHj9yBoe1hAAcJgyRKUyFjZA7m2Cn9JpWvFxHvIP8Ej02KHlMN8T9A==
   dependencies:
     "@types/react" "*"
 
@@ -13217,6 +13217,11 @@ react-grid-layout@^1.3.0:
     react-draggable "^4.4.5"
     react-resizable "^3.0.5"
     resize-observer-polyfill "^1.5.1"
+
+react-hotkeys-hook@^4.4.1:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-4.4.1.tgz#1f7a7a1c9c21d4fa3280bf340fcca8fd77d81994"
+  integrity sha512-sClBMBioFEgFGYLTWWRKvhxcCx1DRznd+wkFHwQZspnRBkHTgruKIHptlK/U/2DPX8BhHoRGzpMVWUXMmdZlmw==
 
 react-immutable-proptypes@^2.1.0:
   version "2.2.0"
