@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
-import org.jetbrains.annotations.NotNull;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -49,7 +48,7 @@ public abstract class DecoratorImpl implements Decorator, Comparable<DecoratorIm
     static final String FIELD_ORDER = "order";
 
     @Override
-    public int compareTo(@NotNull DecoratorImpl o) {
+    public int compareTo(DecoratorImpl o) {
         return order() - o.order();
     }
 
