@@ -16,6 +16,7 @@
  */
 package org.graylog2.configuration;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -117,6 +118,16 @@ class IndexerDiscoveryProviderTest {
 
     @NotNull
     private PreflightConfig resultToConfig(PreflightConfigResult result) {
-        return () -> result;
+        return new PreflightConfig() {
+            @Override
+            public PreflightConfigResult result() {
+                return result;
+            }
+
+            @Override
+            public String preflightPassword() {
+                return RandomStringUtils.randomAlphabetic(10);
+            }
+        };
     }
 }

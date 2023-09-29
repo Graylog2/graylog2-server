@@ -16,22 +16,43 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.ValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
 public class PreflightConfigServiceImpl extends PersistedServiceImpl implements PreflightConfigService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PreflightConfigServiceImpl.class);
+
     @Inject
     public PreflightConfigServiceImpl(MongoConnection connection) {
         super(connection);
+        setInitialPassword();
+    }
+
+    private synchronized void setInitialPassword() {
+        // TODO: can we do that in one query (aggregation), so we don't risk any collisions across nodes?
+        final DBCollection collection = this.collection(PreflightConfigImpl.class);
+        if (collection.count() > 0) {
+            // there is some document, update it only if the password in it doesn't exist
+            collection.update(
+                    new BasicDBObject("password", new BasicDBObject("$exists", false)),
+                    new BasicDBObject("$set", new BasicDBObject("password", RandomStringUtils.randomAlphabetic(PreflightConstants.INITIAL_PASSWORD_LENGTH))),
+                    false,
+                    false);
+        } else {
+            collection.insert(new BasicDBObject("password", RandomStringUtils.randomAlphabetic(PreflightConstants.INITIAL_PASSWORD_LENGTH)));
+        }
     }
 
     @Override
@@ -43,9 +64,12 @@ public class PreflightConfigServiceImpl extends PersistedServiceImpl implements 
 
     @Override
     public PreflightConfig saveConfiguration() throws ValidationException {
-        final ImmutableMap<String, Object> fields = ImmutableMap.of("result", PreflightConfigResult.FINISHED);
-        final PreflightConfigImpl config = new PreflightConfigImpl(fields);
-        final String id = save(config);
+        this.collection(PreflightConfigImpl.class)
+                .update(new BasicDBObject(),
+                        new BasicDBObject("$set", new BasicDBObject("result", PreflightConfigResult.FINISHED)),
+                        false,
+                        false
+                );
         return getPersistedConfig().orElseThrow(() -> new IllegalStateException("Failed to obtain configuration that was just stored"));
     }
 }

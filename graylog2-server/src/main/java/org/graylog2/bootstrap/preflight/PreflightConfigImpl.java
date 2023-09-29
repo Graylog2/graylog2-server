@@ -48,6 +48,14 @@ public class PreflightConfigImpl extends PersistedImpl implements PreflightConfi
     }
 
     @Override
+    public String preflightPassword() {
+        return Optional.ofNullable(getFields().get("password"))
+                .map(String::valueOf)
+                .orElseThrow(() -> new IllegalStateException("Initial preflight password expected to be configured in all environments automatically"));
+    }
+
+
+    @Override
     public Map<String, Validator> getValidations() {
         return Collections.emptyMap();
     }

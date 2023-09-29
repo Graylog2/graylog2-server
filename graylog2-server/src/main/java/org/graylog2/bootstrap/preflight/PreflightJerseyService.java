@@ -77,23 +77,24 @@ public class PreflightJerseyService extends AbstractIdleService {
                                   final Configuration localConfiguration,
                                   @PreflightRestResourcesBinding final Set<Class<?>> systemRestResources,
                                   ObjectMapper objectMapper,
-                                  MetricRegistry metricRegistry) {
+                                  MetricRegistry metricRegistry,
+                                  PreflightConfigService preflightConfigService) {
         this.configuration = requireNonNull(httpConfiguration, "configuration");
-        this.basicAuthFilter = createBasicAuthFilter(localConfiguration);
+        this.basicAuthFilter = createBasicAuthFilter(localConfiguration, requireNonNull(preflightConfigService, "preflightConfigService"));
         this.systemRestResources = systemRestResources;
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
     }
 
     @NotNull
-    private static BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration) {
+    private BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration, PreflightConfigService preflightConfigService) {
         final String username = localConfiguration.getRootUsername();
-        final String randomHttpAuthPassword = RandomStringUtils.randomAlphabetic(10);
-        final String passwordHash = DigestUtils.sha256Hex(randomHttpAuthPassword);
+        final String preflightPassword = preflightConfigService.getPersistedConfig().map(PreflightConfig::preflightPassword)
+                .orElseThrow(() -> new IllegalStateException("No initial preflight password set, this is an unexpected state"));
         LOG.info("========================================================");
-        LOG.info("Preflight web interface accessible with username '{}' and password '{}'", username, randomHttpAuthPassword);
-        LOG.info("========================================================");
-        return new BasicAuthFilter(username, passwordHash, "preflight-config");
+        LOG.info("Preflight web interface accessible with username '{}' and password '{}'", username, preflightPassword);
+        LOG.info("=======================");
+        return new BasicAuthFilter(username, DigestUtils.sha256Hex(preflightPassword), "preflight-config");
     }
 
     @Override
@@ -156,7 +157,7 @@ public class PreflightJerseyService extends AbstractIdleService {
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
                         JacksonPropertyExceptionMapper.class
-)
+                )
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
