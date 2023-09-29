@@ -32,6 +32,7 @@ import com.google.common.net.HostAndPort;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -291,6 +292,14 @@ public class Configuration extends BaseConfiguration {
         return Optional.ofNullable(opensearchNetworkHostHost);
     }
 
+    public String getBindAddress() {
+        return bindAddress;
+    }
+
+    public int getDatanodeHttpPort() {
+        return datanodeHttpPort;
+    }
+
     public static class NodeIdFileValidator implements Validator<String> {
         @Override
         public void validate(String name, String path) throws ValidationException {
@@ -343,17 +352,21 @@ public class Configuration extends BaseConfiguration {
         }
     }
 
-    private static final int GRAYLOG_DEFAULT_PORT = 8999;
+    public static final int DATANODE_DEFAULT_PORT = 8999;
+    public static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
 
     public static final String OVERRIDE_HEADER = "X-Graylog-Server-URL";
     public static final String PATH_WEB = "";
     public static final String PATH_API = "api/";
 
-    @Parameter(value = "http_bind_address", required = true)
-    private HostAndPort httpBindAddress = HostAndPort.fromParts("0.0.0.0", GRAYLOG_DEFAULT_PORT);
+    @Parameter(value = "bind_address", required = true)
+    private String bindAddress = DEFAULT_BIND_ADDRESS;
 
-    @Parameter(value = "hostname", required = true)
-    private String hostname = Tools.getLocalCanonicalHostname();
+    @Parameter(value = "datanode_http_port", required = true)
+    private int datanodeHttpPort = DATANODE_DEFAULT_PORT;
+
+    @Parameter(value = "hostname")
+    private String hostname = null;
 
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
@@ -391,12 +404,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
-    public HostAndPort getHttpBindAddress() {
-        return httpBindAddress
-                .requireBracketsForIPv6()
-                .withDefaultPort(GRAYLOG_DEFAULT_PORT);
-    }
-
     public String getUriScheme() {
         return isHttpEnableTls() ? "https" : "http";
     }
@@ -423,7 +430,7 @@ public class Configuration extends BaseConfiguration {
                 LOG.warn("\"{}\" is not a valid setting for \"http_publish_uri\". Using default <{}>.", httpPublishUri, defaultHttpUri);
                 return defaultHttpUri;
             } else {
-                return Tools.normalizeURI(httpPublishUri, httpPublishUri.getScheme(), GRAYLOG_DEFAULT_PORT, httpPublishUri.getPath());
+                return Tools.normalizeURI(httpPublishUri, httpPublishUri.getScheme(), DATANODE_DEFAULT_PORT, httpPublishUri.getPath());
             }
         }
     }
@@ -434,10 +441,8 @@ public class Configuration extends BaseConfiguration {
     }
 
     private URI getDefaultHttpUri(String path) {
-        final HostAndPort bindAddress = getHttpBindAddress();
-
         final URI publishUri;
-        final InetAddress inetAddress = toInetAddress(bindAddress.getHost());
+        final InetAddress inetAddress = toInetAddress(bindAddress);
         if (inetAddress != null && Tools.isWildcardInetAddress(inetAddress)) {
             final InetAddress guessedAddress;
             try {
@@ -456,7 +461,7 @@ public class Configuration extends BaseConfiguration {
                         getUriScheme(),
                         null,
                         guessedAddress.getHostAddress(),
-                        bindAddress.getPort(),
+                        datanodeHttpPort,
                         path,
                         null,
                         null
@@ -469,8 +474,8 @@ public class Configuration extends BaseConfiguration {
                 publishUri = new URI(
                         getUriScheme(),
                         null,
-                        getHttpBindAddress().getHost(),
-                        getHttpBindAddress().getPort(),
+                        bindAddress,
+                        datanodeHttpPort,
                         path,
                         null,
                         null
@@ -519,39 +524,6 @@ public class Configuration extends BaseConfiguration {
         return httpTlsKeyPassword;
     }
 
-    public URI getHttpExternalUri() {
-        return httpExternalUri == null ? getHttpPublishUri() : httpExternalUri;
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateHttpBindAddress() throws ValidationException {
-        try {
-            final String host = getHttpBindAddress().getHost();
-            if (!InetAddresses.isInetAddress(host)) {
-                final InetAddress inetAddress = InetAddress.getByName(host);
-            }
-        } catch (IllegalArgumentException | UnknownHostException e) {
-            throw new ValidationException(e);
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateHttpPublishUriPathEndsWithSlash() throws ValidationException {
-        if (!getHttpPublishUri().getPath().endsWith("/")) {
-            throw new ValidationException("\"http_publish_uri\" must end with a slash (\"/\")");
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateHttpExternalUriPathEndsWithSlash() throws ValidationException {
-        if (!getHttpExternalUri().getPath().endsWith("/")) {
-            throw new ValidationException("\"http_external_uri\" must end with a slash (\"/\")");
-        }
-    }
-
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validateTlsConfig() throws ValidationException {
@@ -570,8 +542,32 @@ public class Configuration extends BaseConfiguration {
         return path != null && Files.isRegularFile(path) && Files.isReadable(path);
     }
 
+    @SuppressForbidden("Deliberate invocation of DNS lookup")
     public String getHostname() {
-        return hostname;
+        if (hostname != null && !hostname.isBlank()) {
+            // config setting always takes precedence
+            return hostname;
+        }
+
+        if (DEFAULT_BIND_ADDRESS.equals(bindAddress)) {
+            // no hostname is set, bind address is to 0.0.0.0 -> return host name, the OS finds
+            return Tools.getLocalCanonicalHostname();
+        }
+
+        if (InetAddresses.isInetAddress(bindAddress)) {
+            // bindaddress is a real IP, resolving the hostname
+            try {
+                InetAddress addr = InetAddress.getByName(bindAddress);
+                return addr.getHostName();
+            } catch (UnknownHostException e) {
+                final var hostname = Tools.getLocalCanonicalHostname();
+                LOG.error("Could not resolve {} to hostname, check your DNS. Using {} instead.", bindAddress, hostname);
+                return hostname;
+            }
+        }
+
+        // bindaddress is configured as the hostname
+        return bindAddress;
     }
 
     public String getRootPasswordSha2() {
