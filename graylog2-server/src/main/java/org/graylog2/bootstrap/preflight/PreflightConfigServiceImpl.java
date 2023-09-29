@@ -19,18 +19,13 @@ package org.graylog2.bootstrap.preflight;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog2.database.MongoConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
 public class PreflightConfigServiceImpl implements PreflightConfigService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PreflightConfigServiceImpl.class);
     public static final String COLLECTION_NAME = "preflight";
 
     private final MongoConnection connection;

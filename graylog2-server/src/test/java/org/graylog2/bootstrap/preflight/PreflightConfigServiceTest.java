@@ -31,17 +31,12 @@ class PreflightConfigServiceTest {
     static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO5);
     private PreflightConfigService preflightConfigService;
 
-    private MongoDBTestService mongodb;
-
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
-
         // run the migration which create the initial password for preflight
         new V20230929142900_CreateInitialPreflightPassword(mongodb.mongoConnection()).upgrade();
-
         preflightConfigService = new PreflightConfigServiceImpl(mongodb.mongoConnection());
-        this.mongodb = mongodb;
     }
 
     @Test
