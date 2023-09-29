@@ -27,12 +27,12 @@ import TitleTypes from 'views/stores/TitleTypes';
 import EditableTitle from 'views/components/common/EditableTitle';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
-import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
-import useWidgetIds from 'views/components/useWidgetIds';
 import useAppDispatch from 'stores/useAppDispatch';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
+import useWidgetIds from 'views/components/useWidgetIds';
 
 type PageListItem = {
   id: string,
@@ -75,19 +75,19 @@ type Props = {
   show: boolean,
   setShow: Dispatch<SetStateAction<boolean>>,
   queriesList: Immutable.OrderedSet<PageListItem>,
-  dashboardId: string,
   activeQueryId: string,
+  dashboardId: string,
 }
 
-const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboardId, activeQueryId }: Props) => {
-  const widgetIds = useWidgetIds();
+const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQueryId, dashboardId }: Props) => {
   const { setDashboardPage } = useContext(DashboardPageContext);
-  const [orderedQueriesList, setOrderedQueriesList] = useState<Immutable.OrderedSet<PageListItem>>(queriesList);
-  const disablePageDelete = orderedQueriesList.size <= 1;
+  const widgetIds = useWidgetIds();
+  const [nextQueriesList, setNextQueriesList] = useState<Immutable.OrderedSet<PageListItem>>(queriesList);
+  const disablePageDelete = nextQueriesList.size <= 1;
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const onConfirmPagesConfiguration = useCallback(() => {
-    const isActiveQueryDeleted = !orderedQueriesList.find(({ id }) => id === activeQueryId);
+    const isActiveQueryDeleted = !nextQueriesList.find(({ id }) => id === activeQueryId);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_UPDATED, {
       app_pathname: 'dashboard',
@@ -96,15 +96,16 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
     });
 
     if (isActiveQueryDeleted) {
-      const indexedQueryIds = queriesList.map(({ id }) => id).toIndexedSeq();
-      const newActiveQueryId = FindNewActiveQueryId(Immutable.List(indexedQueryIds), activeQueryId);
-
+      const indexedQueryIds = queriesList.map(({ id }) => id).toList();
+      const nextQueryIds = nextQueriesList.map(({ id }) => id).toArray();
+      const removedQueryIds = indexedQueryIds.filter((queryId) => !nextQueryIds.includes(queryId)).toList();
+      const newActiveQueryId = FindNewActiveQueryId(indexedQueryIds, activeQueryId, removedQueryIds);
       setDashboardPage(newActiveQueryId);
     }
 
-    dispatch(setQueriesOrder(orderedQueriesList.map(({ id }) => id).toOrderedSet()))
+    dispatch(setQueriesOrder(nextQueriesList.map(({ id }) => id).toOrderedSet()))
       .then(() => {
-        const newTitles = orderedQueriesList.map(({ id, title }) => {
+        const newTitles = nextQueriesList.map(({ id, title }) => {
           const titleMap = Immutable.Map<string, string>({ title });
           const titlesMap = Immutable.Map<TitleType, Immutable.Map<string, string>>({ [TitleTypes.Tab]: titleMap }) as TitlesMap;
 
@@ -114,7 +115,8 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
         dispatch(mergeQueryTitles(newTitles));
         setShow(false);
       });
-  }, [orderedQueriesList, sendTelemetry, dispatch, activeQueryId, queriesList, setDashboardPage, setShow]);
+  }, [nextQueriesList, sendTelemetry, dispatch, activeQueryId, queriesList, setDashboardPage, setShow]);
+
   const onPagesConfigurationModalClose = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_CANCELED, {
       app_pathname: 'dashboard',
@@ -131,29 +133,29 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
       app_action_value: 'dashboard-page-configuration-sorting',
     });
 
-    setOrderedQueriesList(Immutable.OrderedSet(order));
-  }, [sendTelemetry, setOrderedQueriesList]);
+    setNextQueriesList(Immutable.OrderedSet(order));
+  }, [sendTelemetry, setNextQueriesList]);
 
   const onUpdateTitle = useCallback((id: string, title: string) => {
-    setOrderedQueriesList((currentQueries) => currentQueries
+    setNextQueriesList((currentQueries) => currentQueries
       .map((query) => (query.id === id ? { id, title } : query))
       .toOrderedSet());
   }, []);
 
-  const onRemovePage = useCallback(async (id: string) => {
+  const removePage = useCallback(async (queryId: string) => {
     if (disablePageDelete) {
       return Promise.resolve();
     }
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED, {
-      app_pathname: 'dashboard',
-      app_section: 'dashboard',
-      app_action_value: 'dashboard-page-configuration-remove-page',
-    });
-
     if (await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds)) {
-      setOrderedQueriesList((currentQueries) => currentQueries
-        .filter((query) => query.id !== id).toOrderedSet());
+      sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED, {
+        app_pathname: 'dashboard',
+        app_section: 'dashboard',
+        app_action_value: 'dashboard-page-configuration-remove-page',
+      });
+
+      setNextQueriesList((currentQueries) => currentQueries
+        .filter((query) => query.id !== queryId).toOrderedSet());
     }
 
     return Promise.resolve();
@@ -163,9 +165,9 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
   const customListItemRender = useCallback(({ item }: { item: PageListItem }) => (
     <ListItem item={item}
               onUpdateTitle={onUpdateTitle}
-              onRemove={onRemovePage}
+              onRemove={removePage}
               disableDelete={disablePageDelete} />
-  ), [disablePageDelete, onRemovePage, onUpdateTitle]);
+  ), [disablePageDelete, removePage, onUpdateTitle]);
 
   return (
     <BootstrapModalConfirm showModal={show}
@@ -179,7 +181,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
           Use drag and drop to change the order of the dashboard pages.
           Double-click on a dashboard title to change it.
         </p>
-        <SortableList<PageListItem> items={orderedQueriesList.toArray()}
+        <SortableList<PageListItem> items={nextQueriesList.toArray()}
                                     onMoveItem={updatePageSorting}
                                     displayOverlayInPortal
                                     alignItemContent="center"
