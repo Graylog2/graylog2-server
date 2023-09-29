@@ -16,11 +16,11 @@
  */
 package org.graylog2.configuration;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 public class DummyPreflightConfigService implements PreflightConfigService {
 
