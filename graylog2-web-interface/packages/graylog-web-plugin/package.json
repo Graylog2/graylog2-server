@@ -29,7 +29,7 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@graylog/sawmill": "2.0.6",
+    "@graylog/sawmill": "2.0.7",
     "@tanstack/react-query": "4.35.3",
     "@types/create-react-class": "15.6.4",
     "@types/jquery": "3.5.20",
