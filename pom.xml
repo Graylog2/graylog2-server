@@ -155,7 +155,6 @@
         <netty.version>4.1.97.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.61.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.11.0</okhttp.version>
-        <okio.version>3.5.0</okio.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.30.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
@@ -373,12 +372,6 @@
                 <artifactId>okhttp-tls</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
-            <!-- Explicitly manage okio to fix CVE-2023-3635. Can probably be removed with next okhttp update -->
-            <dependency>
-                <groupId>com.squareup.okio</groupId>
-                <artifactId>okio</artifactId>
-                <version>${okio.version}</version>
-            </dependency>
             <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
@@ -444,6 +437,18 @@
                 <groupId>org.javassist</groupId>
                 <artifactId>javassist</artifactId>
                 <version>3.28.0-GA</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>3.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>1.9.10</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <!-- End management of transitive dependencies for requireUpperBoundDeps -->
 
