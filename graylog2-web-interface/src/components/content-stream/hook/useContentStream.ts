@@ -101,14 +101,18 @@ const useContentStream = (path?: string): { isLoadingFeed: boolean, feedList: Ar
   const { rss_url } = AppConfig.contentStream() || {};
 
   const getDefaultTag = useCallback(() => {
+    if (path) {
+      return path;
+    }
+
     if (isLoadingTags || contentStreamTagError || !currentTag) {
       return DEFAULT_FEED;
     }
 
     return currentTag;
-  }, [contentStreamTagError, currentTag, isLoadingTags]);
+  }, [contentStreamTagError, currentTag, isLoadingTags, path]);
 
-  const rssUrl = rss_url && `${rss_url}/${path || getDefaultTag()}/feed`;
+  const rssUrl = rss_url && `${rss_url}/${getDefaultTag()}/feed`;
 
   const {
     data,
