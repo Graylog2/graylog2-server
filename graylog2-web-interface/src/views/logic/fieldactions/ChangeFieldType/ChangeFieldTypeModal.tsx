@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
+import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
-import { BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
 import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
@@ -32,6 +32,12 @@ const StyledSelect = styled(Select)`
   width: 400px;
   margin-bottom: 20px;
 `;
+
+const RedBadge = styled(Badge)(({ theme }) => css`
+  background-color: ${theme.colors.variant.light.danger};
+`);
+
+const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
 
 const failureStreamId = '000000000000000000000004';
 
@@ -72,7 +78,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   }, []);
 
   return (
-    <BootstrapModalForm title={`Change ${field} field type`}
+    <BootstrapModalForm title={<span>Change {field} field type <BetaBadge /></span>}
                         submitButtonText="Change field type"
                         onSubmitForm={onSubmit}
                         onCancel={onClose}
