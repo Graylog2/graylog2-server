@@ -26,6 +26,7 @@ import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/ho
 import useStream from 'components/streams/hooks/useStream';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -44,10 +45,12 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const [rotated, setRotated] = useState(false);
   const [newFieldType, setNewFieldType] = useState(null);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
-  const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes).map(([value, label]) => ({
-    value,
-    label,
-  })), [fieldTypes]);
+  const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
+    .sort(([, label1], [, label2]) => defaultCompare(label1, label2))
+    .map(([value, label]) => ({
+      value,
+      label,
+    })), [fieldTypes]);
   const { data: failureStream, isFetching: failureStreamLoading } = useStream(failureStreamId);
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
@@ -82,14 +85,16 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
-        <StyledSelect inputId="field_type"
-                      options={fieldTypeOptions}
-                      value={newFieldType}
-                      onChange={onChangeFieldType}
-                      placeholder="Select field type"
-                      disabled={isOptionsLoading}
-                      inputProps={{ 'aria-label': 'Select field type' }}
-                      required />
+        <Input label="New Field Type:">
+          <StyledSelect inputId="field_type"
+                        options={fieldTypeOptions}
+                        value={newFieldType}
+                        onChange={onChangeFieldType}
+                        placeholder="Select field type"
+                        disabled={isOptionsLoading}
+                        inputProps={{ 'aria-label': 'Select field type' }}
+                        required />
+        </Input>
         <Alert bsStyle="info">
           By default the type will be changed in all index sets of the current message/search. By expanding the next section, you can select for which index sets you would like to make the change.
         </Alert>
