@@ -22,10 +22,6 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { Col, ControlLabel, FormGroup, Input, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
-import withTelemetry from 'logic/telemetry/withTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import withLocation from 'routing/withLocation';
 
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';
@@ -60,8 +56,6 @@ class FilterAggregationForm extends React.Component {
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     currentUser: PropTypes.object.isRequired,
-    sendTelemetry: PropTypes.func.isRequired,
-    location: PropTypes.object.isRequired,
   };
 
   static defaultConfig = {
@@ -83,21 +77,9 @@ class FilterAggregationForm extends React.Component {
   }
 
   handleConfigChange = (event) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-
-    if (name === 'event_limit') {
-      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EVENT_LIMIT_CHANGED, {
-        app_pathname: getPathnameWithoutId(this.props.location.pathname),
-        app_section: 'event-definition-condition',
-        app_action_value: 'event-limit-input',
-        limit: value,
-      });
-    }
-
     const config = cloneDeep(this.props.eventDefinition.config);
 
-    config[name] = value;
+    config[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.propagateConfigChange(config);
   };
 
@@ -127,12 +109,6 @@ class FilterAggregationForm extends React.Component {
 
       this.propagateConfigChange(nextConfig);
     } else {
-      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.AGGREGATION_TOGGLED, {
-        app_pathname: getPathnameWithoutId(this.props.location.pathname),
-        app_section: 'event-definition-condition',
-        app_action_value: 'aggregation-radio-button',
-      });
-
       // Reset aggregation data from state if it exists
       const { existingAggregationConfig } = this.state;
 
@@ -215,4 +191,4 @@ class FilterAggregationForm extends React.Component {
   }
 }
 
-export default withLocation(withTelemetry(FilterAggregationForm));
+export default FilterAggregationForm;
