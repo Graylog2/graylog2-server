@@ -250,7 +250,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 .withRetryListener(new RetryListener() {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
-                        LOG.debug("Waiting for datanode {} to come up, attempt {}", config, attempt.getAttemptNumber());
+                        LOG.debug("Waiting for datanode {} to come up, attempt {}", config.nodeId(), attempt.getAttemptNumber());
                         counter.incrementAndGet();
                     }
                 })
