@@ -16,8 +16,6 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-public interface PreflightConfig {
-    PreflightConfigResult result();
-
-    String preflightPassword();
+@Deprecated
+public record PreflightConfig(PreflightConfigResult result) {
 }

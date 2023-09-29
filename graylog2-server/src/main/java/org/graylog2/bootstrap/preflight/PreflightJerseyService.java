@@ -89,8 +89,7 @@ public class PreflightJerseyService extends AbstractIdleService {
     @NotNull
     private BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration, PreflightConfigService preflightConfigService) {
         final String username = localConfiguration.getRootUsername();
-        final String preflightPassword = preflightConfigService.getPersistedConfig().map(PreflightConfig::preflightPassword)
-                .orElseThrow(() -> new IllegalStateException("No initial preflight password set, this is an unexpected state"));
+        final String preflightPassword = preflightConfigService.getPreflightPassword();
         LOG.info("========================================================");
         LOG.info("Preflight web interface accessible with username '{}' and password '{}'", username, preflightPassword);
         LOG.info("=======================");

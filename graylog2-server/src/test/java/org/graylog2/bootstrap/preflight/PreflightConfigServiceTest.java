@@ -20,12 +20,10 @@ import org.assertj.core.api.Assertions;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.migrations.V20230929142900_CreateInitialPreflightPassword;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import java.util.Optional;
 
 class PreflightConfigServiceTest {
 
@@ -38,42 +36,26 @@ class PreflightConfigServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
+
+        // run the migration which create the initial password for preflight
+        new V20230929142900_CreateInitialPreflightPassword(mongodb.mongoConnection()).upgrade();
+
         preflightConfigService = new PreflightConfigServiceImpl(mongodb.mongoConnection());
         this.mongodb = mongodb;
     }
 
     @Test
-    void testPreflightResult() throws ValidationException {
-        final Optional<PreflightConfig> config = preflightConfigService.getPersistedConfig();
-        Assertions.assertThat(config)
-                .isPresent()
-                .hasValueSatisfying(c -> Assertions.assertThat(c.result()).isEqualTo(PreflightConfigResult.UNKNOWN));
-
-        final String password = config.map(PreflightConfig::preflightPassword).orElseThrow();
-
-        preflightConfigService.saveConfiguration();
-
-        Assertions.assertThat(preflightConfigService.getPersistedConfig())
-                .isPresent()
-                .hasValueSatisfying(c -> Assertions.assertThat(c.result()).isEqualTo(PreflightConfigResult.FINISHED))
-                .hasValueSatisfying(c -> Assertions.assertThat(c.preflightPassword()).isEqualTo(password)); // password should stay unmodified
+    void testPreflightResult() {
+        Assertions.assertThat(preflightConfigService.getPreflightConfigResult()).isEqualTo(PreflightConfigResult.UNKNOWN);
+        preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+        Assertions.assertThat(preflightConfigService.getPreflightConfigResult()).isEqualTo(PreflightConfigResult.FINISHED);
     }
 
     @Test
     void testInitialPassword() {
-        final Optional<PreflightConfig> config = preflightConfigService.getPersistedConfig();
-        Assertions.assertThat(config)
-                .map(PreflightConfig::preflightPassword)
+        final String password = preflightConfigService.getPreflightPassword();
+        Assertions.assertThat(password)
                 .isNotEmpty()
-                .hasValueSatisfying(pass -> Assertions.assertThat(pass).hasSizeGreaterThanOrEqualTo(PreflightConstants.INITIAL_PASSWORD_LENGTH));
-    }
-
-    @Test
-    void testSecondStartPasswordUnchanged() {
-        final String initialPassword = preflightConfigService.getPersistedConfig().map(PreflightConfig::preflightPassword).orElseThrow(() -> new IllegalStateException("password expected to be set"));
-        final PreflightConfigServiceImpl secondService = new PreflightConfigServiceImpl(mongodb.mongoConnection());
-        final String passwordAfterSecondInit = secondService.getPersistedConfig().map(PreflightConfig::preflightPassword).orElseThrow(() -> new IllegalStateException("password expected to be set"));
-
-        Assertions.assertThat(passwordAfterSecondInit).isEqualTo(initialPassword);
+                .hasSizeGreaterThanOrEqualTo(PreflightConstants.INITIAL_PASSWORD_LENGTH);
     }
 }

@@ -43,6 +43,8 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
+import org.graylog2.migrations.V20230905081400_CreateFieldTypeMappingsManagerRole;
+import org.graylog2.migrations.V20230929142900_CreateInitialPreflightPassword;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -103,6 +105,8 @@ public class PreflightWebModule extends Graylog2Module {
                 TypeLiteral.get(String.class),
                 new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
                 });
+
+        migrationsBinder().addBinding().to(V20230929142900_CreateInitialPreflightPassword.class);
     }
 
     protected void addPreflightRestResource(Class<?> restResourceClass) {

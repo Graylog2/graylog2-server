@@ -19,57 +19,56 @@ package org.graylog2.bootstrap.preflight;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
-public class PreflightConfigServiceImpl extends PersistedServiceImpl implements PreflightConfigService {
+public class PreflightConfigServiceImpl implements PreflightConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PreflightConfigServiceImpl.class);
+    public static final String COLLECTION_NAME = "preflight";
+
+    private final MongoConnection connection;
 
     @Inject
     public PreflightConfigServiceImpl(MongoConnection connection) {
-        super(connection);
-        setInitialPassword();
-    }
-
-    private synchronized void setInitialPassword() {
-        // TODO: can we do that in one query (aggregation), so we don't risk any collisions across nodes?
-        final DBCollection collection = this.collection(PreflightConfigImpl.class);
-        if (collection.count() > 0) {
-            // there is some document, update it only if the password in it doesn't exist
-            collection.update(
-                    new BasicDBObject("password", new BasicDBObject("$exists", false)),
-                    new BasicDBObject("$set", new BasicDBObject("password", RandomStringUtils.randomAlphabetic(PreflightConstants.INITIAL_PASSWORD_LENGTH))),
-                    false,
-                    false);
-        } else {
-            collection.insert(new BasicDBObject("password", RandomStringUtils.randomAlphabetic(PreflightConstants.INITIAL_PASSWORD_LENGTH)));
-        }
+        this.connection = connection;
     }
 
     @Override
-    public Optional<PreflightConfig> getPersistedConfig() {
-        final DBObject doc = findOne(PreflightConfigImpl.class, new BasicDBObject());
-        return Optional.ofNullable(doc)
-                .map(o -> new PreflightConfigImpl((ObjectId) o.get("_id"), o.toMap()));
-    }
-
-    @Override
-    public PreflightConfig saveConfiguration() throws ValidationException {
-        this.collection(PreflightConfigImpl.class)
-                .update(new BasicDBObject(),
-                        new BasicDBObject("$set", new BasicDBObject("result", PreflightConfigResult.FINISHED)),
-                        false,
+    public PreflightConfig setConfigResult(PreflightConfigResult result) {
+        getCollection()
+                .update(new BasicDBObject("type", "preflight_result"),
+                        new BasicDBObject("$set", new BasicDBObject("value", result)),
+                        true,
                         false
                 );
-        return getPersistedConfig().orElseThrow(() -> new IllegalStateException("Failed to obtain configuration that was just stored"));
+        return new PreflightConfig(result);
+    }
+
+    @Override
+    public PreflightConfigResult getPreflightConfigResult() {
+        final DBObject doc = getCollection().findOne(new BasicDBObject("type", "preflight_result"));
+        return Optional.ofNullable(doc)
+                .map(d -> (String) d.get("value"))
+                .map(PreflightConfigResult::valueOf)
+                .orElse(PreflightConfigResult.UNKNOWN);
+    }
+
+    private DBCollection getCollection() {
+        return this.connection.getDatabase().getCollection(COLLECTION_NAME);
+    }
+
+    @Override
+    public String getPreflightPassword() {
+        final DBObject doc = getCollection().findOne(new BasicDBObject("type", "preflight_password"));
+        return Optional.ofNullable(doc)
+                .map(d -> (String) d.get("value"))
+                .orElseThrow(() -> new IllegalStateException("Initial password should be present in the DB, inconsistent state"));
     }
 }

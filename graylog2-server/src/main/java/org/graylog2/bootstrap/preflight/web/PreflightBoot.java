@@ -66,10 +66,7 @@ public class PreflightBoot {
     }
 
     private boolean preflightFinishedOrSkipped() {
-        final PreflightConfigResult result = preflightConfigServiceIf.getPersistedConfig()
-                .map(PreflightConfig::result)
-                .orElse(PreflightConfigResult.UNKNOWN);
-
+        final PreflightConfigResult result = preflightConfigServiceIf.getPreflightConfigResult();
         return result == PreflightConfigResult.FINISHED || result == PreflightConfigResult.SKIPPED;
     }
 }

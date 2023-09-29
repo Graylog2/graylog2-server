@@ -103,31 +103,8 @@ class IndexerDiscoveryProviderTest {
     }
 
     private PreflightConfigService preflightConfig(@Nullable PreflightConfigResult result) {
-        return new PreflightConfigService() {
-            @Override
-            public Optional<PreflightConfig> getPersistedConfig() {
-                return Optional.of(resultToConfig(result));
-            }
-
-            @Override
-            public PreflightConfig saveConfiguration() throws ValidationException {
-                throw new IllegalStateException("Should not be called here!");
-            }
-        };
-    }
-
-    @NotNull
-    private PreflightConfig resultToConfig(PreflightConfigResult result) {
-        return new PreflightConfig() {
-            @Override
-            public PreflightConfigResult result() {
-                return result;
-            }
-
-            @Override
-            public String preflightPassword() {
-                return RandomStringUtils.randomAlphabetic(10);
-            }
-        };
+        final DummyPreflightConfigService service = new DummyPreflightConfigService();
+        service.setConfigResult(result);
+        return service;
     }
 }
