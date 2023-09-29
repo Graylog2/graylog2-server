@@ -21,12 +21,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ConfirmDialog } from 'components/common';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { qualifyUrl, getPathnameWithoutId } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
   selectedDefinitionsIds: Array<string>,
@@ -63,6 +65,7 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
   const [showDialog, setShowDialog] = useState(false);
   const [actionType, setActionType] = useState(null);
   const selectedItemsAmount = selectedDefinitionsIds?.length;
+  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const refetchEventDefinitions = useCallback(() => queryClient.invalidateQueries(['eventDefinition', 'overview']), [queryClient]);
 
@@ -72,22 +75,34 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
   };
 
   const handleAction = (action) => {
-    sendTelemetry('click', {
-      app_pathname: 'event-definition',
-      app_section: 'event-definition-bulk',
-      app_action_value: `event-definition-bulk-${action}`,
-    });
-
     switch (action) {
       case ACTION_TYPES.DELETE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.BULK_ACTION_DELETE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-bulk',
+          app_action_value: 'delete-menuitem',
+        });
+
         updateState({ show: true, type: ACTION_TYPES.DELETE });
 
         break;
       case ACTION_TYPES.ENABLE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.BULK_ACTION_ENABLE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-bulk',
+          app_action_value: 'enable-menuitem',
+        });
+
         updateState({ show: true, type: ACTION_TYPES.ENABLE });
 
         break;
       case ACTION_TYPES.DISABLE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.BULK_ACTION_DISABLE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-bulk',
+          app_action_value: 'disable-menuitem',
+        });
+
         updateState({ show: true, type: ACTION_TYPES.DISABLE });
 
         break;
