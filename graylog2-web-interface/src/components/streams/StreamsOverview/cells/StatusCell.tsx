@@ -58,7 +58,7 @@ const StatusCell = ({ stream }: Props) => {
   const toggleStreamStatus = useCallback(async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_STATUS_TOGGLED, {
       app_pathname: 'streams',
-      app_action_value: ' stream-item-status',
+      app_action_value: 'stream-item-status',
       event_details: {
         enabled: !stream.disabled,
       },

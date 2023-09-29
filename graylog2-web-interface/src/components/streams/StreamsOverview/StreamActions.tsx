@@ -108,12 +108,12 @@ const StreamActions = ({
   const onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
-      StreamsStore.remove(stream.id, (response) => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DELETED, {
-          app_pathname: 'streams',
-          app_action_value: 'stream-item-delete',
-        });
+      sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DELETED, {
+        app_pathname: 'streams',
+        app_action_value: 'stream-item-delete',
+      });
 
+      StreamsStore.remove(stream.id, (response) => {
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
 
         return response;
