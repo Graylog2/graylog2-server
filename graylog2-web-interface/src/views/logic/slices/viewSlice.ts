@@ -161,8 +161,13 @@ export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async 
     .build();
 
   const searchAfterSave = await createSearch(newSearch);
+  const newViewState = view.state.filter((_state, queryId) => (
+    !!newQueries.find((query) => query.id === queryId)),
+  ).toMap();
+
   const newView = view.toBuilder()
     .search(searchAfterSave)
+    .state(newViewState)
     .build();
 
   return dispatch(updateView(newView));
@@ -181,7 +186,7 @@ export const addQuery = (query: Query, viewState: ViewStateType) => async (dispa
     .state(newViewStates)
     .build();
 
-  return dispatch(updateView(newView, true)).then(() => dispatch(selectQuery(query.id)));
+  return dispatch(updateView(newView, true)).then(() => dispatch(selectQuery(query.id))).then(() => query.id);
 };
 
 export const updateQuery = (queryId: QueryId, query: Query) => async (dispatch: AppDispatch, getState: () => RootState) => {
