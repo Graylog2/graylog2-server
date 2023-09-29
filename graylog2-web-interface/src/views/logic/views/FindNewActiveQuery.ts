@@ -21,8 +21,7 @@ import { List } from 'immutable';
 const FindNewActiveQueryId = (queryIds: List<string>, activeQueryId: string, removedQueryIds: List<string> = List()) => {
   const currentQueryIdIndex = queryIds.indexOf(activeQueryId);
   const priorQueryIds = queryIds.slice(0, currentQueryIdIndex).toList();
-
-  const listToPickNewIdFrom = priorQueryIds.isEmpty
+  const listToPickNewIdFrom = priorQueryIds.isEmpty()
     ? queryIds
     : priorQueryIds.reverse();
 

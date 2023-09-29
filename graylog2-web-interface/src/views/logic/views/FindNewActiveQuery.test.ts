@@ -32,5 +32,7 @@ describe('FindNewActiveQuery', () => {
   it('returns next query when current query is removed', () => {
     expect(FindNewActiveQuery(Immutable.List(['foo', 'bar', 'baz']), 'bar', Immutable.List(['bar']))).toEqual('foo');
     expect(FindNewActiveQuery(Immutable.List(['foo', 'bar', 'baz']), 'foo', Immutable.List(['foo', 'baz']))).toEqual('bar');
+    expect(FindNewActiveQuery(Immutable.List(['foo', 'bar', 'baz']), 'baz', Immutable.List(['baz']))).toEqual('bar');
+    expect(FindNewActiveQuery(Immutable.List(['bar', 'baz']), 'foo', Immutable.List(['foo']))).toEqual('bar');
   });
 });
