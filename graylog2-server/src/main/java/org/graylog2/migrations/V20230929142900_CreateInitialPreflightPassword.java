@@ -19,6 +19,7 @@ package org.graylog2.migrations;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
@@ -46,24 +47,23 @@ public class V20230929142900_CreateInitialPreflightPassword extends Migration {
     @Override
     public void upgrade() {
         final DBCollection collection = mongoConnection.getDatabase().getCollection("preflight");
-        final DBObject existingConfig = collection.findOne();
 
-        if(existingConfig != null) {
-            final Object result = existingConfig.get("result");
+        final WriteResult result = collection.update(
+                new BasicDBObject("result", new BasicDBObject("$exists", true)),
+                new BasicDBObject(Map.of(
+                        "$set", new BasicDBObject("type", "preflight_result"),
+                        "$rename", new BasicDBObject("result", "value")
+                )),
+                false,
+                true);
 
-            collection.insert(new BasicDBObject(Map.of(
-                    "type", "preflight_result",
-                    "value", result
-            )));
-
-            // remove the old configuration item
-            collection.remove(new BasicDBObject("_id", existingConfig.get("_id")));
-        }
-
-        collection.insert(new BasicDBObject(Map.of(
-                "type", "preflight_password",
-                "value", RandomStringUtils.randomAlphabetic(PreflightConstants.INITIAL_PASSWORD_LENGTH)
-        )));
-
+        collection.update(
+                new BasicDBObject("type", "preflight_password"),
+                new BasicDBObject("$setOnInsert", new BasicDBObject(Map.of(
+                        "type", "preflight_password",
+                        "value", RandomStringUtils.randomAlphabetic(PreflightConstants.INITIAL_PASSWORD_LENGTH)
+                ))),
+                true,
+                false);
     }
 }

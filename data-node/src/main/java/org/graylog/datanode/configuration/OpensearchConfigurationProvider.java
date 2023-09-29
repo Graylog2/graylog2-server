@@ -76,9 +76,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     }
 
     private boolean isPreflight() {
-        final PreflightConfigResult preflightResult = preflightConfigService.getPersistedConfig()
-                .map(PreflightConfig::result)
-                .orElse(PreflightConfigResult.UNKNOWN);
+        final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
 
         // if preflight is finished, we assume that there will be some datanode registered via node-service.
         return preflightResult != PreflightConfigResult.FINISHED;

@@ -46,7 +46,9 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
+import org.graylog2.migrations.V20230929142900_CreateInitialPreflightPassword;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -194,6 +196,11 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
 
         LOG.info("Fresh installation detected, starting configuration webserver");
+
+        // run this migration explicitly here, migrations are not running
+        // before preflight but we need to adapt the structure of the preflight collection
+        new V20230929142900_CreateInitialPreflightPassword(preflightInjector.getInstance(MongoConnection.class))
+                .upgrade();
 
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
