@@ -67,6 +67,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -89,6 +90,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final PreflightConfigService preflightConfigService;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
     private final NotificationService notificationService;
+    private final ScheduledExecutorService executor;
 
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
@@ -103,6 +105,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
                                                     final PreflightConfigService preflightConfigService,
                                                     final EventBus serverEventBus,
+                                                    final @Named("daemonScheduler") ScheduledExecutorService executor,
                                                     final NotificationService notificationService) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
@@ -117,6 +120,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
+        this.executor = executor;
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -227,12 +231,14 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                         .filter(c -> DataNodeProvisioningConfig.State.STORED.equals(c.state()))
                         .forEach(c -> {
                             dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTING).build());
-                            try {
-                                checkConnectivity(c);
-                            } catch (ExecutionException | RetryException e) {
-                                LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
-                                dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
-                            }
+                            executor.schedule(() -> {
+                                try {
+                                    checkConnectivity(c);
+                                } catch (ExecutionException | RetryException e) {
+                                    LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
+                                    dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                                }
+                            }, 1, TimeUnit.SECONDS);
                         });
             }
         } catch (Exception e) {
