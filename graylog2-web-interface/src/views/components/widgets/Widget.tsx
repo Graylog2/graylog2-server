@@ -42,6 +42,7 @@ import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -194,7 +195,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   const { pathname } = useLocation();
 
   const onToggleEdit = useCallback(() => {
-    sendTelemetry('input_button_toggle', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_TOGGLED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-edit-button',
@@ -210,7 +211,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
     }
   }, [editing, pathname, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-edit-cancel-button',
@@ -223,8 +224,16 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
     onToggleEdit();
   }, [dispatch, id, oldWidget, onToggleEdit, pathname, sendTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
-  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
-  }), [dispatch, id]);
+  const onWidgetConfigChange = useCallback(async (newWidgetConfig: WidgetConfig) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'search-widget',
+      app_action_value: 'widget-edit-update-button',
+    });
+
+    return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
+    });
+  }, [dispatch, id, pathname, sendTelemetry]);
   const activeQuery = useActiveQueryId();
 
   const { config } = widget;

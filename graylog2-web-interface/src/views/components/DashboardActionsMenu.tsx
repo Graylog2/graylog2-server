@@ -43,6 +43,8 @@ import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import useHistory from 'routing/useHistory';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
 import useHotkey from 'hooks/useHotkey';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -74,6 +76,7 @@ const DashboardActionsMenu = () => {
   const [saveNewDashboardOpen, setSaveNewDashboardOpen] = useState(false);
   const [editDashboardOpen, setEditDashboardOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const sendTelemetry = useSendTelemetry();
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
@@ -88,15 +91,27 @@ const DashboardActionsMenu = () => {
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
   const modalRefs = useRef({});
   const dashboardActions = useMemo(() => pluggableDashboardActions.map(({ component: PluggableDashboardAction, key }) => (
-    <PluggableDashboardAction key={`dashboard-action-${key}`} dashboard={view} modalRef={() => modalRefs.current[key]} />
+    <PluggableDashboardAction key={`dashboard-action-${key}`}
+                              dashboard={view}
+                              modalRef={() => modalRefs.current[key]} />
   )), [pluggableDashboardActions, view]);
   const dashboardActionModals = useMemo(() => pluggableDashboardActions
     .filter(({ modal }) => !!modal)
     .map(({ modal: ActionModal, key }) => (
-      <ActionModal key={`dashboard-action-modal-${key}`} dashboard={view} ref={(r) => { modalRefs.current[key] = r; }} />
+      <ActionModal key={`dashboard-action-modal-${key}`}
+                   dashboard={view}
+                   ref={(r) => {
+                     modalRefs.current[key] = r;
+                   }} />
     )), [pluggableDashboardActions, view]);
 
   const _onSaveNewDashboard = useCallback(async (newDashboard: View) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED, {
+      app_pathname: 'dashboard',
+      app_section: 'dashboard',
+      app_action_value: 'dashboard-save-new',
+    });
+
     const isViewDuplication = !!view.id;
 
     if (isViewDuplication) {
@@ -106,9 +121,25 @@ const DashboardActionsMenu = () => {
     }
 
     return dispatch(onSaveNewDashboard(newDashboard, history));
-  }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, view.id]);
-  const _onSaveView = useCallback(() => dispatch(OnSaveViewAction(view)), [dispatch, view]);
-  const _onUpdateView = useCallback((updatedView: View) => dispatch(updateView(updatedView)), [dispatch]);
+  }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id]);
+  const _onSaveView = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_SAVED, {
+      app_pathname: 'dashboard',
+      app_section: 'dashboard',
+      app_action_value: 'dashboard-save',
+    });
+
+    return dispatch(OnSaveViewAction(view));
+  }, [dispatch, sendTelemetry, view]);
+  const _onUpdateView = useCallback((updatedView) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_UPDATED, {
+      app_pathname: 'dashboard',
+      app_section: 'dashboard',
+      app_action_value: 'dashboard-update',
+    });
+
+    return dispatch(updateView(updatedView));
+  }, [dispatch, sendTelemetry]);
 
   useHotkey({
     actionKey: 'save',
@@ -139,7 +170,10 @@ const DashboardActionsMenu = () => {
                      disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       )}
       {showDropDownButton && (
-        <DropdownButton title={<Icon name="ellipsis-h" title="More Actions" />} id="query-tab-actions-dropdown" pullRight noCaret>
+        <DropdownButton title={<Icon name="ellipsis-h" title="More Actions" />}
+                        id="query-tab-actions-dropdown"
+                        pullRight
+                        noCaret>
           {dashboardActions.length > 0 && (
             <>
               {dashboardActions}
@@ -174,11 +208,11 @@ const DashboardActionsMenu = () => {
       )}
 
       {shareDashboardOpen && (
-      <EntityShareModal entityId={view.id}
-                        entityType="dashboard"
-                        entityTitle={view.title}
-                        description="Search for a User or Team to add as collaborator on this dashboard."
-                        onClose={() => setShareViewOpen(false)} />
+        <EntityShareModal entityId={view.id}
+                          entityType="dashboard"
+                          entityTitle={view.title}
+                          description="Search for a User or Team to add as collaborator on this dashboard."
+                          onClose={() => setShareViewOpen(false)} />
       )}
       {exportOpen && <ExportModal view={view} closeModal={() => setExportOpen(false)} />}
       {dashboardActionModals}

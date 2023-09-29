@@ -39,7 +39,7 @@ type FieldElementProps = {
 };
 
 const FieldElement = styled.span.attrs({
-  className: 'field-element' /* stylelint-disable-line property-no-unknown*/
+  className: 'field-element', /* stylelint-disable-line property-no-unknown */
 })<FieldElementProps>(({ $active, $disabled, theme }) => css`
   color: ${$active ? theme.colors.variant.info : 'currentColor'};
   opacity: ${$disabled ? '0.3' : '1'};
@@ -47,7 +47,11 @@ const FieldElement = styled.span.attrs({
 
 const FieldActions = ({ children, disabled, element, menuContainer, name, type, queryId }: Props) => {
   const actionContext = useContext(ActionContext);
-  const wrappedElement = ({ active }: { active: boolean }) => <FieldElement $active={active} $disabled={disabled}>{element}</FieldElement>;
+  const wrappedElement = ({ active }: { active: boolean }) => (
+    <FieldElement $active={active}
+                  $disabled={disabled}>{element}
+    </FieldElement>
+  );
   const handlerArgs = { queryId, field: name, type, contexts: actionContext };
 
   return (

@@ -25,17 +25,38 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootst
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
+  const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
+
+  const sendEvent = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_section: 'search-message-table',
+      app_action_value: 'seach-message-table-test-against-stream',
+    });
+  };
+
   const streamList = streams.map((stream) => {
     if (stream.is_default) {
-      return <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>;
+      return (
+        <MenuItem key={stream.id}
+                  onClick={() => sendEvent()}
+                  disabled
+                  title="Cannot test against the default stream">{stream.title}
+        </MenuItem>
+      );
     }
 
     return (
       <LinkContainer key={stream.id}
                      to={Routes.stream_edit_example(stream.id, index, id)}>
-        <MenuItem>{stream.title}</MenuItem>
+        <MenuItem onClick={() => sendEvent()}>{stream.title}</MenuItem>
       </LinkContainer>
     );
   });
@@ -99,7 +120,8 @@ const MessageActions = ({
                              messageFields={remainingFields} />
   );
 
-  const showChanges = decorationStats && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
+  const showChanges = decorationStats
+    && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
 
   return (
     <ButtonGroup bsSize="small">

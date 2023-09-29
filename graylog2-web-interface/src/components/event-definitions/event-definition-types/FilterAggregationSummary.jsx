@@ -122,8 +122,8 @@ class FilterAggregationSummary extends React.Component {
     const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
 
-    const effectiveStreamIds = streams.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
-    const streamIdsWithMissingPermission = streams.filter((s) => !effectiveStreamIds.includes(s));
+    const effectiveStreamIds = streams?.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
+    const streamIdsWithMissingPermission = streams?.filter((s) => !effectiveStreamIds.includes(s));
 
     const validationResults = validateExpression(conditions.expression, series);
 
