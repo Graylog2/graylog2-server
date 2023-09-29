@@ -435,6 +435,18 @@
                 <artifactId>auto-value-javabean</artifactId>
                 <version>${auto-value-javabean.version}</version>
             </dependency>
+
+            <!-- Management for transitive dependencies to satisfy the requireUpperBoundDeps rule of the
+                 enforcer plugin. Before bumping any of these managed versions, check if the management is
+                 still required or if it can be removed by updating the dependency that is pulling in the
+                 conflicting version. -->
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.28.0-GA</version>
+            </dependency>
+            <!-- End management of transitive dependencies for requireUpperBoundDeps -->
+
         </dependencies>
     </dependencyManagement>
 
