@@ -143,6 +143,7 @@
         <joda-time.version>2.12.5</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-path.version>2.8.0</json-path.version>
+        <jakarta-annontations.version>1.3.5</jakarta-annontations.version>
         <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
         <kafka.version>3.5.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
@@ -383,6 +384,11 @@
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>jsr305</artifactId>
                 <version>${findbugs-jsr305.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta-annontations.version}</version>
             </dependency>
 
             <!-- test -->
