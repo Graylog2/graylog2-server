@@ -121,7 +121,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             return new OpensearchConfiguration(
                     datanodeConfiguration.opensearchDistribution().directory(),
                     opensearchConfigLocation,
-                    localConfiguration.getHttpBindAddress().getHost(),
+                    localConfiguration.getBindAddress(),
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
@@ -145,8 +145,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
         config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
 
-        // listen on all interfaces
-        config.put("network.bind_host", "0.0.0.0");
+        config.put("network.bind_host", localConfiguration.getBindAddress());
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
         // Uncomment the following line to get DEBUG logs for the underlying Opensearch
