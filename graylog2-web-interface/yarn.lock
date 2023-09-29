@@ -2518,10 +2518,10 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@graylog/sawmill@2.0.6":
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.6.tgz#c8a293cd7ecb3e76b1da7bb4c405b69cef8d36ce"
-  integrity sha512-9dnDvQK1Ivw/pdGb0451aCBn/hKSLN8AKcT9aFkwZa+8P1ZOqJzSaVhZG4EghQdVG884RUFuP9ouKHzMgLYp9A==
+"@graylog/sawmill@2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.7.tgz#f3f10674648ff9681f8d6a17b7aee01dba6f3a71"
+  integrity sha512-bwpVsgj47Pi7xzsOwt6UNbwy9GFxnQG3YsHKLCRmLw8G0BsQMuhPO4CUrr4cCl/AYevuhsXc7KKNDUTK/3DJkw==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
@@ -8998,7 +8998,7 @@ graphemer@^1.4.0:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "5.2.0-SNAPSHOT"
   dependencies:
-    "@graylog/sawmill" "2.0.6"
+    "@graylog/sawmill" "2.0.7"
     "@tanstack/react-query" "4.35.3"
     "@types/create-react-class" "15.6.4"
     "@types/jquery" "3.5.20"
