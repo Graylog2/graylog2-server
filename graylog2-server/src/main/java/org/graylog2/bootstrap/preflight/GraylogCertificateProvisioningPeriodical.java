@@ -241,6 +241,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     }
 
     private void checkConnectivity(final DataNodeProvisioningConfig config) throws ExecutionException, RetryException {
+        LOG.info("Starting connectivity check with node {}", config.nodeId());
         final var counter = new AtomicInteger(0);
         final var nodeId = config.nodeId();
         RetryerBuilder.<String>newBuilder()
@@ -257,7 +258,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 .build()
                 .call(() -> {
                     try {
-                        LOG.info("Starting connectivity check with node {}", nodeId);
                         final var node = nodeService.byNodeId(nodeId);
                         Request request = new Request.Builder().url(node.getTransportAddress()).build();
                         if (okHttpClient.isPresent()) {
@@ -267,6 +267,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             try (Response response = call.execute()) {
                                 if (response.isSuccessful()) {
                                     dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTED).build());
+                                    LOG.info("Connectivity check successful with node {}", nodeId);
                                     return "true";
                                 }
                                 return "false";
