@@ -91,7 +91,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
-        <Input label="New Field Type:">
+        <Input label="New Field Type:" id="new-field-type">
           <StyledSelect inputId="field_type"
                         options={fieldTypeOptions}
                         value={newFieldType}
