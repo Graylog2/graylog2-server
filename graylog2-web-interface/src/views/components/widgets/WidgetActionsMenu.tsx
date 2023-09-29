@@ -47,6 +47,7 @@ import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -158,7 +159,7 @@ const WidgetActionsMenu = ({
   const { parameters, parameterBindings } = useParameters();
 
   const onDuplicate = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-duplicate-button',
@@ -167,7 +168,7 @@ const WidgetActionsMenu = ({
     return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
   }, [sendTelemetry, pathname, dispatch, widget.id, unsetWidgetFocusing, title]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-copy-to-dashboard-button',
@@ -176,7 +177,7 @@ const WidgetActionsMenu = ({
     return _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history);
   }, [history, pathname, sendTelemetry, view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.MOVE, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-move-button',
@@ -185,7 +186,7 @@ const WidgetActionsMenu = ({
     return _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy);
   }, [dispatch, pathname, sendTelemetry, view]);
   const onDelete = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DELETED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-delete-button',
@@ -194,7 +195,7 @@ const WidgetActionsMenu = ({
     return dispatch(_onDelete(widget, view, title));
   }, [dispatch, pathname, sendTelemetry, title, view, widget]);
   const focusWidget = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.FOCUSED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-focus-button',

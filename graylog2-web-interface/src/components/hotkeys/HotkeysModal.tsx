@@ -154,6 +154,7 @@ const HotkeysModal = ({ onToggle }: Props) => {
   return (
     <Modal onHide={onToggle}
            show
+           title="Keyboard shortcuts"
            bsSize="large">
       <Modal.Header closeButton>
         <Modal.Title>Keyboard shortcuts</Modal.Title>
