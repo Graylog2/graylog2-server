@@ -253,7 +253,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
       const tabTitle = (
         <QueryTitle active={id === activeQueryId}
                     id={id}
-                    onClose={() => onRemove(id)}
+                    onRemove={() => onRemove(id)}
                     openEditModal={openTitleEditModal}
                     openCopyToDashboardModal={toggleCopyToDashboardModal}
                     allowsClosing={queries.size > 1}
@@ -336,9 +336,9 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
       {showConfigurationModal && (
         <AdaptableQueryTabsConfiguration show={showConfigurationModal}
                                          setShow={setShowConfigurationModal}
+                                         dashboardId={dashboardId}
                                          queriesList={currentTabs.queriesList}
-                                         activeQueryId={activeQueryId}
-                                         dashboardId={dashboardId} />
+                                         activeQueryId={activeQueryId} />
       )}
       {showCopyToDashboardModal && (
         <CopyToDashboardForm onSubmit={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}

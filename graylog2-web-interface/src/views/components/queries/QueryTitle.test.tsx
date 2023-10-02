@@ -62,7 +62,7 @@ describe('QueryTitle', () => {
       <QueryTitle active
                   id="query-id-1"
                   openEditModal={() => {}}
-                  onClose={() => Promise.resolve()}
+                  onRemove={() => Promise.resolve()}
                   title="Foo"
                   openCopyToDashboardModal={() => {}}
                   {...props} />
