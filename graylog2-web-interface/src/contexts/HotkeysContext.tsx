@@ -48,6 +48,7 @@ export type Options = {
   enableOnFormTags?: readonly FormTags[] | boolean // Enable hotkeys on a list of tags. (Default: false)
   enableOnContentEditable?: boolean // Enable hotkeys on tags with contentEditable props. (Default: false)
   preventDefault?: Trigger // Prevent default browser behavior? (Default: false)
+  displayInOverview?: boolean
 }
 export type ActiveHotkey = {
   options?: Options & { scope: ScopeName },
