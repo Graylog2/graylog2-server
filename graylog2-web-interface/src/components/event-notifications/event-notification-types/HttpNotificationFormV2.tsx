@@ -106,17 +106,17 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
   };
 
   handleMethodChange = (nextValue: string) => {
+    const { config, onChange } = this.props;
+    const nextConfig = cloneDeep(config);
+    nextConfig['method'] = nextValue;
     if (nextValue === 'GET') {
-      const { config, onChange } = this.props;
-      const nextConfig = cloneDeep(config);
-
-      nextConfig['method'] = nextValue;
+      nextConfig['body_template'] = null;
+      nextConfig['content_type'] = null;
+    } else if (config.method === 'GET') {
+      nextConfig['content_type'] = 'JSON';
       nextConfig['body_template'] = '';
-      nextConfig['content_type'] = '';
-      onChange(nextConfig);
-    } else {
-      this.propagateChange('method', nextValue);
     }
+    onChange(nextConfig);
   };
 
   handleContentTypeChange = (nextValue: string) => {
@@ -275,6 +275,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                    label={<>Time zone for date/time values</>}>
               <TimezoneSelect className="timezone-select"
                               name="time_zone"
+                              disabled={config.method === 'GET'}
                               value={config.time_zone}
                               clearable={false}
                               onChange={this.handleTimeZoneChange} />
@@ -283,19 +284,20 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
         </Row>
         <Row>
           <Col md={12}>
+            {config.method !== 'GET' && (
             <FormGroup controlId="notification-body-template"
-                       validationState={validation.errors.body ? 'error' : null}>
+                       validationState={validation.errors.body_template ? 'error' : null}>
               <ControlLabel>Body Template</ControlLabel>
               <SourceCodeEditor id="notification-body-template"
                                 mode="text"
                                 theme="light"
                                 value={config.body_template || ''}
-                                readOnly={config.method === 'GET'}
                                 onChange={this.handleJsonBodyTemplateChange} />
               <HelpBlock>
                 {get(validation, 'errors.body_template[0]', helpElement)}
               </HelpBlock>
             </FormGroup>
+            )}
           </Col>
         </Row>
       </>

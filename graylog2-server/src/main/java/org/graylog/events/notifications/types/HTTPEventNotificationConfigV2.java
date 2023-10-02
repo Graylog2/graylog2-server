@@ -120,6 +120,9 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
         if (!Strings.isNullOrEmpty(apiKey()) && (apiSecret() == null || (!apiSecret().isSet()) && !apiSecret().isKeepValue())) {
             validation.addError(FIELD_API_SECRET, "HTTP Notification cannot specify API key without API secret");
         }
+        if (!httpMethod().equals(HttpMethod.GET) && contentType() == null) {
+            validation.addError(FIELD_CONTENT_TYPE, "Content Type must not be null for PUT/POST methods.");
+        }
 
         return validation;
     }
@@ -198,14 +201,17 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
 
     @Override
     public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        // TODO: Clean this up
-        return HttpEventNotificationConfigV2Entity.builder()
+        HttpEventNotificationConfigV2Entity.Builder builder = HttpEventNotificationConfigV2Entity.builder()
                 .url(ValueReference.of(url()))
                 .skipTLSVerification(ValueReference.of(skipTLSVerification()))
                 .httpMethod(ValueReference.of(httpMethod()))
-                .timeZone(ValueReference.of(timeZone()))
-                .contentType(ValueReference.of(contentType()))
-                .bodyTemplate(ValueReference.of(bodyTemplate()))
-                .build();
+                .timeZone(ValueReference.of(timeZone()));
+        if (contentType() != null) {
+            builder.contentType(ValueReference.of(contentType()));
+            if (bodyTemplate() != null) {
+                builder.bodyTemplate(ValueReference.of(bodyTemplate()));
+            }
+        }
+        return builder.build();
     }
 }

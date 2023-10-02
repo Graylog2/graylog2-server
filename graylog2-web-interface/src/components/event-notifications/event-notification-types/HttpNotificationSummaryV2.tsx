@@ -32,6 +32,18 @@ const HttpNotificationSummaryV2 = ({ type, notification, definitionNotification 
       <td>URL</td>
       <td><code>{notification.config.url}</code></td>
     </tr>
+    <tr>
+      <td>Method</td>
+      <td><code>{notification.config.method}</code></td>
+    </tr>
+    <tr>
+      <td>Content Type</td>
+      <td><code>{notification.config.content_type}</code></td>
+    </tr>
+    <tr>
+      <td>Body Template</td>
+      <td><code>{notification.config.body_template}</code></td>
+    </tr>
   </CommonNotificationSummary>
 );
 

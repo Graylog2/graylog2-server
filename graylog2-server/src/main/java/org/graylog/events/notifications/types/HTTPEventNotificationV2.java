@@ -166,7 +166,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
             body = objectMapper.writeValueAsString(modelData);
         }
         return config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA) ?
-                URLEncoder.encode(body, StandardCharsets.UTF_8) : body;
+                URLEncoder.encode(body, StandardCharsets.UTF_8).replaceAll("\\+", "%20") : body;
     }
 
 }
