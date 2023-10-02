@@ -64,6 +64,7 @@ public class PreflightConfigServiceImpl implements PreflightConfigService {
         final DBObject doc = getCollection().findOne(new BasicDBObject("type", "preflight_password"));
         return Optional.ofNullable(doc)
                 .map(d -> (String) d.get("value"))
-                .orElseThrow(() -> new IllegalStateException("Initial password should be present in the DB, inconsistent state"));
+                .orElseThrow(() -> new IllegalStateException("Initial password should be automatically present in the DB, " +
+                        "this is an inconsistent state. Please report the problem to Graylog."));
     }
 }

@@ -45,6 +45,11 @@ public class V20230929142900_CreateInitialPreflightPassword extends Migration {
     }
 
     @Override
+    public MigrationType migrationType() {
+        return MigrationType.PREFLIGHT;
+    }
+
+    @Override
     public void upgrade() {
         final DBCollection collection = mongoConnection.getDatabase().getCollection("preflight");
 

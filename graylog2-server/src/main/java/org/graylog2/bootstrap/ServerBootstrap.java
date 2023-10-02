@@ -48,6 +48,7 @@ import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
+import org.graylog2.migrations.MigrationType;
 import org.graylog2.migrations.V20230929142900_CreateInitialPreflightPassword;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
@@ -197,10 +198,15 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         LOG.info("Fresh installation detected, starting configuration webserver");
 
-        // run this migration explicitly here, migrations are not running
-        // before preflight but we need to adapt the structure of the preflight collection
-        new V20230929142900_CreateInitialPreflightPassword(preflightInjector.getInstance(MongoConnection.class))
-                .upgrade();
+
+        try {
+            if (configuration.isLeader() && configuration.runMigrations()) {
+                runMigrations(MigrationType.PREFLIGHT);
+            }
+        } catch (Exception e) {
+            LOG.error("Exception while running migrations", e);
+            System.exit(1);
+        }
 
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
@@ -300,7 +306,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         try {
             if (configuration.isLeader() && configuration.runMigrations()) {
-                runMigrations();
+                runMigrations(MigrationType.STANDARD);
             }
         } catch (Exception e) {
             LOG.error("Exception while running migrations", e);
@@ -367,14 +373,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
     }
 
-    public void runMigrations() {
+    public void runMigrations(MigrationType migrationType) {
         //noinspection unchecked
         final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
         Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
 
         LOG.info("Running {} migrations...", migrations.size());
 
-        ImmutableSortedSet.copyOf(migrations).forEach(m -> {
+        ImmutableSortedSet.copyOf(migrations).stream().filter(m -> m.migrationType() == migrationType).forEach(m -> {
             LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());
             try {
                 m.upgrade();
