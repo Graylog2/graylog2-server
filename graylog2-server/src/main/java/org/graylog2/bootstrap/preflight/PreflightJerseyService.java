@@ -26,7 +26,6 @@ import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
@@ -64,11 +63,12 @@ public class PreflightJerseyService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PreflightJerseyService.class);
 
     private final HttpConfiguration configuration;
-    private final BasicAuthFilter basicAuthFilter;
     private final Set<Class<?>> systemRestResources;
 
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
+    private final Configuration localConfiguration;
+    private final PreflightConfigService preflightConfigService;
 
     private HttpServer apiHttpServer = null;
 
@@ -80,20 +80,11 @@ public class PreflightJerseyService extends AbstractIdleService {
                                   MetricRegistry metricRegistry,
                                   PreflightConfigService preflightConfigService) {
         this.configuration = requireNonNull(httpConfiguration, "configuration");
-        this.basicAuthFilter = createBasicAuthFilter(localConfiguration, requireNonNull(preflightConfigService, "preflightConfigService"));
+        this.localConfiguration = requireNonNull(localConfiguration, "localConfiguration");
+        this.preflightConfigService = requireNonNull(preflightConfigService, "preflightConfigService");
         this.systemRestResources = systemRestResources;
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
-    }
-
-    @NotNull
-    private BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration, PreflightConfigService preflightConfigService) {
-        final String username = localConfiguration.getRootUsername();
-        final String preflightPassword = preflightConfigService.getPreflightPassword();
-        LOG.info("========================================================");
-        LOG.info("Preflight web interface accessible with username '{}' and password '{}'", username, preflightPassword);
-        LOG.info("=======================");
-        return new BasicAuthFilter(username, DigestUtils.sha256Hex(preflightPassword), "preflight-config");
     }
 
     @Override
@@ -146,8 +137,7 @@ public class PreflightJerseyService extends AbstractIdleService {
     }
 
     private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {
-
-        final ResourceConfig rc = new ResourceConfig()
+        return new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
@@ -167,9 +157,17 @@ public class PreflightJerseyService extends AbstractIdleService {
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
                 .registerResources(additionalResources)
-                .register(basicAuthFilter);
+                .register(createBasicAuthFilter(localConfiguration, preflightConfigService));
+    }
 
-        return rc;
+    @NotNull
+    private BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration, PreflightConfigService preflightConfigService) {
+        final String username = localConfiguration.getRootUsername();
+        final String preflightPassword = preflightConfigService.getPreflightPassword();
+        LOG.info("========================================================");
+        LOG.info("Preflight web interface accessible with username '{}' and password '{}'", username, preflightPassword);
+        LOG.info("========================================================");
+        return new BasicAuthFilter(username, DigestUtils.sha256Hex(preflightPassword), "preflight-config");
     }
 
     private Map<String, MediaType> mediaTypeMappings() {
