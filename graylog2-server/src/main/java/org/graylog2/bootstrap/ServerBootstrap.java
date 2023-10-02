@@ -41,6 +41,7 @@ import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
@@ -195,6 +196,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Fresh installation detected, starting configuration webserver");
 
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
+        final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
         try {
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears
@@ -212,7 +214,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             // give the leader node a headstart on resume so it can take care of mongo-collections etc.
             // and we prevent problems that occured if all nodes started exactly at the same time
-            if (!configuration.isLeader())
+            if (!leaderElectionService.isLeader())
             {
                 Thread.sleep(5000);
             }
