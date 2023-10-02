@@ -26,6 +26,8 @@ import queryTitle from 'views/logic/queries/QueryTitle';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export type UntypedBigDisplayModeQuery = {
   interval?: string,
@@ -148,7 +150,16 @@ const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const history = useHistory();
-  const onSave = (config: Configuration) => redirectToBigDisplayMode(history, view, createQueryFromConfiguration(config, view), unsetWidgetFocusing);
+  const sendTelemetry = useSendTelemetry();
+
+  const onSave = (config: Configuration) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_FULL_SCREEN_MODE_STARTED, {
+      app_pathname: 'dashboard',
+      app_section: 'dashboard-menu',
+    });
+
+    redirectToBigDisplayMode(history, view, createQueryFromConfiguration(config, view), unsetWidgetFocusing);
+  };
 
   return (
     <>

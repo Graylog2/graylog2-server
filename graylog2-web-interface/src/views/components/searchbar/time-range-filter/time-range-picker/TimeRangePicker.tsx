@@ -37,6 +37,9 @@ import type { DateTime } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RelativeTimeRangeClassified } from './types';
 import {
@@ -153,6 +156,7 @@ const TimeRangePicker = ({
   const { formatTime, userTimezone } = useUserDateTime();
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
   const positionIsBottom = position === 'bottom';
 
   const handleNoOverride = useCallback(() => {
@@ -163,12 +167,12 @@ const TimeRangePicker = ({
   const handleCancel = useCallback(() => {
     toggleDropdownShow();
 
-    sendTelemetry('click', {
-      app_pathname: 'search',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_CANCELED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-time-range-cancel-button',
     });
-  }, [sendTelemetry, toggleDropdownShow]);
+  }, [location.pathname, sendTelemetry, toggleDropdownShow]);
 
   const handleSubmit = useCallback(({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => {
     const normalizedTimeRange = normalizeFromPickerForSearchBar(timeRangeTabs[activeTab]);
@@ -177,12 +181,15 @@ const TimeRangePicker = ({
 
     toggleDropdownShow();
 
-    sendTelemetry('click', {
-      app_pathname: 'search',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_UPDATED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-time-range-confirm-button',
+      event_details: {
+        timerange: normalizedTimeRange,
+      },
     });
-  }, [sendTelemetry, setCurrentTimeRange, toggleDropdownShow]);
+  }, [location.pathname, sendTelemetry, setCurrentTimeRange, toggleDropdownShow]);
 
   const title = (
     <PopoverTitle>
@@ -196,7 +203,10 @@ const TimeRangePicker = ({
     </PopoverTitle>
   );
 
-  const _validateTimeRange = useCallback(({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => dateTimeValidate(timeRangeTabs[activeTab], limitDuration, formatTime), [formatTime, limitDuration]);
+  const _validateTimeRange = useCallback(({
+    timeRangeTabs,
+    activeTab,
+  }: TimeRangePickerFormValues) => dateTimeValidate(timeRangeTabs[activeTab], limitDuration, formatTime), [formatTime, limitDuration]);
   const initialValues = useMemo(() => initialFormValues(currentTimeRange), [currentTimeRange]);
 
   return (

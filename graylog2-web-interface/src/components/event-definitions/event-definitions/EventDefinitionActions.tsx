@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
 import {
@@ -33,8 +32,12 @@ import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import UserNotification from 'util/UserNotification';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -75,6 +78,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
+  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
@@ -91,31 +95,60 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   };
 
   const handleAction = (action, definition) => {
-    sendTelemetry('click', {
-      app_pathname: 'event-definition',
-      app_action_value: `event-definition-action-${action}`,
-    });
-
     switch (action) {
       case DIALOG_TYPES.COPY:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_COPY_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-row',
+          app_action_value: 'copy-menuitem',
+        });
+
         updateState({ show: true, type: DIALOG_TYPES.COPY, definition });
 
         break;
       case DIALOG_TYPES.DELETE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_DELETE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-row',
+          app_action_value: 'delete-menuitem',
+        });
+
         updateState({ show: true, type: DIALOG_TYPES.DELETE, definition });
 
         break;
       case DIALOG_TYPES.ENABLE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_ENABLE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-row',
+          app_action_value: 'enable-menuitem',
+        });
+
         updateState({ show: true, type: DIALOG_TYPES.ENABLE, definition });
 
         break;
       case DIALOG_TYPES.DISABLE:
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_DISABLE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-row',
+          app_action_value: 'disable-menuitem',
+        });
+
         updateState({ show: true, type: DIALOG_TYPES.DISABLE, definition });
 
         break;
       default:
         break;
     }
+  };
+
+  const handleShare = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_SHARE_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-list',
+      app_action_value: 'share-button',
+    });
+
+    setShowEntityShareModal(true);
   };
 
   const handleClearState = () => {
@@ -172,7 +205,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
       <ButtonToolbar key={`actions-${eventDefinition.id}`}>
         <ShareButton entityId={eventDefinition.id}
                      entityType="event_definition"
-                     onClick={() => setShowEntityShareModal(true)}
+                     onClick={handleShare}
                      bsSize="xsmall" />
         <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
                                buttonTitle={MORE_ACTIONS_HOVER_TITLE}
