@@ -89,7 +89,7 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.9.0-1</opensearch.shaded.version>
         <airline.version>2.9.0</airline.version>
-        <amqp-client.version>5.8.0</amqp-client.version>
+        <amqp-client.version>5.19.0</amqp-client.version>
         <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -154,7 +154,7 @@
         <mongojack.version>2.10.1.3</mongojack.version>
         <mongojack4.version>4.8.0-1</mongojack4.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.97.Final</netty.version>
+        <netty.version>4.1.99.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.61.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.11.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -815,11 +815,54 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
+                        <!--
+                          We disabled checks that don't apply to us because we either don't use the platform or
+                          library. (e.g., Android, Flogger) Disabling those checks improves compile times.
+                          See available bug patterns: https://errorprone.info/bugpatterns
+                        -->
                         <arg>
                             -Xplugin:ErrorProne
                             -Xep:DoNotMock:WARN
                             -XepDisableWarningsInGeneratedCode
                             -XepExcludedPaths:.*/target/generated-sources/.*
+                            -Xep:AndroidInjectionBeforeSuper:OFF
+                            -Xep:BugPatternNaming:OFF
+                            -Xep:BundleDeserializationCast:OFF
+                            -Xep:DaggerProvidesNull:OFF
+                            -Xep:FloggerArgumentToString:OFF
+                            -Xep:FloggerFormatString:OFF
+                            -Xep:FloggerLogString:OFF
+                            -Xep:FloggerLogVarargs:OFF
+                            -Xep:FloggerLogWithCause:OFF
+                            -Xep:FloggerMessageFormat:OFF
+                            -Xep:FloggerRedundantIsEnabled:OFF
+                            -Xep:FloggerRequiredModifiers:OFF
+                            -Xep:FloggerSplitLogStatement:OFF
+                            -Xep:FloggerStringConcatenation:OFF
+                            -Xep:FloggerWithCause:OFF
+                            -Xep:FloggerWithoutCause:OFF
+                            -Xep:FragmentInjection:OFF
+                            -Xep:FragmentNotInstantiable:OFF
+                            -Xep:ICCProfileGetInstance:OFF
+                            -Xep:IsLoggableTagLength:OFF
+                            -Xep:JUnit3FloatingPointComparisonWithoutDelta:OFF
+                            -Xep:JUnit3TestNotRun:OFF
+                            -Xep:JUnit4ClassUsedInJUnit3:OFF
+                            -Xep:JUnitAmbiguousTestClass:OFF
+                            -Xep:MislabeledAndroidString:OFF
+                            -Xep:MissingRefasterAnnotation:OFF
+                            -Xep:OutlineNone:OFF
+                            -Xep:ParcelableCreator:OFF
+                            -Xep:RectIntersectReturnValueIgnored:OFF
+                            -Xep:RobolectricShadowDirectlyOn:OFF
+                            -Xep:StringCaseLocaleUsage:OFF
+                            -Xep:SwigMemoryLeak:OFF
+                            -Xep:DefaultCharset:ERROR
+                            -Xep:DoubleCheckedLocking:ERROR
+                            -Xep:InconsistentHashCode:ERROR
+                            -Xep:IncrementInForLoopAndHeader:ERROR
+                            -Xep:NonAtomicVolatileUpdate:ERROR
+                            -Xep:PrimitiveAtomicReference:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>

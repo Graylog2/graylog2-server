@@ -51,7 +51,7 @@ public class IndexSetFieldTypeSummaryService {
             EntityAttribute.builder().id(INDEX_SET_ID).title("Index Set Id").hidden(true).sortable(true).build(),
             EntityAttribute.builder().id(INDEX_SET_TITLE).title("Index Set Title").sortable(true).build(),
             EntityAttribute.builder().id(STREAM_TITLES).title("Stream Titles").sortable(false).build(),
-            EntityAttribute.builder().id(FIELD_TYPE_HISTORY).title("Field Type History").sortable(false).build()
+            EntityAttribute.builder().id(FIELD_TYPE_HISTORY).title("Current Types").sortable(false).build()
     );
 
     private final IndexFieldTypesService indexFieldTypesService;
