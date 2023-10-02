@@ -138,7 +138,8 @@ const DashboardActionsMenu = () => {
                              openSaveAsModal={() => setSaveNewDashboardOpen(true)} />
       )}
       {showSaveNewButton && (
-        <SaveAsDashboardButton onClick={() => setSaveNewDashboardOpen(true)} />
+        <SaveAsDashboardButton onClick={() => setSaveNewDashboardOpen(true)}
+                               openSaveAsModal={() => setSaveNewDashboardOpen(true)} />
       )}
       {showShareButton && (
         <ShareButton entityType="dashboard"

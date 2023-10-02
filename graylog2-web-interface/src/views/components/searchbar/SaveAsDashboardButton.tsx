@@ -19,22 +19,32 @@ import React from 'react';
 
 import Button from 'components/bootstrap/Button';
 import { Icon } from 'components/common';
+import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredParameters';
+import useHotkey from 'hooks/useHotkey';
 
 type Props = {
-  disabled?: boolean,
   onClick: () => void,
+  openSaveAsModal: () => void,
 }
 
-const SaveAsDashboardButton = ({ disabled, onClick }: Props) => (
-  <Button onClick={onClick}
-          disabled={disabled}
-          title="Save as new dashboard">
-    <Icon name="copy" /> Save as
-  </Button>
-);
+const SaveAsDashboardButton = ({ onClick, openSaveAsModal }: Props) => {
+  const hasUndeclaredParameters = useHasUndeclaredParameters();
 
-SaveAsDashboardButton.defaultProps = {
-  disabled: false,
+  useHotkey({
+    actionKey: 'save-as',
+    callback: () => openSaveAsModal(),
+    scope: 'dashboard',
+    telemetryAppPathname: 'search',
+    options: { enabled: !hasUndeclaredParameters },
+  });
+
+  return (
+    <Button onClick={onClick}
+            disabled={hasUndeclaredParameters}
+            title="Save as new dashboard">
+      <Icon name="copy" /> Save as
+    </Button>
+  );
 };
 
 export default SaveAsDashboardButton;
