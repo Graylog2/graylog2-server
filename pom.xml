@@ -783,11 +783,54 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
+                        <!--
+                          We disabled checks that don't apply to us because we either don't use the platform or
+                          library. (e.g., Android, Flogger) Disabling those checks improves compile times.
+                          See available bug patterns: https://errorprone.info/bugpatterns
+                        -->
                         <arg>
                             -Xplugin:ErrorProne
                             -Xep:DoNotMock:WARN
                             -XepDisableWarningsInGeneratedCode
                             -XepExcludedPaths:.*/target/generated-sources/.*
+                            -Xep:AndroidInjectionBeforeSuper:OFF
+                            -Xep:BugPatternNaming:OFF
+                            -Xep:BundleDeserializationCast:OFF
+                            -Xep:DaggerProvidesNull:OFF
+                            -Xep:FloggerArgumentToString:OFF
+                            -Xep:FloggerFormatString:OFF
+                            -Xep:FloggerLogString:OFF
+                            -Xep:FloggerLogVarargs:OFF
+                            -Xep:FloggerLogWithCause:OFF
+                            -Xep:FloggerMessageFormat:OFF
+                            -Xep:FloggerRedundantIsEnabled:OFF
+                            -Xep:FloggerRequiredModifiers:OFF
+                            -Xep:FloggerSplitLogStatement:OFF
+                            -Xep:FloggerStringConcatenation:OFF
+                            -Xep:FloggerWithCause:OFF
+                            -Xep:FloggerWithoutCause:OFF
+                            -Xep:FragmentInjection:OFF
+                            -Xep:FragmentNotInstantiable:OFF
+                            -Xep:ICCProfileGetInstance:OFF
+                            -Xep:IsLoggableTagLength:OFF
+                            -Xep:JUnit3FloatingPointComparisonWithoutDelta:OFF
+                            -Xep:JUnit3TestNotRun:OFF
+                            -Xep:JUnit4ClassUsedInJUnit3:OFF
+                            -Xep:JUnitAmbiguousTestClass:OFF
+                            -Xep:MislabeledAndroidString:OFF
+                            -Xep:MissingRefasterAnnotation:OFF
+                            -Xep:OutlineNone:OFF
+                            -Xep:ParcelableCreator:OFF
+                            -Xep:RectIntersectReturnValueIgnored:OFF
+                            -Xep:RobolectricShadowDirectlyOn:OFF
+                            -Xep:StringCaseLocaleUsage:OFF
+                            -Xep:SwigMemoryLeak:OFF
+                            -Xep:DefaultCharset:ERROR
+                            -Xep:DoubleCheckedLocking:ERROR
+                            -Xep:InconsistentHashCode:ERROR
+                            -Xep:IncrementInForLoopAndHeader:ERROR
+                            -Xep:NonAtomicVolatileUpdate:ERROR
+                            -Xep:PrimitiveAtomicReference:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
