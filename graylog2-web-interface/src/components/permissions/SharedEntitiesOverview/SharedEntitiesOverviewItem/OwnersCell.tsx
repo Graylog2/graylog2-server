@@ -16,7 +16,6 @@
  */
 
 import * as React from 'react';
-import type { List } from 'immutable';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import type Grantee from 'logic/permissions/Grantee';
@@ -24,7 +23,7 @@ import { Link } from 'components/common/router';
 import { defaultCompare } from 'logic/DefaultCompare';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
-import { getShowRouteFromGRN } from 'logic/permissions/GRN';
+import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
 type Props = {
   owners: GranteesList,
@@ -36,36 +35,41 @@ const assertUnreachable = (type: 'error'): never => {
   throw new Error(`Owner of entity has not supported type: ${type}`);
 };
 
-const _getOwnerTitle = ({ type, id, title }: Grantee, userPermissions: List<string>) => {
+type OwnerTitleProps = {
+  owner: Grantee
+}
+
+const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
+  const currentUser = useCurrentUser();
+  const entityRoute = useShowRouteFromGRN(id);
+
   switch (type) {
     case 'user':
-      if (!isPermitted(userPermissions, 'users:list')) return title;
+      if (!isPermitted(currentUser.permissions, 'users:list')) return <span>{title}</span>;
 
-      return <TitleWithLink to={getShowRouteFromGRN(id)} title={title} />;
+      return <TitleWithLink to={entityRoute} title={title} />;
     case 'team':
-      if (!isPermitted(userPermissions, 'teams:list')) return title;
+      if (!isPermitted(currentUser.permissions, 'teams:list')) return <span>{title}</span>;
 
-      return <TitleWithLink to={getShowRouteFromGRN(id)} title={title} />;
+      return <TitleWithLink to={entityRoute} title={title} />;
     case 'global':
-      return 'Everyone';
+      return <span>Everyone</span>;
     default:
       return assertUnreachable(type);
   }
 };
 
 const OwnersCell = ({ owners }: Props) => {
-  const currentUser = useCurrentUser();
   const sortedOwners = owners.sort((o1, o2) => defaultCompare(o1.type, o2.type) || defaultCompare(o1.title, o2.title));
 
   return (
     <td className="limited">
       {sortedOwners.map((owner, index) => {
-        const title = _getOwnerTitle(owner, currentUser?.permissions);
         const isLast = index >= owners.size - 1;
 
         return (
           <React.Fragment key={owner.id}>
-            {title}
+            <OwnerTitle owner={owner} />
             {!isLast && ', '}
           </React.Fragment>
         );

@@ -15,18 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import getShowRouteForEntity from 'routing/getShowRouteForEntity';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
+
+import useShowRouteForEntity from 'routing/hooks/useShowRouteForEntity';
 import Routes from 'routing/Routes';
 
 describe('getShowRouteFromGRN should return correct route', () => {
-  const createsCorrectShowEntityURL = ({ id, type, entityShowURL }) => {
-    expect(getShowRouteForEntity(id, type)).toBe(entityShowURL);
-  };
-
   // eslint-disable-next-line jest/expect-expect
   it.each`
       id              | type               | entityShowURL
       ${'user-id'}    | ${'user'}          | ${Routes.SYSTEM.USERS.show('user-id')}
       ${'stream-id'}  | ${'stream'}        | ${Routes.stream_search('stream-id')}
-    `('for $type with id $id', createsCorrectShowEntityURL);
+    `('for $type with id $id', ({ id, type, entityShowURL }) => {
+    const { result } = renderHook(() => useShowRouteForEntity(id, type));
+
+    expect(result.current).toBe(entityShowURL);
+  });
 });

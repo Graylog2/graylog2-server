@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import Routes from 'routing/Routes';
+import assertUnreachable from 'logic/assertUnreachable';
 
-const assertUnreachable = (type: string): never => {
-  throw new Error(`Can't find route for type: ${type ?? '(undefined)'}`);
-};
-
-const getShowRouteForEntity = (id: string, type: string) => {
+const useShowRouteForEntity = (id: string, type: string) => {
   switch (type?.toLowerCase()) {
     case 'user':
       return Routes.SYSTEM.USERS.show(id);
@@ -45,8 +43,8 @@ const getShowRouteForEntity = (id: string, type: string) => {
     case 'output':
       return Routes.SYSTEM.OUTPUTS;
     default:
-      return assertUnreachable(type);
+      return assertUnreachable(type as never ?? '(undefined)', 'Can\'t find route for type');
   }
 };
 
-export default getShowRouteForEntity;
+export default useShowRouteForEntity;
