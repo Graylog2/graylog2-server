@@ -16,19 +16,47 @@
  */
 
 import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { PluginStore, PluginManifest } from 'graylog-web-plugin/plugin';
 
 import useShowRouteForEntity from 'routing/hooks/useShowRouteForEntity';
 import Routes from 'routing/Routes';
+import CaffeineCacheSummary from 'components/lookup-tables/caches/CaffeineCacheSummary';
 
-describe('getShowRouteFromGRN should return correct route', () => {
-  // eslint-disable-next-line jest/expect-expect
-  it.each`
+describe('getShowRouteFromGRN', () => {
+  it('should return correct route', () => {
+    // eslint-disable-next-line jest/expect-expect
+    it.each`
       id              | type               | entityShowURL
       ${'user-id'}    | ${'user'}          | ${Routes.SYSTEM.USERS.show('user-id')}
       ${'stream-id'}  | ${'stream'}        | ${Routes.stream_search('stream-id')}
     `('for $type with id $id', ({ id, type, entityShowURL }) => {
-    const { result } = renderHook(() => useShowRouteForEntity(id, type));
+      const { result } = renderHook(() => useShowRouteForEntity(id, type));
 
-    expect(result.current).toBe(entityShowURL);
+      expect(result.current).toBe(entityShowURL);
+    });
+  });
+
+  describe('with plugin data', () => {
+    const plugin = new PluginManifest({}, {
+      entityRoutes: [
+        (id, type) => (type === 'dashboard' && id === 'special-id' ? '/plugin-entity-route' : null),
+      ],
+    });
+
+    beforeAll(() => PluginStore.register(plugin));
+
+    afterAll(() => PluginStore.unregister(plugin));
+
+    it('should return entity routes defined by plugins', () => {
+      const { result } = renderHook(() => useShowRouteForEntity('special-id', 'dashboard'));
+
+      expect(result.current).toBe('/plugin-entity-route');
+    });
+
+    it('should still work with common routes', () => {
+      const { result } = renderHook(() => useShowRouteForEntity('common-id', 'dashboard'));
+
+      expect(result.current).toBe('/dashboards/common-id');
+    });
   });
 });
