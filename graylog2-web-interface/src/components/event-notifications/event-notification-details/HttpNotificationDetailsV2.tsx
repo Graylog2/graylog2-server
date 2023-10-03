@@ -29,6 +29,10 @@ const HttpNotificationDetailsV2 = ({ notification } : Props) => (
     <ReadOnlyFormGroup label="Basic Authentication" value={notification.config.basic_auth?.is_set ? '******' : null} />
     <ReadOnlyFormGroup label="API Key" value={notification.config.api_key} />
     <ReadOnlyFormGroup label="API Secret" value={notification.config.api_secret?.is_set ? '******' : null} />
+    <ReadOnlyFormGroup label="Method" value={notification.config.method} />
+    {notification.config.time_zone && (<ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />)}
+    {notification.config.content_type && (<ReadOnlyFormGroup label="Content Type" value={notification.config.content_type} />)}
+    {notification.config.body_template && (<ReadOnlyFormGroup label="Body Template" value={notification.config.body_template} />)}
   </>
 );
 

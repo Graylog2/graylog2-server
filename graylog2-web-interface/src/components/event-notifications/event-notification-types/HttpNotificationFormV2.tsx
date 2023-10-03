@@ -48,7 +48,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     method: 'POST',
     time_zone: 'UTC',
     body_template: '',
-    content_type: 'JSON'
+    content_type: 'JSON',
   };
 
   constructor(props: Props) {
@@ -108,19 +108,21 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
   handleMethodChange = (nextValue: string) => {
     const { config, onChange } = this.props;
     const nextConfig = cloneDeep(config);
-    nextConfig['method'] = nextValue;
+    nextConfig.method = nextValue;
+
     if (nextValue === 'GET') {
-      nextConfig['body_template'] = null;
-      nextConfig['content_type'] = null;
+      nextConfig.body_template = null;
+      nextConfig.content_type = null;
     } else if (config.method === 'GET') {
-      nextConfig['content_type'] = 'JSON';
-      nextConfig['body_template'] = '';
+      nextConfig.content_type = 'JSON';
+      nextConfig.body_template = '';
     }
+
     onChange(nextConfig);
   };
 
   handleContentTypeChange = (nextValue: string) => {
-      this.propagateChange('content_type', nextValue);
+    this.propagateChange('content_type', nextValue);
   };
 
   handleSecretInputChange = (event: { target: { name: string }}) => {
@@ -247,26 +249,26 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
             <Input help="HTTP method used for the notification"
                    id="notification-method"
                    label="HTTP Method">
-            <Select id="method"
-                    name="method"
-                    clearable={false}
-                    options={httpMethods}
-                    matchProp="label"
-                    onChange={this.handleMethodChange}
-                    value={config.method} />
+              <Select id="method"
+                      name="method"
+                      clearable={false}
+                      options={httpMethods}
+                      matchProp="label"
+                      onChange={this.handleMethodChange}
+                      value={config.method} />
             </Input>
           </Col>
           <Col md={4}>
             <Input help="HTTP content type used for POST/PUT notifications"
                    id="notification-content-type"
                    label="Content Type">
-            <Select id="content-type"
-                    name="content-type"
-                    options={contentTypes}
-                    matchProp="label"
-                    disabled={config.method === 'GET'}
-                    onChange={this.handleContentTypeChange}
-                    value={config.content_type} />
+              <Select id="content-type"
+                      name="content-type"
+                      options={contentTypes}
+                      matchProp="label"
+                      disabled={config.method === 'GET'}
+                      onChange={this.handleContentTypeChange}
+                      value={config.content_type} />
             </Input>
           </Col>
           <Col md={4}>
