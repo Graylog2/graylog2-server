@@ -20,10 +20,9 @@ import { PluginStore, PluginManifest } from 'graylog-web-plugin/plugin';
 
 import useShowRouteForEntity from 'routing/hooks/useShowRouteForEntity';
 import Routes from 'routing/Routes';
-import CaffeineCacheSummary from 'components/lookup-tables/caches/CaffeineCacheSummary';
 
 describe('getShowRouteFromGRN', () => {
-  it('should return correct route', () => {
+  describe('should return correct route', () => {
     // eslint-disable-next-line jest/expect-expect
     it.each`
       id              | type               | entityShowURL
