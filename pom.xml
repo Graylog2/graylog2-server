@@ -155,7 +155,7 @@
         <netty.version>4.1.99.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.61.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.11.0</okhttp.version>
-        <okio.version>3.5.0</okio.version>
+        <okio.version>3.6.0</okio.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.30.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
