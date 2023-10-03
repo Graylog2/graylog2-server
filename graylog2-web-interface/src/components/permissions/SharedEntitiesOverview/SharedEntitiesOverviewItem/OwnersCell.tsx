@@ -29,7 +29,7 @@ type Props = {
   owners: GranteesList,
 };
 
-const TitleWithLink = ({ title, entityId }: { to: string, title: string, entityId: string }) => {
+const TitleWithLink = ({ title, entityId }: { title: string, entityId: string }) => {
   const entityRoute = useShowRouteFromGRN(entityId);
 
   return <Link to={entityRoute}>{title}</Link>;

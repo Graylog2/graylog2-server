@@ -23,7 +23,6 @@ import Routes from 'routing/Routes';
 
 describe('getShowRouteFromGRN', () => {
   describe('should return correct route', () => {
-    // eslint-disable-next-line jest/expect-expect
     it.each`
       id              | type               | entityShowURL
       ${'user-id'}    | ${'user'}          | ${Routes.SYSTEM.USERS.show('user-id')}
