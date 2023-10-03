@@ -35,6 +35,10 @@ public class PreflightConfigServiceImpl implements PreflightConfigService {
         this.connection = connection;
     }
 
+    private DBCollection getCollection() {
+        return this.connection.getDatabase().getCollection(COLLECTION_NAME);
+    }
+
     @Override
     public PreflightConfig setConfigResult(PreflightConfigResult result) {
         getCollection()
@@ -53,10 +57,6 @@ public class PreflightConfigServiceImpl implements PreflightConfigService {
                 .map(d -> (String) d.get("value"))
                 .map(PreflightConfigResult::valueOf)
                 .orElse(PreflightConfigResult.UNKNOWN);
-    }
-
-    private DBCollection getCollection() {
-        return this.connection.getDatabase().getCollection(COLLECTION_NAME);
     }
 
     @Override
