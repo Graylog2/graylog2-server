@@ -29,7 +29,11 @@ type Props = {
   owners: GranteesList,
 };
 
-const TitleWithLink = ({ to, title }: { to: string, title: string }) => <Link to={to}>{title}</Link>;
+const TitleWithLink = ({ title, entityId }: { to: string, title: string, entityId: string }) => {
+  const entityRoute = useShowRouteFromGRN(entityId);
+
+  return <Link to={entityRoute}>{title}</Link>;
+};
 
 const assertUnreachable = (type: 'error'): never => {
   throw new Error(`Owner of entity has not supported type: ${type}`);
@@ -41,17 +45,16 @@ type OwnerTitleProps = {
 
 const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
   const currentUser = useCurrentUser();
-  const entityRoute = useShowRouteFromGRN(id);
 
   switch (type) {
     case 'user':
       if (!isPermitted(currentUser.permissions, 'users:list')) return <span>{title}</span>;
 
-      return <TitleWithLink to={entityRoute} title={title} />;
+      return <TitleWithLink entityId={id} title={title} />;
     case 'team':
       if (!isPermitted(currentUser.permissions, 'teams:list')) return <span>{title}</span>;
 
-      return <TitleWithLink to={entityRoute} title={title} />;
+      return <TitleWithLink entityId={id} title={title} />;
     case 'global':
       return <span>Everyone</span>;
     default:
