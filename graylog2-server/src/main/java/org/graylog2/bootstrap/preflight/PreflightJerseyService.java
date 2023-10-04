@@ -49,7 +49,6 @@ import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -134,6 +133,12 @@ public class PreflightJerseyService extends AbstractIdleService {
 
         apiHttpServer.start();
 
+        final var username = localConfiguration.getRootUsername();
+        final var preflightPassword = preflightConfigService.getPreflightPassword();
+        logBanner(bindAddress, username, preflightPassword);
+    }
+
+    private void logBanner(HostAndPort bindAddress, String username, String preflightPassword) {
         var banner = """
 
                                                                              ---
@@ -153,18 +158,17 @@ public class PreflightJerseyService extends AbstractIdleService {
                   #############                                ####                                     -----     ----
                      ######                                   ####                                          -------
 
-                        """;
-        final var username = localConfiguration.getRootUsername();
-        final var preflightPassword = preflightConfigService.getPreflightPassword();
+                ========================================================================================================
 
-        LOG.info("========================================================================================================");
-        Arrays.stream(banner.split("\n")).forEach(LOG::info);
-        LOG.info("");
-        LOG.info("It seems you are starting Graylog for the first time. To set up a fresh install, a setup interface has");
-        LOG.info("been started. You must log in to it to perform the initial configuration and continue.");
-        LOG.info("");
-        LOG.info("Initial configuration is accessible at {}, with username '{}' and password '{}'.", configuration.getHttpBindAddress(), username, preflightPassword);
-        LOG.info("========================================================================================================");
+                It seems you are starting Graylog for the first time. To set up a fresh install, a setup interface has
+                been started. You must log in to it to perform the initial configuration and continue.
+
+                Initial configuration is accessible at %s, with username '%s' and password '%s'.
+
+                ========================================================================================================
+                """.formatted(bindAddress, username, preflightPassword);
+
+        LOG.info(banner);
     }
 
     private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {
