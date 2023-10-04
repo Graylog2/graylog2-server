@@ -49,7 +49,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -123,7 +125,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         LOG.debug("Requesting HTTP endpoint at <{}> in notification <{}>", config.url(), ctx.notificationId());
 
         final OkHttpClient httpClient = selectClient(config);
-        try (final Response r = httpClient.newCall(builder .build()).execute()) {
+        try (final Response r = httpClient.newCall(builder.build()).execute()) {
             if (!r.isSuccessful()) {
                 throw new PermanentEventNotificationException(
                         "Expected successful HTTP response [2xx] but got [" + r.code() + "]. " + config.url());
@@ -161,12 +163,33 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         final ObjectMapper objectMapper = objectMapperProvider.getForTimeZone(config.timeZone());
         if (!Strings.isNullOrEmpty(bodyTemplate)) {
             final Map<String, Object> modelMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
-            body = templateEngine.transform(bodyTemplate, modelMap);
+            if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
+                String[] parts = bodyTemplate.split("&");
+                body = Arrays.stream(parts)
+                        .map(part -> {
+                            final int equalsIndex = part.indexOf("=");
+                            final String encodedKey = urlEncode(part.substring(0, equalsIndex));
+                            final String encodedValue = equalsIndex < part.length() - 1 ?
+                                    urlEncode(templateEngine.transform(part.substring(equalsIndex + 1), modelMap)) : "";
+                            return encodedKey + "=" + encodedValue;
+                        })
+                        .collect(Collectors.joining("&"));
+            } else {
+                body = templateEngine.transform(bodyTemplate, modelMap);
+            }
         } else {
-            body = objectMapper.writeValueAsString(modelData);
+            final String eventString = objectMapper.writeValueAsString(modelData);
+            if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
+                body = "event=" + urlEncode(eventString);
+            } else {
+                body = eventString;
+            }
         }
-        return config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA) ?
-                URLEncoder.encode(body, StandardCharsets.UTF_8).replaceAll("\\+", "%20") : body;
+        return body;
+    }
+
+    private String urlEncode(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
     }
 
 }

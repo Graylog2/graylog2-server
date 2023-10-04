@@ -123,7 +123,21 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
         if (!httpMethod().equals(HttpMethod.GET) && contentType() == null) {
             validation.addError(FIELD_CONTENT_TYPE, "Content Type must not be null for PUT/POST methods.");
         }
-
+        if (contentType() == ContentType.FORM_DATA && bodyTemplate() != null) {
+            final String[] parts = bodyTemplate().split("&");
+            for (String part : parts) {
+                final int equalsIndex = part.indexOf("=");
+                if (equalsIndex == -1) {
+                    validation.addError(FIELD_BODY_TEMPLATE, "Invalid URL encoded form data template.");
+                    break;
+                }
+                final String key = part.substring(0, equalsIndex);
+                if (key.isEmpty()) {
+                    validation.addError(FIELD_BODY_TEMPLATE, "Invalid URL encoded form data template.");
+                    break;
+                }
+            }
+        }
         return validation;
     }
 
