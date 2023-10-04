@@ -32,7 +32,11 @@ import withHistory from 'routing/withHistory';
 import type { HistoryFunction } from 'routing/useHistory';
 import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
 
-import type { RetentionStrategyContext } from './Types';
+import type {
+  RotationStrategyConfig,
+  RetentionStrategyConfig,
+  RetentionStrategyContext
+} from 'components/indices/Types';
 
 type Props = {
   cancelLink: string,
@@ -73,12 +77,12 @@ const _validateIndexPrefix = (value: string) => {
   return error;
 };
 
-const _getRotationConfigState = (strategy: string, data: string) => ({
+const _getRotationConfigState = (strategy: string, data: RotationStrategyConfig) => ({
   rotation_strategy_class: strategy,
   rotation_strategy: data,
 });
 
-const _getRetentionConfigState = (strategy: string, data: string) => ({
+const _getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig) => ({
   retention_strategy_class: strategy,
   retention_strategy: data,
 });

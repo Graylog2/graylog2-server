@@ -139,12 +139,12 @@ const IndexSetsDefaultsConfig = () => {
     strategy: configToUse.retention_strategy_class,
   });
 
-  const getRotationConfigState = (strategy: string, data: string) => ({
+  const getRotationConfigState = (strategy: string, data: RotationStrategyConfig) => ({
     rotation_strategy_config: data,
     rotation_strategy_class: strategy,
   });
 
-  const getRetentionConfigState = (strategy: string, data: string) => ({
+  const getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig) => ({
     retention_strategy_class: strategy,
     retention_strategy_config: data,
   });
