@@ -199,7 +199,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         try {
             if (configuration.isLeader() && configuration.runMigrations()) {
-                runMigrations(MigrationType.PREFLIGHT);
+                runMigrations(preflightInjector, MigrationType.PREFLIGHT);
             }
         } catch (Exception e) {
             LOG.error("Exception while running migrations", e);
@@ -304,7 +304,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         try {
             if (configuration.isLeader() && configuration.runMigrations()) {
-                runMigrations(MigrationType.STANDARD);
+                runMigrations(injector, MigrationType.STANDARD);
             }
         } catch (Exception e) {
             LOG.error("Exception while running migrations", e);
@@ -371,7 +371,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
     }
 
-    public void runMigrations(MigrationType migrationType) {
+    public void runMigrations(Injector injector, MigrationType migrationType) {
         //noinspection unchecked
         final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
         Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));

@@ -48,7 +48,7 @@ public class MigrateCmd extends Server {
         LOG.info("Arch: {}", os.getArch());
 
         try {
-            runMigrations(MigrationType.STANDARD);
+            runMigrations(this.injector, MigrationType.STANDARD);
         } catch (Exception e) {
             LOG.warn("Exception while running migrations", e);
             System.exit(1);
