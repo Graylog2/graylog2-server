@@ -79,9 +79,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
 
-    @Parameter(value = "is_leader")
-    private boolean isLeader = true;
-
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
@@ -231,10 +228,6 @@ public class Configuration extends BaseConfiguration {
 
     public int getShutdownTimeout() {
         return shutdownTimeout;
-    }
-
-    public boolean isLeader() {
-        return isLeader;
     }
 
     public String getOpensearchDistributionRoot() {
