@@ -38,6 +38,7 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.leader.LeaderElectionModule;
+import org.graylog2.cluster.lock.LockServiceModule;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
@@ -91,6 +92,7 @@ public class PreflightWebModule extends Graylog2Module {
         serviceBinder.addBinding().to(PreflightJerseyService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
 
+        install(new LockServiceModule());
         install(new LeaderElectionModule(configuration));
 
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
