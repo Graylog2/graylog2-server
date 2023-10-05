@@ -22,8 +22,7 @@ import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFiel
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
-
-import asMock from '../../../../../test/helpers/mocking/AsMock';
+import asMock from 'helpers/mocking/AsMock';
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection', () => jest.fn());
 const onClose = jest.fn();
