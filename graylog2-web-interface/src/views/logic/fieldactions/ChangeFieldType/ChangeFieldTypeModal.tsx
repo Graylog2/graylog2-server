@@ -31,6 +31,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -67,6 +68,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
   const { putFiledTypeMutation } = usePutFiledTypeMutation();
+  const initialSelection = useInitialSelection();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback((e: React.FormEvent) => {
@@ -78,10 +80,19 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
       rotated,
       field,
     }).then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CHANGED, { app_pathname: telemetryPathName, app_action_value: 'change-field-type' });
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CHANGED, {
+        app_pathname: telemetryPathName,
+        app_action_value:
+          {
+            value: 'change-field-type',
+            rotated,
+            isAllIndexesSelected: indexSetSelection.length === initialSelection.length,
+          },
+      });
+
       onClose();
     });
-  }, [field, indexSetSelection, newFieldType, onClose, putFiledTypeMutation, rotated, sendTelemetry, telemetryPathName]);
+  }, [field, indexSetSelection, initialSelection.length, newFieldType, onClose, putFiledTypeMutation, rotated, sendTelemetry, telemetryPathName]);
 
   const onChangeFieldType = useCallback((value: string) => {
     setNewFieldType(value);
@@ -123,7 +134,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
         <Alert bsStyle="info">
           By default the type will be changed in all index sets of the current message/search. By expanding the next section, you can select for which index sets you would like to make the change.
         </Alert>
-        <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} />
+        <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelection} />
         <Input type="checkbox"
                id="rotate"
                name="rotate"
