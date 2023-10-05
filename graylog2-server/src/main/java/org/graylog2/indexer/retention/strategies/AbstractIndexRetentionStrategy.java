@@ -88,6 +88,17 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
             activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
             runRetention(indexSet, deflectorIndices, removeCount);
+        } else {
+            var debug = deflectorIndices.keySet().stream()
+                    .collect(Collectors.toMap(k -> k, k -> Map.of(
+                            "isReopened", indices.isReopened(k),
+                            "hasCurrentWriteAlias", hasCurrentWriteAlias(indexSet, deflectorIndices, k),
+                            "exceedsAgeLimit", exceedsAgeLimit(k, cutoffSoft, cutoffHard),
+                            "closingDate", indices.indexClosingDate(k),
+                            "creationDate", indices.indexCreationDate(k)
+                    )));
+            LOG.debug("Nothing to retain for indexSet <{}>: (min {}, max {}) details: <{}>",
+                    indexSet.getIndexPrefix(), timeBasedConfig.indexLifetimeMin(), timeBasedConfig.indexLifetimeMax(), debug);
         }
     }
 
