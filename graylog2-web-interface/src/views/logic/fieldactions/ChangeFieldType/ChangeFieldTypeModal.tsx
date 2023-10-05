@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
@@ -27,6 +27,10 @@ import useStream from 'components/streams/hooks/useStream';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { defaultCompare } from 'logic/DefaultCompare';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -48,6 +52,7 @@ type Props = {
 }
 
 const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(false);
   const [newFieldType, setNewFieldType] = useState(null);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
@@ -62,6 +67,8 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
   const { putFiledTypeMutation } = usePutFiledTypeMutation();
+  const { pathname } = useLocation();
+  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
 
@@ -70,18 +77,30 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
       newFieldType,
       rotated,
       field,
-    }).then(() => onClose());
-  }, [field, indexSetSelection, newFieldType, onClose, putFiledTypeMutation, rotated]);
+    }).then(() => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CHANGED, { app_pathname: telemetryPathName, app_action_value: 'change-field-type' });
+      onClose();
+    });
+  }, [field, indexSetSelection, newFieldType, onClose, putFiledTypeMutation, rotated, sendTelemetry, telemetryPathName]);
 
   const onChangeFieldType = useCallback((value: string) => {
     setNewFieldType(value);
   }, []);
 
+  useEffect(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_OPENED, { app_pathname: telemetryPathName, app_action_value: 'change-field-type-opened' });
+  }, [sendTelemetry, telemetryPathName]);
+
+  const onCancel = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CLOSED, { app_pathname: telemetryPathName, app_action_value: 'change-field-type-closed' });
+    onClose();
+  }, [onClose, sendTelemetry, telemetryPathName]);
+
   return (
     <BootstrapModalForm title={<span>Change {field} field type <BetaBadge /></span>}
                         submitButtonText="Change field type"
                         onSubmitForm={onSubmit}
-                        onCancel={onClose}
+                        onCancel={onCancel}
                         show={show}
                         bsSize="large">
       <div>
