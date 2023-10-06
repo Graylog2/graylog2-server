@@ -111,11 +111,6 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILENAME);
             config.put("plugins.security.ssl.transport.truststore_password", truststore.passwordAsString());
 
-            // this disables hostname verification for transport. It's a workaround for localnode communication
-            // via SSL, where Opensearch still tries to communicate with 'localhost' and not the publish_host or other
-            // configured node names.
-            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
-
             config.put("plugins.security.ssl.http.enabled", "true");
 
             config.put("plugins.security.ssl.http.keystore_type", KEYSTORE_FORMAT);

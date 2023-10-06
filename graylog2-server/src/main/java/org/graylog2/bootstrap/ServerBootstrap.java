@@ -41,11 +41,13 @@ import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
+import org.graylog2.migrations.MigrationType;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -194,7 +196,18 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         LOG.info("Fresh installation detected, starting configuration webserver");
 
+
+        try {
+            if (configuration.isLeader() && configuration.runMigrations()) {
+                runMigrations(preflightInjector, MigrationType.PREFLIGHT);
+            }
+        } catch (Exception e) {
+            LOG.error("Exception while running migrations", e);
+            System.exit(1);
+        }
+
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
+        final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
         try {
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears
@@ -212,7 +225,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             // give the leader node a headstart on resume so it can take care of mongo-collections etc.
             // and we prevent problems that occured if all nodes started exactly at the same time
-            if (!configuration.isLeader())
+            if (!leaderElectionService.isLeader())
             {
                 Thread.sleep(5000);
             }
@@ -291,7 +304,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         try {
             if (configuration.isLeader() && configuration.runMigrations()) {
-                runMigrations();
+                runMigrations(injector, MigrationType.STANDARD);
             }
         } catch (Exception e) {
             LOG.error("Exception while running migrations", e);
@@ -358,14 +371,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
     }
 
-    public void runMigrations() {
+    public void runMigrations(Injector injector, MigrationType migrationType) {
         //noinspection unchecked
         final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
         Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
 
         LOG.info("Running {} migrations...", migrations.size());
 
-        ImmutableSortedSet.copyOf(migrations).forEach(m -> {
+        ImmutableSortedSet.copyOf(migrations).stream().filter(m -> m.migrationType() == migrationType).forEach(m -> {
             LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());
             try {
                 m.upgrade();
