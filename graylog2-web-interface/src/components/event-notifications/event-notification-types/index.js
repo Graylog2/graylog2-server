@@ -24,13 +24,13 @@ import HttpNotificationSummary from './HttpNotificationSummary';
 import LegacyNotificationForm from './LegacyNotificationForm';
 import LegacyNotificationFormContainer from './LegacyNotificationFormContainer';
 import LegacyNotificationSummaryContainer from './LegacyNotificationSummaryContainer';
+import HttpNotificationSummaryV2 from './HttpNotificationSummaryV2';
+import HttpNotificationFormV2 from './HttpNotificationFormV2';
 
 import EmailNotificationDetails from '../event-notification-details/EmailNotificationDetails';
 import HttpNotificationDetails from '../event-notification-details/HttpNotificationDetails';
 import LegacyNotificationDetails from '../event-notification-details/LegacyNotificationDetails';
-import HttpNotificationSummaryV2 from './HttpNotificationSummaryV2';
 import HttpNotificationDetailsV2 from '../event-notification-details/HttpNotificationDetailsV2';
-import HttpNotificationFormV2 from './HttpNotificationFormV2';
 
 PluginStore.register(new PluginManifest({}, {
   eventNotificationTypes: [
