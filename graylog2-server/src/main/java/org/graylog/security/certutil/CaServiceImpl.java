@@ -31,7 +31,6 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.cluster.certificates.CertificatesService;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +44,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.List;
@@ -54,6 +55,7 @@ import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 @Singleton
 public class CaServiceImpl implements CaService {
+    private static final String CA_ALIAS = "ca";
     private static final Logger LOG = LoggerFactory.getLogger(CaServiceImpl.class);
 
     public final String KEYSTORE_ID = "GRAYLOG CA";
@@ -106,28 +108,29 @@ public class CaServiceImpl implements CaService {
     }
 
     @Override
-    public void upload(String pass, List<FormDataBodyPart> parts) throws CACreationException {
-        final var password = pass == null ? null : pass.toCharArray();
+    public void upload(String password, List<FormDataBodyPart> parts) throws CACreationException {
         // TODO: if the upload consists of more than one file, handle accordingly
         // or: decide that it's always only one file containing all certificates
         try {
-            KeyStore keyStore = KeyStore.getInstance(PKCS12);
-            for(BodyPart part : parts) {
+            KeyStore keyStore = KeyStore.getInstance(PKCS12, "BC");
+            keyStore.load(null, null);
+            for (BodyPart part : parts) {
                 InputStream is = part.getEntityAs(InputStream.class);
                 byte[] bytes = is.readAllBytes();
                 String pem = new String(bytes, StandardCharsets.UTF_8);
                 // Test, if upload is PEM file, must contain at least a certificate
                 if (pem.contains("-----BEGIN CERTIFICATE")) {
-                    pemCaReader.readCA(keyStore, password, pem);
+                    var ca = pemCaReader.readCA(pem, password);
+                    keyStore.setKeyEntry(CA_ALIAS, ca.privateKey(), password.toCharArray(), ca.certificates().toArray(new Certificate[0]));
                 } else {
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-                    keyStore.load(bais, password);
+                    keyStore.load(bais, password.toCharArray());
                 }
             }
-            keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, password, passwordSecret.toCharArray());
+            keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, password.toCharArray(), passwordSecret.toCharArray());
             triggerCaChangedEvent();
        } catch (IOException | KeyStoreStorageException | NoSuchAlgorithmException | CertificateException |
-                KeyStoreException ex) {
+                KeyStoreException | NoSuchProviderException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
             throw new CACreationException("Could not write CA: " + ex.getMessage(), ex);
         }
