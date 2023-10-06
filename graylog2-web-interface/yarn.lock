@@ -3844,10 +3844,10 @@
     expect "^29.0.0"
     pretty-format "^29.0.0"
 
-"@types/jquery@3.5.20":
-  version "3.5.20"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.20.tgz#a23eece847591c7aaa47c52d6910052af473df4e"
-  integrity sha512-UI+EGhgYD4LdSZ8gaiziFqXYIIB38VQSDsnAs8jL/div7FGrzrShx4HKCykVzk3tPfiIlusdNP9Wi3G60LCF2Q==
+"@types/jquery@3.5.21":
+  version "3.5.21"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.21.tgz#5670300cfab6bdd0940d1befe95bec5026430de6"
+  integrity sha512-BgCalH4OX2JcjbnD9E86L+WeN6IcCGZle+Iy0I6eOMuraAfcMb0Z1x9E51rC2Dqq+m8KexEoDBW6GIJxUPmLEg==
   dependencies:
     "@types/sizzle" "*"
 
@@ -8201,9 +8201,9 @@ fast-memoize@^2.5.1:
   integrity sha512-xdmw296PCL01tMOXx9mdJSmWY29jQgxyuZdq0rEHMu+Tpe1eOEtCycoG6chzlcrWsNgpZP7oL8RiQr7+G6Bl6g==
 
 fast-xml-parser@^4.2.7:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-4.3.1.tgz#4f89c31e4c392d6e3d68b299733cad0c2d50d495"
-  integrity sha512-viVv3xb8D+SiS1W4cv4tva3bni08kAkx0gQnWrykMM8nXPc1FxqZPU00dCEVjkiCg4HoXd2jC4x29Nzg/l2DAA==
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-4.3.2.tgz#761e641260706d6e13251c4ef8e3f5694d4b0d79"
+  integrity sha512-rmrXUXwbJedoXkStenj1kkljNF7ugn5ZjR9FJcwmCfcCbtOMDghPajbc+Tck6vE6F5XsDmx+Pr2le9fw8+pXBg==
   dependencies:
     strnum "^1.0.5"
 
@@ -8996,7 +8996,7 @@ graphemer@^1.4.0:
     "@graylog/sawmill" "2.0.7"
     "@tanstack/react-query" "4.35.7"
     "@types/create-react-class" "15.6.4"
-    "@types/jquery" "3.5.20"
+    "@types/jquery" "3.5.21"
     "@types/react" "18.2.20"
     babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
