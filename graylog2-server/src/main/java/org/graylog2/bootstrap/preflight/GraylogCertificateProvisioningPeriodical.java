@@ -72,6 +72,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningPeriodical.class);
+    private static final int CONNECTION_ATTEMPTS = 40;
+    private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS = 3;
+    private static final int RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS = 2;
 
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService nodeService;
@@ -246,8 +249,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         final var counter = new AtomicInteger(0);
         final var nodeId = config.nodeId();
         RetryerBuilder.<String>newBuilder()
-                .withWaitStrategy(WaitStrategies.fixedWait(3, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(40))
+                .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
                 .withRetryListener(new RetryListener() {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
@@ -278,7 +281,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                         }
                     } catch (Exception e) {
                         // swallow exceptions during the first minute
-                        if (counter.get() > 19) {
+                        if (counter.get() > (CONNECTION_ATTEMPTS / RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS)) {
                             LOG.warn("Exception trying to connect to node " + config.nodeId() + ": " + e.getMessage() + ", retrying", e);
                         }
                         return "false";
