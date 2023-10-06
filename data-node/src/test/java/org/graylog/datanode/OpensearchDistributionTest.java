@@ -31,6 +31,9 @@ class OpensearchDistributionTest {
     private Path tempDir;
 
     @TempDir
+    private Path emptyTempDir;
+
+    @TempDir
     private Path tempDirWithoutArch;
 
     @BeforeEach
@@ -41,6 +44,16 @@ class OpensearchDistributionTest {
 
         Files.createDirectory(tempDirWithoutArch.resolve("opensearch-2.4.1"));
         Files.createDirectory(tempDir.resolve(".config")); // just to include something which is not OS dist
+    }
+
+    @Test
+    void testFailedDetectionInDirectory() {
+        Assertions.assertThatThrownBy(() -> OpensearchDistribution.detectInDirectory(emptyTempDir.resolve("nonexistent"), "amd64"))
+                .hasMessageStartingWith("Failed to list content of provided directory");
+
+
+        Assertions.assertThatThrownBy(() -> OpensearchDistribution.detectInDirectory(emptyTempDir, "amd64"))
+                .hasMessageStartingWith("Could not detect any opensearch distribution");
     }
 
     @Test
