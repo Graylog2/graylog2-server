@@ -58,9 +58,7 @@ public class RunsWithDataNodeDiscoveryProvider implements Provider<Boolean> {
     }
 
     private Boolean doGet() {
-        final PreflightConfigResult preflightResult = preflightConfigService.getPersistedConfig()
-                .map(PreflightConfig::result)
-                .orElse(PreflightConfigResult.UNKNOWN);
+        final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
 
         // if preflight is finished, we assume that there will be some datanode registered via node-service.
         if (preflightResult == PreflightConfigResult.FINISHED) {

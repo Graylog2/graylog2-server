@@ -55,6 +55,7 @@ export const hotKeysCollections: HotkeyCollections = {
     actions: {
       ...viewActions,
       save: { keys: 'mod+s', description: 'Save dashboard' },
+      'save-as': { keys: 'mod+shift+s', description: 'Save dashboard as' },
     },
   },
 };

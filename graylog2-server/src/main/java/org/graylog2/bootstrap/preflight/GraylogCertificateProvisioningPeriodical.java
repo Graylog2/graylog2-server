@@ -175,30 +175,28 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
 
                 // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
-                var preflightConfig = preflightConfigService.getPersistedConfig();
-                preflightConfig.ifPresent(cfg -> {
-                    if (cfg.result().equals(PreflightConfigResult.FINISHED)) {
-                        if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
-                            nodes.stream()
-                                    .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
-                                    .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
-                                            .state(DataNodeProvisioningConfig.State.CONFIGURED)
-                                            .build()));
+                var cfg = preflightConfigService.getPreflightConfigResult();
+                if (cfg.equals(PreflightConfigResult.FINISHED)) {
+                    if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
+                        nodes.stream()
+                                .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
+                                .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
+                                        .state(DataNodeProvisioningConfig.State.CONFIGURED)
+                                        .build()));
+                    } else {
+                        var hasUnconfiguredNodes = nodes.stream()
+                                .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
+                                .findFirst();
+                        if (hasUnconfiguredNodes.isPresent()) {
+                            var notification = notificationService.buildNow()
+                                    .addType(Notification.Type.DATA_NODE_NEEDS_PROVISIONING)
+                                    .addSeverity(Notification.Severity.URGENT);
+                            notificationService.publishIfFirst(notification);
                         } else {
-                            var hasUnconfiguredNodes = nodes.stream()
-                                    .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
-                                    .findFirst();
-                            if (hasUnconfiguredNodes.isPresent()) {
-                                var notification = notificationService.buildNow()
-                                        .addType(Notification.Type.DATA_NODE_NEEDS_PROVISIONING)
-                                        .addSeverity(Notification.Severity.URGENT);
-                                notificationService.publishIfFirst(notification);
-                            } else {
-                                notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
-                            }
+                            notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
                         }
                     }
-                });
+                    }
 
                 nodes.stream()
                         .filter(c -> DataNodeProvisioningConfig.State.CSR.equals(c.state()))
