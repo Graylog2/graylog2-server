@@ -16,6 +16,7 @@
  */
 package org.graylog2.configuration;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -102,21 +103,8 @@ class IndexerDiscoveryProviderTest {
     }
 
     private PreflightConfigService preflightConfig(@Nullable PreflightConfigResult result) {
-        return new PreflightConfigService() {
-            @Override
-            public Optional<PreflightConfig> getPersistedConfig() {
-                return Optional.of(resultToConfig(result));
-            }
-
-            @Override
-            public PreflightConfig saveConfiguration() throws ValidationException {
-                throw new IllegalStateException("Should not be called here!");
-            }
-        };
-    }
-
-    @NotNull
-    private PreflightConfig resultToConfig(PreflightConfigResult result) {
-        return () -> result;
+        final DummyPreflightConfigService service = new DummyPreflightConfigService();
+        service.setConfigResult(result);
+        return service;
     }
 }
