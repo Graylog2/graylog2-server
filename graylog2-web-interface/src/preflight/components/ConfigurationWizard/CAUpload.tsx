@@ -83,6 +83,10 @@ const validate = (formValues: FormValues) => {
   return errors;
 };
 
+const Explanation = styled.p`
+  margin-bottom: 10px;
+`;
+
 const CAUpload = () => {
   const queryClient = useQueryClient();
   const onRejectUpload = useCallback(() => {
@@ -99,11 +103,28 @@ const CAUpload = () => {
     },
   });
 
+  const validateFiles = (files: Array<unknown>) => {
+    if (!files?.length) {
+      return 'Please upload a file.';
+    }
+
+    if (files?.length > 1) {
+      return 'Please upload only a single file.';
+    }
+
+    return null;
+  };
+
   return (
     <Formik<FormValues> initialValues={{}} onSubmit={(formValues: FormValues) => onProcessUpload(formValues)} validate={validate}>
       {({ isSubmitting, isValid }) => (
         <Form>
-          <Field name="files">
+          <Explanation>
+            Here you can upload your existing CA. You need to upload a single file containing both private key
+            (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in PEM
+            or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
+          </Explanation>
+          <Field name="files" validate={validateFiles}>
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
                 <Input.Label required htmlFor="ca-dropzone">Certificate Authority</Input.Label>
@@ -127,12 +148,11 @@ const CAUpload = () => {
                   </DropzoneInner>
                 </CADropzone>
                 <Files>
-                  {value?.map(({ name: fileName }, index) => (
+                  {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
                     <File key={fileName}>
                       <Icon name="file" /> {fileName} <DeleteIcon name="xmark"
                                                                   onClick={() => {
-                                                                    const newValue = [...value];
-                                                                    delete newValue[index];
+                                                                    const newValue = value.filter((_ignored, idx) => idx !== index);
                                                                     onChange({ target: { name, value: newValue } });
                                                                   }} />
                     </File>
@@ -148,7 +168,7 @@ const CAUpload = () => {
                        type="password"
                        label="Password" />
           <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
-          <Button disabled={isSubmitting || !isValid} type="submit">
+          <Button disabled={!isValid} type="submit">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
           </Button>
         </Form>
