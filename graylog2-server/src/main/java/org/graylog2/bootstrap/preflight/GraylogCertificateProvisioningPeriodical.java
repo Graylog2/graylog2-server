@@ -23,6 +23,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -116,7 +117,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
-        this.executor = Executors.newCachedThreadPool();
+        this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
