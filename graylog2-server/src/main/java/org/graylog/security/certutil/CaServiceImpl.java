@@ -34,6 +34,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -108,7 +109,8 @@ public class CaServiceImpl implements CaService {
     }
 
     @Override
-    public void upload(String password, List<FormDataBodyPart> parts) throws CACreationException {
+    public void upload(@Nullable String password, List<FormDataBodyPart> parts) throws CACreationException {
+        final var passwordCharArray = password == null ? null : password.toCharArray();
         // TODO: if the upload consists of more than one file, handle accordingly
         // or: decide that it's always only one file containing all certificates
         try {
@@ -121,13 +123,13 @@ public class CaServiceImpl implements CaService {
                 // Test, if upload is PEM file, must contain at least a certificate
                 if (pem.contains("-----BEGIN CERTIFICATE")) {
                     var ca = pemCaReader.readCA(pem, password);
-                    keyStore.setKeyEntry(CA_ALIAS, ca.privateKey(), password.toCharArray(), ca.certificates().toArray(new Certificate[0]));
+                    keyStore.setKeyEntry(CA_ALIAS, ca.privateKey(), passwordCharArray, ca.certificates().toArray(new Certificate[0]));
                 } else {
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-                    keyStore.load(bais, password.toCharArray());
+                    keyStore.load(bais, passwordCharArray);
                 }
             }
-            keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, password.toCharArray(), passwordSecret.toCharArray());
+            keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, passwordCharArray, passwordSecret.toCharArray());
             triggerCaChangedEvent();
        } catch (IOException | KeyStoreStorageException | NoSuchAlgorithmException | CertificateException |
                 KeyStoreException | NoSuchProviderException ex) {
