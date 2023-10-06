@@ -35,7 +35,6 @@ import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
@@ -55,19 +54,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import java.io.IOException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -90,7 +87,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final PreflightConfigService preflightConfigService;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
     private final NotificationService notificationService;
-    private final ScheduledExecutorService executor;
+    private final ExecutorService executor;
 
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
@@ -105,7 +102,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
                                                     final PreflightConfigService preflightConfigService,
                                                     final EventBus serverEventBus,
-                                                    final @Named("daemonScheduler") ScheduledExecutorService executor,
                                                     final NotificationService notificationService) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
@@ -120,7 +116,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
-        this.executor = executor;
+        this.executor = Executors.newCachedThreadPool();
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -231,14 +227,14 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                         .filter(c -> DataNodeProvisioningConfig.State.STORED.equals(c.state()))
                         .forEach(c -> {
                             dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTING).build());
-                            executor.schedule(() -> {
+                            executor.submit(() -> {
                                 try {
                                     checkConnectivity(c);
                                 } catch (ExecutionException | RetryException e) {
                                     LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
                                     dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
                                 }
-                            }, 1, TimeUnit.SECONDS);
+                            });
                         });
             }
         } catch (Exception e) {
