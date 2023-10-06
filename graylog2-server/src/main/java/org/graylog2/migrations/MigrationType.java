@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
+package org.graylog2.migrations;
 
-/**
- * We don't need this wrapper anymore, we could directly return the results itself. This needs some FE changes
- * that should happen in the same PR.
- * @param result
- */
-@Deprecated
-public record PreflightConfig(PreflightConfigResult result) {
+public enum MigrationType {
+    /**
+     * Will run _before_ the preflight interface starts
+     */
+    PREFLIGHT,
+    /**
+     * Will run during a regular startup, after the preflight is either skipped or finished. This is the default
+     * behaviour for most of our migrations.
+     */
+    STANDARD
 }

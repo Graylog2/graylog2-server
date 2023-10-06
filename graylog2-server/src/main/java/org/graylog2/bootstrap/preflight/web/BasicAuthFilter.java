@@ -18,9 +18,7 @@ package org.graylog2.bootstrap.preflight.web;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.util.encoders.Base64;
-import org.graylog2.Configuration;
 
-import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.MediaType;
@@ -39,12 +37,6 @@ public class BasicAuthFilter implements ContainerRequestFilter {
     private final String adminPasswordHash;
     private final String realm;
 
-    @Inject
-    public BasicAuthFilter(Configuration configuration) {
-        this.adminUsername = configuration.getRootUsername();
-        this.adminPasswordHash = configuration.getRootPasswordSha2();
-        this.realm = "preflight-config";
-    }
 
     public BasicAuthFilter(String adminUsername, String adminPasswordHash, String realm) {
         this.adminUsername = adminUsername;
