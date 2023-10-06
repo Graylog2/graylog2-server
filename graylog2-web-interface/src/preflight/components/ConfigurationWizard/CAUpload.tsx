@@ -93,7 +93,7 @@ const CAUpload = () => {
     UserNotification.error('CA upload failed');
   }, []);
 
-  const { mutate: onProcessUpload, isLoading } = useMutation(submitUpload, {
+  const { mutateAsync: onProcessUpload, isLoading } = useMutation(submitUpload, {
     onSuccess: () => {
       UserNotification.success('CA uploaded successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);

@@ -39,6 +39,7 @@ import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.jetbrains.annotations.NotNull;
@@ -180,7 +181,8 @@ public class PreflightJerseyService extends AbstractIdleService {
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
-                        JacksonPropertyExceptionMapper.class
+                        JacksonPropertyExceptionMapper.class,
+                        AnyExceptionClassMapper.class
                 )
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
