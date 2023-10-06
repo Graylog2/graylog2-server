@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight;
 
-/**
- * We don't need this wrapper anymore, we could directly return the results itself. This needs some FE changes
- * that should happen in the same PR.
- * @param result
- */
-@Deprecated
-public record PreflightConfig(PreflightConfigResult result) {
-}
+import { useContext, useMemo } from 'react';
+
+import { ActionContext } from 'views/logic/ActionContext';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import { filtersToStreamSet } from 'views/logic/queries/Query';
+
+const useCurrentStream = () => {
+  const { widget, message } = useContext(ActionContext);
+  const currentQuery = useCurrentQuery();
+
+  return useMemo(() => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS() ?? [], [message?.fields?.streams, currentQuery.filter, widget?.streams]);
+};
+
+export default useCurrentStream;
