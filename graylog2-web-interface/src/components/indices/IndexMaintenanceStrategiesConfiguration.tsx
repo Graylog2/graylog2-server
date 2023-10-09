@@ -16,12 +16,13 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type {
+  RetentionStrategyConfig,
   RotationStrategy,
   TimeBasedRotationStrategyConfig,
   JsonSchema,
@@ -40,6 +41,7 @@ import {
 } from 'stores/indices/IndicesStore';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
+import { useIndexRetention } from 'components/indices/contexts/IndexRetentionContext';
 
 type IndexMaintenanceStrategiesFormValues = {
   rotation_strategy?: RotationStrategy,
@@ -51,6 +53,10 @@ interface ConfigComponentProps extends SystemConfigurationComponentProps {
   config: StrategyConfig,
   jsonSchema: JsonSchema,
   updateConfig: (update: StrategyConfig) => void
+  useMaxNumberOfIndices?: () => [
+    number | undefined,
+    React.Dispatch<React.SetStateAction<number>>
+  ],
 }
 
 type Props = {
@@ -78,6 +84,8 @@ type Props = {
     retention_strategy_class?: string,
   },
 }
+
+const hasRetentionConfigField = (configData: any, field: string): configData is RetentionStrategyConfig => field in configData;
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
@@ -135,7 +143,10 @@ const getConfigurationComponent = (
   strategy: Strategy | string,
   config: StrategyConfig,
   onConfigUpdate: (update: StrategyConfig) => void,
-) => {
+  useMaxNumberOfIndices: () => [
+    number | undefined,
+    React.Dispatch<React.SetStateAction<number>>
+  ]) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
   }
@@ -149,11 +160,18 @@ const getConfigurationComponent = (
   const strategyType = typeof strategy === 'string' ? strategy : strategy.type;
 
   const strategyConfig = getStrategyConfig(configTypeName, selectedStrategy, strategyType, config, strategies);
-  const element = React.createElement(strategyPlugin.configComponent as React.ComponentType<ConfigComponentProps>, {
+
+  let componentProps : ConfigComponentProps = {
     config: strategyConfig,
     jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
     updateConfig: onConfigUpdate,
-  });
+  };
+
+  if (selectedStrategy === ARCHIVE_RETENTION_STRATEGY) {
+    componentProps = { ...componentProps, useMaxNumberOfIndices };
+  }
+
+  const element = React.createElement(strategyPlugin.configComponent as React.ComponentType<ConfigComponentProps>, componentProps);
 
   return (<span key={strategyType}>{element}</span>);
 };
@@ -179,6 +197,14 @@ const IndexMaintenanceStrategiesConfiguration = ({
       retention_strategy_class: retentionStrategyClass,
     },
   } = useFormikContext<IndexMaintenanceStrategiesFormValues>();
+
+  const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
+
+  useEffect(() => {
+    if (config && hasRetentionConfigField(config, 'max_number_of_indices')) {
+      setMaxNumberOfIndices(config.max_number_of_indices);
+    }
+  }, [config, setMaxNumberOfIndices]);
 
   const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
   const isArchiveRetention = retentionStrategyClass !== ARCHIVE_RETENTION_STRATEGY;
@@ -301,6 +327,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
             rotationStrategy,
             rotationStrategy,
             _onIndexTimeSizeOptimizingUpdate,
+            () => [maxNumberOfIndices, setMaxNumberOfIndices],
           )}
           {shouldShowNormalRetentionForm && getConfigurationComponent(
             name,
@@ -310,6 +337,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
             strategy,
             config,
             _onConfigUpdate,
+            () => [maxNumberOfIndices, setMaxNumberOfIndices],
           )}
         </Col>
       </Row>

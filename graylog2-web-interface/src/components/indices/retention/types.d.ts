@@ -24,6 +24,10 @@ interface IndexRetentionConfigComponentProps extends SystemConfigurationComponen
   config: IndexRetentionConfig;
   jsonSchema: RetentionJsonSchema;
   updateConfig: (update: IndexRetentionConfigProp) => void;
+  useMaxNumberOfIndices: () => [
+    number | undefined,
+    React.Dispatch<React.SetStateAction<number>>
+  ]
 }
 
 type IndexRetentionSummaryComponentProps = {
