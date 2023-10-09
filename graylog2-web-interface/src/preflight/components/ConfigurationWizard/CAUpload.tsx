@@ -77,7 +77,11 @@ const validate = (formValues: FormValues) => {
   let errors = {};
 
   if (!formValues.files?.length) {
-    errors = { ...errors, files: 'A CA file is required' };
+    errors = { ...errors, files: 'Please upload a file.' };
+  }
+
+  if (formValues.files?.length > 1) {
+    errors = { ...errors, files: 'Please upload only a single file.' };
   }
 
   return errors;
@@ -93,7 +97,7 @@ const CAUpload = () => {
     UserNotification.error('CA upload failed');
   }, []);
 
-  const { mutate: onProcessUpload, isLoading } = useMutation(submitUpload, {
+  const { mutateAsync: onProcessUpload, isLoading } = useMutation(submitUpload, {
     onSuccess: () => {
       UserNotification.success('CA uploaded successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
@@ -103,20 +107,10 @@ const CAUpload = () => {
     },
   });
 
-  const validateFiles = (files: Array<unknown>) => {
-    if (!files?.length) {
-      return 'Please upload a file.';
-    }
-
-    if (files?.length > 1) {
-      return 'Please upload only a single file.';
-    }
-
-    return null;
-  };
+  const onSubmit = useCallback((formValues: FormValues) => onProcessUpload(formValues).catch(() => {}), [onProcessUpload]);
 
   return (
-    <Formik<FormValues> initialValues={{}} onSubmit={(formValues: FormValues) => onProcessUpload(formValues)} validate={validate}>
+    <Formik<FormValues> initialValues={{}} onSubmit={onSubmit} validate={validate}>
       {({ isSubmitting, isValid }) => (
         <Form>
           <Explanation>
@@ -124,7 +118,7 @@ const CAUpload = () => {
             (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in PEM
             or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
           </Explanation>
-          <Field name="files" validate={validateFiles}>
+          <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
                 <Input.Label required htmlFor="ca-dropzone">Certificate Authority</Input.Label>
