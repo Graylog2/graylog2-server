@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -56,6 +57,9 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
     }
 
     private static OpensearchDistribution detectInSubdirectory(Path directory, String osArch) {
+
+        final var archCode = archCode(osArch);
+
         final List<OpensearchDistribution> opensearchDistributions;
         try (
                 var files = Files.list(directory);
@@ -65,20 +69,28 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
                     .flatMap(f -> parse(f).stream())
                     .toList();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to list content of provided directory " + directory.toAbsolutePath(), e);
+            throw createErrorMessage(directory, archCode, "Failed to list content of provided directory", e);
         }
 
         if (opensearchDistributions.isEmpty()) {
-            throw new IllegalArgumentException("Could not detect any opensearch distribution in " + directory.toAbsolutePath());
+            throw createErrorMessage(directory, archCode, "Could not detect any opensearch distribution");
         }
 
         LOG.info("Found following opensearch distributions: " + opensearchDistributions.stream().map(d -> d.directory().toAbsolutePath()).toList());
 
-        final var archCode = archCode(osArch);
-
         return findByArchitecture(opensearchDistributions, archCode)
                 .orElseGet(() -> findWithoutArchitecture(opensearchDistributions)
-                        .orElseThrow(() -> new IllegalArgumentException("No Opensearch distribution found for architecture " + osArch)));
+                        .orElseThrow(() -> createErrorMessage(directory, archCode, "No Opensearch distribution found for your system architecture")));
+    }
+
+    private static IllegalArgumentException createErrorMessage(Path directory, String osArch, String message) {
+        return createErrorMessage(directory, osArch, message, null);
+    }
+
+
+    private static IllegalArgumentException createErrorMessage(Path directory, String archCode, String errorMessage, Exception cause) {
+        final String message = String.format(Locale.ROOT, "%s. Directory used for Opensearch detection: %s. Please configure opensearch_location to a directory that contains an opensearch distribution for your architecture %s. You can download Opensearch from https://opensearch.org/downloads.html . Please extract the downloaded distribution and point opensearch_location configuration option to that directory.", errorMessage, directory.toAbsolutePath(), archCode);
+        return new IllegalArgumentException(message, cause);
     }
 
     public static String archCode(final String osArch) {
