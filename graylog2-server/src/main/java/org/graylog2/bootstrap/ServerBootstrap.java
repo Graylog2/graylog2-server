@@ -208,7 +208,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
+        final Service manageableLeaderElectionService = preflightInjector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
+
         try {
+            manageableLeaderElectionService.startAsync().awaitRunning();
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears
             while (preflightBoot.shouldRunPreflightWeb()) {
@@ -219,18 +222,23 @@ public abstract class ServerBootstrap extends CmdLineTool {
                     throw new RuntimeException(e);
                 }
             }
+
         } finally {
+            // check, if this is the leader before shutting down preflight in case we want to delay startup
+            final var isLeader = leaderElectionService.isLeader();
             serviceManager.stopAsync().awaitStopped();
-        }
-        try {
-            // give the leader node a headstart on resume so it can take care of mongo-collections etc.
-            // and we prevent problems that occured if all nodes started exactly at the same time
-            if (!leaderElectionService.isLeader())
-            {
-                Thread.sleep(5000);
+            manageableLeaderElectionService.stopAsync().awaitTerminated();
+
+            try {
+                // delay startup if we're not the leader to give the leader node a headstart on resume
+                // so it can take care of mongo-collections etc.
+                // and we prevent problems that occured if all nodes started exactly at the same time
+                if (!isLeader) {
+                    Thread.sleep(5000);
+                }
+            } catch (InterruptedException e) {
+                LOG.warn("Tried to wait for a bit before resuming but got interrupted. Resuming anyway now. Error was: {}", e.getMessage());
             }
-        } catch (InterruptedException e) {
-            LOG.warn("Tried to wait for a bit before resuming but got interrupted. Resuming anyway now. Error was: {}", e.getMessage());
         }
     }
 
