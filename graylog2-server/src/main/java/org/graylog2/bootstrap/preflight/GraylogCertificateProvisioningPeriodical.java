@@ -72,6 +72,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningPeriodical.class);
+    private static final int THREADPOOL_THREADS = 5;
     private static final int CONNECTION_ATTEMPTS = 40;
     private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS = 3;
     private static final int RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS = 2;
@@ -120,7 +121,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
-        this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
+        this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
