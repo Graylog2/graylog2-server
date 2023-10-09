@@ -166,6 +166,14 @@ export const TELEMETRY_EVENT_TYPE = {
     CREATE_CLICKED: 'EventDefinition Summary Create Clicked',
     UPDATE_CLICKED: 'EventDefinition Summary Update Clicked',
   },
+  NOTIFICATIONS: {
+    CREATE_CLICKED: 'Notifications Create Clicked',
+    EDIT_CLICKED: 'Notifications Edit Clicked',
+    EXECUTE_TEST_CLICKED: 'Notifications Execute Test Clicked',
+    BULK_ACTION_DELETE_CLICKED: 'Notifications Bulk Delete Clicked',
+    ROW_ACTION_DELETE_CLICKED: 'Notifications Row Delete Clicked',
+    ROW_ACTION_TEST_CLICKED: 'Notifications Row Test Clicked',
+  },
   CONTENTSTREAM: {
     PREV_ARROW_CLICKED: 'Content Stream Left Arrow Clicked',
     NEXT_ARROW_CLICKED: 'Content Stream Right Arrow Clicked',
