@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useEffect } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
 import { Icon, Pluralize } from 'components/common';
@@ -52,6 +53,16 @@ const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: {
 
 const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
+const useSubmitOnFormChange = (refreshEnabled: boolean) => {
+  const { dirty, isSubmitting, submitForm } = useFormikContext();
+
+  useEffect(() => {
+    if (refreshEnabled && dirty && !isSubmitting) {
+      submitForm();
+    }
+  }, [dirty, isSubmitting, refreshEnabled, submitForm]);
+};
+
 const RefreshControls = () => {
   const refreshConfig = useRefreshConfig();
   const location = useLocation();
@@ -70,6 +81,7 @@ const RefreshControls = () => {
   };
 
   useEffect(() => () => RefreshActions.disable(), []);
+  useSubmitOnFormChange(!!refreshConfig?.enabled);
 
   const _toggleEnable = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
@@ -84,7 +96,7 @@ const RefreshControls = () => {
     } else {
       RefreshActions.enable();
     }
-  }, [refreshConfig?.enabled, sendTelemetry]);
+  }, [refreshConfig.enabled, sendTelemetry]);
 
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
     <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>
