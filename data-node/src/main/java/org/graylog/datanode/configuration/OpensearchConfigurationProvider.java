@@ -42,9 +42,11 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
+    private final int MAX_TRIES = 60;
     private final Configuration localConfiguration;
     private final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration;
     private final MongoCertSecureConfiguration mongoCertSecureConfiguration;
@@ -103,8 +105,23 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             if(localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
             } else if(isPreflight()) {
-                final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).toList());
-                opensearchProperties.put("cluster.initial_master_nodes", nodeList);
+                var maxCounter = new AtomicInteger(0);
+                try {
+                    var activeNodes = nodeService.allActive(Node.Type.DATANODE);
+                    // at this point, there should at least be the current node in the list of active nodes. If not, then we have a race condition with the
+                    // registration of the node. So we sleep for a second and try again.
+                    while (activeNodes.isEmpty()) {
+                        Thread.sleep(1000);
+                        activeNodes = nodeService.allActive(Node.Type.DATANODE);
+                        if(maxCounter.getAndIncrement() > MAX_TRIES) {
+                            throw new OpensearchConfigurationException("No active nodes found. Aborting DataNode configuration.");
+                        }
+                    }
+                    final var nodeList = String.join(",", activeNodes.values().stream().map(Node::getHostname).toList());
+                    opensearchProperties.put("cluster.initial_master_nodes", nodeList);
+                } catch (InterruptedException e) {
+                    throw new OpensearchConfigurationException(e);
+                }
             }
             opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
 

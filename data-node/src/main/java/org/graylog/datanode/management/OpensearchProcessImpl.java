@@ -49,9 +49,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
+    private final int MAX_TRIES = 60;
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
     private final StateMachineTracerAggregator tracerAggregator;
@@ -158,11 +160,24 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     private void writeSeedHostsList() {
+        var maxCounter = new AtomicInteger(0);
         try {
-            final Set<String> current = nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
+            var activeNodes = nodeService.allActive(Node.Type.DATANODE);
+            // at this point, there should at least be the current node in the list of active nodes. If not, then we have a race condition with the
+            // registration of the node. So we sleep for a second and try again.
+            while (activeNodes.isEmpty()) {
+                Thread.sleep(1000);
+                activeNodes = nodeService.allActive(Node.Type.DATANODE);
+                if(maxCounter.getAndIncrement() > MAX_TRIES) {
+                    throw new RuntimeException("No active nodes found. Aborting DataNode.");
+                }
+            }
+            final Set<String> current = activeNodes.values().stream().map(Node::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
             Files.write(hostsfile, current, Charset.defaultCharset(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } catch (IOException iox) {
             LOG.error("Could not write to file: {} - {}", hostsfile, iox.getMessage());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
     }
