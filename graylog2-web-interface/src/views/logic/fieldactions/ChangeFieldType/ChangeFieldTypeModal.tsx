@@ -18,7 +18,7 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
-import { Select, Spinner } from 'components/common';
+import { HoverForHelp, Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
@@ -54,7 +54,7 @@ type Props = {
 
 const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const [rotated, setRotated] = useState(false);
+  const [rotated, setRotated] = useState(true);
   const [newFieldType, setNewFieldType] = useState(null);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
@@ -116,12 +116,12 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                         bsSize="large">
       <div>
         <Alert bsStyle="warning">
-          Changing the type of the field can have a significant impact on the ingestion of future log messages.
+          Changing the type of the field <b>{field}</b> can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
-        <Input label="New Field Type:" id="new-field-type">
+        <Input label={`New Field Type For ${field}:`} id="new-field-type">
           <StyledSelect inputId="field_type"
                         options={fieldTypeOptions}
                         value={newFieldType}
@@ -132,13 +132,19 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                         required />
         </Input>
         <Alert bsStyle="info">
-          By default the type will be changed in all index sets of the current message/search. By expanding the next section, you can select for which index sets you would like to make the change.
+          By default the <b>{newFieldType}</b> as a field type for <b>{field}</b> will be changed in all index sets of the current message/search. You can select for which index sets you would like to make the change.
         </Alert>
         <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelection} />
         <Input type="checkbox"
                id="rotate"
                name="rotate"
-               label="Rotate affected indices after change"
+               label={(
+                 <>Rotate affected indices after change
+                   <HoverForHelp displayLeftMargin>
+                     To see and use the <b>{newFieldType}</b> as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+                   </HoverForHelp>
+                 </>
+)}
                onChange={() => setRotated((cur) => !cur)}
                checked={rotated} />
       </div>
