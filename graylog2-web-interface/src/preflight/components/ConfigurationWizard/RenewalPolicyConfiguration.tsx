@@ -80,7 +80,7 @@ const defaultFormValues = {
 const RenewalPolicyConfiguration = () => {
   const queryClient = useQueryClient();
 
-  const { mutate: onSubmit } = useMutation(createPolicy, {
+  const { mutateAsync: onCreateRenewalPolicy } = useMutation(createPolicy, {
     onSuccess: () => {
       UserNotification.success('Renewal policy created successfully');
       queryClient.invalidateQueries(RENEWAL_POLICY_QUERY_KEY);
@@ -89,6 +89,8 @@ const RenewalPolicyConfiguration = () => {
       UserNotification.error(`Renewal policy creation failed with error: ${error}`);
     },
   });
+
+  const onSubmit = (formValues: FormValues) => onCreateRenewalPolicy(formValues).catch(() => {});
 
   return (
     <>
