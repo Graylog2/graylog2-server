@@ -156,7 +156,9 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
             final var nodes = dataNodeProvisioningService.findAllNodesThatNeedAttention();
             if(!nodes.isEmpty()) {
 
-                final var password = configuration.configuredCaExists() ? configuration.getCaPassword().toCharArray() : passwordSecret.toCharArray();
+                final var password = configuration.configuredCaExists()
+                        ? configuration.getCaPassword().toCharArray()
+                        : passwordSecret.toCharArray();
                 Optional<KeyStore> optKey = caService.loadKeyStore();
                 if (optKey.isEmpty()) {
                     LOG.debug("No keystore available.");
@@ -173,11 +175,9 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     okHttpClient = buildConnectivityCheckOkHttpClient();
                 }
 
-                KeyStore caKeystore = optKey.get();
+                final var caKeystore = optKey.get();
                 var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
                 var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
-
-                var rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
 
                 // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
                 var cfg = preflightConfigService.getPreflightConfigResult();
@@ -217,7 +217,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                 } else {
                                     var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
                                     //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
-                                    final List<X509Certificate> caCertificates = List.of(caCertificate, rootCertificate);
+                                    final List<X509Certificate> caCertificates = List.of(caCertificate);
                                     certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
                                 }
                             } catch (Exception e) {
