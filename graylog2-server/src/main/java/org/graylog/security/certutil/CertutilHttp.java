@@ -50,6 +50,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Locale;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 @Command(name = "http", description = "Manage certificates for data-node", groupNames = {"certutil"})

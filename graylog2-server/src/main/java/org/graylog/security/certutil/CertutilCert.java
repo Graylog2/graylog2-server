@@ -40,14 +40,13 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Arrays;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 
 @Command(name = "cert", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilCert implements CliCommand {
 
-    @Deprecated //no need to have separate alias for both certificates types
-    public static final String DATANODE_KEY_ALIAS = "datanode";
     @Option(name = "--ca", description = "Filename for the CA keystore")
     protected String caKeystoreFilename = "datanode-ca.p12";
 
@@ -83,7 +82,7 @@ public class CertutilCert implements CliCommand {
             KeyStore caKeystore = KeyStore.getInstance(PKCS12);
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
-            final Key caPrivateKey = caKeystore.getKey("ca", password);
+            final Key caPrivateKey = caKeystore.getKey(CA_KEY_ALIAS, password);
 
             final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
             final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");

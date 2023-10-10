@@ -70,6 +70,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
+
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningPeriodical.class);
@@ -204,8 +206,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 final var nodesWithCSR = nodesByState.get(DataNodeProvisioningConfig.State.CSR);
                 final var hasNodesWithCSR = !nodesWithCSR.isEmpty();
                 if (hasNodesWithCSR) {
-                    var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
-                    var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
+                    var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, password);
+                    var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
                     nodesWithCSR.forEach(c -> {
                         try {
                             var csr = csrStorage.readCsr(c.nodeId());

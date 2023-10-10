@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
 @Singleton
@@ -155,7 +156,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
                 if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) rootCert)) {
                     notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "root cert");
                 }
-                final var caCert = ks.getCertificate("ca");
+                final var caCert = ks.getCertificate(CA_KEY_ALIAS);
                 if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
                     notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
                 }

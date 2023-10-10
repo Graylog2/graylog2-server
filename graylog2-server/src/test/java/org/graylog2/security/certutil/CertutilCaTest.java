@@ -34,8 +34,9 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPathValidatorException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 
 class CertutilCaTest {
 

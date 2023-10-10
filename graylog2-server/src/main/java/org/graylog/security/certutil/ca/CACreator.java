@@ -25,6 +25,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 public class CACreator {
