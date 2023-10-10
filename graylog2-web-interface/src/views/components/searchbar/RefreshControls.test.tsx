@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
-import { Formik } from 'formik';
+import { Formik, useFormikContext, Form } from 'formik';
+import userEvent from '@testing-library/user-event';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
 import { asMock } from 'helpers/mocking';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+import Button from 'preflight/components/common/Button';
 
 import RefreshControls from './RefreshControls';
 
@@ -51,14 +53,18 @@ const autoRefreshOptions = {
 };
 
 describe('RefreshControls', () => {
-  const SUT = ({ onSubmit }: { onSubmit?: () => void }) => (
+  const SUT = ({ onSubmit, children }: { onSubmit?: () => void, children?: React.ReactNode }) => (
     <Formik initialValues={{}} onSubmit={onSubmit}>
-      <RefreshControls />
+      <Form>
+        <RefreshControls />
+        {children}
+      </Form>
     </Formik>
   );
 
   SUT.defaultProps = {
     onSubmit: () => {},
+    children: undefined,
   };
 
   beforeEach(() => {
@@ -107,5 +113,30 @@ describe('RefreshControls', () => {
     fireEvent.click(await screen.findByTitle(/pause refresh/i));
 
     expect(RefreshActions.disable).toHaveBeenCalled();
+  });
+
+  it('should submit the form when there are form changes while the refresh interval is active', async () => {
+    asMock(useRefreshConfig).mockReturnValue({ enabled: true, interval: 5000 });
+    const onSubmitMock = jest.fn();
+
+    const TriggerFormChangeButton = () => {
+      const { setFieldValue } = useFormikContext();
+
+      return (
+        <Button onClick={() => setFieldValue('example-field', 'example-value')}>
+          Change form field value
+        </Button>
+      );
+    };
+
+    render(
+      <SUT onSubmit={onSubmitMock}>
+        <TriggerFormChangeButton />
+      </SUT>,
+    );
+
+    userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
+
+    await waitFor(() => expect(onSubmitMock).toHaveBeenCalled());
   });
 });
