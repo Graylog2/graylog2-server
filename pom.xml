@@ -605,7 +605,7 @@
                                         <!-- Mockito should by now have all the features we need. -->
                                         <exclude>org.powermock</exclude>
 
-                                        <!-- Ban AWS SDK bundle dependencies for v1 and v2. These add hundreds of
+                                        <!-- Ban AWS SDK bundle dependencies for v1 and v2. These would add hundreds of
                                              megabytes to our production artifacts and must be avoided. -->
                                         <exclude>com.amazonaws:aws-java-sdk-bundle</exclude>
                                         <exclude>software.amazon.awssdk:bundle</exclude>
