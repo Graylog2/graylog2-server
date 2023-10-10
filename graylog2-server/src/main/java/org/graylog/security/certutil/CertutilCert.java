@@ -88,11 +88,11 @@ public class CertutilCert implements CliCommand {
 
             console.printLine("Successfully read CA from the keystore");
 
-            final KeyPair intermediateCA = new KeyPair((PrivateKey) caPrivateKey, null, caCertificate);
+            final KeyPair caPair = new KeyPair((PrivateKey) caPrivateKey, null, caCertificate);
 
             console.printLine("Generating private key and certificate for this datanode");
 
-            final CertRequest req = CertRequest.signed(Tools.getLocalCanonicalHostname(), intermediateCA)
+            final CertRequest req = CertRequest.signed(Tools.getLocalCanonicalHostname(), caPair)
                     .withSubjectAlternativeName("localhost")
                     .withSubjectAlternativeName(Tools.getLocalHostname())
                     .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
@@ -113,7 +113,7 @@ public class CertutilCert implements CliCommand {
             char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_CERTIFICATE_PASSWORD);
 
             nodeKeystore.setKeyEntry(CertConstants.DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
-                    new X509Certificate[]{nodePair.certificate(), intermediateCA.certificate()});
+                    new X509Certificate[]{nodePair.certificate(), caPair.certificate()});
 
 
             final Path nodeKeystorePath = Path.of(nodeKeystoreFilename);

@@ -222,7 +222,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                         .build());
                             } else {
                                 var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
-                                //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
                                 final List<X509Certificate> caCertificates = List.of(caCertificate);
                                 certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
                             }
