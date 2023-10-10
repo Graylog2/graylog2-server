@@ -52,11 +52,11 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 @Singleton
 public class CaServiceImpl implements CaService {
-    private static final String CA_ALIAS = "ca";
     private static final Logger LOG = LoggerFactory.getLogger(CaServiceImpl.class);
 
     public final String KEYSTORE_ID = "GRAYLOG CA";
@@ -123,7 +123,7 @@ public class CaServiceImpl implements CaService {
                 // Test, if upload is PEM file, must contain at least a certificate
                 if (pem.contains("-----BEGIN CERTIFICATE")) {
                     var ca = pemCaReader.readCA(pem, password);
-                    keyStore.setKeyEntry(CA_ALIAS, ca.privateKey(), passwordCharArray, ca.certificates().toArray(new Certificate[0]));
+                    keyStore.setKeyEntry(CA_KEY_ALIAS, ca.privateKey(), passwordCharArray, ca.certificates().toArray(new Certificate[0]));
                 } else {
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
                     keyStore.load(bais, passwordCharArray);

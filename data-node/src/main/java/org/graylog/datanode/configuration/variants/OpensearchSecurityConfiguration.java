@@ -102,6 +102,8 @@ public class OpensearchSecurityConfiguration {
         if (securityEnabled()) {
             config.putAll(commonSecureConfig());
 
+            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
+
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", transportCertificate.location().getFileName().toString()); // todo: this should be computed as a relative path
             config.put("plugins.security.ssl.transport.keystore_password", transportCertificate.passwordAsString());
