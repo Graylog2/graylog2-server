@@ -1,0 +1,5 @@
+type = "c"
+message = "Automatically submit search bar form changes, while search auto refresh is active."
+
+pulls = ["16870"]
+issues = ["Graylog2/graylog-plugin-enterprise#5896"]
