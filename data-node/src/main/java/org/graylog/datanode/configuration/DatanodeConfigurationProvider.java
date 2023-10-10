@@ -43,7 +43,7 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     private final DatanodeConfiguration datanodeConfiguration;
 
     @Inject
-    public DatanodeConfigurationProvider(final Configuration localConfiguration, IndexerJwtAuthTokenProvider jwtTokenProvider, OpensearchDistribution opensearchDistribution) throws IOException {
+    public DatanodeConfigurationProvider(final Configuration localConfiguration, IndexerJwtAuthTokenProvider jwtTokenProvider, OpensearchDistributionProvider opensearchDistribution) throws IOException {
         datanodeConfiguration = new DatanodeConfiguration(
                 opensearchDistribution,
                 getNodesFromConfig(localConfiguration.getDatanodeNodeName()),
