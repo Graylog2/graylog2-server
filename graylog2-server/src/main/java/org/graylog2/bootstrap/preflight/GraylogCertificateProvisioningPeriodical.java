@@ -68,6 +68,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
@@ -175,24 +176,20 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     okHttpClient = buildConnectivityCheckOkHttpClient();
                 }
 
-                final var caKeystore = optKey.get();
-                var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
-                var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
+                var nodesByState = nodes.stream().collect(Collectors.groupingBy(node -> Optional.ofNullable(node.state())
+                        .orElse(DataNodeProvisioningConfig.State.UNCONFIGURED)));
 
                 // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
                 var cfg = preflightConfigService.getPreflightConfigResult();
                 if (cfg.equals(PreflightConfigResult.FINISHED)) {
+                    var unconfiguredNodes = nodesByState.get(DataNodeProvisioningConfig.State.UNCONFIGURED);
                     if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
-                        nodes.stream()
-                                .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
-                                .forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
-                                        .state(DataNodeProvisioningConfig.State.CONFIGURED)
-                                        .build()));
+                        unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
+                                .state(DataNodeProvisioningConfig.State.CONFIGURED)
+                                .build()));
                     } else {
-                        var hasUnconfiguredNodes = nodes.stream()
-                                .filter(c -> DataNodeProvisioningConfig.State.UNCONFIGURED.equals(c.state()))
-                                .findFirst();
-                        if (hasUnconfiguredNodes.isPresent()) {
+                        var hasUnconfiguredNodes = !unconfiguredNodes.isEmpty();
+                        if (hasUnconfiguredNodes) {
                             var notification = notificationService.buildNow()
                                     .addType(Notification.Type.DATA_NODE_NEEDS_PROVISIONING)
                                     .addSeverity(Notification.Severity.URGENT);
@@ -201,33 +198,37 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
                         }
                     }
-                    }
+                }
 
-                nodes.stream()
-                        .filter(c -> DataNodeProvisioningConfig.State.CSR.equals(c.state()))
-                        .forEach(c -> {
-                            try {
-                                var csr = csrStorage.readCsr(c.nodeId());
-                                if (csr.isEmpty()) {
-                                    LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                                    dataNodeProvisioningService.save(c.toBuilder()
-                                            .state(DataNodeProvisioningConfig.State.ERROR)
-                                            .errorMsg("Node in CSR state, but no CSR present")
-                                            .build());
-                                } else {
-                                    var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
-                                    //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
-                                    final List<X509Certificate> caCertificates = List.of(caCertificate);
-                                    certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
-                                }
-                            } catch (Exception e) {
-                                LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                                dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                final var caKeystore = optKey.get();
+                final var nodesWithCSR = nodesByState.get(DataNodeProvisioningConfig.State.CSR);
+                final var hasNodesWithCSR = !nodesWithCSR.isEmpty();
+                if (hasNodesWithCSR) {
+                    var caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
+                    var caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
+                    nodesWithCSR.forEach(c -> {
+                        try {
+                            var csr = csrStorage.readCsr(c.nodeId());
+                            if (csr.isEmpty()) {
+                                LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
+                                dataNodeProvisioningService.save(c.toBuilder()
+                                        .state(DataNodeProvisioningConfig.State.ERROR)
+                                        .errorMsg("Node in CSR state, but no CSR present")
+                                        .build());
+                            } else {
+                                var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
+                                //TODO: assumptions about the chain, to contain 2 CAs, named "ca" and "root"...
+                                final List<X509Certificate> caCertificates = List.of(caCertificate);
+                                certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
                             }
-                        });
+                        } catch (Exception e) {
+                            LOG.error("Could not sign CSR: " + e.getMessage(), e);
+                            dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                        }
+                    });
+                }
 
-                nodes.stream()
-                        .filter(c -> DataNodeProvisioningConfig.State.STORED.equals(c.state()))
+                nodesByState.get(DataNodeProvisioningConfig.State.STORED)
                         .forEach(c -> {
                             dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTING).build());
                             executor.submit(() -> {
