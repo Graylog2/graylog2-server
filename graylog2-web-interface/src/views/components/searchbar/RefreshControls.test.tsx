@@ -18,6 +18,8 @@ import React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
+import { Formik } from 'formik';
+
 import { RefreshActions } from 'views/stores/RefreshStore';
 import { asMock } from 'helpers/mocking';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
@@ -49,6 +51,16 @@ const autoRefreshOptions = {
 };
 
 describe('RefreshControls', () => {
+  const SUT = ({ onSubmit }: { onSubmit?: () => void }) => (
+    <Formik initialValues={{}} onSubmit={onSubmit}>
+      <RefreshControls />
+    </Formik>
+  );
+
+  SUT.defaultProps = {
+    onSubmit: () => {},
+  };
+
   beforeEach(() => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: {
@@ -73,7 +85,7 @@ describe('RefreshControls', () => {
     ${false}     | ${1000}
   `('renders refresh controls with enabled: $enabled and interval: $interval', async ({ enabled, interval }) => {
       asMock(useRefreshConfig).mockReturnValue({ enabled, interval });
-      render(<RefreshControls />);
+      render(<SUT />);
 
       await screen.findByLabelText(/refresh search controls/i);
     });
@@ -81,7 +93,7 @@ describe('RefreshControls', () => {
 
   it('should start the interval', async () => {
     asMock(useRefreshConfig).mockReturnValue({ enabled: false, interval: 1000 });
-    render(<RefreshControls />);
+    render(<SUT />);
 
     fireEvent.click(await screen.findByTitle(/start refresh/i));
 
@@ -90,7 +102,7 @@ describe('RefreshControls', () => {
 
   it('should stop the interval', async () => {
     asMock(useRefreshConfig).mockReturnValue({ enabled: true, interval: 1000 });
-    render(<RefreshControls />);
+    render(<SUT />);
 
     fireEvent.click(await screen.findByTitle(/pause refresh/i));
 
