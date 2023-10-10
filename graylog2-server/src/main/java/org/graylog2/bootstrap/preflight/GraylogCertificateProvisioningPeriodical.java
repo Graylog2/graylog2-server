@@ -30,6 +30,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
 import org.graylog.security.certutil.cert.storage.CertChainStorage;
@@ -56,9 +57,11 @@ import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Objects;
@@ -162,7 +165,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 final var password = configuration.configuredCaExists()
                         ? configuration.getCaPassword().toCharArray()
                         : passwordSecret.toCharArray();
-                Optional<KeyStore> optKey = caService.loadKeyStore();
+                final Optional<KeyStore> optKey = caService.loadKeyStore();
                 if (optKey.isEmpty()) {
                     LOG.debug("No keystore available.");
                     return;
@@ -184,7 +187,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
                 var cfg = preflightConfigService.getPreflightConfigResult();
                 if (cfg.equals(PreflightConfigResult.FINISHED)) {
-                    var unconfiguredNodes = nodesByState.get(DataNodeProvisioningConfig.State.UNCONFIGURED);
+                    var unconfiguredNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.UNCONFIGURED, List.of());
                     if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
                         unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
                                 .state(DataNodeProvisioningConfig.State.CONFIGURED)
@@ -203,7 +206,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 }
 
                 final var caKeystore = optKey.get();
-                final var nodesWithCSR = nodesByState.get(DataNodeProvisioningConfig.State.CSR);
+                final var nodesWithCSR = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.CSR, List.of());
                 final var hasNodesWithCSR = !nodesWithCSR.isEmpty();
                 if (hasNodesWithCSR) {
                     var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, password);
@@ -230,7 +233,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     });
                 }
 
-                nodesByState.get(DataNodeProvisioningConfig.State.STORED)
+                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STORED, List.of())
                         .forEach(c -> {
                             dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTING).build());
                             executor.submit(() -> {
@@ -243,7 +246,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             });
                         });
             }
-        } catch (Exception e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreStorageException e) {
             throw new RuntimeException(e);
         }
     }
