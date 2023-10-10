@@ -84,8 +84,7 @@ public class CertutilCert implements CliCommand {
 
             final Key caPrivateKey = caKeystore.getKey(CA_KEY_ALIAS, password);
 
-            final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
-            final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+            final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
 
             console.printLine("Successfully read CA from the keystore");
 
@@ -113,8 +112,8 @@ public class CertutilCert implements CliCommand {
 
             char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_CERTIFICATE_PASSWORD);
 
-            nodeKeystore.setKeyEntry(DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
-                    new X509Certificate[]{nodePair.certificate(), intermediateCA.certificate(), rootCertificate});
+            nodeKeystore.setKeyEntry(CertConstants.DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
+                    new X509Certificate[]{nodePair.certificate(), intermediateCA.certificate()});
 
 
             final Path nodeKeystorePath = Path.of(nodeKeystoreFilename);
