@@ -38,10 +38,12 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.leader.LeaderElectionModule;
+import org.graylog2.cluster.lock.LockServiceModule;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
+import org.graylog2.migrations.V20230929142900_CreateInitialPreflightPassword;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -91,16 +93,21 @@ public class PreflightWebModule extends Graylog2Module {
         serviceBinder.addBinding().to(PreflightJerseyService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
 
+        install(new LockServiceModule());
         install(new LeaderElectionModule(configuration));
 
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
         bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
+
+        migrationsBinder().addBinding().to(V20230929142900_CreateInitialPreflightPassword.class);
 
         // needed for the ObjectMapperModule
         MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
                 new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
                 });
+
+
     }
 
     protected void addPreflightRestResource(Class<?> restResourceClass) {

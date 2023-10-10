@@ -38,7 +38,7 @@ const createCA = (caData: FormValues) => fetch(
 const CACreateForm = () => {
   const queryClient = useQueryClient();
 
-  const { mutate: onSubmit } = useMutation(createCA, {
+  const { mutateAsync: onCreateCA } = useMutation(createCA, {
     onSuccess: () => {
       UserNotification.success('CA created successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
@@ -47,6 +47,8 @@ const CACreateForm = () => {
       UserNotification.error(`CA creation failed with error: ${error}`);
     },
   });
+
+  const onSubmit = (formValues: FormValues) => onCreateCA(formValues).catch(() => {});
 
   return (
     <div>
