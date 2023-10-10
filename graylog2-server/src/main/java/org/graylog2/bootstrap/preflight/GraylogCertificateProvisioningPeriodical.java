@@ -16,7 +16,14 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,7 +36,6 @@ import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
@@ -49,20 +55,27 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import java.io.IOException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningPeriodical.class);
+    private static final int THREADPOOL_THREADS = 5;
+    private static final int CONNECTION_ATTEMPTS = 40;
+    private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS = 3;
+    private static final int RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS = 2;
 
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService nodeService;
@@ -79,6 +92,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final PreflightConfigService preflightConfigService;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
     private final NotificationService notificationService;
+    private final ExecutorService executor;
 
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
@@ -107,6 +121,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
+        this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -214,36 +229,66 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 nodes.stream()
                         .filter(c -> DataNodeProvisioningConfig.State.STORED.equals(c.state()))
                         .forEach(c -> {
-                            try {
-                                if (checkConnectivity(c.nodeId())) {
-                                    dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTED).build());
+                            dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTING).build());
+                            executor.submit(() -> {
+                                try {
+                                    checkConnectivity(c);
+                                } catch (ExecutionException | RetryException e) {
+                                    LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
+                                    dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
                                 }
-                            } catch (Exception e) {
-                                LOG.warn("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage() + ", retrying", e);
-                            }
+                            });
                         });
             }
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private boolean checkConnectivity(final String nodeId) throws NodeNotFoundException, IOException {
-        final var node = nodeService.byNodeId(nodeId);
-        Request request = new Request.Builder().url(node.getTransportAddress()).build();
-        if(okHttpClient.isPresent()) {
-            OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
-            builder.authenticator((route, response) -> response.request().newBuilder().header("Authorization", indexerJwtAuthTokenProvider.get()).build());
-            Call call = builder.build().newCall(request);
-            try(Response response = call.execute()) {
-                return response.isSuccessful();
-            }
-        } else {
-            return false;
-        }
-     }
+    private void checkConnectivity(final DataNodeProvisioningConfig config) throws ExecutionException, RetryException {
+        LOG.info("Starting connectivity check with node {}", config.nodeId());
+        final var counter = new AtomicInteger(0);
+        final var nodeId = config.nodeId();
+        RetryerBuilder.<String>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        LOG.debug("Waiting for datanode {} to come up, attempt {}", config.nodeId(), attempt.getAttemptNumber());
+                        counter.incrementAndGet();
+                    }
+                })
+                .retryIfResult(check -> Objects.equals("false", check))
+                .build()
+                .call(() -> {
+                    try {
+                        final var node = nodeService.byNodeId(nodeId);
+                        Request request = new Request.Builder().url(node.getTransportAddress()).build();
+                        if (okHttpClient.isPresent()) {
+                            OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
+                            builder.authenticator((route, response) -> response.request().newBuilder().header("Authorization", indexerJwtAuthTokenProvider.get()).build());
+                            Call call = builder.build().newCall(request);
+                            try (Response response = call.execute()) {
+                                if (response.isSuccessful()) {
+                                    dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTED).build());
+                                    LOG.info("Connectivity check successful with node {}", nodeId);
+                                    return "true";
+                                }
+                                return "false";
+                            }
+                        } else {
+                            return "false";
+                        }
+                    } catch (Exception e) {
+                        // swallow exceptions during the first minute
+                        if (counter.get() > (CONNECTION_ATTEMPTS / RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS)) {
+                            LOG.warn("Exception trying to connect to node " + config.nodeId() + ": " + e.getMessage() + ", retrying", e);
+                        }
+                        return "false";
+                    }
+                });
+    }
 
     @NotNull
     @Override

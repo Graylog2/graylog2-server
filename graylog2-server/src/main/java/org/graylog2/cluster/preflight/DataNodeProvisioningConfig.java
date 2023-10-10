@@ -37,6 +37,7 @@ public abstract class DataNodeProvisioningConfig {
         CSR, // DataNode created the CSR
         SIGNED, // Graylog CA signed the CSR
         STORED, // Certificate is combined with private key and stored in Mongo
+        CONNECTING, // connectivity check running until error or connected
         CONNECTED, // DataNode started with the certificate
         ERROR // sh*t happened
     }
