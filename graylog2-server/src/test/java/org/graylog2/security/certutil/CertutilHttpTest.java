@@ -98,9 +98,9 @@ class CertutilHttpTest {
         var hostname = Tools.getLocalCanonicalHostname();
         final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(DATANODE_KEY_ALIAS);
         Assertions.assertThat(certificateChain)
-                .hasSize(3)
-                .extracting(c ->(X509Certificate)c)
+                .hasSize(2)
+                .extracting(c -> (X509Certificate) c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=root", "CN=ca", "CN=" + hostname);
+                .contains("CN=ca", "CN=" + hostname);
     }
 }
