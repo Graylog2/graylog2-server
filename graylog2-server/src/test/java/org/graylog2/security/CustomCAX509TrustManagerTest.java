@@ -115,10 +115,10 @@ public class CustomCAX509TrustManagerTest {
         var hostname = Tools.getLocalCanonicalHostname();
         final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(DATANODE_KEY_ALIAS);
         Assertions.assertThat(certificateChain)
-                .hasSize(3)
-                .extracting(c ->(X509Certificate)c)
+                .hasSize(2)
+                .extracting(c -> (X509Certificate) c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=root", "CN=ca", "CN=" + hostname);
+                .contains("CN=ca", "CN=" + hostname);
 
         // additional Tests
         final var noAdditionalKeystore = new DummyCaService(null);
@@ -129,7 +129,7 @@ public class CustomCAX509TrustManagerTest {
         final var customTM = new CustomCAX509TrustManager(additionalKeystore, serverEventBus);
 
         final var default_issuers = defaultTM.getAcceptedIssuers().length;
-        Assertions.assertThat(customTM.getAcceptedIssuers().length).isEqualTo(default_issuers + 2);
+        Assertions.assertThat(customTM.getAcceptedIssuers().length).isEqualTo(default_issuers + 1);
 
         final var cert = (X509Certificate) nodeKeyStore.getCertificate(DATANODE_KEY_ALIAS);
 
