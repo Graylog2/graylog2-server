@@ -50,7 +50,7 @@ public class OpensearchBinPreflightCheck implements PreflightCheck {
     public void runCheck() throws PreflightCheckException {
         final Path opensearchDir = opensearchDirSupplier.get();
         if (!Files.isDirectory(opensearchDir)) {
-            throw new PreflightCheckException("Opensearch base directory " + opensearchDirSupplier + " doesn't exist!");
+            throw new PreflightCheckException("Opensearch base directory " + opensearchDir + " doesn't exist!");
         }
 
         final Path binPath = opensearchDir.resolve(Paths.get("bin", "opensearch"));
