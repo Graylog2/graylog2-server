@@ -164,7 +164,7 @@ const Buttons = () => {
   }, [handleNextClick, setRotated]);
 
   const handleWithoutRotation = useCallback(() => {
-    setRotated(true);
+    setRotated(false);
     handleNextClick();
   }, [handleNextClick, setRotated]);
 
@@ -308,7 +308,8 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
     <ChangeFieldTypeContext.Provider value={contextValue}>
       <BootstrapModalWrapper showModal={show}
                              onHide={onCancel}
-                             backdrop>
+                             backdrop
+                             bsSize="large">
         <form>
           <Modal.Header closeButton>
             <Modal.Title><span>Change {field} field type <BetaBadge /></span></Modal.Title>
@@ -319,7 +320,8 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                     onStepChange={handleStepChange}
                     horizontal
                     containerClassName=""
-                    hidePreviousNextButtons />
+                    hidePreviousNextButtons
+                    justified />
           </Modal.Body>
           <Modal.Footer>
             <Buttons />
