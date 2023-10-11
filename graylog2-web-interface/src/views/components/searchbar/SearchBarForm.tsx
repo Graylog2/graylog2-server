@@ -30,6 +30,7 @@ import validate from 'views/components/searchbar/validate';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useHandlerContext from 'views/components/useHandlerContext';
+import AutoRefresh from 'views/components/searchbar/AutoRefresh';
 
 type FormRenderer = (props: FormikProps<SearchBarFormValues>) => React.ReactNode;
 type Props = {
@@ -79,6 +80,7 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
                                  validateOnMount={validateOnMount}>
       {(...args) => (
         <Form>
+          {/* <AutoRefresh /> */}
           {_isFunction(children) ? children(...args) : children}
         </Form>
       )}

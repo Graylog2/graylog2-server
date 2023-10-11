@@ -211,6 +211,8 @@ const QueryInput = ({
   name,
 }: Props) => {
   const { userTimezone } = useUserDateTime();
+  // const refreshConfig = useRefreshConfig();
+  // const { submitForm } = useFormikContext();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
   const completer = useCompleter({ streams, timeRange, completerFactory, userTimezone });

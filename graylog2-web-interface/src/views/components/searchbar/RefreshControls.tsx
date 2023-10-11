@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
@@ -53,35 +53,40 @@ const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: {
 
 const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
-const useSubmitOnFormChange = (refreshEnabled: boolean) => {
-  const { dirty, isSubmitting, submitForm } = useFormikContext();
-
-  useEffect(() => {
-    if (refreshEnabled && dirty && !isSubmitting) {
-      submitForm();
-    }
-  }, [dirty, isSubmitting, refreshEnabled, submitForm]);
-};
-
 const RefreshControls = () => {
+  const { isValidating, submitForm, isValid, isSubmitting } = useFormikContext();
+  // const { submitForm } = useFormikContext();
   const refreshConfig = useRefreshConfig();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
+  const [intervalValue, setIntervalValue] = useState(0);
 
-  const _onChange = (interval: number) => {
+  const _onChange = (newIntervalValue: number) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
       app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'refresh-search-control-dropdown',
-      event_details: { interval: interval },
+      event_details: { interval: newIntervalValue },
     });
 
-    RefreshActions.setInterval(interval);
+    setIntervalValue(newIntervalValue);
+
+    RefreshActions.setInterval(newIntervalValue);
   };
 
   useEffect(() => () => RefreshActions.disable(), []);
-  useSubmitOnFormChange(!!refreshConfig?.enabled);
+  // useSubmitOnFormChange(!!refreshConfig?.enabled);
+
+  useEffect(() => {
+    const interval = intervalValue ? setInterval(() => {
+      if (isValid && !isSubmitting && !isValidating) {
+        submitForm();
+      }
+    }, intervalValue) : null;
+
+    return () => clearInterval(interval);
+  }, [intervalValue, isSubmitting, isValid, isValidating, submitForm]);
 
   const _toggleEnable = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
@@ -101,7 +106,7 @@ const RefreshControls = () => {
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
     <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>
   ));
-  const intervalDuration = moment.duration(refreshConfig.interval);
+  const intervalDuration = moment.duration(intervalValue);
   const naturalInterval = intervalDuration.asSeconds() < 60
     ? (
       <span>{intervalDuration.asSeconds()} <Pluralize singular="second"

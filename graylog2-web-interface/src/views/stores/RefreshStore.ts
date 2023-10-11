@@ -51,7 +51,7 @@ export const RefreshStore = singletonStore(
     refreshConfig: {},
     defaultInterval: undefined,
 
-    intervalId: undefined,
+    // intervalId: undefined,
 
     init() {
       this.listenTo(SearchConfigStore, this.onDefaultIntervalChange, this.onDefaultIntervalChange);
@@ -71,34 +71,34 @@ export const RefreshStore = singletonStore(
       return this.refreshConfig;
     },
 
-    _scheduleRefresh() {
-      if (this.intervalId) {
-        clearInterval(this.intervalId);
-      }
-
-      if (this.refreshConfig.enabled) {
-        const { interval } = this.refreshConfig;
-
-        return setTimeout(async () => {
-          await RefreshActions.refresh();
-          this.intervalId = this._scheduleRefresh();
-        }, interval);
-      }
-
-      return undefined;
-    },
+    // _scheduleRefresh() {
+    //   if (this.intervalId) {
+    //     clearInterval(this.intervalId);
+    //   }
+    //
+    //   if (this.refreshConfig.enabled) {
+    //     const { interval } = this.refreshConfig;
+    //
+    //     return setTimeout(async () => {
+    //       await RefreshActions.refresh();
+    //       this.intervalId = this._scheduleRefresh();
+    //     }, interval);
+    //   }
+    //
+    //   return undefined;
+    // },
 
     setInterval(interval: number) {
       this.refreshConfig = { interval, enabled: true };
 
-      this.intervalId = this._scheduleRefresh();
+      // this.intervalId = this._scheduleRefresh();
       this._trigger();
     },
 
     enable() {
       this.refreshConfig = { interval: this.refreshConfig.interval ?? moment.duration(this.defaultInterval).asMilliseconds(), enabled: true };
 
-      this.intervalId = this._scheduleRefresh();
+      // this.intervalId = this._scheduleRefresh();
 
       this._trigger();
     },
@@ -106,15 +106,15 @@ export const RefreshStore = singletonStore(
     disable() {
       this.refreshConfig = { ...this.refreshConfig, enabled: false };
 
-      this.intervalId = this._scheduleRefresh();
+      // this.intervalId = this._scheduleRefresh();
 
       this._trigger();
     },
 
     _trigger() {
-      const { enabled, interval } = this.refreshConfig;
+      const { enabled } = this.refreshConfig;
 
-      this.trigger({ enabled, interval });
+      this.trigger({ enabled });
     },
   }),
 );
