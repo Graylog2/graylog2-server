@@ -85,7 +85,7 @@ type Props = {
   },
 }
 
-const hasRetentionConfigField = (configData: any, field: string): configData is RetentionStrategyConfig => field in configData;
+const hasRetentionConfigField = (configData: StrategyConfig, field: string): configData is RetentionStrategyConfig => field in configData;
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
