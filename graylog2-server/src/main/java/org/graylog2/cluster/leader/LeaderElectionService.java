@@ -16,7 +16,9 @@
  */
 package org.graylog2.cluster.leader;
 
-public interface LeaderElectionService {
+import com.google.common.util.concurrent.Service;
+
+public interface LeaderElectionService extends Service {
     /**
      * Check if the current node is the leader of the cluster.
      * <p>

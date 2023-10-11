@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.exceptions;
 
-public class CACreationException extends Exception {
+import { useContext, useMemo } from 'react';
 
-    public CACreationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+import { ActionContext } from 'views/logic/ActionContext';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import { filtersToStreamSet } from 'views/logic/queries/Query';
 
-    public CACreationException(String message) {
-        super(message);
-    }
-}
+const useCurrentStream = () => {
+  const { widget, message } = useContext(ActionContext);
+  const currentQuery = useCurrentQuery();
+
+  return useMemo(() => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS() ?? [], [message?.fields?.streams, currentQuery.filter, widget?.streams]);
+};
+
+export default useCurrentStream;

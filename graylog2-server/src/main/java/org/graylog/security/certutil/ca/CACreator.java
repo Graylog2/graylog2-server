@@ -25,6 +25,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 public class CACreator {
@@ -32,13 +33,8 @@ public class CACreator {
                              final Duration certificateValidity) throws CACreationException {
 
         try {
-            KeyPair rootCA = CertificateGenerator.generate(
-                    CertRequest.selfSigned("root")
-                            .isCA(true)
-                            .validity(certificateValidity)
-            );
-            KeyPair intermediateCA = CertificateGenerator.generate(
-                    CertRequest.signed("ca", rootCA)
+            final KeyPair rootCA = CertificateGenerator.generate(
+                    CertRequest.selfSigned("ca")
                             .isCA(true)
                             .validity(certificateValidity)
             );
@@ -47,14 +43,10 @@ public class CACreator {
             // TODO: check, if password should be used/set
             caKeystore.load(null, null);
 
-            caKeystore.setKeyEntry("root",
+            caKeystore.setKeyEntry(CA_KEY_ALIAS,
                     rootCA.privateKey(),
                     password,
                     new X509Certificate[]{rootCA.certificate()});
-            caKeystore.setKeyEntry("ca",
-                    intermediateCA.privateKey(),
-                    password,
-                    new X509Certificate[]{intermediateCA.certificate(), rootCA.certificate()});
 
             return caKeystore;
 

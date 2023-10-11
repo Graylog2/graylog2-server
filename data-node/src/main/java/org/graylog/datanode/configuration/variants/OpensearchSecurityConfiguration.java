@@ -102,6 +102,8 @@ public class OpensearchSecurityConfiguration {
         if (securityEnabled()) {
             config.putAll(commonSecureConfig());
 
+            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
+
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", transportCertificate.location().getFileName().toString()); // todo: this should be computed as a relative path
             config.put("plugins.security.ssl.transport.keystore_password", transportCertificate.passwordAsString());
@@ -110,11 +112,6 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILENAME);
             config.put("plugins.security.ssl.transport.truststore_password", truststore.passwordAsString());
-
-            // this disables hostname verification for transport. It's a workaround for localnode communication
-            // via SSL, where Opensearch still tries to communicate with 'localhost' and not the publish_host or other
-            // configured node names.
-            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
 
             config.put("plugins.security.ssl.http.enabled", "true");
 

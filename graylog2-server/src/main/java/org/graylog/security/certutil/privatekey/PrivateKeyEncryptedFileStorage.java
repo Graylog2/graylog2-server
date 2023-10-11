@@ -61,7 +61,7 @@ public record PrivateKeyEncryptedFileStorage(Path privateKeyFilename) implements
 
     @Override
     public PrivateKey readEncryptedKey(char[] password)
-            throws IOException, OperatorCreationException, PKCSException {
+            throws IOException, PKCSException {
         PEMParser parser = new PEMParser(new FileReader(privateKeyFilename.toFile(), Charset.defaultCharset()));
         PKCS8EncryptedPrivateKeyInfo encPrivKeyInfo = (PKCS8EncryptedPrivateKeyInfo) parser.readObject();
         InputDecryptorProvider pkcs8Prov = new JcePKCSPBEInputDecryptorProviderBuilder()

@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.ca.exceptions;
+package org.graylog2.migrations;
 
-public class CACreationException extends Exception {
-
-    public CACreationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public CACreationException(String message) {
-        super(message);
-    }
+public enum MigrationType {
+    /**
+     * Will run _before_ the preflight interface starts
+     */
+    PREFLIGHT,
+    /**
+     * Will run during a regular startup, after the preflight is either skipped or finished. This is the default
+     * behaviour for most of our migrations.
+     */
+    STANDARD
 }
