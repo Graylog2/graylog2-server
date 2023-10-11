@@ -60,4 +60,7 @@ export const DATA_NODES_STATUS = {
   ERROR: {
     key: 'ERROR',
   },
+  CONNECTING: {
+    key: 'CONNECTING',
+  },
 };

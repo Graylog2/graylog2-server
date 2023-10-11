@@ -22,6 +22,7 @@ import Spinner from 'components/common/Spinner';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { Alert, Badge, List } from 'preflight/components/common';
 import Icon from 'preflight/components/common/Icon';
+import type { DataNodeStatus } from 'preflight/types';
 
 const P = styled.p`
   max-width: 700px;
@@ -36,13 +37,22 @@ const SecureIcon = styled(Icon)`
 `;
 
 type NodeProps = {
+  status: DataNodeStatus,
   nodeId: string,
   transportAddress: string,
 };
 
 const isSecure = (address: string) => address?.toLocaleLowerCase().startsWith('https://');
 
-const colorByState = (address: string) => {
+const colorByState = (status: DataNodeStatus, address: string) => {
+  if (status === 'CONNECTING') {
+    return 'yellow';
+  }
+
+  if (status === 'ERROR') {
+    return 'red';
+  }
+
   if (!address) {
     return 'grey';
   }
@@ -51,10 +61,20 @@ const colorByState = (address: string) => {
 };
 
 const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'unlock');
+const isConnecting = (status: DataNodeStatus) => status === 'CONNECTING';
+const ConnectingSpinner = () => <Spinner text="" />;
 
-const Node = ({ nodeId, transportAddress }: NodeProps) => (
-  <NodeId color={colorByState(transportAddress)} title="Short node id"><SecureIcon name={lockIcon(transportAddress)} />{nodeId}</NodeId>
+const Node = ({ nodeId, transportAddress, status }: NodeProps) => (
+  <NodeId color={colorByState(status, transportAddress)} title="Short node id">
+    <SecureIcon name={lockIcon(transportAddress)} />{nodeId}
+    {isConnecting(status) ? <>{' '}<ConnectingSpinner /></> : null}
+  </NodeId>
 );
+
+const ErrorBadge = styled(Badge)`
+  margin-left: 5px;
+`;
+const Error = ({ message }: { message: string }) => <ErrorBadge title={message} color="red">{message}</ErrorBadge>;
 
 const DataNodesOverview = () => {
   const {
@@ -82,11 +102,15 @@ const DataNodesOverview = () => {
               hostname,
               transport_address,
               short_node_id,
+              status,
+              error_msg,
+
             }) => (
               <List.Item key={short_node_id}>
-                <Node nodeId={short_node_id} transportAddress={transport_address} />
+                <Node status={status} nodeId={short_node_id} transportAddress={transport_address} />
                 <span title="Transport address">{transport_address}</span>{' – '}
                 <span title="Hostname">{hostname}</span>
+                {error_msg && <Error message={error_msg} />}
               </List.Item>
             ))}
           </List>
