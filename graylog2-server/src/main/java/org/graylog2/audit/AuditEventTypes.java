@@ -185,6 +185,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DASHBOARD_WIDGET_DELETE)
             .add(DASHBOARD_WIDGET_POSITIONS_UPDATE)
             .add(DASHBOARD_WIDGET_UPDATE)
+            .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)
