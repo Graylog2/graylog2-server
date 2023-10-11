@@ -51,6 +51,17 @@ const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: {
   return <>{buttonText}</>;
 };
 
+const useDisableOnFormChange = () => {
+  const refreshConfig = useRefreshConfig();
+  const { dirty, isSubmitting } = useFormikContext();
+
+  useEffect(() => {
+    if (refreshConfig.enabled && !isSubmitting && dirty) {
+      RefreshActions.disable();
+    }
+  }, [dirty, isSubmitting, refreshConfig.enabled]);
+};
+
 const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
 const RefreshControls = () => {
@@ -69,9 +80,14 @@ const RefreshControls = () => {
     });
 
     RefreshActions.setInterval(interval);
+
+    if (dirty) {
+      submitForm();
+    }
   };
 
   useEffect(() => () => RefreshActions.disable(), []);
+  useDisableOnFormChange();
 
   const _toggleEnable = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {

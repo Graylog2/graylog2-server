@@ -66,6 +66,16 @@ describe('RefreshControls', () => {
     children: undefined,
   };
 
+  const TriggerFormChangeButton = () => {
+    const { setFieldValue } = useFormikContext();
+
+    return (
+      <Button onClick={() => setFieldValue('example-field', 'example-value')}>
+        Change form field value
+      </Button>
+    );
+  };
+
   beforeEach(() => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: {
@@ -118,16 +128,6 @@ describe('RefreshControls', () => {
     asMock(useRefreshConfig).mockReturnValue({ enabled: false, interval: 5000 });
     const onSubmitMock = jest.fn();
 
-    const TriggerFormChangeButton = () => {
-      const { setFieldValue } = useFormikContext();
-
-      return (
-        <Button onClick={() => setFieldValue('example-field', 'example-value')}>
-          Change form field value
-        </Button>
-      );
-    };
-
     render(
       <SUT onSubmit={onSubmitMock}>
         <TriggerFormChangeButton />
@@ -138,5 +138,19 @@ describe('RefreshControls', () => {
     userEvent.click(await screen.findByTitle(/start refresh/i));
 
     await waitFor(() => expect(onSubmitMock).toHaveBeenCalled());
+  });
+
+  it('should stop the interval when there are form changes while the interval is active', async () => {
+    asMock(useRefreshConfig).mockReturnValue({ enabled: true, interval: 5000 });
+
+    render(
+      <SUT>
+        <TriggerFormChangeButton />
+      </SUT>,
+    );
+
+    userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
+
+    await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalled());
   });
 });
