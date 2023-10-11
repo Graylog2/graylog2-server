@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -41,6 +42,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.function.Predicate;
+
+import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 
 @RequiresAuthentication
 @Api(value = "DataNodes/API", description = "Proxy direct access to Data Node's API")
@@ -63,6 +66,7 @@ public class DataNodeApiProxyResource extends RestResource {
 
     @GET
     @ApiOperation(value = "GET request to Data Node's API")
+    @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestGet(@ApiParam(name = "path", required = true)
                                @PathParam("path") String path,
                                @Context ContainerRequestContext requestContext) throws IOException {
@@ -71,6 +75,7 @@ public class DataNodeApiProxyResource extends RestResource {
 
     @POST
     @ApiOperation(value = "POST request to Data Node's API")
+    @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestPost(@ApiParam(name = "path", required = true)
                                 @PathParam("path") String path,
                                 @Context ContainerRequestContext requestContext) throws IOException {
@@ -79,6 +84,7 @@ public class DataNodeApiProxyResource extends RestResource {
 
     @PUT
     @ApiOperation(value = "PUT request to Data Node's API")
+    @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestPut(@ApiParam(name = "path", required = true)
                                @PathParam("path") String path,
                                @Context ContainerRequestContext requestContext) throws IOException {
@@ -87,6 +93,7 @@ public class DataNodeApiProxyResource extends RestResource {
 
     @DELETE
     @ApiOperation(value = "DELETE request to Data Node's API")
+    @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestDelete(@ApiParam(name = "path", required = true)
                                   @PathParam("path") String path,
                                   @Context ContainerRequestContext requestContext) throws IOException {
