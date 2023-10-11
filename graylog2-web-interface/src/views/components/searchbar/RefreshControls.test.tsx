@@ -15,14 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
+import { Form, Formik, useFormikContext } from 'formik';
+import userEvent from '@testing-library/user-event';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
 import { asMock } from 'helpers/mocking';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+import Button from 'preflight/components/common/Button';
 
 import RefreshControls from './RefreshControls';
 
@@ -49,6 +52,20 @@ const autoRefreshOptions = {
 };
 
 describe('RefreshControls', () => {
+  const SUT = ({ onSubmit, children }: { onSubmit?: () => void, children?: React.ReactNode }) => (
+    <Formik initialValues={{}} onSubmit={onSubmit}>
+      <Form>
+        <RefreshControls />
+        {children}
+      </Form>
+    </Formik>
+  );
+
+  SUT.defaultProps = {
+    onSubmit: () => {},
+    children: undefined,
+  };
+
   beforeEach(() => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: {
@@ -73,7 +90,7 @@ describe('RefreshControls', () => {
     ${false}     | ${1000}
   `('renders refresh controls with enabled: $enabled and interval: $interval', async ({ enabled, interval }) => {
       asMock(useRefreshConfig).mockReturnValue({ enabled, interval });
-      render(<RefreshControls />);
+      render(<SUT />);
 
       await screen.findByLabelText(/refresh search controls/i);
     });
@@ -81,19 +98,45 @@ describe('RefreshControls', () => {
 
   it('should start the interval', async () => {
     asMock(useRefreshConfig).mockReturnValue({ enabled: false, interval: 1000 });
-    render(<RefreshControls />);
+    render(<SUT />);
 
-    fireEvent.click(await screen.findByTitle(/start refresh/i));
+    userEvent.click(await screen.findByTitle(/start refresh/i));
 
     expect(RefreshActions.enable).toHaveBeenCalled();
   });
 
   it('should stop the interval', async () => {
     asMock(useRefreshConfig).mockReturnValue({ enabled: true, interval: 1000 });
-    render(<RefreshControls />);
+    render(<SUT />);
 
-    fireEvent.click(await screen.findByTitle(/pause refresh/i));
+    userEvent.click(await screen.findByTitle(/pause refresh/i));
 
     expect(RefreshActions.disable).toHaveBeenCalled();
+  });
+
+  it('should submit the form when there are changes when starting the interval', async () => {
+    asMock(useRefreshConfig).mockReturnValue({ enabled: false, interval: 5000 });
+    const onSubmitMock = jest.fn();
+
+    const TriggerFormChangeButton = () => {
+      const { setFieldValue } = useFormikContext();
+
+      return (
+        <Button onClick={() => setFieldValue('example-field', 'example-value')}>
+          Change form field value
+        </Button>
+      );
+    };
+
+    render(
+      <SUT onSubmit={onSubmitMock}>
+        <TriggerFormChangeButton />
+      </SUT>,
+    );
+
+    userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
+    userEvent.click(await screen.findByTitle(/start refresh/i));
+
+    await waitFor(() => expect(onSubmitMock).toHaveBeenCalled());
   });
 });

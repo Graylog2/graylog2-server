@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useEffect } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
 import { Icon, Pluralize } from 'components/common';
@@ -53,6 +54,7 @@ const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: {
 const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
 const RefreshControls = () => {
+  const { dirty, submitForm } = useFormikContext();
   const refreshConfig = useRefreshConfig();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -82,9 +84,13 @@ const RefreshControls = () => {
     if (refreshConfig.enabled) {
       RefreshActions.disable();
     } else {
+      if (dirty) {
+        submitForm();
+      }
+
       RefreshActions.enable();
     }
-  }, [refreshConfig?.enabled, sendTelemetry]);
+  }, [dirty, refreshConfig.enabled, sendTelemetry, submitForm]);
 
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
     <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>
