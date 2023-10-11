@@ -22,6 +22,7 @@ import okhttp3.HttpUrl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class simply delegates the safe methods to the {@link java.net.URL}.
@@ -104,6 +105,10 @@ public class URL {
 
     public int getPort() {
         return url.port();
+    }
+
+    public boolean hasParsedUrl() {
+        return Objects.nonNull(this.url);
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
