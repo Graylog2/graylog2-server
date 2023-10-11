@@ -148,7 +148,7 @@
         <log4j.version>2.20.0</log4j.version>
         <lucene.version>9.1.0</lucene.version>
         <metrics.version>4.1.9</metrics.version>
-        <mongodb-driver.version>4.8.1</mongodb-driver.version>
+        <mongodb-driver.version>4.11.0</mongodb-driver.version>
         <mongojack.version>2.10.1.3</mongojack.version>
         <mongojack4.version>4.8.0-1</mongojack4.version>
         <natty.version>0.13</natty.version>
