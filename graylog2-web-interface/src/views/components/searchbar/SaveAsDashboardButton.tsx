@@ -34,7 +34,6 @@ const SaveAsDashboardButton = ({ onClick, openSaveAsModal }: Props) => {
     actionKey: 'save-as',
     callback: () => openSaveAsModal(),
     scope: 'dashboard',
-    telemetryAppPathname: 'search',
     options: { enabled: !hasUndeclaredParameters },
   });
 
