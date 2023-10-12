@@ -81,7 +81,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
         this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
         this.keystoreStorage = keystoreStorage;
         // TODO: merge with real storage
-        this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve("privateKey.cert"));
+        this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(datanodeConfiguration.datanodeDirectories().getConfigurationTargetDir().resolve("privateKey.cert"));
         this.passwordSecret = passwordSecret.toCharArray();
     }
 

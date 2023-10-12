@@ -74,13 +74,13 @@ public class OpensearchSecurityConfiguration {
      * initial set of opensearch users, it will create and persist a truststore that will be set as a system-wide
      * truststore.
      */
-    public OpensearchSecurityConfiguration configure(Configuration localConfiguration, DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
+    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
         if (securityEnabled()) {
 
             logCertificateInformation("transport certificate", transportCertificate);
             logCertificateInformation("HTTP certificate", httpCertificate);
 
-            final Path opensearchConfigDir = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir();
+            final Path opensearchConfigDir = datanodeConfiguration.datanodeDirectories().getConfigurationTargetDir();
 
             final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
