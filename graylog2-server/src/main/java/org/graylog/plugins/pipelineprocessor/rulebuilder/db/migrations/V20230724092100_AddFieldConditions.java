@@ -54,7 +54,7 @@ public class V20230724092100_AddFieldConditions extends Migration {
         Arrays.stream(noConversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeNoConversion(type)));
         String[] conversionTypes = {"map", "string", "url"};
         Arrays.stream(conversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldType(type)));
-        String[] conversionParamTypes = {"bool", "double", "long", "ip"};
+        String[] conversionParamTypes = {"bool", "double", "long", "ip", "number"};
         Arrays.stream(conversionParamTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeConversionParam(type)));
         ruleFragmentService.upsert(createCheckDateField());
         ruleFragmentService.upsert(createCIDRMatchField());
