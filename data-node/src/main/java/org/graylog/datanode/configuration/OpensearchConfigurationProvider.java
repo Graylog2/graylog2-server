@@ -117,7 +117,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             }
 
             return new OpensearchConfiguration(
-                    datanodeConfiguration.opensearchDistribution().directory(),
+                    datanodeConfiguration.opensearchDistributionProvider().get().directory(),
                     opensearchConfigLocation,
                     localConfiguration.getBindAddress(),
                     localConfiguration.getHostname(),

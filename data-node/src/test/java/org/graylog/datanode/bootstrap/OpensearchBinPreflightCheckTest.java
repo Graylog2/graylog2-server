@@ -37,7 +37,7 @@ public class OpensearchBinPreflightCheckTest {
     @Test
     void testNonexistentDirectory() {
         final Path baseDirectory = tempDir.resolve("nonexistent");
-        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(baseDirectory);
+        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> baseDirectory);
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
                 .hasMessage("Opensearch base directory %s doesn't exist!", baseDirectory.toAbsolutePath());
@@ -53,7 +53,7 @@ public class OpensearchBinPreflightCheckTest {
         // nonexistent!
         final Path executable = binDir.resolve("opensearch");
 
-        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(baseDir);
+        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> baseDir);
 
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
@@ -68,7 +68,7 @@ public class OpensearchBinPreflightCheckTest {
         final Path executable = binDir.resolve("opensearch");
         Files.createFile(executable);
 
-        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(baseDir);
+        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> baseDir);
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
                 .hasMessageStartingWith(StringUtils.f("Opensearch binary %s is not executable!", executable.toAbsolutePath()));
@@ -85,7 +85,7 @@ public class OpensearchBinPreflightCheckTest {
        Files.setPosixFilePermissions(executable, Collections.singleton(PosixFilePermission.OWNER_EXECUTE));
 
 
-        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(baseDir);
+        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> baseDir);
         Assertions.assertThatCode(check::runCheck)
                 .doesNotThrowAnyException();
     }

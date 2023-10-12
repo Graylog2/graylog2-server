@@ -18,6 +18,8 @@ package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
 import org.graylog.datanode.OpensearchDistribution;
+import org.graylog.datanode.configuration.OpensearchArchitecture;
+import org.graylog.datanode.configuration.OpensearchDistributionProvider;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,7 +189,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     }
 
     private static ImageFromDockerfile createImage() {
-        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
+        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem() + ".tar.gz";
         final Path downloadedOpensearch = getPath().resolve(Path.of("downloads", opensearchTarArchive));
 
         if(!Files.exists(downloadedOpensearch)) {

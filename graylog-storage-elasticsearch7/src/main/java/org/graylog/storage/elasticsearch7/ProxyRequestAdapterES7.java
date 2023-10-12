@@ -14,27 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.storage.elasticsearch7;
 
-import React, { useState, useCallback } from 'react';
+import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 
-import useHotkey from 'hooks/useHotkey';
-import HotkeyModal from 'components/hotkeys/HotkeysModal';
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-const HotkeysModalContainer = () => {
-  const [show, setShow] = useState(false);
-  const toggleModal = useCallback(() => setShow((cur) => !cur), []);
+public class ProxyRequestAdapterES7 implements ProxyRequestAdapter {
+    private static final String ERROR_MESSAGE = "This functionality is only available when the Data Node is used.";
 
-  useHotkey({
-    actionKey: 'show-hotkeys-modal',
-    callback: toggleModal,
-    scope: 'general',
-  });
-
-  if (!show) {
-    return null;
-  }
-
-  return <HotkeyModal onToggle={() => toggleModal()} />;
-};
-
-export default HotkeysModalContainer;
+    @Override
+    public ProxyResponse request(ProxyRequest request) throws IOException {
+        return new ProxyResponse(400, new ByteArrayInputStream(ERROR_MESSAGE.getBytes(StandardCharsets.UTF_8)));
+    }
+}

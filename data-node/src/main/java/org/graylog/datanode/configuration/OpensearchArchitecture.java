@@ -16,17 +16,24 @@
  */
 package org.graylog.datanode.configuration;
 
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
+public enum OpensearchArchitecture {
+    x64,
+    aarch64;
 
-/**
- * DatanodeConfiguration holds the static configuration as parsed during the datanode startup, either from the
- * config file or from the ENV properties.
- */
-public record DatanodeConfiguration(
-        OpensearchDistributionProvider opensearchDistributionProvider,
-        String nodeName,
-        int processLogsBufferSize,
-        IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider
-) {
+    public static OpensearchArchitecture fromOperatingSystem() {
+        final var osArch = System.getProperty("os.arch");
+        return fromCode(osArch);
+    }
+
+    public static OpensearchArchitecture fromCode(String osArch) {
+        return switch (osArch) {
+            case "amd64" -> x64;
+            case "x86_64" -> x64;
+            case "x64" -> x64;
+            case "aarch64" -> aarch64;
+            case "arm64" -> aarch64;
+            default ->
+                    throw new UnsupportedOperationException("Unsupported OpenSearch distribution architecture: " + osArch);
+        };
+    }
 }

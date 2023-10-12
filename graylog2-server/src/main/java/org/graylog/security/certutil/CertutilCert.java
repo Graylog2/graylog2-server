@@ -40,14 +40,13 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Arrays;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 
 @Command(name = "cert", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilCert implements CliCommand {
 
-    @Deprecated //no need to have separate alias for both certificates types
-    public static final String DATANODE_KEY_ALIAS = "datanode";
     @Option(name = "--ca", description = "Filename for the CA keystore")
     protected String caKeystoreFilename = "datanode-ca.p12";
 
@@ -83,18 +82,17 @@ public class CertutilCert implements CliCommand {
             KeyStore caKeystore = KeyStore.getInstance(PKCS12);
             caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
-            final Key caPrivateKey = caKeystore.getKey("ca", password);
+            final Key caPrivateKey = caKeystore.getKey(CA_KEY_ALIAS, password);
 
-            final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
-            final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+            final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
 
             console.printLine("Successfully read CA from the keystore");
 
-            final KeyPair intermediateCA = new KeyPair((PrivateKey) caPrivateKey, null, caCertificate);
+            final KeyPair caPair = new KeyPair((PrivateKey) caPrivateKey, null, caCertificate);
 
             console.printLine("Generating private key and certificate for this datanode");
 
-            final CertRequest req = CertRequest.signed(Tools.getLocalCanonicalHostname(), intermediateCA)
+            final CertRequest req = CertRequest.signed(Tools.getLocalCanonicalHostname(), caPair)
                     .withSubjectAlternativeName("localhost")
                     .withSubjectAlternativeName(Tools.getLocalHostname())
                     .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
@@ -114,8 +112,8 @@ public class CertutilCert implements CliCommand {
 
             char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_CERTIFICATE_PASSWORD);
 
-            nodeKeystore.setKeyEntry(DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
-                    new X509Certificate[]{nodePair.certificate(), intermediateCA.certificate(), rootCertificate});
+            nodeKeystore.setKeyEntry(CertConstants.DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
+                    new X509Certificate[]{nodePair.certificate(), caPair.certificate()});
 
 
             final Path nodeKeystorePath = Path.of(nodeKeystoreFilename);
