@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.export.TestData;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
@@ -63,7 +64,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void setUp() {
         indexLookup = mock(IndexLookup.class);
 
-        sut = new ElasticsearchExportBackend(indexLookup, requestStrategy(), false);
+        sut = new ElasticsearchExportBackend(indexLookup, requestStrategy(), false, new IgnoreSearchFilters());
     }
 
     private RequestStrategy requestStrategy() {
