@@ -16,9 +16,6 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import org.apache.logging.log4j.core.appender.rolling.action.DeletingVisitor;
-import org.apache.logging.log4j.core.appender.rolling.action.PathCondition;
-import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
@@ -31,13 +28,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 
 public class OpensearchConfigSync implements PreflightCheck {
@@ -53,7 +46,7 @@ public class OpensearchConfigSync implements PreflightCheck {
 
     @Override
     public void runCheck() throws PreflightCheckException {
-        final Path opensearchProcessConfigurationDir = configuration.datanodeDirectories().getOpensearchProcessConfigurationLocation();
+        final Path opensearchProcessConfigurationDir = configuration.datanodeDirectories().getOpensearchProcessConfigurationDir();
         LOG.info("Directory used for Opensearch process configuration is {}", opensearchProcessConfigurationDir.toAbsolutePath());
 
         try {

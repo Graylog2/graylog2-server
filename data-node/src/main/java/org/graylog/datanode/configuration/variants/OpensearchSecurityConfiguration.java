@@ -80,7 +80,7 @@ public class OpensearchSecurityConfiguration {
             logCertificateInformation("transport certificate", transportCertificate);
             logCertificateInformation("HTTP certificate", httpCertificate);
 
-            final Path opensearchConfigDir = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationLocation();
+            final Path opensearchConfigDir = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir();
 
             final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);

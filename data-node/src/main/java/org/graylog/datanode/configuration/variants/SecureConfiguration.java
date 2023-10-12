@@ -27,6 +27,6 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
 
     public SecureConfiguration(final DatanodeConfiguration localConfiguration) {
         this.datanodeConfigDir = localConfiguration.datanodeDirectories().getConfigurationSourceDir();
-        this.opensearchConfigDir = localConfiguration.datanodeDirectories().getOpensearchProcessConfigurationLocation();
+        this.opensearchConfigDir = localConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir();
     }
 }

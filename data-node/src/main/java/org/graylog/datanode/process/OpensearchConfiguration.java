@@ -81,7 +81,7 @@ public record OpensearchConfiguration(
 
     public Environment getEnv() {
         final Environment env = new Environment(System.getenv());
-        env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationLocation().toString());
+        env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
         return env;
     }
 

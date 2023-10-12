@@ -89,7 +89,7 @@ public class DatanodeDirectories {
      * This directory is used by us to store all runtime-generated configuration of datanode. This
      * could be truststores, private keys, certificates and other generated config files.
      *
-     * We also synchronize and generate opensearch configuration into a subdir of this dir, see {@link #getOpensearchProcessConfigurationLocation()}
+     * We also synchronize and generate opensearch configuration into a subdir of this dir, see {@link #getOpensearchProcessConfigurationDir()}
      * Read-write permissions required.
      */
     public Path getConfigurationTargetDir() {
@@ -101,7 +101,7 @@ public class DatanodeDirectories {
      * configuration. Opensearch is then instructed to accept this dir as its base configuration dir (OPENSEARCH_PATH_CONF env property).
      * @see org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync
      */
-    public Path getOpensearchProcessConfigurationLocation() {
+    public Path getOpensearchProcessConfigurationDir() {
         return resolvePath(configurationTargetDir).resolve("opensearch");
     }
 
