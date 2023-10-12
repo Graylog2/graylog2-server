@@ -115,7 +115,8 @@ public class DatanodeDirectories {
                 "dataTargetDir='" + getDataTargetDir() + '\'' +
                 ", logsTargetDir='" + getLogsTargetDir() + '\'' +
                 ", configurationSourceDir='" + getConfigurationSourceDir() + '\'' +
-                ", configurationTargetDir='" + configurationTargetDir + '\'' +
+                ", configurationTargetDir='" + getConfigurationTargetDir() + '\'' +
+                ", opensearchProcessConfigurationDir='" + getOpensearchProcessConfigurationDir() + '\'' +
                 '}';
     }
 }
