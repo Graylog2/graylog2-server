@@ -16,11 +16,21 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import type {
+  RetentionStrategyConfig,
+  RotationStrategy,
+  TimeBasedRotationStrategyConfig,
+  JsonSchema,
+  StrategyConfig,
+  Strategy,
+  Strategies,
+} from 'components/indices/Types';
+import type { SystemConfigurationComponentProps } from 'views/types';
 import {
   ARCHIVE_RETENTION_STRATEGY,
   NOOP_RETENTION_STRATEGY,
@@ -31,6 +41,51 @@ import {
 } from 'stores/indices/IndicesStore';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
+import { useIndexRetention } from 'components/indices/contexts/IndexRetentionContext';
+
+type IndexMaintenanceStrategiesFormValues = {
+  rotation_strategy?: RotationStrategy,
+  rotation_strategy_class?: string,
+  retention_strategy_class?: string,
+}
+
+interface ConfigComponentProps extends SystemConfigurationComponentProps {
+  config: StrategyConfig,
+  jsonSchema: JsonSchema,
+  updateConfig: (update: StrategyConfig) => void
+  useMaxNumberOfIndices?: () => [
+    number | undefined,
+    React.Dispatch<React.SetStateAction<number>>
+  ],
+}
+
+type Props = {
+  title: string,
+  name: string,
+  description?: string,
+  selectPlaceholder: string,
+  pluginExports: Array<{
+    type: string,
+    displayName: string,
+    configComponent: React.ComponentType<ConfigComponentProps>
+  }>,
+  strategies: Strategies,
+  retentionStrategiesContext: {
+    max_index_retention_period?: string,
+  },
+  activeConfig: {
+    strategy: string,
+    config: StrategyConfig,
+  },
+  getState: (strategy: string, data: StrategyConfig) => {
+    rotation_strategy_config?: StrategyConfig,
+    rotation_strategy_class?: string,
+    retention_strategy_config?: StrategyConfig,
+    retention_strategy_class?: string,
+  },
+}
+
+const hasRetentionConfigField = (configData: StrategyConfig, field: string): configData is RetentionStrategyConfig => field in configData;
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
@@ -44,39 +99,54 @@ const StyledAlert = styled(Alert)`
   margin-left: 15px;
 `;
 
-const getStrategyJsonSchema = (selectedStrategy, strategies) => {
+const getStrategyJsonSchema = (selectedStrategy: string, strategies: Strategies) : JsonSchema | undefined => {
   const result = strategies.filter((s) => s.type === selectedStrategy)[0];
 
   return result ? result.json_schema : undefined;
 };
 
-const getDefaultStrategyConfig = (selectedStrategy, strategies) => {
+const getDefaultStrategyConfig = (selectedStrategy: string, strategies: Strategies) : StrategyConfig | undefined => {
   const result = strategies.filter((s) => s.type === selectedStrategy)[0];
 
   return result ? result.default_config : undefined;
 };
 
-const getTimeBaseStrategyWithElasticLimit = (activeConfig, strategies) => {
-  const timeBasedStrategy = getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY, strategies);
+const getTimeBaseStrategyWithElasticLimit = (activeConfig: TimeBasedRotationStrategyConfig, strategies: Strategies) : StrategyConfig => {
+  const timeBasedStrategy = getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY, strategies) as TimeBasedRotationStrategyConfig;
 
   return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
 };
 
-const getStrategyConfig = (configTypeName, selectedStrategy, activeStrategy, activeConfig, strategies) => {
+const getStrategyConfig = (configTypeName: string, selectedStrategy: string, activeStrategy: string, activeConfig: StrategyConfig, strategies: Strategies) : StrategyConfig | undefined => {
   if (selectedStrategy === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && configTypeName === 'retention') {
     return activeConfig;
   }
 
   if (activeStrategy === selectedStrategy) {
     // If the newly selected strategy is the current active strategy, we use the active configuration.
-    return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? getTimeBaseStrategyWithElasticLimit(activeConfig, strategies) : activeConfig;
+    return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? getTimeBaseStrategyWithElasticLimit(activeConfig as TimeBasedRotationStrategyConfig, strategies) : activeConfig;
   }
 
   // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
   return getDefaultStrategyConfig(selectedStrategy, strategies);
 };
 
-const getConfigurationComponent = (configTypeName, selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
+const getConfigurationComponent = (
+  configTypeName: string,
+  selectedStrategy: string,
+  pluginExports: Array<{
+    type: string,
+    displayName: string,
+    configComponent: React.ComponentType,
+  }>,
+  strategies: Strategies,
+  strategy: Strategy | string,
+  config: StrategyConfig,
+  onConfigUpdate: (update: StrategyConfig) => void,
+  useMaxNumberOfIndices: () => [
+    number | undefined,
+    React.Dispatch<React.SetStateAction<number>>
+  ]) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
   }
@@ -87,14 +157,23 @@ const getConfigurationComponent = (configTypeName, selectedStrategy, pluginExpor
     return null;
   }
 
-  const strategyConfig = getStrategyConfig(configTypeName, selectedStrategy, strategy, config, strategies);
-  const element = React.createElement(strategyPlugin.configComponent, {
+  const strategyType = typeof strategy === 'string' ? strategy : strategy.type;
+
+  const strategyConfig = getStrategyConfig(configTypeName, selectedStrategy, strategyType, config, strategies);
+
+  let componentProps : ConfigComponentProps = {
     config: strategyConfig,
     jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
     updateConfig: onConfigUpdate,
-  });
+  };
 
-  return (<span key={strategy.type}>{element}</span>);
+  if (selectedStrategy === ARCHIVE_RETENTION_STRATEGY) {
+    componentProps = { ...componentProps, useMaxNumberOfIndices };
+  }
+
+  const element = React.createElement(strategyPlugin.configComponent as React.ComponentType<ConfigComponentProps>, componentProps);
+
+  return (<span key={strategyType}>{element}</span>);
 };
 
 const IndexMaintenanceStrategiesConfiguration = ({
@@ -107,8 +186,8 @@ const IndexMaintenanceStrategiesConfiguration = ({
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
   activeConfig: { strategy, config },
   getState,
-}) => {
-  const [newStrategy, setNewStrategy] = useState(strategy);
+} : Props) => {
+  const [newStrategy, setNewStrategy] = useState<string | undefined>(strategy);
   const {
     setValues,
     values,
@@ -117,7 +196,15 @@ const IndexMaintenanceStrategiesConfiguration = ({
       rotation_strategy_class: rotationStrategyClass,
       retention_strategy_class: retentionStrategyClass,
     },
-  } = useFormikContext();
+  } = useFormikContext<IndexMaintenanceStrategiesFormValues>();
+
+  const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
+
+  useEffect(() => {
+    if (config && hasRetentionConfigField(config, 'max_number_of_indices')) {
+      setMaxNumberOfIndices(config.max_number_of_indices);
+    }
+  }, [config, setMaxNumberOfIndices]);
 
   const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
   const isArchiveRetention = retentionStrategyClass !== ARCHIVE_RETENTION_STRATEGY;
@@ -240,6 +327,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
             rotationStrategy,
             rotationStrategy,
             _onIndexTimeSizeOptimizingUpdate,
+            () => [maxNumberOfIndices, setMaxNumberOfIndices],
           )}
           {shouldShowNormalRetentionForm && getConfigurationComponent(
             name,
@@ -249,6 +337,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
             strategy,
             config,
             _onConfigUpdate,
+            () => [maxNumberOfIndices, setMaxNumberOfIndices],
           )}
         </Col>
       </Row>

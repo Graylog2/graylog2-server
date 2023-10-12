@@ -16,14 +16,13 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState } from 'react';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
+import { useIndexRetention } from 'components/indices/contexts/IndexRetentionContext';
 
-const ClosingRetentionStrategyConfiguration = ({ config, updateConfig }) => {
-  const { max_number_of_indices } = config;
-  const [maxNumberOfIndices, setMaxNumberOfIndices] = useState(max_number_of_indices);
+const ClosingRetentionStrategyConfiguration = ({ updateConfig }) => {
+  const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
 
   const _onInputUpdate = (field) => (e) => {
     const update = {};
@@ -50,7 +49,6 @@ const ClosingRetentionStrategyConfiguration = ({ config, updateConfig }) => {
 };
 
 ClosingRetentionStrategyConfiguration.propTypes = {
-  config: PropTypes.object.isRequired,
   updateConfig: PropTypes.func.isRequired,
 };
 

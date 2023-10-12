@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class ProxyRequestAdapterProvider extends VersionAwareProvider<ProxyRequestAdapter> {
     @Inject
-    public ProxyRequestAdapterProvider(@DetectedSearchVersion SearchVersion elasticsearchVersion, Map<SearchVersion, Provider<ProxyRequestAdapter>> pluginBindings) {
-        super(elasticsearchVersion, pluginBindings);
+    public ProxyRequestAdapterProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<ProxyRequestAdapter>> pluginBindings) {
+        super(indexerVersion, pluginBindings);
     }
 }
