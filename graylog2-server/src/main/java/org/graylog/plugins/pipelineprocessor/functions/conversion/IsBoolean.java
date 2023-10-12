@@ -16,12 +16,15 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.conversion;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
+
+import java.util.Objects;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -44,14 +47,7 @@ public class IsBoolean extends AbstractFunction<Boolean> {
         if (!convert) {
             return value instanceof Boolean;
         }
-        if (value instanceof Boolean) {
-            return true;
-        }
-        try {
-            return Boolean.parseBoolean(String.valueOf(value));
-        } catch (Exception e) {
-            return false;
-        }
+        return Objects.nonNull(BooleanUtils.toBooleanObject(String.valueOf(value)));
     }
 
     @Override
