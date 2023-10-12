@@ -27,6 +27,8 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_BUTTON_CLICKED: 'Search Button Clicked',
   SEARCH_FILTER_CREATE_CLICKED: 'Search Filter Create Clicked',
   SEARCH_FILTER_CREATED: 'Search Filter Created',
+  SEARCH_FILTER_UPDATED: 'Search Filter Updated',
+  SEARCH_FILTER_DELETED: 'Search Filter Deleted',
   SEARCH_FILTER_LOAD_CLICKED: 'Search Filter Load Clicked',
   SEARCH_FILTER_LOADED: 'Search Filter Loaded',
   SEARCH_FILTER_ITEM_MENU_TOGGLED: 'Search Filter Item Menu Toggled',
@@ -308,6 +310,27 @@ export const TELEMETRY_EVENT_TYPE = {
     BACKEND_CONFIGURATION_DELETED: 'Archive Backend Configuration Deleted',
     CONFIGURATION_UPDATED: 'Archive Configuration Update',
   },
+  LICENSE: {
+    VALIDATED: 'License Validated',
+    SAVED: 'License Saved',
+    DELETED: 'License Deleted',
+  },
+  REPORT: {
+    CONFIGURED: 'Report Configured',
+    DELETED: 'Report Deleted',
+    SENT: 'Report Sent',
+    CREATED: 'Report Created',
+    UPDATED: 'Report Updated',
+  },
+  CUSTOMIZATION: {
+    NOTIFICATION_CREATED: 'Customization Notification Created',
+    NOTIFICATION_DELETED: 'Customization Notification Deleted',
+    NOTIFICATION_BULK_DELETED: 'Customization Notification Bulk Deleted',
+    THEME_REVERTED: 'Customization Theme Reverted',
+    THEME_RESETED: 'Customization Theme Reseted',
+  },
+  TRAFFIC_VIOLATION_CONFIGURATION_SAVED: 'Traffic Violation Configuration Saved',
+  FAILURE_PROCESSING_CONFIGURATION_SAVED: 'Failure Processing Configuration Saved',
 } as const;
 
 type ExtractObjectValues<T extends object> = {
