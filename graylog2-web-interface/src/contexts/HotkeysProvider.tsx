@@ -38,6 +38,8 @@ export const hotKeysCollections: HotkeyCollections = {
     description: 'General keyboard shortcuts',
     actions: {
       'show-hotkeys-modal': { keys: 'shift+?', displayKeys: '?', description: 'Show available keyboard shorts' },
+      'submit-form': { keys: 'enter', description: 'Submit form' },
+      'close-modal': { keys: 'esc', description: 'Close modal' },
     },
   },
   search: {

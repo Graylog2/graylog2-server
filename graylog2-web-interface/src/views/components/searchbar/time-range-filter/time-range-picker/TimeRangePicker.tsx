@@ -223,7 +223,10 @@ const TimeRangePicker = ({
                                          onSubmit={handleSubmit}
                                          validateOnMount>
         {(({ isValid, submitForm }) => (
-          <KeyCapture shortcuts={{ enter: submitForm, esc: handleCancel }}>
+          <KeyCapture shortcuts={[
+            { actionKey: 'submit-form', callback: submitForm, scope: 'general', options: { displayInOverview: false } },
+            { actionKey: 'close-modal', callback: handleCancel, scope: 'general', options: { displayInOverview: false } },
+          ]}>
             <Form>
               <Row>
                 <Col md={12}>
