@@ -14,27 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.storage.providers;
 
-import React, { useState, useCallback } from 'react';
+import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.VersionAwareProvider;
 
-import useHotkey from 'hooks/useHotkey';
-import HotkeyModal from 'components/hotkeys/HotkeysModal';
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Map;
 
-const HotkeysModalContainer = () => {
-  const [show, setShow] = useState(false);
-  const toggleModal = useCallback(() => setShow((cur) => !cur), []);
-
-  useHotkey({
-    actionKey: 'show-hotkeys-modal',
-    callback: toggleModal,
-    scope: 'general',
-  });
-
-  if (!show) {
-    return null;
-  }
-
-  return <HotkeyModal onToggle={() => toggleModal()} />;
-};
-
-export default HotkeysModalContainer;
+public class ProxyRequestAdapterProvider extends VersionAwareProvider<ProxyRequestAdapter> {
+    @Inject
+    public ProxyRequestAdapterProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<ProxyRequestAdapter>> pluginBindings) {
+        super(indexerVersion, pluginBindings);
+    }
+}

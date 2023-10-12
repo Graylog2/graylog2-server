@@ -14,27 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.indexer.datanode;
 
-import React, { useState, useCallback } from 'react';
+import java.io.IOException;
+import java.io.InputStream;
 
-import useHotkey from 'hooks/useHotkey';
-import HotkeyModal from 'components/hotkeys/HotkeysModal';
+public interface ProxyRequestAdapter {
+    record ProxyRequest(String method, String path, InputStream body) {}
 
-const HotkeysModalContainer = () => {
-  const [show, setShow] = useState(false);
-  const toggleModal = useCallback(() => setShow((cur) => !cur), []);
+    record ProxyResponse(int status, InputStream response) {}
 
-  useHotkey({
-    actionKey: 'show-hotkeys-modal',
-    callback: toggleModal,
-    scope: 'general',
-  });
-
-  if (!show) {
-    return null;
-  }
-
-  return <HotkeyModal onToggle={() => toggleModal()} />;
-};
-
-export default HotkeysModalContainer;
+    ProxyResponse request(ProxyRequest request) throws IOException;
+}

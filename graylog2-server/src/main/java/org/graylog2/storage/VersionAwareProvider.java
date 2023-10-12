@@ -25,8 +25,8 @@ public class VersionAwareProvider<T> implements Provider<T> {
     private final Map<SearchVersion, Provider<T>> pluginBindings;
 
     @Inject
-    public VersionAwareProvider(@DetectedSearchVersion SearchVersion elasticsearchVersion, Map<SearchVersion, Provider<T>> pluginBindings) {
-        this.elasticsearchMajorVersion = majorVersionFrom(elasticsearchVersion);
+    public VersionAwareProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<T>> pluginBindings) {
+        this.elasticsearchMajorVersion = majorVersionFrom(indexerVersion);
         this.pluginBindings = pluginBindings;
     }
 
