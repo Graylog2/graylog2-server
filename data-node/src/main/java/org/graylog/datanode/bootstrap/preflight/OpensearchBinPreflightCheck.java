@@ -28,25 +28,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class OpensearchBinPreflightCheck implements PreflightCheck {
 
-    private final Path opensearchDir;
+    private final Supplier<Path> opensearchDirSupplier;
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchBinPreflightCheck.class);
 
     @Inject
     public OpensearchBinPreflightCheck(DatanodeConfiguration datanodeConfiguration) {
-        this(datanodeConfiguration.opensearchDistribution().directory());
+        this(() -> datanodeConfiguration.opensearchDistributionProvider().get().directory());
     }
 
-    public OpensearchBinPreflightCheck(Path opensearchBaseDirectory) {
-        this.opensearchDir = opensearchBaseDirectory;
+    public OpensearchBinPreflightCheck(Supplier<Path> opensearchBaseDirectory) {
+        this.opensearchDirSupplier = opensearchBaseDirectory;
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
+        final Path opensearchDir = opensearchDirSupplier.get();
         if (!Files.isDirectory(opensearchDir)) {
             throw new PreflightCheckException("Opensearch base directory " + opensearchDir + " doesn't exist!");
         }

@@ -30,6 +30,7 @@ import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
+import org.graylog.datanode.configuration.OpensearchDistributionProvider;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
@@ -271,16 +272,6 @@ public class Configuration extends BaseConfiguration {
     public void validatePasswordSecret() throws ValidationException {
         if (passwordSecret == null || passwordSecret.length() < 16) {
             throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateOpenSearchDistribution() throws ValidationException {
-        try {
-            OpensearchDistribution.detectInDirectory(Path.of(getOpensearchDistributionRoot()));
-        } catch (RuntimeException | IOException e) {
-            throw new ValidationException("Could not detect OpenSearch in " + getOpensearchDistributionRoot() + ", please check your installation. Error was: " + e.getMessage());
         }
     }
 
