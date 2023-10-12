@@ -27,6 +27,7 @@ import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -58,10 +59,13 @@ public class DataNodeApiProxyResource extends RestResource {
     );
 
     private final ProxyRequestAdapter proxyRequestAdapter;
+    private final boolean enableAllowlist;
 
     @Inject
-    public DataNodeApiProxyResource(ProxyRequestAdapter proxyRequestAdapter) {
+    public DataNodeApiProxyResource(ProxyRequestAdapter proxyRequestAdapter,
+                                    @Named("datanode_proxy_api_allowlist") boolean enableAllowlist) {
         this.proxyRequestAdapter = proxyRequestAdapter;
+        this.enableAllowlist = enableAllowlist;
     }
 
     @GET
@@ -102,7 +106,7 @@ public class DataNodeApiProxyResource extends RestResource {
 
     private Response request(String method, String path, InputStream entityStream) throws IOException {
         final var request = new ProxyRequestAdapter.ProxyRequest(method, path, entityStream);
-        if (allowList.stream().noneMatch(condition -> condition.test(request))) {
+        if (enableAllowlist && allowList.stream().noneMatch(condition -> condition.test(request))) {
             return Response.status(Response.Status.BAD_REQUEST).entity("This request is not allowed.").build();
         }
 
