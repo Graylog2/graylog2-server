@@ -86,7 +86,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.trustManager = trustManager;
         this.nodeService = nodeService;
         this.configuration = configuration;
-        this.hostsfile = Path.of(configuration.getOpensearchConfigLocation()).resolve("opensearch").resolve("unicast_hosts.txt");
+        this.hostsfile = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationLocation().resolve("unicast_hosts.txt");
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {

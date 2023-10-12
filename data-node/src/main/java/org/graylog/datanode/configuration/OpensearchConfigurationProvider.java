@@ -112,13 +112,13 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             if (chosenSecurityConfigurationVariant.isPresent()) {
                 securityConfiguration = chosenSecurityConfigurationVariant.get()
                         .build()
-                        .configure(localConfiguration, signingKey);
+                        .configure(localConfiguration, datanodeConfiguration, signingKey);
                 opensearchProperties.putAll(securityConfiguration.getProperties());
             }
 
             return new OpensearchConfiguration(
-                    datanodeConfiguration.opensearchDistributionProvider().get().directory(),
-                    opensearchConfigLocation,
+                    datanodeConfiguration.opensearchDistributionProvider().get(),
+                    datanodeConfiguration.datanodeDirectories(),
                     localConfiguration.getBindAddress(),
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
@@ -137,7 +137,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
         localConfiguration.getOpensearchNetworkHostHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());

@@ -20,6 +20,7 @@ import org.graylog.datanode.configuration.OpensearchArchitecture;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public record OpensearchDistribution(Path directory, String version, @Nullable String platform,
                                      @Nullable OpensearchArchitecture architecture) {
@@ -28,4 +29,7 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
         this(path, version, null, null);
     }
 
+    public Path getOpensearchBinFile() {
+        return directory.resolve(Paths.get("bin", "opensearch"));
+    }
 }

@@ -18,6 +18,7 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import org.bouncycastle.operator.OperatorException;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
@@ -72,7 +73,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                                            final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
                                            final SmartKeystoreStorage keystoreStorage,
                                            final @Named("password_secret") String passwordSecret,
-                                           final Configuration configuration) {
+                                           final DatanodeConfiguration datanodeConfiguration) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -82,7 +83,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
         this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
         this.keystoreStorage = keystoreStorage;
         // TODO: merge with real storage
-        this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(Path.of(configuration.getOpensearchConfigLocation()).resolve("privateKey.cert"));
+        this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationLocation().resolve("privateKey.cert"));
         this.passwordSecret = passwordSecret.toCharArray();
     }
 
