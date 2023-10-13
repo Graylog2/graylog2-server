@@ -242,6 +242,7 @@ export const TELEMETRY_EVENT_TYPE = {
     PACKS_OVERRIDE_FORM_OPENED: 'Illuminate Packs Override Form Opened',
     PACKS_OVERRIDE_SAVED: 'Illuminate Packs Override Saved',
   },
+  SHORTCUT_TYPED: 'Shortcut Typed',
 } as const;
 
 type ExtractObjectValues<T extends object> = {

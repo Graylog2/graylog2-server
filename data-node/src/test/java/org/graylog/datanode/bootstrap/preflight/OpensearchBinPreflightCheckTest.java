@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap;
+package org.graylog.datanode.bootstrap.preflight;
 
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.shared.utilities.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,10 @@ public class OpensearchBinPreflightCheckTest {
     @Test
     void testNonexistentDirectory() {
         final Path baseDirectory = tempDir.resolve("nonexistent");
-        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(baseDirectory);
+
+        final OpensearchDistribution dist = new OpensearchDistribution(baseDirectory, "2.10.0");
+
+        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> dist);
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
                 .hasMessage("Opensearch base directory %s doesn't exist!", baseDirectory.toAbsolutePath());
@@ -53,7 +56,8 @@ public class OpensearchBinPreflightCheckTest {
         // nonexistent!
         final Path executable = binDir.resolve("opensearch");
 
-        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(baseDir);
+        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, "2.10.0");
+        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> dist);
 
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
@@ -68,7 +72,9 @@ public class OpensearchBinPreflightCheckTest {
         final Path executable = binDir.resolve("opensearch");
         Files.createFile(executable);
 
-        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(baseDir);
+        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, "2.10.0");
+
+        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> dist);
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
                 .hasMessageStartingWith(StringUtils.f("Opensearch binary %s is not executable!", executable.toAbsolutePath()));
@@ -84,8 +90,9 @@ public class OpensearchBinPreflightCheckTest {
         Files.createFile(executable);
        Files.setPosixFilePermissions(executable, Collections.singleton(PosixFilePermission.OWNER_EXECUTE));
 
+        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, "2.10.0");
 
-        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(baseDir);
+        final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> dist);
         Assertions.assertThatCode(check::runCheck)
                 .doesNotThrowAnyException();
     }

@@ -29,7 +29,6 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
 import com.google.inject.util.Types;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
@@ -161,7 +160,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
-        if(featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
+        if (featureFlags.isOn(FEATURE_FLAG_PREFLIGHT_WEB_ENABLED)) {
             runPreflightWeb(preflightCheckModules);
         }
 
@@ -208,10 +207,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         final LeaderElectionService leaderElectionService = preflightInjector.getInstance(LeaderElectionService.class);
-        final Service manageableLeaderElectionService = preflightInjector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
 
         try {
-            manageableLeaderElectionService.startAsync().awaitRunning();
+            leaderElectionService.startAsync().awaitRunning();
             serviceManager.startAsync().awaitHealthy();
             // wait till the marker document appears
             while (preflightBoot.shouldRunPreflightWeb()) {
@@ -227,7 +225,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             // check, if this is the leader before shutting down preflight in case we want to delay startup
             final var isLeader = leaderElectionService.isLeader();
             serviceManager.stopAsync().awaitStopped();
-            manageableLeaderElectionService.stopAsync().awaitTerminated();
+            leaderElectionService.stopAsync().awaitTerminated();
 
             try {
                 // delay startup if we're not the leader to give the leader node a headstart on resume
@@ -330,7 +328,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             activityWriter = injector.getInstance(ActivityWriter.class);
             serviceManager = injector.getInstance(ServiceManager.class);
-            leaderElectionService = injector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
+            leaderElectionService = injector.getInstance(LeaderElectionService.class);
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
             annotateProvisionException(e);
