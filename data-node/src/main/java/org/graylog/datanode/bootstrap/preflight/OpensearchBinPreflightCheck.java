@@ -55,7 +55,7 @@ public class OpensearchBinPreflightCheck implements PreflightCheck {
             throw new PreflightCheckException("Opensearch base directory " + opensearchDir + " doesn't exist!");
         }
 
-        final Path binPath = distribution.getOpensearchBinFile();
+        final Path binPath = distribution.getOpensearchExecutable();
 
         if (!Files.exists(binPath)) {
             throw new PreflightCheckException("Opensearch binary " + binPath + " doesn't exist!");

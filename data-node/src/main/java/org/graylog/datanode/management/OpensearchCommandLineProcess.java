@@ -30,7 +30,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -77,7 +76,7 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
-        final Path executable = config.opensearchDistribution().getOpensearchBinFile();;
+        final Path executable = config.opensearchDistribution().getOpensearchExecutable();;
         final List<String> arguments = getOpensearchConfigurationArguments(config).entrySet().stream()
                 .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
         resultHandler = new CommandLineProcessListener(listener);

@@ -29,7 +29,7 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
         this(path, version, null, null);
     }
 
-    public Path getOpensearchBinFile() {
+    public Path getOpensearchExecutable() {
         return directory.resolve(Paths.get("bin", "opensearch"));
     }
 }
