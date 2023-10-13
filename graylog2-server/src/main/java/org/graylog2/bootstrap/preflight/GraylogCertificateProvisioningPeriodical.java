@@ -22,9 +22,9 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.base.Suppliers;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -56,6 +56,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -64,13 +65,14 @@ import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
@@ -93,8 +95,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
-    private final EventBus serverEventBus;
-    private Optional<OkHttpClient> okHttpClient = Optional.empty();
+    private final Supplier<OkHttpClient> okHttpClient;
     private final PreflightConfigService preflightConfigService;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
     private final NotificationService notificationService;
@@ -123,30 +124,26 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.nodeService = nodeService;
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
-        this.serverEventBus = serverEventBus;
         this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
         this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
+        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(caService, serverEventBus));
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
-    private Optional<OkHttpClient> buildConnectivityCheckOkHttpClient() {
+    private static OkHttpClient buildConnectivityCheckOkHttpClient(final CaService caService, final EventBus serverEventBus) {
         try {
-            OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-            try {
-                var sslContext = SSLContext.getInstance("TLS");
-                var tm = new CustomCAX509TrustManager(caService, serverEventBus);
-                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
-                clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
-            } catch (NoSuchAlgorithmException ex) {
-                LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
-            }
-            return Optional.of(clientBuilder.build());
-        } catch (Exception ex) {
-            LOG.error("Could not create temporary okhttpclient " + ex.getMessage(), ex);
+            final var clientBuilder = new OkHttpClient.Builder();
+            final var sslContext = SSLContext.getInstance("TLS");
+            final var tm = new CustomCAX509TrustManager(caService, serverEventBus);
+            sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
+            clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
+            return clientBuilder.build();
+        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
+            LOG.error("Could not set Graylog CA trust manager: {}", ex.getMessage(), ex);
+            throw new RuntimeException(ex);
         }
-        return Optional.empty();
     }
 
     private RenewalPolicy getRenewalPolicy() {
@@ -175,10 +172,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 if (renewalPolicy == null) {
                     LOG.debug("No renewal policy available.");
                     return;
-                }
-
-                if (okHttpClient.isEmpty()) {
-                    okHttpClient = buildConnectivityCheckOkHttpClient();
                 }
 
                 var nodesByState = nodes.stream().collect(Collectors.groupingBy(node -> Optional.ofNullable(node.state())
@@ -255,7 +248,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         LOG.info("Starting connectivity check with node {}", config.nodeId());
         final var counter = new AtomicInteger(0);
         final var nodeId = config.nodeId();
-        RetryerBuilder.<String>newBuilder()
+        final var retryer = RetryerBuilder.<Response>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
                 .withRetryListener(new RetryListener() {
@@ -265,36 +258,38 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                         counter.incrementAndGet();
                     }
                 })
-                .retryIfResult(check -> Objects.equals("false", check))
+                .retryIfResult(response -> !response.isSuccessful())
                 .retryIfException()
-                .build()
-                .call(() -> {
-                    try {
-                        final var node = nodeService.byNodeId(nodeId);
-                        Request request = new Request.Builder().url(node.getTransportAddress()).build();
-                        if (okHttpClient.isPresent()) {
-                            OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
-                            builder.authenticator((route, response) -> response.request().newBuilder().header("Authorization", indexerJwtAuthTokenProvider.get()).build());
-                            Call call = builder.build().newCall(request);
-                            try (Response response = call.execute()) {
-                                if (response.isSuccessful()) {
-                                    dataNodeProvisioningService.save(config.asConnected());
-                                    LOG.info("Connectivity check successful with node {}", nodeId);
-                                    return "true";
-                                }
-                                return "false";
-                            }
-                        } else {
-                            return "false";
-                        }
-                    } catch (Exception e) {
-                        // swallow exceptions during the first minute
-                        if (counter.get() > (CONNECTION_ATTEMPTS / RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS)) {
-                            LOG.warn("Exception trying to connect to node " + config.nodeId() + ": " + e.getMessage() + ", retrying", e);
-                        }
-                        throw e;
-                    }
-                });
+                .build();
+        final Callable<Response> callable = () -> {
+            try {
+                final var node = nodeService.byNodeId(nodeId);
+                final var request = new Request.Builder().url(node.getTransportAddress()).build();
+                final var builder = okHttpClient.get().newBuilder()
+                        .authenticator((route, response) -> response.request()
+                                .newBuilder()
+                                .header("Authorization", indexerJwtAuthTokenProvider.get())
+                                .build());
+                final var call = builder.build().newCall(request);
+                return call.execute();
+            } catch (Exception e) {
+                // swallow exceptions during the first minute
+                if (counter.get() > (CONNECTION_ATTEMPTS / RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS)) {
+                    LOG.warn("Exception trying to connect to node " + config.nodeId() + ": " + e.getMessage() + ", retrying", e);
+                }
+                throw e;
+            }
+        };
+        try (Response response = retryer.call(callable)) {
+            var success = response.isSuccessful();
+            if (success) {
+                dataNodeProvisioningService.save(config.asConnected());
+                LOG.info("Connectivity check successful with node {}", nodeId);
+            } else {
+                var errorMessage = response.message();
+                dataNodeProvisioningService.save(config.asError("Connectivity check failed with message: " + errorMessage));
+            }
+        }
     }
 
     @NotNull
