@@ -119,7 +119,7 @@ public class CustomCAX509TrustManagerTest {
                 .hasSize(2)
                 .extracting(c -> (X509Certificate) c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=ca", "CN=" + hostname);
+                .contains("CN=Graylog CA", "CN=" + hostname);
 
         // additional Tests
         final var noAdditionalKeystore = new DummyCaService(null);
