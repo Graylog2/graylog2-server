@@ -40,7 +40,7 @@ export const hotKeysCollections: HotkeyCollections = {
       'show-hotkeys-modal': { keys: 'shift+?', displayKeys: '?', description: 'Show available keyboard shorts' },
       'submit-form': { keys: 'enter', description: 'Submit form' },
       'close-modal': { keys: 'esc', description: 'Close modal' },
-      'show-scratchpad-modal': { keys: 'shift+>', displayKeys: '>', description: 'Show scratchpad' },
+      'show-scratchpad-modal': { keys: 'mod+/', description: 'Show scratchpad' },
     },
   },
   search: {
