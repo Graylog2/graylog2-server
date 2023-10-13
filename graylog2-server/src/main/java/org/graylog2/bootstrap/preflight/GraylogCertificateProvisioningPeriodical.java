@@ -189,9 +189,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 if (cfg.equals(PreflightConfigResult.FINISHED)) {
                     var unconfiguredNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.UNCONFIGURED, List.of());
                     if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
-                        unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
-                                .state(DataNodeProvisioningConfig.State.CONFIGURED)
-                                .build()));
+                        unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.withState(DataNodeProvisioningConfig.State.CONFIGURED)));
                     } else {
                         var hasUnconfiguredNodes = !unconfiguredNodes.isEmpty();
                         if (hasUnconfiguredNodes) {
@@ -216,10 +214,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             var csr = csrStorage.readCsr(c.nodeId());
                             if (csr.isEmpty()) {
                                 LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                                dataNodeProvisioningService.save(c.toBuilder()
-                                        .state(DataNodeProvisioningConfig.State.ERROR)
-                                        .errorMsg("Node in CSR state, but no CSR present")
-                                        .build());
+                                dataNodeProvisioningService.save(c.withError("Node in CSR state, but no CSR present"));
                             } else {
                                 var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
                                 final List<X509Certificate> caCertificates = List.of(caCertificate);
@@ -227,25 +222,31 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             }
                         } catch (Exception e) {
                             LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                            dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                            dataNodeProvisioningService.save(c.withError(e.getMessage()));
                         }
                     });
                 }
 
                 nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STORED, List.of())
                         .forEach(c -> {
-                            dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTING).build());
+                            dataNodeProvisioningService.save(c.withState(DataNodeProvisioningConfig.State.CONNECTING));
                             executor.submit(() -> {
                                 try {
                                     checkConnectivity(c);
-                                } catch (ExecutionException | RetryException e) {
+                                } catch (ExecutionException e) {
                                     LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
-                                    dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                                    dataNodeProvisioningService.save(c.withError(e.getMessage()));
+                                } catch (RetryException e) {
+                                    LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
+                                    var exceptionCause = Optional.ofNullable(e.getLastFailedAttempt().getExceptionCause()).orElse(e);
+                                    var errorMsg = exceptionCause.getMessage();
+                                    dataNodeProvisioningService.save(c.withError(errorMsg));
                                 }
                             });
                         });
             }
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreStorageException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException |
+                 KeyStoreStorageException e) {
             throw new RuntimeException(e);
         }
     }
@@ -265,6 +266,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     }
                 })
                 .retryIfResult(check -> Objects.equals("false", check))
+                .retryIfException()
                 .build()
                 .call(() -> {
                     try {
@@ -276,7 +278,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             Call call = builder.build().newCall(request);
                             try (Response response = call.execute()) {
                                 if (response.isSuccessful()) {
-                                    dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTED).build());
+                                    dataNodeProvisioningService.save(config.withState(DataNodeProvisioningConfig.State.CONNECTED));
                                     LOG.info("Connectivity check successful with node {}", nodeId);
                                     return "true";
                                 }
@@ -290,7 +292,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                         if (counter.get() > (CONNECTION_ATTEMPTS / RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS)) {
                             LOG.warn("Exception trying to connect to node " + config.nodeId() + ": " + e.getMessage() + ", retrying", e);
                         }
-                        return "false";
+                        throw e;
                     }
                 });
     }

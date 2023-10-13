@@ -88,6 +88,14 @@ public abstract class DataNodeProvisioningConfig {
         return Builder.create();
     }
 
+    public DataNodeProvisioningConfig withState(State state) {
+        return toBuilder().state(state).build();
+    }
+
+    public DataNodeProvisioningConfig withError(String error) {
+        return toBuilder().state(State.ERROR).errorMsg(error).build();
+    }
+
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
