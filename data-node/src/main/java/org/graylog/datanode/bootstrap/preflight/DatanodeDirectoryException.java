@@ -14,20 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.datanode.bootstrap.preflight;
 
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import java.io.IOException;
 
-/**
- * DatanodeConfiguration holds the static configuration as parsed during the datanode startup, either from the
- * config file or from the ENV properties.
- */
-public record DatanodeConfiguration(
-        OpensearchDistributionProvider opensearchDistributionProvider,
-        DatanodeDirectories datanodeDirectories,
-        String nodeName,
-        int processLogsBufferSize,
-        IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider
-) {
+public class DatanodeDirectoryException extends IOException {
+    public DatanodeDirectoryException(String message) {
+        super(message);
+    }
+
+    public DatanodeDirectoryException(String message, IOException cause) {
+        super(message, cause);
+    }
 }
