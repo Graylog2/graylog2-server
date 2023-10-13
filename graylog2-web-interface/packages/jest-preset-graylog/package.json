@@ -27,7 +27,7 @@
     "jest-environment-enzyme": "^7.1.2",
     "jest-environment-jsdom": "29.6.2",
     "jest-enzyme": "^7.1.2",
-    "jest-styled-components": "7.1.1",
+    "jest-styled-components": "7.2.0",
     "react-select-event": "^5.0.0"
   }
 }
