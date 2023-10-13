@@ -17,6 +17,7 @@
 package org.graylog.datanode.configuration.variants;
 
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.certificates.KeystoreReEncryption;
 import org.graylog.datanode.configuration.verification.ConfigProperty;
@@ -49,9 +50,10 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
 
     @Inject
     public UploadedCertFilesSecureConfiguration(final Configuration localConfiguration,
+                                                final DatanodeConfiguration datanodeConfiguration,
                                                 final KeystoreReEncryption keystoreReEncryption,
                                                 final ConfigSectionCompletenessVerifier configSectionCompletenessVerifier) {
-        super(localConfiguration);
+        super(datanodeConfiguration);
         this.keystoreReEncryption = keystoreReEncryption;
         this.configSectionCompletenessVerifier = configSectionCompletenessVerifier;
         this.uploadedTransportKeystorePath = datanodeConfigDir

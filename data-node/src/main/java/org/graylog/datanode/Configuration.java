@@ -30,7 +30,7 @@ import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
-import org.graylog.datanode.configuration.OpensearchDistributionProvider;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URI;
@@ -83,16 +82,16 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_data_location")
+    @Parameter(value = "opensearch_data_location", required = true)
     private String opensearchDataLocation = "datanode/data";
 
-    @Parameter(value = "opensearch_logs_location")
+    @Parameter(value = "opensearch_logs_location", required = true)
     private String opensearchLogsLocation = "datanode/logs";
 
-    @Parameter(value = "opensearch_config_location")
+    @Parameter(value = "opensearch_config_location", required = true)
     private String opensearchConfigLocation = "datanode/config";
 
-    @Parameter(value = "config_location")
+    @Parameter(value = "config_location", required = true)
     private String configLocation = "config";
 
     @Parameter(value = "process_logs_buffer_size")
@@ -235,18 +234,33 @@ public class Configuration extends BaseConfiguration {
         return opensearchDistributionRoot;
     }
 
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
     public String getOpensearchConfigLocation() {
         return opensearchConfigLocation;
     }
 
-    public String getConfigLocation() {
+
+    /**
+     * This is a pointer to a directory holding configuration files (and certificates) for the datanode itself.
+     * We treat it as read only for the datanode and should never persist anything in it.
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public String getDatanodeConfigurationLocation() {
         return configLocation;
     }
 
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
     public String getOpensearchDataLocation() {
         return opensearchDataLocation;
     }
 
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
     public String getOpensearchLogsLocation() {
         return opensearchLogsLocation;
     }

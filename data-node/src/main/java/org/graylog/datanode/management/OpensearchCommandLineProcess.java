@@ -30,7 +30,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +48,7 @@ public class OpensearchCommandLineProcess implements Closeable {
      */
     private void fixJdkOnMac(final OpensearchConfiguration config) {
         final var isMacOS = OS.isFamilyMac();
-        final var jdk = config.opensearchDir().resolve("jdk.app");
+        final var jdk = config.opensearchDistribution().directory().resolve("jdk.app");
         final var jdkNotLinked = !Files.exists(jdk);
         if (isMacOS && jdkNotLinked) {
             // Link System jdk into startup folder, get path:
@@ -77,7 +76,7 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
-        final Path executable = config.opensearchDir().resolve(Paths.get("bin", "opensearch"));
+        final Path executable = config.opensearchDistribution().getOpensearchExecutable();;
         final List<String> arguments = getOpensearchConfigurationArguments(config).entrySet().stream()
                 .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
         resultHandler = new CommandLineProcessListener(listener);

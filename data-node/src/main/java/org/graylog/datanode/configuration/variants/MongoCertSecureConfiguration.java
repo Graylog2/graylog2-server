@@ -17,6 +17,7 @@
 package org.graylog.datanode.configuration.variants;
 
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.certificates.KeystoreReEncryption;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
@@ -44,12 +45,13 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
 
     @Inject
     public MongoCertSecureConfiguration(final Configuration localConfiguration,
+                                        final DatanodeConfiguration datanodeConfiguration,
                                         final KeystoreReEncryption keystoreReEncryption,
                                         final NodeId nodeId,
                                         final @Named("password_secret") String passwordSecret,
                                         final CertificatesService certificatesService
     ) {
-        super(localConfiguration);
+        super(datanodeConfiguration);
         this.keystoreReEncryption = keystoreReEncryption;
         this.certificatesService = certificatesService;
 

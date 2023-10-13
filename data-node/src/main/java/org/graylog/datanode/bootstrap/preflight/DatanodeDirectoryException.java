@@ -14,20 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.providers;
+package org.graylog.datanode.bootstrap.preflight;
 
-import org.graylog2.indexer.datanode.ProxyRequestAdapter;
-import org.graylog2.storage.DetectedSearchVersion;
-import org.graylog2.storage.SearchVersion;
-import org.graylog2.storage.VersionAwareProvider;
+import java.io.IOException;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
+public class DatanodeDirectoryException extends IOException {
+    public DatanodeDirectoryException(String message) {
+        super(message);
+    }
 
-public class ProxyRequestAdapterProvider extends VersionAwareProvider<ProxyRequestAdapter> {
-    @Inject
-    public ProxyRequestAdapterProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<ProxyRequestAdapter>> pluginBindings) {
-        super(indexerVersion, pluginBindings);
+    public DatanodeDirectoryException(String message, IOException cause) {
+        super(message, cause);
     }
 }
