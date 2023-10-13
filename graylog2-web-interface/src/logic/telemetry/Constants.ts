@@ -168,6 +168,14 @@ export const TELEMETRY_EVENT_TYPE = {
     CREATE_CLICKED: 'EventDefinition Summary Create Clicked',
     UPDATE_CLICKED: 'EventDefinition Summary Update Clicked',
   },
+  NOTIFICATIONS: {
+    CREATE_CLICKED: 'Notifications Create Clicked',
+    EDIT_CLICKED: 'Notifications Edit Clicked',
+    EXECUTE_TEST_CLICKED: 'Notifications Execute Test Clicked',
+    BULK_ACTION_DELETE_CLICKED: 'Notifications Bulk Delete Clicked',
+    ROW_ACTION_DELETE_CLICKED: 'Notifications Row Delete Clicked',
+    ROW_ACTION_TEST_CLICKED: 'Notifications Row Test Clicked',
+  },
   CONTENTSTREAM: {
     PREV_ARROW_CLICKED: 'Content Stream Left Arrow Clicked',
     NEXT_ARROW_CLICKED: 'Content Stream Right Arrow Clicked',
@@ -332,6 +340,16 @@ export const TELEMETRY_EVENT_TYPE = {
   TRAFFIC_VIOLATION_CONFIGURATION_SAVED: 'Traffic Violation Configuration Saved',
   FAILURE_PROCESSING_CONFIGURATION_SAVED: 'Failure Processing Configuration Saved',
   SHORTCUT_TYPED: 'Shortcut Typed',
+  CONFIGURATIONS: {
+    INDEX_SETS_UPDATED: 'Configurations Index Sets Defaults Updated',
+    PERMISSIONS_UPDATED: 'Configurations Permissions Updated',
+    SEARCHES_UPDATED: 'Configurations Searches Updated',
+    URL_WHITE_LIST_UPDATED: 'Configurations Url White List Updated',
+    USER_UPDATED: 'Configurations User Updated',
+    CERTIFICATE_RENEWAL_UPDATED: 'Configurations Certificate Renewal Updated',
+    CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
+    DECORATORS_UPDATED: 'Configurations Decorators Updated',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
