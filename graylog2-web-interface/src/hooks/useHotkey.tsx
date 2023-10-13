@@ -116,11 +116,12 @@ const useHotkey = <T extends HTMLElement>({
         enabled: mergedOptions.enabled,
         displayInOverview: mergedOptions.displayInOverview,
         combinationKey: mergedOptions.combinationKey,
+        splitKey: mergedOptions.splitKey,
       },
     });
 
     return () => removeActiveHotkey({ scope, actionKey });
-  }, [actionKey, addActiveHotkey, scope, removeActiveHotkey, mergedOptions.combinationKey, mergedOptions.enabled, mergedOptions.displayInOverview]);
+  }, [actionKey, addActiveHotkey, scope, removeActiveHotkey, mergedOptions.combinationKey, mergedOptions.enabled, mergedOptions.displayInOverview, mergedOptions.splitKey]);
 
   const keys = hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys;
 

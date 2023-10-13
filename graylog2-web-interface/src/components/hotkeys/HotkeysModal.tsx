@@ -17,6 +17,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import pick from 'lodash/pick';
+import isArray from 'lodash/isArray';
+import flattenDeep from 'lodash/flattenDeep';
 
 import { KeyboardKey, Modal, Button } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
@@ -54,6 +56,7 @@ const KeysList = styled.div`
   display: inline-flex;
   gap: 5px;
   justify-content: right;
+  flex-wrap: wrap;
 `;
 
 const KeySeparator = styled.div`
@@ -74,30 +77,56 @@ type KeyProps = {
   description: string,
   isEnabled: boolean,
   isMacOS: boolean,
-  keys: string,
+  keys: string | Array<string>,
+  splitKey: string,
 }
 
-const Key = ({ description, keys, combinationKey, isEnabled, isMacOS }: KeyProps) => {
-  const keysArray = keys.split(combinationKey);
+type ShortcutKeysProps = {
+  keys: string | Array<string>,
+  splitKey: string,
+  combinationKey: string,
+  isEnabled: boolean,
+  isMacOS: boolean
+}
+
+const ShortcutKeys = ({ keys, splitKey, combinationKey, isEnabled, isMacOS }: ShortcutKeysProps) => {
+  const shortcutsArray = isArray(keys) ? keys : [keys];
+  const splitShortcutsArray = flattenDeep(shortcutsArray.map((key) => key.split(splitKey)));
 
   return (
-    <ShortcutListItem>
-      {description}
-      <KeysList>
-        {keysArray.map((key, index) => {
-          const isLast = index === keysArray.length - 1;
+    <>
+      {splitShortcutsArray.map((keysStr, keysStrIndex) => {
+        const keysArray = keysStr.split(combinationKey);
+        const isLastSplit = keysStrIndex === splitShortcutsArray.length - 1;
 
-          return (
-            <React.Fragment key={key}>
-              <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key, isMacOS)}</KeyboardKey>
-              {!isLast && <KeySeparator>{combinationKey}</KeySeparator>}
-            </React.Fragment>
-          );
-        })}
-      </KeysList>
-    </ShortcutListItem>
+        return (
+          <React.Fragment key={keysStr}>
+            {keysArray.map((key, index) => {
+              const isLast = index === keysArray.length - 1;
+
+              return (
+                <React.Fragment key={key}>
+                  <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key, isMacOS)}</KeyboardKey>
+                  {!isLast && <KeySeparator>{combinationKey}</KeySeparator>}
+                </React.Fragment>
+              );
+            })}
+            {!isLastSplit && <KeySeparator>or</KeySeparator>}
+          </React.Fragment>
+        );
+      })}
+    </>
   );
 };
+
+const Key = ({ description, keys, combinationKey, splitKey, isEnabled, isMacOS }: KeyProps) => (
+  <ShortcutListItem>
+    {description}
+    <KeysList>
+      <ShortcutKeys keys={keys} combinationKey={combinationKey} splitKey={splitKey} isEnabled={isEnabled} isMacOS={isMacOS} />
+    </KeysList>
+  </ShortcutListItem>
+);
 
 type HotkeyCollectionSectionProps = {
   collection: HotkeyCollection,
@@ -124,14 +153,18 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectio
       <ShortcutList>
         {filtratedActions.map(([actionKey, { description: keyDescription, keys, displayKeys }]) => {
           const isEnabled = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled !== false;
+          const splitKey = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.splitKey;
+          const combinationKey = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.combinationKey;
+          const reactKey = isArray(keys) ? keys.join(',') : keys;
 
           return (
             <Key description={keyDescription}
                  keys={displayKeys ?? keys}
-                 combinationKey="+"
+                 combinationKey={combinationKey}
+                 splitKey={splitKey}
                  isEnabled={isEnabled}
                  isMacOS={isMacOS}
-                 key={keys} />
+                 key={reactKey} />
           );
         })}
       </ShortcutList>

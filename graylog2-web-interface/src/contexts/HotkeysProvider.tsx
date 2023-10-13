@@ -65,7 +65,7 @@ export const hotKeysCollections: HotkeyCollections = {
     title: 'Scratchpad',
     description: 'Scratchpad shortcuts',
     actions: {
-      clear: { keys: 'mod+backspace', description: 'Clear scratchpad' },
+      clear: { keys: ['mod+backspace', 'mod+del'], description: 'Clear scratchpad' },
       copy: { keys: 'shift+mod+c', description: 'Copy scratchpad' },
     },
   },
