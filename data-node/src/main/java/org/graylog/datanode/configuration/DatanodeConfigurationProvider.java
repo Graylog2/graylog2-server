@@ -17,25 +17,13 @@
 package org.graylog.datanode.configuration;
 
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Singleton
 public class DatanodeConfigurationProvider implements Provider<DatanodeConfiguration> {
@@ -43,9 +31,14 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     private final DatanodeConfiguration datanodeConfiguration;
 
     @Inject
-    public DatanodeConfigurationProvider(final Configuration localConfiguration, IndexerJwtAuthTokenProvider jwtTokenProvider, OpensearchDistributionProvider opensearchDistribution) throws IOException {
+    public DatanodeConfigurationProvider(
+            final Configuration localConfiguration,
+            IndexerJwtAuthTokenProvider jwtTokenProvider,
+            OpensearchDistributionProvider opensearchDistributionProvider,
+            NodeId nodeId) {
         datanodeConfiguration = new DatanodeConfiguration(
-                opensearchDistribution,
+                opensearchDistributionProvider,
+                DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
                 getNodesFromConfig(localConfiguration.getDatanodeNodeName()),
                 localConfiguration.getProcessLogsBufferSize(),
                 jwtTokenProvider
@@ -53,7 +46,7 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     }
 
     public static String getNodesFromConfig(final String configProperty) {
-        if(configProperty != null) return configProperty;
+        if (configProperty != null) return configProperty;
         return Tools.getLocalCanonicalHostname();
     }
 
@@ -61,5 +54,4 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     public DatanodeConfiguration get() {
         return datanodeConfiguration;
     }
-
 }

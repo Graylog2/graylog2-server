@@ -17,9 +17,7 @@
 package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
-import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
-import org.graylog.datanode.configuration.OpensearchDistributionProvider;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,10 +187,10 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     }
 
     private static ImageFromDockerfile createImage() {
-        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem() + ".tar.gz";
-        final Path downloadedOpensearch = getPath().resolve(Path.of("downloads", opensearchTarArchive));
+        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
+        final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchTarArchive));
 
-        if(!Files.exists(downloadedOpensearch)) {
+        if (!Files.exists(downloadedOpensearch)) {
             throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
         }
 
@@ -209,7 +207,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                                 .run("mkdir -p bin/config")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
-                                .add(opensearchTarArchive, ".") // this will automatically extract the tar
+                                .add(opensearchTarArchive, "./" + opensearchTarArchive + "/") // this will automatically extract the tar
                                 .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
                                 .run("useradd opensearch")
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)

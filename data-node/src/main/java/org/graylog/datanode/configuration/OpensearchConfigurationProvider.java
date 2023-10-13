@@ -25,7 +25,6 @@ import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
@@ -40,7 +39,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -112,13 +110,13 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             if (chosenSecurityConfigurationVariant.isPresent()) {
                 securityConfiguration = chosenSecurityConfigurationVariant.get()
                         .build()
-                        .configure(localConfiguration, signingKey);
+                        .configure(datanodeConfiguration, signingKey);
                 opensearchProperties.putAll(securityConfiguration.getProperties());
             }
 
             return new OpensearchConfiguration(
-                    datanodeConfiguration.opensearchDistributionProvider().get().directory(),
-                    opensearchConfigLocation,
+                    datanodeConfiguration.opensearchDistributionProvider().get(),
+                    datanodeConfiguration.datanodeDirectories(),
                     localConfiguration.getBindAddress(),
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
@@ -137,7 +135,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
         localConfiguration.getOpensearchNetworkHostHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
