@@ -189,7 +189,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 if (cfg.equals(PreflightConfigResult.FINISHED)) {
                     var unconfiguredNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.UNCONFIGURED, List.of());
                     if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
-                        unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.withState(DataNodeProvisioningConfig.State.CONFIGURED)));
+                        unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.asConfigured()));
                     } else {
                         var hasUnconfiguredNodes = !unconfiguredNodes.isEmpty();
                         if (hasUnconfiguredNodes) {
@@ -214,7 +214,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             var csr = csrStorage.readCsr(c.nodeId());
                             if (csr.isEmpty()) {
                                 LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                                dataNodeProvisioningService.save(c.withError("Node in CSR state, but no CSR present"));
+                                dataNodeProvisioningService.save(c.asError("Node in CSR state, but no CSR present"));
                             } else {
                                 var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
                                 final List<X509Certificate> caCertificates = List.of(caCertificate);
@@ -222,25 +222,25 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             }
                         } catch (Exception e) {
                             LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                            dataNodeProvisioningService.save(c.withError(e.getMessage()));
+                            dataNodeProvisioningService.save(c.asError(e.getMessage()));
                         }
                     });
                 }
 
                 nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STORED, List.of())
                         .forEach(c -> {
-                            dataNodeProvisioningService.save(c.withState(DataNodeProvisioningConfig.State.CONNECTING));
+                            dataNodeProvisioningService.save(c.asConnecting());
                             executor.submit(() -> {
                                 try {
                                     checkConnectivity(c);
                                 } catch (ExecutionException e) {
                                     LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
-                                    dataNodeProvisioningService.save(c.withError(e.getMessage()));
+                                    dataNodeProvisioningService.save(c.asError(e.getMessage()));
                                 } catch (RetryException e) {
                                     LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
                                     var exceptionCause = Optional.ofNullable(e.getLastFailedAttempt().getExceptionCause()).orElse(e);
                                     var errorMsg = exceptionCause.getMessage();
-                                    dataNodeProvisioningService.save(c.withError(errorMsg));
+                                    dataNodeProvisioningService.save(c.asError(errorMsg));
                                 }
                             });
                         });
@@ -278,7 +278,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             Call call = builder.build().newCall(request);
                             try (Response response = call.execute()) {
                                 if (response.isSuccessful()) {
-                                    dataNodeProvisioningService.save(config.withState(DataNodeProvisioningConfig.State.CONNECTED));
+                                    dataNodeProvisioningService.save(config.asConnected());
                                     LOG.info("Connectivity check successful with node {}", nodeId);
                                     return "true";
                                 }
