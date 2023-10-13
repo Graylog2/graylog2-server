@@ -29,12 +29,12 @@ import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 public class CACreator {
-    public KeyStore createCA(final char[] password,
+    public KeyStore createCA(String organization, final char[] password,
                              final Duration certificateValidity) throws CACreationException {
 
         try {
             final KeyPair rootCA = CertificateGenerator.generate(
-                    CertRequest.selfSigned("ca")
+                    CertRequest.selfSigned(organization)
                             .isCA(true)
                             .validity(certificateValidity)
             );

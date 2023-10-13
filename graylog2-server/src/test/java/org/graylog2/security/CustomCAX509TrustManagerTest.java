@@ -63,7 +63,8 @@ public class CustomCAX509TrustManagerTest {
         }
 
         @Override
-        public void create(Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {}
+        public void create(String organization, Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {
+        }
 
         @Override
         public void upload(String pass, List<FormDataBodyPart> parts) throws CACreationException {}

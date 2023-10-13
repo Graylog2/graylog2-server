@@ -62,7 +62,7 @@ public class CertutilCa implements CliCommand {
             console.printLine("Generating datanode CA");
 
             final Duration certificateValidity = Duration.ofDays(10 * 365);
-            KeyStore caKeystore = caCreator.createCA(password, certificateValidity);
+            KeyStore caKeystore = caCreator.createCA("Graylog CA", password, certificateValidity);
 
             console.printLine("Private keys and certificates for root and intermediate CA generated");
 
