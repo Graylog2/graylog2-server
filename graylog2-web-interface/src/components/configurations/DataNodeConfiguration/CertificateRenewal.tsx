@@ -30,6 +30,9 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import DataNodeBadge from 'components/datanode/DataNodeBadge';
 import { Badge } from 'preflight/components/common';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledList = styled(ListGroup)`
   max-width: fit-content;
@@ -98,6 +101,7 @@ const provisioningWording = {
 
 const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNode['status'] }) => {
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
   const [isRenewing, setIsRenewing] = useState(false);
   const {
     buttonTitle,
@@ -111,8 +115,8 @@ const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNod
   const onCertificateRenewal = () => {
     setIsRenewing(true);
 
-    sendTelemetry('form_submit', {
-      app_pathname: 'configurations',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.CERTIFICATE_RENEWAL_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'data-node',
       app_action_value: telemetryAppSection,
     });
