@@ -108,7 +108,11 @@ type HotkeyCollectionSectionProps = {
 const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectionSectionProps) => {
   const { activeHotkeys } = useHotkeysContext();
   const { title, description, actions } = collection;
-  const filtratedActions = Object.entries(actions).filter(([actionKey]) => activeHotkeys.has(`${scope}.${actionKey}`));
+  const filtratedActions = Object.entries(actions).filter(([actionKey]) => {
+    const key: `${ScopeName}.${string}` = `${scope}.${actionKey}`;
+
+    return activeHotkeys.has(key) && (activeHotkeys.get(key).options.displayInOverview !== false);
+  });
 
   if (!filtratedActions.length) {
     return null;

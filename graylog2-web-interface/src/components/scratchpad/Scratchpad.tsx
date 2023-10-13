@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
@@ -26,6 +26,8 @@ import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
 import Store from 'logic/local-storage/Store';
+import useHotkey from 'hooks/useHotkey';
+import copyToClipboard from 'util/copyToClipboard';
 
 const DEFAULT_SCRATCHDATA = '';
 const TEXTAREA_ID = 'scratchpad-text-content';
@@ -107,7 +109,7 @@ const Scratchpad = () => {
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
-  const resetStatusTimer = () => {
+  const resetStatusTimer = useCallback(() => {
     if (statusTimeout.current) {
       clearTimeout(statusTimeout.current);
     }
@@ -115,13 +117,13 @@ const Scratchpad = () => {
     statusTimeout.current = setTimeout(() => {
       setShowStatusMessage(false);
     }, 1000);
-  };
+  }, []);
 
-  const updateStatusMessage = (message) => {
+  const updateStatusMessage = useCallback((message) => {
     setStatusMessage(message);
     setShowStatusMessage(true);
     resetStatusTimer();
-  };
+  }, [resetStatusTimer]);
 
   const handleChange = debounce(() => {
     const { value } = textareaRef.current;
@@ -146,13 +148,13 @@ const Scratchpad = () => {
     writeData({ securityConfirmed: true });
   };
 
-  const openConfirmClear = () => {
+  const openConfirmClear = useCallback(() => {
     setShowModal(true);
-  };
+  }, []);
 
-  const handleCancelClear = () => {
+  const handleCancelClear = useCallback(() => {
     setShowModal(false);
-  };
+  }, []);
 
   const handleClearText = () => {
     setScratchData(DEFAULT_SCRATCHDATA);
@@ -183,6 +185,26 @@ const Scratchpad = () => {
       textareaRef.current.value = scratchData;
     }
   }, [scratchData, isScratchpadVisible]);
+
+  useHotkey({
+    actionKey: 'clear',
+    scope: 'scratchpad',
+    callback: openConfirmClear,
+    options: { enableOnFormTags: true, preventDefault: true, displayInOverview: isScratchpadVisible },
+    dependencies: [isScratchpadVisible],
+  });
+
+  const copyCallback = useCallback(() => {
+    copyToClipboard(scratchData).then(() => updateStatusMessage(STATUS_COPIED));
+  }, [scratchData, updateStatusMessage]);
+
+  useHotkey({
+    actionKey: 'copy',
+    scope: 'scratchpad',
+    callback: copyCallback,
+    options: { enableOnFormTags: true, displayInOverview: isScratchpadVisible },
+    dependencies: [isScratchpadVisible],
+  });
 
   if (!isScratchpadVisible) return null;
 

@@ -20,7 +20,7 @@ import type Immutable from 'immutable';
 import { singleton } from 'logic/singleton';
 
 export type DefaultScopeName = '*';
-export type ScopeName = 'general' | 'search' | 'dashboard';
+export type ScopeName = 'general' | 'search' | 'dashboard' | 'scratchpad';
 export type ScopeParam = Array<ScopeName> | ScopeName
 
 export type KeyboardModifiers = {
