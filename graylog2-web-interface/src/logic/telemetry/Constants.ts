@@ -331,6 +331,7 @@ export const TELEMETRY_EVENT_TYPE = {
   },
   TRAFFIC_VIOLATION_CONFIGURATION_SAVED: 'Traffic Violation Configuration Saved',
   FAILURE_PROCESSING_CONFIGURATION_SAVED: 'Failure Processing Configuration Saved',
+  SHORTCUT_TYPED: 'Shortcut Typed',
 } as const;
 
 type ExtractObjectValues<T extends object> = {

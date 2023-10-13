@@ -68,7 +68,6 @@ public class ServerBindings extends Graylog2Module {
     private void bindProviders() {
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
         bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
-        bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
     }
 

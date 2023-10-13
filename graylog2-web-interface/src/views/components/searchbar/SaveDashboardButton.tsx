@@ -52,7 +52,6 @@ const SaveDashboardButton = ({ userIsAllowedToEdit, openSaveAsModal }: Props) =>
     actionKey: 'save',
     callback: () => (isNewView ? openSaveAsModal() : _onSaveView()),
     scope: 'dashboard',
-    telemetryAppPathname: 'search',
     options: { enabled: !hasUndeclaredParameters && userIsAllowedToEdit },
   });
 
