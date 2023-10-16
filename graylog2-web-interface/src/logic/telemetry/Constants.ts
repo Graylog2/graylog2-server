@@ -373,6 +373,10 @@ export const TELEMETRY_EVENT_TYPE = {
     INDEX_SET_DEFAULT_SET: 'Indices Index Set Default Set',
     INDEX_SET_DELETED: 'Indices Index Set Deleted',
   },
+  LOGGING: {
+    LOG_LEVEL_EDITED: 'Logging Log Level Edited',
+    SHOW_LOG_LEVEL_METRICS_TOGGLED: 'Logging Show Log Level Metrics Toggled',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
