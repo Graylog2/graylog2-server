@@ -22,9 +22,8 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.eventbus.EventBus;
+import com.google.common.base.Suppliers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -56,6 +55,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -63,14 +64,15 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
@@ -81,7 +83,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final int THREADPOOL_THREADS = 5;
     private static final int CONNECTION_ATTEMPTS = 40;
     private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS = 3;
-    private static final int RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS = 2;
+    private static final Duration DELAY_BEFORE_SHOWING_EXCEPTIONS = Duration.ofMinutes(1);
+    private static final String ERROR_MESSAGE_PREFIX = "Error trying to connect to data node ";
 
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService nodeService;
@@ -93,8 +96,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
-    private final EventBus serverEventBus;
-    private Optional<OkHttpClient> okHttpClient = Optional.empty();
+    private final Supplier<OkHttpClient> okHttpClient;
     private final PreflightConfigService preflightConfigService;
     private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
     private final NotificationService notificationService;
@@ -112,8 +114,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final @Named("password_secret") String passwordSecret,
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
                                                     final PreflightConfigService preflightConfigService,
-                                                    final EventBus serverEventBus,
-                                                    final NotificationService notificationService) {
+                                                    final NotificationService notificationService,
+                                                    final CustomCAX509TrustManager trustManager) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -123,30 +125,25 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.nodeService = nodeService;
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
-        this.serverEventBus = serverEventBus;
         this.preflightConfigService = preflightConfigService;
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
         this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
+        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager));
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
-    private Optional<OkHttpClient> buildConnectivityCheckOkHttpClient() {
+    private static OkHttpClient buildConnectivityCheckOkHttpClient(final X509TrustManager trustManager) {
         try {
-            OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-            try {
-                var sslContext = SSLContext.getInstance("TLS");
-                var tm = new CustomCAX509TrustManager(caService, serverEventBus);
-                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
-                clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
-            } catch (NoSuchAlgorithmException ex) {
-                LOG.error("Could not set Graylog CA trustmanager: {}", ex.getMessage(), ex);
-            }
-            return Optional.of(clientBuilder.build());
-        } catch (Exception ex) {
-            LOG.error("Could not create temporary okhttpclient " + ex.getMessage(), ex);
+            final var clientBuilder = new OkHttpClient.Builder();
+            final var sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
+            clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
+            return clientBuilder.build();
+        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
+            LOG.error("Could not set Graylog CA trust manager: {}", ex.getMessage(), ex);
+            throw new RuntimeException(ex);
         }
-        return Optional.empty();
     }
 
     private RenewalPolicy getRenewalPolicy() {
@@ -177,10 +174,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     return;
                 }
 
-                if (okHttpClient.isEmpty()) {
-                    okHttpClient = buildConnectivityCheckOkHttpClient();
-                }
-
                 var nodesByState = nodes.stream().collect(Collectors.groupingBy(node -> Optional.ofNullable(node.state())
                         .orElse(DataNodeProvisioningConfig.State.UNCONFIGURED)));
 
@@ -189,9 +182,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 if (cfg.equals(PreflightConfigResult.FINISHED)) {
                     var unconfiguredNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.UNCONFIGURED, List.of());
                     if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
-                        unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.toBuilder()
-                                .state(DataNodeProvisioningConfig.State.CONFIGURED)
-                                .build()));
+                        unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.asConfigured()));
                     } else {
                         var hasUnconfiguredNodes = !unconfiguredNodes.isEmpty();
                         if (hasUnconfiguredNodes) {
@@ -216,10 +207,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             var csr = csrStorage.readCsr(c.nodeId());
                             if (csr.isEmpty()) {
                                 LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                                dataNodeProvisioningService.save(c.toBuilder()
-                                        .state(DataNodeProvisioningConfig.State.ERROR)
-                                        .errorMsg("Node in CSR state, but no CSR present")
-                                        .build());
+                                dataNodeProvisioningService.save(c.asError("Node in CSR state, but no CSR present"));
                             } else {
                                 var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
                                 final List<X509Certificate> caCertificates = List.of(caCertificate);
@@ -227,72 +215,74 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             }
                         } catch (Exception e) {
                             LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                            dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
+                            dataNodeProvisioningService.save(c.asError(e.getMessage()));
                         }
                     });
                 }
 
                 nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STORED, List.of())
                         .forEach(c -> {
-                            dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTING).build());
-                            executor.submit(() -> {
-                                try {
-                                    checkConnectivity(c);
-                                } catch (ExecutionException | RetryException e) {
-                                    LOG.error("Exception trying to connect to node " + c.nodeId() + ": " + e.getMessage(), e);
-                                    dataNodeProvisioningService.save(c.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(e.getMessage()).build());
-                                }
-                            });
+                            dataNodeProvisioningService.save(c.asConnecting());
+                            executor.submit(() -> checkConnectivity(c));
                         });
             }
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreStorageException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException |
+                 KeyStoreStorageException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void checkConnectivity(final DataNodeProvisioningConfig config) throws ExecutionException, RetryException {
-        LOG.info("Starting connectivity check with node {}", config.nodeId());
-        final var counter = new AtomicInteger(0);
+    private void checkConnectivity(final DataNodeProvisioningConfig config) {
+        LOG.info("Starting connectivity check with node {}, silencing error messages for {} seconds.", config.nodeId(), DELAY_BEFORE_SHOWING_EXCEPTIONS.getSeconds());
         final var nodeId = config.nodeId();
-        RetryerBuilder.<String>newBuilder()
+        final var retryer = RetryerBuilder.<Response>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
                 .withRetryListener(new RetryListener() {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
-                        LOG.debug("Waiting for datanode {} to come up, attempt {}", config.nodeId(), attempt.getAttemptNumber());
-                        counter.incrementAndGet();
+                        if (attempt.getDelaySinceFirstAttempt() > DELAY_BEFORE_SHOWING_EXCEPTIONS.toMillis()) {
+                            if (attempt.hasException()) {
+                                var e = attempt.getExceptionCause();
+                                LOG.warn(ERROR_MESSAGE_PREFIX + " {}: {}, retrying (attempt #{})", config.nodeId(), e.getMessage(), attempt.getAttemptNumber());
+                            } else {
+                                LOG.warn(ERROR_MESSAGE_PREFIX + " {}, retrying (attempt #{})", config.nodeId(), attempt.getAttemptNumber());
+                            }
+                        }
                     }
                 })
-                .retryIfResult(check -> Objects.equals("false", check))
-                .build()
-                .call(() -> {
-                    try {
-                        final var node = nodeService.byNodeId(nodeId);
-                        Request request = new Request.Builder().url(node.getTransportAddress()).build();
-                        if (okHttpClient.isPresent()) {
-                            OkHttpClient.Builder builder = okHttpClient.get().newBuilder();
-                            builder.authenticator((route, response) -> response.request().newBuilder().header("Authorization", indexerJwtAuthTokenProvider.get()).build());
-                            Call call = builder.build().newCall(request);
-                            try (Response response = call.execute()) {
-                                if (response.isSuccessful()) {
-                                    dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONNECTED).build());
-                                    LOG.info("Connectivity check successful with node {}", nodeId);
-                                    return "true";
-                                }
-                                return "false";
-                            }
-                        } else {
-                            return "false";
-                        }
-                    } catch (Exception e) {
-                        // swallow exceptions during the first minute
-                        if (counter.get() > (CONNECTION_ATTEMPTS / RATIO_WHEN_WE_START_SHOWING_EXCEPTIONS)) {
-                            LOG.warn("Exception trying to connect to node " + config.nodeId() + ": " + e.getMessage() + ", retrying", e);
-                        }
-                        return "false";
-                    }
-                });
+                .retryIfResult(response -> !response.isSuccessful())
+                .retryIfException()
+                .build();
+        final Callable<Response> callable = () -> {
+            final var node = nodeService.byNodeId(nodeId);
+            final var request = new Request.Builder().url(node.getTransportAddress()).build();
+            final var builder = okHttpClient.get().newBuilder()
+                    .authenticator((route, response) -> response.request()
+                            .newBuilder()
+                            .header("Authorization", indexerJwtAuthTokenProvider.get())
+                            .build());
+            final var call = builder.build().newCall(request);
+            return call.execute();
+        };
+        try (Response response = retryer.call(callable)) {
+            var success = response.isSuccessful();
+            if (success) {
+                dataNodeProvisioningService.save(config.asConnected());
+                LOG.info("Connectivity check successful with node {}", nodeId);
+            } else {
+                var errorMessage = response.message();
+                dataNodeProvisioningService.save(config.asError("Data Node not reachable: " + errorMessage));
+            }
+        } catch (ExecutionException e) {
+            LOG.error(ERROR_MESSAGE_PREFIX + " {}: {}", config.nodeId(), e.getMessage());
+            dataNodeProvisioningService.save(config.asError(e.getMessage()));
+        } catch (RetryException e) {
+            LOG.error(ERROR_MESSAGE_PREFIX + " {}: {}", config.nodeId(), e.getMessage());
+            var exceptionCause = Optional.ofNullable(e.getLastFailedAttempt().getExceptionCause()).orElse(e);
+            var errorMsg = exceptionCause.getMessage();
+            dataNodeProvisioningService.save(config.asError(errorMsg));
+        }
     }
 
     @NotNull
