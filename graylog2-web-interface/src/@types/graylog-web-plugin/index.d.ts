@@ -129,6 +129,7 @@ declare module 'graylog-web-plugin/plugin' {
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
     routes?: Array<PluginRoute>;
+    entityRoutes?: Array<(id: string, type: string) => string>
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
