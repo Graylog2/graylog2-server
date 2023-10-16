@@ -36,6 +36,9 @@ const STATUS_COPIED = 'Copied!';
 const STATUS_AUTOSAVED = 'Auto saved.';
 const STATUS_DEFAULT = '';
 
+type Position = { x: number, y: number };
+type ScratchpadSize = { width: string, height: string }
+
 const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
@@ -97,13 +100,13 @@ const Scratchpad = () => {
   const scratchpadStore = Store.get(localStorageItem) || {};
   const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState<boolean>(scratchpadStore.securityConfirmed || false);
   const [scratchData, setScratchData] = useState<string>(scratchpadStore.value || DEFAULT_SCRATCHDATA);
-  const [size, setSize] = useState<{ width: string, height: string } | undefined>(scratchpadStore.size || undefined);
-  const [position, setPosition] = useState<{ x:number, y:number } | undefined>(scratchpadStore.position || undefined);
+  const [size, setSize] = useState<ScratchpadSize | undefined>(scratchpadStore.size || undefined);
+  const [position, setPosition] = useState<Position | undefined>(scratchpadStore.position || undefined);
   const [statusMessage, setStatusMessage] = useState<string>(STATUS_DEFAULT);
   const [showStatusMessage, setShowStatusMessage] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const writeData = (newData) => {
+  const writeData = (newData: Record<string, unknown>) => {
     const currentStorage = Store.get(localStorageItem);
 
     Store.set(localStorageItem, { ...currentStorage, ...newData });
@@ -119,7 +122,7 @@ const Scratchpad = () => {
     }, 1000);
   };
 
-  const updateStatusMessage = (message) => {
+  const updateStatusMessage = (message: string) => {
     setStatusMessage(message);
     setShowStatusMessage(true);
     resetStatusTimer();
@@ -133,12 +136,12 @@ const Scratchpad = () => {
     writeData({ value });
   }, 500);
 
-  const handleDrag = (newPosition) => {
+  const handleDrag = (newPosition: Position) => {
     setPosition(newPosition);
     writeData({ position: newPosition });
   };
 
-  const handleSize = (newSize) => {
+  const handleSize = (newSize: ScratchpadSize) => {
     setSize(newSize);
     writeData({ size: newSize });
   };
