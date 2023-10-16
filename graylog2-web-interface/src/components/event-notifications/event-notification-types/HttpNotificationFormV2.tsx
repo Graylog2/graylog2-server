@@ -268,6 +268,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                       matchProp="label"
                       disabled={config.method === 'GET'}
                       onChange={this.handleContentTypeChange}
+                      clearable={false}
                       value={config.content_type} />
             </Input>
           </Col>
