@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
@@ -102,8 +101,6 @@ public class OpensearchSecurityConfiguration {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         if (securityEnabled()) {
             config.putAll(commonSecureConfig());
-
-            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
 
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", transportCertificate.location().getFileName().toString()); // todo: this should be computed as a relative path

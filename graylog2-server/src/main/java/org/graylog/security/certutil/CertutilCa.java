@@ -18,7 +18,7 @@ package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import org.graylog.security.certutil.ca.CACreator;
+import org.graylog.security.certutil.ca.CAKeyPair;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
@@ -37,20 +37,17 @@ public class CertutilCa implements CliCommand {
     @Option(name = "--filename", description = "Filename for the CA keystore")
     protected String keystoreFilename = "datanode-ca.p12";
     private final CommandLineConsole console;
-    private final CACreator caCreator;
     private final KeystoreFileStorage caKeystoreStorage;
     public static final CommandLineConsole.Prompt PROMPT_ENTER_CA_PASSWORD = CommandLineConsole.prompt("Enter CA password: ");
 
     public CertutilCa() {
         this.console = new SystemConsole();
-        this.caCreator = new CACreator();
         this.caKeystoreStorage = new KeystoreFileStorage(new SinglePasswordKeystoreContentMover());
     }
 
     public CertutilCa(String keystoreFilename, CommandLineConsole console) {
         this.keystoreFilename = keystoreFilename;
         this.console = console;
-        this.caCreator = new CACreator();
         this.caKeystoreStorage = new KeystoreFileStorage(new SinglePasswordKeystoreContentMover());
     }
 
@@ -62,7 +59,7 @@ public class CertutilCa implements CliCommand {
             console.printLine("Generating datanode CA");
 
             final Duration certificateValidity = Duration.ofDays(10 * 365);
-            KeyStore caKeystore = caCreator.createCA(DEFAULT_ORGANIZATION_NAME, password, certificateValidity);
+            KeyStore caKeystore = CAKeyPair.create(DEFAULT_ORGANIZATION_NAME, password, certificateValidity).toKeyStore();
 
             console.printLine("Private keys and certificates for root and intermediate CA generated");
 
