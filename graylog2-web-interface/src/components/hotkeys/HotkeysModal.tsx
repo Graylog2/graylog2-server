@@ -140,7 +140,7 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectio
   const filtratedActions = Object.entries(actions).filter(([actionKey]) => {
     const key: `${ScopeName}.${string}` = `${scope}.${actionKey}`;
 
-    return activeHotkeys.has(key) && (activeHotkeys.get(key).options.displayInOverview !== false);
+    return activeHotkeys.has(key) && activeHotkeys.get(key).options.displayInOverview;
   });
 
   if (!filtratedActions.length) {
@@ -152,7 +152,7 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectio
       <p className="description">{description}</p>
       <ShortcutList>
         {filtratedActions.map(([actionKey, { description: keyDescription, keys, displayKeys }]) => {
-          const isEnabled = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled !== false;
+          const isEnabled = !!activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled;
           const splitKey = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.splitKey;
           const combinationKey = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.combinationKey;
           const reactKey = isArray(keys) ? keys.join(',') : keys;
