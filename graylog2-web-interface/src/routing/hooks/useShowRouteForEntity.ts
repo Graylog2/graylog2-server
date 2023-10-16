@@ -15,12 +15,42 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Routes from 'routing/Routes';
+import assertUnreachable from 'logic/assertUnreachable';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-const assertUnreachable = (type: string): never => {
-  throw new Error(`Can't find route for type: ${type ?? '(undefined)'}`);
+const getFirstMatchingEntityRoute = (
+  entityRouteResolver: Array<(id: string, type: string) => string | null>,
+  id: string,
+  type: string,
+) => {
+  for (let i = 0; i < entityRouteResolver.length; i += 1) {
+    const entityRoute = entityRouteResolver[i](id, type);
+
+    if (entityRoute) {
+      return entityRoute;
+    }
+  }
+
+  return undefined;
 };
 
-const getShowRouteForEntity = (id: string, type: string) => {
+const useEntityRouteFromPlugin = (id: string, type: string) => {
+  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
+
+  if (!pluginEntityRoutesResolver?.length) {
+    return null;
+  }
+
+  return getFirstMatchingEntityRoute(pluginEntityRoutesResolver, id, type);
+};
+
+const useShowRouteForEntity = (id: string, type: string) => {
+  const entityRouteFromPlugin = useEntityRouteFromPlugin(id, type);
+
+  if (entityRouteFromPlugin) {
+    return entityRouteFromPlugin;
+  }
+
   switch (type?.toLowerCase()) {
     case 'user':
       return Routes.SYSTEM.USERS.show(id);
@@ -45,8 +75,8 @@ const getShowRouteForEntity = (id: string, type: string) => {
     case 'output':
       return Routes.SYSTEM.OUTPUTS;
     default:
-      return assertUnreachable(type);
+      return assertUnreachable(type as never ?? '(undefined)', 'Can\'t find route for type');
   }
 };
 
-export default getShowRouteForEntity;
+export default useShowRouteForEntity;
