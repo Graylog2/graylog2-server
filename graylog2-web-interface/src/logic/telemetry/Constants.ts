@@ -369,6 +369,10 @@ export const TELEMETRY_EVENT_TYPE = {
     OUTPUT_FROM_STREAM_REMOVED: 'Outputs Output From Stream Removed',
     OUTPUT_UPDATED: 'Outputs Output Updated',
   },
+  INDICES: {
+    INDEX_SET_DEFAULT_SET: 'Indices Index Set Default Set',
+    INDEX_SET_DELETED: 'Indices Index Set Deleted',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
