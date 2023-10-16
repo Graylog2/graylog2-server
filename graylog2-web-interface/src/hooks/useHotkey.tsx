@@ -123,9 +123,12 @@ const useHotkey = <T extends HTMLElement>({
     return () => removeActiveHotkey({ scope, actionKey });
   }, [actionKey, addActiveHotkey, scope, removeActiveHotkey, mergedOptions.combinationKey, mergedOptions.enabled, mergedOptions.displayInOverview, mergedOptions.splitKey]);
 
-  const keys = hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys;
-
-  return originalUseHotkeys<T>(keys, callbackWithTelemetry, mergedOptions, dependencies);
+  return originalUseHotkeys<T>(
+    hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys,
+    callbackWithTelemetry,
+    mergedOptions,
+    dependencies,
+  );
 };
 
 export default useHotkey;

@@ -203,7 +203,7 @@ const Scratchpad = () => {
     scope: 'scratchpad',
     callback: copyCallback,
     options: { enableOnFormTags: true, displayInOverview: isScratchpadVisible },
-    dependencies: [isScratchpadVisible],
+    dependencies: [isScratchpadVisible, copyCallback],
   });
 
   if (!isScratchpadVisible) return null;
