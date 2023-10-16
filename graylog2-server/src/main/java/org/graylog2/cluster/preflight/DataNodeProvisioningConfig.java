@@ -88,6 +88,22 @@ public abstract class DataNodeProvisioningConfig {
         return Builder.create();
     }
 
+    public DataNodeProvisioningConfig asConnecting() {
+        return toBuilder().state(State.CONNECTING).errorMsg(null).build();
+    }
+
+    public DataNodeProvisioningConfig asConfigured() {
+        return toBuilder().state(State.CONFIGURED).errorMsg(null).build();
+    }
+
+    public DataNodeProvisioningConfig asConnected() {
+        return toBuilder().state(State.CONNECTED).errorMsg(null).build();
+    }
+
+    public DataNodeProvisioningConfig asError(String error) {
+        return toBuilder().state(State.ERROR).errorMsg(error).build();
+    }
+
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
