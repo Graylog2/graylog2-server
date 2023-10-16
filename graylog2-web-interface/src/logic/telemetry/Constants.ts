@@ -377,6 +377,18 @@ export const TELEMETRY_EVENT_TYPE = {
     LOG_LEVEL_EDITED: 'Logging Log Level Edited',
     SHOW_LOG_LEVEL_METRICS_TOGGLED: 'Logging Show Log Level Metrics Toggled',
   },
+  LUT: {
+    DELETED: 'LUT Deleted',
+    CREATED: 'LUT Created',
+    UPDATED: 'LUT Updated',
+    CACHE_TYPE_CHANGED: 'LUT Cache Type Changed',
+    CACHE_DELETED: 'LUT Cache Deleted',
+    CACHE_CREATED: 'LUT Cache Created',
+    CACHE_UPDATED: 'LUT Cache Updated',
+    DATA_ADAPTER_DELETED: 'LUT Data Adapter Deleted',
+    DATA_ADAPTER_CREATED: 'LUT Data Adapter Created',
+    DATA_ADAPTER_UPDATED: 'LUT Data Adapter Updated',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {

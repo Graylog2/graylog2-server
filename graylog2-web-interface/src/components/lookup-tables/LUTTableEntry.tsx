@@ -26,6 +26,8 @@ import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
   table: LookupTable,
@@ -47,6 +49,8 @@ const Actions = styled(ButtonToolbar)`
 
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
+
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const handleDelete = React.useCallback(() => {
@@ -56,9 +60,16 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
     );
 
     if (shouldDelete) {
-      LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
+      LookupTablesActions.delete(table.id).then(() => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
+          app_pathname: 'lut',
+          app_section: 'lut',
+        });
+
+        LookupTablesActions.reloadPage();
+      });
     }
-  }, [table.id, table.title]);
+  }, [table.id, table.title, sendTelemetry]);
 
   const handleEdit = React.useCallback(() => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));

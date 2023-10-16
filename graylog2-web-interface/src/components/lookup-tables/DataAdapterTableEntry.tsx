@@ -27,6 +27,8 @@ import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTable
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const Actions = styled(ButtonToolbar)`
   display: flex;
@@ -43,6 +45,8 @@ type Props = {
 const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
+  const sendTelemetry = useSendTelemetry();
+
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
 
   const _onEdit = React.useCallback(() => {
@@ -52,9 +56,16 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
   const _onDelete = React.useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete data adapter "${adapterTitle}"?`)) {
-      LookupTableDataAdaptersActions.delete(adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
+      LookupTableDataAdaptersActions.delete(adapter.id).then(() => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DATA_ADAPTER_DELETED, {
+          app_pathname: 'lut',
+          app_section: 'lut_data_adapter',
+        });
+
+        LookupTableDataAdaptersActions.reloadPage();
+      });
     }
-  }, [adapterTitle, adapter.id]);
+  }, [adapterTitle, adapter.id, sendTelemetry]);
 
   return (
     <tbody>

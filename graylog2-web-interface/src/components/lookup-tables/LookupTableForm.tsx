@@ -27,10 +27,12 @@ import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker 
 import useScopePermissions from 'hooks/useScopePermissions';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type LookupTableType = LookupTable & {
-  enable_single_value: boolean,
-  enable_multi_value: boolean,
+    enable_single_value: boolean,
+    enable_multi_value: boolean,
 }
 
 const INIT_TABLE_VALUES: LookupTableType = {
@@ -58,6 +60,7 @@ type Props = {
 const LookupTableForm = ({ saved, create, table }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
   const validate = (values: LookupTableType) => {
     const errors = {};
@@ -93,7 +96,14 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
       promise = LookupTablesActions.update(valuesToSave);
     }
 
-    return promise.then(() => saved());
+    return promise.then(() => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CREATED' : 'UPDATED'], {
+        app_pathname: 'lut',
+        app_section: 'lut',
+      });
+
+      saved();
+    });
   };
 
   const initialValues: LookupTableType = {
