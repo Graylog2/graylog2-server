@@ -389,6 +389,12 @@ export const TELEMETRY_EVENT_TYPE = {
     DATA_ADAPTER_CREATED: 'LUT Data Adapter Created',
     DATA_ADAPTER_UPDATED: 'LUT Data Adapter Updated',
   },
+  USERS: {
+    USER_CREATED: 'Users User Created',
+    USER_DISABLED: 'Users User Disabled',
+    USER_ENABLED: 'Users User Enabled',
+    USER_DELETED: 'Users User Deleted',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
