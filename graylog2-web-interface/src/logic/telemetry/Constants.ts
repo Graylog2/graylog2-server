@@ -362,6 +362,13 @@ export const TELEMETRY_EVENT_TYPE = {
     INPUT_START_CLICKED: 'Inputs Input Start Clicked',
     INPUT_STOP_CLICKED: 'Inputs Input Stop Clicked',
   },
+  OUTPUTS: {
+    OUTPUT_CREATED: 'Outputs Output Created',
+    OUTPUT_ASSIGNED: 'Outputs Output Assigned',
+    OUTPUT_GLOBALLY_REMOVED: 'Outputs Output Globally Removed',
+    OUTPUT_FROM_STREAM_REMOVED: 'Outputs Output From Stream Removed',
+    OUTPUT_UPDATED: 'Outputs Output Updated',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
