@@ -24,6 +24,8 @@ import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
+import com.github.joschi.jadconfig.validators.DirectoryPathWritableValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
@@ -82,17 +84,17 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_data_location", required = true)
-    private String opensearchDataLocation = "datanode/data";
+    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryPathWritableValidator.class)
+    private Path opensearchDataLocation = Path.of("datanode/data");
 
-    @Parameter(value = "opensearch_logs_location", required = true)
-    private String opensearchLogsLocation = "datanode/logs";
+    @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryPathWritableValidator.class)
+    private Path opensearchLogsLocation = Path.of("datanode/logs");
 
-    @Parameter(value = "opensearch_config_location", required = true)
-    private String opensearchConfigLocation = "datanode/config";
+    @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryPathWritableValidator.class)
+    private Path opensearchConfigLocation = Path.of("datanode/config");
 
-    @Parameter(value = "config_location", required = true)
-    private String configLocation = "config";
+    @Parameter(value = "config_location", validators = DirectoryPathReadableValidator.class)
+    private Path configLocation = null;
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
@@ -121,13 +123,13 @@ public class Configuration extends BaseConfiguration {
     private String opensearchNetworkHostHost = null;
 
     @Parameter(value = "transport_certificate")
-    private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
+    private String datanodeTransportCertificate = null;
 
     @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
-    private String datanodeHttpCertificate = "datanode-http-certificates.p12";
+    private String datanodeHttpCertificate = null;
 
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
@@ -237,7 +239,7 @@ public class Configuration extends BaseConfiguration {
     /**
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
-    public String getOpensearchConfigLocation() {
+    public Path getOpensearchConfigLocation() {
         return opensearchConfigLocation;
     }
 
@@ -246,22 +248,24 @@ public class Configuration extends BaseConfiguration {
      * This is a pointer to a directory holding configuration files (and certificates) for the datanode itself.
      * We treat it as read only for the datanode and should never persist anything in it.
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     *
      */
-    public String getDatanodeConfigurationLocation() {
+    @Nullable
+    public Path getDatanodeConfigurationLocation() {
         return configLocation;
     }
 
     /**
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
-    public String getOpensearchDataLocation() {
+    public Path getOpensearchDataLocation() {
         return opensearchDataLocation;
     }
 
     /**
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
-    public String getOpensearchLogsLocation() {
+    public Path getOpensearchLogsLocation() {
         return opensearchLogsLocation;
     }
 

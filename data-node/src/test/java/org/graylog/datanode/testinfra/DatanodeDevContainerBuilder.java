@@ -141,9 +141,10 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/datanode/data")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/datanode/logs")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/datanode/config")
+                .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config") // this is the datanode config dir for certs
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/opensearch/data")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/opensearch/logs")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/opensearch/config")
 
                 .withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongoDbUri)
                 .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
@@ -201,12 +202,11 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .withDockerfileFromBuilder(builder ->
                         builder.from("eclipse-temurin:17-jre-jammy")
                                 .workDir(IMAGE_WORKING_DIR)
-                                .run("mkdir -p config")
-                                .run("mkdir -p config/opensearch")
-                                .run("mkdir -p bin")
-                                .run("mkdir -p bin/config")
-                                .run("mkdir -p data")
-                                .run("mkdir -p logs")
+                                .run("mkdir -p opensearch/config")
+                                .run("mkdir -p opensearch/data")
+                                .run("mkdir -p opensearch/logs")
+                                .run("mkdir -p conf")
+
                                 .add(opensearchTarArchive, "./" + opensearchTarArchive + "/") // this will automatically extract the tar
                                 .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
                                 .run("useradd opensearch")
