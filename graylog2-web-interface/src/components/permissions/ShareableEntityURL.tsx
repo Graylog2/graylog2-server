@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { ClipboardButton, Icon } from 'components/common';
 import { Alert, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
-import { getShowRouteFromGRN } from 'logic/permissions/GRN';
+import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
 const Container = styled(Alert)`
   display: flex;
@@ -59,7 +59,7 @@ type Props = {
 
 const ShareableEntityURL = ({ entityGRN }: Props) => {
   const container = useRef();
-  const entityRoute = getShowRouteFromGRN(entityGRN);
+  const entityRoute = useShowRouteFromGRN(entityGRN);
   const entityUrl = `${window.location.origin.toString()}${entityRoute}`;
 
   return (
