@@ -350,6 +350,18 @@ export const TELEMETRY_EVENT_TYPE = {
     CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
   },
+  INPUTS: {
+    INPUT_SELECTED: 'Inputs Input Selected',
+    INPUT_CREATED: 'Inputs Input Created',
+    FIND_MORE_CLICKED: 'Inputs Find More Inputs Clicked',
+    INPUT_DELETED: 'Inputs Input Deleted',
+    INPUT_UPDATED: 'Inputs Input Updated',
+    SHOW_RECEIVED_MESSAGES_CLICKED: 'Inputs Show Received Messages Clicked',
+    MANAGE_EXTRACTORS_CLICKED: 'Inputs Manage Extractors Clicked',
+    SHOW_METRICS_CLICKED: 'Inputs Show Metrics Clicked',
+    INPUT_START_CLICKED: 'Inputs Input Start Clicked',
+    INPUT_STOP_CLICKED: 'Inputs Input Stop Clicked',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
