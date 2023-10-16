@@ -100,7 +100,7 @@ public class CaServiceImpl implements CaService {
     }
 
     @Override
-    public void create(String organization, final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException {
+    public void create(final String organization, final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException {
         final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY : daysValid);
         KeyStore keyStore = caCreator.createCA(organization, passwordSecret.toCharArray(), certificateValidity);
         keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, passwordSecret.toCharArray(), password);
