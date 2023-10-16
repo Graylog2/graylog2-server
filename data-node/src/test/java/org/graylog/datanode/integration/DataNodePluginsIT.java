@@ -16,18 +16,12 @@
  */
 package org.graylog.datanode.integration;
 
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.WaitStrategies;
+import org.graylog.datanode.DatanodeOpensearchWait;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.datanode.testinfra.DatanodeTestExtension;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 
@@ -43,7 +37,8 @@ public class DataNodePluginsIT {
     void ensureUnneededPluginsAreNotLoaded() throws Exception {
         final var opensearchRestPort = backend.getOpensearchRestPort();
         final var baseUrl = "http://localhost:" + opensearchRestPort;
-        waitForOpensearch(baseUrl);
+
+        DatanodeOpensearchWait.onPort(opensearchRestPort).waitForGreenStatus();
 
         given()
                 .get(baseUrl + "/_cat/plugins")
@@ -63,17 +58,5 @@ public class DataNodePluginsIT {
                         Matchers.not(Matchers.containsString("opensearch-security-analytics")),
                         Matchers.not(Matchers.containsString("opensearch-sql"))
                 );
-    }
-
-    private void waitForOpensearch(String baseUrl) throws ExecutionException, RetryException {
-        final var retryer = RetryerBuilder.newBuilder()
-                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .retryIfException(e -> e instanceof IOException)
-                .build();
-
-        retryer.call(() -> given()
-                .get(baseUrl)
-                .then()
-                .statusCode(200));
     }
 }
