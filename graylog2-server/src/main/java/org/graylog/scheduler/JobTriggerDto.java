@@ -28,6 +28,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,6 +42,7 @@ public abstract class JobTriggerDto {
     static final String FIELD_START_TIME = "start_time";
     static final String FIELD_END_TIME = "end_time";
     static final String FIELD_NEXT_TIME = "next_time";
+    static final String FIELD_EXECUTION_DURATION = "execution_duration";
     private static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_UPDATED_AT = "updated_at";
     static final String FIELD_TRIGGERED_AT = "triggered_at";
@@ -59,6 +61,7 @@ public abstract class JobTriggerDto {
 
     @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
     public abstract String jobDefinitionType();
+
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
 
@@ -80,6 +83,9 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_TRIGGERED_AT)
     public abstract Optional<DateTime> triggeredAt();
 
+    @JsonProperty(FIELD_EXECUTION_DURATION)
+    public abstract Optional<Duration> executionDuration();
+
     @JsonProperty(FIELD_STATUS)
     public abstract JobTriggerStatus status();
 
@@ -97,6 +103,7 @@ public abstract class JobTriggerDto {
 
     @JsonProperty(FIELD_IS_CANCELLED)
     public abstract boolean isCancelled();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -156,6 +163,9 @@ public abstract class JobTriggerDto {
 
         @JsonProperty(FIELD_TRIGGERED_AT)
         public abstract Builder triggeredAt(@Nullable DateTime triggeredAt);
+
+        @JsonProperty(FIELD_EXECUTION_DURATION)
+        public abstract Builder executionDuration(@Nullable Duration executionDuration);
 
         @JsonProperty(FIELD_STATUS)
         public abstract Builder status(JobTriggerStatus status);
