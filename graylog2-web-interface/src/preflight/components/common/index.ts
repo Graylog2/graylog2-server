@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as Alert } from './Alert';
 export { default as Badge } from './Badge';
 export { default as Button } from './Button';
 export { default as Col } from './Col';
