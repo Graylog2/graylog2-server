@@ -23,7 +23,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Suppliers;
-import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -56,6 +55,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -114,8 +114,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final @Named("password_secret") String passwordSecret,
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
                                                     final PreflightConfigService preflightConfigService,
-                                                    final EventBus serverEventBus,
-                                                    final NotificationService notificationService) {
+                                                    final NotificationService notificationService,
+                                                    final CustomCAX509TrustManager trustManager) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.csrStorage = csrStorage;
         this.certMongoStorage = certMongoStorage;
@@ -129,17 +129,16 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
         this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
-        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(caService, serverEventBus));
+        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager));
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
-    private static OkHttpClient buildConnectivityCheckOkHttpClient(final CaService caService, final EventBus serverEventBus) {
+    private static OkHttpClient buildConnectivityCheckOkHttpClient(final X509TrustManager trustManager) {
         try {
             final var clientBuilder = new OkHttpClient.Builder();
             final var sslContext = SSLContext.getInstance("TLS");
-            final var tm = new CustomCAX509TrustManager(caService, serverEventBus);
-            sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
-            clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), tm);
+            sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
+            clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
             return clientBuilder.build();
         } catch (NoSuchAlgorithmException | KeyManagementException ex) {
             LOG.error("Could not set Graylog CA trust manager: {}", ex.getMessage(), ex);
