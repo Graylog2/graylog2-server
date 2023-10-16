@@ -29,14 +29,14 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
      * The target configuration is regenerated during each startup, so it could also be a random filename
      * as long as we use the same name as a copy-target and opensearch config property.
      */
-    private static final String TARGET_DATANODE_HTTP_CERTIFICATES_FILENAME = "http-certificates.p12";
+    private static final String TARGET_DATANODE_HTTP_KEYSTORE_FILENAME = "http-keystore.p12";
     /**
      * This filename is used only internally - we copy user-provided certificates to this location and
      * we configure opensearch to read this file. It doesn't have to match naming provided by user.
      * The target configuration is regenerated during each startup, so it could also be a random filename
      * as long as we use the same name as a copy-target and opensearch config property.
      */
-    private static final String TARGET_DATANODE_TRANSPORT_CERTIFICATES_FILENAME = "transport-certificates.p12";
+    private static final String TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME = "transport-keystore.p12";
 
     private final Path opensearchProcessConfigurationDir;
 
@@ -45,11 +45,11 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
     }
 
     KeystoreFileLocation getHttpKeystoreLocation() {
-        return new KeystoreFileLocation(opensearchProcessConfigurationDir.resolve(TARGET_DATANODE_HTTP_CERTIFICATES_FILENAME));
+        return new KeystoreFileLocation(opensearchProcessConfigurationDir.resolve(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME));
     }
 
 
     KeystoreFileLocation getTransportKeystoreLocation() {
-        return new KeystoreFileLocation(opensearchProcessConfigurationDir.resolve(TARGET_DATANODE_TRANSPORT_CERTIFICATES_FILENAME));
+        return new KeystoreFileLocation(opensearchProcessConfigurationDir.resolve(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME));
     }
 }

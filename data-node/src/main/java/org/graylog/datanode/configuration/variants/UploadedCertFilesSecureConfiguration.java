@@ -69,7 +69,7 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
         List<String> errors = new LinkedList<>();
 
         if(StringUtils.isBlank(datanodeTransportCertificatePassword)) {
-            errors.add(TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY  + " required");
+            errors.add(TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY  + " required. Please configure password to your transport certificates keystore.");
         }
 
         if(!fileExists(uploadedTransportKeystoreFileName)) {
@@ -77,7 +77,7 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
         }
 
         if(StringUtils.isBlank(datanodeHttpCertificatePassword)) {
-            errors.add(HTTP_CERTIFICATE_PASSWORD_PROPERTY  + " required");
+            errors.add(HTTP_CERTIFICATE_PASSWORD_PROPERTY  + " required. Please configure password to your http certificates keystore.");
         }
 
         if(!fileExists(uploadedHttpKeystoreFileName)) {
@@ -98,6 +98,10 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
                 .orElse(false);
     }
 
+    /**
+     * We require either full set of http and transport certificates and their keys or nothing. Anything in-between will
+     * lead to an exception, it's a mismatched configuration and would cause problems in the future.
+     */
     private boolean noneOfRequiredConfigOptionsProvided() {
         return StringUtils.isBlank(datanodeTransportCertificatePassword) &&
                 StringUtils.isBlank(datanodeHttpCertificatePassword) &&
@@ -111,11 +115,11 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
         final KeystoreFileLocation targetTransportKeystoreLocation = getTransportKeystoreLocation();
         final KeystoreFileLocation targetHttpKeystoreLocation = getHttpKeystoreLocation();
 
-        final char[] transportOTP = keystoreReEncryption.reEncyptWithOtp(new KeystoreFileLocation(datanodeConfiguration.datanodeDirectories().getConfigurationSourceDir().map(confDir -> confDir.resolve(uploadedTransportKeystoreFileName)).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"))),
+        final char[] transportOTP = keystoreReEncryption.reEncyptWithOtp(new KeystoreFileLocation(datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedTransportKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"))),
                 datanodeTransportCertificatePassword.toCharArray(),
                 targetTransportKeystoreLocation);
 
-        final char[] httpOTP = keystoreReEncryption.reEncyptWithOtp(new KeystoreFileLocation(datanodeConfiguration.datanodeDirectories().getConfigurationSourceDir().map(confDir -> confDir.resolve(uploadedHttpKeystoreFileName)).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"))),
+        final char[] httpOTP = keystoreReEncryption.reEncyptWithOtp(new KeystoreFileLocation(datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(uploadedHttpKeystoreFileName).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"))),
                 datanodeHttpCertificatePassword.toCharArray(),
                 targetHttpKeystoreLocation);
 
