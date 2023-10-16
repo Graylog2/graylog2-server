@@ -32,6 +32,8 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Clock;
@@ -44,6 +46,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.bouncycastle.asn1.x509.GeneralName.dNSName;
 import static org.bouncycastle.asn1.x509.GeneralName.iPAddress;
@@ -72,6 +75,10 @@ public class CsrSigner {
             case dNSName, iPAddress, rfc822Name -> true;
             default -> false;
         };
+    }
+
+    private boolean isDNSName(final int name) {
+        return name == dNSName;
     }
 
     private Duration periodToDuration(Period period) {
@@ -125,6 +132,7 @@ public class CsrSigner {
                         .stream()
                         .flatMap(Arrays::stream))
                 .filter(name -> isValidName(name.getTagNo()))
+                .flatMap(name -> isDNSName(name.getTagNo()) ? resolveDNSName(name) : Stream.of(name))
                 .collect(Collectors.toSet());
         if (!altNames.isEmpty()) {
             builder.addExtension(Extension.subjectAlternativeName, false,
@@ -134,6 +142,16 @@ public class CsrSigner {
         ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(caPrivateKey);
         X509CertificateHolder certHolder = builder.build(signer);
         return new JcaX509CertificateConverter().getCertificate(certHolder);
+    }
+
+    private Stream<? extends GeneralName> resolveDNSName(GeneralName name) {
+        final var hostname = name.getName().toString();
+        try {
+            final var inetAddress = InetAddress.getByName(hostname);
+            return Stream.of(name, new GeneralName(iPAddress, inetAddress.getHostAddress()));
+        } catch (UnknownHostException e) {
+            return Stream.of(name);
+        }
     }
 
 }
