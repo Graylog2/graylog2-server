@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useState, useEffect, useRef, useCallback } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
@@ -109,7 +109,7 @@ const Scratchpad = () => {
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
-  const resetStatusTimer = useCallback(() => {
+  const resetStatusTimer = () => {
     if (statusTimeout.current) {
       clearTimeout(statusTimeout.current);
     }
@@ -117,13 +117,13 @@ const Scratchpad = () => {
     statusTimeout.current = setTimeout(() => {
       setShowStatusMessage(false);
     }, 1000);
-  }, []);
+  };
 
-  const updateStatusMessage = useCallback((message) => {
+  const updateStatusMessage = (message) => {
     setStatusMessage(message);
     setShowStatusMessage(true);
     resetStatusTimer();
-  }, [resetStatusTimer]);
+  };
 
   const handleChange = debounce(() => {
     const { value } = textareaRef.current;
@@ -148,13 +148,13 @@ const Scratchpad = () => {
     writeData({ securityConfirmed: true });
   };
 
-  const openConfirmClear = useCallback(() => {
+  const openConfirmClear = () => {
     setShowModal(true);
-  }, []);
+  };
 
-  const handleCancelClear = useCallback(() => {
+  const handleCancelClear = () => {
     setShowModal(false);
-  }, []);
+  };
 
   const handleClearText = () => {
     setScratchData(DEFAULT_SCRATCHDATA);
@@ -193,16 +193,15 @@ const Scratchpad = () => {
     options: { enableOnFormTags: true, preventDefault: true },
   });
 
-  const copyCallback = useCallback(() => {
+  const copyCallback = () => {
     copyToClipboard(scratchData).then(() => updateStatusMessage(STATUS_COPIED));
-  }, [scratchData, updateStatusMessage]);
+  };
 
   useHotkey({
     actionKey: 'copy',
     scope: 'scratchpad',
     callback: copyCallback,
     options: { enableOnFormTags: true },
-    dependencies: [copyCallback],
   });
 
   return (
