@@ -27,7 +27,7 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const defaultOptions: ReactHotKeysHookOptions = {
+const defaultOptions: ReactHotKeysHookOptions & Options = {
   preventDefault: true,
   enabled: true,
   enableOnFormTags: false,
@@ -39,6 +39,7 @@ const defaultOptions: ReactHotKeysHookOptions = {
   description: undefined,
   document: undefined,
   ignoreModifiers: false,
+  displayInOverview: undefined,
 };
 
 const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, scope: ScopeName) => {
@@ -113,16 +114,21 @@ const useHotkey = <T extends HTMLElement>({
       options: {
         scope,
         enabled: mergedOptions.enabled,
+        displayInOverview: mergedOptions.displayInOverview,
         combinationKey: mergedOptions.combinationKey,
+        splitKey: mergedOptions.splitKey,
       },
     });
 
     return () => removeActiveHotkey({ scope, actionKey });
-  }, [actionKey, addActiveHotkey, scope, removeActiveHotkey, mergedOptions.combinationKey, mergedOptions.enabled]);
+  }, [actionKey, addActiveHotkey, scope, removeActiveHotkey, mergedOptions.combinationKey, mergedOptions.enabled, mergedOptions.displayInOverview, mergedOptions.splitKey]);
 
-  const keys = hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys;
-
-  return originalUseHotkeys<T>(keys, callbackWithTelemetry, mergedOptions, dependencies);
+  return originalUseHotkeys<T>(
+    hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys,
+    callbackWithTelemetry,
+    mergedOptions,
+    dependencies,
+  );
 };
 
 export default useHotkey;
