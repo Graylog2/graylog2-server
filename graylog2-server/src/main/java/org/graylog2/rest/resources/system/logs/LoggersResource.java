@@ -152,7 +152,8 @@ public class LoggersResource extends RestResource {
         if(loggerName.equals(loggerConfig.getName())) {
             loggerConfig.setLevel(level);
         } else {
-            final LoggerConfig newLoggerConfig = new LoggerConfig(loggerName, level, loggerConfig.isAdditive());
+            boolean additive = LogManager.ROOT_LOGGER_NAME.equals(loggerConfig.getName()) || loggerConfig.isAdditive();
+            final LoggerConfig newLoggerConfig = new LoggerConfig(loggerName, level, additive);
             newLoggerConfig.setLevel(level);
             config.addLogger(loggerName, newLoggerConfig);
         }
