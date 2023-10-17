@@ -175,8 +175,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/");
 
-        container.withImagePullPolicy(PullPolicy.alwaysPull());
-
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
     }
