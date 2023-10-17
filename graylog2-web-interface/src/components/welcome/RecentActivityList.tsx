@@ -25,8 +25,9 @@ import { StyledLabel } from 'components/welcome/EntityListItem';
 import type { RecentActivityType } from 'components/welcome/types';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 import getTitleForEntityType from 'util/getTitleForEntityType';
-import { getShowRouteFromGRN, getValuesFromGRN } from 'logic/permissions/GRN';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
+import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
 type Props = { itemGrn: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
 
@@ -34,7 +35,7 @@ const ActionItem = ({ itemGrn, activityType, itemTitle, userName }: Props) => {
   const hasReadPermission = useHasEntityPermissionByGRN(itemGrn, 'read');
   const { id: itemId, type: itemType } = getValuesFromGRN(itemGrn);
   const entityTypeTitle = useMemo(() => getTitleForEntityType(itemType, false) ?? `(unsupported type ${itemType})`, [itemType]);
-  const entityLink = getShowRouteFromGRN(itemGrn);
+  const entityLink = useShowRouteFromGRN(itemGrn);
   const entityTitle = itemTitle || itemId;
   const showLink = activityType !== 'delete' && !!entityLink && hasReadPermission;
 
