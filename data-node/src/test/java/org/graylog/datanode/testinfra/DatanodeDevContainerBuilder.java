@@ -205,7 +205,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                                 .run("mkdir -p opensearch/config")
                                 .run("mkdir -p opensearch/data")
                                 .run("mkdir -p opensearch/logs")
-                                .run("mkdir -p conf")
+                                .run("mkdir -p config")
 
                                 .add(opensearchTarArchive, "./" + opensearchTarArchive + "/") // this will automatically extract the tar
                                 .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
