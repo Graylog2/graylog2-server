@@ -57,7 +57,7 @@ describe('CACreateForm', () => {
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
       expect.stringContaining('/api/ca/create'),
-      {},
+      { organization: 'Graylog CA' },
       false,
     ));
 
@@ -78,7 +78,7 @@ describe('CACreateForm', () => {
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
       expect.stringContaining('/api/ca/create'),
-      {},
+      { organization: 'Graylog CA' },
       false,
     ));
 
