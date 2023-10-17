@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { DayModifiers } from 'react-day-picker';
 import DayPicker from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
 import 'react-day-picker/lib/style.css';
-import { toDateObject, adjustFormat } from 'util/DateTime';
+
+import { toDateObject, adjustFormat, isValidDate, toUTCFromTz } from 'util/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   width: 100%;
@@ -58,6 +60,16 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
+const useSelectedDate = (date: string | undefined) => {
+  const { userTimezone, formatTime } = useUserDateTime();
+
+  if (!isValidDate(date)) {
+    return undefined;
+  }
+
+  return toDateObject(formatTime(date, 'internal'), undefined, userTimezone);
+};
+
 type Props = {
   date?: string | undefined,
   onChange: (day: Date, modifiers: DayModifiers, event: React.MouseEvent<HTMLDivElement>) => void,
@@ -66,30 +78,21 @@ type Props = {
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
-  let selectedDate;
+  const { userTimezone } = useUserDateTime();
+  const selectedDate = useSelectedDate(date);
 
-  if (date) {
-    try {
-      selectedDate = toDateObject(date);
-    } catch (e) {
-      // don't do anything
-    }
-  }
-
-  const modifiers = {
-    selected: (moddedDate) => {
+  const modifiers = useMemo(() => ({
+    selected: (moddedDate: Date) => {
       if (!selectedDate) {
         return false;
       }
 
-      const dateTime = toDateObject(adjustFormat(moddedDate, 'complete'));
-
-      return (adjustFormat(selectedDate, 'date') === adjustFormat(dateTime, 'date'));
+      return adjustFormat(selectedDate, 'date', userTimezone) === adjustFormat(moddedDate, 'date');
     },
     disabled: {
       before: new Date(fromDate),
     },
-  };
+  }), [fromDate, selectedDate, userTimezone]);
 
   return (
     <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
