@@ -72,9 +72,9 @@ const App = () => (
         }
 
         return (
-          <ScratchpadProvider loginName={currentUser.username}>
-            <NavigationTelemetry />
-            <HotkeysProvider>
+          <HotkeysProvider>
+            <ScratchpadProvider loginName={currentUser.username}>
+              <NavigationTelemetry />
               <>
                 <AppLayout>
                   <Navigation />
@@ -92,8 +92,8 @@ const App = () => (
                 </AppLayout>
                 <HotkeysModalContainer />
               </>
-            </HotkeysProvider>
-          </ScratchpadProvider>
+            </ScratchpadProvider>
+          </HotkeysProvider>
         );
       }}
     </CurrentUserContext.Consumer>

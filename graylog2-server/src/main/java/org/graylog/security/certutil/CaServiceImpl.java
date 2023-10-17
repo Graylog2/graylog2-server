@@ -18,7 +18,7 @@ package org.graylog.security.certutil;
 
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.graylog.security.certutil.ca.CACreator;
+import org.graylog.security.certutil.ca.CAKeyPair;
 import org.graylog.security.certutil.ca.PemCaReader;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
@@ -63,7 +63,6 @@ public class CaServiceImpl implements CaService {
     private final SmartKeystoreStorage keystoreStorage;
     private final KeystoreMongoLocation mongoDbCaLocation;
     private final KeystoreFileLocation manuallyProvidedCALocation;
-    private final CACreator caCreator;
     private final PemCaReader pemCaReader;
     private final CaConfiguration configuration;
     private final CertificatesService certificatesService;
@@ -74,12 +73,10 @@ public class CaServiceImpl implements CaService {
     @Inject
     public CaServiceImpl(final Configuration configuration,
                          final SmartKeystoreStorage keystoreStorage,
-                         final CACreator caCreator,
                          final PemCaReader pemCaReader,
                          final CertificatesService certificatesService,
                          final @Named("password_secret") String passwordSecret, ClusterEventBus eventBus) {
         this.keystoreStorage = keystoreStorage;
-        this.caCreator = caCreator;
         this.pemCaReader = pemCaReader;
         this.configuration = configuration;
         this.certificatesService = certificatesService;
@@ -100,9 +97,9 @@ public class CaServiceImpl implements CaService {
     }
 
     @Override
-    public void create(final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException {
-        final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY: daysValid);
-        KeyStore keyStore = caCreator.createCA(passwordSecret.toCharArray(), certificateValidity);
+    public void create(final String organization, final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException {
+        final Duration certificateValidity = Duration.ofDays(daysValid == null || daysValid == 0 ? DEFAULT_VALIDITY : daysValid);
+        KeyStore keyStore = CAKeyPair.create(organization, passwordSecret.toCharArray(), certificateValidity).toKeyStore();
         keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, passwordSecret.toCharArray(), password);
         LOG.debug("Generated a new CA.");
         triggerCaChangedEvent();
