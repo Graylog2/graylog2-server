@@ -401,7 +401,11 @@ export const TELEMETRY_EVENT_TYPE = {
     DELETED: 'Grok Pattern Deleted',
     TESTED: 'Grok Pattern Tested',
     IMPORTED: 'Grok Pattern Imported',
-  }
+  },
+  ROLES: {
+    USER_ASSIGNED: 'Roles User Assigned',
+    USER_UNASSIGNED: 'Roles User Unassigned',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
