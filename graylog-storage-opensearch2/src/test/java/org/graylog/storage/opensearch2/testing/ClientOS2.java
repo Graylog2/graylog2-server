@@ -427,4 +427,9 @@ public class ClientOS2 implements Client {
                 "Unable to read OS cluster setting: " + setting);
         return response.getSetting(setting);
     }
+
+    @Override
+    public void putFieldMapping(String index, String field, String type) {
+        updateMapping(index, Collections.singletonMap("properties", Collections.singletonMap(field, Collections.singletonMap("type", type))));
+    }
 }

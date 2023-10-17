@@ -52,7 +52,7 @@ public class PluginLoader {
     private static final String[] PLUGIN_FILE_EXTENSIONS = {"jar", "JAR"};
 
     private final File pluginDir;
-    private final ChainingClassLoader classLoader;
+    protected final ChainingClassLoader classLoader;
 
     public PluginLoader(File pluginDir, ChainingClassLoader classLoader) {
         this.pluginDir = requireNonNull(pluginDir);
@@ -72,11 +72,11 @@ public class PluginLoader {
                 .build();
     }
 
-    private Iterable<Plugin> loadClassPathPlugins() {
+    protected Iterable<Plugin> loadClassPathPlugins() {
         return ServiceLoader.load(Plugin.class);
     }
 
-    private Iterable<Plugin> loadJarPlugins() {
+    protected Iterable<Plugin> loadJarPlugins() {
         return ImmutableSet.copyOf(ServiceLoader.load(Plugin.class, classLoader));
     }
 
@@ -204,7 +204,7 @@ public class PluginLoader {
         }
     }
 
-    private class PluginAdapterFunction implements Function<Plugin, Plugin> {
+    protected class PluginAdapterFunction implements Function<Plugin, Plugin> {
         private final Injector injector;
 
         public PluginAdapterFunction(Injector injector) {

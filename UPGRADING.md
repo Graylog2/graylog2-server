@@ -61,6 +61,27 @@ Removed fields:
 
 Note that additional CrowdStrike message parsing is expected to be released in a future release of Graylog Illuminate.
 
+## Microsoft Defender for Endpoint input log parsing changes
+
+Several log parsing changes have been made to the Microsoft Defender for Endpoint input.
+
+Added fields:
+`event_source_product`: Contains the static value `microsoft_defender_endpoint`.
+
+Changed fields:
+- `message`: Now contains the full message payload.
+- `source`: Now contains the `detectionSource` log value.
+
+Removed fields:
+- `alert_signature`
+- `alert_signature_id`
+- `event_start`
+- `event_end`
+- `full_message`
+
+Note that additional Microsoft Defender for Endpoint message parsing is expected to be released in a future release of
+Graylog Illuminate.
+
 ## Java API Changes
 The following Java Code API changes have been made.
 

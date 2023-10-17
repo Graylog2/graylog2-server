@@ -188,12 +188,14 @@ interface ExportFormat {
   fileExtension: string;
 }
 
+export interface SystemConfigurationComponentProps {
+  config: any,
+  updateConfig: (newConfig: any) => any,
+}
+
 export interface SystemConfiguration {
   configType: string;
-  component: React.ComponentType<{
-    config: any,
-    updateConfig: (newConfig: any) => any,
-  }>;
+  component: React.ComponentType<SystemConfigurationComponentProps>;
 }
 
 export type SearchTypeResult = {

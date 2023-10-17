@@ -24,9 +24,14 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type { SupportedTimeRangeType } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import type {
+  SupportedTimeRangeType,
+} from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 import TimeRangePicker from 'views/components/searchbar/time-range-filter/time-range-picker/index';
 import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 import TimeRangeFilterButtons from './TimeRangeFilterButtons';
 import TimeRangeDisplay from './TimeRangeDisplay';
@@ -69,6 +74,7 @@ const TimeRangeFilter = ({
   const containerRef = useRef();
   const { showDropdownButton } = useContext(TimeRangeFilterSettingsContext);
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
   const [show, setShow] = useState(false);
 
   if (validTypes && value && 'type' in value && !validTypes.includes(value?.type)) {
@@ -78,10 +84,10 @@ const TimeRangeFilter = ({
   const toggleShow = () => {
     setShow(!show);
 
-    sendTelemetry('input_button_toggle', {
-      app_pathname: 'search',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TOGGLED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
-      app_action_value: 'time-range-dropdown',
+      app_action_value: 'time-range-picker',
       event_details: {
         showing: !show,
       },

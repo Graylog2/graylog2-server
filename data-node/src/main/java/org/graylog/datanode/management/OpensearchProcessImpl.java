@@ -20,7 +20,9 @@ import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchInfo;
 import org.graylog.datanode.process.ProcessEvent;
@@ -29,15 +31,24 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
@@ -45,7 +56,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final StateMachineTracerAggregator tracerAggregator;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<OpensearchConfiguration> configuration = Optional.empty();
+    private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<RestHighLevelClient> restClient = Optional.empty();
 
@@ -59,8 +70,12 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final Queue<String> stdout;
     private final Queue<String> stderr;
     private final CustomCAX509TrustManager trustManager;
+    private final Path hostsfile;
+    private final NodeService nodeService;
+    private final Configuration configuration;
 
-    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager) {
+
+    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService nodeService) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = ProcessStateMachine.createNew();
         tracerAggregator = new StateMachineTracerAggregator();
@@ -68,6 +83,9 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.stdout = new CircularFifoQueue<>(logsCacheSize);
         this.stderr = new CircularFifoQueue<>(logsCacheSize);
         this.trustManager = trustManager;
+        this.nodeService = nodeService;
+        this.configuration = configuration;
+        this.hostsfile = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve("unicast_hosts.txt");
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
@@ -94,13 +112,19 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public URI getOpensearchBaseUrl() {
-        final String baseUrl = configuration.map(OpensearchConfiguration::getRestBaseUrl)
+        final String baseUrl = opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl)
                 .map(httpHost -> new URIBuilder()
                         .setHost(httpHost.getHostName())
                         .setPort(httpHost.getPort())
                         .setScheme(httpHost.getSchemeName()).toString())
                 .orElse(""); // TODO: will this cause problems in the nodeservice?
         return URI.create(baseUrl);
+    }
+
+    @Override
+    public String getOpensearchClusterUrl() {
+        final var hostname = DatanodeConfigurationProvider.getNodesFromConfig(configuration.getDatanodeNodeName());
+        return hostname + ":" + configuration.getOpensearchTransportPort();
     }
 
     public void onEvent(ProcessEvent event) {
@@ -128,17 +152,28 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public void startWithConfig(OpensearchConfiguration configuration) {
-        this.configuration = Optional.of(configuration);
+        this.opensearchConfiguration = Optional.of(configuration);
         restart();
     }
 
+    private void writeSeedHostsList() {
+        try {
+            final Set<String> current = nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
+            Files.write(hostsfile, current, Charset.defaultCharset(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        } catch (IOException iox) {
+            LOG.error("Could not write to file: {} - {}", hostsfile, iox.getMessage());
+        }
+
+    }
     @Override
     public synchronized void restart() {
-        configuration.ifPresentOrElse(
+        opensearchConfiguration.ifPresentOrElse(
                 (config -> {
                     stopProcess();
                     // refresh TM if the SSL certs changed
                     trustManager.refresh();
+                    // refresh the seed hosts
+                    writeSeedHostsList();
                     commandLineProcess = new OpensearchCommandLineProcess(config, this);
                     commandLineProcess.start();
                     restClient = Optional.of(createRestClient(config));

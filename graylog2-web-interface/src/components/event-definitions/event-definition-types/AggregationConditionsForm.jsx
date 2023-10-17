@@ -20,7 +20,6 @@ import styled from 'styled-components';
 import get from 'lodash/get';
 
 import { Alert, Row } from 'components/bootstrap';
-import { Icon } from 'components/common';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 
@@ -91,7 +90,7 @@ class AggregationConditionsForm extends React.Component {
       // Keep series up-to-date with changes in conditions
       const seriesReferences = extractSeriesReferences(nextConditions);
 
-      nextSeries = (changes.series || eventDefinition.config.series).filter((s) => seriesReferences.includes(s.id));
+      nextSeries = (changes.series || eventDefinition?.config?.series)?.filter((s) => seriesReferences.includes(s.id)) || [];
     } else {
       nextSeries = [];
     }
@@ -106,15 +105,14 @@ class AggregationConditionsForm extends React.Component {
   render() {
     const { showInlineValidation } = this.state;
     const { eventDefinition, validation } = this.props;
-    const expression = eventDefinition.config.conditions.expression || initialEmptyConditionConfig;
-    const expressionValidation = validateExpression(expression, eventDefinition.config.series);
+    const expression = eventDefinition?.config?.conditions?.expression || initialEmptyConditionConfig;
+    const expressionValidation = validateExpression(expression, eventDefinition?.config?.series || []);
 
     return (
       <>
         <h3 className={commonStyles.title}>Create Events for Definition</h3>
         {validation.errors.conditions && (
-          <StyledAlert bsStyle="danger">
-            <h4><Icon name="exclamation-triangle" />&nbsp;Errors found</h4>
+          <StyledAlert bsStyle="danger" title="Errors found">
             <p>{get(validation, 'errors.conditions[0]')}</p>
           </StyledAlert>
         )}
@@ -126,8 +124,8 @@ class AggregationConditionsForm extends React.Component {
                                           onChange={this.handleChange} />
         </Row>
 
-        <AggregationConditionsFormSummary conditions={eventDefinition.config.conditions}
-                                          series={eventDefinition.config.series}
+        <AggregationConditionsFormSummary conditions={eventDefinition?.config?.conditions || {}}
+                                          series={eventDefinition?.config?.series || []}
                                           expressionValidation={expressionValidation}
                                           showInlineValidation={showInlineValidation}
                                           toggleShowValidation={this.toggleShowInlineValidation} />

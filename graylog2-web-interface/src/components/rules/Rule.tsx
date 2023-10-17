@@ -15,11 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { PageHeader } from 'components/common';
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, Button, BootstrapModalConfirm } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import useHistory from 'routing/useHistory';
+import Routes from 'routing/Routes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import RuleBuilder from './rule-builder/RuleBuilder';
 import RuleForm from './RuleForm';
@@ -34,6 +40,12 @@ type Props = {
 };
 
 const Rule = ({ create, title, isRuleBuilder }: Props) => {
+  const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
+
+  const history = useHistory();
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   let pageTitle;
 
   if (create) {
@@ -46,6 +58,21 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
     <div>
       <PipelinesPageNavigation />
       <PageHeader title={pageTitle}
+                  actions={(isRuleBuilder && create) ? (
+                    <Button bsStyle="success"
+                            bsSize="small"
+                            onClick={() => {
+                              sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.USE_SOURCE_CODE_EDITOR_CLICKED, {
+                                app_pathname: getPathnameWithoutId(pathname),
+                                app_section: 'pipeline-rules',
+                                app_action_value: 'source-code-editor-button',
+                              });
+
+                              setShowConfirmSourceCodeEditor(true);
+                            }}>
+                      Use Source Code Editor
+                    </Button>
+                  ) : undefined}
                   documentationLink={{
                     title: 'Pipeline rules documentation',
                     path: DocsHelper.PAGES.PIPELINE_RULES,
@@ -70,6 +97,32 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
         </Row>
       )}
 
+      {showConfirmSourceCodeEditor && (
+        <BootstrapModalConfirm showModal
+                               title="Switch to Source Code Editor"
+                               onConfirm={() => {
+                                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CONFIRM_CLICKED, {
+                                   app_pathname: getPathnameWithoutId(pathname),
+                                   app_section: 'pipeline-rules',
+                                   app_action_value: 'confirm-button',
+                                 });
+
+                                 history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
+                                 setShowConfirmSourceCodeEditor(false);
+                               }}
+                               onCancel={() => {
+                                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CANCEL_CLICKED, {
+                                   app_pathname: getPathnameWithoutId(pathname),
+                                   app_section: 'pipeline-rules',
+                                   app_action_value: 'cancel-button',
+                                 });
+
+                                 setShowConfirmSourceCodeEditor(false);
+                               }}>
+          <div>You are about to leave this page and go to the Source Code Editor.</div>
+          <div>Make sure you have no unsaved changes.</div>
+        </BootstrapModalConfirm>
+      )}
     </div>
   );
 };

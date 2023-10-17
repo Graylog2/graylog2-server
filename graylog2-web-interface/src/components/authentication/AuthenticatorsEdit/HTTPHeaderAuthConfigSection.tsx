@@ -22,7 +22,7 @@ import Routes from 'routing/Routes';
 import type HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
 import { Input, Button, Col, Row, Alert } from 'components/bootstrap';
-import { FormikFormGroup, ErrorAlert, Spinner, Icon } from 'components/common';
+import { FormikFormGroup, ErrorAlert, Spinner } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import useHistory from 'routing/useHistory';
 import type { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
@@ -88,7 +88,7 @@ const HTTPHeaderAuthConfigSection = () => {
             <Row>
               <Col mdOffset={3} md={9}>
                 <Alert bsStyle="info">
-                  <Icon name="info-circle" /> Please configure the <code>trusted_proxies</code> setting in the Graylog
+                  Please configure the <code>trusted_proxies</code> setting in the Graylog
                   server configuration file.
                 </Alert>
               </Col>

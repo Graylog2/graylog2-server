@@ -19,6 +19,7 @@ package org.graylog2.bootstrap.preflight.web.resources;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.ConfigurationStatus;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.plugin.Version;
@@ -53,6 +54,6 @@ public class PreflightStatusResource {
     @POST
     @Path("/finish-config")
     public PreflightConfig finishConfig() throws ValidationException {
-        return preflightConfigService.saveConfiguration();
+         return preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
     }
 }

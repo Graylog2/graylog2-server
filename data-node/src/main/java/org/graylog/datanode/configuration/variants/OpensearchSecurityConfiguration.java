@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
 import org.slf4j.Logger;
@@ -73,13 +73,13 @@ public class OpensearchSecurityConfiguration {
      * initial set of opensearch users, it will create and persist a truststore that will be set as a system-wide
      * truststore.
      */
-    public OpensearchSecurityConfiguration configure(Configuration localConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
+    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
         if (securityEnabled()) {
 
             logCertificateInformation("transport certificate", transportCertificate);
             logCertificateInformation("HTTP certificate", httpCertificate);
 
-            final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
+            final Path opensearchConfigDir = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir();
 
             final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
@@ -111,11 +111,6 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILENAME);
             config.put("plugins.security.ssl.transport.truststore_password", truststore.passwordAsString());
 
-            // this disables hostname verification for transport. It's a workaround for localnode communication
-            // via SSL, where Opensearch still tries to communicate with 'localhost' and not the publish_host or other
-            // configured node names.
-            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
-
             config.put("plugins.security.ssl.http.enabled", "true");
 
             config.put("plugins.security.ssl.http.keystore_type", KEYSTORE_FORMAT);
@@ -146,20 +141,8 @@ public class OpensearchSecurityConfiguration {
         final File file = opensearchConfigDir.resolve(Path.of("opensearch-security", "config.yml")).toFile();
         Map<String, Object> contents = objectMapper.readValue(file, new TypeReference<>() {});
 
-        /* TODO: the following two lines should be active, once #16334 is merged and there are nightly builds of master available to build a compatible 5.2-dev DataNode Docker image
         Map<String, Object> config = filterConfigurationMap(contents, "config", "dynamic", "authc", "jwt_auth_domain", "http_authenticator", "config");
         config.put("signing_key", Base64.getEncoder().encodeToString(signingKey));
-        */
-
-        // TODO: remove the following block, once #16334 is merged and there are nightly builds of master available to build a compatible 5.2-dev DataNode Docker image
-        Map<String, Object> jwt_auth_domain = filterConfigurationMap(contents, "config", "dynamic", "authc", "jwt_auth_domain");
-        jwt_auth_domain.put("http_enabled", true);
-        jwt_auth_domain.put("transport_enabled", true);
-
-        Map<String, Object> config = filterConfigurationMap(jwt_auth_domain, "http_authenticator", "config");
-        config.put("signing_key", Base64.getEncoder().encodeToString(signingKey));
-        config.put("roles_key", "os_roles");
-        // TODO: remove up until here
 
         objectMapper.writeValue(file, contents);
     }

@@ -31,7 +31,7 @@ public class IsString extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsString() {
-        valueParam = object("value").primary().description("Value to check").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
     }
 
     @Override

@@ -28,13 +28,12 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
-import org.graylog2.security.IndexerJwtAuthToken;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class ServerPreflightChecksModule extends Graylog2Module {
 
@@ -46,7 +45,7 @@ public class ServerPreflightChecksModule extends Graylog2Module {
                 .implement(TrustManager.class, CustomCAX509TrustManager.class)
                 .build(TrustManagerProvider.class));
 
-        bind(CustomCAX509TrustManager.class).asEagerSingleton();
+        bind(X509TrustManager.class).to(CustomCAX509TrustManager.class).asEagerSingleton();
 
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();
@@ -54,7 +53,6 @@ public class ServerPreflightChecksModule extends Graylog2Module {
         bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(AuditEventSender.class).to(NullAuditEventSender.class);
 
-        bind(String.class).annotatedWith(IndexerJwtAuthToken.class).toProvider(IndexerJwtAuthTokenProvider.class).asEagerSingleton();
         // The MongoDBPreflightCheck is not registered here, because it is called separately from ServerBootstrap
         addPreflightCheck(SearchDbPreflightCheck.class);
         addPreflightCheck(DiskJournalPreflightCheck.class);

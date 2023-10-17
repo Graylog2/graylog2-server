@@ -22,28 +22,24 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Objects;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
 public class V20230724092100_AddFieldConditions extends Migration {
 
-    private static final Logger log = LoggerFactory.getLogger(V20230613154400_AddImplicitToStringFragments.class);
+    private static final Logger log = LoggerFactory.getLogger(V20230724092100_AddFieldConditions.class);
     private final RuleFragmentService ruleFragmentService;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V20230724092100_AddFieldConditions(RuleFragmentService ruleFragmentService, ClusterConfigService clusterConfigService) {
+    public V20230724092100_AddFieldConditions(RuleFragmentService ruleFragmentService) {
         this.ruleFragmentService = ruleFragmentService;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -54,14 +50,12 @@ public class V20230724092100_AddFieldConditions extends Migration {
     @Override
     public void upgrade() {
         log.debug("Adding field condition fragments via migration");
-        if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
-            log.debug("Migration already completed!");
-//            return;
-        }
-        String[] noConversionTypes = {"collection", "ip", "list", "not_null", "null", "number", "period"};
+        String[] noConversionTypes = {"collection", "list", "not_null", "null"};
         Arrays.stream(noConversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeNoConversion(type)));
-        String[] conversionTypes = {"bool", "double", "long", "map", "string", "url"};
+        String[] conversionTypes = {"map", "string", "url"};
         Arrays.stream(conversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldType(type)));
+        String[] conversionParamTypes = {"bool", "double", "long", "ip", "number"};
+        Arrays.stream(conversionParamTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeConversionParam(type)));
         ruleFragmentService.upsert(createCheckDateField());
         ruleFragmentService.upsert(createCIDRMatchField());
         ruleFragmentService.upsert(createStringContainsField());
@@ -69,7 +63,6 @@ public class V20230724092100_AddFieldConditions extends Migration {
         ruleFragmentService.upsert(createStringStartsWithField());
         ruleFragmentService.upsert(createGrokMatchesField());
 
-        clusterConfigService.write(new MigrationCompleted());
         log.debug("field condition fragments were successfully added");
     }
 
@@ -104,6 +97,31 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .params(ImmutableList.of(
                                 string("field").description("Field to check").build(),
                                 bool("attemptConversion").optional().description("If set the check will also try if the field could be converted to a " + type + " using the to_" + type + " method").build()
+                        ))
+                        .returnType(Void.class)
+                        .description("Checks whether the value in the given field is a " + type)
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Field is " + type)
+                        .ruleBuilderTitle("Check if value in '${field}' is a " + type)
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
+                        .build())
+                .isCondition()
+                .build();
+    }
+
+    RuleFragment createCheckFieldTypeConversionParam(String type) {
+        return RuleFragment.builder()
+                .fragment(("is_%type%(" +
+                        "  value: $message.${field}<#if attemptConversion!false>," +
+                        "  attemptConversion: true</#if>" +
+                        ")")
+                        .replace("%type%", type)
+                )
+                .descriptor(FunctionDescriptor.builder()
+                        .name("field_" + type)
+                        .params(ImmutableList.of(
+                                string("field").description("Field to check").build(),
+                                bool("attemptConversion").optional().description("If set the check will also try if the field's string representation represents a " + type).build()
                         ))
                         .returnType(Void.class)
                         .description("Checks whether the value in the given field is a " + type)
@@ -271,7 +289,5 @@ public class V20230724092100_AddFieldConditions extends Migration {
                 .isCondition()
                 .build();
     }
-
-    public record MigrationCompleted() {}
 
 }

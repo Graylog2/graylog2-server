@@ -104,7 +104,10 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => {
+const useInitialFormValues = ({ currentQuery, queryFilters }: {
+  currentQuery: Query | undefined,
+  queryFilters: Immutable.Map<QueryId, FilterType>
+}) => {
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
@@ -129,7 +132,10 @@ type Props = {
 };
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
-  const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({ key: stream.title, value: stream.id })));
+  const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({
+    key: stream.title,
+    value: stream.id,
+  })));
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
@@ -158,7 +164,17 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                            limitDuration={limitDuration}
                            onSubmit={_onSubmit}
                            validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)}>
-              {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
+              {({
+                dirty,
+                errors,
+                isSubmitting,
+                isValid,
+                isValidating,
+                handleSubmit,
+                values,
+                setFieldValue,
+                validateForm,
+              }) => {
                 const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
                 return (

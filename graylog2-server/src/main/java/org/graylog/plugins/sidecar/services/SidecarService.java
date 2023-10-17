@@ -34,6 +34,9 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationSystemEventPublisher;
 import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -57,6 +60,9 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
     private static final String COLLECTION_NAME = "sidecars";
     private final CollectorService collectorService;
     private final ConfigurationService configurationService;
+    private final NotificationService notificationService;
+    private final NotificationSystemEventPublisher notificationSystemEventPublisher;
+
 
     private final Validator validator;
 
@@ -65,10 +71,14 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                           ConfigurationService configurationService,
                           MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
+                          NotificationService notificationService,
+                          NotificationSystemEventPublisher notificationSystemEventPublisher,
                           Validator validator) {
         super(mongoConnection, mapper, Sidecar.class, COLLECTION_NAME);
         this.collectorService = collectorService;
         this.configurationService = configurationService;
+        this.notificationService = notificationService;
+        this.notificationSystemEventPublisher = notificationSystemEventPublisher;
         this.validator = validator;
 
         db.createIndex(new BasicDBObject(Sidecar.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
@@ -109,11 +119,11 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
 
         final List<ConfigurationAssignment> tagAssigned = taggedConfigs.stream()
                 .filter(c -> matchingOsCollectorIds.contains(c.collectorId())).map(c -> {
-            // fill in ConfigurationAssignment.assignedFromTags()
-            // If we only support one tag on a configuration, this can be simplified
-            final Set<String> matchedTags = c.tags().stream().filter(sidecarTags::contains).collect(Collectors.toSet());
-            return ConfigurationAssignment.create(c.collectorId(), c.id(), matchedTags);
-        }).toList();
+                    // fill in ConfigurationAssignment.assignedFromTags()
+                    // If we only support one tag on a configuration, this can be simplified
+                    final Set<String> matchedTags = c.tags().stream().filter(sidecarTags::contains).collect(Collectors.toSet());
+                    return ConfigurationAssignment.create(c.collectorId(), c.id(), matchedTags);
+                }).toList();
 
         final List<ConfigurationAssignment> manuallyAssigned = sidecar.assignments().stream().filter(a -> {
             // also overwrite manually assigned configs that would now be assigned through tags
@@ -211,6 +221,9 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                                     .nodeDetails(nodeDetailsToSave)
                                     .build();
                             save(toSave);
+
+                            createSystemNotification(message, toSave);
+
                             return 1;
 
                         }
@@ -220,6 +233,17 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
         }
 
         return count;
+    }
+
+    private void createSystemNotification(String message, Sidecar toSave) {
+        Notification notification = notificationService.buildNow();
+        notification.addType(Notification.Type.SIDECAR_STATUS_UNKNOWN);
+        notification.addSeverity(Notification.Severity.NORMAL);
+        notification.addKey(toSave.nodeId());
+        notification.addDetail("message", message);
+        notification.addDetail("sidecar_name", toSave.nodeName());
+        notification.addDetail("sidecar_id", toSave.nodeId());
+        notificationSystemEventPublisher.submit(notification);
     }
 
     public Sidecar fromRequest(String nodeId, RegistrationRequest request, String collectorVersion) {
@@ -237,7 +261,7 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                 collectorVersion);
     }
 
-    public Sidecar applyManualAssignments(String sidecarNodeId, List<ConfigurationAssignment> assignments) throws NotFoundException{
+    public Sidecar applyManualAssignments(String sidecarNodeId, List<ConfigurationAssignment> assignments) throws NotFoundException {
         Sidecar sidecar = findByNodeId(sidecarNodeId);
         if (sidecar == null) {
             throw new NotFoundException("Couldn't find sidecar with nodeId " + sidecarNodeId);

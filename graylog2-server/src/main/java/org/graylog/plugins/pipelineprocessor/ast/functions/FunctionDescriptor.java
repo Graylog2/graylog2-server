@@ -27,7 +27,6 @@ import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 
 @AutoValue
 @JsonAutoDetect
@@ -84,25 +83,6 @@ public abstract class FunctionDescriptor<T> {
     @JsonIgnore
     @Nullable
     public abstract RuleBuilderFunctionGroup ruleBuilderFunctionGroup();
-
-    /**
-     * tries to determine the function group from the primary parameter class, if not set
-     *
-     * @return determined group if rule builder is enabled and no group is explicitly set
-     */
-    @SuppressWarnings("rawtypes")
-    @JsonProperty("rule_builder_function_group")
-    public RuleBuilderFunctionGroup getRuleBuilderFunctionGroup() {
-        if (ruleBuilderEnabled() && ruleBuilderFunctionGroup() == null) {
-            final Optional<ParameterDescriptor> primaryParam = params().stream()
-                    .filter(ParameterDescriptor::primary)
-                    .findFirst();
-            if (primaryParam.isPresent()) {
-                return RuleBuilderFunctionGroup.map(primaryParam.get().type());
-            }
-        }
-        return ruleBuilderFunctionGroup();
-    }
 
     public static <T> Builder<T> builder() {
         //noinspection unchecked

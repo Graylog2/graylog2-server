@@ -43,6 +43,7 @@ import org.graylog.datanode.configuration.variants.OpensearchSecurityConfigurati
 import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.CertConstants;
+import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
@@ -143,7 +144,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void shutDown() {
-        shutdownHttpServer(apiHttpServer, configuration.getHttpBindAddress());
+        shutdownHttpServer(apiHttpServer, HostAndPort.fromParts(configuration.getBindAddress(), configuration.getDatanodeHttpPort()));
     }
 
     private void shutdownHttpServer(HttpServer httpServer, HostAndPort bindAddress) {
@@ -154,13 +155,12 @@ public class JerseyService extends AbstractIdleService {
     }
 
     private void startUpApi(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
-        final HostAndPort bindAddress = configuration.getHttpBindAddress();
         final String contextPath = configuration.getHttpPublishUri().getPath();
         final URI listenUri = new URI(
                 configuration.getUriScheme(),
                 null,
-                bindAddress.getHost(),
-                bindAddress.getPort(),
+                configuration.getBindAddress(),
+                configuration.getDatanodeHttpPort(),
                 isNullOrEmpty(contextPath) ? "/" : contextPath,
                 null,
                 null
@@ -177,7 +177,7 @@ public class JerseyService extends AbstractIdleService {
 
         apiHttpServer.start();
 
-        LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
+        LOG.info("Started REST API at <{}:{}>", configuration.getBindAddress(), configuration.getDatanodeHttpPort());
     }
 
     private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {
@@ -223,11 +223,17 @@ public class JerseyService extends AbstractIdleService {
                              int maxHeaderSize,
                              boolean enableGzip,
                              Set<Resource> additionalResources) {
+        final boolean isSecuredInstance = sslEngineConfigurator != null;
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
+
+        if(isSecuredInstance) {
+            resourceConfig.register(new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode"));
+        }
+
         final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(
                 listenUri,
                 resourceConfig,
-                sslEngineConfigurator != null,
+                isSecuredInstance,
                 sslEngineConfigurator,
                 false);
 

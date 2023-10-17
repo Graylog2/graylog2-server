@@ -39,6 +39,10 @@ import {
 } from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import * as FormsUtils from 'util/FormsUtils';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -46,6 +50,19 @@ const requiredFields = [
   'fieldName',
   'config.providers[0].type',
 ];
+
+const getProviderPlugin = (type) => {
+  if (type === undefined) {
+    return {};
+  }
+
+  return PluginStore.exports('fieldValueProviders').find((edt) => edt.type === type) || {};
+};
+
+const getConfigProviderType = (config, defaultValue) => get(config, 'providers[0].type', defaultValue);
+
+const formatFieldValueProviders = () => PluginStore.exports('fieldValueProviders')
+  .map((type) => ({ label: type.displayName, value: type.type }));
 
 class FieldForm extends React.Component {
   static propTypes = {
@@ -55,6 +72,8 @@ class FieldForm extends React.Component {
     keys: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -75,25 +94,15 @@ class FieldForm extends React.Component {
     };
   }
 
-  getProviderPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-
-    return PluginStore.exports('fieldValueProviders').find((edt) => edt.type === type) || {};
-  };
-
-  getConfigProviderType = (config, defaultValue) => get(config, 'providers[0].type', defaultValue);
-
   validate = () => {
     const { isKey, keyPosition, config } = this.state;
     const errors = {};
 
-    const providerType = this.getConfigProviderType(config);
+    const providerType = getConfigProviderType(config);
     let pluginRequiredFields = [];
 
     if (providerType) {
-      const providerPlugin = this.getProviderPlugin(providerType);
+      const providerPlugin = getProviderPlugin(providerType);
 
       pluginRequiredFields = providerPlugin.requiredFields;
     }
@@ -124,12 +133,28 @@ class FieldForm extends React.Component {
   };
 
   handleSubmit = () => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.DONE_CLICKED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-fields',
+      app_action_value: 'done-button',
+    });
+
     if (this.validate()) {
       const { fieldName: prevFieldName, onChange } = this.props;
       const { fieldName, config, isKey, keyPosition } = this.state;
 
       onChange(prevFieldName, fieldName, config, isKey, keyPosition - 1);
     }
+  };
+
+  handleCancel = () => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.CANCEL_CLICKED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-fields',
+      app_action_value: 'cancel-button',
+    });
+
+    this.props.onCancel();
   };
 
   handleFieldNameChange = (event) => {
@@ -143,8 +168,18 @@ class FieldForm extends React.Component {
   };
 
   handleProviderTypeChange = (nextProvider) => {
+    this.props.sendTelemetry(
+      (nextProvider === 'lookup-v1')
+        ? TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_LOOKUP_TABLE_SELECTED
+        : TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_TEMPLATE_SELECTED, {
+        app_pathname: getPathnameWithoutId(this.props.location.pathname),
+        app_section: 'event-definition-fields',
+        app_action_value: 'set-value-from-select',
+        value_source: nextProvider,
+      });
+
     const { config } = this.state;
-    const providerPlugin = this.getProviderPlugin(nextProvider);
+    const providerPlugin = getProviderPlugin(nextProvider);
     const defaultProviderConfig = providerPlugin.defaultConfig || {};
     const nextConfig = {
       ...config,
@@ -166,6 +201,13 @@ class FieldForm extends React.Component {
   toggleKey = (event) => {
     const checked = FormsUtils.getValueFromInput(event.target);
 
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.AS_EVENT_KEY_TOGGLED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-fields',
+      app_action_value: 'event-key-checkbox',
+      event_key_checked: checked,
+    });
+
     this.setState({ isKey: checked });
   };
 
@@ -173,13 +215,13 @@ class FieldForm extends React.Component {
     const { fieldName, config, validation } = this.state;
     const { currentUser } = this.props;
 
-    const providerType = this.getConfigProviderType(config);
+    const providerType = getConfigProviderType(config);
 
     if (!providerType) {
       return null;
     }
 
-    const providerPlugin = this.getProviderPlugin(providerType);
+    const providerPlugin = getProviderPlugin(providerType);
 
     return (providerPlugin.formComponent
       ? React.createElement(providerPlugin.formComponent, {
@@ -193,11 +235,8 @@ class FieldForm extends React.Component {
     );
   };
 
-  formatFieldValueProviders = () => PluginStore.exports('fieldValueProviders')
-    .map((type) => ({ label: type.displayName, value: type.type }));
-
   render() {
-    const { fieldName: prevFieldName, onCancel } = this.props;
+    const { fieldName: prevFieldName } = this.props;
     const { fieldName, isKey, keyPosition, config, validation } = this.state;
 
     return (
@@ -254,8 +293,8 @@ class FieldForm extends React.Component {
                     ignoreAccents={false}
                     placeholder="Select Value Source"
                     onChange={this.handleProviderTypeChange}
-                    options={this.formatFieldValueProviders()}
-                    value={this.getConfigProviderType(config, '')}
+                    options={formatFieldValueProviders()}
+                    value={getConfigProviderType(config, '')}
                     matchProp="label"
                     required />
             <HelpBlock>
@@ -271,7 +310,7 @@ class FieldForm extends React.Component {
         <Col md={12}>
           <ButtonToolbar>
             <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
-            <Button onClick={onCancel}>Cancel</Button>
+            <Button onClick={this.handleCancel}>Cancel</Button>
           </ButtonToolbar>
         </Col>
       </Row>
@@ -279,4 +318,4 @@ class FieldForm extends React.Component {
   }
 }
 
-export default FieldForm;
+export default withLocation(withTelemetry(FieldForm));

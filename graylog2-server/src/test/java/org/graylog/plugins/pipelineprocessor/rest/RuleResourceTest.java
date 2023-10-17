@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
@@ -73,13 +74,16 @@ public class RuleResourceTest {
     RuleSimulator ruleSimulator;
     @Mock
     PipelineRuleService pipelineRuleService;
+    @Mock
+    RuleBuilderService ruleBuilderService;
+
     RuleResource underTest;
 
     @Before
     public void setup() {
         underTest = new RuleResource(ruleService, ruleSimulator, pipelineService, ruleMetricsConfigService,
                 pipelineRuleService, paginatedRuleService, functionRegistry,
-                pipelineServiceHelper, streamService);
+                pipelineServiceHelper, streamService, ruleBuilderService);
     }
 
     @Test
@@ -142,7 +146,7 @@ public class RuleResourceTest {
                 when true
                 then
                    debug("OK");
-                end""", title), null, null, null);
+                end""", title), null, null, null, null);
     }
 
     private PipelineDao pipelineDao(String id, String title) {

@@ -80,6 +80,7 @@ import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
@@ -269,7 +270,7 @@ public abstract class CmdLineTool implements CliCommand {
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        pluginLoader = new PluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
+        pluginLoader = getPluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
 
         installCommandConfig();
         installPluginBootstrapConfig(pluginLoader);
@@ -326,6 +327,10 @@ public abstract class CmdLineTool implements CliCommand {
         reporter.start();
 
         startCommand();
+    }
+
+    protected PluginLoader getPluginLoader(File pluginDir, ChainingClassLoader classLoader) {
+        return new PluginLoader(pluginDir, classLoader);
     }
 
     private void installPluginBootstrapConfig(PluginLoader pluginLoader) {

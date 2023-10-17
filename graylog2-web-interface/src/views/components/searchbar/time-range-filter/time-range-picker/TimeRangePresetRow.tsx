@@ -23,8 +23,8 @@ import styled from 'styled-components';
 import TimeRangePresetDropdown from 'views/components/searchbar/time-range-filter/TimeRangePresetDropdown';
 import { isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
 import { IfPermitted } from 'components/common';
-import TimeRangeAddToQuickListButton
-  from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangeAddToQuickListButton';
+import SaveTimeRangeAsPresetButton
+  from 'views/components/searchbar/time-range-filter/time-range-picker/SaveTimeRangeAsPresetButton';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type {
@@ -69,7 +69,7 @@ const TimeRangePresetRow = () => {
     <Container>
       {showAddToQuickListButton && isTimeRange(timeRangeTabs[activeTab]) && (
         <IfPermitted permissions="clusterconfigentry:edit">
-          <TimeRangeAddToQuickListButton />
+          <SaveTimeRangeAsPresetButton />
         </IfPermitted>
       )}
       {showPresetsButton && <TimeRangePresetDropdown onChange={onSetPreset} />}

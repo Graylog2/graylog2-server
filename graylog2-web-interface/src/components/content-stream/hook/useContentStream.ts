@@ -39,7 +39,7 @@ export type FeedMediaContent = {
   attr_width?: string,
   attr_height?: string,
 };
-export type FeedITem = {
+export type FeedItem = {
   title?: string,
   link?: string,
   comments?: string,
@@ -64,7 +64,7 @@ type RssFeed = {
       description: string
       generator: string,
       image: string
-      item: Array<FeedITem> | FeedITem,
+      item: Array<FeedItem> | FeedItem,
       language: string
       lastBuildDate: string,
       link: string
@@ -76,7 +76,7 @@ type RssFeed = {
   }
 }
 
-const parseXML = (text: string): Array<FeedITem> => {
+const parseXML = (text: string): Array<FeedItem> => {
   const options = {
     ignoreAttributes: false,
     attributeNamePrefix: 'attr_',
@@ -96,25 +96,29 @@ export const fetchNewsFeed = (rssUrl: string) => rssUrl && window.fetch(rssUrl, 
   .catch((error) => error);
 export const CONTENT_STREAM_CONTENT_KEY = ['content-stream', 'content'];
 
-const useContentStream = (path?: string): { isLoadingFeed: boolean, feedList: Array<FeedITem>, error: Error } => {
+const useContentStream = (path?: string): { isLoadingFeed: boolean, feedList: Array<FeedItem>, error: Error } => {
   const { contenStreamTags: { currentTag, isLoadingTags, contentStreamTagError } } = useContentStreamSettings();
   const { rss_url } = AppConfig.contentStream() || {};
 
   const getDefaultTag = useCallback(() => {
+    if (path) {
+      return path;
+    }
+
     if (isLoadingTags || contentStreamTagError || !currentTag) {
       return DEFAULT_FEED;
     }
 
     return currentTag;
-  }, [contentStreamTagError, currentTag, isLoadingTags]);
+  }, [contentStreamTagError, currentTag, isLoadingTags, path]);
 
-  const rssUrl = rss_url && `${rss_url}/${path || getDefaultTag()}/feed`;
+  const rssUrl = rss_url && `${rss_url}/${getDefaultTag()}/feed`;
 
   const {
     data,
     isLoading,
     error,
-  } = useQuery<Array<FeedITem>, Error>([...CONTENT_STREAM_CONTENT_KEY, rssUrl], () => fetchNewsFeed(rssUrl), {
+  } = useQuery<Array<FeedItem>, Error>([...CONTENT_STREAM_CONTENT_KEY, rssUrl], () => fetchNewsFeed(rssUrl), {
     initialData: [],
   });
 

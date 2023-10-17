@@ -25,14 +25,18 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
+import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
-import org.graylog2.utilities.uri.TransportAddressSanitizer;
+import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.rest.ApiError;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -42,6 +46,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -56,19 +61,19 @@ public class PreflightResource {
     private final NodeService nodeService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final CaService caService;
-    private final TransportAddressSanitizer transportAddressSanitizer;
+    private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
 
     @Inject
     public PreflightResource(final NodeService nodeService,
                              final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
-                             final TransportAddressSanitizer transportAddressSanitizer,
+                             final ClusterConfigService clusterConfigService,
                              final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
-        this.transportAddressSanitizer = transportAddressSanitizer;
+        this.clusterConfigService = clusterConfigService;
         this.passwordSecret = passwordSecret;
     }
 
@@ -84,7 +89,7 @@ public class PreflightResource {
             final var preflight = preflightDataNodes.get(n.getNodeId());
             return new DataNode(n.getNodeId(),
                     n.getType(),
-                    transportAddressSanitizer.withRemovedCredentials(n.getTransportAddress()),
+                    n.getTransportAddress(),
                     preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null,
                     n.getHostname(),
                     n.getShortNodeId());
@@ -100,18 +105,22 @@ public class PreflightResource {
     @POST
     @Path("/ca/create")
     @NoAuditEvent("No Audit Event needed")
-    public void createCA() throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
+    public void createCA(@NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
         // TODO: get validity from preflight UI
-        caService.create(CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+        caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
     }
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("/ca/upload")
     @NoAuditEvent("No Audit Event needed")
-    public String uploadCA(@FormDataParam("password") String password, @FormDataParam("files") List<FormDataBodyPart> bodyParts) throws CACreationException {
-        caService.upload(password, bodyParts);
-        return "Ok";
+    public Response uploadCA(@FormDataParam("password") String password, @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
+        try {
+            caService.upload(password, bodyParts);
+            return Response.ok().build();
+        } catch (CACreationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
+        }
     }
 
     @DELETE
@@ -119,6 +128,7 @@ public class PreflightResource {
     @NoAuditEvent("No Audit Event needed")
     public void startOver() {
         caService.startOver();
+        clusterConfigService.remove(RenewalPolicy.class);
         dataNodeProvisioningService.deleteAll();
     }
 

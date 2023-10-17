@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { DataTable, ExternalLink, Spinner, Icon } from 'components/common';
+import { DataTable, ExternalLink, Spinner } from 'components/common';
 import { Alert } from 'components/bootstrap';
 
 class PluginsDataTable extends React.Component {
@@ -46,7 +46,7 @@ class PluginsDataTable extends React.Component {
     }
 
     if (this.props.plugins.length === 0) {
-      return <Alert bsStyle="info"><Icon name="info-circle" />&nbsp; This node has not any installed plugins.</Alert>;
+      return <Alert bsStyle="info">This node has not any installed plugins.</Alert>;
     }
 
     const headers = ['Name', 'Version', 'Author', 'Description'];

@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Button, Alert, Modal, Tooltip } from 'components/bootstrap';
-import { OverlayTrigger, PaginatedList, Spinner, Timestamp, Icon } from 'components/common';
+import { OverlayTrigger, PaginatedList, Spinner, Timestamp } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import UserNotification from 'util/UserNotification';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
@@ -110,7 +110,6 @@ class ImportsViewModal extends React.Component {
     if (totalUploads === 0) {
       return (
         <Alert bsStyle="info">
-          <Icon name="info-circle" />&nbsp;
           There are no configuration uploads available. Please go to
           <strong>System -&gt; Collectors (legacy)
             -&gt; Details -&gt; Import Configuration

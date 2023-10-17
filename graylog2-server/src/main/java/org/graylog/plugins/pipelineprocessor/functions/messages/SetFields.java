@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
@@ -39,12 +40,14 @@ public class SetFields extends AbstractFunction<Void> {
     private final ParameterDescriptor<String, String> prefixParam;
     private final ParameterDescriptor<String, String> suffixParam;
     private final ParameterDescriptor<Message, Message> messageParam;
+    private final ParameterDescriptor<Boolean, Boolean> cleanFields;
 
     public SetFields() {
-        fieldsParam = type("fields", Map.class).primary().description("The map of new fields to set").build();
+        fieldsParam = type("fields", Map.class).ruleBuilderVariable().description("The map of new fields to set").build();
         prefixParam = string("prefix").optional().description("The prefix for the field names").build();
         suffixParam = string("suffix").optional().description("The suffix for the field names").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
+        cleanFields = bool("clean_fields").optional().description("Substitute invalid characters in field names with underscores").build();
     }
 
     @Override
@@ -63,6 +66,9 @@ public class SetFields extends AbstractFunction<Void> {
                 if (suffix.isPresent()) {
                     field = field + suffix.get();
                 }
+                if (cleanFields.optional(args, context).orElse(false)) {
+                    field = Message.cleanKey(field);
+                }
                 message.addField(field, value);
             });
         }
@@ -74,9 +80,9 @@ public class SetFields extends AbstractFunction<Void> {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .returnType(Void.class)
-                .params(of(fieldsParam, prefixParam, suffixParam, messageParam))
+                .params(of(fieldsParam, prefixParam, suffixParam, messageParam, cleanFields))
                 .description("Sets new fields in a message. If no specific message is provided, it sets the fields in the currently processed message")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Set fields")
                 .ruleBuilderTitle("Set fields from map '${fields}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)

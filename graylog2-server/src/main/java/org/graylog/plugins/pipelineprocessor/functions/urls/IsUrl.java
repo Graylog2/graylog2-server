@@ -31,13 +31,16 @@ public class IsUrl extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsUrl() {
-        valueParam = object("value").primary().description("Value to check").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
     }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         final Object value = valueParam.required(args, context);
-        return value instanceof URL;
+        if (value instanceof URL url) {
+            return url.hasParsedUrl();
+        }
+        return false;
     }
 
     @Override

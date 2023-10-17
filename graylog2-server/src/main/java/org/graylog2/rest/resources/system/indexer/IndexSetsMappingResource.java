@@ -21,6 +21,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -38,6 +40,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Locale;
 import java.util.Set;
@@ -51,10 +54,12 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsMappingResource extends RestResource {
     private final IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService;
+    private final PermittedStreams permittedStreams;
 
     @Inject
-    public IndexSetsMappingResource(IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService) {
+    public IndexSetsMappingResource(IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService, PermittedStreams permittedStreams) {
         this.indexSetFieldTypeSummaryService = indexSetFieldTypeSummaryService;
+        this.permittedStreams = permittedStreams;
     }
 
     @POST
@@ -71,8 +76,9 @@ public class IndexSetsMappingResource extends RestResource {
                                                                                    allowableValues = "index_set_id,index_set_title")
                                                                          @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                                          @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
-                                                                         @DefaultValue("asc") @QueryParam("order") String order) {
-        final Set<String> streamsIds = request.streamsIds();
+                                                                         @DefaultValue("asc") @QueryParam("order") String order,
+                                                                         @Context SearchUser searchUser) {
+        final Set<String> streamsIds = normalizeStreamIds(request.streamsIds(), searchUser);
         final String fieldName = request.fieldName();
         return indexSetFieldTypeSummaryService.getIndexSetFieldTypeSummary(streamsIds,
                 fieldName,
@@ -82,5 +88,11 @@ public class IndexSetsMappingResource extends RestResource {
                 sort,
                 Sorting.Direction.valueOf(order.toUpperCase(Locale.ROOT))
         );
+    }
+
+    private Set<String> normalizeStreamIds(Set<String> streams, SearchUser searchUser) {
+        return (streams == null || streams.isEmpty())
+                ? permittedStreams.load(searchUser)
+                : streams;
     }
 }

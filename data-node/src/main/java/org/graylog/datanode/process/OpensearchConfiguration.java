@@ -17,18 +17,19 @@
 package org.graylog.datanode.process;
 
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.OpensearchDistribution;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
-import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public record OpensearchConfiguration(
-        Path opensearchDir,
-        Path opensearchConfigDir,
+        OpensearchDistribution opensearchDistribution,
+        DatanodeDirectories datanodeDirectories,
         String bindAddress,
         String hostname,
         int httpPort,
@@ -67,6 +68,9 @@ public record OpensearchConfiguration(
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
             config.put("discovery.seed_hosts", toValuesList(discoverySeedHosts));
         }
+
+        config.put("discovery.seed_providers", "file");
+
         config.putAll(additionalConfiguration);
         return config;
     }
@@ -77,13 +81,18 @@ public record OpensearchConfiguration(
 
     public Environment getEnv() {
         final Environment env = new Environment(System.getenv());
-        env.put("OPENSEARCH_PATH_CONF", opensearchConfigDir.resolve("opensearch").toAbsolutePath().toString());
+        env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
         return env;
     }
 
     public HttpHost getRestBaseUrl() {
         final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
         return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
+    }
+
+    public HttpHost getClusterBaseUrl() {
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        return new HttpHost(hostname(), transportPort(), sslEnabled ? "https" : "http");
     }
 
     public boolean securityConfigured() {

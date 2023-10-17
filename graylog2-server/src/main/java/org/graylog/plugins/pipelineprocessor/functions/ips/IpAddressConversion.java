@@ -39,7 +39,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
     private final ParameterDescriptor<String, String> defaultParam;
 
     public IpAddressConversion() {
-        ipParam = ParameterDescriptor.object("ip").description("Value to convert").build();
+        ipParam = ParameterDescriptor.object("ip").ruleBuilderVariable().description("Value to convert").build();
         defaultParam = ParameterDescriptor.string("default").optional().description("Used when 'ip' is null or malformed, defaults to '0.0.0.0'").build();
     }
 
@@ -77,9 +77,9 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
                         defaultParam
                 ))
                 .description("Converts a value to an IPAddress using its string representation")
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to IP")
-                .ruleBuilderTitle("Convert '${value}' to an IP address")
+                .ruleBuilderTitle("Convert '${ip}' to an IP address")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }

@@ -50,10 +50,6 @@ jest.mock('stores/notifications/NotificationsStore', () => ({
 ));
 
 describe('<Notification>', () => {
-  beforeEach(() => {
-
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
     jest.useRealTimers();
@@ -82,10 +78,10 @@ describe('<Notification>', () => {
       jest.advanceTimersByTime(100);
     });
 
-    const title = screen.getByRole('heading', {
+    const alert = screen.getByRole('alert', {
       name: /there is a node without any running inputs/i,
     });
 
-    await waitFor(() => expect(title).toBeInTheDocument());
+    await waitFor(() => expect(alert).toBeInTheDocument());
   });
 });

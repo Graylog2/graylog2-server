@@ -25,6 +25,10 @@ import { Select } from 'components/common';
 import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
 import type User from 'logic/users/User';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import styles from './EventConditionForm.css';
 
@@ -47,6 +51,9 @@ type Props = {
 }
 
 const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange }: Props) => {
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   const getConditionPlugin = (type): any => {
     if (type === undefined) {
       return {};
@@ -75,6 +82,13 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
     .map((type) => ({ label: type.displayName, value: type.type }));
 
   const handleEventDefinitionTypeChange = (nextType: string) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.TYPE_SELECTED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-condition',
+      app_action_value: 'type-select',
+      condition_type: nextType,
+    });
+
     const conditionPlugin = getConditionPlugin(nextType);
     const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
 

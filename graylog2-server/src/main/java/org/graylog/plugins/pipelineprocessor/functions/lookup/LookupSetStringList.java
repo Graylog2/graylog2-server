@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 
 import javax.inject.Inject;
@@ -49,7 +50,7 @@ public class LookupSetStringList extends AbstractFunction<Object> {
         keyParam = object("key")
                 .description("The key to set in the lookup table")
                 .build();
-        valueParam = ParameterDescriptor.type("value", List.class)
+        valueParam = ParameterDescriptor.type("value", List.class).ruleBuilderVariable()
                 .description("The list value that should be set into the lookup table")
                 .build();
         ttlSecondsParam = ParameterDescriptor.integer("ttl")
@@ -87,6 +88,10 @@ public class LookupSetStringList extends AbstractFunction<Object> {
                 .description("Set a string list in the named lookup table. Returns the new value on success, null on failure.")
                 .params(lookupTableParam, keyParam, valueParam, ttlSecondsParam)
                 .returnType(List.class)
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Set string list in lookup table")
+                .ruleBuilderTitle("Set string list in '${lookup_table}' using key '${key}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
 }

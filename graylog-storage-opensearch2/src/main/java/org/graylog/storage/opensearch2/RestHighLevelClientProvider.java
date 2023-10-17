@@ -27,7 +27,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.security.IndexerJwtAuthToken;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
@@ -72,7 +72,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
             @RunsWithDataNode Boolean runsWithDataNode,
             @Named("indexer_use_jwt_authentication") boolean indexerUseJwtAuthentication,
-            @IndexerJwtAuthToken String jwtBearerToken) {
+            IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
 
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
 
@@ -86,7 +86,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     muteOpenSearchDeprecationWarnings,
                 credentialsProvider,
                     runsWithDataNode || indexerUseJwtAuthentication,
-                    jwtBearerToken);
+                    indexerJwtAuthTokenProvider);
 
             var sniffer = SnifferWrapper.create(
                     client.getLowLevelClient(),
@@ -131,7 +131,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             boolean muteElasticsearchDeprecationWarnings,
             CredentialsProvider credentialsProvider,
             boolean isJwtAuthentication,
-            final String jwtBearerToken) {
+            final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
         final RestClientBuilder restClientBuilder = RestClient.builder(esHosts)
                 .setRequestConfigCallback(requestConfig -> {
@@ -152,7 +152,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
 
                     if(isJwtAuthentication) {
-                        httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", jwtBearerToken));
+                        httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", indexerJwtAuthTokenProvider.get()));
                     } else {
                         httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
                     }

@@ -59,6 +59,11 @@ public class NodeImpl extends PersistedImpl implements Node {
     }
 
     @Override
+    public String getClusterAddress() {
+        return (String) fields.get("cluster_address");
+    }
+
+    @Override
     public DateTime getLastSeen() {
         final Object rawLastSeen = fields.get("last_seen");
         if (rawLastSeen == null) {

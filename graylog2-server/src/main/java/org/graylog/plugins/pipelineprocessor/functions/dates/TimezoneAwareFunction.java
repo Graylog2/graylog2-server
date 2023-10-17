@@ -67,7 +67,7 @@ public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
                         .add(timeZoneParam)
                         .build())
                 .description(description())
-                .ruleBuilderEnabled(false)
+                .ruleBuilderEnabled()
                 .ruleBuilderName(getRuleBuilderName())
                 .ruleBuilderTitle(getRuleBuilderTitle())
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)

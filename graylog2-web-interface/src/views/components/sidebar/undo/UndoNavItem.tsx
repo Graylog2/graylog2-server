@@ -21,13 +21,37 @@ import useAppDispatch from 'stores/useAppDispatch';
 import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { undo } from 'views/logic/slices/undoRedoActions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import useHotkey from 'hooks/useHotkey';
+import type { ViewType } from 'views/logic/views/View';
+import useViewType from 'views/hooks/useViewType';
 
 const TITLE = 'Undo';
 
 const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
+  const viewType = useViewType();
   const dispatch = useAppDispatch();
   const { isUndoAvailable } = useAppSelector(selectUndoRedoAvailability);
-  const onClick = useCallback(() => dispatch(undo()), [dispatch]);
+  const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
+
+  const onClick = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_UNDO, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_action_value: 'search-sidebar-undo',
+    });
+
+    return dispatch(undo());
+  }, [dispatch, location.pathname, sendTelemetry]);
+
+  useHotkey({
+    actionKey: 'undo',
+    callback: () => dispatch(undo()),
+    scope: viewType.toLowerCase() as Lowercase<ViewType>,
+  });
 
   return (
     <NavItem disabled={!isUndoAvailable}

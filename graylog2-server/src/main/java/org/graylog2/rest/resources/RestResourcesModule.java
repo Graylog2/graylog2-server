@@ -33,6 +33,7 @@ import org.graylog2.rest.resources.cluster.ClusterSystemPluginResource;
 import org.graylog2.rest.resources.cluster.ClusterSystemProcessingResource;
 import org.graylog2.rest.resources.cluster.ClusterSystemResource;
 import org.graylog2.rest.resources.cluster.ClusterSystemShutdownResource;
+import org.graylog2.rest.resources.datanodes.DataNodeApiProxyResource;
 import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource;
 import org.graylog2.rest.resources.messages.MessageResource;
 import org.graylog2.rest.resources.roles.RolesResource;
@@ -107,7 +108,7 @@ import org.graylog2.telemetry.rest.TelemetryResource;
 public class RestResourcesModule extends Graylog2Module {
     private final Configuration configuration;
 
-    public RestResourcesModule(Configuration configuration) {
+    public RestResourcesModule(final Configuration configuration) {
         this.configuration = configuration;
     }
 
@@ -146,6 +147,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(TelemetryResource.class);
         addSystemRestResource(ContentStreamResource.class);
         addSystemRestResource(CertificateRenewalResource.class);
+        addSystemRestResource(DataNodeApiProxyResource.class);
     }
 
     private void addDebugResources() {

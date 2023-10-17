@@ -47,7 +47,11 @@ const FieldElement = styled.span.attrs({
 
 const FieldActions = ({ children, disabled, element, menuContainer, name, type, queryId }: Props) => {
   const actionContext = useContext(ActionContext);
-  const wrappedElement = ({ active }: { active: boolean }) => <FieldElement $active={active} $disabled={disabled}>{element}</FieldElement>;
+  const wrappedElement = ({ active }: { active: boolean }) => (
+    <FieldElement $active={active}
+                  $disabled={disabled}>{element}
+    </FieldElement>
+  );
   const handlerArgs = { queryId, field: name, type, contexts: actionContext };
 
   return (

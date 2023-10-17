@@ -44,7 +44,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.9.0</opensearch.version>
+        <opensearch.version>2.10.0</opensearch.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -138,12 +138,12 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
+            <artifactId>bcpkix-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
+            <artifactId>bcprov-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
@@ -267,7 +267,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -337,19 +337,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog.autovalue</groupId>
-            <artifactId>auto-value-javabean</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
@@ -398,7 +385,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.2</version>
+            <version>4.4</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
@@ -419,7 +406,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -438,7 +424,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -491,7 +476,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -518,21 +503,6 @@
                 <version>${download-maven-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>download-opensearch-tar-linux-x64</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>wget</goal>
-                        </goals>
-                        <configuration>
-                            <url>
-                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
-                            </url>
-                            <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
-                            <outputDirectory>${project.build.directory}/downloads</outputDirectory>
-                            <unpack>false</unpack>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>unpack-opensearch-tar-linux-x64</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -551,21 +521,6 @@
                                     <replacement>$1-linux-x64/</replacement>
                                 </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                             </fileMappers>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>download-opensearch-tar-linux-aarch64</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>wget</goal>
-                        </goals>
-                        <configuration>
-                            <url>
-                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
-                            </url>
-                            <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
-                            <outputDirectory>${project.build.directory}/downloads</outputDirectory>
-                            <unpack>false</unpack>
                         </configuration>
                     </execution>
                     <execution>
@@ -611,6 +566,42 @@
                                 <chmod dir="${project.build.directory}/opensearch"
                                        includes="opensearch-*/config/**"
                                        perm="ugo+r" />
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>remove-unused-opensearch-plugins</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- Remove unused OpenSearch plugins -->
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-alerting" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-custom-codecs" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-geospatial" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-index-management" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-knn" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-neural-search" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications-core" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-performance-analyzer" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-reports-scheduler" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-security-analytics" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-sql" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-alerting" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-custom-codecs" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-geospatial" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-index-management" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-knn" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-neural-search" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications-core" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-performance-analyzer" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-reports-scheduler" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-security-analytics" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-sql" />
                             </target>
                         </configuration>
                     </execution>

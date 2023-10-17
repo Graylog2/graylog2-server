@@ -49,6 +49,7 @@ import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
 import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
+import useHotkey from 'hooks/useHotkey';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -93,6 +94,8 @@ const SearchActionsMenu = () => {
   const history = useHistory();
 
   const toggleFormModal = useCallback(() => setShowForm((cur) => !cur), []);
+  const closeFormModal = useCallback(() => setShowForm(false), []);
+  const openFormModal = useCallback(() => setShowForm(true), []);
   const toggleListModal = useCallback(() => setShowList((cur) => !cur), []);
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
@@ -115,9 +118,9 @@ const SearchActionsMenu = () => {
       .build();
 
     await dispatch(onSaveView(newView));
-    toggleFormModal();
+    closeFormModal();
     await dispatch(loadView(newView));
-  }, [dispatch, toggleFormModal, view]);
+  }, [closeFormModal, dispatch, view]);
 
   const saveAsSearch = useCallback(async (newTitle: string) => {
     if (!newTitle || newTitle === '') {
@@ -159,6 +162,19 @@ const SearchActionsMenu = () => {
   const _loadAsDashboard = useCallback(() => {
     loadAsDashboard(history, view);
   }, [history, view]);
+
+  useHotkey({
+    actionKey: 'save',
+    callback: () => (loaded ? saveSearch(title) : openFormModal()),
+    scope: 'search',
+    dependencies: [loaded, saveSearch, title],
+  });
+
+  useHotkey({
+    actionKey: 'save-as',
+    callback: () => openFormModal(),
+    scope: 'search',
+  });
 
   return (
     <Container aria-label="Search Meta Buttons">

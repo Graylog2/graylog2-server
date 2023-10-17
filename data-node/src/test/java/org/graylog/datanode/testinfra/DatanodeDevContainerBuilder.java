@@ -17,8 +17,7 @@
 package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog.testing.PropertyLoader;
+import org.graylog.datanode.configuration.OpensearchArchitecture;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,6 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,6 +42,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevContainerBuilder.class);
     private static final Supplier<ImageFromDockerfile> imageSupplier = Suppliers.memoize(DatanodeDevContainerBuilder::createImage);
 
+    private String rootUsername = "admin";
     private String passwordSecret;
     private String rootPasswordSha2;
     private String mongoDbUri;
@@ -53,8 +52,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private String nodeName = "node1";
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
-
-    private static final String PROPERTIES_FILE = "api-it-tests.properties";
 
     protected static Path getPath() {
         return getProjectReposPath().resolve(Path.of("graylog2-server", "data-node", "target"));
@@ -75,6 +72,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     @Override
     public org.graylog.testing.datanode.DatanodeDevContainerBuilder rootPasswordSha2(final String rootPasswordSha2) {
         this.rootPasswordSha2 = rootPasswordSha2;
+        return this;
+    }
+
+    @Override
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder rootUsername(final String rootUsername) {
+        this.rootUsername = rootUsername;
         return this;
     }
 
@@ -152,9 +155,9 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
                 .withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", nodeName)
 
-                .withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin")
-                .withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin")
+                .withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", rootUsername)
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
+                .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", rootPasswordSha2)
 
                 .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
                 .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + restPort)
@@ -184,10 +187,10 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     }
 
     private static ImageFromDockerfile createImage() {
-        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchDistribution.archCode(System.getProperty("os.arch")) + ".tar.gz";
-        final Path downloadedOpensearch = getPath().resolve(Path.of("downloads", opensearchTarArchive));
+        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
+        final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchTarArchive));
 
-        if(!Files.exists(downloadedOpensearch)) {
+        if (!Files.exists(downloadedOpensearch)) {
             throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
         }
 
@@ -204,7 +207,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                                 .run("mkdir -p bin/config")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
-                                .add(opensearchTarArchive, ".") // this will automatically extract the tar
+                                .add(opensearchTarArchive, "./" + opensearchTarArchive + "/") // this will automatically extract the tar
                                 .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
                                 .run("useradd opensearch")
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
