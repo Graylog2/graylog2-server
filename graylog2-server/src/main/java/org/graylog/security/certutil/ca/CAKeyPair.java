@@ -57,9 +57,10 @@ public class CAKeyPair {
         }
     }
 
-    public static CAKeyPair create(final char[] password,
+    public static CAKeyPair create(final String organization,
+                                   final char[] password,
                                    final Duration certificateValidity) throws CACreationException {
-        return new CAKeyPair(password, certificateValidity);
+        return new CAKeyPair(organization, password, certificateValidity);
     }
 
     public KeyStore toKeyStore() {
