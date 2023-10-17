@@ -14,27 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.bootstrap.preflight.web.resources.model;
 
-import React, { useState, useCallback } from 'react';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import useHotkey from 'hooks/useHotkey';
-import HotkeyModal from 'components/hotkeys/HotkeysModal';
-
-const HotkeysModalContainer = () => {
-  const [show, setShow] = useState(false);
-  const toggleModal = useCallback(() => setShow((cur) => !cur), []);
-
-  useHotkey({
-    actionKey: 'show-hotkeys-modal',
-    callback: () => setShow(true),
-    scope: 'general',
-  });
-
-  if (!show) {
-    return null;
-  }
-
-  return <HotkeyModal onToggle={() => toggleModal()} />;
-};
-
-export default HotkeysModalContainer;
+public record CreateCARequest(@JsonProperty("organization") String organization) {
+}
