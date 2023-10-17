@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.images.PullPolicy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.IOException;
@@ -173,6 +174,9 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                         .withStartupTimeout(Duration.ofSeconds(60)));
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/");
+
+        container.withImagePullPolicy(PullPolicy.alwaysPull());
+
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
     }
