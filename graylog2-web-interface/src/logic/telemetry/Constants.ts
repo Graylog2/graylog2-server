@@ -395,7 +395,7 @@ export const TELEMETRY_EVENT_TYPE = {
     USER_ENABLED: 'Users User Enabled',
     USER_DELETED: 'Users User Deleted',
   },
-  GROK_PATTERN:{
+  GROK_PATTERN: {
     CREATED: 'Grok Pattern Created',
     UPDATED: 'Grok Pattern Updated',
     DELETED: 'Grok Pattern Deleted',
@@ -405,6 +405,16 @@ export const TELEMETRY_EVENT_TYPE = {
   ROLES: {
     USER_ASSIGNED: 'Roles User Assigned',
     USER_UNASSIGNED: 'Roles User Unassigned',
+  },
+  AUTHENTICATION: {
+    CONFIG_UPDATED: 'Authentication Config Updated',
+    SERVICE_CREATED: 'Authentication Service Created',
+    SERVICE_SELECTED: 'Authentication Service Selected',
+    SERVER_CONFIG_SAVE_CLICKED: 'Authentication Server Config Save Clicked',
+    USER_SYNC_SAVE_CLICKED: 'Authentication User Sync Save Clicked',
+    GROUP_SYNC_SAVE_CLICKED: 'Authentication Group Sync Save Clicked',
+    NEXT_USER_SYNC_CLICKED: 'Authentication Next User Sync Clicked',
+    NEXT_GROUP_SYNC_CLICKED: 'Authentication Next Group Sync Clicked',
   },
 } as const;
 
