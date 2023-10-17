@@ -55,6 +55,6 @@
     "use-query-params": "^2.2.0",
     "webpack": "5.89.0",
     "webpack-cli": "5.1.4",
-    "webpack-merge": "4.2.2"
+    "webpack-merge": "5.10.0"
   }
 }
