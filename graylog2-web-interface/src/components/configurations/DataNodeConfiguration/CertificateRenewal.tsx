@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import moment from 'moment';
 
-import { qualifyUrl } from 'util/URLUtils';
+import { qualifyUrl, getPathnameWithoutId } from 'util/URLUtils';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import type { DataNode } from 'preflight/types';
 import UserNotification from 'util/UserNotification';
@@ -31,7 +31,6 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import DataNodeBadge from 'components/datanode/DataNodeBadge';
 import { Badge } from 'preflight/components/common';
 import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledList = styled(ListGroup)`
