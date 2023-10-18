@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import 'react-day-picker/lib/style.css';
 
-import { toDateObject, adjustFormat, isValidDate, toUTCFromTz } from 'util/DateTime';
+import { toDateObject, adjustFormat, isValidDate } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
