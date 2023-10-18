@@ -29,6 +29,7 @@ const defaultComponentIgnore = [
 ];
 
 module.exports = {
+  skipComponentsWithoutExample: true,
   require: [
     'core-js/stable',
     'regenerator-runtime/runtime',
@@ -111,6 +112,10 @@ module.exports = {
           ],
         },
       ],
+    },
+    {
+      name: 'Hooks',
+      components: 'src/hooks/**/*.ts',
     },
   ],
   usageMode: 'collapse',
