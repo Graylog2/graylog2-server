@@ -56,6 +56,16 @@ export const CollectorConfigurationsStore = singletonStore(
     paginatedConfigurations: undefined,
     query: undefined,
 
+    getInitialState() {
+      return {
+        configurations: this.configurations,
+        query: this.query,
+        total: this.total,
+        pagination: this.pagination,
+        paginatedConfigurations: this.paginatedConfigurations,
+      };
+    },
+
     propagateChanges() {
       this.trigger({
         configurations: this.configurations,

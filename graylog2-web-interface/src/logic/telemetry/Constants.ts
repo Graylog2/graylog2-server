@@ -395,7 +395,7 @@ export const TELEMETRY_EVENT_TYPE = {
     USER_ENABLED: 'Users User Enabled',
     USER_DELETED: 'Users User Deleted',
   },
-  GROK_PATTERN: {
+  GROK_PATTERN:{
     CREATED: 'Grok Pattern Created',
     UPDATED: 'Grok Pattern Updated',
     DELETED: 'Grok Pattern Deleted',
@@ -415,6 +415,18 @@ export const TELEMETRY_EVENT_TYPE = {
     GROUP_SYNC_SAVE_CLICKED: 'Authentication Group Sync Save Clicked',
     NEXT_USER_SYNC_CLICKED: 'Authentication Next User Sync Clicked',
     NEXT_GROUP_SYNC_CLICKED: 'Authentication Next Group Sync Clicked',
+  },
+  SIDECARS: {
+    CONFIGURATION_CREATED: 'Sidecar Configuration Created',
+    CONFIGURATION_UPDATED: 'Sidecar Configuration Updated',
+    CONFIGURATION_CLONED: 'Sidecar Configuration Cloned',
+    CONFIGURATION_DELETED: 'Sidecar Configuration Deleted',
+    CONFIGURATION_ASSIGNED: 'Sidecar Configuration Assigned',
+    PROCESS_ACTION_SET: 'Sidecar Process Action Set',
+    LOG_COLLECTOR_CLONED: 'Sidecar Log Collector Cloned',
+    LOG_COLLECTOR_CREATED: 'Sidecar Log Collector Created',
+    LOG_COLLECTOR_UPDATED: 'Sidecar Log Collector Updated',
+    LOG_COLLECTOR_DELETED: 'Sidecar Log Collector Deleted',
   },
 } as const;
 
