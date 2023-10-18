@@ -29,7 +29,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
 
@@ -86,7 +85,7 @@ public abstract class JobTriggerDto {
     public abstract Optional<DateTime> triggeredAt();
 
     @JsonProperty(FIELD_EXECUTION_DURATION)
-    public abstract Optional<Duration> executionDuration();
+    public abstract Optional<Long> executionDurationMs();
 
     @JsonProperty(FIELD_STATUS)
     public abstract JobTriggerStatus status();
@@ -168,7 +167,7 @@ public abstract class JobTriggerDto {
         public abstract Builder triggeredAt(@Nullable DateTime triggeredAt);
 
         @JsonProperty(FIELD_EXECUTION_DURATION)
-        public abstract Builder executionDuration(@Nullable Duration executionDuration);
+        public abstract Builder executionDurationMs(@Nullable Long executionDurationMs);
 
         @JsonProperty(FIELD_STATUS)
         public abstract Builder status(JobTriggerStatus status);
