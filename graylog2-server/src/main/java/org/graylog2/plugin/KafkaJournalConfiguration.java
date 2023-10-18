@@ -55,7 +55,7 @@ public class KafkaJournalConfiguration extends PathConfiguration {
 
     @NamedBindingOverride(value = MESSAGE_JOURNAL_DIR)
     public Path getMessageJournalDir() {
-        return Optional.of(messageJournalDir).orElse(getDataDir().resolve("journal"));
+        return Optional.ofNullable(messageJournalDir).orElse(getDataDir().resolve("journal"));
     }
 
     public Size getMessageJournalSegmentSize() {
