@@ -69,8 +69,7 @@ const LoginContainer = styled.div`
 const TextContainer = styled.div`
   vertical-align: middle;
   justify-content: center;
-  justify-self: center;
-  align-self: center;
+  place-self: center center;
   height: auto;
 `;
 
