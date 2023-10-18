@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { GRN, GRNType } from 'logic/permissions/types';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
+import useShowRouteForEntity from 'routing/hooks/useShowRouteForEntity';
 
-const _convertEmptyString = (value: string) => (value === '' ? undefined : value);
+const useShowRouteFromGRN = (grn: string) => {
+  const { id, type } = getValuesFromGRN(grn);
 
-export const createGRN = (type: string, id: string) => `grn::::${type}:${id}`;
-
-export const getValuesFromGRN = (grn: GRN) => {
-  const grnValues = grn.split(':');
-  const [resourceNameType, cluster, tenant, scope, type, id] = grnValues.map(_convertEmptyString);
-
-  return { resourceNameType, cluster, tenant, scope, type: type as GRNType, id };
+  return useShowRouteForEntity(id, type);
 };
+
+export default useShowRouteFromGRN;

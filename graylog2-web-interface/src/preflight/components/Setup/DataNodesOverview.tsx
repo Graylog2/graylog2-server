@@ -19,9 +19,10 @@ import { Space } from '@mantine/core';
 import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
+import Alert from 'components/bootstrap/Alert';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import { Alert, Badge, List } from 'preflight/components/common';
 import DataNodeBadge from 'components/datanode/DataNodeBadge';
+import { Badge, List } from 'preflight/components/common';
 
 const P = styled.p`
   max-width: 700px;
@@ -73,7 +74,7 @@ const DataNodesOverview = () => {
         </>
       )}
       {(!dataNodes.length && !isInitialLoadingDataNodes) && (
-        <Alert type="info">
+        <Alert bsStyle="info">
           No data nodes have been found.
         </Alert>
       )}

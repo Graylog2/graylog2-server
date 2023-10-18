@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { GRN, GRNType } from 'logic/permissions/types';
+package org.graylog2.bootstrap.preflight.web.resources.model;
 
-const _convertEmptyString = (value: string) => (value === '' ? undefined : value);
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-export const createGRN = (type: string, id: string) => `grn::::${type}:${id}`;
-
-export const getValuesFromGRN = (grn: GRN) => {
-  const grnValues = grn.split(':');
-  const [resourceNameType, cluster, tenant, scope, type, id] = grnValues.map(_convertEmptyString);
-
-  return { resourceNameType, cluster, tenant, scope, type: type as GRNType, id };
-};
+public record CreateCARequest(@JsonProperty("organization") String organization) {
+}
