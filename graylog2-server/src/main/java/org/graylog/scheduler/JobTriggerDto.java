@@ -17,6 +17,7 @@
 package org.graylog.scheduler;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -34,6 +35,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = JobTriggerDto.Builder.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class JobTriggerDto {
     public static final String FIELD_ID = "id";
 
@@ -115,6 +117,7 @@ public abstract class JobTriggerDto {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
