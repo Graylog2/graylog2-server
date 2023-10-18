@@ -152,10 +152,6 @@ public class CertRenewalServiceImpl implements CertRenewalService {
             if(keystore.isPresent()) {
                 final var ks = keystore.get();
                 final var nextRenewal = getNextRenewal();
-                final var rootCert = ks.getCertificate("root");
-                if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) rootCert)) {
-                    notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "root cert");
-                }
                 final var caCert = ks.getCertificate(CA_KEY_ALIAS);
                 if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
                     notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
