@@ -74,7 +74,7 @@ public class LoggersResource extends RestResource {
 
     private static final Map<String, Subsystem> SUBSYSTEMS = ImmutableMap.<String, Subsystem>of(
             "graylog", new Subsystem("Graylog", ImmutableList.of("org.graylog2", "org.graylog"), "All messages from Graylog-owned systems."),
-            "indexer", new Subsystem("Indexer", "org.elasticsearch", "All messages related to indexing and searching."),
+            "indexer", new Subsystem("Indexer", "org.opensearch", "All messages related to indexing and searching."),
             "authentication", new Subsystem("Authentication", "org.apache.shiro", "All user authentication messages."),
             "sockets", new Subsystem("Sockets", "netty", "All messages related to socket communication."));
 
@@ -152,8 +152,7 @@ public class LoggersResource extends RestResource {
         if(loggerName.equals(loggerConfig.getName())) {
             loggerConfig.setLevel(level);
         } else {
-            boolean additive = LogManager.ROOT_LOGGER_NAME.equals(loggerConfig.getName()) || loggerConfig.isAdditive();
-            final LoggerConfig newLoggerConfig = new LoggerConfig(loggerName, level, additive);
+            final LoggerConfig newLoggerConfig = new LoggerConfig(loggerName, level, true);
             newLoggerConfig.setLevel(level);
             config.addLogger(loggerName, newLoggerConfig);
         }
