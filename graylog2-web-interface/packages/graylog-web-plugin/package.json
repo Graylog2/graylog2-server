@@ -31,8 +31,8 @@
   "dependencies": {
     "@graylog/sawmill": "2.0.7",
     "@tanstack/react-query": "4.36.1",
-    "@types/create-react-class": "15.6.4",
-    "@types/jquery": "3.5.22",
+    "@types/create-react-class": "15.6.5",
+    "@types/jquery": "3.5.24",
     "@types/react": "18.2.20",
     "babel-preset-graylog": "file:../babel-preset-graylog",
     "create-react-class": "15.7.0",
