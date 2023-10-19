@@ -25,7 +25,7 @@ type Props = {
 };
 
 /**
- * This component receives any date time and displays the relative time until now in a human readable format.
+ * This component receives any date time and displays the relative time until now in a human-readable format.
  */
 
 const RelativeTime = ({ dateTime: dateTimeProp }: Props) => {

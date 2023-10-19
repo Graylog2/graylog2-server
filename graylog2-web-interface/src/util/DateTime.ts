@@ -63,7 +63,8 @@ const getFormatStringsForDateTimeFormats = (dateTimeFormats: Array<DateTimeForma
 });
 
 /**
- * General component description in JSDoc format. Markdown is *supported*.
+ * Takes a date and returns is as a moment object. Optionally you can define a time zone, which will be considered when printing out the date.
+ * You can also define `acceptedFormats` in case you want to throw an error if the provided date does not match an expected format.
  */
 export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<DateTimeFormats>, tz = DEFAULT_OUTPUT_TZ) => {
   const acceptedFormatStrings = getFormatStringsForDateTimeFormats(acceptedFormats);
@@ -73,24 +74,41 @@ export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<DateTim
   return validateDateTime(dateObject, dateTime, validationInfo);
 };
 
+/**
+ * Transforms an ISO 8601 date time to a moment date object. It throws an error is the provided date time is not expressed according to ISO 8601.
+ */
 export const parseFromIsoString = (dateTimeString: string, tz = DEFAULT_OUTPUT_TZ) => toDateObject(dateTimeString, ['internal'], tz);
 
+/**
+ * Returns the estimated browser time zone.
+ */
 export const getBrowserTimezone = () => moment.tz.guess();
 
+/**
+ * Returns the provided date time as a string, based on the targeted format and timezone.
+ */
 export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'default', tz = DEFAULT_OUTPUT_TZ) => toDateObject(dateTime, undefined, tz).format(DATE_TIME_FORMATS[format]);
 
+/**
+ * Returns the provided date time as a string, based on the targeted format and the browser timezone.
+ */
 export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'default') => adjustFormat(time, format, getBrowserTimezone());
 
+/**
+ * Returns the relative time in a human-readable format for the provided date time.
+ * If you just want to display output, you can use the `RelativeTime` component.
+ */
 export const relativeDifference = (dateTime: DateTime) => {
   const dateObject = toDateObject(dateTime);
 
   return validateDateTime(dateObject, dateTime).fromNow();
 };
 
+/**
+ * Validate if the provided time has a supported format.
+ */
 export const isValidDate = (dateTime: DateTime) => moment(dateTime, Object.values(DATE_TIME_FORMATS), true).isValid();
 
-// This function allows transforming a date time, which does not contain a time zone like `2010-01-01 10:00:00`, to UTC.
-// For this calculation it is necessary to define the time zone of the provided date time.
 export const toUTCFromTz = (dateTime: string, sourceTimezone: string) => {
   if (!sourceTimezone) {
     throw new Error('It is required to define the time zone of the date time provided for internalUTCTime.');
