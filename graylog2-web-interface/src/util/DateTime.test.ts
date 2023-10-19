@@ -172,11 +172,11 @@ describe('DateTime utils', () => {
 
   describe('toUTCFromTz', () => {
     it('should transform time to UTC based on defined tz', () => {
-      expect(toUTCFromTz('2020-01-01T10:00:00.000', moscowTZ)).toBe('2020-01-01T07:00:00.000Z');
+      expect(toUTCFromTz('2020-01-01T10:00:00.000', moscowTZ).toISOString()).toEqual('2020-01-01T07:00:00.000Z');
     });
 
     it('should prioritize time zone of date time over provided time zone when calculating UTC time', () => {
-      expect(toUTCFromTz('2020-01-01T12:00:00.000+05:00', 'Europe/Berlin')).toBe('2020-01-01T07:00:00.000Z');
+      expect(toUTCFromTz('2020-01-01T12:00:00.000+05:00', 'Europe/Berlin').toISOString()).toBe('2020-01-01T07:00:00.000Z');
     });
   });
 });
