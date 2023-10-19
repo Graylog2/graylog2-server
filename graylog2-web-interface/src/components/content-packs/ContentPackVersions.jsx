@@ -45,6 +45,7 @@ class ContentPackVersions extends React.Component {
     const { contentPackRevisions } = this.props;
 
     this.state = {
+      modalRev: 0,
       showModal: false,
       selectedVersion: contentPackRevisions.latestRevision,
     };
@@ -119,11 +120,11 @@ class ContentPackVersions extends React.Component {
     const { onInstall: onInstallProp } = this.props;
 
     const closeModal = () => {
-      this.setState({ showModal: false });
+      this.setState({ showModal: false, modalRev: 0 });
     };
 
     const open = () => {
-      this.setState({ showModal: true });
+      this.setState({ showModal: true, modalRev: item.rev });
     };
 
     const onInstall = () => {
@@ -132,7 +133,7 @@ class ContentPackVersions extends React.Component {
     };
 
     const modal = (
-      <BootstrapModalWrapper showModal={this.state.showModal}
+      <BootstrapModalWrapper showModal={this.state.showModal && this.state.modalRev === item.rev}
                              onHide={closeModal}
                              bsSize="large"
                              data-app-section="content_pack_versions"
