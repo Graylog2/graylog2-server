@@ -42,10 +42,10 @@ public abstract class ExportITHelper {
 
     public abstract LinkedHashSet<SimpleMessageChunk> collectChunksFor(final ExportMessagesCommand command);
 
-    public ExportMessagesCommand.Builder commandBuilderWithAllStreams() {
+    public ExportMessagesCommand.Builder commandBuilderWithAllTestDefaultStreams() {
         return ExportMessagesCommand.withDefaults()
                 .toBuilder()
-                .timeRange(allMessagesTimeRange())
+                .timeRange(allMessagesInTestsDefaultTimeRange())
                 .streams(ImmutableSet.of("stream-01", "stream-02", "stream-03"));
     }
 
@@ -57,7 +57,7 @@ public abstract class ExportITHelper {
                 .orElseThrow(() -> new RuntimeException("failed to collect field names"));
     }
 
-    public AbsoluteRange allMessagesTimeRange() {
+    public AbsoluteRange allMessagesInTestsDefaultTimeRange() {
         return AbsoluteRange.create("2015-01-01T00:00:00.000Z", "2015-01-03T00:00:00.000Z");
     }
 

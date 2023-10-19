@@ -73,7 +73,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesCorrectIndicesAndStreams() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .streams(ImmutableSet.of("stream-01", "stream-02"))
                 .build();
 
@@ -90,7 +90,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesQueryString() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .queryString(ElasticsearchQueryString.of("Ha Ho"))
                 .build();
 
@@ -104,7 +104,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesTimeRange() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .timeRange(AbsoluteRange.create("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.000Z"))
                 .build();
 
@@ -118,7 +118,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesFieldsInOrder() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .fieldsInOrder("timestamp", "message")
                 .build();
 
@@ -133,7 +133,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void marksFirstChunk() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams().build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
 
         SimpleMessageChunk[] chunks = helper.collectChunksFor(command).toArray(new SimpleMessageChunk[0]);
 
@@ -144,7 +144,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void failsWithLeadingHighlightQueryIfDisallowed() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams().queryString(ElasticsearchQueryString.of("*a")).build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().queryString(ElasticsearchQueryString.of("*a")).build();
 
         assertThatExceptionOfType(ExportException.class)
                 .isThrownBy(() -> backend.run(command, chunk -> {}))
@@ -155,7 +155,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void respectsResultLimitIfSet() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams().chunkSize(1).limit(3).build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().chunkSize(1).limit(3).build();
 
         SimpleMessageChunk totalResult = helper.collectTotalResult(command);
 
@@ -166,7 +166,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void deliversCompleteLastChunkIfLimitIsReached() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams().chunkSize(2).limit(3).build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().chunkSize(2).limit(3).build();
 
         SimpleMessageChunk totalResult = helper.collectTotalResult(command);
 
@@ -177,7 +177,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void resultsHaveAllMessageFields() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .fieldsInOrder("timestamp", "message")
                 .build();
 
@@ -199,7 +199,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void sortsByTimestampAscending() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams().build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
 
         helper.runWithExpectedResult(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
@@ -212,7 +212,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesProvidedTimeZone() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = helper.commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .timeZone(DateTimeZone.forID("Australia/Adelaide")) // UTC+9:30
                 .build();
 
