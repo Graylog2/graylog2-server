@@ -440,6 +440,12 @@ export const TELEMETRY_EVENT_TYPE = {
     DOWNLOADED: 'Content Pack Downloaded',
     ALL_VERSIONS_DELETED: 'Content Pack All Versions Deleted',
   },
+  TEAM: {
+    CREATED: 'Team Created',
+    ASSIGNED: 'Team Assigned',
+    UNASSIGNED: 'Team Unassigned',
+    DELETED: 'Team Deleted',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
