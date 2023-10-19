@@ -70,7 +70,7 @@ const GroupSyncStep = ({
         <ButtonToolbar className="pull-right">
           <Button bsStyle="primary"
                   onClick={() => {
-                    sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.GROUP_SYNC_SAVE_CLICKED, {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_GROUP_SYNC_SAVE_CLICKED, {
                       app_pathname: getPathnameWithoutId(pathname),
                       app_section: 'directory-service',
                       app_action_value: 'groupsync-save',

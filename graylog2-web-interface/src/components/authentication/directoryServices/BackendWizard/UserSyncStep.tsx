@@ -78,7 +78,7 @@ const UserSyncStep = ({
   const sendTelemetry = useSendTelemetry();
 
   const _onSubmitAll = (validateForm) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.USER_SYNC_SAVE_CLICKED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_USER_SYNC_SAVE_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'directory-service',
       app_action_value: 'usersync-save',
@@ -209,7 +209,7 @@ const UserSyncStep = ({
             <Button bsStyle="success"
                     disabled={isSubmitting}
                     onClick={() => {
-                      sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.NEXT_GROUP_SYNC_CLICKED, {
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_GROUP_SYNC_CLICKED, {
                         app_pathname: getPathnameWithoutId(pathname),
                         app_section: 'directory-service',
                         app_action_value: 'groupsync-button',

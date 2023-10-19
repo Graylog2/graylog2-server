@@ -117,7 +117,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   };
 
   const _onSubmitAll = (validateForm) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.SERVER_CONFIG_SAVE_CLICKED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_SERVER_CONFIG_SAVE_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'directory-service',
       app_action_value: 'server-configuration-save',
@@ -257,7 +257,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
             <Button bsStyle="primary"
                     disabled={isSubmitting}
                     onClick={() => {
-                      sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.NEXT_USER_SYNC_CLICKED, {
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_USER_SYNC_CLICKED, {
                         app_pathname: getPathnameWithoutId(pathname),
                         app_section: 'directory-service',
                         app_action_value: 'usersync-button',
