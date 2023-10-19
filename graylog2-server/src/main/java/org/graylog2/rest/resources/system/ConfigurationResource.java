@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ExposedConfiguration;
+import org.graylog2.configuration.retrieval.SingleConfigurationValueRetriever;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -34,7 +35,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Api(value = "System/Configuration", description = "Read-only access to configuration settings")
@@ -42,10 +43,13 @@ import java.util.Arrays;
 @Produces(MediaType.APPLICATION_JSON)
 public class ConfigurationResource extends RestResource {
     private final Configuration configuration;
+    private final SingleConfigurationValueRetriever singleConfigurationValueRetriever;
 
     @Inject
-    public ConfigurationResource(final Configuration configuration) {
+    public ConfigurationResource(final Configuration configuration,
+                                 final SingleConfigurationValueRetriever singleConfigurationValueRetriever) {
         this.configuration = configuration;
+        this.singleConfigurationValueRetriever = singleConfigurationValueRetriever;
     }
 
     @GET
@@ -63,17 +67,12 @@ public class ConfigurationResource extends RestResource {
                                       @PathParam("name") @NotEmpty String configSettingName) {
 
         final ExposedConfiguration conf = ExposedConfiguration.create(configuration);
+        final Optional<Object> value = singleConfigurationValueRetriever.retrieveSingleValue(conf, configSettingName);
 
-        return Arrays.stream(ExposedConfiguration.class.getMethods())
-                .filter(method -> method.isAnnotationPresent(JsonProperty.class))
-                .filter(method -> method.getAnnotation(JsonProperty.class).value().equals(configSettingName))
-                .findFirst()
-                .map(method -> {
-                    try {
-                        return Response.ok(method.invoke(conf)).build();
-                    } catch (Exception ex) {
-                        return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), ex.getMessage()).build();
-                    }
-                }).orElse(Response.status(Response.Status.NOT_FOUND).build());
+        return value.map(v -> Response.ok(new SingleValue(v)).build())
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+
     }
+
+    public record SingleValue(@JsonProperty("value") Object value) {}
 }
