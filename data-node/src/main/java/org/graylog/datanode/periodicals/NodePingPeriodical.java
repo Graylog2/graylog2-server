@@ -26,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.net.URI;
 import java.util.function.Supplier;
 
@@ -38,22 +40,25 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<URI> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
     private final Supplier<Boolean> isLeader;
+    private final String hostname;
 
 
     @Inject
-    public NodePingPeriodical(NodeService nodeService, NodeId nodeId, OpensearchProcess managedOpenSearch) {
-        this(nodeService, nodeId, managedOpenSearch::getOpensearchBaseUrl, managedOpenSearch::getOpensearchClusterUrl, managedOpenSearch::isLeaderNode);
+    public NodePingPeriodical(NodeService nodeService, NodeId nodeId, @Named("hostname") @Nullable String hostname, OpensearchProcess managedOpenSearch) {
+        this(nodeService, nodeId, hostname, managedOpenSearch::getOpensearchBaseUrl, managedOpenSearch::getOpensearchClusterUrl, managedOpenSearch::isLeaderNode);
     }
 
     NodePingPeriodical(
             NodeService nodeService,
             NodeId nodeId,
+            String hostname,
             Supplier<URI> opensearchBaseUri,
             Supplier<String> opensearchClusterUri,
             Supplier<Boolean> isLeader
     ) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
+        this.hostname = hostname != null ? hostname : Tools.getLocalCanonicalHostname();
         this.opensearchBaseUri = opensearchBaseUri;
         this.opensearchClusterUri = opensearchClusterUri;
         this.isLeader = isLeader;
@@ -115,7 +120,8 @@ public class NodePingPeriodical extends Periodical {
                 isLeader.get(),
                 opensearchBaseUri.get(),
                 opensearchClusterUri.get(),
-                Tools.getLocalCanonicalHostname());
+                hostname
+        );
 
         if (!registrationSucceeded) {
             LOG.error("Failed to register node {} for heartbeats.", nodeId.getNodeId());

@@ -37,6 +37,7 @@ class NodePingPeriodicalTest {
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
+                null,
                 () -> uri,
                 () -> cluster,
                 () -> true
@@ -66,6 +67,7 @@ class NodePingPeriodicalTest {
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
+                null,
                 () -> uri,
                 () -> cluster,
                 () -> true
@@ -79,6 +81,37 @@ class NodePingPeriodicalTest {
                 Mockito.eq(uri),
                 Mockito.eq(cluster),
                 Mockito.any()
+        );
+    }
+
+    @Test
+    void doRunRegisterWithCustomHostname() throws NodeNotFoundException {
+
+        final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
+        final URI uri = URI.create("http://otherhost:9200");
+        final String cluster = "otherhost:9300";
+
+        final NodeService nodeService = Mockito.mock(NodeService.class);
+
+        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri, cluster);
+
+        final NodePingPeriodical task = new NodePingPeriodical(
+                nodeService,
+                nodeID,
+                "otherhost",
+                () -> uri,
+                () -> cluster,
+                () -> true
+        );
+
+        task.doRun();
+
+        Mockito.verify(nodeService).registerServer(
+                Mockito.eq(nodeID.getNodeId()),
+                Mockito.eq(true),
+                Mockito.eq(uri),
+                Mockito.eq(cluster),
+                Mockito.eq("otherhost")
         );
     }
 }
