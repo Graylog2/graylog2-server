@@ -113,10 +113,6 @@ module.exports = {
         },
       ],
     },
-    {
-      name: 'Hooks',
-      components: 'src/hooks/**/*.ts',
-    },
   ],
   usageMode: 'collapse',
   styleguideComponents: {

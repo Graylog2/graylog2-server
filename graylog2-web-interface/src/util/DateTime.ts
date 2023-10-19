@@ -62,6 +62,9 @@ const getFormatStringsForDateTimeFormats = (dateTimeFormats: Array<DateTimeForma
   return format;
 });
 
+/**
+ * General component description in JSDoc format. Markdown is *supported*.
+ */
 export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<DateTimeFormats>, tz = DEFAULT_OUTPUT_TZ) => {
   const acceptedFormatStrings = getFormatStringsForDateTimeFormats(acceptedFormats);
   const dateObject = moment(dateTime, acceptedFormatStrings, true).tz(tz);
