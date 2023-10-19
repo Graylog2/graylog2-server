@@ -52,7 +52,7 @@ export const SidecarsAdministrationStore = singletonStore(
         filters: this.filters,
         query: this.query,
         pagination: this.pagination,
-      }
+      };
     },
 
     propagateChanges() {

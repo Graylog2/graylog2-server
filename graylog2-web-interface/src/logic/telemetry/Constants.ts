@@ -395,7 +395,7 @@ export const TELEMETRY_EVENT_TYPE = {
     USER_ENABLED: 'Users User Enabled',
     USER_DELETED: 'Users User Deleted',
   },
-  GROK_PATTERN:{
+  GROK_PATTERN: {
     CREATED: 'Grok Pattern Created',
     UPDATED: 'Grok Pattern Updated',
     DELETED: 'Grok Pattern Deleted',

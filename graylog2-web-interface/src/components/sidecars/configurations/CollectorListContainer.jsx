@@ -25,14 +25,16 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import CollectorList from './CollectorList';
 
+const validateCollector = (collector) => CollectorsActions.validate(collector);
+
+const loadCollectors = () => {
+  CollectorsActions.list({});
+};
+
 class CollectorListContainer extends React.Component {
   componentDidMount() {
-    this.loadCollectors();
+    loadCollectors();
   }
-
-  loadCollectors = () => {
-    CollectorsActions.list({});
-  };
 
   handleClone = (collector, name, callback) => {
     const { sendTelemetry } = this.props;
@@ -71,8 +73,6 @@ class CollectorListContainer extends React.Component {
     CollectorsActions.list({ query: query, pageSize: pageSize }).finally(callback);
   };
 
-  validateCollector = (collector) => CollectorsActions.validate(collector);
-
   render() {
     const { collectors } = this.props;
 
@@ -89,7 +89,7 @@ class CollectorListContainer extends React.Component {
                      onQueryChange={this.handleQueryChange}
                      onClone={this.handleClone}
                      onDelete={this.handleDelete}
-                     validateCollector={this.validateCollector} />
+                     validateCollector={validateCollector} />
     );
   }
 }
@@ -100,7 +100,7 @@ CollectorListContainer.propTypes = {
 };
 
 CollectorListContainer.defaultProps = {
-  collector: undefined,
+  collectors: undefined,
   sendTelemetry: () => {},
 };
 

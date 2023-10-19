@@ -43,6 +43,26 @@ ValidationMessage.propTypes = {
   defaultText: PropTypes.string.isRequired,
 };
 
+const formatServiceTypes = () => {
+  const options = [];
+
+  options.push({ value: 'exec', label: 'Foreground execution' });
+  options.push({ value: 'svc', label: 'Windows service' });
+
+  return options;
+};
+
+const formatOperatingSystems = () => {
+  const options = [];
+
+  options.push({ value: 'linux', label: 'Linux' });
+  options.push({ value: 'windows', label: 'Windows' });
+  options.push({ value: 'darwin', label: 'Darwin' });
+  options.push({ value: 'freebsd', label: 'FreeBSD' });
+
+  return options;
+};
+
 class CollectorForm extends React.Component {
   constructor(props) {
     super(props);
@@ -143,26 +163,6 @@ class CollectorForm extends React.Component {
     history.goBack();
   };
 
-  _formatServiceTypes = () => {
-    const options = [];
-
-    options.push({ value: 'exec', label: 'Foreground execution' });
-    options.push({ value: 'svc', label: 'Windows service' });
-
-    return options;
-  };
-
-  _formatOperatingSystems = () => {
-    const options = [];
-
-    options.push({ value: 'linux', label: 'Linux' });
-    options.push({ value: 'windows', label: 'Windows' });
-    options.push({ value: 'darwin', label: 'Darwin' });
-    options.push({ value: 'freebsd', label: 'FreeBSD' });
-
-    return options;
-  };
-
   _validationState = (fieldName) => {
     const { validation_errors: validationErrors } = this.state;
 
@@ -210,7 +210,7 @@ class CollectorForm extends React.Component {
                        validationState={this._validationState('service_type')}>
               <ControlLabel>Process management</ControlLabel>
               <Select inputId="service_type"
-                      options={this._formatServiceTypes()}
+                      options={formatServiceTypes()}
                       value={formData.service_type}
                       onChange={this._formDataUpdate('service_type')}
                       placeholder="Service Type"
@@ -226,7 +226,7 @@ class CollectorForm extends React.Component {
                        validationState={this._validationState('node_operating_system')}>
               <ControlLabel>Operating System</ControlLabel>
               <Select inputId="node_operating_system"
-                      options={this._formatOperatingSystems()}
+                      options={formatOperatingSystems()}
                       value={formData.node_operating_system}
                       onChange={this._formDataUpdate('node_operating_system')}
                       placeholder="Name"
@@ -292,7 +292,7 @@ CollectorForm.propTypes = {
   collector: PropTypes.object,
   history: PropTypes.object.isRequired,
   sendTelemetry: PropTypes.func,
-},
+};
 
 CollectorForm.defaultProps = {
   action: 'edit',
