@@ -59,6 +59,7 @@ public class FieldTypeMappingsService {
                 });
             } catch (Exception ex) {
                 LOG.error("Failed to update field type in index set : " + indexSetId, ex);
+                throw ex;
             }
         }
     }
