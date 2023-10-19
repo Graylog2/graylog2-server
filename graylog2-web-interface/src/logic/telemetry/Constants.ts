@@ -435,6 +435,11 @@ export const TELEMETRY_EVENT_TYPE = {
   },
   SYSTEM_OVERVIEW_OUTGOING_TRAFFIC_DAYS_CHANGED: 'System Overview Outgoing Traffic Days Changed',
   URLWHITELIST_CONFIGURATION_UPDATED: 'Urlwhitelist Configuration Updated',
+  CONTENT_PACK: {
+    INSTALLED: 'Content Pack Installed',
+    DOWNLOADED: 'Content Pack Downloaded',
+    ALL_VERSIONS_DELETED: 'Content Pack All Versions Deleted',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
