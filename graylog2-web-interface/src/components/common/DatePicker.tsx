@@ -74,8 +74,8 @@ const useSelectedDate = (date: DateTime | undefined) => {
 type Props = {
   date?: DateTime | undefined,
   onChange: (day: Date, modifiers: DayModifiers, event: React.MouseEvent<HTMLDivElement>) => void,
-  fromDate: Date,
-  showOutsideDays: boolean,
+  fromDate?: Date,
+  showOutsideDays?: boolean,
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
