@@ -116,6 +116,7 @@ export const TELEMETRY_EVENT_TYPE = {
     ROW_ACTION_SHARE_CLICKED: 'EventDefinition List Row Share Clicked',
   },
   EVENTDEFINITION_CREATE_BUTTON_CLICKED: 'EventDefinition Create Button Clicked',
+  EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
   EVENTDEFINITION_DETAILS: {
@@ -342,6 +343,7 @@ export const TELEMETRY_EVENT_TYPE = {
   SHORTCUT_TYPED: 'Shortcut Typed',
   CONFIGURATIONS: {
     INDEX_SETS_UPDATED: 'Configurations Index Sets Defaults Updated',
+    THREATINTEL_CONFIGURATION_UPDATED: 'Configurations Threat Intel Configuration Updated',
     PERMISSIONS_UPDATED: 'Configurations Permissions Updated',
     SEARCHES_UPDATED: 'Configurations Searches Updated',
     URL_WHITE_LIST_UPDATED: 'Configurations Url White List Updated',
@@ -349,6 +351,7 @@ export const TELEMETRY_EVENT_TYPE = {
     CERTIFICATE_RENEWAL_UPDATED: 'Configurations Certificate Renewal Updated',
     CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
+    GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
@@ -372,6 +375,8 @@ export const TELEMETRY_EVENT_TYPE = {
   INDICES: {
     INDEX_SET_DEFAULT_SET: 'Indices Index Set Default Set',
     INDEX_SET_DELETED: 'Indices Index Set Deleted',
+    INDEX_SET_CREATED: 'Indices Index Set Created',
+    INDEX_SET_UPDATED: 'Indices Index Set Updated',
   },
   LOGGING: {
     LOG_LEVEL_EDITED: 'Logging Log Level Edited',
@@ -428,6 +433,8 @@ export const TELEMETRY_EVENT_TYPE = {
     LOG_COLLECTOR_UPDATED: 'Sidecar Log Collector Updated',
     LOG_COLLECTOR_DELETED: 'Sidecar Log Collector Deleted',
   },
+  SYSTEM_OVERVIEW_OUTGOING_TRAFFIC_DAYS_CHANGED: 'System Overview Outgoing Traffic Days Changed',
+  URLWHITELIST_CONFIGURATION_UPDATED: 'Urlwhitelist Configuration Updated',
 } as const;
 
 type ExtractObjectValues<T extends object> = {
