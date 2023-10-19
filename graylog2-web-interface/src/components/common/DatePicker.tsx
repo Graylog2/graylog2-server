@@ -105,7 +105,10 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
 
 DatePicker.propTypes = {
   /** Initial date to select in the date picker. */
-  date: PropTypes.string,
+  date: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+  ]),
   /**
    * Callback that will be called when user picks a date. It will receive the new selected day,
    * `react-day-picker`'s modifiers, and the original event as arguments.
