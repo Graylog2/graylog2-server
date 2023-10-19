@@ -4108,9 +4108,9 @@
   integrity sha512-59CA5oavBEWSNLtS/BChj9xntiWMsIf9IytjxmBo9OuZEYuRzRf3K1ARzFPlXTOz5Zm2wXI38AP9RlLqDYMToQ==
 
 "@types/urijs@^1.19.19":
-  version "1.19.20"
-  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.19.20.tgz#7ea4254f4c2cdbd7d34e47d483e76fa1b81e19a4"
-  integrity sha512-77Mq/2BeHU894J364dUv9tSwxxyCLtcX228Pc8TwZpP5bvOoMns+gZoftp3LYl3FBH8vChpWbuagKGiMki2c1A==
+  version "1.19.22"
+  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.19.22.tgz#188c573007001de3be3983af5437727bf3042dd6"
+  integrity sha512-qnYBwfN7O/+i6E1Kr8JaCKsrCLpRCiQ1XxkSxNIYuJ/5Aagt0+HlMX78DJMUrNzDULMz0eu2gcprlxJaDtACOw==
 
 "@types/use-sync-external-store@^0.0.3":
   version "0.0.3"
