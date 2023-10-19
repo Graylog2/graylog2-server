@@ -40,10 +40,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
     private final Provider<OpensearchConfiguration> configurationProvider;
-    private final CustomCAX509TrustManager trustManager;
     private final EventBus eventBus;
-    private final NodeService nodeService;
-    private final Configuration configuration;
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
@@ -53,9 +50,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final NodeService nodeService,
                                     final Configuration configuration) {
         this.configurationProvider = configurationProvider;
-        this.trustManager = trustManager;
-        this.nodeService = nodeService;
-        this.configuration = configuration;
         this.eventBus = eventBus;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
         eventBus.register(this);
@@ -86,7 +80,16 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         if (config.securityConfigured()) {
             this.process.startWithConfig(config);
         } else {
-            LOG.warn("Opensearch process not started. Please provide proper security configuration, using certificate provisioning in the pre-flight mode, by manual certificate creation or by disabling security in the config.");
+
+            String noConfigMessage = """
+                \n
+                ========================================================================================================
+                It seems you are starting Data node for the first time. The current configuration is not sufficient to
+                start the indexer process because a security configuration is missing. You have to either provide http
+                and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
+                ========================================================================================================
+                """;
+            LOG.info(noConfigMessage);
         }
         eventBus.post(new OpensearchConfigurationChangeEvent(config));
     }
