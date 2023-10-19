@@ -125,13 +125,13 @@ class ContentPacksList extends React.Component {
 
   _formatItems(items) {
     const { pageSize, currentPage } = this.state;
-    const { contentPackMetadata, onDeletePack } = this.props;
+    const { contentPackMetadata, onDeletePack, sendTelemetry, location } = this.props;
     const begin = (pageSize * (currentPage - 1));
     const end = begin + pageSize;
     const shownItems = items.slice(begin, end);
 
     return shownItems.map((item) => {
-      const { openFunc, installModal, sendTelemetry, location } = this._installModal(item);
+      const { openFunc, installModal } = this._installModal(item);
       let downloadRef;
       const downloadModal = (
         <ContentPackDownloadControl ref={(node) => {
@@ -154,7 +154,7 @@ class ContentPacksList extends React.Component {
         });
 
         openFunc();
-      }
+      };
 
       const handleDownload = () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.DOWNLOADED, {
@@ -164,7 +164,7 @@ class ContentPacksList extends React.Component {
         });
 
         downloadRef.open();
-      }
+      };
 
       const handleDeleteAllVersions = () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.ALL_VERSIONS_DELETED, {
@@ -174,7 +174,7 @@ class ContentPacksList extends React.Component {
         });
 
         onDeletePack(item.id);
-      }
+      };
 
       return (
         <ControlledTableList.Item key={item.id}>
