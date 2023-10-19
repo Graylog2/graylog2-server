@@ -22,7 +22,8 @@ import styled, { css } from 'styled-components';
 
 import 'react-day-picker/lib/style.css';
 
-import { toDateObject, adjustFormat, isValidDate } from 'util/DateTime';
+import type { DateTime } from 'util/DateTime';
+import { isValidDate } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
@@ -60,25 +61,25 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
-const useSelectedDate = (date: string | undefined) => {
-  const { userTimezone, formatTime } = useUserDateTime();
+const useSelectedDate = (date: DateTime | undefined) => {
+  const { toUserTimezone } = useUserDateTime();
 
   if (!isValidDate(date)) {
     return undefined;
   }
 
-  return toDateObject(formatTime(date, 'internal'), undefined, userTimezone);
+  return toUserTimezone(date);
 };
 
 type Props = {
-  date?: string | undefined,
+  date?: DateTime | undefined,
   onChange: (day: Date, modifiers: DayModifiers, event: React.MouseEvent<HTMLDivElement>) => void,
   fromDate: Date,
   showOutsideDays: boolean,
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
-  const { userTimezone } = useUserDateTime();
+  const { formatTime } = useUserDateTime();
   const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(() => ({
@@ -87,12 +88,12 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
         return false;
       }
 
-      return adjustFormat(selectedDate, 'date', userTimezone) === adjustFormat(moddedDate, 'date');
+      return formatTime(selectedDate, 'date') === formatTime(moddedDate, 'date');
     },
     disabled: {
       before: new Date(fromDate),
     },
-  }), [fromDate, selectedDate, userTimezone]);
+  }), [formatTime, fromDate, selectedDate]);
 
   return (
     <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
