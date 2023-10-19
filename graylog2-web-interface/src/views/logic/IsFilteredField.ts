@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { RESERVED_FIELDS } from 'views/Constants';
+import { FILTERED_FIELDS } from 'views/Constants';
 
-const isReservedField = (fieldName: string) => RESERVED_FIELDS.includes(fieldName);
+const isFilteredField = (fieldName: string) => FILTERED_FIELDS.includes(fieldName);
 
-export default isReservedField;
+export default isFilteredField;

@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_CREATE;
+import static org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService.BLACKLISTED_FIELDS;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -81,8 +82,8 @@ public class FieldTypeMappingsResource extends RestResource {
                                     @Valid
                                     @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request) {
         checkPermissionsForCreation(request.indexSetsIds());
+        checkFieldIsAllowedToBeChanged(request.fieldName());
 
-        //TODO: more complex validation of request
         var type = CustomFieldMappings.AVAILABLE_TYPES.get(request.type());
         if (type == null) {
             throw new BadRequestException("Invalid type provided: " + request.type() + " - available types: " + CustomFieldMappings.AVAILABLE_TYPES.keySet());
@@ -92,6 +93,12 @@ public class FieldTypeMappingsResource extends RestResource {
         fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();
+    }
+
+    private void checkFieldIsAllowedToBeChanged(String fieldName) {
+        if (BLACKLISTED_FIELDS.contains(fieldName)) {
+            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + BLACKLISTED_FIELDS);
+        }
     }
 
 

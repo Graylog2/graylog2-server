@@ -320,7 +320,7 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
 
-        addInstrumentedAppender(metricRegistry, logLevel);
+        addInstrumentedAppender(metricRegistry);
         // Report metrics via JMX.
         final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build();
         reporter.start();
@@ -396,13 +396,13 @@ public abstract class CmdLineTool implements CliCommand {
         context.updateLoggers(config);
     }
 
-    private void addInstrumentedAppender(final MetricRegistry metrics, final Level level) {
+    private void addInstrumentedAppender(final MetricRegistry metrics) {
         final InstrumentedAppender appender = new InstrumentedAppender(metrics, null, null, false);
         appender.start();
 
         final LoggerContext context = (LoggerContext) LogManager.getContext(false);
         final org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
-        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, level, null);
+        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, null, null);
         context.updateLoggers(config);
     }
 

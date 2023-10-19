@@ -31,7 +31,7 @@ const ThroughputNavItem = styled(NavItem)`
     align-items: center;
     height: 50px;
 
-    @media (max-width: 991px) {
+    @media (width <= 991px) {
       height: auto;
       display: block;
     }
@@ -45,7 +45,7 @@ const ContentWrap = styled.strong`
   grid-gap: 0;
   height: 30px;
 
-  @media (max-width: 991px) {
+  @media (width <= 991px) {
     height: auto;
     display: block;
 
