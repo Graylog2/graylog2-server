@@ -19,9 +19,9 @@ import React, { useCallback, useState } from 'react';
 import type { ActionComponentProps, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
-import isReservedField from 'views/logic/IsReservedField';
 import type User from 'logic/users/User';
 import AppConfig from 'util/AppConfig';
+import isReservedField from 'views/logic/IsReservedField';
 
 const ChangeFieldType = ({
   field,
@@ -42,7 +42,7 @@ const hasMappingPermission = (currentUser: User) => currentUser.permissions.incl
 export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => {
   const { currentUser } = contexts;
 
-  return (!isFunction(field) && !type.isDecorated() && !isReservedField(field) && field !== 'source' && hasMappingPermission(currentUser));
+  return (!isFunction(field) && !type.isDecorated() && !isReservedField(field) && hasMappingPermission(currentUser));
 };
 
 export const isChangeFieldTypeHidden = () => !AppConfig.isFeatureEnabled('field_types_management');
