@@ -41,14 +41,29 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: {
-  refreshConfigEnabled: boolean,
-  naturalInterval: React.ReactNode
-}) => {
-  const buttonText = refreshConfigEnabled ? <>Every {naturalInterval}</> : 'Not updating';
+const ButtonLabel = ({ refreshConfigEnabled }: { refreshConfigEnabled: boolean }) => {
+  const refreshConfig = useRefreshConfig();
+  const intervalDuration = moment.duration(refreshConfig.interval);
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return <>{buttonText}</>;
+  if (!refreshConfigEnabled) {
+    return <>Not updating</>;
+  }
+
+  const naturalInterval = intervalDuration.asSeconds() < 60
+    ? (
+      <span>{intervalDuration.asSeconds()} <Pluralize singular="second"
+                                                      plural="seconds"
+                                                      value={intervalDuration.asSeconds()} />
+      </span>
+    )
+    : (
+      <span>{intervalDuration.asMinutes()} <Pluralize singular="minute"
+                                                      plural="minutes"
+                                                      value={intervalDuration.asMinutes()} />
+      </span>
+    );
+
+  return <>Every {naturalInterval}</>;
 };
 
 const useDisableOnFormChange = () => {
@@ -71,7 +86,10 @@ const RefreshControls = () => {
   const sendTelemetry = useSendTelemetry();
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
 
-  const _onChange = (interval: number) => {
+  useEffect(() => () => RefreshActions.disable(), []);
+  useDisableOnFormChange();
+
+  const selectInterval = useCallback((interval: number) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
       app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
@@ -84,12 +102,9 @@ const RefreshControls = () => {
     if (dirty) {
       submitForm();
     }
-  };
+  }, [dirty, location.pathname, sendTelemetry, submitForm]);
 
-  useEffect(() => () => RefreshActions.disable(), []);
-  useDisableOnFormChange();
-
-  const _toggleEnable = useCallback(() => {
+  const toggleEnable = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
       app_pathname: 'search',
       app_section: 'search-bar',
@@ -108,33 +123,17 @@ const RefreshControls = () => {
     }
   }, [dirty, refreshConfig.enabled, sendTelemetry, submitForm]);
 
-  const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
-    <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>
-  ));
-  const intervalDuration = moment.duration(refreshConfig.interval);
-  const naturalInterval = intervalDuration.asSeconds() < 60
-    ? (
-      <span>{intervalDuration.asSeconds()} <Pluralize singular="second"
-                                                      plural="seconds"
-                                                      value={intervalDuration.asSeconds()} />
-      </span>
-    )
-    : (
-      <span>{intervalDuration.asMinutes()} <Pluralize singular="minute"
-                                                      plural="minutes"
-                                                      value={intervalDuration.asMinutes()} />
-      </span>
-    );
-
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
-      <Button onClick={_toggleEnable} title={refreshConfig.enabled ? 'Pause Refresh' : 'Start Refresh'}>
-        {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
+      <Button onClick={toggleEnable} title={refreshConfig.enabled ? 'Pause Refresh' : 'Start Refresh'}>
+        <Icon name={refreshConfig.enabled ? 'pause' : 'play'} />
       </Button>
 
-      <DropdownButton title={<ButtonLabel refreshConfigEnabled={refreshConfig.enabled} naturalInterval={naturalInterval} />}
+      <DropdownButton title={<ButtonLabel refreshConfigEnabled={refreshConfig.enabled} />}
                       id="refresh-options-dropdown">
-        {intervalOptions}
+        {Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
+          <MenuItem key={`RefreshControls-${label}`} onClick={() => selectInterval(durationToMS(interval))}>{label}</MenuItem>
+        ))}
       </DropdownButton>
     </FlexibleButtonGroup>
   );
