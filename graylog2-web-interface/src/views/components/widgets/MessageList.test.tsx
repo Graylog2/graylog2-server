@@ -58,6 +58,8 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations'),
 }));
 
+jest.mock('views/hooks/useAutoRefresh');
+
 const searchTypeResults = {
   'search-type-id': {
     effectiveTimerange: mockEffectiveTimeRange,
@@ -78,7 +80,6 @@ jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/components/widgets/useCurrentSearchTypesResults');
 jest.mock('views/components/widgets/reexecuteSearchTypes');
 jest.mock('stores/useAppDispatch');
-jest.mock('views/hooks/useAutoRefresh');
 
 describe('MessageList', () => {
   const config = MessagesWidgetConfig.builder().fields([]).build();
@@ -100,7 +101,15 @@ describe('MessageList', () => {
     total: 1,
   };
 
-  beforeAll(loadViewsPlugin);
+  beforeAll(() => {
+    loadViewsPlugin();
+
+    asMock(useAutoRefresh).mockReturnValue({
+      refreshConfig: null,
+      startAutoRefresh: () => {},
+      stopAutoRefresh: () => {},
+    });
+  });
 
   afterAll(unloadViewsPlugin);
 

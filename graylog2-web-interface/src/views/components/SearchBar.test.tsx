@@ -58,6 +58,12 @@ jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('stores/useAppDispatch');
 
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
+
 const query = MockQuery.builder()
   .timerange({ type: 'relative', from: 300 })
   .query({ type: 'elasticsearch', query_string: '*' })

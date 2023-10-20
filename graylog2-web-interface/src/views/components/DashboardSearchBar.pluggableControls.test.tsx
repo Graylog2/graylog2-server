@@ -37,6 +37,12 @@ jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
+
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
   SearchConfigActions: {
