@@ -3943,9 +3943,9 @@
     "@types/react" "*"
 
 "@types/react-plotly.js@^2.5.2":
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/@types/react-plotly.js/-/react-plotly.js-2.6.1.tgz#243019c11f30c19179095df9080a70d35ec33af8"
-  integrity sha512-vFJZRCC2Pav0NdrFm0grPMm9+67ejGZZglDBWqo+J6VFbB4CAatjoNiowfardznuujaaoDNoZ4MSCFwYyVk4aA==
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@types/react-plotly.js/-/react-plotly.js-2.6.2.tgz#d304d011dd21239fc1545244d2b1d2f4dbce32df"
+  integrity sha512-lO4+4CibZI8uxmjp0TtJyc8Kp44Qd3dlmRg0GrOZuCU+uMpW4A5A2YTRNKk9d1zOdTOhtmWG5+e5mFQje8GDgA==
   dependencies:
     "@types/plotly.js" "*"
     "@types/react" "*"
