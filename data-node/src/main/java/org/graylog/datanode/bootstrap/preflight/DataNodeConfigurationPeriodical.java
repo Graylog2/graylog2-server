@@ -43,6 +43,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.Optional;
 
@@ -71,7 +72,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                                            final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
                                            final SmartKeystoreStorage keystoreStorage,
                                            final @Named("password_secret") String passwordSecret,
-                                           final DatanodeConfiguration datanodeConfiguration) {
+                                           final DatanodeConfiguration datanodeConfiguration) throws IOException {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -81,7 +82,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
         this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
         this.keystoreStorage = keystoreStorage;
         // TODO: merge with real storage
-        this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(datanodeConfiguration.datanodeDirectories().getConfigurationTargetDir().resolve("privateKey.cert"));
+        this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(datanodeConfiguration.datanodeDirectories().createConfigurationFile(Path.of("privateKey.cert")));
         this.passwordSecret = passwordSecret.toCharArray();
     }
 

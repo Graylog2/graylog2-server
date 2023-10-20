@@ -18,6 +18,7 @@ package org.graylog.datanode.configuration;
 
 import org.graylog.datanode.Configuration;
 import org.graylog2.plugin.system.NodeId;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,12 +106,24 @@ public class DatanodeDirectories {
     /**
      * This directory is used by us to store all runtime-generated configuration of datanode. This
      * could be truststores, private keys, certificates and other generated config files.
-     *
      * We also synchronize and generate opensearch configuration into a subdir of this dir, see {@link #getOpensearchProcessConfigurationDir()}
      * Read-write permissions required.
      */
     public Path getConfigurationTargetDir() {
         return resolveNodeSubdir(configurationTargetDir);
+    }
+
+    public Path createConfigurationFile(Path relativePath) throws IOException {
+        final Path resolvedPath = getConfigurationTargetDir().resolve(relativePath);
+        return createRestrictedAccessFile(resolvedPath);
+    }
+
+    @NotNull
+    private static Path createRestrictedAccessFile(Path resolvedPath) throws IOException {
+        Files.deleteIfExists(resolvedPath);
+        final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
+        final FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
+        return Files.createFile(resolvedPath, fileAttributes);
     }
 
     /**
@@ -133,10 +146,7 @@ public class DatanodeDirectories {
 
     public Path createOpensearchProcessConfigurationFile(Path relativePath) throws IOException {
         final Path resolvedPath = getOpensearchProcessConfigurationDir().resolve(relativePath);
-        Files.deleteIfExists(resolvedPath);
-        final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
-        final FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
-        return Files.createFile(resolvedPath, fileAttributes);
+        return createRestrictedAccessFile(resolvedPath);
     }
 
 
