@@ -32,6 +32,7 @@ import useViewTitle from 'views/hooks/useViewTitle';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import useCreateSearch from 'views/hooks/useCreateSearch';
 
 type SearchComponentSlots = { InfoBarSlot: React.ComponentType }
 
@@ -72,6 +73,8 @@ const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewV
   }
 
   const { view, executionState } = result;
+
+  console.log({ view, executionState });
 
   return view
     ? (

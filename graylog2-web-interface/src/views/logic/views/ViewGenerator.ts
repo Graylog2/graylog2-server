@@ -16,7 +16,6 @@
  */
 import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import type Parameter from 'views/logic/parameters/Parameter';
 
 import View from './View';
 import ViewStateGenerator from './ViewStateGenerator';
@@ -30,18 +29,15 @@ export default async ({
   streamId,
   timeRange,
   queryString,
-  parameters,
 }: {
   type: ViewType,
   streamId?: string | string[],
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
-  parameters?: Array<Parameter>,
 },
 ) => {
   const query = QueryGenerator(streamId, undefined, timeRange, queryString);
-  const search = Search.create().toBuilder().queries([query]).parameters(parameters)
-    .build();
+  const search = Search.create().toBuilder().queries([query]).build();
   const viewState = await ViewStateGenerator(type, streamId);
 
   const view = View.create()
