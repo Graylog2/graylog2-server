@@ -40,6 +40,7 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
@@ -99,7 +100,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             if(localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
             } else if(isPreflight()) {
-                final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).toList());
+                final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).collect(Collectors.toSet()));
                 opensearchProperties.put("cluster.initial_master_nodes", nodeList);
             }
             opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
@@ -133,7 +134,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        localConfiguration.getOpensearchNetworkHostHost().ifPresent(
+        localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
         config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
