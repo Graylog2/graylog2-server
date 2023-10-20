@@ -74,11 +74,11 @@ const ViewEventDefinitionPage = () => {
   }, [currentUser, history, params]);
 
   const handleDuplicateEvent = () => {
-    EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, {
-        app_pathname: 'event-definition',
-      });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, {
+      app_pathname: 'event-definition',
+    });
 
+    EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent) => {
       navigate(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
     });
   };

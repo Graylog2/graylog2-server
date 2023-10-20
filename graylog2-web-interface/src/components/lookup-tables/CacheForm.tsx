@@ -30,9 +30,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type TitleProps = {
-    title: string,
-    typeName: string,
-    create: boolean,
+  title: string,
+  typeName: string,
+  create: boolean,
 };
 
 const Title = ({ title, typeName, create }: TitleProps) => {

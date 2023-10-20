@@ -39,26 +39,26 @@ class CollectorListContainer extends React.Component {
   handleClone = (collector, name, callback) => {
     const { sendTelemetry } = this.props;
 
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_CLONED, {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
+    });
+
     CollectorsActions.copy(collector, name)
       .then(() => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_CLONED, {
-          app_pathname: 'sidecars',
-          app_section: 'configuration',
-        });
-
         callback();
       });
   };
 
-  handleDelete = (collector) => {
+  handleDelete = async (collector) => {
     const { sendTelemetry } = this.props;
 
-    CollectorsActions.delete(collector).then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_DELETED, {
-        app_pathname: 'sidecars',
-        app_section: 'configuration',
-      });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_DELETED, {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
     });
+
+    await CollectorsActions.delete(collector);
   };
 
   handlePageChange = (page, pageSize) => {

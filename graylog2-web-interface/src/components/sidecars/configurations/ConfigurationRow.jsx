@@ -43,17 +43,17 @@ class ConfigurationRow extends React.Component {
     sendTelemetry: () => {},
   };
 
-  _handleDelete = () => {
-    const { configuration, onDelete } = this.props;
+  _handleDelete = async () => {
+    const { configuration, onDelete, sendTelemetry } = this.props;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_DELETED, {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
+    });
 
     // eslint-disable-next-line no-alert
     if (window.confirm(`You are about to delete configuration "${configuration.name}". Are you sure?`)) {
-      onDelete(configuration).then(() => {
-        this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_DELETED, {
-          app_pathname: 'sidecars',
-          app_section: 'configuration',
-        });
-      });
+      await onDelete(configuration);
     }
   };
 

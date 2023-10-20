@@ -32,7 +32,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-    cache: LookupTableCache,
+  cache: LookupTableCache,
 };
 
 const Actions = styled(ButtonToolbar)`

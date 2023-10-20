@@ -55,13 +55,13 @@ class ConfigurationListContainer extends React.Component {
   handleClone = (configuration, name, callback) => {
     const { sendTelemetry } = this.props;
 
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_CLONED, {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
+    });
+
     CollectorConfigurationsActions.copyConfiguration(configuration, name)
       .then((response) => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_CLONED, {
-          app_pathname: 'sidecars',
-          app_section: 'configuration',
-        });
-
         callback();
 
         return response;

@@ -216,6 +216,14 @@ class DataAdapterForm extends React.Component {
     const { dataAdapter } = this.state;
     const { create, saved, sendTelemetry } = this.props;
 
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
+      app_pathname: 'lut',
+      app_section: 'lut_data_adapter',
+      event_details: {
+        type: dataAdapter?.config?.type,
+      },
+    });
+
     let promise;
 
     if (create) {
@@ -225,14 +233,6 @@ class DataAdapterForm extends React.Component {
     }
 
     promise.then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
-        app_pathname: 'lut',
-        app_section: 'lut_data_adapter',
-        event_details: {
-          type: dataAdapter?.config?.type,
-        },
-      });
-
       saved();
     });
   };

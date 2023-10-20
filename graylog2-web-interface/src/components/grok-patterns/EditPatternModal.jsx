@@ -99,16 +99,16 @@ class EditPatternModal extends React.Component {
   _saved = () => {
     const { create, sendTelemetry } = this.props;
 
+    sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN[create ? 'CREATED' : 'UPDATED'], {
+      app_pathname: 'grokpatterns',
+      app_section: 'grokpatterns',
+    });
+
     this._closeModal();
 
     if (create) {
       this.setState({ name: '', pattern: '', sampleData: '', test_result: '' });
     }
-
-    sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN[create ? 'CREATED' : 'UPDATED'], {
-      app_pathname: 'grokpatterns',
-      app_section: 'grokpatterns',
-    });
   };
 
   _save = () => {

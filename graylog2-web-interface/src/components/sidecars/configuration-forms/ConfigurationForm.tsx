@@ -90,7 +90,14 @@ const ConfigurationForm = ({
     });
   };
 
-  const _save = () => {
+  const _save = async () => {
+    const isCreate = action === 'create';
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`CONFIGURATION_${isCreate ? 'CREATED' : 'UPDATED'}`], {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
+    });
+
     if (_hasErrors()) {
       // Ensure we display an error on the template field, as this is not validated by the browser
       _validateFormData(formData, true);
@@ -98,7 +105,6 @@ const ConfigurationForm = ({
       return;
     }
 
-    const isCreate = action === 'create';
     let promise;
 
     if (isCreate) {
@@ -108,12 +114,7 @@ const ConfigurationForm = ({
       promise = CollectorConfigurationsActions.updateConfiguration(formData);
     }
 
-    promise.then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`CONFIGURATION_${isCreate ? 'CREATED' : 'UPDATED'}`], {
-        app_pathname: 'sidecars',
-        app_section: 'configuration',
-      });
-    });
+    await promise;
   };
 
   const _debouncedValidateFormData = debounce(_validateFormData, 200);

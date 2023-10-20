@@ -54,6 +54,11 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const handleDelete = React.useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
+      app_pathname: 'lut',
+      app_section: 'lut',
+    });
+
     // eslint-disable-next-line no-alert
     const shouldDelete = window.confirm(
       `Are you sure you want to delete lookup table "${table.title}"?`,
@@ -61,11 +66,6 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
 
     if (shouldDelete) {
       LookupTablesActions.delete(table.id).then(() => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
-          app_pathname: 'lut',
-          app_section: 'lut',
-        });
-
         LookupTablesActions.reloadPage();
       });
     }

@@ -54,14 +54,14 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
   }, [history, adapterName]);
 
   const _onDelete = React.useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DATA_ADAPTER_DELETED, {
+      app_pathname: 'lut',
+      app_section: 'lut_data_adapter',
+    });
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete data adapter "${adapterTitle}"?`)) {
       LookupTableDataAdaptersActions.delete(adapter.id).then(() => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DATA_ADAPTER_DELETED, {
-          app_pathname: 'lut',
-          app_section: 'lut_data_adapter',
-        });
-
         LookupTableDataAdaptersActions.reloadPage();
       });
     }

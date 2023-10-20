@@ -31,8 +31,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type LookupTableType = LookupTable & {
-    enable_single_value: boolean,
-    enable_multi_value: boolean,
+  enable_single_value: boolean,
+  enable_multi_value: boolean,
 }
 
 const INIT_TABLE_VALUES: LookupTableType = {
@@ -86,6 +86,11 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
   };
 
   const handleSubmit = (values: LookupTableType) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CREATED' : 'UPDATED'], {
+      app_pathname: 'lut',
+      app_section: 'lut',
+    });
+
     let promise: Promise<any>;
 
     const valuesToSave: LookupTable = _omit(values, ['enable_single_value', 'enable_multi_value']);
@@ -97,11 +102,6 @@ const LookupTableForm = ({ saved, create, table }: Props) => {
     }
 
     return promise.then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CREATED' : 'UPDATED'], {
-        app_pathname: 'lut',
-        app_section: 'lut',
-      });
-
       saved();
     });
   };
