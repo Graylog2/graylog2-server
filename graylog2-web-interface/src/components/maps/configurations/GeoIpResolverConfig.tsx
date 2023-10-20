@@ -80,7 +80,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       app_section: 'geolocation-processor',
     });
 
-    updateConfig(values)
+    return updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
           setShowModal(false);
