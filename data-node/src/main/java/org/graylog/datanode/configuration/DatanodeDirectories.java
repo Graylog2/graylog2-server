@@ -22,8 +22,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This is a collection of pointers to directories used to store data, logs and configuration of the managed opensearch.
@@ -40,8 +46,8 @@ public class DatanodeDirectories {
     private final Path configurationSourceDir;
     private final Path configurationTargetDir;
 
-    public DatanodeDirectories(String nodeName, Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
-        this.nodeId = nodeName;
+    public DatanodeDirectories(String nodeId, Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
+        this.nodeId = nodeId;
         this.dataTargetDir = dataTargetDir;
         this.logsTargetDir = logsTargetDir;
         this.configurationSourceDir = configurationSourceDir;
@@ -115,6 +121,24 @@ public class DatanodeDirectories {
     public Path getOpensearchProcessConfigurationDir() {
         return resolveNodeSubdir(configurationTargetDir).resolve("opensearch");
     }
+
+    public Path createOpensearchProcessConfigurationDir() throws IOException {
+        final Path dir = getOpensearchProcessConfigurationDir();
+        // TODO: should we always delete existing process configuration dir and recreate if here? IMHO yes
+        final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
+        final FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
+        Files.createDirectories(dir, fileAttributes);
+        return dir;
+    }
+
+    public Path createOpensearchProcessConfigurationFile(Path relativePath) throws IOException {
+        final Path resolvedPath = getOpensearchProcessConfigurationDir().resolve(relativePath);
+        Files.deleteIfExists(resolvedPath);
+        final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
+        final FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
+        return Files.createFile(resolvedPath, fileAttributes);
+    }
+
 
     private Path resolveNodeSubdir(Path path) {
         return path.resolve(nodeId).toAbsolutePath();

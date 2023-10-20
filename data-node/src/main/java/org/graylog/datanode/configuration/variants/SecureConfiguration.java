@@ -19,6 +19,7 @@ package org.graylog.datanode.configuration.variants;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 public sealed abstract class SecureConfiguration implements SecurityConfigurationVariant permits MongoCertSecureConfiguration, UploadedCertFilesSecureConfiguration {
@@ -29,27 +30,29 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
      * The target configuration is regenerated during each startup, so it could also be a random filename
      * as long as we use the same name as a copy-target and opensearch config property.
      */
-    private static final String TARGET_DATANODE_HTTP_KEYSTORE_FILENAME = "http-keystore.p12";
+    private static final Path TARGET_DATANODE_HTTP_KEYSTORE_FILENAME = Path.of("http-keystore.p12");
     /**
      * This filename is used only internally - we copy user-provided certificates to this location and
      * we configure opensearch to read this file. It doesn't have to match naming provided by user.
      * The target configuration is regenerated during each startup, so it could also be a random filename
      * as long as we use the same name as a copy-target and opensearch config property.
      */
-    private static final String TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME = "transport-keystore.p12";
+    private static final Path TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME = Path.of("transport-keystore.p12");
 
-    private final Path opensearchProcessConfigurationDir;
+    private final DatanodeConfiguration datanodeConfiguration;
 
-    public SecureConfiguration(final DatanodeConfiguration localConfiguration) {
-        this.opensearchProcessConfigurationDir = localConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir();
+    public SecureConfiguration(final DatanodeConfiguration datanodeConfiguration) {
+        this.datanodeConfiguration = datanodeConfiguration;
     }
 
-    KeystoreFileLocation getHttpKeystoreLocation() {
-        return new KeystoreFileLocation(opensearchProcessConfigurationDir.resolve(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME));
+    KeystoreFileLocation getHttpKeystoreLocation() throws IOException {
+        final Path filePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME);
+        return new KeystoreFileLocation(filePath);
     }
 
 
-    KeystoreFileLocation getTransportKeystoreLocation() {
-        return new KeystoreFileLocation(opensearchProcessConfigurationDir.resolve(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME));
+    KeystoreFileLocation getTransportKeystoreLocation() throws IOException {
+        final Path filePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME);
+        return new KeystoreFileLocation(filePath);
     }
 }
