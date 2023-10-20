@@ -135,8 +135,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         localConfiguration.getOpensearchNetworkHostHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
-        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
+        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
+        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
 
         config.put("network.bind_host", localConfiguration.getBindAddress());
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
