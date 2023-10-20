@@ -113,7 +113,7 @@ describe('ShowDashboardInBigDisplayMode', () => {
     await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledWith(20000));
   });
 
-  it('not change RefreshActions when query refresh param did not changed', async () => {
+  it('not change auto refresh when query refresh param did not changed', async () => {
     const startAutoRefresh = jest.fn();
 
     asMock(useAutoRefresh).mockReturnValue({
