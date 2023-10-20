@@ -34,7 +34,7 @@ const useMinimumRefreshInterval = () => {
     },
   );
 
-  return { data, isInitialLoading };
+  return { data: data?.value, isInitialLoading };
 };
 
 export default useMinimumRefreshInterval;
