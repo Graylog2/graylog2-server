@@ -28,7 +28,7 @@ const useMinimumRefreshInterval = () => {
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading system configuration "minimum_auto_refresh_interval" failed with status: ${errorThrown}`,
-          'Could not load streams');
+          'Could not configuration option');
       },
       keepPreviousData: true,
     },
