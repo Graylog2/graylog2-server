@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.configuration.variants;
 
-import org.apache.commons.lang.StringUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
@@ -68,27 +67,31 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
 
         List<String> errors = new LinkedList<>();
 
-        if(StringUtils.isBlank(datanodeTransportCertificatePassword)) {
-            errors.add(TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY  + " required. Please configure password to your transport certificates keystore.");
+        if (isBlank(datanodeTransportCertificatePassword)) {
+            errors.add(TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY + " required. Please configure password to your transport certificates keystore.");
         }
 
-        if(!fileExists(uploadedTransportKeystoreFileName)) {
+        if (!fileExists(uploadedTransportKeystoreFileName)) {
             errors.add("transport_certificate required. Please provide a path to a certificate file in your configuration.");
         }
 
-        if(StringUtils.isBlank(datanodeHttpCertificatePassword)) {
-            errors.add(HTTP_CERTIFICATE_PASSWORD_PROPERTY  + " required. Please configure password to your http certificates keystore.");
+        if (isBlank(datanodeHttpCertificatePassword)) {
+            errors.add(HTTP_CERTIFICATE_PASSWORD_PROPERTY + " required. Please configure password to your http certificates keystore.");
         }
 
-        if(!fileExists(uploadedHttpKeystoreFileName)) {
+        if (!fileExists(uploadedHttpKeystoreFileName)) {
             errors.add("http_certificate required. Please provide a path to a certificate file in your configuration.");
         }
 
-        if(!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             throw new OpensearchConfigurationException("Configuration incomplete, check the following settings: " + String.join(", ", errors));
         }
 
         return true;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     private boolean fileExists(String filename) {
@@ -103,10 +106,10 @@ public final class UploadedCertFilesSecureConfiguration extends SecureConfigurat
      * lead to an exception, it's a mismatched configuration and would cause problems in the future.
      */
     private boolean noneOfRequiredConfigOptionsProvided() {
-        return StringUtils.isBlank(datanodeTransportCertificatePassword) &&
-                StringUtils.isBlank(datanodeHttpCertificatePassword) &&
-                StringUtils.isBlank(uploadedHttpKeystoreFileName) &&
-                StringUtils.isBlank(uploadedTransportKeystoreFileName);
+        return isBlank(datanodeTransportCertificatePassword) &&
+                isBlank(datanodeHttpCertificatePassword) &&
+                isBlank(uploadedHttpKeystoreFileName) &&
+                isBlank(uploadedTransportKeystoreFileName);
     }
 
     @Override
