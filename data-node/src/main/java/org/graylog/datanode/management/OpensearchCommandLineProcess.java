@@ -17,6 +17,7 @@
 package org.graylog.datanode.management;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.process.OpensearchConfiguration;
@@ -29,9 +30,13 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -82,15 +87,15 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
         try {
-            Map<String,Object> jsonMap;
-            final var originalConfig = config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(ORIGINAL_CONFIG);
-            if(Files.exists(originalConfig)) {
-                jsonMap = mapper.readValue(originalConfig.toFile(), Map.class);
-            } else {
-                jsonMap = new HashMap<>();
+            final var originalConfigFile = config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(ORIGINAL_CONFIG);
+            final var configFile = config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(CONFIG);
+            if(Files.exists(originalConfigFile)) {
+                Files.copy(originalConfigFile, configFile, StandardCopyOption.REPLACE_EXISTING);
             }
-            getOpensearchConfigurationArguments(config).entrySet().stream().forEach(it -> jsonMap.put(it.getKey(), it.getValue()));
-            mapper.writeValue(config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(CONFIG).toFile(), jsonMap);
+            var jsonAsString = new StringWriter();
+            jsonAsString.write("\n");
+            mapper.writeValue(jsonAsString, getOpensearchConfigurationArguments(config));
+            Files.write(configFile, jsonAsString.toString().getBytes(Charset.defaultCharset()),  StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
         }
