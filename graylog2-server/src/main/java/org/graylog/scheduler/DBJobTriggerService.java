@@ -419,7 +419,6 @@ public class DBJobTriggerService {
         }
         trigger.triggeredAt().ifPresent(triggeredAt -> {
             var duration = new org.joda.time.Duration(triggeredAt, DateTime.now(DateTimeZone.UTC));
-            var executionDuration = java.time.Duration.ofMillis(duration.getMillis());
             update.set(FIELD_LAST_EXECUTION_TIME, Optional.of(duration.getMillis()));
         });
 
