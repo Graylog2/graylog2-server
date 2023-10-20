@@ -37,6 +37,7 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,10 +171,12 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                 .collect(Collectors.toSet());
     }
 
+    @SuppressForbidden("Deliberate use of InetAddress#getHostName")
     private String reverseLookup(String ipAddress) {
         try {
             final var inetAddress = InetAddress.getByName(ipAddress);
-            return inetAddress.getHostName();
+            final var reverseLookup = inetAddress.getHostName();
+            return reverseLookup.equals(ipAddress) ? null : reverseLookup;
         } catch (Exception e) {
             return null;
         }
