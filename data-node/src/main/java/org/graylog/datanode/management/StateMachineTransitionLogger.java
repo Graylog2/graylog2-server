@@ -33,6 +33,8 @@ public class StateMachineTransitionLogger implements StateMachineTracer {
 
     @Override
     public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
-        LOG.debug("Triggered {}, source state: {}, destination: {}", trigger, source, destination);
+        if (!source.equals(destination)) {
+            LOG.debug("Triggered {}, source state: {}, destination: {}", trigger, source, destination);
+        }
     }
 }
