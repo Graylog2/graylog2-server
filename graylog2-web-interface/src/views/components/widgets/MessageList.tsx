@@ -140,7 +140,7 @@ const MessageList = ({
         currentPage: pageNo,
       });
     });
-  }, [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState]);
+  }, [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState, stopAutoRefresh]);
 
   const onSortChange = useCallback((newSort: SortConfig[]) => {
     const newConfig = config.toBuilder().sort(newSort).build();
