@@ -95,19 +95,21 @@ public class DataNodeConfigurationPeriodical extends Periodical {
     public void doRun() {
         LOG.debug("checking if this DataNode is supposed to take configuration steps.");
         var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId());
-        if (cfg == null) {
+        if (cfg.isEmpty()) {
             // write default config if none exists for this node
             writeInitialProvisioningConfig();
             return;
         }
-        switch (cfg.state()) {
-            case CONFIGURED -> {
-                writeCsr(cfg);
+        cfg.ifPresent(c -> {
+            final var state = c.state();
+            if (state == null) {
+                return;
             }
-            case SIGNED -> {
-                readSignedCertificate(cfg);
+            switch (state) {
+                case CONFIGURED -> writeCsr(c);
+                case SIGNED -> readSignedCertificate(c);
             }
-        }
+        });
     }
 
     private void readSignedCertificate(DataNodeProvisioningConfig cfg) {
@@ -150,7 +152,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
             LOG.info("created CSR for this node");
         } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
             LOG.error("error generating a CSR: " + ex.getMessage(), ex);
-            dataNodeProvisioningService.save(cfg.toBuilder().state(DataNodeProvisioningConfig.State.ERROR).errorMsg(ex.getMessage()).build());
+            dataNodeProvisioningService.save(cfg.asError(ex.getMessage()));
         }
     }
 

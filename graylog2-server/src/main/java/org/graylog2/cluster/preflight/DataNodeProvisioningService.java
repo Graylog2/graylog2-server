@@ -21,7 +21,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface DataNodeProvisioningService {
-    DataNodeProvisioningConfig getPreflightConfigFor(String nodeId);
+    Optional<DataNodeProvisioningConfig> getPreflightConfigFor(String nodeId);
+
     List<DataNodeProvisioningConfig> findAllNodesThatNeedAttention();
 
     void writeCsr(String nodeId, String csr);
