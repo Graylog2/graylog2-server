@@ -59,11 +59,8 @@ public record OpensearchConfiguration(
         if (clusterName != null && !clusterName.isBlank()) {
             config.put("cluster.name", clusterName);
         }
-        if (nodeName != null && !nodeName.isBlank()) {
-            config.put("node.name", nodeName);
-        } else {
-            config.put("node.name", hostname);
-        }
+
+        config.put("node.name", nodeName);
 
         if (nodeRoles != null && !nodeRoles.isEmpty()) {
             config.put("node.roles", toValuesList(nodeRoles));
