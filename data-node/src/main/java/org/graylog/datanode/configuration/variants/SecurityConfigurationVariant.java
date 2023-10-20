@@ -17,6 +17,7 @@
 package org.graylog.datanode.configuration.variants;
 
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ import java.security.GeneralSecurityException;
 
 public interface SecurityConfigurationVariant {
 
-    boolean checkPrerequisites(final Configuration localConfiguration);
+    boolean isConfigured(final Configuration localConfiguration) throws OpensearchConfigurationException;
 
     OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException;
 }
