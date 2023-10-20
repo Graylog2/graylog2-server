@@ -20,12 +20,13 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 
 import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext';
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
+import useAppDispatch from 'stores/useAppDispatch';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
 
-type Props = React.PropsWithChildren<{
-  onRefresh: () => void
-}>
+const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
+  const dispatch = useAppDispatch();
+  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
 
-const AutoRefreshProvider = ({ children, onRefresh }: Props) => {
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
   const startAutoRefresh = useCallback((interval: number) => setRefreshConfig({ enabled: true, interval }), []);
   const stopAutoRefresh = useCallback(() => setRefreshConfig((cur) => ({ ...cur, enabled: false })), []);
@@ -37,11 +38,11 @@ const AutoRefreshProvider = ({ children, onRefresh }: Props) => {
 
   useEffect(() => {
     const refreshInterval = refreshConfig?.enabled
-      ? setInterval(() => onRefresh(), refreshConfig.interval)
+      ? setInterval(() => refreshSearch(), refreshConfig.interval)
       : null;
 
     return () => clearInterval(refreshInterval);
-  }, [onRefresh, refreshConfig?.enabled, refreshConfig?.interval]);
+  }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval]);
 
   return (
     <AutoRefreshContext.Provider value={contextValue}>

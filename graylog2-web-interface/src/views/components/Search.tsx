@@ -51,7 +51,6 @@ import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
-import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
@@ -134,7 +133,7 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
   }, []);
 
   return (
-    <AutoRefreshProvider onRefresh={refreshSearch}>
+    <>
       <SynchronizeUrl />
       <ExternalValueActionsProvider>
         <WidgetFocusProvider>
@@ -198,7 +197,7 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
           </WidgetFocusContext.Consumer>
         </WidgetFocusProvider>
       </ExternalValueActionsProvider>
-    </AutoRefreshProvider>
+    </>
   );
 };
 

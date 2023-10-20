@@ -25,7 +25,6 @@ import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
@@ -37,6 +36,7 @@ import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes'
 import type { SearchErrorResponse } from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
@@ -74,17 +74,11 @@ const dummySearchJobResults = {
   search_id: 'bar',
   results: {},
 };
-
-jest.mock('views/stores/RefreshStore', () => ({
-  RefreshActions: {
-    disable: jest.fn(),
-  },
-}));
-
 jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/components/widgets/useCurrentSearchTypesResults');
 jest.mock('views/components/widgets/reexecuteSearchTypes');
 jest.mock('stores/useAppDispatch');
+jest.mock('views/hooks/useAutoRefresh');
 
 describe('MessageList', () => {
   const config = MessagesWidgetConfig.builder().fields([]).build();
@@ -213,6 +207,14 @@ describe('MessageList', () => {
   });
 
   it('disables refresh actions, when using pagination', async () => {
+    const stopAutoRefresh = jest.fn();
+
+    asMock(useAutoRefresh).mockReturnValue({
+      refreshConfig: null,
+      startAutoRefresh: () => {},
+      stopAutoRefresh,
+    });
+
     const dispatch = jest.fn().mockResolvedValue(finishedLoading({
       result: new SearchResult(dummySearchJobResults),
       widgetMapping: Immutable.Map(),
@@ -224,7 +226,7 @@ describe('MessageList', () => {
 
     clickNextPageButton();
 
-    await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(stopAutoRefresh).toHaveBeenCalledTimes(1));
   });
 
   it('displays error description, when using pagination throws an error', async () => {

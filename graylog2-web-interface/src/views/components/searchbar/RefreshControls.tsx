@@ -19,19 +19,16 @@ import { useCallback, useEffect } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
-import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
 import { Icon, Pluralize, Spinner, HoverForHelp } from 'components/common';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId, qualifyUrl } from 'util/URLUtils';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import UserNotification from 'preflight/util/UserNotification';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -70,33 +67,17 @@ const ButtonLabel = () => {
 };
 
 const useDisableOnFormChange = () => {
-  const { refreshConfig } = useAutoRefresh();
+  const { refreshConfig, stopAutoRefresh } = useAutoRefresh();
   const { dirty, isSubmitting } = useFormikContext();
 
   useEffect(() => {
     if (refreshConfig?.enabled && !isSubmitting && dirty) {
-      RefreshActions.disable();
+      stopAutoRefresh();
     }
-  }, [dirty, isSubmitting, refreshConfig?.enabled]);
+  }, [dirty, isSubmitting, refreshConfig?.enabled, stopAutoRefresh]);
 };
 
 const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
-
-const useMinimumRefreshInterval = () => {
-  const { data, isInitialLoading } = useQuery(
-    ['system', 'configuration', 'minimum-refresh-interval'],
-    () => fetch('GET', qualifyUrl('/system/configuration/minimum_auto_refresh_interval')),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading system configuration "minimum_auto_refresh_interval" failed with status: ${errorThrown}`,
-          'Could not load streams');
-      },
-      keepPreviousData: true,
-    },
-  );
-
-  return { data, isInitialLoading };
-};
 
 const useDefaultInterval = () => {
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions, default_auto_refresh_option: defaultAutoRefreshInterval } } = useSearchConfiguration();
