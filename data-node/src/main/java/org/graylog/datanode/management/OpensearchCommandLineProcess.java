@@ -49,7 +49,6 @@ public class OpensearchCommandLineProcess implements Closeable {
     private final CommandLineProcess commandLineProcess;
     private final CommandLineProcessListener resultHandler;
     private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-    private static final String ORIGINAL_CONFIG = "opensearch.orig.yml";
     private static final String CONFIG = "opensearch.yml";
 
     /**
@@ -87,15 +86,9 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
         try {
-            final var originalConfigFile = config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(ORIGINAL_CONFIG);
             final var configFile = config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(CONFIG);
-            if(Files.exists(originalConfigFile)) {
-                Files.copy(originalConfigFile, configFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-            var jsonAsString = new StringWriter();
-            jsonAsString.write("\n");
-            mapper.writeValue(jsonAsString, getOpensearchConfigurationArguments(config));
-            Files.write(configFile, jsonAsString.toString().getBytes(Charset.defaultCharset()),  StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            Files.deleteIfExists(configFile);
+            mapper.writeValue(configFile.toFile(), getOpensearchConfigurationArguments(config));
         } catch (IOException e) {
             throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
         }
