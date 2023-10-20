@@ -3619,10 +3619,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/create-react-class@15.6.4":
-  version "15.6.4"
-  resolved "https://registry.yarnpkg.com/@types/create-react-class/-/create-react-class-15.6.4.tgz#88642058525c17460e2cb2450edc231c18d85729"
-  integrity sha512-t2OF0DsDBCI2e8Omsl4RFEJnXmzKOPkX3HdOyTwYXnqgFimSDbHkPnhHUfw6KjhfDYRspQxbXooptBmbYY22ow==
+"@types/create-react-class@15.6.5":
+  version "15.6.5"
+  resolved "https://registry.yarnpkg.com/@types/create-react-class/-/create-react-class-15.6.5.tgz#e32a3e7069d578b5835654b97d8bc2d8e130dcca"
+  integrity sha512-siVnXy7YQaOCf52+WjIBI7y1LcZaTZnyq8d3BwMdoUboiiSsL29C/XRAs/Y5rUkkbqYgZSNU6CX4rqM8CEyIqQ==
   dependencies:
     "@types/react" "*"
 
@@ -3646,10 +3646,10 @@
     "@types/cheerio" "*"
     "@types/react" "^16"
 
-"@types/enzyme@3.10.14":
-  version "3.10.14"
-  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.14.tgz#dc30e3820a6331e8165be442cc778f25457ec44d"
-  integrity sha512-JeTG2MNUX1bH2DqccwUe3SuPoLu+kUz5UgR3Tvl9nBdfNj7rBZscytctSjEatd5Ul9GXXGKaQBaxODIgJYVRqA==
+"@types/enzyme@3.10.15":
+  version "3.10.15"
+  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.15.tgz#56d1167bb11a2c3f65af790de0cbb0e990b21489"
+  integrity sha512-Tdm2XXW7TfyKhb/ddSLMpj8W0UgxbCOOauFNeLJH7+KzsfOBrHF6XPctw11SwGoOPyUglYQpvMoQNFXOF0uTwg==
   dependencies:
     "@types/cheerio" "*"
     "@types/react" "^16"
@@ -3796,10 +3796,10 @@
     expect "^29.0.0"
     pretty-format "^29.0.0"
 
-"@types/jquery@3.5.22":
-  version "3.5.22"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.22.tgz#893273736f5695a520986c019c873b75b157f26a"
-  integrity sha512-ISQFeUK5GwRftLK4PVvKTWEVCxZ2BpaqBz0TWkIq5w4vGojxZP9+XkqgcPjxoqmPeew+HLyWthCBvK7GdF5NYA==
+"@types/jquery@3.5.24":
+  version "3.5.24"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.24.tgz#5b4d42654c4882a177d15ce755caf547bc2317c1"
+  integrity sha512-V/TG69ge5amcr8Ap7vY3SObqKfZlV7ttqcYnNcYnndI77ySIRi05+3GjvfwRtE2qalAC2ySLIL1ker512sI20g==
   dependencies:
     "@types/sizzle" "*"
 
@@ -7593,7 +7593,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.7"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-9c294420-1a46-4ce8-8617-25f62de524ea-1697760879099/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.4.2"
     eslint-plugin-jest-dom "5.1.0"
@@ -9009,16 +9009,16 @@ graphemer@^1.4.0:
   dependencies:
     "@graylog/sawmill" "2.0.7"
     "@tanstack/react-query" "4.36.1"
-    "@types/create-react-class" "15.6.4"
-    "@types/jquery" "3.5.22"
+    "@types/create-react-class" "15.6.5"
+    "@types/jquery" "3.5.24"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-3fc1f1cb-5130-47d1-a350-7317e550cd63-1697760878518/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-3fc1f1cb-5130-47d1-a350-7317e550cd63-1697760878518/node_modules/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.2.0-SNAPSHOT-3fc1f1cb-5130-47d1-a350-7317e550cd63-1697760878518/node_modules/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -10588,7 +10588,7 @@ jest-pnp-resolver@^1.2.2:
     "@testing-library/react" "12.1.5"
     "@testing-library/react-hooks" "^8.0.0"
     "@testing-library/user-event" "^13.5.0"
-    "@types/enzyme" "3.10.14"
+    "@types/enzyme" "3.10.15"
     "@types/jest" "29.5.5"
     babel-jest "29.6.2"
     enzyme "3.11.0"
@@ -15057,25 +15057,20 @@ styled-components@6.0.9:
     postcss-syntax "0.36.2"
     stylelint "15.11.0"
     stylelint-config-recommended "13.0.0"
-    stylelint-config-standard "29.0.0"
+    stylelint-config-standard "34.0.0"
     stylelint-config-styled-components "0.1.1"
 
-stylelint-config-recommended@13.0.0:
+stylelint-config-recommended@13.0.0, stylelint-config-recommended@^13.0.0:
   version "13.0.0"
   resolved "https://registry.yarnpkg.com/stylelint-config-recommended/-/stylelint-config-recommended-13.0.0.tgz#c48a358cc46b629ea01f22db60b351f703e00597"
   integrity sha512-EH+yRj6h3GAe/fRiyaoO2F9l9Tgg50AOFhaszyfov9v6ayXJ1IkSHwTxd7lB48FmOeSGDPLjatjO11fJpmarkQ==
 
-stylelint-config-recommended@^9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-recommended/-/stylelint-config-recommended-9.0.0.tgz#1c9e07536a8cd875405f8ecef7314916d94e7e40"
-  integrity sha512-9YQSrJq4NvvRuTbzDsWX3rrFOzOlYBmZP+o513BJN/yfEmGSr0AxdvrWs0P/ilSpVV/wisamAHu5XSk8Rcf4CQ==
-
-stylelint-config-standard@29.0.0:
-  version "29.0.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-standard/-/stylelint-config-standard-29.0.0.tgz#4cc0e0f05512a39bb8b8e97853247d3a95d66fa2"
-  integrity sha512-uy8tZLbfq6ZrXy4JKu3W+7lYLgRQBxYTUUB88vPgQ+ZzAxdrvcaSUW9hOMNLYBnwH+9Kkj19M2DHdZ4gKwI7tg==
+stylelint-config-standard@34.0.0:
+  version "34.0.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-standard/-/stylelint-config-standard-34.0.0.tgz#309f3c48118a02aae262230c174282e40e766cf4"
+  integrity sha512-u0VSZnVyW9VSryBG2LSO+OQTjN7zF9XJaAJRX/4EwkmU0R2jYwmBSN10acqZisDitS0CLiEiGjX7+Hrq8TAhfQ==
   dependencies:
-    stylelint-config-recommended "^9.0.0"
+    stylelint-config-recommended "^13.0.0"
 
 stylelint-config-styled-components@0.1.1:
   version "0.1.1"
