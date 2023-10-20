@@ -19,16 +19,19 @@ import { useCallback, useEffect } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { useQuery } from '@tanstack/react-query';
 
+import fetch from 'logic/rest/FetchProvider';
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
-import { Icon, Pluralize } from 'components/common';
+import { Icon, Pluralize, Spinner } from 'components/common';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
+import { getPathnameWithoutId, qualifyUrl } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import UserNotification from 'preflight/util/UserNotification';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -41,11 +44,15 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = ({ refreshConfigEnabled }: { refreshConfigEnabled: boolean }) => {
+const Warning = styled.li`
+  padding: 3px;
+`;
+
+const ButtonLabel = () => {
   const refreshConfig = useRefreshConfig();
   const intervalDuration = moment.duration(refreshConfig.interval);
 
-  if (!refreshConfigEnabled) {
+  if (!refreshConfig.enabled) {
     return <>Not updating</>;
   }
 
@@ -79,12 +86,35 @@ const useDisableOnFormChange = () => {
 
 const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
+const useMinimumRefreshInterval = () => {
+  const { data, isInitialLoading } = useQuery(
+    ['system', 'configuration', 'minimum-refresh-interval'],
+    () => fetch('GET', qualifyUrl('/system/configuration/minimum_auto_refresh_interval')),
+    {
+      onError: (errorThrown) => {
+        UserNotification.error(`Loading system configuration "minimum_auto_refresh_interval" failed with status: ${errorThrown}`,
+          'Could not load streams');
+      },
+      keepPreviousData: true,
+    },
+  );
+
+  return { data, isInitialLoading };
+};
+
 const RefreshControls = () => {
   const { dirty, submitForm } = useFormikContext();
   const refreshConfig = useRefreshConfig();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
+  const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimunRefreshInterval } = useMinimumRefreshInterval();
+
+  const allIntervalOptions = Object.entries(autoRefreshTimerangeOptions);
+  const availableIntervalOptions = isLoadingMinimunRefreshInterval ? [] : allIntervalOptions.filter(([interval]) => (
+    durationToMS(interval) >= durationToMS(minimumRefreshInterval)
+  ));
+  const allOptionsAreBelowMinimum = !isLoadingMinimunRefreshInterval && !!allIntervalOptions?.length && !availableIntervalOptions.length;
 
   useEffect(() => () => RefreshActions.disable(), []);
   useDisableOnFormChange();
@@ -105,6 +135,12 @@ const RefreshControls = () => {
   }, [dirty, location.pathname, sendTelemetry, submitForm]);
 
   const toggleEnable = useCallback(() => {
+    if (allOptionsAreBelowMinimum) {
+      window.alert(`All configured options are below the configured minimum of "${minimumRefreshInterval}".`);
+
+      return;
+    }
+
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
       app_pathname: 'search',
       app_section: 'search-bar',
@@ -121,7 +157,7 @@ const RefreshControls = () => {
 
       RefreshActions.enable();
     }
-  }, [dirty, refreshConfig.enabled, sendTelemetry, submitForm]);
+  }, [allOptionsAreBelowMinimum, dirty, minimumRefreshInterval, refreshConfig.enabled, sendTelemetry, submitForm]);
 
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
@@ -129,9 +165,13 @@ const RefreshControls = () => {
         <Icon name={refreshConfig.enabled ? 'pause' : 'play'} />
       </Button>
 
-      <DropdownButton title={<ButtonLabel refreshConfigEnabled={refreshConfig.enabled} />}
+      <DropdownButton title={<ButtonLabel />}
                       id="refresh-options-dropdown">
-        {Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
+        {isLoadingMinimunRefreshInterval && <Spinner />}
+        {allOptionsAreBelowMinimum && (
+          <Warning>All configured intervals are below the minimum of &ldquo;{minimumRefreshInterval}&rdquo;.</Warning>
+        )}
+        {availableIntervalOptions.map(([interval, label]) => (
           <MenuItem key={`RefreshControls-${label}`} onClick={() => selectInterval(durationToMS(interval))}>{label}</MenuItem>
         ))}
       </DropdownButton>
