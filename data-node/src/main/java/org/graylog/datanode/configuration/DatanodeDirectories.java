@@ -21,7 +21,9 @@ import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * This is a collection of pointers to directories used to store data, logs and configuration of the managed opensearch.
@@ -33,12 +35,12 @@ public class DatanodeDirectories {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDirectories.class);
 
     private final String nodeId;
-    private final String dataTargetDir;
-    private final String logsTargetDir;
-    private final String configurationSourceDir;
-    private final String configurationTargetDir;
+    private final Path dataTargetDir;
+    private final Path logsTargetDir;
+    private final Path configurationSourceDir;
+    private final Path configurationTargetDir;
 
-    public DatanodeDirectories(String nodeName, String dataTargetDir, String logsTargetDir, String configurationSourceDir, String configurationTargetDir) {
+    public DatanodeDirectories(String nodeName, Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
         this.nodeId = nodeName;
         this.dataTargetDir = dataTargetDir;
         this.logsTargetDir = logsTargetDir;
@@ -64,7 +66,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getDataTargetDir() {
-        return resolvePath(dataTargetDir);
+        return resolveNodeSubdir(dataTargetDir);
     }
 
     /**
@@ -72,7 +74,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getLogsTargetDir() {
-        return resolvePath(logsTargetDir);
+        return resolveNodeSubdir(logsTargetDir);
     }
 
 
@@ -81,8 +83,17 @@ public class DatanodeDirectories {
      * we read certificates from here. We'll never write anything to it.
      * Read-only permissions required.
      */
-    public Path getConfigurationSourceDir() {
-        return Path.of(configurationSourceDir).toAbsolutePath();
+    public Optional<Path> getConfigurationSourceDir() {
+        return Optional.ofNullable(configurationSourceDir).map(Path::toAbsolutePath);
+    }
+
+    public Optional<Path> resolveConfigurationSourceFile(String filename) {
+        final Path filePath = Path.of(filename);
+        if (filePath.isAbsolute()) {
+            return Optional.of(filePath);
+        } else {
+            return getConfigurationSourceDir().map(dir -> dir.resolve(filename));
+        }
     }
 
     /**
@@ -93,7 +104,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getConfigurationTargetDir() {
-        return resolvePath(configurationTargetDir);
+        return resolveNodeSubdir(configurationTargetDir);
     }
 
     /**
@@ -102,11 +113,11 @@ public class DatanodeDirectories {
      * @see org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync
      */
     public Path getOpensearchProcessConfigurationDir() {
-        return resolvePath(configurationTargetDir).resolve("opensearch");
+        return resolveNodeSubdir(configurationTargetDir).resolve("opensearch");
     }
 
-    private Path resolvePath(String path) {
-        return Path.of(path).resolve(nodeId).toAbsolutePath();
+    private Path resolveNodeSubdir(Path path) {
+        return path.resolve(nodeId).toAbsolutePath();
     }
 
     @Override

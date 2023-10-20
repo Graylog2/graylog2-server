@@ -155,7 +155,7 @@ public class PreflightResource {
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
         var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeID);
-        var builder = cfg != null ? cfg.toBuilder() : DataNodeProvisioningConfig.builder().nodeId(nodeID);
+        var builder = cfg.map(DataNodeProvisioningConfig::toBuilder).orElse(DataNodeProvisioningConfig.builder().nodeId(nodeID));
         builder.altNames(params.altNames()).validFor(params.validFor());
         dataNodeProvisioningService.save(builder.build());
 

@@ -64,7 +64,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     }
   }
 
-  @media (max-width: 991px) {
+  @media (width <= 991px) {
     .small-scrn-badge {
       float: right;
       margin: 15px 15px 0;
@@ -106,7 +106,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     }
   }
 
-  @media (min-width: 768px) {
+  @media (width >= 768px) {
     .navbar-toggle {
       display: block;
     }
@@ -145,7 +145,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     }
   }
 
-  @media (min-width: 991px) {
+  @media (width >= 991px) {
     .header-meta-nav {
       display: flex;
       align-items: center;

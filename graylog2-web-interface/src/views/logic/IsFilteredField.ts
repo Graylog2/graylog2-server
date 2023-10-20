@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.verification;
+import { FILTERED_FIELDS } from 'views/Constants';
 
-public enum ConfigSectionCompleteness {
-    COMPLETE, INCOMPLETE, MISSING
-}
+const isFilteredField = (fieldName: string) => FILTERED_FIELDS.includes(fieldName);
+
+export default isFilteredField;
