@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.management;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessInformation;
@@ -30,6 +32,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +43,9 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private final CommandLineProcess commandLineProcess;
     private final CommandLineProcessListener resultHandler;
+    private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private static final String ORIGINAL_CONFIG = "opensearch.orig.yml";
+    private static final String CONFIG = "opensearch.yml";
 
     /**
      * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
@@ -74,13 +80,28 @@ public class OpensearchCommandLineProcess implements Closeable {
         }
     }
 
+    private void writeOpenSearchConfig(final OpensearchConfiguration config) {
+        try {
+            Map<String,Object> jsonMap;
+            final var originalConfig = config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(ORIGINAL_CONFIG);
+            if(Files.exists(originalConfig)) {
+                jsonMap = mapper.readValue(originalConfig.toFile(), Map.class);
+            } else {
+                jsonMap = new HashMap<>();
+            }
+            getOpensearchConfigurationArguments(config).entrySet().stream().forEach(it -> jsonMap.put(it.getKey(), it.getValue()));
+            mapper.writeValue(config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(CONFIG).toFile(), jsonMap);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
+        }
+    }
+
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
-        final Path executable = config.opensearchDistribution().getOpensearchExecutable();;
-        final List<String> arguments = getOpensearchConfigurationArguments(config).entrySet().stream()
-                .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
+        final Path executable = config.opensearchDistribution().getOpensearchExecutable();
+        writeOpenSearchConfig(config);
         resultHandler = new CommandLineProcessListener(listener);
-        commandLineProcess = new CommandLineProcess(executable, arguments, resultHandler, config.getEnv());
+        commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
     }
 
     private static Map<String, String> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
