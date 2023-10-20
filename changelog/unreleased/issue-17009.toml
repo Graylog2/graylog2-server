@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Strict file permissions for key material in datanode."
+
+issues = ["17009"]
+pulls = ["17026"]
