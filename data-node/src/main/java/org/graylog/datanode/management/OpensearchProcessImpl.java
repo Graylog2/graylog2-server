@@ -123,8 +123,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public String getOpensearchClusterUrl() {
-        final var hostname = configuration.getDatanodeNodeName();
-        return hostname + ":" + configuration.getOpensearchTransportPort();
+        return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
     }
 
     public void onEvent(ProcessEvent event) {

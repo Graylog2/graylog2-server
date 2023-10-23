@@ -56,7 +56,7 @@ public class ClusterManagerDiscovery extends Periodical {
         if (managedOpenSearch.isInState(ProcessState.AVAILABLE)) {
             final Boolean isManagerNode = getClusterStateResponse(managedOpenSearch)
                     .map(r -> r.nodes().get(r.clusterManagerNode()))
-                    .map(managerNode -> managerNode.name().equals(configuration.getDatanodeNodeName()))
+                    .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
                     .orElse(false);
             managedOpenSearch.setLeaderNode(isManagerNode);
         }
