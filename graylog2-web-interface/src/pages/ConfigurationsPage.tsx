@@ -165,6 +165,7 @@ const ConfigurationsPage = () => {
     },
     {
       name: 'Data Node',
+      hide: isCloud,
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: DataNodeConfiguration,

@@ -36,10 +36,10 @@ const CAConfiguration = () => (
       Using it we can provision your data nodes with certificates easily.
     </p>
     <Space h="md" />
-    <StyledTabs defaultValue="upload">
+    <StyledTabs defaultValue="create">
       <Tabs.List>
-        <Tabs.Tab value="upload">Upload CA</Tabs.Tab>
         <Tabs.Tab value="create">Create new CA</Tabs.Tab>
+        <Tabs.Tab value="upload">Upload CA</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value="upload" pt="xs">

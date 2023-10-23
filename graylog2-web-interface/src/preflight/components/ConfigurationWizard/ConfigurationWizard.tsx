@@ -24,7 +24,8 @@ import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Consta
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
-import { List, Grid, Space, Alert } from 'preflight/components/common';
+import { List, Grid, Space } from 'preflight/components/common';
+import Alert from 'components/bootstrap/Alert';
 import RenewalPolicyConfiguration from 'preflight/components/ConfigurationWizard/RenewalPolicyConfiguration';
 import type { ConfigurationStep } from 'preflight/types';
 import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
@@ -78,7 +79,7 @@ type FetchErrorsOverviewProps = {
 const FetchErrorsOverview = ({ errors }: FetchErrorsOverviewProps) => (
   <>
     {errors.map(({ entityName, error }) => (
-      <Alert type="danger" key={entityName}>
+      <Alert bsStyle="danger" key={entityName}>
         There was an error fetching the {entityName}: {error.message}
       </Alert>
     ))}

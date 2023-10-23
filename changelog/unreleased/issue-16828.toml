@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Geo-Location Processor Configuration modal being stuck after the updating the config failed."
+
+issues = ["16828"]
+pulls = ["16926"]

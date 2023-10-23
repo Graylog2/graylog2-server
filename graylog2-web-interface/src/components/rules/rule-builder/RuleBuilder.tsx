@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import ObjectID from 'bson-objectid';
 
 import useHistory from 'routing/useHistory';
@@ -43,19 +43,19 @@ const ActionsCol = styled(Col)`
   margin-top: 50px;
 `;
 
-const StyledPanel = styled(Panel)`
-  background-color: #fff;
+const StyledPanel = styled(Panel)(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
   border: 0;
   box-shadow: none;
   margin-bottom: 0;
-`;
+`);
 
-const StyledPanelHeading = styled(Panel.Heading)`
+const StyledPanelHeading = styled(Panel.Heading)(({ theme }) => css`
   display: flex;
   justify-content: space-between;
-  background-color: #f5f5f5 !important;
+  background-color: ${theme.colors.table.backgroundAlt} !important;
   border: 0;
-`;
+`);
 
 const WhenOperator = styled.div`
   display: flex;

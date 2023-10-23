@@ -15,38 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+
+import { asMock } from 'helpers/mocking';
+import useHotkey from 'hooks/useHotkey';
 
 import KeyCapture from './KeyCapture';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
+
 describe('<KeyCapture />', () => {
+  const mockUseHotkey = jest.fn();
+
+  beforeEach(() => {
+    asMock(useHotkey).mockImplementation(mockUseHotkey);
+  });
+
   it('renders its children', () => {
-    render(<KeyCapture shortcuts={{ enter: () => {} }}><>The children</></KeyCapture>);
+    render(<KeyCapture shortcuts={[{ scope: 'general', callback: () => {}, actionKey: 'test' }]}>The children</KeyCapture>);
 
     expect(screen.getByText('The children')).toBeInTheDocument();
   });
 
-  it('triggers function defined for a specific key on key press', () => {
-    const onEnter = jest.fn();
-    render(<KeyCapture shortcuts={{ enter: onEnter }} />);
+  it('runs useHotkey hooks with proper params', () => {
+    const mockCallback = jest.fn();
 
-    fireEvent.keyDown(document.body, { key: 'Enter', which: 13 });
+    render(<KeyCapture shortcuts={[
+      { scope: 'general', callback: mockCallback, actionKey: 'make' },
+      { scope: 'search', callback: mockCallback, actionKey: 'do' },
+    ]} />);
 
-    expect(onEnter).toHaveBeenCalledTimes(1);
-  });
-
-  it('resets shortcuts after unmount', () => {
-    const onEnter = jest.fn();
-    const { unmount } = render(<KeyCapture shortcuts={{ enter: onEnter }} />);
-
-    fireEvent.keyDown(document.body, { key: 'Enter', which: 13 });
-
-    expect(onEnter).toHaveBeenCalledTimes(1);
-
-    unmount();
-
-    fireEvent.keyDown(document.body, { key: 'Enter', which: 13 });
-
-    expect(onEnter).toHaveBeenCalledTimes(1);
+    expect(mockUseHotkey).toHaveBeenCalledWith({ scope: 'general', callback: mockCallback, actionKey: 'make' });
+    expect(mockUseHotkey).toHaveBeenCalledWith({ scope: 'search', callback: mockCallback, actionKey: 'do' });
   });
 });
