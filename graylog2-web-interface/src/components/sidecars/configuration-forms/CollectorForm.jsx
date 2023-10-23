@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
+import upperCase from 'lodash/upperCase';
 
 import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -123,11 +124,26 @@ class CollectorForm extends React.Component {
     }
   };
 
+  handleSelectTelemetry = (key, value) => {
+    const { sendTelemetry } = this.props;
+
+    if (key === 'service_type' || key === 'node_operating_system') {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`LOG_COLLECTOR_${upperCase(key).replace(/\s|\//g, '_')}_CHANGED`], {
+        app_pathname: 'sidecars',
+        app_section: 'configuration',
+        event_details: {
+          [key]: value,
+        },
+      });
+    }
+  };
+
   _formDataUpdate = (key) => {
     const { formData } = this.state;
 
     return (nextValue) => {
       const nextFormData = cloneDeep(formData);
+      this.handleSelectTelemetry(key, nextValue);
 
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);

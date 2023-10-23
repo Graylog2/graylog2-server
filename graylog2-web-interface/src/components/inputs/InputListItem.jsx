@@ -74,7 +74,13 @@ const InputListItem = createReactClass({
   },
 
   _editInput() {
+    const { sendTelemetry, location } = this.props;
     this.configurationForm.open();
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_EDIT_CLICKED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_action_value: 'show-received-messages',
+    });
   },
 
   _updateInput(data) {
