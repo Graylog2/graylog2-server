@@ -120,7 +120,7 @@ public class Configuration extends BaseConfiguration {
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
     @Parameter(value = "opensearch_network_host")
-    private String opensearchNetworkHostHost = null;
+    private String opensearchNetworkHost = null;
 
     @Parameter(value = "transport_certificate")
     private String datanodeTransportCertificate = null;
@@ -345,8 +345,8 @@ public class Configuration extends BaseConfiguration {
         return datanodeHttpCertificatePassword;
     }
 
-    public Optional<String> getOpensearchNetworkHostHost() {
-        return Optional.ofNullable(opensearchNetworkHostHost);
+    public Optional<String> getOpensearchNetworkHost() {
+        return Optional.ofNullable(opensearchNetworkHost);
     }
 
     public String getBindAddress() {

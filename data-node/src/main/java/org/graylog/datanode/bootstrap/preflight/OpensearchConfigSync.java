@@ -31,7 +31,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
+import java.util.Set;
 
 public class OpensearchConfigSync implements PreflightCheck {
 
@@ -46,11 +50,10 @@ public class OpensearchConfigSync implements PreflightCheck {
 
     @Override
     public void runCheck() throws PreflightCheckException {
-        final Path opensearchProcessConfigurationDir = configuration.datanodeDirectories().getOpensearchProcessConfigurationDir();
-        LOG.info("Directory used for Opensearch process configuration is {}", opensearchProcessConfigurationDir.toAbsolutePath());
-
         try {
-            Files.createDirectories(opensearchProcessConfigurationDir);
+
+            final Path opensearchProcessConfigurationDir = configuration.datanodeDirectories().createOpensearchProcessConfigurationDir();
+            LOG.info("Directory used for Opensearch process configuration is {}", opensearchProcessConfigurationDir.toAbsolutePath());
 
             // this is a directory in main/resources that holds all the initial configuration files needed by the opensearch
             // we manage this directory in git. Generally we assume that this is a read-only location and we need to copy
@@ -61,7 +64,6 @@ public class OpensearchConfigSync implements PreflightCheck {
             synchronizeConfig(sourceOfInitialConfiguration, opensearchProcessConfigurationDir);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Failed to prepare opensearch config directory", e);
-
         }
     }
 
