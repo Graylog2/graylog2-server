@@ -14,13 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.verification;
+package org.graylog2.bootstrap.preflight.web.resources.model;
 
-public record ConfigProperty(String propertyName, String propertyValue) {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public ConfigProperty {
-        if (propertyName == null || propertyName.isEmpty()) {
-            throw new IllegalArgumentException("Property name cannot be empty");
-        }
-    }
+public record CreateCARequest(@JsonProperty("organization") String organization) {
 }

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
@@ -52,7 +51,7 @@ public class OpensearchSecurityConfiguration {
 
     private static final String KEYSTORE_FORMAT = "PKCS12";
     private static final String TRUSTSTORE_FORMAT = "PKCS12";
-    private static final String TRUSTSTORE_FILENAME = "datanode-truststore.p12";
+    private static final Path TRUSTSTORE_FILE = Path.of("datanode-truststore.p12");
 
     private final KeystoreInformation transportCertificate;
     private final KeystoreInformation httpCertificate;
@@ -82,7 +81,7 @@ public class OpensearchSecurityConfiguration {
 
             final Path opensearchConfigDir = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir();
 
-            final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
+            final Path trustStorePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TRUSTSTORE_FILE);
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
             this.truststore = TruststoreCreator.newTruststore()
@@ -103,15 +102,13 @@ public class OpensearchSecurityConfiguration {
         if (securityEnabled()) {
             config.putAll(commonSecureConfig());
 
-            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
-
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", transportCertificate.location().getFileName().toString()); // todo: this should be computed as a relative path
             config.put("plugins.security.ssl.transport.keystore_password", transportCertificate.passwordAsString());
             config.put("plugins.security.ssl.transport.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
-            config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILENAME);
+            config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILE.toString());
             config.put("plugins.security.ssl.transport.truststore_password", truststore.passwordAsString());
 
             config.put("plugins.security.ssl.http.enabled", "true");
@@ -122,7 +119,7 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
-            config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILENAME);
+            config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
             config.put("plugins.security.ssl.http.truststore_password", truststore.passwordAsString());
         } else {
             config.put("plugins.security.disabled", "true");

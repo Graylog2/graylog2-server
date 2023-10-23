@@ -19,7 +19,7 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Button, Space } from 'preflight/components/common';
+import { Button, FormikInput, Space } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
@@ -58,10 +58,15 @@ const CACreateForm = () => {
         The CA should only be used to secure your Graylog data nodes.
       </p>
       <Space h="xs" />
-      <Formik initialValues={{}} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
+      <Formik initialValues={{ organization: 'Graylog CA' }} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
         {({ isSubmitting, isValid }) => (
           <Form>
             <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
+            <FormikInput placeholder="Organization Name"
+                         name="organization"
+                         label="Organization Name"
+                         required />
+            <Space h="md" />
             <Button disabled={isSubmitting || !isValid} type="submit">
               {isSubmitting ? 'Creating CA...' : 'Create CA'}
             </Button>
