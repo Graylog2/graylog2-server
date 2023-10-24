@@ -28,6 +28,10 @@ import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBUpsertRetryer;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.streams.StreamService;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -83,6 +87,46 @@ public class IndexFieldTypesService {
         this.db.createIndex(new BasicDBObject(FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
         this.db.createIndex(new BasicDBObject(FIELDS_FIELD_NAMES, 1));
         this.db.createIndex(new BasicDBObject(FIELD_INDEX_SET_ID, 1));
+    }
+
+
+    public PageListResponse<IndexSetFieldType> getIndexSetFieldTypesList(
+            final String indexSetId,
+            final int page,
+            final int perPage,
+            final String sort,
+            final Sorting.Direction order) {
+
+        final Optional<IndexFieldTypesDTO> indexFieldTypesDTO = Optional.ofNullable(db.findOne(DBQuery.is(FIELD_INDEX_SET_ID, indexSetId)));
+        final List<IndexSetFieldType> retrievedPage = indexFieldTypesDTO.map(
+                dto -> dto.fields()
+                        .stream()
+                        .map(fieldTypeDTO -> new IndexSetFieldType(
+                                        fieldTypeDTO.fieldName(),
+                                        REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType()))
+                                )
+                        )
+                        .sorted(IndexSetFieldType.getComparator(sort, order))
+                        .skip((long) Math.max(0, page - 1) * perPage)
+                        .limit(perPage)
+                        .collect(Collectors.toList())
+        ).orElse(List.of());
+
+        final int total = indexFieldTypesDTO.map(dto -> dto.fields().size()).orElse(0);
+
+        return PageListResponse.create("",
+                PaginatedList.PaginationInfo.create(
+                        total,
+                        retrievedPage.size(),
+                        page,
+                        perPage),
+                total,
+                sort,
+                order.toString().toLowerCase(Locale.ROOT),
+                retrievedPage,
+                IndexSetFieldType.ATTRIBUTES,
+                IndexSetFieldType.ENTITY_DEFAULTS);
+
     }
 
     public List<String> fieldTypeHistory(final String indexSetId,
