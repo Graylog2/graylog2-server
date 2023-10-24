@@ -103,7 +103,8 @@ public class IndexFieldTypesService {
                         .stream()
                         .map(fieldTypeDTO -> new IndexSetFieldType(
                                         fieldTypeDTO.fieldName(),
-                                        REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType()))
+                                REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType())),
+                                fieldTypeHistory(indexSetId, fieldTypeDTO.fieldName(), true)
                                 )
                         )
                         .sorted(IndexSetFieldType.getComparator(sort, order))

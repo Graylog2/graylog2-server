@@ -25,10 +25,12 @@ import java.util.Comparator;
 import java.util.List;
 
 public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
-                                @JsonProperty(TYPE) String type) {
+                                @JsonProperty(TYPE) String type,
+                                @JsonProperty(FIELD_TYPE_HISTORY) List<String> fieldTypeHistory) {
 
     public static final String FIELD_NAME = "field_name";
     public static final String TYPE = "type";
+    public static final String FIELD_TYPE_HISTORY = "type_history";
 
     public static final String DEFAULT_SORT_FIELD = IndexSetFieldType.FIELD_NAME;
     public static final Sorting DEFAULT_SORT = Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.ASC);
@@ -38,6 +40,7 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
 
     public static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(IndexSetFieldType.FIELD_NAME).title("Field name").sortable(true).build(),
+            EntityAttribute.builder().id(IndexSetFieldType.FIELD_TYPE_HISTORY).title("Type history").sortable(false).build(),
             EntityAttribute.builder().id(IndexSetFieldType.TYPE).title("Type").sortable(true).build()
     );
 
