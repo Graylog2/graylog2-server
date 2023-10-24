@@ -159,7 +159,7 @@ public class IndexFieldTypesService {
         } else {
             LinkedList<String> reducedTypeHistory = new LinkedList<>();
             typeHistory.forEach(type -> {
-                if (reducedTypeHistory.isEmpty() || !type.equals(reducedTypeHistory.getLast())) {
+                if (reducedTypeHistory.isEmpty() || (type != null && !type.equals(reducedTypeHistory.getLast()))) {
                     reducedTypeHistory.add(type);
                 }
             });
