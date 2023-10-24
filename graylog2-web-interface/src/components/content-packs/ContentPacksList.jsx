@@ -17,33 +17,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer, Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import {
-  Button,
   Col,
-  DropdownButton,
-  MenuItem,
-  Modal,
   Row,
-  ButtonToolbar,
 } from 'components/bootstrap';
 import {
-  Pagination, PageSizeSelect,
-  ModalSubmit, NoSearchResult, NoEntitiesExist,
+  Pagination, PageSizeSelect, NoSearchResult, NoEntitiesExist,
 } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
-import ContentPackStatus from 'components/content-packs/ContentPackStatus';
-import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackListItem from 'components/content-packs/components/ContentPackListItem';
 import withTelemetry from 'logic/telemetry/withTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import withLocation from 'routing/withLocation';
-
-import ContentPackInstall from './ContentPackInstall';
 
 class ContentPacksList extends React.Component {
   static propTypes = {
@@ -51,8 +36,6 @@ class ContentPacksList extends React.Component {
     contentPackMetadata: PropTypes.object,
     onDeletePack: PropTypes.func,
     onInstall: PropTypes.func,
-    sendTelemetry: PropTypes.func.isRequired,
-    location: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -68,7 +51,6 @@ class ContentPacksList extends React.Component {
     super(props);
 
     this.state = {
-      showModal: false,
       filteredContentPacks: props.contentPacks,
       pageSize: 10,
       currentPage: 1,
@@ -81,144 +63,6 @@ class ContentPacksList extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ filteredContentPacks: nextProps.contentPacks });
-  }
-
-  _installModal(item) {
-    let installRef;
-
-    const { onInstall: onInstallProp } = this.props;
-
-    const closeModal = () => {
-      this.setState({ showModal: false });
-    };
-
-    const open = () => {
-      this.setState({ showModal: true });
-    };
-
-    const onInstall = () => {
-      installRef.onInstall();
-      closeModal();
-    };
-
-    const modal = (
-      <BootstrapModalWrapper showModal={this.state.showModal}
-                             onHide={closeModal}
-                             bsSize="large">
-        <Modal.Header closeButton>
-          <Modal.Title>Install Content Pack</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ContentPackInstall ref={(node) => {
-            installRef = node;
-          }}
-                              contentPack={item}
-                              onInstall={onInstallProp} />
-        </Modal.Body>
-        <Modal.Footer>
-          <ModalSubmit submitButtonText="Install" onSubmit={onInstall} onCancel={closeModal} />
-        </Modal.Footer>
-      </BootstrapModalWrapper>
-    );
-
-    return { openFunc: open, installModal: modal };
-  }
-
-  _formatItems(items) {
-    const { pageSize, currentPage } = this.state;
-    const { contentPackMetadata, onDeletePack, sendTelemetry, location } = this.props;
-    const begin = (pageSize * (currentPage - 1));
-    const end = begin + pageSize;
-    const shownItems = items.slice(begin, end);
-
-    return shownItems.map((item) => {
-      const { openFunc, installModal } = this._installModal(item);
-      let downloadRef;
-      const downloadModal = (
-        <ContentPackDownloadControl ref={(node) => {
-          downloadRef = node;
-        }}
-                                    contentPackId={item.id}
-                                    revision={item.rev} />
-      );
-
-      const metadata = contentPackMetadata[item.id] || {};
-      const installed = Object.keys(metadata).find((rev) => metadata[rev].installation_count > 0);
-      const states = installed ? ['installed'] : [];
-      const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
-
-      const handleInstall = () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.INSTALLED, {
-          app_pathname: getPathnameWithoutId(location.pathname),
-          app_section: 'content-packs',
-          app_action_value: 'install-button',
-        });
-
-        openFunc();
-      };
-
-      const handleDownload = () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.DOWNLOADED, {
-          app_pathname: getPathnameWithoutId(location.pathname),
-          app_section: 'content-packs',
-          app_action_value: 'download-menu-item',
-        });
-
-        downloadRef.open();
-      };
-
-      const handleDeleteAllVersions = () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.ALL_VERSIONS_DELETED, {
-          app_pathname: getPathnameWithoutId(location.pathname),
-          app_section: 'content-packs',
-          app_action_value: 'delete-all-versions-menu-item',
-        });
-
-        onDeletePack(item.id);
-      };
-
-      return (
-        <ControlledTableList.Item key={item.id}>
-          <Row className="row-sm">
-            <Col md={9}>
-              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link>
-                <small>Latest
-                  Version: {item.rev} <ContentPackStatus contentPackId={item.id} states={states} />
-                </small>
-              </h3>
-            </Col>
-            <Col md={3} className="text-right">
-              <ButtonToolbar className="pull-right">
-                {updateButton}
-                <Button bsSize="small" onClick={handleInstall}>Install</Button>
-                {installModal}
-                <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
-                  <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>
-                    <MenuItem>Show</MenuItem>
-                  </LinkContainer>
-                  <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
-                    <MenuItem>Create New Version</MenuItem>
-                  </LinkContainer>
-                  <MenuItem onSelect={handleDownload}>
-                    Download
-                  </MenuItem>
-                  <MenuItem divider />
-                  <MenuItem onSelect={handleDeleteAllVersions}>
-                    Delete All Versions
-                  </MenuItem>
-                </DropdownButton>
-                {downloadModal}
-              </ButtonToolbar>
-            </Col>
-          </Row>
-          <Row className="row-sm content-packs-summary">
-            <Col md={12}>
-              {item.summary}&nbsp;
-            </Col>
-          </Row>
-        </ControlledTableList.Item>
-      );
-    });
   }
 
   _formatItemsNew(items) {

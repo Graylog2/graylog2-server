@@ -19,8 +19,6 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import Routes from 'routing/Routes';
-/* import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
- * import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants'; */
 
 type Props = {
   pack: any,
@@ -30,44 +28,20 @@ type Props = {
 };
 
 const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstall }: Props) => {
-  /* const sendTelemetry = useSendTelemetry(); */
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const installRef = useRef();
-  const downloadRef = useRef();
 
   const metadata = contentPackMetadata[pack.id] || {};
   const installed = Object.keys(metadata).find((rev) => metadata[rev].installation_count > 0);
   const states = installed ? ['installed'] : [];
   const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
-  const handleInstall = () => {
-    /* sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.INSTALLED, {
-     *   app_pathname: 'content-packs',
-     *   app_section: 'content-packs',
-     * }); */
+  const handleInstall = () => setShowInstallModal(true);
 
-    setShowInstallModal(true);
-  };
+  const handleDownload = () => setShowDownloadModal(true);
 
-  const handleDownload = () => {
-    /* sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.DOWNLOADED, {
-     *   app_pathname: 'content-packs',
-     *   app_section: 'content-packs',
-     * }); */
-
-    setShowDownloadModal(true);
-    downloadRef?.current?.open();
-  };
-
-  const handleDeleteAllVersions = () => {
-    /* sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.ALL_VERSIONS_DELETED, {
-     *   app_pathname: 'content-packs',
-     *   app_section: 'content-packs',
-     * }); */
-
-    onDeletePack(pack.id);
-  };
+  const handleDeleteAllVersions = () => onDeletePack(pack.id);
 
   const onCloseInstallModal = () => setShowInstallModal(false);
 
@@ -126,7 +100,8 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
         </BootstrapModalWrapper>
       )}
       {showDownloadModal && (
-        <ContentPackDownloadControl ref={downloadRef}
+        <ContentPackDownloadControl show={showDownloadModal}
+                                    onHide={() => setShowDownloadModal(false)}
                                     contentPackId={pack.id}
                                     revision={pack.rev} />
       )}
