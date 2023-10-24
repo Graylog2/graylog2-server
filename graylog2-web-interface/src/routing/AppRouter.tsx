@@ -103,6 +103,7 @@ import {
   UsersOverviewPage,
   ViewEventDefinitionPage,
   SidecarFailureTrackingPage,
+  IndexSetFieldTypesPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -210,6 +211,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.INDEX_SETS.CREATE, element: <IndexSetCreationPage /> },
             { path: RoutePaths.SYSTEM.INDEX_SETS.SHOW(':indexSetId'), element: <IndexSetPage /> },
             { path: RoutePaths.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId'), element: <IndexSetConfigurationPage /> },
+            { path: RoutePaths.SYSTEM.INDEX_SETS.FIELD_TYPES(':indexSetId'), element: <IndexSetFieldTypesPage /> },
 
             { path: RoutePaths.SYSTEM.INDICES.LIST, element: <IndicesPage /> },
             !isCloud && (
