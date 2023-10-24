@@ -280,6 +280,7 @@ export const TELEMETRY_EVENT_TYPE = {
     INVESTIGATION_NOTE_EDIT: 'Security Investigation Note Updated',
     INVESTIGATION_NOTE_DELETED: 'Security Investigation Note Deleted',
     SIGMA_IMPORT_RULES_OPENED: 'Security Sigma Rules Import Opened',
+    SIGMA_IMPORT_RULES_IMPORTED: 'Security Sigma Rules Imported',
     SIGMA_RULE_UPDATED: 'Security Sigma Rules Update',
     SIGMA_RULE_CREATED: 'Security Sigma Rules Created',
     ANOMALY_DETECTION_SAVED: 'Security Anomaly Detection Saved',
