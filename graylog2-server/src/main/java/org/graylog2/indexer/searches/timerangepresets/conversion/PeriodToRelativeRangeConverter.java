@@ -24,8 +24,22 @@ import java.util.function.Function;
 public class PeriodToRelativeRangeConverter implements Function<Period, RelativeRange> {
 
     @Override
-    public RelativeRange apply(final Period period) {
+    public RelativeRange apply(Period period) {
         if (period != null) {
+            // years are not supported in the toStandardSeconds conversion, so we convert it to days and assume 365 days a year
+            if(period.getYears() > 0) {
+                final int years = period.getYears();
+                period = period.minusYears(years);
+                period = period.plusDays(years * 365);
+            }
+
+            // months are not supported in the toStandardSeconds conversion, so we convert it to days and assume 30 days a month
+            if(period.getMonths() > 0) {
+                final int months = period.getMonths();
+                period = period.minusMonths(months);
+                period = period.plusDays(months * 30);
+            }
+
             return RelativeRange.Builder.builder()
                     .from(period.toStandardSeconds().getSeconds())
                     .build();
