@@ -310,7 +310,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public String getDatanodeNodeName() {
-        return datanodeNodeName;
+        return datanodeNodeName != null && !datanodeNodeName.isBlank() ? datanodeNodeName : getHostname();
     }
 
     public String getInitialManagerNodes() {
