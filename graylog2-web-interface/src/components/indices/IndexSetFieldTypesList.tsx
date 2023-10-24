@@ -14,8 +14,127 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
-const IndexSetFieldTypesList = () => <>IndexSetFieldTypesList</>;
+import type { IndexSetFieldType } from 'hooks/useIndexSetFieldType';
+import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
+import useParams from 'routing/useParams';
+import { NoEntitiesExist, NoSearchResult, PaginatedList, SearchForm } from 'components/common';
+import EntityDataTable from 'components/common/EntityDataTable';
+import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import type { Sort } from 'stores/PaginationTypes';
+import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
+
+import QueryHelper from '../common/QueryHelper';
+
+export const ENTITY_TABLE_ID = 'index-set-field-types';
+export const DEFAULT_LAYOUT = {
+  pageSize: 20,
+  sort: { attributeId: 'field_name', direction: 'asc' } as Sort,
+  displayedColumns: ['field_name', 'type'],
+  columnsOrder: ['field_name', 'type'],
+};
+
+const IndexSetFieldTypesList = () => {
+  const { indexSetId } = useParams();
+  const [query, setQuery] = useState('');
+  const [activePage, setActivePage] = useState(1);
+  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
+    entityTableId: ENTITY_TABLE_ID,
+    defaultPageSize: DEFAULT_LAYOUT.pageSize,
+    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
+    defaultSort: DEFAULT_LAYOUT.sort,
+  });
+  const searchParams = useMemo(() => ({
+    query,
+    page: activePage,
+    pageSize: layoutConfig.pageSize,
+    sort: layoutConfig.sort,
+  }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
+  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
+  const onPageChange = useCallback(
+    (newPage: number, newPageSize: number) => {
+      if (newPage) {
+        setActivePage(newPage);
+      }
+
+      if (newPageSize) {
+        updateTableLayout({ perPage: newPageSize });
+      }
+    }, [updateTableLayout],
+  );
+
+  const onPageSizeChange = useCallback((newPageSize: number) => {
+    setActivePage(1);
+    updateTableLayout({ perPage: newPageSize });
+  }, [updateTableLayout]);
+
+  const onSortChange = useCallback((newSort: Sort) => {
+    setActivePage(1);
+    updateTableLayout({ sort: newSort });
+  }, [updateTableLayout]);
+
+  const onSearch = useCallback((newQuery: string) => {
+    setActivePage(1);
+    setQuery(newQuery);
+  }, []);
+
+  const onResetSearch = useCallback(() => onSearch(''), [onSearch]);
+
+  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
+    updateTableLayout({ displayedAttributes });
+  }, [updateTableLayout]);
+  const { isLoading, data: { list, pagination, attributes } } = useIndexSetFieldTypes(indexSetId, searchParams, { enabled: !isLoadingLayoutPreferences });
+
+  const customColumnRenderers = useMemo(() => ({
+    attributes: {
+      title: {
+        renderCell: (title: string, search) => (
+          'GGGG'
+        ),
+      },
+    },
+  }), []);
+
+  return (
+    <PaginatedList onChange={onPageChange}
+                   totalItems={pagination?.total}
+                   pageSize={layoutConfig.pageSize}
+                   activePage={activePage}
+                   showPageSizeSelect={false}
+                   useQueryParameter={false}>
+      <div style={{ marginBottom: '5px' }}>
+        <SearchForm focusAfterMount
+                    onSearch={onSearch}
+                    queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
+                    topMargin={0}
+                    onReset={onResetSearch} />
+      </div>
+      {pagination?.total === 0 && !searchParams.query && (
+        <NoEntitiesExist>
+          No fields have been created yet.
+        </NoEntitiesExist>
+      )}
+      {pagination?.total === 0 && searchParams.query && (
+        <NoSearchResult>
+          No fields have been found.
+        </NoSearchResult>
+      )}
+      {!!list?.length && (
+        <EntityDataTable<IndexSetFieldType> data={list}
+                                            visibleColumns={layoutConfig.displayedAttributes}
+                                            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+                                            onColumnsChange={onColumnsChange}
+                                            onSortChange={onSortChange}
+                                            activeSort={layoutConfig.sort}
+                                            pageSize={searchParams.pageSize}
+                                            onPageSizeChange={onPageSizeChange}
+                                            actionsCellWidth={120}
+                                            columnRenderers={customColumnRenderers}
+                                            columnDefinitions={attributes} />
+      )}
+    </PaginatedList>
+  );
+};
 
 export default IndexSetFieldTypesList;

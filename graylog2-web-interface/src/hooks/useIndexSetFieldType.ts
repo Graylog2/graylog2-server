@@ -17,30 +17,62 @@
 import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
-import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import type { Attribute, SearchParams } from 'stores/PaginationTypes';
+import PaginationURL from 'util/PaginationURL';
 
 const INITIAL_DATA = {
-  fieldTypes: {},
+  pagination: { total: 0 },
+  list: [],
+  attributes: [],
+};
+export type IndexSetFieldTypeJson = {
+    field_name: string,
+    type: string,
+}
+
+export type IndexSetFieldType = {
+    id: string,
+    fieldName: string,
+    type: string,
+}
+
+const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams) => {
+  const indexSetFiledTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
+  const url = PaginationURL(
+    indexSetFiledTypeUrl,
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.query,
+    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+
+  return fetch('GET', url).then(
+    ({ elements, total, attributes }) => ({
+      list: elements.map((fieldType: IndexSetFieldTypeJson) => ({ id: fieldType.field_name, fieldName: fieldType.field_name, type: fieldType.type })),
+      pagination: { total },
+      attributes,
+    }));
 };
 
-export const url = (indexSetId) => qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
-const fetchIndexSetFieldTypes = async (indexSetId: string) => fetch('GET', url(indexSetId));
-
-const useFiledTypeOptions = (indexSetId: string): {
-    data: { fieldTypes: FieldTypes },
+const useIndexSetFieldTypes = (indexSetId: string, searchParams: SearchParams, { enabled }): {
+    data: {
+        list: Readonly<Array<IndexSetFieldType>>,
+        pagination: { total: number },
+        attributes: Array<Attribute>
+    },
     isLoading: boolean,
 } => {
   const { data, isLoading } = useQuery(
-    ['indexSetFieldTypes'],
-    () => fetchIndexSetFieldTypes(indexSetId),
+    ['indexSetFieldTypes', searchParams],
+    () => fetchIndexSetFieldTypes(indexSetId, searchParams),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading index field types failed with status: ${errorThrown}`,
           'Could not load index field types');
       },
       keepPreviousData: true,
+      enabled,
     },
   );
 
@@ -50,4 +82,4 @@ const useFiledTypeOptions = (indexSetId: string): {
   });
 };
 
-export default useFiledTypeOptions;
+export default useIndexSetFieldTypes;
