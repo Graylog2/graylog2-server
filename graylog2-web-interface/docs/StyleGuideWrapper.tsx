@@ -23,6 +23,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import GraylogThemeProvider from '../src/theme/GraylogThemeProvider';
 import CurrentUserContext from '../src/contexts/CurrentUserContext';
 import User from '../src/logic/users/User';
+import UserDateTimeProvider from '../src/contexts/UserDateTimeProvider';
 /* eslint-enable import/no-relative-packages */
 
 export const adminUser = User.builder()
@@ -58,10 +59,12 @@ const StyleGuideWrapper = ({ children }: Props) => {
     path: '/:url?',
     element: (
       <CurrentUserContext.Provider value={adminUser}>
-        <GraylogThemeProvider initialThemeModeOverride="light">
-          <StyleGuideStyles />
-          {children}
-        </GraylogThemeProvider>
+        <UserDateTimeProvider>
+          <GraylogThemeProvider initialThemeModeOverride="light">
+            <StyleGuideStyles />
+            {children}
+          </GraylogThemeProvider>
+        </UserDateTimeProvider>
       </CurrentUserContext.Provider>
     ),
   }]);

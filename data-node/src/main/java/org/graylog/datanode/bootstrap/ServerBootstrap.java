@@ -73,10 +73,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog DataNode")
-    private String pidFile = TMPDIR + FILE_SEPARATOR + "datanode.pid";
+    private final String pidFile = TMPDIR + FILE_SEPARATOR + "datanode.pid";
 
     @Option(name = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
-    private boolean noPidFile = false;
+    private final boolean noPidFile = false;
 
     protected abstract void startNodeRegistration(Injector injector);
 
@@ -198,6 +198,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
 
+        startNodeRegistration(injector);
+
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
         try {
@@ -217,8 +219,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         Runtime.getRuntime().addShutdownHook(new Thread(injector.getInstance(shutdownHook())));
 
         // Start services.
-//        final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
-//        serviceManager.addListener(serviceManagerListener, MoreExecutors.directExecutor());
         try {
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
@@ -239,7 +239,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             Thread.currentThread().join();
         } catch (InterruptedException e) {
-            return;
         }
     }
 
@@ -269,13 +268,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> result = super.getSharedBindingsModules();
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
-//        result.add(new SecurityBindings());
-//        result.add(new ValidatorModule());
-//        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new DatanodeConfigurationBindings());
-//        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 
         return result;
     }
