@@ -275,6 +275,7 @@ export const TELEMETRY_EVENT_TYPE = {
     INVESTIGATION_DETAILS_UPDATED: 'Security Investigation Details Updated',
     INVESTIGATION_DRAWER_OPENED: 'Security Investigation Drawer Opened',
     INVESTIGATION_DRAWER_CLOSED: 'Security Investigation Drawer Closed',
+    INVESTIGATION_DRAWER_COLLAPSE_TOGGLED: 'Security Investigation Drawer Collapse Toggled',
     INVESTIGATION_NOTE_ADDED: 'Security Investigation Note Added',
     INVESTIGATION_NOTE_SAVED: 'Security Investigation Note Saved',
     INVESTIGATION_NOTE_EDIT: 'Security Investigation Note Updated',
