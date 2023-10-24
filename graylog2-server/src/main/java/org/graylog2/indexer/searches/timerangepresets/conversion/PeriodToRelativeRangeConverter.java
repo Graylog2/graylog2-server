@@ -27,13 +27,13 @@ public class PeriodToRelativeRangeConverter implements Function<Period, Relative
     public RelativeRange apply(Period period) {
         if (period != null) {
             // years are not supported in the toStandardSeconds conversion, so we convert it to days and assume 365 days a year
-            if(period.getYears() > 0) {
+            if (period.getYears() > 0) {
                 final int years = period.getYears();
                 period = period.minusYears(years).plusDays(years * 365);
             }
 
             // months are not supported in the toStandardSeconds conversion, so we convert it to days and assume 30 days a month
-            if(period.getMonths() > 0) {
+            if (period.getMonths() > 0) {
                 final int months = period.getMonths();
                 period = period.minusMonths(months).plusDays(months * 30);
             }
