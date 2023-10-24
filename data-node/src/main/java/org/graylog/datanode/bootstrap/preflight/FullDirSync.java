@@ -27,19 +27,30 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class FullDirSync {
     private static final Logger LOG = LoggerFactory.getLogger(FullDirSync.class);
 
+    /**
+     * The execute bit for directories means that owner can traverse these and access their content.
+     */
+    protected static final Set<PosixFilePermission> DIRECTORY_PERMISSIONS = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_EXECUTE);
+    protected static final Set<PosixFilePermission> FILE_PERMISSIONS = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
+
     public static void run(Path source, Path target) throws IOException {
 
         final List<Path> existingPaths = collectExistingPaths(target);
-        final List<Path> copiedPaths = copyFiles(source, target);
+        existingPaths.remove(target); // exclude the target, we don't want to remove it in following step
+        deletePaths(existingPaths);
+        copyFiles(source, target);
+    }
 
-        existingPaths.removeAll(copiedPaths);
-
+    private static void deletePaths(List<Path> existingPaths) throws IOException {
         for (Path path : existingPaths) {
             if (Files.isDirectory(path)) {
                 LOG.info("Deleting obsolete directory " + path);
@@ -54,7 +65,6 @@ public class FullDirSync {
             }
 
         }
-
     }
 
     private static List<Path> copyFiles(Path source, Path target) throws IOException {
@@ -65,7 +75,7 @@ public class FullDirSync {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 Path currentTarget = target.resolve(source.relativize(dir).toString());
-                Files.createDirectories(currentTarget);
+                Files.createDirectories(currentTarget, PosixFilePermissions.asFileAttribute((DIRECTORY_PERMISSIONS)));
                 copiedPaths.add(currentTarget);
                 LOG.info("Synchronizing directory {}", currentTarget);
                 return FileVisitResult.CONTINUE;
@@ -75,6 +85,7 @@ public class FullDirSync {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 final Path currentTarget = target.resolve(source.relativize(file).toString());
                 Files.copy(file, currentTarget, StandardCopyOption.REPLACE_EXISTING);
+                Files.setPosixFilePermissions(currentTarget, FILE_PERMISSIONS);
                 copiedPaths.add(currentTarget);
                 LOG.info("Synchronizing file {}", currentTarget);
                 return FileVisitResult.CONTINUE;
