@@ -255,19 +255,21 @@ public class GelfCodec extends AbstractCodec {
 
         final JsonNode shortMessageNode = jsonNode.path("short_message");
         final JsonNode messageNode = jsonNode.path("message");
+        String message = shortMessageNode.asText();
         if (!shortMessageNode.isMissingNode()) {
             if (!shortMessageNode.isTextual()) {
                 throw new IllegalArgumentException(prefix + "has invalid \"short_message\": " + shortMessageNode.asText());
             }
-            if (StringUtils.isBlank(shortMessageNode.asText()) && StringUtils.isBlank(messageNode.asText())) {
-                throw new IllegalArgumentException(prefix + "has empty mandatory \"short_message\" field.");
+            String shortMessage = shortMessageNode.asText();
+            if (shortMessage == null && message == null) {
+                throw new IllegalArgumentException(prefix + "mandatory \"short_message\" field is null.");
             }
         } else if (!messageNode.isMissingNode()) {
             if (!messageNode.isTextual()) {
                 throw new IllegalArgumentException(prefix + "has invalid \"message\": " + messageNode.asText());
             }
-            if (StringUtils.isBlank(messageNode.asText())) {
-                throw new IllegalArgumentException(prefix + "has empty mandatory \"message\" field.");
+            if (message == null) {
+                throw new IllegalArgumentException(prefix + "mandatory \"message\" field is null.");
             }
         } else {
             throw new IllegalArgumentException(prefix + "is missing mandatory \"short_message\" or \"message\" field.");
