@@ -337,6 +337,7 @@ export const TELEMETRY_EVENT_TYPE = {
     NOTIFICATION_BULK_DELETED: 'Customization Notification Bulk Deleted',
     THEME_REVERTED: 'Customization Theme Reverted',
     THEME_RESETED: 'Customization Theme Reseted',
+    HEADER_BADGE_UPDATED: 'Customization Header Badge Updated',
   },
   TRAFFIC_VIOLATION_CONFIGURATION_SAVED: 'Traffic Violation Configuration Saved',
   FAILURE_PROCESSING_CONFIGURATION_SAVED: 'Failure Processing Configuration Saved',
