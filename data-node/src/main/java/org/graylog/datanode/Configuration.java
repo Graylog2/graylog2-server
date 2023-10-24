@@ -24,13 +24,15 @@ import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
+import com.github.joschi.jadconfig.validators.DirectoryPathWritableValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.net.HostAndPort;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
@@ -60,6 +62,13 @@ public class Configuration extends BaseConfiguration {
     public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
     public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
 
+    public static final int DATANODE_DEFAULT_PORT = 8999;
+    public static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
+
+    public static final String OVERRIDE_HEADER = "X-Graylog-Server-URL";
+    public static final String PATH_WEB = "";
+    public static final String PATH_API = "api/";
+
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 
@@ -72,26 +81,20 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
 
-    @Parameter(value = "is_leader")
-    private boolean isLeader = true;
-
-    @Parameter("disable_native_system_stats_collector")
-    private boolean disableNativeSystemStatsCollector = false;
-
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_data_location")
-    private String opensearchDataLocation = "datanode/data";
+    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchDataLocation = Path.of("datanode/data");
 
-    @Parameter(value = "opensearch_logs_location")
-    private String opensearchLogsLocation = "datanode/logs";
+    @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchLogsLocation = Path.of("datanode/logs");
 
-    @Parameter(value = "opensearch_config_location")
-    private String opensearchConfigLocation = "datanode/config";
+    @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchConfigLocation = Path.of("datanode/config");
 
-    @Parameter(value = "config_location")
-    private String configLocation = "config";
+    @Parameter(value = "config_location", validators = DirectoryPathReadableValidator.class)
+    private Path configLocation = null;
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
@@ -117,16 +120,16 @@ public class Configuration extends BaseConfiguration {
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
     @Parameter(value = "opensearch_network_host")
-    private String opensearchNetworkHostHost = null;
+    private String opensearchNetworkHost = null;
 
     @Parameter(value = "transport_certificate")
-    private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
+    private String datanodeTransportCertificate = null;
 
     @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
-    private String datanodeHttpCertificate = "datanode-http-certificates.p12";
+    private String datanodeHttpCertificate = null;
 
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
@@ -142,6 +145,72 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
+
+    @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
+    private String passwordSecret;
+
+    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
+    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
+
+    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
+    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
+
+    @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
+    private String nodeIdFile = "data/node-id";
+
+    @Parameter(value = "root_username")
+    private String rootUsername = "admin";
+
+    @Parameter(value = "root_timezone")
+    private DateTimeZone rootTimeZone = DateTimeZone.UTC;
+
+    @Parameter(value = "root_email")
+    private String rootEmail = "";
+
+    @Parameter(value = "bind_address", required = true)
+    private String bindAddress = DEFAULT_BIND_ADDRESS;
+
+    @Parameter(value = "datanode_http_port", required = true)
+    private int datanodeHttpPort = DATANODE_DEFAULT_PORT;
+
+    @Parameter(value = "hostname")
+    private String hostname = null;
+
+    @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
+    private URI httpPublishUri;
+
+    @Parameter(value = "http_enable_cors")
+    private boolean httpEnableCors = false;
+
+    @Parameter(value = "http_enable_gzip")
+    private boolean httpEnableGzip = true;
+
+    @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
+    private int httpMaxHeaderSize = 8192;
+
+    @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    private int httpThreadPoolSize = 64;
+
+    @Parameter(value = "http_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
+    private int httpSelectorRunnersCount = 1;
+
+    @Parameter(value = "http_enable_tls")
+    private boolean httpEnableTls = false;
+
+    @Parameter(value = "http_tls_cert_file")
+    private Path httpTlsCertFile;
+
+    @Parameter(value = "http_tls_key_file")
+    private Path httpTlsKeyFile;
+
+    @Parameter(value = "http_tls_key_password")
+    private String httpTlsKeyPassword;
+
+    @Parameter(value = "http_external_uri")
+    private URI httpExternalUri;
+
+    @Parameter(value = "http_allow_embedding")
+    private boolean httpAllowEmbedding = false;
 
     public boolean isInsecureStartup() {
         return insecureStartup;
@@ -163,31 +232,40 @@ public class Configuration extends BaseConfiguration {
         return shutdownTimeout;
     }
 
-    public boolean isDisableNativeSystemStatsCollector() {
-        return disableNativeSystemStatsCollector;
-    }
-
-    public boolean isLeader() {
-        return isLeader;
-    }
-
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
     }
 
-    public String getOpensearchConfigLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchConfigLocation() {
         return opensearchConfigLocation;
     }
 
-    public String getConfigLocation() {
+
+    /**
+     * This is a pointer to a directory holding configuration files (and certificates) for the datanode itself.
+     * We treat it as read only for the datanode and should never persist anything in it.
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     *
+     */
+    @Nullable
+    public Path getDatanodeConfigurationLocation() {
         return configLocation;
     }
 
-    public String getOpensearchDataLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchDataLocation() {
         return opensearchDataLocation;
     }
 
-    public String getOpensearchLogsLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchLogsLocation() {
         return opensearchLogsLocation;
     }
 
@@ -195,22 +273,13 @@ public class Configuration extends BaseConfiguration {
         return opensearchProcessLogsBufferSize;
     }
 
-    @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
-    private String passwordSecret;
-
     public String getPasswordSecret() {
         return passwordSecret;
     }
 
-    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
-    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
-
     public Duration getIndexerJwtAuthTokenCachingDuration() {
         return indexerJwtAuthTokenCachingDuration;
     }
-
-    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
-    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
     public Duration getIndexerJwtAuthTokenExpirationDuration() {
         return indexerJwtAuthTokenExpirationDuration;
@@ -223,18 +292,6 @@ public class Configuration extends BaseConfiguration {
             throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
         }
     }
-
-    @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
-    private String nodeIdFile = "data/node-id";
-
-    @Parameter(value = "root_username")
-    private String rootUsername = "admin";
-
-    @Parameter(value = "root_timezone")
-    private DateTimeZone rootTimeZone = DateTimeZone.UTC;
-
-    @Parameter(value = "root_email")
-    private String rootEmail = "";
 
     public String getNodeIdFile() {
         return nodeIdFile;
@@ -288,8 +345,8 @@ public class Configuration extends BaseConfiguration {
         return datanodeHttpCertificatePassword;
     }
 
-    public Optional<String> getOpensearchNetworkHostHost() {
-        return Optional.ofNullable(opensearchNetworkHostHost);
+    public Optional<String> getOpensearchNetworkHost() {
+        return Optional.ofNullable(opensearchNetworkHost);
     }
 
     public String getBindAddress() {
@@ -351,58 +408,6 @@ public class Configuration extends BaseConfiguration {
             throw new ValidationException("Node ID file at path " + path + " isn't " + b + ". Please specify the correct path or change the permissions");
         }
     }
-
-    public static final int DATANODE_DEFAULT_PORT = 8999;
-    public static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
-
-    public static final String OVERRIDE_HEADER = "X-Graylog-Server-URL";
-    public static final String PATH_WEB = "";
-    public static final String PATH_API = "api/";
-
-    @Parameter(value = "bind_address", required = true)
-    private String bindAddress = DEFAULT_BIND_ADDRESS;
-
-    @Parameter(value = "datanode_http_port", required = true)
-    private int datanodeHttpPort = DATANODE_DEFAULT_PORT;
-
-    @Parameter(value = "hostname")
-    private String hostname = null;
-
-    @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
-    private URI httpPublishUri;
-
-    @Parameter(value = "http_enable_cors")
-    private boolean httpEnableCors = false;
-
-    @Parameter(value = "http_enable_gzip")
-    private boolean httpEnableGzip = true;
-
-    @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpMaxHeaderSize = 8192;
-
-    @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpThreadPoolSize = 64;
-
-    @Parameter(value = "http_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
-    private int httpSelectorRunnersCount = 1;
-
-    @Parameter(value = "http_enable_tls")
-    private boolean httpEnableTls = false;
-
-    @Parameter(value = "http_tls_cert_file")
-    private Path httpTlsCertFile;
-
-    @Parameter(value = "http_tls_key_file")
-    private Path httpTlsKeyFile;
-
-    @Parameter(value = "http_tls_key_password")
-    private String httpTlsKeyPassword;
-
-    @Parameter(value = "http_external_uri")
-    private URI httpExternalUri;
-
-    @Parameter(value = "http_allow_embedding")
-    private boolean httpAllowEmbedding = false;
 
     public String getUriScheme() {
         return isHttpEnableTls() ? "https" : "http";

@@ -63,7 +63,7 @@ public class MapGet extends AbstractFunction<Object> {
                 .description("Get a value from a map")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Get value for key in map")
-                .ruleBuilderTitle("Get value for '${key}' from map")
+                .ruleBuilderTitle("Get value for '${key}' from map '${map}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.OTHER)
                 .build();
     }

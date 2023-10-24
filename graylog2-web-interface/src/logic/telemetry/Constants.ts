@@ -74,6 +74,9 @@ export const TELEMETRY_EVENT_TYPE = {
     COPY_VALUE_TO_CLIPBOARD: 'Search Value Action Copy Value To Clipboard Clicked',
     CREATE_EVENT_DEFINITION: 'Search Value Action Create Event Definition Clicked',
     INSERT_INTO_DASHBOARD_SEARCH: 'Search Value Action Insert Into Dashboard/Search Clicked',
+    CHANGE_FIELD_TYPE_OPENED: 'Search Field Action Change Field Type Opened',
+    CHANGE_FIELD_TYPE_CLOSED: 'Search Field Action Change Field Type Closed',
+    CHANGE_FIELD_TYPE_CHANGED: 'Search Field Action Change Field Type Changed',
   },
   DASHBOARD_FULL_SCREEN_MODE_STARTED: 'Dashboard Fullscreen Mode Started',
   SEARCH_MESSAGE_TABLE_SHOW_SURROUNDING_MESSAGE: 'Search Message Table Show Surrounding Message Clicked ',
@@ -231,6 +234,7 @@ export const TELEMETRY_EVENT_TYPE = {
     PACKS_OVERRIDE_FORM_OPENED: 'Illuminate Packs Override Form Opened',
     PACKS_OVERRIDE_SAVED: 'Illuminate Packs Override Saved',
   },
+  SHORTCUT_TYPED: 'Shortcut Typed',
 } as const;
 
 type ExtractObjectValues<T extends object> = {

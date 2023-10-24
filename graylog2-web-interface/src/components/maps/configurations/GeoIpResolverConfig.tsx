@@ -80,7 +80,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       app_action_value: 'configuration-save',
     });
 
-    updateConfig(values)
+    return updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
           setShowModal(false);

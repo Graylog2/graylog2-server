@@ -46,8 +46,8 @@ public class CertificateAndPrivateKeyMerger {
                           final PrivateKeyEncryptedStorage privateKeyEncryptedStorage,
                           final char[] privateKeyStoragePassword,
                           final char[] certFilePassword,
-                          final String alias) throws GeneralSecurityException, IOException,
-            OperatorCreationException, PKCSException, KeyStoreStorageException {
+                          final String alias)
+            throws GeneralSecurityException, IOException, OperatorCreationException, PKCSException, KeyStoreStorageException {
 
         KeyStore nodeKeystore = KeyStore.getInstance(CertConstants.PKCS12);
         nodeKeystore.load(null, null);

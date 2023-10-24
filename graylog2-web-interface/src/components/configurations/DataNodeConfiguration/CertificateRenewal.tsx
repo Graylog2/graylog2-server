@@ -25,10 +25,11 @@ import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import type { DataNode } from 'preflight/types';
 import UserNotification from 'util/UserNotification';
 import { Spinner } from 'components/common';
-import { Alert, Badge, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
+import { Alert, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
 import { defaultCompare } from 'logic/DefaultCompare';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import Icon from 'components/common/Icon';
+import DataNodeBadge from 'components/datanode/DataNodeBadge';
+import { Badge } from 'preflight/components/common';
 
 const StyledList = styled(ListGroup)`
   max-width: fit-content;
@@ -49,35 +50,6 @@ const DataNodeInfos = styled.div`
 const NodeIdColumn = styled.div`
   width: 100px;
 `;
-
-const NodeId = styled(Badge)`
-  margin-right: 3px;
-`;
-
-const SecureIcon = styled(Icon)`
-  margin-right: 3px;
-`;
-
-type NodeProps = {
-  nodeId: string,
-  transportAddress: string,
-};
-
-const isSecure = (address: string) => address?.toLocaleLowerCase().startsWith('https://');
-
-const badgeStyle = (address: string) => {
-  if (!address) {
-    return 'danger';
-  }
-
-  return isSecure(address) ? 'success' : 'primary';
-};
-
-const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'unlock');
-
-const Node = ({ nodeId, transportAddress }: NodeProps) => (
-  <NodeId bsStyle={badgeStyle(transportAddress)} title="Short node id"><SecureIcon name={lockIcon(transportAddress)} />{nodeId}</NodeId>
-);
 
 export const fetchDataNodes = () => fetchPeriodically<Array<DataNode>>('GET', qualifyUrl('/certrenewal'));
 
@@ -164,6 +136,11 @@ const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNod
   );
 };
 
+const ErrorBadge = styled(Badge)`
+  margin-left: 5px;
+`;
+const Error = ({ message }: { message: string }) => <ErrorBadge title={message} color="red">{message}</ErrorBadge>;
+
 const CertificateRenewal = () => {
   const { data: dataNodes, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes();
   const sortedDataNodes = dataNodes?.sort((d1, d2) => defaultCompare(d1.cert_valid_until, d2.cert_valid_until));
@@ -186,14 +163,16 @@ const CertificateRenewal = () => {
               short_node_id,
               cert_valid_until,
               status,
+              error_msg,
             }) => (
               <ListGroupItem key={short_node_id}>
                 <NodeIdColumn>
-                  <Node nodeId={short_node_id} transportAddress={transport_address} />
+                  <DataNodeBadge status={status} nodeId={short_node_id} transportAddress={transport_address} />
                 </NodeIdColumn>
                 <DataNodeInfos>
                   <span title="Transport address">{transport_address}</span>{' – '}
                   <span title="Hostname">{hostname}</span>
+                  {error_msg && <Error message={error_msg} />}
                 </DataNodeInfos>
                 <RightCol>
                   {cert_valid_until && (<span title={cert_valid_until}>valid until {moment(cert_valid_until).from(moment())}{' '}</span>)}
