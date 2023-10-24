@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -23,7 +24,7 @@ import { Modal, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
-const ContentPackDownloadControl =  ({ contentPackId, revision, show, onHide }) =>  {
+const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }) => {
   const [showDownloadModal, setShowDownloadModal] = useState(show);
 
   const getDownloadUrl = () => qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);

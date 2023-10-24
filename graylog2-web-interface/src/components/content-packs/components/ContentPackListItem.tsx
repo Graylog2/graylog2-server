@@ -30,7 +30,6 @@ type Props = {
 const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstall }: Props) => {
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
-  const installRef = useRef();
 
   const metadata = contentPackMetadata[pack.id] || {};
   const installed = Object.keys(metadata).find((rev) => metadata[rev].installation_count > 0);
@@ -90,8 +89,7 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
             <Modal.Title>Install Content Pack</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <ContentPackInstall ref={installRef}
-                                contentPack={pack}
+            <ContentPackInstall contentPack={pack}
                                 onInstall={onInstall} />
           </Modal.Body>
           <Modal.Footer>
