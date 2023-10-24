@@ -107,7 +107,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(datanodeConfiguration.nodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
@@ -123,8 +123,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public String getOpensearchClusterUrl() {
-        final var hostname = DatanodeConfigurationProvider.getNodesFromConfig(configuration.getDatanodeNodeName());
-        return hostname + ":" + configuration.getOpensearchTransportPort();
+        return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
     }
 
     public void onEvent(ProcessEvent event) {
