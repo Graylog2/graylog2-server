@@ -46,6 +46,7 @@ import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class EmailSender {
     private static final Logger LOG = LoggerFactory.getLogger(EmailSender.class);
@@ -170,7 +171,7 @@ public class EmailSender {
                     .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.NORMAL)
-                    .addDetail("title", "No recipients have been defined!")
+                    .addDetail("title", f("No recipients have been defined for notification with ID [%s]!", ctx.notificationId()))
                     .addDetail("description", "To fix this, go to the notification configuration and add at least one alert recipient.");
             notificationService.publishIfFirst(notification);
         }
