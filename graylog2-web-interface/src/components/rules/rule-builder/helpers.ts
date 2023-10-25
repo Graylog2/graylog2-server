@@ -36,7 +36,7 @@ const jsonifyText = (text: string): string => {
           .split('\n')
           .map((line) => line.trim().split(':').map((keyValue) => keyValue.trim()))
           .filter((keyValue) => keyValue[0] && keyValue[1])
-          .map((keyValue) => keyValue.join('":"'))
+          .map((keyValue) => `${keyValue[0]}":"${keyValue.slice(1).join(':')}`)
           .join('","')
       }"}`;
 

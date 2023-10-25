@@ -32,6 +32,8 @@ import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
 
@@ -69,6 +71,7 @@ const _headerCellFormatter = (header) => {
 class GrokPatterns extends React.Component {
   static propTypes = {
     paginationQueryParameter: PropTypes.object.isRequired,
+    sendTelemetry: PropTypes.func,
   };
 
   constructor(props) {
@@ -146,7 +149,14 @@ class GrokPatterns extends React.Component {
   confirmedRemove = (pattern) => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`)) {
-      GrokPatternsStore.deletePattern(pattern, this.loadData);
+      GrokPatternsStore.deletePattern(pattern, () => {
+        this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.DELETED, {
+          app_pathname: 'grokpatterns',
+          app_section: 'grokpatterns',
+        });
+
+        this.loadData();
+      });
     }
   };
 
@@ -254,4 +264,8 @@ class GrokPatterns extends React.Component {
   }
 }
 
-export default withPaginationQueryParameter(GrokPatterns);
+GrokPatterns.defaultProps = {
+  sendTelemetry: () => {},
+};
+
+export default withTelemetry(withPaginationQueryParameter(GrokPatterns));

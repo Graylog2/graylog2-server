@@ -68,6 +68,30 @@ class PeriodToRelativeRangeConverterTest {
         verifyResult(result, 4207);
     }
 
+    @Test
+    void testMonthsPeriodConversion() {
+        final RelativeRange result = converter.apply(Period.months(2));
+        verifyResult(result, 2 * 30 * 24 * 60 * 60);
+    }
+
+    @Test
+    void testYearsPeriodConversion() {
+        final RelativeRange result = converter.apply(Period.years(3));
+        verifyResult(result, 3 * 365 * 24 * 60 * 60);
+    }
+
+    @Test
+    void testYearsMonthsPeriodConversion() {
+        final RelativeRange result = converter.apply(Period.years(5).plusMonths(1));
+        verifyResult(result, (5 * 365 + 1 * 30) * 24 * 60 * 60);
+    }
+
+    @Test
+    void testYearsMonthsMixedPeriodConversion() {
+        final RelativeRange result = converter.apply(Period.years(5).plusMonths(1).plusHours(1).plusMinutes(10).plusSeconds(7));
+        verifyResult(result, ((5 * 365 + 1 * 30) * 24 * 60 * 60) + (60 * 60) + (10 * 60) + 7);
+    }
+
     private void verifyResult(final RelativeRange result, final int expectedFromField) {
         assertThat(result)
                 .isNotNull()
