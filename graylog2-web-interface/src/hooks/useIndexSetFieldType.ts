@@ -30,11 +30,13 @@ const INITIAL_DATA = {
 export type IndexSetFieldTypeJson = {
     field_name: string,
     type: string,
+    type_history: Array<string>
 }
 
 export type IndexSetFieldType = {
     id: string,
     fieldName: string,
+    typeHistory: Array<string>,
     type: string,
 }
 
@@ -49,7 +51,12 @@ const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchP
 
   return fetch('GET', url).then(
     ({ elements, total, attributes }) => ({
-      list: elements.map((fieldType: IndexSetFieldTypeJson) => ({ id: fieldType.field_name, fieldName: fieldType.field_name, type: fieldType.type })),
+      list: elements.map((fieldType: IndexSetFieldTypeJson) => ({
+        id: fieldType.field_name,
+        fieldName: fieldType.field_name,
+        type: fieldType.type,
+        typeHistory: fieldType.type_history,
+      })),
       pagination: { total },
       attributes,
     }));
@@ -62,8 +69,9 @@ const useIndexSetFieldTypes = (indexSetId: string, searchParams: SearchParams, {
         attributes: Array<Attribute>
     },
     isLoading: boolean,
+    refetch: () => void,
 } => {
-  const { data, isLoading } = useQuery(
+  const { data, isLoading, refetch } = useQuery(
     ['indexSetFieldTypes', searchParams],
     () => fetchIndexSetFieldTypes(indexSetId, searchParams),
     {
@@ -79,6 +87,7 @@ const useIndexSetFieldTypes = (indexSetId: string, searchParams: SearchParams, {
   return ({
     data: data ?? INITIAL_DATA,
     isLoading,
+    refetch,
   });
 };
 

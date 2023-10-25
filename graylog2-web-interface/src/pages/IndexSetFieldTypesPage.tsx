@@ -17,7 +17,7 @@
 import React, { useEffect } from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Row, Button } from 'components/bootstrap';
+import { Row, Col, Button } from 'components/bootstrap';
 import { useStore } from 'stores/connect';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import useParams from 'routing/useParams';
@@ -37,7 +37,7 @@ const IndexSetFieldTypesPage = () => {
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
       <div>
-        <PageHeader title="Configure Index Set Field Types"
+        <PageHeader title={`Configure ${indexSet ? indexSet.title : 'Index Set'} Field Types`}
                     documentationLink={{
                       title: 'Index model documentation',
                       path: DocsHelper.PAGES.INDEX_MODEL,
@@ -53,7 +53,9 @@ const IndexSetFieldTypesPage = () => {
         </PageHeader>
 
         <Row className="content">
-          <IndexSetFieldTypesList />
+          <Col md={12}>
+            <IndexSetFieldTypesList />
+          </Col>
         </Row>
       </div>
     </DocumentTitle>

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -73,10 +73,6 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
   const { data: { list, attributes, pagination }, isLoading } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
 
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-
-  useEffect(() => {
-    setIndexSetSelection(initialSelection);
-  }, [initialSelection, setIndexSetSelection]);
 
   const onPageChange = useCallback(
     (newPage: number, newPageSize: number) => {
