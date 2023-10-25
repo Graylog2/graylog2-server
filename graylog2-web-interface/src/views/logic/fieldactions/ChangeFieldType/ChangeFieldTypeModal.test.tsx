@@ -20,16 +20,13 @@ import selectEvent from 'react-select-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
-import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import type { Attributes } from 'stores/PaginationTypes';
-import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import suppressConsole from 'helpers/suppressConsole';
 
 const onCloseMock = jest.fn();
@@ -39,7 +36,15 @@ const renderChangeFieldTypeModal = ({
   show = true,
 }) => render(
   <TestStoreProvider>
-    <ChangeFieldTypeModal onClose={onClose} field={field} show={show} />
+    <ChangeFieldTypeModal onClose={onClose}
+                          field={field}
+                          show={show}
+                          isOptionsLoading={false}
+                          fieldTypes={{
+                            string: 'String type',
+                            int: 'Number(int)',
+                          }}
+                          initialSelectedIndexSets={['id-1', 'id-2']} />
   </TestStoreProvider>,
 );
 const attributes: Attributes = [
@@ -101,24 +106,10 @@ const paginatedFieldUsage = ({
   isLoading: false,
 });
 
-const fieldTypes: {
-  data: { fieldTypes: FieldTypes },
-  isLoading: boolean,
-} = {
-  data: {
-    fieldTypes: {
-      string: 'String type',
-      int: 'Number(int)',
-    },
-  },
-  isLoading: false,
-};
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection', () => jest.fn());
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 describe('ChangeFieldTypeModal', () => {
@@ -131,8 +122,6 @@ describe('ChangeFieldTypeModal', () => {
   beforeEach(() => {
     asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFiledTypeMutation: putFiledTypeMutationMock });
     asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
-    asMock(useFieldTypes).mockReturnValue(fieldTypes);
-    asMock(useInitialSelection).mockReturnValue(['id-1', 'id-2']);
 
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
