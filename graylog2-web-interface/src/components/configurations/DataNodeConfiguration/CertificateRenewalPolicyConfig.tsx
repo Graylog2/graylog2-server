@@ -31,6 +31,9 @@ import { ConfigurationType } from 'components/configurations/ConfigurationTypes'
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Select from 'components/common/Select';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type RenewalPolicy = {
   mode: 'AUTOMATIC' | 'MANUAL',
@@ -115,6 +118,7 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   const { data: currentConfig, isLoading } = useQuery(queryKey, fetchCurrentConfig);
 
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
   const queryClient = useQueryClient();
 
   const { mutateAsync: updateConfig } = useMutation(handleSaveConfig, {
@@ -158,8 +162,8 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   };
 
   const saveConfig = (values: FormConfig) => {
-    sendTelemetry('form_submit', {
-      app_pathname: 'configurations',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.CERTIFICATE_RENEWAL_POLICY_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'certificate-renewal-policy',
       app_action_value: 'configuration-save',
     });

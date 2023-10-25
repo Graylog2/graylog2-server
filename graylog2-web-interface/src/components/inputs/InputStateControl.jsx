@@ -23,6 +23,9 @@ import Reflux from 'reflux';
 import { Button } from 'components/bootstrap';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 function inputStateFilter(state) {
   return state.inputStates ? state.inputStates[this.props.input.id] : undefined;
@@ -36,6 +39,7 @@ const InputStateControl = createReactClass({
   propTypes: {
     input: PropTypes.object.isRequired,
     sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connectFilter(InputStatesStore, 'inputState', inputStateFilter)],
@@ -67,8 +71,8 @@ const InputStateControl = createReactClass({
   _startInput() {
     this.setState({ loading: true });
 
-    this.props.sendTelemetry('click', {
-      app_pathname: 'inputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_START_CLICKED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'start-input',
     });
 
@@ -81,8 +85,8 @@ const InputStateControl = createReactClass({
   _stopInput() {
     this.setState({ loading: true });
 
-    this.props.sendTelemetry('click', {
-      app_pathname: 'inputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_STOP_CLICKED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'stop-input',
     });
 
@@ -109,4 +113,4 @@ const InputStateControl = createReactClass({
   },
 });
 
-export default withTelemetry(InputStateControl);
+export default withLocation(withTelemetry(InputStateControl));

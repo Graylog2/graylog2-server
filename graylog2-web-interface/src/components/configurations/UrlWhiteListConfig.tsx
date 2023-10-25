@@ -29,6 +29,9 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const UrlWhiteListConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -38,6 +41,7 @@ const UrlWhiteListConfig = () => {
   const [isValid, setIsValid] = useState(false);
 
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.URL_WHITELIST_CONFIG).then(() => {
@@ -72,8 +76,8 @@ const UrlWhiteListConfig = () => {
   };
 
   const saveConfig = () => {
-    sendTelemetry('form_submit', {
-      app_pathname: 'configurations',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.URL_WHITE_LIST_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'urlwhitelist',
       app_action_value: 'configuration-save',
     });

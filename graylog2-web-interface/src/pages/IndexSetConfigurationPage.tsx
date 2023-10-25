@@ -31,8 +31,8 @@ import useParams from 'routing/useParams';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
-
-import useSendTelemetry from '../logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) => IndexSetsActions.update(indexSet).then(() => {
   history.push(Routes.SYSTEM.INDICES.LIST);
@@ -73,10 +73,9 @@ const IndexSetConfigurationPage = () => {
   const saveConfiguration = (newIndexSet: IndexSet) => {
     _saveConfiguration(history, newIndexSet);
 
-    sendTelemetry('form_submit', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_UPDATED, {
       app_pathname: 'indexsets',
       app_section: 'indexset',
-      app_action_value: 'configuration-form',
     });
   };
 
