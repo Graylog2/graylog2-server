@@ -1,4 +1,3 @@
-
 export type ContentPackInstallation = {
   created_at: string,
   description: string,
@@ -28,12 +27,12 @@ export interface EntityType {
 }
 
 export interface Data {
-  [key: string]: Type | { [key: string]: Type  },
+  [key: string]: Type | { [key: string]: Type },
 }
 
-export interface Type  {
-  "@type": string,
-  "@value": string,
+export interface Type {
+  '@type': string,
+  '@value': string,
 }
 
 export interface Constraint {

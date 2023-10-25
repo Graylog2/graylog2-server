@@ -88,8 +88,8 @@ const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onI
 
   const pageSizeSelect = (
     <StyledPageSizeSelect onChange={itemsShownChange}
-                    pageSize={paginationOption.perPage}
-                    pageSizes={[10, 25, 50, 100]} />
+                          pageSize={paginationOption.perPage}
+                          pageSizes={[10, 25, 50, 100]} />
   );
 
   const noContentMessage = contentPacks.length <= 0
