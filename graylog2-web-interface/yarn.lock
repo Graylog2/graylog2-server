@@ -9005,7 +9005,7 @@ graphemer@^1.4.0:
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
-  version "5.2.0-SNAPSHOT"
+  version "6.0.0-SNAPSHOT"
   dependencies:
     "@graylog/sawmill" "2.0.7"
     "@tanstack/react-query" "4.36.1"
@@ -12811,9 +12811,9 @@ postcss@^8.4.21, postcss@^8.4.23, postcss@^8.4.28:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.83.3"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.83.3.tgz#a0787e9c492114fa4237b1022ac913bb43125697"
-  integrity sha512-8MQbt0zyLAW3DfAiz9QQz5m849Xsnp/uRJHxYeC7lOBmG9Yp4KLpXGKj9cdZl0jdinWohPQHsX7iG7U5jBpPAQ==
+  version "1.85.2"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.85.2.tgz#d540a17baac2d67d631a4c83fb498b698f135fc4"
+  integrity sha512-xKteAKQhhNhOPWHUEso7Ajm7Qk+lJnDH4JVJ+r4kti62sXtVTSmayhDZoPgiCmQ3w1YtvL13wojb1IbpCpxScw==
   dependencies:
     fflate "^0.4.1"
 
