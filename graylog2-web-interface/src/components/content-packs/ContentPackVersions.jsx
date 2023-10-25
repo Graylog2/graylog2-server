@@ -17,12 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import Routes from 'routing/Routes';
-import { DataTable, ModalSubmit } from 'components/common';
-import { BootstrapModalWrapper, Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'components/bootstrap';
-import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
-import ContentPackInstall from 'components/content-packs/ContentPackInstall';
+import { DataTable } from 'components/common';
+import ContentPackVersionItem from 'components/content-packs/components/ContentPackVersionItem';
 
 import './ContentPackVersions.css';
 
@@ -50,22 +46,11 @@ class ContentPackVersions extends React.Component {
     this.state = {
       modalRev: 0,
       showModal: false,
+      
       selectedVersion: contentPackRevisions.latestRevision,
     };
 
-    this.onChange = this.onChange.bind(this);
-    this.rowFormatter = this.rowFormatter.bind(this);
     this.headerFormatter = this.headerFormatter.bind(this);
-  }
-
-  onChange(event) {
-    const { onChange } = this.props;
-
-    this.setState({
-      selectedVersion: event.target.value,
-    });
-
-    onChange(event.target.value);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -77,98 +62,16 @@ class ContentPackVersions extends React.Component {
     return (<th>{header}</th>);
   };
 
-  rowFormatter(pack) {
-    const { onDeletePack } = this.props;
-    const { selectedVersion } = this.state;
-
-    const { openFunc, installModal } = this._installModal(pack);
-    let downloadRef;
-    const downloadModal = (
-      <ContentPackDownloadControl ref={(node) => {
-        downloadRef = node;
-      }}
-                                  contentPackId={pack.id}
-                                  revision={pack.rev} />
-    );
+  rowFormatter = (item) => {
+    const { onDeletePack, contentPackRevisions, onInstall, onChange } = this.props;
 
     return (
-      <tr key={pack.id + pack.rev}>
-        <td>
-          <input type="radio"
-                 value={pack.rev}
-                 onChange={this.onChange}
-                 checked={parseInt(selectedVersion, 10) === pack.rev} />
-        </td>
-        <td>{pack.rev}</td>
-        <td className="text-right">
-          <ButtonToolbar className="pull-right">
-            <Button bsStyle="success"
-                    bsSize="small"
-                    onClick={() => {
-                      downloadRef.open();
-                    }}>Download
-            </Button>
-            <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
-              <MenuItem onClick={openFunc}>Install</MenuItem>
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
-                <MenuItem>Create New From Revision</MenuItem>
-              </LinkContainer>
-              <MenuItem divider />
-              <MenuItem onClick={() => {
-                onDeletePack(pack.id, pack.rev);
-              }}>Delete
-              </MenuItem>
-              {installModal}
-            </DropdownButton>
-          </ButtonToolbar>
-        </td>
-        {downloadModal}
-      </tr>
-    );
-  }
-
-  _installModal(item) {
-    let installRef;
-
-    const { onInstall: onInstallProp } = this.props;
-
-    const closeModal = () => {
-      this.setState({ showModal: false, modalRev: 0 });
-    };
-
-    const open = () => {
-      this.setState({ showModal: true, modalRev: item.rev });
-    };
-
-    const onInstall = () => {
-      installRef.onInstall();
-      closeModal();
-    };
-
-    const modal = (
-      <BootstrapModalWrapper showModal={this.state.showModal && this.state.modalRev === item.rev}
-                             onHide={closeModal}
-                             bsSize="large">
-        <Modal.Header closeButton>
-          <Modal.Title>Install</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ContentPackInstall ref={(node) => {
-            installRef = node;
-          }}
-                              contentPack={item}
-                              onInstall={onInstallProp} />
-        </Modal.Body>
-        <Modal.Footer>
-          <ModalSubmit onSubmit={onInstall}
-                       submitButtonType="button"
-                       onCancel={closeModal}
-                       submitButtonText="Install" />
-        </Modal.Footer>
-      </BootstrapModalWrapper>
-    );
-
-    return { openFunc: open, installModal: modal };
+      <ContentPackVersionItem pack={item}
+                              contentPackRevisions={contentPackRevisions}
+                              onDeletePack={onDeletePack}
+                              onChange={onChange}
+                              onInstall={onInstall} />
+    )
   }
 
   render() {
