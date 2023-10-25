@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 
 import {
   Col,
@@ -28,15 +29,29 @@ import {
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackListItem from 'components/content-packs/components/ContentPackListItem';
-import withTelemetry from 'logic/telemetry/withTelemetry';
-import withLocation from 'routing/withLocation';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 
-const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onInstall }) => {
+import type { ContentPackInstallation, ContentPackMetadata } from './Types';
+
+type Props = {
+  contentPacks: Array<ContentPackInstallation>,
+  contentPackMetadata: ContentPackMetadata,
+  onDeletePack: (id: string) => void,
+  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void,
+};
+
+const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => css`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacings.xs};
+  float: right;
+`);
+
+const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onInstall }: Props) => {
   const [filteredContentPacks, setFilteredContentPacks] = useState(contentPacks);
   const [paginationOption, setPaginationOption] = useState(DEFAULT_PAGINATION);
 
-  const formatItems = (items) => {
+  const formatItems = (items: Array<ContentPackInstallation>) => {
     const { perPage, page } = paginationOption;
     const begin = (perPage * (page - 1));
     const end = begin + perPage;
@@ -51,15 +66,15 @@ const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onI
     ));
   };
 
-  const filterContentPacks = (filteredItems) => {
+  const filterContentPacks = (filteredItems: Array<ContentPackInstallation>) => {
     setFilteredContentPacks(filteredItems);
   };
 
-  const itemsShownChange = (pageSize) => {
+  const itemsShownChange = (pageSize: number) => {
     setPaginationOption({ ...paginationOption, perPage: pageSize });
   };
 
-  const onChangePage = (nextPage) => {
+  const onChangePage = (nextPage: number) => {
     setPaginationOption({ ...paginationOption, page: nextPage });
   };
 
@@ -72,7 +87,7 @@ const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onI
   );
 
   const pageSizeSelect = (
-    <PageSizeSelect onChange={itemsShownChange}
+    <StyledPageSizeSelect onChange={itemsShownChange}
                     pageSize={paginationOption.perPage}
                     pageSizes={[10, 25, 50, 100]} />
   );
@@ -136,4 +151,4 @@ ContentPacksList.defaultProps = {
   onInstall: () => {},
 };
 
-export default withLocation(withTelemetry(ContentPacksList));
+export default ContentPacksList;

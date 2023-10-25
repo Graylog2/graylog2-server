@@ -20,17 +20,19 @@ import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import Routes from 'routing/Routes';
 
+import type { ContentPackInstallation, ContentPackMetadata } from '../Types';
+
 type Props = {
-  pack: any,
-  contentPackMetadata: any,
+  pack: ContentPackInstallation,
+  contentPackMetadata: ContentPackMetadata,
   onDeletePack: (id: string) => void,
-  onInstall: () => void,
+  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void,
 };
 
 const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstall: onInstallProp }: Props) => {
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
-  const installRef = useRef();
+  const installRef = useRef(null);
   const metadata = contentPackMetadata[pack.id] || {};
   const installed = Object.keys(metadata).find((rev) => metadata[rev].installation_count > 0);
   const states = installed ? ['installed'] : [];
@@ -45,7 +47,10 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
   const onCloseInstallModal = () => setShowInstallModal(false);
 
   const onInstall = () => {
-    installRef?.current?.onInstall();
+    if (installRef.current !== null) {
+      installRef.current?.onInstall();
+    }
+
     setShowInstallModal(false);
   };
 
