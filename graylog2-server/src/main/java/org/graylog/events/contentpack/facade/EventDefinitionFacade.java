@@ -47,7 +47,6 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +65,6 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     private final DBEventDefinitionService eventDefinitionService;
     private final Set<PluginMetaData> pluginMetaData;
     private final UserService userService;
-    protected final StreamService streamService;
 
     @Inject
     public EventDefinitionFacade(ObjectMapper objectMapper,
@@ -74,15 +72,13 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                                  Set<PluginMetaData> pluginMetaData,
                                  DBJobDefinitionService jobDefinitionService,
                                  DBEventDefinitionService eventDefinitionService,
-                                 UserService userService,
-                                 StreamService streamService) {
+                                 UserService userService) {
         this.objectMapper = objectMapper;
         this.pluginMetaData = pluginMetaData;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.jobDefinitionService = jobDefinitionService;
         this.eventDefinitionService = eventDefinitionService;
         this.userService = userService;
-        this.streamService = streamService;
     }
 
     @VisibleForTesting
