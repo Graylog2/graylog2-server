@@ -246,6 +246,11 @@ public class StreamFacade implements EntityFacade<Stream> {
                 throw new ContentPackException("System stream <" + streamId + "> does not exist!", e);
             }
         } else {
+            final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
+            final Optional<Stream> stream = streamService.loadAll().stream().filter(s -> streamEntity.title().asString().equals(s.getTitle())).findFirst();
+            if (stream.isPresent()) {
+                return Optional.of(NativeEntity.create(entity.id(), stream.get().getId(), ModelTypes.STREAM_V1, stream.get().getTitle(), stream.get()));
+            }
             return Optional.empty();
         }
     }

@@ -380,11 +380,17 @@ public class ContentPackService {
     public ImmutableSet<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
         // It's important to only compute the EntityDescriptor IDs once per #collectEntities call! Otherwise we
         // will get broken references between the entities.
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(resolvedEntities);
+        Map<EntityDescriptor, String> entityDescriptorIdMap = new HashMap<>();
+        resolvedEntities.stream().forEach(e -> {
+            final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(e.type(), UnsupportedEntityFacade.INSTANCE);
+            entityDescriptorIdMap.put(e, facade.resolveEntityDescriptorId(e));
+        });
+
+        EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(entityDescriptorIdMap);
 
         final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
-            if (EntityDescriptorIds.isSystemStreamDescriptor(entityDescriptor)) {
+            if (EntityDescriptorIds.isNonExportableStreamDescriptor(entityDescriptor)) {
                 continue;
             }
             final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);

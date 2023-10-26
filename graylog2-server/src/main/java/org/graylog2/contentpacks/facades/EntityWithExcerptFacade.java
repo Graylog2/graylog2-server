@@ -32,6 +32,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
     /**
@@ -144,5 +145,9 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
      */
     default boolean usesScopedEntities() {
         return false;
+    }
+
+    default String resolveEntityDescriptorId(EntityDescriptor entityDescriptor) {
+        return UUID.randomUUID().toString();
     }
 }

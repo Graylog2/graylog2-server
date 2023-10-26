@@ -247,7 +247,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @Override
     public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final ImmutableSet<String> streamRefs = ImmutableSet.copyOf(streams().stream()
-                .map(streamId -> entityDescriptorIds.get(streamId, ModelTypes.STREAM_V1))
+                .map(streamId -> getStreamDescriptor(streamId, entityDescriptorIds))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet()));
@@ -264,12 +264,21 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 .build();
     }
 
+    private Optional<String> getStreamDescriptor(String id, EntityDescriptorIds entityDescriptorIds) {
+        //super.streamService.
+        Optional<String> descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_V1);
+        if (!descriptor.isPresent()) {
+            descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_TITLE);
+        }
+        return descriptor;
+    }
+
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
         streams().forEach(streamId -> {
             final EntityDescriptor depStream = EntityDescriptor.builder()
                     .id(ModelId.of(streamId))
-                    .type(ModelTypes.STREAM_V1)
+                    .type(ModelTypes.STREAM_TITLE)
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
