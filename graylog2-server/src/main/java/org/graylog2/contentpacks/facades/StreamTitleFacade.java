@@ -55,16 +55,6 @@ public class StreamTitleFacade extends StreamFacade {
     }
 
     @Override
-    public String resolveEntityDescriptorId(EntityDescriptor entityDescriptor) {
-        try {
-            final Stream stream = streamService.load(entityDescriptor.id().id());
-            return stream.getTitle();
-        } catch (NotFoundException e) {
-            throw new ContentPackException();
-        }
-    }
-
-    @Override
     public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         try {
@@ -110,15 +100,6 @@ public class StreamTitleFacade extends StreamFacade {
         }
     }
 
-    private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
-        final StreamTitleEntity streamEntity = objectMapper.convertValue(entity.data(), StreamTitleEntity.class);
-        final Optional<Stream> stream = streamService.loadAll().stream().filter(s -> streamEntity.title().asString().equals(s.getTitle())).findFirst();
-        if (stream.isPresent()) {
-            return Optional.of(NativeEntity.create(entity.id(), stream.get().getId(), ModelTypes.STREAM_V1, stream.get().getTitle(), stream.get()));
-        }
-        return Optional.empty();
-    }
-
     public static Object resolveStreamEntity(String id, Map entities) {
         Object streamEntity = entities.get(EntityDescriptor.create(id, ModelTypes.STREAM_V1));
         if (streamEntity == null) {
@@ -127,4 +108,20 @@ public class StreamTitleFacade extends StreamFacade {
         return streamEntity;
     }
 
+    public static Optional<String> getStreamDescriptor(String id, EntityDescriptorIds entityDescriptorIds) {
+        Optional<String> descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_V1);
+        if (!descriptor.isPresent()) {
+            descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_TITLE);
+        }
+        return descriptor;
+    }
+
+    private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final StreamTitleEntity streamEntity = objectMapper.convertValue(entity.data(), StreamTitleEntity.class);
+        final Optional<Stream> stream = streamService.loadAll().stream().filter(s -> streamEntity.title().asString().equals(s.getTitle())).findFirst();
+        if (stream.isPresent()) {
+            return Optional.of(NativeEntity.create(entity.id(), stream.get().getId(), ModelTypes.STREAM_V1, stream.get().getTitle(), stream.get()));
+        }
+        return Optional.empty();
+    }
 }

@@ -53,6 +53,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static org.graylog2.contentpacks.facades.StreamTitleFacade.getStreamDescriptor;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
@@ -262,15 +263,6 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                 .searchWithinMs(searchWithinMs())
                 .eventLimit(eventLimit())
                 .build();
-    }
-
-    private Optional<String> getStreamDescriptor(String id, EntityDescriptorIds entityDescriptorIds) {
-        //super.streamService.
-        Optional<String> descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_V1);
-        if (!descriptor.isPresent()) {
-            descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_TITLE);
-        }
-        return descriptor;
     }
 
     @Override

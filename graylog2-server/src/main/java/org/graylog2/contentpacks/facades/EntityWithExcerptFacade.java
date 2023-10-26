@@ -146,8 +146,4 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
     default boolean usesScopedEntities() {
         return false;
     }
-
-    default String resolveEntityDescriptorId(EntityDescriptor entityDescriptor) {
-        return UUID.randomUUID().toString();
-    }
 }

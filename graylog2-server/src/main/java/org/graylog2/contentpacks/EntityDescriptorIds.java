@@ -25,7 +25,6 @@ import org.graylog2.plugin.streams.Stream;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -58,10 +57,6 @@ public class EntityDescriptorIds {
         return new EntityDescriptorIds(descriptorIds);
     }
 
-    public static EntityDescriptorIds of(Map<EntityDescriptor, String> entityDescriptors) {
-        return new EntityDescriptorIds(ImmutableMap.copyOf(entityDescriptors));
-    }
-
     public static boolean isSystemStreamDescriptor(EntityDescriptor descriptor) {
         return ModelTypes.STREAM_V1.equals(descriptor.type()) && Stream.isSystemStreamId(descriptor.id().id());
     }
@@ -86,4 +81,3 @@ public class EntityDescriptorIds {
         return get(id, type).orElseThrow(() -> new ContentPackException("Couldn't find entity " + id + "/" + type));
     }
 }
-

@@ -24,9 +24,6 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
