@@ -2,4 +2,4 @@ type = "c"
 message = "Exclude non-message streams from aggregation event searches."
 
 issues = ["Graylog2/graylog-plugin-enterprise/issues/6042"]
-pulls = ["99999"]
+pulls = ["17087"]
