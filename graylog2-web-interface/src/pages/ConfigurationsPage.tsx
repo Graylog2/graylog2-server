@@ -38,6 +38,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import DataNodeConfiguration from 'components/configurations/DataNodeConfiguration/DataNodeConfiguration';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
+import KeyboardShortcutsSection from 'pages/configurations/KeyboardShortcutsSection';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -177,6 +178,10 @@ const ConfigurationsPage = () => {
       SectionComponent: PluginsConfig,
       showCaret: true,
       catchAll: true,
+    },
+    {
+      name: 'Keyboard Shortcuts',
+      SectionComponent: KeyboardShortcutsSection,
     },
   ].filter(({ hide }) => !hide), [currentUser?.permissions, isCloud]);
 
