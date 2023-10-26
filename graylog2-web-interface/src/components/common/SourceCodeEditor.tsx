@@ -356,7 +356,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
                        readOnly={readOnly}
                        value={value}
                        width="100%"
-                       wrapEnabled={wrapEnabled}/>
+                       wrapEnabled={wrapEnabled} />
           </SourceCodeContainer>
         </Resizable>
       </div>
