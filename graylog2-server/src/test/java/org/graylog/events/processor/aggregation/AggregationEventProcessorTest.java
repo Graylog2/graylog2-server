@@ -65,7 +65,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -93,20 +92,14 @@ public class AggregationEventProcessorTest {
     private Consumer<List<MessageSummary>> messageConsumer;
     @Mock
     private NotificationService notificationService;
+    @Mock
+    private StreamService streamService;
+
     private EventStreamService eventStreamService;
 
     @Before
     public void setUp() throws Exception {
-        final StreamService streamService = mock(StreamService.class);
         eventStreamService = new EventStreamService(streamService);
-        when(streamService.loadAll()).thenReturn(ImmutableList.of(
-                new StreamMock(Collections.singletonMap("_id", "stream-1"), Collections.emptyList()),
-                new StreamMock(Collections.singletonMap("_id", "stream-2"), Collections.emptyList()),
-                new StreamMock(Collections.singletonMap("_id", "stream-3"), Collections.emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_STREAM_ID), Collections.emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_EVENTS_STREAM_ID), Collections.emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID), Collections.emptyList())
-        ));
     }
 
     @Test
@@ -447,6 +440,16 @@ public class AggregationEventProcessorTest {
 
     @Test
     public void testEventsFromAggregationResultWithEmptyResultAndNoConfiguredStreamsUsesAllStreamsAsSourceStreams() throws EventProcessorException {
+        when(streamService.loadAll()).thenReturn(ImmutableList.of(
+                new StreamMock(Collections.singletonMap("_id", "stream-1"), Collections.emptyList()),
+                new StreamMock(Collections.singletonMap("_id", "stream-2"), Collections.emptyList()),
+                new StreamMock(Collections.singletonMap("_id", "stream-3"), Collections.emptyList()),
+                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_STREAM_ID), Collections.emptyList()),
+                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_EVENTS_STREAM_ID), Collections.emptyList()),
+                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID), Collections.emptyList()),
+                new StreamMock(Collections.singletonMap("_id", StreamImpl.FAILURES_STREAM_ID), Collections.emptyList())
+        ));
+
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
