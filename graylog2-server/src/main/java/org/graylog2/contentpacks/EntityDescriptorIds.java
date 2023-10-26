@@ -48,7 +48,7 @@ public class EntityDescriptorIds {
     public static EntityDescriptorIds of(Collection<EntityDescriptor> entityDescriptors) {
         final ImmutableMap<EntityDescriptor, String> descriptorIds = entityDescriptors.stream()
                 .collect(ImmutableMap.toImmutableMap(Function.identity(), d -> {
-                    if (isNonExportableStreamDescriptor(d)) {
+                    if (isSystemStreamDescriptor(d)) {
                         return d.id().id();
                     } else {
                         return UUID.randomUUID().toString();
@@ -64,10 +64,6 @@ public class EntityDescriptorIds {
 
     public static boolean isSystemStreamDescriptor(EntityDescriptor descriptor) {
         return ModelTypes.STREAM_V1.equals(descriptor.type()) && Stream.isSystemStreamId(descriptor.id().id());
-    }
-
-    public static boolean isNonExportableStreamDescriptor(EntityDescriptor descriptor) {
-        return ModelTypes.STREAM_TITLE.equals(descriptor.type()) || isSystemStreamDescriptor(descriptor);
     }
 
     private EntityDescriptorIds(ImmutableMap<EntityDescriptor, String> descriptorIds) {
