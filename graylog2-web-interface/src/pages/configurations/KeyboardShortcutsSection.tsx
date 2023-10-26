@@ -15,20 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
-import { Col } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import type { HotkeyCollection, ScopeName } from 'contexts/HotkeysContext';
 import HotkeyCollectionSection from 'components/hotkeys/HotkeyCollectionSection';
 import { DEFAULT_COMBINATION_KEY, DEFAULT_SPLIT_KEY } from 'hooks/useHotkey';
 
+const StyledSectionGrid = styled(SectionGrid)`
+  margin-top: 10px;
+`;
+
 const KeyboardShortcutsSection = () => {
   const { hotKeysCollections } = useHotkeysContext();
 
   return (
-    <Col md={10}>
-      <SectionGrid>
+    <div>
+      <h2>Graylog Keyboard Shortcuts</h2>
+      <StyledSectionGrid>
         {Object.entries(hotKeysCollections).map(([scope, collection]: [ScopeName, HotkeyCollection]) => {
           const { title, description, actions } = collection;
           const sectionActions = Object.entries(actions).map(([actionKey, { description: keyDescription, keys, displayKeys }]) => ({
@@ -42,8 +47,8 @@ const KeyboardShortcutsSection = () => {
 
           return <HotkeyCollectionSection key={scope} title={title} description={description} sectionActions={sectionActions} />;
         })}
-      </SectionGrid>
-    </Col>
+      </StyledSectionGrid>
+    </div>
   );
 };
 

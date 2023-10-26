@@ -181,7 +181,11 @@ const ConfigurationsPage = () => {
     },
     {
       name: 'Keyboard Shortcuts',
-      SectionComponent: KeyboardShortcutsSection,
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: KeyboardShortcutsSection,
+        title: 'Graylog Keyboard Shortcuts',
+      },
     },
   ].filter(({ hide }) => !hide), [currentUser?.permissions, isCloud]);
 
