@@ -3861,10 +3861,10 @@
   dependencies:
     moment ">=2.14.0"
 
-"@types/mousetrap@1.6.12":
-  version "1.6.12"
-  resolved "https://registry.yarnpkg.com/@types/mousetrap/-/mousetrap-1.6.12.tgz#d923b92fe138d73809a02716693f079850986553"
-  integrity sha512-tzXGzMbvXt815z0Z7FE45wmRVRitMTaPgfVcdGhOS6LtEOWBZBokFJxEdatVA8cj+cQxvdFLmlMC4c12TNqv9A==
+"@types/mousetrap@1.6.13":
+  version "1.6.13"
+  resolved "https://registry.yarnpkg.com/@types/mousetrap/-/mousetrap-1.6.13.tgz#1b2e4cd374fdd1ee58a240be0aafd94f7270b3be"
+  integrity sha512-dEzDpaR+P/thkMsjsREQDX9OP8AMyLncTkgUgTTIxq5lJTlQffiLJt67ImDtaX+kC7CaNIX30pfdrrMZkym+eg==
 
 "@types/node@*":
   version "13.7.4"
