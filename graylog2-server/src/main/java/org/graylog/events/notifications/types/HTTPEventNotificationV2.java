@@ -27,6 +27,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.commons.lang.StringUtils;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
@@ -56,6 +57,27 @@ import java.util.stream.Collectors;
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.graylog.events.event.EventDto.FIELD_EVENT_TIMESTAMP;
+import static org.graylog.events.event.EventDto.FIELD_FIELDS;
+import static org.graylog.events.event.EventDto.FIELD_ID;
+import static org.graylog.events.event.EventDto.FIELD_KEY;
+import static org.graylog.events.event.EventDto.FIELD_KEY_TUPLE;
+import static org.graylog.events.event.EventDto.FIELD_MESSAGE;
+import static org.graylog.events.event.EventDto.FIELD_ORIGIN_CONTEXT;
+import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
+import static org.graylog.events.event.EventDto.FIELD_PROCESSING_TIMESTAMP;
+import static org.graylog.events.event.EventDto.FIELD_SOURCE;
+import static org.graylog.events.event.EventDto.FIELD_SOURCE_STREAMS;
+import static org.graylog.events.event.EventDto.FIELD_STREAMS;
+import static org.graylog.events.event.EventDto.FIELD_TIMERANGE_END;
+import static org.graylog.events.event.EventDto.FIELD_TIMERANGE_START;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_BACKLOG;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_DESCRIPTION;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_ID;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_TITLE;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_TYPE;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_JOB_DEFINITION_ID;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_JOB_TRIGGER_ID;
 
 public class HTTPEventNotificationV2 extends HTTPNotification implements EventNotification {
     public interface Factory extends EventNotification.Factory<HTTPEventNotificationV2> {
@@ -64,6 +86,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(HTTPEventNotificationV2.class);
+    private static final String EVENT = "event_";
 
     private final EventNotificationService notificationCallbackService;
     private final ObjectMapperProvider objectMapperProvider;
@@ -161,10 +184,10 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         final String body;
         final String bodyTemplate = config.bodyTemplate();
         final ObjectMapper objectMapper = objectMapperProvider.getForTimeZone(config.timeZone());
+        final Map<String, Object> modelMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
         if (!Strings.isNullOrEmpty(bodyTemplate)) {
-            final Map<String, Object> modelMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
             if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
-                String[] parts = bodyTemplate.split("&");
+                final String[] parts = bodyTemplate.split("&");
                 body = Arrays.stream(parts)
                         .map(part -> {
                             final int equalsIndex = part.indexOf("=");
@@ -178,14 +201,43 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                 body = templateEngine.transform(bodyTemplate, modelMap);
             }
         } else {
-            final String eventString = objectMapper.writeValueAsString(modelData);
             if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
-                body = "event=" + urlEncode(eventString);
+                final Map<String, Object> eventMap = objectMapper.convertValue(modelData.event(), TypeReferences.MAP_STRING_OBJECT);
+                body = getUrlEncodedEvent(modelMap, eventMap);
             } else {
-                body = eventString;
+                body = objectMapper.writeValueAsString(modelData);
             }
         }
         return body;
+    }
+
+    private String getUrlEncodedEvent(Map<String, Object> modelMap, Map<String, Object> eventMap) {
+        return StringUtils.chop(urlEncodedKeyValue(FIELD_EVENT_DEFINITION_ID, modelMap.get(FIELD_EVENT_DEFINITION_ID)) +
+                urlEncodedKeyValue(FIELD_EVENT_DEFINITION_TYPE, modelMap.get(FIELD_EVENT_DEFINITION_TYPE)) +
+                urlEncodedKeyValue(FIELD_EVENT_DEFINITION_TITLE, modelMap.get(FIELD_EVENT_DEFINITION_TITLE)) +
+                urlEncodedKeyValue(FIELD_EVENT_DEFINITION_DESCRIPTION, modelMap.get(FIELD_EVENT_DEFINITION_DESCRIPTION)) +
+                urlEncodedKeyValue(FIELD_JOB_DEFINITION_ID, modelMap.get(FIELD_JOB_DEFINITION_ID)) +
+                urlEncodedKeyValue(FIELD_JOB_TRIGGER_ID, modelMap.get(FIELD_JOB_TRIGGER_ID)) +
+                urlEncodedKeyValue(EVENT + FIELD_ID, eventMap.get(FIELD_ID)) +
+                urlEncodedKeyValue(EVENT + FIELD_ORIGIN_CONTEXT, eventMap.get(FIELD_ORIGIN_CONTEXT)) +
+                urlEncodedKeyValue(EVENT + FIELD_EVENT_TIMESTAMP, eventMap.get(FIELD_EVENT_TIMESTAMP)) +
+                urlEncodedKeyValue(EVENT + FIELD_PROCESSING_TIMESTAMP, eventMap.get(FIELD_PROCESSING_TIMESTAMP)) +
+                urlEncodedKeyValue(EVENT + FIELD_TIMERANGE_START, eventMap.get(FIELD_TIMERANGE_START)) +
+                urlEncodedKeyValue(EVENT + FIELD_TIMERANGE_END, eventMap.get(FIELD_TIMERANGE_END)) +
+                urlEncodedKeyValue(EVENT + FIELD_STREAMS, eventMap.get(FIELD_STREAMS)) +
+                urlEncodedKeyValue(EVENT + FIELD_SOURCE_STREAMS, eventMap.get(FIELD_SOURCE_STREAMS)) +
+                urlEncodedKeyValue(EVENT + FIELD_MESSAGE, eventMap.get(FIELD_MESSAGE)) +
+                urlEncodedKeyValue(EVENT + FIELD_SOURCE, eventMap.get(FIELD_SOURCE)) +
+                urlEncodedKeyValue(EVENT + FIELD_KEY_TUPLE, eventMap.get(FIELD_KEY_TUPLE)) +
+                urlEncodedKeyValue(EVENT + FIELD_KEY, eventMap.get(FIELD_KEY)) +
+                urlEncodedKeyValue(EVENT + FIELD_PRIORITY, eventMap.get(FIELD_PRIORITY)) +
+                urlEncodedKeyValue(EVENT + FIELD_FIELDS, eventMap.get(FIELD_FIELDS)) +
+                urlEncodedKeyValue(FIELD_BACKLOG, modelMap.get(FIELD_BACKLOG))
+        );
+    }
+
+    private String urlEncodedKeyValue(String key, Object value) {
+        return urlEncode(key) + "=" + (value != null ? urlEncode(value.toString()) : "") + "&";
     }
 
     private String urlEncode(String s) {

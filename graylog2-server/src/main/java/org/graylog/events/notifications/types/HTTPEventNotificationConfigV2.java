@@ -38,6 +38,8 @@ import org.joda.time.DateTimeZone;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @AutoValue
 @JsonTypeName(HTTPEventNotificationConfigV2.TYPE_NAME)
 @JsonDeserialize(builder = HTTPEventNotificationConfigV2.Builder.class)
@@ -123,7 +125,7 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
         if (!httpMethod().equals(HttpMethod.GET) && contentType() == null) {
             validation.addError(FIELD_CONTENT_TYPE, "Content Type must not be null for PUT/POST methods.");
         }
-        if (contentType() == ContentType.FORM_DATA && bodyTemplate() != null) {
+        if (contentType() == ContentType.FORM_DATA && !isNullOrEmpty(bodyTemplate())) {
             final String[] parts = bodyTemplate().split("&");
             for (String part : parts) {
                 final int equalsIndex = part.indexOf("=");

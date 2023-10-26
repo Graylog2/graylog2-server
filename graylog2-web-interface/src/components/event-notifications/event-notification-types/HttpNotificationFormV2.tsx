@@ -295,6 +295,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                                 mode="text"
                                 theme="light"
                                 value={config.body_template || ''}
+                                wrapEnabled={true}
                                 onChange={this.handleJsonBodyTemplateChange} />
               <HelpBlock>
                 {get(validation, 'errors.body_template[0]', helpElement)}
