@@ -460,7 +460,7 @@
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
-                <version>${opentelemetry.version}</version>
+                <version>${opentelemetry-instrumentation-annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>software.amazon.msk</groupId>
