@@ -28,14 +28,14 @@ import javax.validation.constraints.NotBlank;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class StreamTitleEntity {
+public abstract class StreamReferenceEntity {
     @JsonProperty("title")
     @NotBlank
     public abstract ValueReference title();
 
     @JsonCreator
-    public static StreamTitleEntity create(
+    public static StreamReferenceEntity create(
             @JsonProperty("title") @NotBlank ValueReference title) {
-        return new AutoValue_StreamTitleEntity(title);
+        return new AutoValue_StreamReferenceEntity(title);
     }
 }

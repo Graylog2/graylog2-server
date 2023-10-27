@@ -27,8 +27,6 @@ import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
@@ -42,7 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.graylog2.contentpacks.facades.StreamTitleFacade.resolveStreamEntity;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
 
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfigEntity.TYPE_NAME)

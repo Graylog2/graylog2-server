@@ -17,7 +17,7 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
-import org.graylog2.contentpacks.model.entities.StreamTitleEntity;
+import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -29,19 +29,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class StreamTitleFacade extends StreamFacade {
-    private static final Logger LOG = LoggerFactory.getLogger(StreamTitleFacade.class);
+public class StreamReferenceFacade extends StreamFacade {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamReferenceFacade.class);
 
-    public static final ModelType TYPE_V1 = ModelTypes.STREAM_TITLE;
+    public static final ModelType TYPE_V1 = ModelTypes.STREAM_REF_V1;
 
     private final ObjectMapper objectMapper;
     private final StreamService streamService;
 
     @Inject
-    public StreamTitleFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration, IndexSetService indexSetService, UserService userService) {
+    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration, IndexSetService indexSetService, UserService userService) {
         super(objectMapper, streamService, streamRuleService, legacyAlertsMigration, indexSetService, userService);
         this.objectMapper = objectMapper;
         this.streamService = streamService;
@@ -50,13 +51,19 @@ public class StreamTitleFacade extends StreamFacade {
     @Override
     public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
         final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
-        mutableGraph.addNode(EntityDescriptor.create(entityDescriptor.id().id(), ModelTypes.STREAM_TITLE));
+        mutableGraph.addNode(EntityDescriptor.create(entityDescriptor.id().id(), ModelTypes.STREAM_REF_V1));
         return ImmutableGraph.copyOf(mutableGraph);
     }
 
     @Override
     public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
+
+        // If we are already exporting the actual Stream, we don't need to export the title entity too.
+        if (entityDescriptorIds.get(modelId.id(), ModelTypes.STREAM_V1).isPresent()) {
+            return Optional.empty();
+        }
+
         try {
             final Stream stream = streamService.load(modelId.id());
             return Optional.of(exportNativeEntity(stream, entityDescriptorIds));
@@ -68,12 +75,12 @@ public class StreamTitleFacade extends StreamFacade {
 
     @VisibleForTesting
     Entity exportNativeEntity(Stream stream, EntityDescriptorIds entityDescriptorIds) {
-        final StreamTitleEntity streamEntity = StreamTitleEntity.create(ValueReference.of(stream.getTitle()));
+        final StreamReferenceEntity streamEntity = StreamReferenceEntity.create(ValueReference.of(stream.getTitle()));
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         return EntityV1.builder()
-                .id(ModelId.of(entityDescriptorIds.getOrThrow(stream.getId(), ModelTypes.STREAM_TITLE)))
-                .type(ModelTypes.STREAM_TITLE)
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(stream.getId(), ModelTypes.STREAM_REF_V1)))
+                .type(ModelTypes.STREAM_REF_V1)
                 .data(data)
                 .build();
     }
@@ -100,28 +107,47 @@ public class StreamTitleFacade extends StreamFacade {
         }
     }
 
+    @Override
+    public NativeEntity<Stream> createNativeEntity(Entity entity,
+                                                   Map<String, ValueReference> parameters,
+                                                   Map<EntityDescriptor, Object> nativeEntities,
+                                                   String username) {
+        if (entity instanceof EntityV1) {
+            // Throw an exception if this is reached. Install process should fail earlier if no existing Stream found.
+            // A native entity cannot be created as this is only a reference to an existing stream.
+            final StreamReferenceEntity streamEntity = objectMapper.convertValue(((EntityV1) entity).data(), StreamReferenceEntity.class);
+            throw new ContentPackException("Stream with title <" + streamEntity.title().asString(parameters) + "> does not exist!");
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final StreamReferenceEntity streamEntity = objectMapper.convertValue(entity.data(), StreamReferenceEntity.class);
+        final List<Stream> streams = streamService.loadAllByTitle(streamEntity.title().asString());
+        if (streams.size() == 1) {
+            final Stream stream = streams.get(0);
+            return Optional.of(NativeEntity.create(entity.id(), stream.getId(), ModelTypes.STREAM_V1, stream.getTitle(), stream));
+        } else {
+            throw new ContentPackException(streams.isEmpty()
+                    ? "Stream with title <" + streamEntity.title().asString(parameters) + "> does not exist!"
+                    : "Multiple Streams with title <" + streamEntity.title().asString(parameters) + "> exist!");
+        }
+    }
+
     public static Object resolveStreamEntity(String id, Map entities) {
         Object streamEntity = entities.get(EntityDescriptor.create(id, ModelTypes.STREAM_V1));
         if (streamEntity == null) {
-            streamEntity = entities.get(EntityDescriptor.create(id, ModelTypes.STREAM_TITLE));
+            streamEntity = entities.get(EntityDescriptor.create(id, ModelTypes.STREAM_REF_V1));
         }
         return streamEntity;
     }
 
     public static Optional<String> getStreamDescriptor(String id, EntityDescriptorIds entityDescriptorIds) {
         Optional<String> descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_V1);
-        if (!descriptor.isPresent()) {
-            descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_TITLE);
+        if (descriptor.isEmpty()) {
+            descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_REF_V1);
         }
         return descriptor;
-    }
-
-    private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
-        final StreamTitleEntity streamEntity = objectMapper.convertValue(entity.data(), StreamTitleEntity.class);
-        final Optional<Stream> stream = streamService.loadAll().stream().filter(s -> streamEntity.title().asString().equals(s.getTitle())).findFirst();
-        if (stream.isPresent()) {
-            return Optional.of(NativeEntity.create(entity.id(), stream.get().getId(), ModelTypes.STREAM_V1, stream.get().getTitle(), stream.get()));
-        }
-        return Optional.empty();
     }
 }
