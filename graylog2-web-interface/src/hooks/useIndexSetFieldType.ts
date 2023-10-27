@@ -30,13 +30,15 @@ const INITIAL_DATA = {
 export type IndexSetFieldTypeJson = {
     field_name: string,
     type: string,
-    type_history: Array<string>
+    is_custom: string,
+    is_reserved: string,
 }
 
 export type IndexSetFieldType = {
     id: string,
     fieldName: string,
-    typeHistory: Array<string>,
+    isCustom: string,
+    isReserved: string,
     type: string,
 }
 
@@ -55,7 +57,8 @@ const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchP
         id: fieldType.field_name,
         fieldName: fieldType.field_name,
         type: fieldType.type,
-        typeHistory: fieldType.type_history,
+        isCustom: fieldType.is_custom,
+        isReserved: fieldType.is_reserved,
       })),
       pagination: { total },
       attributes,

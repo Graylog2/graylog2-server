@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
-import take from 'lodash/take';
 
 import type { IndexSetFieldType } from 'hooks/useIndexSetFieldType';
 import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
@@ -28,7 +27,6 @@ import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
-import type { TypeHistoryItem } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 import QueryHelper from '../common/QueryHelper';
 
@@ -36,8 +34,8 @@ export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'field_name', direction: 'asc' } as Sort,
-  displayedColumns: ['field_name', 'type', 'type_history'],
-  columnsOrder: ['field_name', 'type', 'type_history'],
+  displayedColumns: ['field_name', 'type', 'is_custom'],
+  columnsOrder: ['field_name', 'type', 'is_custom'],
 };
 
 const IndexSetFieldTypesList = () => {
@@ -108,18 +106,6 @@ const IndexSetFieldTypesList = () => {
       type: {
         renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
       },
-      type_history: {
-        renderCell: (items: Array<TypeHistoryItem>) => {
-          const rest = take(items, items.length - 1).map((item) => fieldTypes[item] || item);
-          if (!rest.length) return null;
-
-          return (
-            <span>
-              {rest.join(', ')}
-            </span>
-          );
-        },
-      },
     },
   }), [fieldTypes]);
 
@@ -131,7 +117,6 @@ const IndexSetFieldTypesList = () => {
     <Button onClick={() => openEditModal(fieldType)}
             role="button"
             bsSize="xsmall"
-            bsStyle="danger"
             title={`Edit ${fieldType.fieldName} field type`}
             tabIndex={0}>
       Edit
