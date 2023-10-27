@@ -80,7 +80,6 @@ class ConfigurationHelper extends React.Component {
         </Row>
       </Panel>
     );
-    /* eslint-enable no-template-curly-in-string */
   }
 }
 
