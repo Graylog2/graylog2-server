@@ -3855,9 +3855,9 @@
   integrity sha512-Kfe/D3hxHTusnPNRbycJE1N77WHDsdS4AjUYIzlDzhDrS47NrwuL3YW4VITxwR7KCVpzwgy4Rbj829KSSQmwXQ==
 
 "@types/moment-duration-format@^2.2.2":
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/@types/moment-duration-format/-/moment-duration-format-2.2.4.tgz#24d4b7c209e45570ce514e43fa0d703002a61276"
-  integrity sha512-yKbULlpoDMYAW2eLQNpvXDH1yEFz83qyRhQP1c/Xl5+/pfqEjhlHN//Oy8scLSsXEHy5vY3Ph3eUsoHckSq+zg==
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/@types/moment-duration-format/-/moment-duration-format-2.2.5.tgz#8e290780c5f23b69d99d78f456e8a974c65b6fbf"
+  integrity sha512-0ojMdyThftIMXblaNFbIC4RUNUuiKyXP9BwywS6fm6L4Sod78ziFzO+cH2UWReexJo3go3xhkY3CVdcBiryocg==
   dependencies:
     moment ">=2.14.0"
 
