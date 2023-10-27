@@ -61,6 +61,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -219,7 +220,7 @@ public class AggregationEventProcessor implements EventProcessor {
 
     private void filterSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                               EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
-        final Set<String> streams = getStreams(parameters);
+        final Set<String> streams = eventStreamService.buildEventSourceStreams(getStreams(parameters), Collections.emptySet());
 
         final AtomicInteger messageCount = new AtomicInteger(0);
         final MoreSearch.ScrollCallback callback = (messages, continueScrolling) -> {
