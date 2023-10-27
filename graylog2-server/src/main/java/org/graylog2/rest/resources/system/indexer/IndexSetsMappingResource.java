@@ -81,7 +81,7 @@ public class IndexSetsMappingResource extends RestResource {
                                                                       @ApiParam(name = "sort",
                                                                                 value = "The field to sort the result on",
                                                                                 required = true,
-                                                                                allowableValues = "field_name,type")
+                                                                                allowableValues = "field_name,type,is_custom,is_reserved")
                                                                       @DefaultValue(IndexSetFieldType.DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
                                                                       @DefaultValue("asc") @QueryParam("order") String order,

@@ -26,11 +26,13 @@ import java.util.List;
 
 public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
                                 @JsonProperty(TYPE) String type,
-                                @JsonProperty(FIELD_TYPE_HISTORY) List<String> fieldTypeHistory) {
+                                @JsonProperty(IS_CUSTOM) boolean isCustom,
+                                @JsonProperty(IS_RESERVED) boolean isReserved) {
 
     public static final String FIELD_NAME = "field_name";
     public static final String TYPE = "type";
-    public static final String FIELD_TYPE_HISTORY = "type_history";
+    public static final String IS_CUSTOM = "is_custom";
+    public static final String IS_RESERVED = "is_reserved";
 
     public static final String DEFAULT_SORT_FIELD = IndexSetFieldType.FIELD_NAME;
     public static final Sorting DEFAULT_SORT = Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.ASC);
@@ -40,18 +42,20 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
 
     public static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(IndexSetFieldType.FIELD_NAME).title("Field name").sortable(true).build(),
-            EntityAttribute.builder().id(IndexSetFieldType.FIELD_TYPE_HISTORY).title("Type history").sortable(false).build(),
+            EntityAttribute.builder().id(IndexSetFieldType.IS_CUSTOM).title("Custom").sortable(true).build(),
+            EntityAttribute.builder().id(IndexSetFieldType.IS_RESERVED).title("Reserved").sortable(true).build(),
             EntityAttribute.builder().id(IndexSetFieldType.TYPE).title("Type").sortable(true).build()
     );
 
     public static Comparator<IndexSetFieldType> getComparator(final String sort,
                                                               final Sorting.Direction order) {
-        final Comparator<IndexSetFieldType> comparator = Comparator.comparing(dto -> {
-            if (sort.equals(IndexSetFieldType.TYPE)) {
-                return dto.type();
-            }
-            return dto.fieldName();
-        });
+        final Comparator<IndexSetFieldType> comparator = switch (sort) {
+            case TYPE -> Comparator.comparing(IndexSetFieldType::type);
+            case IS_RESERVED -> Comparator.comparing(IndexSetFieldType::isReserved);
+            case IS_CUSTOM -> Comparator.comparing(IndexSetFieldType::isCustom);
+            default -> Comparator.comparing(IndexSetFieldType::fieldName);
+        };
+
         if (order == Sorting.Direction.DESC) {
             return comparator.reversed();
         } else {

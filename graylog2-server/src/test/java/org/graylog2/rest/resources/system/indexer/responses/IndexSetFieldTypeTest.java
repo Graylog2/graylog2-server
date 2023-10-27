@@ -20,7 +20,6 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
-import java.util.List;
 
 import static org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType.FIELD_NAME;
 import static org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType.TYPE;
@@ -36,28 +35,28 @@ class IndexSetFieldTypeTest {
         final Comparator<IndexSetFieldType> fieldNameComparator = IndexSetFieldType.getComparator(FIELD_NAME, Sorting.Direction.ASC);
         final Comparator<IndexSetFieldType> reversedFieldNameComparator = IndexSetFieldType.getComparator(FIELD_NAME, Sorting.Direction.DESC);
         assertEquals(0, fieldNameComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("buhaha", "string", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("buhaha", "string", true, false)
         ));
         assertEquals(0, reversedFieldNameComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("buhaha", "string", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("buhaha", "string", true, false)
         ));
         assertTrue(0 > fieldNameComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("chiquita", "string", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("chiquita", "string", true, false)
         ));
         assertTrue(0 < reversedFieldNameComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("chiquita", "string", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("chiquita", "string", true, false)
         ));
         assertTrue(0 < fieldNameComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("arizona", "string", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("arizona", "string", true, false)
         ));
         assertTrue(0 > reversedFieldNameComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("arizona", "string", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("arizona", "string", true, false)
         ));
     }
 
@@ -67,28 +66,28 @@ class IndexSetFieldTypeTest {
         final Comparator<IndexSetFieldType> fieldTypeComparator = IndexSetFieldType.getComparator(TYPE, Sorting.Direction.ASC);
         final Comparator<IndexSetFieldType> reversedFieldTypeComparator = IndexSetFieldType.getComparator(TYPE, Sorting.Direction.DESC);
         assertEquals(0, fieldTypeComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("buhaha", "long", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("buhaha", "long", true, false)
         ));
         assertEquals(0, reversedFieldTypeComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("buhaha", "long", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("buhaha", "long", true, false)
         ));
         assertTrue(0 > fieldTypeComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("chiquita", "string", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("chiquita", "string", true, false)
         ));
         assertTrue(0 < reversedFieldTypeComparator.compare(
-                new IndexSetFieldType("buhaha", "long", List.of()),
-                new IndexSetFieldType("chiquita", "string", List.of())
+                new IndexSetFieldType("buhaha", "long", true, false),
+                new IndexSetFieldType("chiquita", "string", true, false)
         ));
         assertTrue(0 < fieldTypeComparator.compare(
-                new IndexSetFieldType("buhaha", "text", List.of()),
-                new IndexSetFieldType("arizona", "string", List.of())
+                new IndexSetFieldType("buhaha", "text", true, false),
+                new IndexSetFieldType("arizona", "string", true, false)
         ));
         assertTrue(0 > reversedFieldTypeComparator.compare(
-                new IndexSetFieldType("buhaha", "text", List.of()),
-                new IndexSetFieldType("arizona", "string", List.of())
+                new IndexSetFieldType("buhaha", "text", true, false),
+                new IndexSetFieldType("arizona", "string", true, false)
         ));
     }
 }

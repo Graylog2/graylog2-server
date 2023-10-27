@@ -59,4 +59,8 @@ public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
         modifiedMappings.add(changedMapping);
         return new CustomFieldMappings(modifiedMappings);
     }
+
+    public boolean containsCustomMappingForField(final String fieldName) {
+        return stream().anyMatch(m -> m.fieldName().equals(fieldName));
+    }
 }

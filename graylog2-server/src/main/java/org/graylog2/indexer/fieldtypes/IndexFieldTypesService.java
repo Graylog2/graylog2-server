@@ -29,6 +29,10 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBUpsertRetryer;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
@@ -69,12 +73,17 @@ public class IndexFieldTypesService {
     private final JacksonDBCollection<IndexFieldTypesDTO, ObjectId> db;
     private final StreamService streamService;
     private final MongoCollection<Document> mongoCollection;
+
+    private final IndexSetService indexSetService;
+
     @Inject
-    public IndexFieldTypesService(MongoConnection mongoConnection,
-                                  StreamService streamService,
-                                  MongoJackObjectMapperProvider objectMapperProvider) {
+    public IndexFieldTypesService(final MongoConnection mongoConnection,
+                                  final StreamService streamService,
+                                  final MongoJackObjectMapperProvider objectMapperProvider,
+                                  final IndexSetService indexSetService) {
         this.streamService = streamService;
         this.mongoCollection = mongoConnection.getMongoDatabase().getCollection("index_field_types");
+        this.indexSetService = indexSetService;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("index_field_types"),
                 IndexFieldTypesDTO.class,
                 ObjectId.class,
@@ -97,14 +106,18 @@ public class IndexFieldTypesService {
             final String sort,
             final Sorting.Direction order) {
 
-        final Optional<IndexFieldTypesDTO> indexFieldTypesDTO = Optional.ofNullable(db.findOne(DBQuery.is(FIELD_INDEX_SET_ID, indexSetId)));
+        final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
+        final CustomFieldMappings customFieldMappings = indexSetConfig.map(IndexSetConfig::customFieldMappings).orElse(new CustomFieldMappings());
+
+        final Optional<IndexFieldTypesDTO> indexFieldTypesDTO = indexSetConfig.isPresent() ? Optional.ofNullable(db.findOne(DBQuery.is(FIELD_INDEX_SET_ID, indexSetId))) : Optional.empty();
         final List<IndexSetFieldType> retrievedPage = indexFieldTypesDTO.map(
                 dto -> dto.fields()
                         .stream()
                         .map(fieldTypeDTO -> new IndexSetFieldType(
                                         fieldTypeDTO.fieldName(),
                                 REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType())),
-                                fieldTypeHistory(indexSetId, fieldTypeDTO.fieldName(), true)
+                                customFieldMappings.containsCustomMappingForField(fieldTypeDTO.fieldName()),
+                                FieldTypeMappingsService.BLACKLISTED_FIELDS.contains(fieldTypeDTO.fieldName())
                                 )
                         )
                         .sorted(IndexSetFieldType.getComparator(sort, order))
