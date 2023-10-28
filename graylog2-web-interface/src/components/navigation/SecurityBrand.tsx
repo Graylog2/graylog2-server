@@ -41,7 +41,7 @@ type Props = {
 }
 
 // Don't pass active prop, since `a` tag doesn't support it.
-const NavigationBrand = ({ active: _active, ...props }: Props) => {
+const SecurityBrand = ({ active: _active, ...props }: Props) => {
   const theme = useTheme();
 
   return (
@@ -68,19 +68,20 @@ const NavigationBrand = ({ active: _active, ...props }: Props) => {
               clipRule="evenodd"
               d="M213.772 36.0561C213.892 35.6114 214.499 35.5522 214.703 35.9652L219.03 44.7215C219.114 44.892 219.288 45 219.478 45H223C223.828 45 224.5 45.6716 224.5 46.5C224.5 47.3284 223.828 48 223 48H217.614C217.424 48 217.25 47.892 217.166 47.7215L214.941 43.22L211.228 56.9439C211.108 57.3886 210.501 57.4478 210.297 57.0348L205.97 48.2785C205.886 48.108 205.712 48 205.522 48H202C201.172 48 200.5 47.3284 200.5 46.5C200.5 45.6716 201.172 45 202 45H207.386C207.576 45 207.75 45.108 207.834 45.2785L210.059 49.78L213.772 36.0561Z"
               fill={theme.colors.variant.darker.default} />
+        <text x="165" y="85" fill={theme.colors.brand.logo} fontSize="38" fontFamily="Arial">Security</text>
       </svg>
     </Link>
   );
 };
 
-NavigationBrand.propTypes = {
+SecurityBrand.propTypes = {
   active: PropTypes.bool,
   className: PropTypes.string,
 };
 
-NavigationBrand.defaultProps = {
+SecurityBrand.defaultProps = {
   active: false,
   className: undefined,
 };
 
-export default NavigationBrand;
+export default SecurityBrand;

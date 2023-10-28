@@ -30,10 +30,10 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import { Icon } from 'components/common';
+import PerspectiveSwitcher from 'components/navigation/PerspectiveSwitcher';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
-import NavigationBrand from './NavigationBrand';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
 import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
@@ -140,9 +140,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
     <StyledNavbar fluid fixedTop collapseOnSelect>
       <Navbar.Header>
         <Navbar.Brand>
-          <LinkContainer relativeActive to={Routes.STARTPAGE}>
-            <NavigationBrand />
-          </LinkContainer>
+          <PerspectiveSwitcher />
         </Navbar.Brand>
         <Navbar.Toggle />
         <DevelopmentHeaderBadge smallScreen />
