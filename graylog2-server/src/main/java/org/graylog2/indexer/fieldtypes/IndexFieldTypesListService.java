@@ -18,6 +18,7 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.fieldtypes.utils.FieldTypeDTOsMerger;
@@ -27,7 +28,6 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
-import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -37,7 +37,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
-import static org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO.FIELD_INDEX_NAME;
 import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
 
 public class IndexFieldTypesListService {
@@ -67,19 +66,19 @@ public class IndexFieldTypesListService {
             final Sorting.Direction order) {
 
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
-        final Optional<MongoIndexSet> mongoIndexSet = indexSetConfig.map(indexSetFactory::create);
+        final Optional<IndexSet> mongoIndexSet = indexSetConfig.map(indexSetFactory::create);
 
         final CustomFieldMappings customFieldMappings = indexSetConfig.map(IndexSetConfig::customFieldMappings).orElse(new CustomFieldMappings());
 
         final Set<FieldTypeDTO> deflectorFieldDtos = mongoIndexSet
-                .map(MongoIndexSet::getActiveWriteIndex)
-                .map(indexName -> indexFieldTypesService.findOneByQuery(DBQuery.is(FIELD_INDEX_NAME, indexName)))
+                .map(IndexSet::getActiveWriteIndex)
+                .map(indexName -> indexFieldTypesService.findOneByIndexName(indexName))
                 .map(IndexFieldTypesDTO::fields)
                 .orElse(ImmutableSet.of());
 
         final Set<FieldTypeDTO> previousFieldDtos = mongoIndexSet
                 .map(this::getPreviousActiveIndexSet)
-                .map(indexName -> indexFieldTypesService.findOneByQuery(DBQuery.is(FIELD_INDEX_NAME, indexName)))
+                .map(indexName -> indexFieldTypesService.findOneByIndexName(indexName))
                 .map(IndexFieldTypesDTO::fields)
                 .orElse(ImmutableSet.of());
 
@@ -115,14 +114,7 @@ public class IndexFieldTypesListService {
 
     }
 
-    private String getPreviousActiveIndexSet(final MongoIndexSet indexSet) {
-        final String activeWriteIndex = indexSet.getActiveWriteIndex();
-        if (activeWriteIndex != null) {
-            final Optional<Integer> deflectorNumber = indexSet.extractIndexNumber(activeWriteIndex);
-            final String indexPrefix = indexSet.getIndexPrefix();
-            return deflectorNumber.map(num -> indexPrefix + MongoIndexSet.SEPARATOR + (num - 1)).orElse(null);
-        }
-
-        return null;
+    private String getPreviousActiveIndexSet(final IndexSet indexSet) {
+        return indexSet.getNthIndexBeforeActiveIndexSet(1);
     }
 }

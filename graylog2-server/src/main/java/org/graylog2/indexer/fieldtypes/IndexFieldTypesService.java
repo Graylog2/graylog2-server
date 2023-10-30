@@ -204,11 +204,11 @@ public class IndexFieldTypesService {
         return findByQuery(DBQuery.empty());
     }
 
-    public Collection<IndexFieldTypesDTO> findByQuery(DBQuery.Query query) {
+    private Collection<IndexFieldTypesDTO> findByQuery(DBQuery.Query query) {
         return ImmutableList.copyOf((Iterable<IndexFieldTypesDTO>) db.find(query));
     }
 
-    public IndexFieldTypesDTO findOneByQuery(DBQuery.Query query) {
-        return db.findOne(query);
+    public IndexFieldTypesDTO findOneByIndexName(final String indexName) {
+        return db.findOne(DBQuery.is(FIELD_INDEX_NAME, indexName));
     }
 }
