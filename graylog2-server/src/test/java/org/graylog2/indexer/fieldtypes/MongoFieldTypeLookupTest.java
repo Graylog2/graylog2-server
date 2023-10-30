@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.streams.StreamService;
 import org.junit.After;
 import org.junit.Before;
@@ -46,7 +45,7 @@ public class MongoFieldTypeLookupTest {
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
         final StreamService streamService = mock(StreamService.class);
-        this.dbService = new IndexFieldTypesService(mongodb.mongoConnection(), streamService, objectMapperProvider, mock(IndexSetService.class));
+        this.dbService = new IndexFieldTypesService(mongodb.mongoConnection(), streamService, objectMapperProvider);
         this.lookup = new MongoFieldTypeLookup(dbService, new FieldTypeMapper());
     }
 

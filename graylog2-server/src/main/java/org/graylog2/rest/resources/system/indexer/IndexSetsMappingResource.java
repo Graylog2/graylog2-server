@@ -24,7 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesListService;
 import org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
@@ -58,15 +58,15 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsMappingResource extends RestResource {
     private final IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService;
-    private final IndexFieldTypesService indexFieldTypesService;
     private final PermittedStreams permittedStreams;
+    private final IndexFieldTypesListService indexFieldTypesListService;
 
     @Inject
     public IndexSetsMappingResource(final IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService,
-                                    final IndexFieldTypesService indexFieldTypesService,
+                                    final IndexFieldTypesListService indexFieldTypesListService,
                                     final PermittedStreams permittedStreams) {
         this.indexSetFieldTypeSummaryService = indexSetFieldTypeSummaryService;
-        this.indexFieldTypesService = indexFieldTypesService;
+        this.indexFieldTypesListService = indexFieldTypesListService;
         this.permittedStreams = permittedStreams;
     }
 
@@ -87,7 +87,7 @@ public class IndexSetsMappingResource extends RestResource {
                                                                       @DefaultValue("asc") @QueryParam("order") String order,
                                                                       @Context SearchUser searchUser) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
-        return indexFieldTypesService.getIndexSetFieldTypesList(indexSetId,
+        return indexFieldTypesListService.getIndexSetFieldTypesList(indexSetId,
                 page,
                 perPage,
                 sort,

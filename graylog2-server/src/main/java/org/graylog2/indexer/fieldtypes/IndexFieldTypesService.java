@@ -28,14 +28,6 @@ import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBUpsertRetryer;
-import org.graylog2.database.PaginatedList;
-import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
-import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.rest.models.tools.responses.PageListResponse;
-import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.streams.StreamService;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -74,16 +66,13 @@ public class IndexFieldTypesService {
     private final StreamService streamService;
     private final MongoCollection<Document> mongoCollection;
 
-    private final IndexSetService indexSetService;
 
     @Inject
     public IndexFieldTypesService(final MongoConnection mongoConnection,
                                   final StreamService streamService,
-                                  final MongoJackObjectMapperProvider objectMapperProvider,
-                                  final IndexSetService indexSetService) {
+                                  final MongoJackObjectMapperProvider objectMapperProvider) {
         this.streamService = streamService;
         this.mongoCollection = mongoConnection.getMongoDatabase().getCollection("index_field_types");
-        this.indexSetService = indexSetService;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("index_field_types"),
                 IndexFieldTypesDTO.class,
                 ObjectId.class,
@@ -96,51 +85,6 @@ public class IndexFieldTypesService {
         this.db.createIndex(new BasicDBObject(FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
         this.db.createIndex(new BasicDBObject(FIELDS_FIELD_NAMES, 1));
         this.db.createIndex(new BasicDBObject(FIELD_INDEX_SET_ID, 1));
-    }
-
-
-    public PageListResponse<IndexSetFieldType> getIndexSetFieldTypesList(
-            final String indexSetId,
-            final int page,
-            final int perPage,
-            final String sort,
-            final Sorting.Direction order) {
-
-        final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
-        final CustomFieldMappings customFieldMappings = indexSetConfig.map(IndexSetConfig::customFieldMappings).orElse(new CustomFieldMappings());
-
-        final Optional<IndexFieldTypesDTO> indexFieldTypesDTO = indexSetConfig.isPresent() ? Optional.ofNullable(db.findOne(DBQuery.is(FIELD_INDEX_SET_ID, indexSetId))) : Optional.empty();
-        final List<IndexSetFieldType> retrievedPage = indexFieldTypesDTO.map(
-                dto -> dto.fields()
-                        .stream()
-                        .map(fieldTypeDTO -> new IndexSetFieldType(
-                                        fieldTypeDTO.fieldName(),
-                                REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType())),
-                                customFieldMappings.containsCustomMappingForField(fieldTypeDTO.fieldName()),
-                                FieldTypeMappingsService.BLACKLISTED_FIELDS.contains(fieldTypeDTO.fieldName())
-                                )
-                        )
-                        .sorted(IndexSetFieldType.getComparator(sort, order))
-                        .skip((long) Math.max(0, page - 1) * perPage)
-                        .limit(perPage)
-                        .collect(Collectors.toList())
-        ).orElse(List.of());
-
-        final int total = indexFieldTypesDTO.map(dto -> dto.fields().size()).orElse(0);
-
-        return PageListResponse.create("",
-                PaginatedList.PaginationInfo.create(
-                        total,
-                        retrievedPage.size(),
-                        page,
-                        perPage),
-                total,
-                sort,
-                order.toString().toLowerCase(Locale.ROOT),
-                retrievedPage,
-                IndexSetFieldType.ATTRIBUTES,
-                IndexSetFieldType.ENTITY_DEFAULTS);
-
     }
 
     public List<String> fieldTypeHistory(final String indexSetId,
@@ -260,7 +204,11 @@ public class IndexFieldTypesService {
         return findByQuery(DBQuery.empty());
     }
 
-    private Collection<IndexFieldTypesDTO> findByQuery(DBQuery.Query query) {
+    public Collection<IndexFieldTypesDTO> findByQuery(DBQuery.Query query) {
         return ImmutableList.copyOf((Iterable<IndexFieldTypesDTO>) db.find(query));
+    }
+
+    public IndexFieldTypesDTO findOneByQuery(DBQuery.Query query) {
+        return db.findOne(query);
     }
 }
