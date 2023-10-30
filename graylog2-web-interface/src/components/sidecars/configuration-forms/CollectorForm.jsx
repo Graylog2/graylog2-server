@@ -16,11 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
+import upperCase from 'lodash/upperCase';
 
 import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -28,6 +26,9 @@ import Routes from 'routing/Routes';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import withHistory from 'routing/withHistory';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import connect from 'stores/connect';
 
 const ValidationMessage = ({ validationErrors, fieldName, defaultText }) => {
   if (validationErrors[fieldName]) {
@@ -43,32 +44,32 @@ ValidationMessage.propTypes = {
   defaultText: PropTypes.string.isRequired,
 };
 
-const CollectorForm = createReactClass({
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  displayName: 'CollectorForm',
+const formatServiceTypes = () => {
+  const options = [];
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  propTypes: {
-    action: PropTypes.oneOf(['create', 'edit']),
-    collector: PropTypes.object,
-    history: PropTypes.object.isRequired,
-  },
+  options.push({ value: 'exec', label: 'Foreground execution' });
+  options.push({ value: 'svc', label: 'Windows service' });
 
-  mixins: [Reflux.connect(CollectorsStore)],
+  return options;
+};
 
-  getDefaultProps() {
-    return {
-      action: 'edit',
-      collector: {
-        default_template: '',
-      },
-    };
-  },
+const formatOperatingSystems = () => {
+  const options = [];
 
-  getInitialState() {
+  options.push({ value: 'linux', label: 'Linux' });
+  options.push({ value: 'windows', label: 'Windows' });
+  options.push({ value: 'darwin', label: 'Darwin' });
+  options.push({ value: 'freebsd', label: 'FreeBSD' });
+
+  return options;
+};
+
+class CollectorForm extends React.Component {
+  constructor(props) {
+    super(props);
     const { collector } = this.props;
 
-    return {
+    this.state = {
       error: false,
       validation_errors: {},
       formData: {
@@ -82,100 +83,103 @@ const CollectorForm = createReactClass({
         default_template: String(collector.default_template),
       },
     };
-  },
+  }
 
   UNSAFE_componentWillMount() {
     this._debouncedValidateFormData = debounce(this._validateFormData, 200);
-  },
+  }
 
   componentDidMount() {
     CollectorsActions.all();
     CollectorConfigurationsActions.all();
-  },
+  }
 
-  hasErrors() {
+  hasErrors = () => {
     const { error } = this.state;
 
     return error;
-  },
+  };
 
-  _save() {
-    const { action, history } = this.props;
+  _save = () => {
+    const { action, history, sendTelemetry } = this.props;
     const { formData } = this.state;
+    const isCreate = action === 'create';
 
     if (!this.hasErrors()) {
-      if (action === 'create') {
-        CollectorsActions.create(formData)
+      let promise;
+
+      if (isCreate) {
+        promise = CollectorsActions.create(formData)
           .then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
       } else {
-        CollectorsActions.update(formData);
+        promise = CollectorsActions.update(formData);
       }
-    }
-  },
 
-  _formDataUpdate(key) {
+      promise.then(() => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`LOG_COLLECTOR_${isCreate ? 'CREATED' : 'UPDATED'}`], {
+          app_pathname: 'sidecars',
+          app_section: 'configuration',
+        });
+      });
+    }
+  };
+
+  handleSelectTelemetry = (key, value) => {
+    const { sendTelemetry } = this.props;
+
+    if (key === 'service_type' || key === 'node_operating_system') {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`LOG_COLLECTOR_${upperCase(key).replace(/\s|\//g, '_')}_CHANGED`], {
+        app_pathname: 'sidecars',
+        app_section: 'configuration',
+        event_details: {
+          [key]: value,
+        },
+      });
+    }
+  };
+
+  _formDataUpdate = (key) => {
     const { formData } = this.state;
 
     return (nextValue) => {
       const nextFormData = cloneDeep(formData);
+      this.handleSelectTelemetry(key, nextValue);
 
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
     };
-  },
+  };
 
-  _validateFormData(nextFormData) {
+  _validateFormData = (nextFormData) => {
     if (nextFormData.name && nextFormData.node_operating_system) {
       CollectorsActions.validate(nextFormData).then((validation) => (
         this.setState({ validation_errors: validation.errors, error: validation.failed })
       ));
     }
-  },
+  };
 
-  _onNameChange(event) {
+  _onNameChange = (event) => {
     const nextName = event.target.value;
 
     this._formDataUpdate('name')(nextName);
-  },
+  };
 
-  _onInputChange(key) {
-    return (event) => {
-      this._formDataUpdate(key)(event.target.value);
-    };
-  },
+  _onInputChange = (key) => (event) => {
+    this._formDataUpdate(key)(event.target.value);
+  };
 
-  _onSubmit(event) {
+  _onSubmit = (event) => {
     event.preventDefault();
     this._save();
-  },
+  };
 
-  _onCancel() {
+  _onCancel = () => {
     const { history } = this.props;
     history.goBack();
-  },
+  };
 
-  _formatServiceTypes() {
-    const options = [];
-
-    options.push({ value: 'exec', label: 'Foreground execution' });
-    options.push({ value: 'svc', label: 'Windows service' });
-
-    return options;
-  },
-
-  _formatOperatingSystems() {
-    const options = [];
-
-    options.push({ value: 'linux', label: 'Linux' });
-    options.push({ value: 'windows', label: 'Windows' });
-    options.push({ value: 'darwin', label: 'Darwin' });
-    options.push({ value: 'freebsd', label: 'FreeBSD' });
-
-    return options;
-  },
-
-  _validationState(fieldName) {
+  _validationState = (fieldName) => {
     const { validation_errors: validationErrors } = this.state;
 
     if (validationErrors[fieldName]) {
@@ -183,7 +187,7 @@ const CollectorForm = createReactClass({
     }
 
     return null;
-  },
+  };
 
   render() {
     const { action } = this.props;
@@ -222,7 +226,7 @@ const CollectorForm = createReactClass({
                        validationState={this._validationState('service_type')}>
               <ControlLabel>Process management</ControlLabel>
               <Select inputId="service_type"
-                      options={this._formatServiceTypes()}
+                      options={formatServiceTypes()}
                       value={formData.service_type}
                       onChange={this._formDataUpdate('service_type')}
                       placeholder="Service Type"
@@ -238,7 +242,7 @@ const CollectorForm = createReactClass({
                        validationState={this._validationState('node_operating_system')}>
               <ControlLabel>Operating System</ControlLabel>
               <Select inputId="node_operating_system"
-                      options={this._formatOperatingSystems()}
+                      options={formatOperatingSystems()}
                       value={formData.node_operating_system}
                       onChange={this._formDataUpdate('node_operating_system')}
                       placeholder="Name"
@@ -296,7 +300,22 @@ const CollectorForm = createReactClass({
         </form>
       </div>
     );
-  },
-});
+  }
+}
 
-export default withHistory(CollectorForm);
+CollectorForm.propTypes = {
+  action: PropTypes.oneOf(['create', 'edit']),
+  collector: PropTypes.object,
+  history: PropTypes.object.isRequired,
+  sendTelemetry: PropTypes.func,
+};
+
+CollectorForm.defaultProps = {
+  action: 'edit',
+  collector: {
+    default_template: '',
+  },
+  sendTelemetry: () => {},
+};
+
+export default withTelemetry(withHistory(connect(CollectorForm, { collectors: CollectorsStore })));

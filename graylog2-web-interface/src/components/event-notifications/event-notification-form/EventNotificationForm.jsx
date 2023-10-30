@@ -76,13 +76,16 @@ class EventNotificationForm extends React.Component {
   };
 
   handleSubmit = (event) => {
-    const { notification, onSubmit, sendTelemetry } = this.props;
+    const { notification, onSubmit, sendTelemetry, action, location } = this.props;
 
-    sendTelemetry('form_submit', {
-      app_pathname: 'events',
-      app_section: 'event-notification',
-      app_action_value: 'save',
-    });
+    sendTelemetry(
+      action === 'create'
+        ? TELEMETRY_EVENT_TYPE.NOTIFICATIONS.CREATE_CLICKED
+        : TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EDIT_CLICKED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_section: 'event-notification',
+        app_action_value: `${action}-button`,
+      });
 
     event.preventDefault();
 
@@ -103,10 +106,10 @@ class EventNotificationForm extends React.Component {
   };
 
   handleTypeChange = (nextType) => {
-    const { sendTelemetry } = this.props;
+    const { sendTelemetry, location } = this.props;
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_TYPE_SELECTED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'event-definition-notifications',
       app_action_value: 'notification-type-select',
       notification_type: nextType,
@@ -119,12 +122,12 @@ class EventNotificationForm extends React.Component {
   };
 
   handleTestTrigger = () => {
-    const { notification, onTest, sendTelemetry } = this.props;
+    const { notification, onTest, sendTelemetry, location } = this.props;
 
-    sendTelemetry('input_value_change', {
-      app_pathname: 'events',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EXECUTE_TEST_CLICKED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'event-notification',
-      app_action_value: 'notification-test',
+      app_action_value: 'execute-test-button',
     });
 
     onTest(notification);
