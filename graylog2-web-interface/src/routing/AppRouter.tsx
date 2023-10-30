@@ -17,6 +17,7 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import type { PluginRoute } from 'graylog-web-plugin';
+
 import {
   AuthenticationCreatePage,
   AuthenticationBackendCreatePage,
