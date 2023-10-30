@@ -159,7 +159,7 @@
         <opentelemetry.version>1.31.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
-        <prometheus-client.version>0.11.0</prometheus-client.version>
+        <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>3.24.4</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
