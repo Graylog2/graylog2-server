@@ -97,18 +97,18 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     protected Map<String, Map<String, Object>> fieldProperties(final String analyzer,
                                                                final CustomFieldMappings customFieldMappings) {
         final ImmutableMap.Builder<String, Map<String, Object>> builder = ImmutableMap.<String, Map<String, Object>>builder()
-                .put("message", analyzedString(analyzer, false))
-                .put("full_message", analyzedString(analyzer, false))
+                .put(Message.FIELD_MESSAGE, analyzedString(analyzer, false))
+                .put(Message.FIELD_FULL_MESSAGE, analyzedString(analyzer, false))
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
-                .put("timestamp", typeTimeWithMillis())
+                .put(Message.FIELD_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_MESSAGE_ID, notAnalyzedString())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
-                .put("source", analyzedString("analyzer_keyword", true))
-                .put("streams", notAnalyzedString());
+                .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true))
+                .put(Message.FIELD_STREAMS, notAnalyzedString());
 
         if (customFieldMappings != null) {
             customFieldMappings.forEach(customMapping -> builder.put(customMapping.fieldName(), type(customMapping.toPhysicalType())));

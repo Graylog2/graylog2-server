@@ -41,6 +41,7 @@ import { adjustFormat } from 'util/DateTime';
 import useIndexDefaults from 'pages/useIndexDefaults';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
   retentionStrategies?: Array<RetentionStrategy> | null | undefined,
@@ -58,9 +59,8 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   }, []);
 
   const _saveConfiguration = (indexSetItem: IndexSet) => {
-    sendTelemetry('form_submit', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_CREATED, {
       app_pathname: 'indexsets',
-      app_action_value: 'createindexset',
     });
 
     const copy = indexSetItem;

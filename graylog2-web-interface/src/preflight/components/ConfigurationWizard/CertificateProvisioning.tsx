@@ -19,7 +19,8 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
 import fetch from 'logic/rest/FetchProvider';
-import { Button, Title, Alert, Group, Space } from 'preflight/components/common';
+import { Button, Title, Group, Space } from 'preflight/components/common';
+import Alert from 'components/bootstrap/Alert';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 import useDataNodes, { DATA_NODES_OVERVIEW_QUERY_KEY } from 'preflight/hooks/useDataNodes';
@@ -65,7 +66,7 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
         You can now provision certificate for your data nodes.
       </p>
       {(!dataNodes.length && !isInitialLoading) ? (
-        <Alert type="warning">
+        <Alert bsStyle="warning">
           At least one Graylog data node needs to run before the certificate can be provisioned.
         </Alert>
       ) : <Space h="sm" />}

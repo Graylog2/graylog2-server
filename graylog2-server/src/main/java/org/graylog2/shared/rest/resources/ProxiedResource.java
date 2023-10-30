@@ -109,17 +109,17 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     public static String authenticationToken(HttpHeaders httpHeaders) {
-        final List<String> authorizationHeader = httpHeaders.getRequestHeader("Authorization");
-        if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            return authorizationHeader.get(0);
-        }
-
         final Cookie authenticationCookie = httpHeaders.getCookies().get("authentication");
         if (authenticationCookie != null) {
             final String sessionId = authenticationCookie.getValue();
             final String credentials = sessionId + ":session";
             final String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
             return "Basic " + base64Credentials;
+        }
+
+        final List<String> authorizationHeader = httpHeaders.getRequestHeader("Authorization");
+        if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
+            return authorizationHeader.get(0);
         }
 
         return null;

@@ -51,7 +51,6 @@ describe('Headers', () => {
     fields?: Array<FieldTypeMapping>,
     sortConfigMap?: OrderedMap<string, SortConfig>
   };
-  /* eslint-enable react/require-default-props */
 
   const RenderHeaders = ({
     columnPivots = [],

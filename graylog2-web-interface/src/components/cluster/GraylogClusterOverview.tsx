@@ -33,6 +33,7 @@ import { formatTrafficData } from 'util/TrafficUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import TrafficGraph from './TrafficGraph';
 
@@ -108,7 +109,7 @@ const GraylogClusterTrafficGraph = () => {
 
     setGraphDays(newDays);
 
-    sendTelemetry('input_value_change', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SYSTEM_OVERVIEW_OUTGOING_TRAFFIC_DAYS_CHANGED, {
       app_pathname: 'system-overview',
       app_section: 'outgoing-traffic',
       app_action_value: 'trafficgraph-days-button',

@@ -22,12 +22,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import ApiRoutes from 'routing/ApiRoutes';
 import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { getPathnameWithoutId, qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useLocation from 'routing/useLocation';
 
 type Props = {
   selectedNotificationsIds: Array<string>,
@@ -38,14 +40,15 @@ type Props = {
 const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, refetchEventNotifications }: Props) => {
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
   const selectedItemsAmount = selectedNotificationsIds?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event notification', 'event notifications');
 
   const onDelete = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: 'event-notification',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.BULK_ACTION_DELETE_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-notification-bulk',
-      app_action_value: 'delete-button',
+      app_action_value: 'bulk-delete-button',
     });
 
     // eslint-disable-next-line no-alert
@@ -82,7 +85,7 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
         UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
       });
     }
-  }, [sendTelemetry, selectedItemsAmount, descriptor, selectedNotificationsIds, queryClient, setSelectedNotificationsIds, refetchEventNotifications]);
+  }, [sendTelemetry, pathname, selectedItemsAmount, descriptor, selectedNotificationsIds, queryClient, setSelectedNotificationsIds, refetchEventNotifications]);
 
   return (
     <BulkActionsDropdown selectedEntities={selectedNotificationsIds} setSelectedEntities={setSelectedNotificationsIds}>

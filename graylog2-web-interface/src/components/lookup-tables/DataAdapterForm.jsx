@@ -26,6 +26,8 @@ import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import Routes from 'routing/Routes';
 import withHistory from 'routing/withHistory';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 class DataAdapterForm extends React.Component {
   validationCheckTimer = undefined;
@@ -40,6 +42,7 @@ class DataAdapterForm extends React.Component {
     dataAdapter: PropTypes.object,
     validate: PropTypes.func,
     validationErrors: PropTypes.object,
+    sendTelemetry: PropTypes.func,
     history: PropTypes.object.isRequired,
   };
 
@@ -57,6 +60,7 @@ class DataAdapterForm extends React.Component {
     },
     validate: null,
     validationErrors: {},
+    sendTelemetry: () => {},
   };
 
   constructor(props) {
@@ -210,7 +214,15 @@ class DataAdapterForm extends React.Component {
     }
 
     const { dataAdapter } = this.state;
-    const { create, saved } = this.props;
+    const { create, saved, sendTelemetry } = this.props;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
+      app_pathname: 'lut',
+      app_section: 'lut_data_adapter',
+      event_details: {
+        type: dataAdapter?.config?.type,
+      },
+    });
 
     let promise;
 
@@ -383,4 +395,4 @@ class DataAdapterForm extends React.Component {
   }
 }
 
-export default withHistory(DataAdapterForm);
+export default withTelemetry(withHistory(DataAdapterForm));

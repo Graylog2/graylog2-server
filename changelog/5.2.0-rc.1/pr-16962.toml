@@ -1,0 +1,5 @@
+type = "f"
+message = "Allow logging metrics to include DEBUG/TRACE level."
+
+issues = ["10866"]
+pulls = ["16962"]
