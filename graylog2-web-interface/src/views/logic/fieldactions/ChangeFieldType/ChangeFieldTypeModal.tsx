@@ -17,7 +17,7 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
+import { Badge, BootstrapModalForm, Alert, Input, ControlLabel } from 'components/bootstrap';
 import { HoverForHelp, Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
@@ -121,7 +121,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
-        <Input label={`New Field Type For ${field}:`} id="new-field-type">
+        <Input label={`Select Field Type For ${field}`} id="new-field-type">
           <StyledSelect inputId="field_type"
                         options={fieldTypeOptions}
                         value={newFieldType}
@@ -135,16 +135,15 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
           By default the <b>{newFieldType}</b> as a field type for <b>{field}</b> will be changed in all index sets of the current message/search. You can select for which index sets you would like to make the change.
         </Alert>
         <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelection} />
+        <ControlLabel>Select rotation strategy
+          <HoverForHelp displayLeftMargin>
+            To see and use the <b>{newFieldType}</b> as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+          </HoverForHelp>
+        </ControlLabel>
         <Input type="checkbox"
                id="rotate"
                name="rotate"
-               label={(
-                 <>Rotate affected indices after change
-                   <HoverForHelp displayLeftMargin>
-                     To see and use the <b>{newFieldType}</b> as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
-                   </HoverForHelp>
-                 </>
-)}
+               label="Rotate affected indices after change"
                onChange={() => setRotated((cur) => !cur)}
                checked={rotated} />
       </div>

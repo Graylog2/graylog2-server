@@ -23,6 +23,7 @@ import {
   NoEntitiesExist,
   EntityDataTable,
 } from 'components/common';
+import { ControlLabel } from 'components/bootstrap';
 import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/logic/fieldactions/ChangeFieldType/Constants';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { SearchParams, Sort } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
@@ -113,6 +114,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
 
   return (
     <Container>
+      <ControlLabel>Select targeted index sets</ControlLabel>
       <PaginatedList onChange={onPageChange}
                      totalItems={pagination?.total}
                      pageSize={layoutConfig.pageSize}
