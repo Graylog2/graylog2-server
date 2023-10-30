@@ -17,9 +17,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import type { IndexSetFieldType } from 'hooks/useIndexSetFieldType';
+import { Label, Button } from 'components/bootstrap';
 import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
-import { Button } from 'components/bootstrap';
 import { NoEntitiesExist, NoSearchResult, PaginatedList, SearchForm, Spinner } from 'components/common';
 import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
@@ -106,6 +106,10 @@ const IndexSetFieldTypesList = () => {
       type: {
         renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
       },
+      is_custom: {
+        renderHeader: () => null,
+        renderCell: (isCustom: boolean) => (isCustom ? <Label bsStyle="primary">custom</Label> : null),
+      },
     },
   }), [fieldTypes]);
 
@@ -113,15 +117,28 @@ const IndexSetFieldTypesList = () => {
     handleOnOpen(fieldType.fieldName);
   }, [handleOnOpen]);
 
+  const onRemove = useCallback(() => {}, []);
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
-    <Button onClick={() => openEditModal(fieldType)}
-            role="button"
-            bsSize="xsmall"
-            title={`Edit ${fieldType.fieldName} field type`}
-            tabIndex={0}>
-      Edit
-    </Button>
-  ), [openEditModal]);
+    <>
+      <Button onClick={() => openEditModal(fieldType)}
+              role="button"
+              bsSize="xsmall"
+              title={`${fieldType.isCustom ? 'Edit' : 'Add'} custom field type for ${fieldType.fieldName}`}
+              tabIndex={0}>
+        {fieldType.isCustom ? 'Edit' : 'Add'}
+      </Button>
+      {fieldType.isCustom && (
+      <Button onClick={onRemove}
+              role="button"
+              bsSize="xsmall"
+              bsStyle="danger"
+              title="Remove custom type"
+              tabIndex={0}>
+        Delete
+      </Button>
+      )}
+    </>
+  ), [onRemove, openEditModal]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
