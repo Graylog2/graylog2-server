@@ -37,6 +37,10 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 import ContentPackInstall from './ContentPackInstall';
 
@@ -46,6 +50,8 @@ class ContentPacksList extends React.Component {
     contentPackMetadata: PropTypes.object,
     onDeletePack: PropTypes.func,
     onInstall: PropTypes.func,
+    sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -119,7 +125,7 @@ class ContentPacksList extends React.Component {
 
   _formatItems(items) {
     const { pageSize, currentPage } = this.state;
-    const { contentPackMetadata, onDeletePack } = this.props;
+    const { contentPackMetadata, onDeletePack, sendTelemetry, location } = this.props;
     const begin = (pageSize * (currentPage - 1));
     const end = begin + pageSize;
     const shownItems = items.slice(begin, end);
@@ -140,6 +146,36 @@ class ContentPacksList extends React.Component {
       const states = installed ? ['installed'] : [];
       const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
+      const handleInstall = () => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.INSTALLED, {
+          app_pathname: getPathnameWithoutId(location.pathname),
+          app_section: 'content-packs',
+          app_action_value: 'install-button',
+        });
+
+        openFunc();
+      };
+
+      const handleDownload = () => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.DOWNLOADED, {
+          app_pathname: getPathnameWithoutId(location.pathname),
+          app_section: 'content-packs',
+          app_action_value: 'download-menu-item',
+        });
+
+        downloadRef.open();
+      };
+
+      const handleDeleteAllVersions = () => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENT_PACK.ALL_VERSIONS_DELETED, {
+          app_pathname: getPathnameWithoutId(location.pathname),
+          app_section: 'content-packs',
+          app_action_value: 'delete-all-versions-menu-item',
+        });
+
+        onDeletePack(item.id);
+      };
+
       return (
         <ControlledTableList.Item key={item.id}>
           <Row className="row-sm">
@@ -153,7 +189,7 @@ class ContentPacksList extends React.Component {
             <Col md={3} className="text-right">
               <ButtonToolbar className="pull-right">
                 {updateButton}
-                <Button bsSize="small" onClick={openFunc}>Install</Button>
+                <Button bsSize="small" onClick={handleInstall}>Install</Button>
                 {installModal}
                 <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
                   <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>
@@ -162,14 +198,12 @@ class ContentPacksList extends React.Component {
                   <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
                     <MenuItem>Create New Version</MenuItem>
                   </LinkContainer>
-                  <MenuItem onSelect={() => {
-                    downloadRef.open();
-                  }}>Download
+                  <MenuItem onSelect={handleDownload}>
+                    Download
                   </MenuItem>
                   <MenuItem divider />
-                  <MenuItem onSelect={() => {
-                    onDeletePack(item.id);
-                  }}>Delete All Versions
+                  <MenuItem onSelect={handleDeleteAllVersions}>
+                    Delete All Versions
                   </MenuItem>
                 </DropdownButton>
                 {downloadModal}
@@ -261,4 +295,4 @@ class ContentPacksList extends React.Component {
   }
 }
 
-export default ContentPacksList;
+export default withLocation(withTelemetry(ContentPacksList));

@@ -50,7 +50,5 @@ public class StaticLeaderElectionService extends AbstractIdleService implements 
 
     @Override
     protected void shutDown() throws Exception {
-        // This has likely no effect in the server shutdown phase
-        configuration.setIsLeader(false);
     }
 }

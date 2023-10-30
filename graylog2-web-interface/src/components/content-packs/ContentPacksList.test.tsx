@@ -20,6 +20,8 @@ import userEvent from '@testing-library/user-event';
 
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
+jest.mock('routing/withLocation', () => (Component) => (props) => <Component {...props} location={{ pathname: '/' }} />);
+
 describe('<ContentPacksList />', () => {
   const contentPacks = [
     { id: '1', rev: 1, title: 'UFW Grok Patterns', summary: 'Content Pack: Grok Patterns to extract informations from UFW logfiles', version: '1.0' },
@@ -70,7 +72,7 @@ describe('<ContentPacksList />', () => {
 
   it('should delete a content pack', async () => {
     const deleteFn = jest.fn();
-    render(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
+    render(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} location={{ pathname: '/content-packs' }} />);
 
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
 

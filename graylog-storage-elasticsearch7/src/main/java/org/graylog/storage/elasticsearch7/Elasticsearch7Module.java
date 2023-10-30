@@ -31,6 +31,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
@@ -75,6 +76,8 @@ public class Elasticsearch7Module extends VersionAwareModule {
                 .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsES7.class);
 
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsES7.class);
+        bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterES7.class);
+        
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);

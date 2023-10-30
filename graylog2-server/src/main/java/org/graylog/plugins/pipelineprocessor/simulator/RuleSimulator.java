@@ -78,6 +78,10 @@ public class RuleSimulator {
             if (!map.containsKey("_id")) {
                 map.put("_id", UUID.randomUUID().toString());
             }
+            final String messageField = "message"; // message field must be of type string
+            if (map.containsKey(messageField) && !(map.get(messageField) instanceof String)) {
+                map.put(messageField, String.valueOf(map.get(messageField)));
+            }
             message = new Message(map);
         } catch (JacksonException e) {
             message = new Message(messageString, "127.0.0.1", DateTime.now(DateTimeZone.UTC));

@@ -39,6 +39,11 @@ const getUserTimezone = (userTimezone: string, tzOverride?: string) => {
 /**
  * Provides methods to convert times based on the user time zone.
  * Should be used when displaying times and the related components are not a suitable option.
+ *
+ * userTimezone   - time zone of the current user.
+ * formatTime     - method which takes a date and optionally a format and returns it as a string in the current user timezone.
+ *                  For example, it transforms `2010-07-30T16:03:25.000Z` to `2010-07-30 17:03:25` for a user with the timezone `Europe/Berlin`.
+ * toUserTimezone - method which takes a date and transforms it a moment date object, based on the user timezone.
  */
 
 const StaticTimezoneProvider = ({ children, tz }: Required<Props>) => {

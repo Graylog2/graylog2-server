@@ -38,6 +38,9 @@ export const hotKeysCollections: HotkeyCollections = {
     description: 'General keyboard shortcuts',
     actions: {
       'show-hotkeys-modal': { keys: 'shift+?', displayKeys: '?', description: 'Show available keyboard shorts' },
+      'submit-form': { keys: 'enter', description: 'Submit form' },
+      'close-modal': { keys: 'esc', description: 'Close modal' },
+      'show-scratchpad-modal': { keys: 'mod+/', description: 'Show scratchpad' },
     },
   },
   search: {
@@ -56,6 +59,14 @@ export const hotKeysCollections: HotkeyCollections = {
       ...viewActions,
       save: { keys: 'mod+s', description: 'Save dashboard' },
       'save-as': { keys: 'mod+shift+s', description: 'Save dashboard as' },
+    },
+  },
+  scratchpad: {
+    title: 'Scratchpad',
+    description: 'Scratchpad shortcuts',
+    actions: {
+      clear: { keys: ['mod+backspace', 'mod+del'], description: 'Clear scratchpad' },
+      copy: { keys: 'shift+mod+c', description: 'Copy scratchpad' },
     },
   },
 };

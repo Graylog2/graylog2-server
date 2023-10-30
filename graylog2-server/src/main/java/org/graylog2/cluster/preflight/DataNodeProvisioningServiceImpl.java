@@ -51,8 +51,8 @@ public class DataNodeProvisioningServiceImpl extends PaginatedDbService<DataNode
     }
 
     @Override
-    public DataNodeProvisioningConfig getPreflightConfigFor(String nodeId) {
-        return dbCollection.findOne(DBQuery.is(FIELD_NODEID, nodeId));
+    public Optional<DataNodeProvisioningConfig> getPreflightConfigFor(String nodeId) {
+        return Optional.ofNullable(dbCollection.findOne(DBQuery.is(FIELD_NODEID, nodeId)));
     }
 
     @Override
