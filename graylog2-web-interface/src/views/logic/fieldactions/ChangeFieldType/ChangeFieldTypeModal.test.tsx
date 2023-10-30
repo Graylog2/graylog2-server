@@ -155,7 +155,7 @@ describe('ChangeFieldTypeModal', () => {
     renderChangeFieldTypeModal({});
 
     await suppressConsole(async () => {
-      const typeSelect = await screen.findByText(/select field type/i);
+      const typeSelect = await screen.findByText(/select field type for field/i);
       selectEvent.openMenu(typeSelect);
     });
 
@@ -163,19 +163,8 @@ describe('ChangeFieldTypeModal', () => {
     await screen.findByText('Number(int)');
   });
 
-  it('Shows Show index sets button without indexes', async () => {
+  it('Shows index sets data', async () => {
     renderChangeFieldTypeModal({});
-
-    await screen.findByText('Show index sets');
-
-    expect(screen.queryByText('Index Title')).not.toBeInTheDocument();
-  });
-
-  it('Shows index sets data on Show index sets button click', async () => {
-    renderChangeFieldTypeModal({});
-
-    const showIndexSetsButton = await screen.findByText('Show index sets');
-    fireEvent.click(showIndexSetsButton);
 
     await screen.findByText('Stream Title 1');
     await screen.findByText('Index Title 1');
@@ -188,24 +177,20 @@ describe('ChangeFieldTypeModal', () => {
   it('run putFiledTypeMutationMock with selected type and indexes', async () => {
     renderChangeFieldTypeModal({});
 
-    const typeSelect = await screen.findByLabelText(/select field type/i);
+    const typeSelect = await screen.findByLabelText(/select field type for field/i);
     selectEvent.openMenu(typeSelect);
     await selectEvent.select(typeSelect, 'Number(int)');
 
-    await screen.findByText('Number(int)');
     const submit = await screen.findByTitle(/change field type/i);
-    fireEvent.click(submit);
-
-    const showIndexSetsButton = await screen.findByText('Show index sets');
-    fireEvent.click(showIndexSetsButton);
 
     const rowCheckboxes = await screen.findAllByTitle(/deselect entity/i);
     fireEvent.click(rowCheckboxes[1]);
+    fireEvent.click(submit);
 
     await waitFor(() => expect(putFiledTypeMutationMock).toHaveBeenCalledWith({
-      indexSetSelection: ['id-1', 'id-2'],
+      indexSetSelection: ['id-1'],
       newFieldType: 'int',
-      rotated: false,
+      rotated: true,
       field: 'field',
     }));
   });
