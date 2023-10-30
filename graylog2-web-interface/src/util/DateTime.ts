@@ -65,7 +65,7 @@ const getFormatStringsForDateTimeFormats = (dateTimeFormats: Array<DateTimeForma
 
 export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<DateTimeFormats>, tz = DEFAULT_OUTPUT_TZ) => {
   const acceptedFormatStrings = getFormatStringsForDateTimeFormats(acceptedFormats);
-  const dateObject = moment(dateTime, acceptedFormatStrings, true).tz(tz);
+  const dateObject = moment.utc(dateTime, acceptedFormatStrings, true).tz(tz);
   const validationInfo = acceptedFormats?.length ? `Expected formats: ${acceptedFormatStrings.join(', ')}.` : undefined;
 
   return validateDateTime(dateObject, dateTime, validationInfo);
