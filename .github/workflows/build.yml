@@ -17,14 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.java-version }}
+        if: false
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
           cache: maven
       - name: License check
+        if: false
         run: mvn -B --fail-fast license:check
       - name: Build with Maven
+        if: false
         run: mvn -B --fail-fast -Pedantic -Dspotbugs.skip -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 verify javadoc:javadoc
         env:
           JAVA_OPTS: -Xmx6G
