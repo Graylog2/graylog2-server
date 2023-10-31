@@ -15,13 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { DayModifiers } from 'react-day-picker';
 import DayPicker from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
 import 'react-day-picker/lib/style.css';
-import { toDateObject, adjustFormat } from 'util/DateTime';
+
+import type { DateTime } from 'util/DateTime';
+import { isValidDate } from 'util/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   width: 100%;
@@ -58,38 +61,39 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
+const useSelectedDate = (date: DateTime | undefined) => {
+  const { toUserTimezone } = useUserDateTime();
+
+  if (!isValidDate(date)) {
+    return undefined;
+  }
+
+  return toUserTimezone(date);
+};
+
 type Props = {
-  date?: string | undefined,
+  date?: DateTime | undefined,
   onChange: (day: Date, modifiers: DayModifiers, event: React.MouseEvent<HTMLDivElement>) => void,
-  fromDate: Date,
-  showOutsideDays: boolean,
+  fromDate?: Date,
+  showOutsideDays?: boolean,
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
-  let selectedDate;
+  const { formatTime } = useUserDateTime();
+  const selectedDate = useSelectedDate(date);
 
-  if (date) {
-    try {
-      selectedDate = toDateObject(date);
-    } catch (e) {
-      // don't do anything
-    }
-  }
-
-  const modifiers = {
-    selected: (moddedDate) => {
+  const modifiers = useMemo(() => ({
+    selected: (moddedDate: Date) => {
       if (!selectedDate) {
         return false;
       }
 
-      const dateTime = toDateObject(adjustFormat(moddedDate, 'complete'));
-
-      return (adjustFormat(selectedDate, 'date') === adjustFormat(dateTime, 'date'));
+      return formatTime(selectedDate, 'date') === formatTime(moddedDate, 'date');
     },
     disabled: {
       before: new Date(fromDate),
     },
-  };
+  }), [formatTime, fromDate, selectedDate]);
 
   return (
     <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
@@ -101,7 +105,10 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
 
 DatePicker.propTypes = {
   /** Initial date to select in the date picker. */
-  date: PropTypes.string,
+  date: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+  ]),
   /**
    * Callback that will be called when user picks a date. It will receive the new selected day,
    * `react-day-picker`'s modifiers, and the original event as arguments.
