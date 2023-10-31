@@ -139,7 +139,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
         </Input>
         <StyledLabel>Select Targeted Index Sets</StyledLabel>
         <p>
-          By default the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field}</b> will be changed in all index sets of the current message/search. You can select for which index sets you would like to make the change.
+          By default the {newFieldType ? <b>{newFieldType}</b> : 'selected'} field type will be set for the <b>{field}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
         </p>
         <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelection} />
         <StyledLabel>Select Rotation Strategy</StyledLabel>
