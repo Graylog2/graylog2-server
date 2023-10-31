@@ -44,6 +44,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import Alert from 'components/bootstrap/Alert';
 import useLocation from 'routing/useLocation';
+import ReadableDuration from 'components/common/ReadableDuration';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
@@ -363,7 +364,7 @@ const SearchesConfig = () => {
             </Input>
             {!isLoadingMinimumRefreshInterval && (
               <Alert bsStyle="warning">
-                Please note, a minimum refresh interval of &ldquo;{minimumRefreshInterval}&rdquo; has been configured in the graylog.conf.
+                Please note, a minimum refresh interval of <ReadableDuration duration={minimumRefreshInterval} /> ({minimumRefreshInterval}) has been configured in the graylog.conf.
                 Only intervals which are equal or above the minimum can be used.
               </Alert>
             )}

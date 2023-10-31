@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootstrap';
-import { Icon, Pluralize, Spinner, HoverForHelp } from 'components/common';
+import { Icon, Spinner, HoverForHelp } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -29,6 +29,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
+import ReadableDuration from 'components/common/ReadableDuration';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -48,22 +49,7 @@ const ButtonLabel = () => {
     return <>Not updating</>;
   }
 
-  const intervalDuration = moment.duration(refreshConfig.interval);
-  const naturalInterval = intervalDuration.asSeconds() < 60
-    ? (
-      <span>{intervalDuration.asSeconds()} <Pluralize singular="second"
-                                                      plural="seconds"
-                                                      value={intervalDuration.asSeconds()} />
-      </span>
-    )
-    : (
-      <span>{intervalDuration.asMinutes()} <Pluralize singular="minute"
-                                                      plural="minutes"
-                                                      value={intervalDuration.asMinutes()} />
-      </span>
-    );
-
-  return <>Every {naturalInterval}</>;
+  return <>Every <ReadableDuration duration={refreshConfig.interval} /></>;
 };
 
 const useDisableOnFormChange = () => {
@@ -166,8 +152,7 @@ const RefreshControls = () => {
               {label}
               {isBelowMinimum && (
                 <HoverForHelp displayLeftMargin>
-                  Interval &ldquo;{interval}&rdquo; is below configured minimum interval
-                  &ldquo;{minimumRefreshInterval}&rdquo;
+                  Interval of <ReadableDuration duration={interval} /> ({interval}) is below configured minimum interval of <ReadableDuration duration={minimumRefreshInterval} /> ({minimumRefreshInterval}).
                 </HoverForHelp>
               )}
             </MenuItem>
