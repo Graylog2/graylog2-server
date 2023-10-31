@@ -109,6 +109,7 @@ const fieldTypes: {
     fieldTypes: {
       string: 'String type',
       int: 'Number(int)',
+      boolean: 'Boolean',
     },
   },
   isLoading: false,
@@ -155,12 +156,11 @@ describe('ChangeFieldTypeModal', () => {
     renderChangeFieldTypeModal({});
 
     await suppressConsole(async () => {
-      const typeSelect = await screen.findByText(/select field type for field/i);
+      const typeSelect = await screen.findByLabelText(/select field type for field/i);
       selectEvent.openMenu(typeSelect);
     });
 
-    await screen.findByText('String type');
-    await screen.findByText('Number(int)');
+    await screen.findByText('Boolean');
   });
 
   it('Shows index sets data', async () => {
