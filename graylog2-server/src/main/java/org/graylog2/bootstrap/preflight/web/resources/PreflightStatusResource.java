@@ -23,7 +23,6 @@ import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.plugin.Version;
-import org.graylog2.plugin.database.ValidationException;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -53,7 +52,14 @@ public class PreflightStatusResource {
     @NoAuditEvent("No audit event yet")
     @POST
     @Path("/finish-config")
-    public PreflightConfig finishConfig() throws ValidationException {
+    public PreflightConfig finishConfig() {
          return preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+    }
+
+    @NoAuditEvent("No audit event yet")
+    @POST
+    @Path("/skip-config")
+    public PreflightConfig skipConfig() {
+        return preflightConfigService.setConfigResult(PreflightConfigResult.SKIPPED);
     }
 }
