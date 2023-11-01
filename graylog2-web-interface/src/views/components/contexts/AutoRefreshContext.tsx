@@ -14,18 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-// Returns a new query ID, in case the active query gets deleted.
-import type { List } from 'immutable';
+import { singleton } from 'logic/singleton';
 
-const FindNewActiveQueryId = (queryIds: List<string>, activeQueryId: string, removedQueryIds: List<string>) => {
-  const currentQueryIdIndex = queryIds.indexOf(activeQueryId);
-  const priorQueryIds = queryIds.slice(0, currentQueryIdIndex).toList();
-  const listToPickNewIdFrom = priorQueryIds.isEmpty()
-    ? queryIds
-    : priorQueryIds.reverse();
+export type RefreshConfig = {
+  interval: number,
+  enabled: boolean
+}
 
-  return listToPickNewIdFrom.find((queryId) => !removedQueryIds.includes(queryId));
+type AutoRefreshContextType = {
+  refreshConfig: RefreshConfig | null,
+  startAutoRefresh: (interval: number) => void
+  stopAutoRefresh: () => void,
 };
 
-export default FindNewActiveQueryId;
+const AutoRefreshContext = React.createContext<AutoRefreshContextType | null>(null);
+
+export default singleton('contexts.AutoRefreshContext', () => AutoRefreshContext);
