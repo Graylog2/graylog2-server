@@ -129,7 +129,7 @@ const RefreshControls = () => {
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
       <Button onClick={_toggleEnable} title={refreshConfig.enabled ? 'Pause Refresh' : 'Start Refresh'}>
-        {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
+        <Icon name="arrows-rotate" spin={refreshConfig.enabled} />
       </Button>
 
       <DropdownButton title={<ButtonLabel refreshConfigEnabled={refreshConfig.enabled} naturalInterval={naturalInterval} />}
