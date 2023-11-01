@@ -82,14 +82,6 @@ Removed fields:
 Note that additional Microsoft Defender for Endpoint message parsing is expected to be released in a future release of
 Graylog Illuminate.
 
-## Java API Changes
-The following Java Code API changes have been made.
-
-| File/method                   | Description                                                     |
-|-------------------------------|-----------------------------------------------------------------|
-| `ExampleClass#exampleFuntion` | TODO placeholder comment             |
-
-
 ## REST API Endpoint Changes
 The following REST API changes have been made.
 
