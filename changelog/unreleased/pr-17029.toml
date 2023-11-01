@@ -1,0 +1,5 @@
+type = "a"
+message = "Implement option for graylog.conf to define shortest possible search auto-refresh interval."
+
+issues = ["16972", "17011", "Graylog2/graylog-plugin-enterprise#5138"]
+pulls = ["17029"]

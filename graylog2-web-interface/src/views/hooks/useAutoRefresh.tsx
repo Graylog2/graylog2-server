@@ -14,8 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { RefreshStore } from 'views/stores/RefreshStore';
+import { useContext } from 'react';
 
-const useRefreshConfig = () => useStore(RefreshStore);
-export default useRefreshConfig;
+import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
+
+const useAutoRefresh = () => {
+  const autoRefresh = useContext(AutoRefreshContext);
+
+  if (!autoRefresh) {
+    throw new Error('useAutoRefresh hook needs to be used inside AutoRefreshContext.Provider');
+  }
+
+  return autoRefresh;
+};
+
+export default useAutoRefresh;
