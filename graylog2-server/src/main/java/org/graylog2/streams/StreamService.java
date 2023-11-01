@@ -51,7 +51,7 @@ public interface StreamService extends PersistedService {
     Set<String> indexSetIdsByIds(Collection<String> streamIds);
 
     List<Stream> loadAllEnabled();
-    
+
     default List<Stream> loadAllByTitle(String title) {
         throw new UnsupportedOperationException("loadAllByTitle method not implemented");
     }
