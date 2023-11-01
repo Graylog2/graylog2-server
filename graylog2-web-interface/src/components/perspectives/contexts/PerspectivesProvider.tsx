@@ -18,14 +18,18 @@ import * as React from 'react';
 import type { PropsWithChildren } from 'react';
 import { useMemo } from 'react';
 
+import usePluginEntities from 'hooks/usePluginEntities';
+
 import PerspectivesContext from './PerspectivesContext';
 
 const PerspectivesProvider = ({ children }: PropsWithChildren) => {
+  const availablePerspectives = usePluginEntities('perspectives');
+
   const contextValue = useMemo(() => ({
     activePerspective: 'default',
-    availablePerspectives: [],
-    setPerspective: () => {},
-  }), []);
+    availablePerspectives,
+    setActivePerspective: () => {},
+  }), [availablePerspectives]);
 
   return (
     <PerspectivesContext.Provider value={contextValue}>

@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import { singleton } from 'logic/singleton';
-import type { Perspective } from 'components/perspectives/types';
+import DefaultBrand from './DefaultBrand';
 
-type PerspectivesContextType = {
-  activePerspective: string,
-  availablePerspectives: Array<Perspective>
-  setActivePerspective: (perspectiveId: string) => void
-}
+const perspectivesBindings = {
+  perspectives: [
+    {
+      id: 'default',
+      title: 'Classic Graylog UI',
+      brandComponent: DefaultBrand,
+    },
+  ],
+};
 
-const PerspectivesContext = React.createContext<PerspectivesContextType | undefined>(undefined);
-
-export default singleton('contexts.PerspectivesContext', () => PerspectivesContext);
+export default perspectivesBindings;
