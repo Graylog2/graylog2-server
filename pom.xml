@@ -522,7 +522,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.6</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
@@ -632,8 +632,7 @@
                         <bundledSignature>jdk-reflection</bundledSignature>
                         <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                         <bundledSignature>jdk-non-portable</bundledSignature>
-                        <!-- Workaround until signatures for ${commons-io.version} are released: -->
-                        <bundledSignature>commons-io-unsafe-2.11.0</bundledSignature>
+                        <bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature>
                     </bundledSignatures>
                     <signatures>
                         <![CDATA[
