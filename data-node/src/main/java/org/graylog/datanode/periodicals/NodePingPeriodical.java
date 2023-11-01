@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.periodicals;
 
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -26,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.net.URI;
 import java.util.function.Supplier;
 
@@ -38,16 +41,18 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<URI> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
     private final Supplier<Boolean> isLeader;
+    private final Configuration configuration;
 
 
     @Inject
-    public NodePingPeriodical(NodeService nodeService, NodeId nodeId, OpensearchProcess managedOpenSearch) {
-        this(nodeService, nodeId, managedOpenSearch::getOpensearchBaseUrl, managedOpenSearch::getOpensearchClusterUrl, managedOpenSearch::isLeaderNode);
+    public NodePingPeriodical(NodeService nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch) {
+        this(nodeService, nodeId, configuration, managedOpenSearch::getOpensearchBaseUrl, managedOpenSearch::getOpensearchClusterUrl, managedOpenSearch::isLeaderNode);
     }
 
     NodePingPeriodical(
             NodeService nodeService,
             NodeId nodeId,
+            Configuration configuration,
             Supplier<URI> opensearchBaseUri,
             Supplier<String> opensearchClusterUri,
             Supplier<Boolean> isLeader
@@ -57,6 +62,7 @@ public class NodePingPeriodical extends Periodical {
         this.opensearchBaseUri = opensearchBaseUri;
         this.opensearchClusterUri = opensearchClusterUri;
         this.isLeader = isLeader;
+        this.configuration = configuration;
     }
 
     @Override
@@ -115,7 +121,7 @@ public class NodePingPeriodical extends Periodical {
                 isLeader.get(),
                 opensearchBaseUri.get(),
                 opensearchClusterUri.get(),
-                Tools.getLocalCanonicalHostname());
+                configuration.getHostname());
 
         if (!registrationSucceeded) {
             LOG.error("Failed to register node {} for heartbeats.", nodeId.getNodeId());

@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,7 +85,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.trustManager = trustManager;
         this.nodeService = nodeService;
         this.configuration = configuration;
-        this.hostsfile = Path.of(configuration.getOpensearchConfigLocation()).resolve("opensearch").resolve("unicast_hosts.txt");
+        this.hostsfile = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve("unicast_hosts.txt");
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
@@ -108,7 +107,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(datanodeConfiguration.nodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
@@ -124,8 +123,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public String getOpensearchClusterUrl() {
-        final var hostname = DatanodeConfigurationProvider.getNodesFromConfig(configuration.getDatanodeNodeName());
-        return hostname + ":" + configuration.getOpensearchTransportPort();
+        return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
     }
 
     public void onEvent(ProcessEvent event) {

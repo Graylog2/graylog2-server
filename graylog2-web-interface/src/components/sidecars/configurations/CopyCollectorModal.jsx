@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import upperFirst from 'lodash/upperFirst';
+import cloneDeep from 'lodash/cloneDeep';
 
 import CloneMenuItem from '../common/CloneMenuItem';
 

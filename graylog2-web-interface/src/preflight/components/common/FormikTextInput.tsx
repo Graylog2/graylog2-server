@@ -25,12 +25,14 @@ type Props = {
   label: React.ReactNode,
   placeholder?: string,
   type?: string
+  required?: boolean,
 }
 
-const FormikTextInput = ({ name, placeholder, label, type }: Props) => (
+const FormikTextInput = ({ name, placeholder, label, type, required }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange, onBlur }, meta: { error: validationError } }) => (
       <TextInput onBlur={onBlur}
+                 required={required}
                  id={name}
                  label={label}
                  type={type}
@@ -45,6 +47,7 @@ const FormikTextInput = ({ name, placeholder, label, type }: Props) => (
 FormikTextInput.defaultProps = {
   placeholder: undefined,
   type: undefined,
+  required: false,
 };
 
 export default FormikTextInput;

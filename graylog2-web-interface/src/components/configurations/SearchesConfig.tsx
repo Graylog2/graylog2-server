@@ -39,6 +39,9 @@ import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
@@ -78,6 +81,7 @@ const SearchesConfig = () => {
   const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
   const [timeRangePresetsUpdated, setTimeRangePresetsUpdated] = useState<Immutable.List<TimeRangePreset>>(undefined);
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
@@ -152,8 +156,8 @@ const SearchesConfig = () => {
   const saveConfig = () => {
     const update = { ...formConfig };
 
-    sendTelemetry('form_submit', {
-      app_pathname: 'configurations',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.SEARCHES_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search',
       app_action_value: 'configuration-save',
     });

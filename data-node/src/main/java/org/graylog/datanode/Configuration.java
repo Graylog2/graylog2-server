@@ -24,12 +24,15 @@ import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
+import com.github.joschi.jadconfig.validators.DirectoryPathWritableValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
@@ -38,7 +41,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URI;
@@ -82,17 +84,17 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_data_location")
-    private String opensearchDataLocation = "datanode/data";
+    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchDataLocation = Path.of("datanode/data");
 
-    @Parameter(value = "opensearch_logs_location")
-    private String opensearchLogsLocation = "datanode/logs";
+    @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchLogsLocation = Path.of("datanode/logs");
 
-    @Parameter(value = "opensearch_config_location")
-    private String opensearchConfigLocation = "datanode/config";
+    @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchConfigLocation = Path.of("datanode/config");
 
-    @Parameter(value = "config_location")
-    private String configLocation = "config";
+    @Parameter(value = "config_location", validators = DirectoryPathReadableValidator.class)
+    private Path configLocation = null;
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
@@ -118,16 +120,16 @@ public class Configuration extends BaseConfiguration {
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
     @Parameter(value = "opensearch_network_host")
-    private String opensearchNetworkHostHost = null;
+    private String opensearchNetworkHost = null;
 
     @Parameter(value = "transport_certificate")
-    private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
+    private String datanodeTransportCertificate = null;
 
     @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
-    private String datanodeHttpCertificate = "datanode-http-certificates.p12";
+    private String datanodeHttpCertificate = null;
 
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
@@ -234,19 +236,36 @@ public class Configuration extends BaseConfiguration {
         return opensearchDistributionRoot;
     }
 
-    public String getOpensearchConfigLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchConfigLocation() {
         return opensearchConfigLocation;
     }
 
-    public String getConfigLocation() {
+
+    /**
+     * This is a pointer to a directory holding configuration files (and certificates) for the datanode itself.
+     * We treat it as read only for the datanode and should never persist anything in it.
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     *
+     */
+    @Nullable
+    public Path getDatanodeConfigurationLocation() {
         return configLocation;
     }
 
-    public String getOpensearchDataLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchDataLocation() {
         return opensearchDataLocation;
     }
 
-    public String getOpensearchLogsLocation() {
+    /**
+     * Use {@link DatanodeDirectories} to obtain a reference to this directory.
+     */
+    public Path getOpensearchLogsLocation() {
         return opensearchLogsLocation;
     }
 
@@ -274,16 +293,6 @@ public class Configuration extends BaseConfiguration {
         }
     }
 
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateOpenSearchDistribution() throws ValidationException {
-        try {
-            OpensearchDistribution.detectInDirectory(Path.of(getOpensearchDistributionRoot()));
-        } catch (RuntimeException | IOException e) {
-            throw new ValidationException("Could not detect OpenSearch in " + getOpensearchDistributionRoot() + ", please check your installation. Error was: " + e.getMessage());
-        }
-    }
-
     public String getNodeIdFile() {
         return nodeIdFile;
     }
@@ -301,7 +310,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public String getDatanodeNodeName() {
-        return datanodeNodeName;
+        return datanodeNodeName != null && !datanodeNodeName.isBlank() ? datanodeNodeName : getHostname();
     }
 
     public String getInitialManagerNodes() {
@@ -336,8 +345,8 @@ public class Configuration extends BaseConfiguration {
         return datanodeHttpCertificatePassword;
     }
 
-    public Optional<String> getOpensearchNetworkHostHost() {
-        return Optional.ofNullable(opensearchNetworkHostHost);
+    public Optional<String> getOpensearchNetworkHost() {
+        return Optional.ofNullable(opensearchNetworkHost);
     }
 
     public String getBindAddress() {

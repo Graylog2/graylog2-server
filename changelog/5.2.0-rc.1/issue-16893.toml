@@ -1,0 +1,10 @@
+type = "c"
+message = "Unify auto-refresh behaviour in case there are form changes."
+
+issues = ["Graylog2/graylog-plugin-enterprise#5896"]
+pulls = ["16893"]
+
+details.user = """
+We are now submiting the search, when starting the auto-refresh and there are not submitted changes.
+We also unified the behaviour by stoping the auto-refresh, when there are changes, while the auto-refresh is active.
+"""

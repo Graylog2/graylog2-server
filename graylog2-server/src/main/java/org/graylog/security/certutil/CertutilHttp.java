@@ -50,6 +50,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Locale;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 @Command(name = "http", description = "Manage certificates for data-node", groupNames = {"certutil"})
@@ -121,9 +122,8 @@ public class CertutilHttp implements CliCommand {
                 KeyStore caKeystore = KeyStore.getInstance("PKCS12");
                 caKeystore.load(new FileInputStream(caKeystoreFilename), password);
 
-                final PrivateKey caPrivateKey = (PrivateKey) caKeystore.getKey("ca", password);
-                final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate("ca");
-                final X509Certificate rootCertificate = (X509Certificate) caKeystore.getCertificate("root");
+                final PrivateKey caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, password);
+                final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
 
                 final KeyPair caKeyPair = new KeyPair(caPrivateKey, null, caCertificate);
 
@@ -154,7 +154,7 @@ public class CertutilHttp implements CliCommand {
                 char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_HTTP_CERTIFICATE_PASSWORD);
 
                 nodeKeystore.setKeyEntry(DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
-                        new X509Certificate[]{nodePair.certificate(), caKeyPair.certificate(), rootCertificate});
+                        new X509Certificate[]{nodePair.certificate(), caKeyPair.certificate()});
 
 
                 final Path nodeKeystorePath = Path.of(nodeKeystoreFilename);
