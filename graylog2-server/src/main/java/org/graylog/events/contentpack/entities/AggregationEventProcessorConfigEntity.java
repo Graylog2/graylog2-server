@@ -41,6 +41,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
 
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfigEntity.TYPE_NAME)
@@ -129,7 +130,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                                                Map<EntityDescriptor, Object> nativeEntities) {
         final ImmutableSet<String> streamSet = ImmutableSet.copyOf(
                 streams().stream()
-                        .map(id -> resolveStreamEntity(id, nativeEntities))
+                        .map(id -> resolveStreamEntityObject(id, nativeEntities))
                         .map(object -> {
                             if (object == null) {
                                 throw new ContentPackException("Missing Stream for event definition");
@@ -161,7 +162,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                                        Map<EntityDescriptor, Entity> entities,
                                        MutableGraph<Entity> graph) {
         streams().stream()
-                .map(id -> (Entity) resolveStreamEntity(id, entities))
+                .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> graph.putEdge(entity, stream));
     }

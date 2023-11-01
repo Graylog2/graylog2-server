@@ -135,7 +135,11 @@ public class StreamReferenceFacade extends StreamFacade {
         }
     }
 
-    public static Object resolveStreamEntity(String id, Map entities) {
+    public static Entity resolveStreamEntity(String id, Map<EntityDescriptor, Entity> entities) {
+        return (Entity) resolveStreamEntityObject(id, entities);
+    }
+
+    public static Object resolveStreamEntityObject(String id, Map entities) {
         Object streamEntity = entities.get(EntityDescriptor.create(id, ModelTypes.STREAM_V1));
         if (streamEntity == null) {
             streamEntity = entities.get(EntityDescriptor.create(id, ModelTypes.STREAM_REF_V1));
@@ -143,11 +147,16 @@ public class StreamReferenceFacade extends StreamFacade {
         return streamEntity;
     }
 
-    public static Optional<String> getStreamDescriptor(String id, EntityDescriptorIds entityDescriptorIds) {
+    public static Optional<String> getStreamEntityId(String id, EntityDescriptorIds entityDescriptorIds) {
         Optional<String> descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_V1);
         if (descriptor.isEmpty()) {
             descriptor = entityDescriptorIds.get(id, ModelTypes.STREAM_REF_V1);
         }
         return descriptor;
+    }
+
+    public static String getStreamEntityIdOrThrow(String id, EntityDescriptorIds entityDescriptorIds) {
+        return getStreamEntityId(id, entityDescriptorIds).orElseThrow(() ->
+                new ContentPackException("Couldn't find entity " + id + "/" + ModelTypes.STREAM_V1 + " or " + ModelTypes.STREAM_REF_V1));
     }
 }
