@@ -244,7 +244,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.OVERVIEW, element: <DataNodesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
             !isCloud && (
