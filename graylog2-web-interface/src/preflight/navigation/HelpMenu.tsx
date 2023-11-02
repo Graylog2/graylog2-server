@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Icon, MenuTarget, MenuDropdownWrapper, Text } from 'preflight/components/common';
+import { Button, Icon, MenuDropdownWrapper, Text } from 'preflight/components/common';
 import Menu from 'components/bootstrap/Menu';
 
 const StyledButton = styled(Button)(({ theme }) => css`
@@ -29,12 +29,12 @@ const StyledButton = styled(Button)(({ theme }) => css`
 const HelpMenu = () => (
   <Menu width={250}
         position="bottom-end">
-    <MenuTarget>
+    <Menu.Target>
       <StyledButton variant="default">
         <Text weight={500} size="sm" mr={3}>Get Help</Text>
         <Icon name="chevron-down" />
       </StyledButton>
-    </MenuTarget>
+    </Menu.Target>
     <MenuDropdownWrapper>
       <Menu.Item component="a"
                  rightSection={<Icon name="arrow-up-right-from-square" />}
