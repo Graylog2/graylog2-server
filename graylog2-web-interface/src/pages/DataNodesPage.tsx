@@ -19,9 +19,11 @@ import React from 'react';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
- 
+import DataNodesPageNavigation from 'components/datanode/DataNodesPageNavigation';
+
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
+    <DataNodesPageNavigation />
     <PageHeader title="Data Nodes"
                 documentationLink={{
                   title: 'Data Nodes documentation',

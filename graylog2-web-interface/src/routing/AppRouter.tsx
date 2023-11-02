@@ -34,6 +34,7 @@ import {
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DataNodesPage,
+  DataNodesClusterPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
@@ -245,6 +246,7 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
             !isCloud && (
