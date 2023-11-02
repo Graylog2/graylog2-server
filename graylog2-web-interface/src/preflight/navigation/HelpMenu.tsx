@@ -17,7 +17,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Icon, Menu, MenuTarget, MenuItem, MenuDropdownWrapper, Text } from 'preflight/components/common';
+import { Button, Icon, MenuTarget, MenuItem, MenuDropdownWrapper, Text } from 'preflight/components/common';
+import Menu from 'components/bootstrap/Menu';
 
 const StyledButton = styled(Button)(({ theme }) => css`
   border-radius: 50px;

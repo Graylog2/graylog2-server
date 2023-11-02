@@ -23,7 +23,6 @@ export { default as Grid } from './Grid';
 export { default as Icon } from './Icon';
 export { default as Input } from './Input';
 export { default as List } from './List';
-export { default as Menu } from './Menu';
 export { default as MenuDropdownWrapper } from './mantine/MenuDropdownWrapper';
 export { default as MenuItem } from './MenuItem';
 export { default as MenuTarget } from './mantine/MenuTarget';
