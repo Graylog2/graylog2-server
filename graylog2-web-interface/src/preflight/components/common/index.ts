@@ -30,4 +30,14 @@ export { default as Space } from './Space';
 export { default as Tabs } from './Tabs';
 export { default as TextInput } from './TextInput';
 export { default as Title } from './Title';
-export * from './mantine/imports';
+export {
+  Anchor,
+  Box,
+  Divider,
+  Group,
+  Header,
+  NumberInput,
+  Text,
+  UnstyledButton,
+  Collapse,
+} from '@mantine/core';
