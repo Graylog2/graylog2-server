@@ -34,18 +34,24 @@ const renderChangeFieldTypeModal = ({
   onClose = onCloseMock,
   field = 'field',
   show = true,
+  showSelectionTable = undefined,
+  initialFieldType = undefined,
+  fieldTypes = {
+    string: 'String type',
+    int: 'Number(int)',
+    bool: 'Boolean',
+  },
+  initialSelectedIndexSets = ['id-1', 'id-2'],
 }) => render(
   <TestStoreProvider>
     <ChangeFieldTypeModal onClose={onClose}
                           field={field}
                           show={show}
                           isOptionsLoading={false}
-                          fieldTypes={{
-                            string: 'String type',
-                            int: 'Number(int)',
-                            bool: 'Boolean',
-                          }}
-                          initialSelectedIndexSets={['id-1', 'id-2']} />
+                          fieldTypes={fieldTypes}
+                          initialSelectedIndexSets={initialSelectedIndexSets}
+                          showSelectionTable={showSelectionTable}
+                          initialFieldType={initialFieldType} />
   </TestStoreProvider>,
 );
 const attributes: Attributes = [
@@ -182,5 +188,42 @@ describe('ChangeFieldTypeModal', () => {
       rotated: true,
       field: 'field',
     }));
+  });
+
+  it('run putFiledTypeMutationMock with selected type and indexes when showSelectionTable false', async () => {
+    renderChangeFieldTypeModal({ initialSelectedIndexSets: ['id-2'] });
+
+    const typeSelect = await screen.findByLabelText(/select field type for field/i);
+    selectEvent.openMenu(typeSelect);
+    await selectEvent.select(typeSelect, 'Number(int)');
+
+    const submit = await screen.findByTitle(/change field type/i);
+
+    fireEvent.click(submit);
+
+    await waitFor(() => expect(putFiledTypeMutationMock).toHaveBeenCalledWith({
+      indexSetSelection: ['id-2'],
+      newFieldType: 'int',
+      rotated: true,
+      field: 'field',
+    }));
+  });
+
+  it('Doesn\'t shows index sets data when showSelectionTable false', async () => {
+    renderChangeFieldTypeModal({ showSelectionTable: false });
+
+    expect(screen.queryByText('Stream Title 1')).not.toBeInTheDocument();
+    expect(screen.queryByText('Stream Title 1')).not.toBeInTheDocument();
+    expect(screen.queryByText('Index Title 1')).not.toBeInTheDocument();
+    expect(screen.queryByText('String type')).not.toBeInTheDocument();
+    expect(screen.queryByText('Stream Title 2')).not.toBeInTheDocument();
+    expect(screen.queryByText('Index Title 2')).not.toBeInTheDocument();
+    expect(screen.queryByText('Number(int)')).not.toBeInTheDocument();
+  });
+
+  it('Use initial type', async () => {
+    renderChangeFieldTypeModal({ initialFieldType: 'bool' });
+
+    await screen.findByText('Boolean');
   });
 });
