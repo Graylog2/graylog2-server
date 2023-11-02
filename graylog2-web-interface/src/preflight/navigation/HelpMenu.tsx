@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Icon, MenuTarget, MenuItem, MenuDropdownWrapper, Text } from 'preflight/components/common';
+import { Button, Icon, MenuTarget, MenuDropdownWrapper, Text } from 'preflight/components/common';
 import Menu from 'components/bootstrap/Menu';
 
 const StyledButton = styled(Button)(({ theme }) => css`
@@ -36,30 +36,30 @@ const HelpMenu = () => (
       </StyledButton>
     </MenuTarget>
     <MenuDropdownWrapper>
-      <MenuItem component="a"
-                rightSection={<Icon name="arrow-up-right-from-square" />}
-                href="https://docs.graylog.org/docs"
-                target="_blank">
+      <Menu.Item component="a"
+                 rightSection={<Icon name="arrow-up-right-from-square" />}
+                 href="https://docs.graylog.org/docs"
+                 target="_blank">
         Graylog Documentation
-      </MenuItem>
-      <MenuItem component="a"
-                rightSection={<Icon name="arrow-up-right-from-square" />}
-                href="https://docs.graylog.org/docs/changelog"
-                target="_blank">
+      </Menu.Item>
+      <Menu.Item component="a"
+                 rightSection={<Icon name="arrow-up-right-from-square" />}
+                 href="https://docs.graylog.org/docs/changelog"
+                 target="_blank">
         Graylog changelogs
-      </MenuItem>
-      <MenuItem component="a"
-                rightSection={<Icon name="arrow-up-right-from-square" />}
-                href="https://docs.graylog.org/docs/changelog-graylog"
-                target="_blank">
+      </Menu.Item>
+      <Menu.Item component="a"
+                 rightSection={<Icon name="arrow-up-right-from-square" />}
+                 href="https://docs.graylog.org/docs/changelog-graylog"
+                 target="_blank">
         Graylog Operations changelogs
-      </MenuItem>
-      <MenuItem component="a"
-                rightSection={<Icon name="arrow-up-right-from-square" />}
-                href="https://support.graylog.org/portal"
-                target="_blank">
+      </Menu.Item>
+      <Menu.Item component="a"
+                 rightSection={<Icon name="arrow-up-right-from-square" />}
+                 href="https://support.graylog.org/portal"
+                 target="_blank">
         Support
-      </MenuItem>
+      </Menu.Item>
     </MenuDropdownWrapper>
   </Menu>
 );

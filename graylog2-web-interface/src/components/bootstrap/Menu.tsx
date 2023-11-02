@@ -36,6 +36,10 @@ const Menu = ({ children, ...otherProps }: MenuProps) => {
   );
 };
 
+Menu.Target = MantineMenu.Target;
+Menu.Dropdown = MantineMenu.Dropdown;
+Menu.Item = MantineMenu.Item;
+
 Menu.propTypes = {
   children: PropTypes.node.isRequired,
 };
