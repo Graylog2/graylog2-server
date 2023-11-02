@@ -22,7 +22,6 @@ import styled from 'styled-components';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import WidgetModel from 'views/logic/widgets/Widget';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -43,6 +42,7 @@ import { setTitle } from 'views/logic/slices/titlesActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -187,6 +187,7 @@ const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: 
 
 const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Props) => {
   const fields = useQueryFieldTypes();
+  const { stopAutoRefresh } = useAutoRefresh();
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
@@ -205,11 +206,11 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       unsetWidgetEditing();
       setOldWidget(undefined);
     } else {
-      RefreshActions.disable();
+      stopAutoRefresh();
       setWidgetEditing(widget.id);
       setOldWidget(widget);
     }
-  }, [editing, pathname, sendTelemetry, setWidgetEditing, unsetWidgetEditing, widget]);
+  }, [editing, pathname, sendTelemetry, setWidgetEditing, stopAutoRefresh, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),

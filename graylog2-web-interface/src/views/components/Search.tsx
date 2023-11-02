@@ -50,7 +50,6 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import useParameters from 'views/hooks/useParameters';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
@@ -113,12 +112,6 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useAutoRefresh = (refresh: () => Promise<unknown>) => {
-  useEffect(() => RefreshActions.refresh.listen(() => {
-    RefreshActions.refresh.promise(refresh());
-  }), [refresh]);
-};
-
 type Props = {
   InfoBarSlot?: React.ComponentType,
   SearchAreaContainer?: React.ComponentType,
@@ -132,8 +125,6 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
   useEffect(() => {
     refreshSearch();
   }, [refreshSearch]);
-
-  useAutoRefresh(refreshSearch);
 
   useEffect(() => {
     SearchConfigActions.refresh();
