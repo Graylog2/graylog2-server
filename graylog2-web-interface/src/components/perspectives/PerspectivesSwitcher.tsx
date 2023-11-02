@@ -14,26 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
 import { useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { Menu } from '@mantine/core';
 
+import Menu from 'components/bootstrap/Menu';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import Icon from 'components/common/Icon';
 import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-
-const Dropdown = styled.div``;
+import useFeature from 'hooks/useFeature';
 
 const Container = styled.span`
   display: flex;
   flex-direction: row;
   align-content: center;
   align-items: center;
-  padding: 0 15px;
 `;
 
 const ItemContainer = styled.span(({ theme }) => css`
@@ -44,31 +41,46 @@ const ItemContainer = styled.span(({ theme }) => css`
   align-content: center;
   align-items: center;
 `);
+
 const Item = styled.span`
   padding-left: 15px;
 `;
 
-const PerspectiveSwitcher = () => {
-  const [showMenu, setShowMenu] = useState(false);
+const DropdownTrigger = styled.button`
+  background: transparent;
+  border: 0;
+`;
+
+const ActiveBrand = () => {
   const { availablePerspectives } = useContext(PerspectivesContext);
   const activePerspectiveId = useActivePerspective();
   const activePerspective = availablePerspectives.find(({ id }) => id === activePerspectiveId);
   const ActiveBrandComponent = activePerspective.brandComponent;
 
   return (
+    <LinkContainer relativeActive to={Routes.STARTPAGE}>
+      <ActiveBrandComponent />
+    </LinkContainer>
+  );
+};
+
+const Switcher = () => {
+  const [showMenu, setShowMenu] = useState(false);
+  const { availablePerspectives, setActivePerspective } = useContext(PerspectivesContext);
+  const onChangePerspective = (perspectiveId: string) => () => setActivePerspective(perspectiveId);
+
+  return (
     <Container>
       <Menu shadow="md" width={300} opened={showMenu} onChange={setShowMenu}>
-        <LinkContainer relativeActive to={Routes.STARTPAGE}>
-          <ActiveBrandComponent />
-        </LinkContainer>
+        <ActiveBrand />
         <Menu.Target>
-          <Dropdown onClick={() => setShowMenu((show) => !show)}>
+          <DropdownTrigger type="button" onClick={() => setShowMenu((show) => !show)}>
             <Icon name="caret-down" />
-          </Dropdown>
+          </DropdownTrigger>
         </Menu.Target>
         <Menu.Dropdown>
           {availablePerspectives.map(({ brandComponent: BrandComponent, title, id }) => (
-            <Menu.Item key={id}>
+            <Menu.Item key={id} onClick={onChangePerspective(id)}>
               <ItemContainer>
                 <BrandComponent /><Item>{title}</Item>
               </ItemContainer>
@@ -78,6 +90,19 @@ const PerspectiveSwitcher = () => {
       </Menu>
     </Container>
   );
+};
+
+const PerspectiveSwitcher = () => {
+  const { availablePerspectives } = useContext(PerspectivesContext);
+  const hasPerspectivesFeature = useFeature('frontend_perspectives');
+
+  if (!hasPerspectivesFeature || availablePerspectives.length === 1) {
+    return (
+      <ActiveBrand />
+    );
+  }
+
+  return <Switcher />;
 };
 
 export default PerspectiveSwitcher;
