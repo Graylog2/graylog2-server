@@ -19,10 +19,11 @@ import React from 'react';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
- 
-const DataNodesPage = () => (
-  <DocumentTitle title="Data Nodes">
-    <PageHeader title="Data Nodes"
+import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
+
+const DataNodesClusterPage = () => (
+  <DocumentTitle title="Data Nodes Cluster">
+    <PageHeader title="Data Nodes Cluster"
                 documentationLink={{
                   title: 'Data Nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
@@ -33,10 +34,10 @@ const DataNodesPage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        DataNodes List using EntityDataTable
+        <DataNodeConfiguration />
       </Col>
     </Row>
   </DocumentTitle>
 );
 
-export default DataNodesPage;
+export default DataNodesClusterPage;
