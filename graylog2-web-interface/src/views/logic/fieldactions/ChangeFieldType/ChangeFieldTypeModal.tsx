@@ -59,9 +59,10 @@ type Props = {
   showSelectionTable?: boolean,
   fieldTypes: FieldTypes,
   isOptionsLoading: boolean,
+  initialFieldType?: string,
 }
 
-const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoading, initialSelectedIndexSets, onClose, field, showSelectionTable }: Props) => {
+const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoading, initialSelectedIndexSets, onClose, field, showSelectionTable, initialFieldType }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
   const [newFieldType, setNewFieldType] = useState(null);
@@ -119,6 +120,10 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
     setIndexSetSelection(initialSelectedIndexSets);
   }, [initialSelectedIndexSets, setIndexSetSelection]);
 
+  useEffect(() => {
+    if (initialFieldType) setNewFieldType(initialFieldType);
+  }, [initialFieldType]);
+
   return (
     <BootstrapModalForm title={<span>Change {field} Field Type <BetaBadge /></span>}
                         submitButtonText="Change field type"
@@ -147,15 +152,15 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
         {
           showSelectionTable && (
           <>
-        <StyledLabel>Select Targeted Index Sets</StyledLabel>
-        <p>
-          By default the {newFieldType ? <b>{newFieldType}</b> : 'selected'} field type will be set for the <b>{field}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
-        </p>
-        <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelection} />
-        <StyledLabel>Select Rotation Strategy</StyledLabel>
-        <p>
-          To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
-        </p>
+            <StyledLabel>Select Targeted Index Sets</StyledLabel>
+            <p>
+              By default the {newFieldType ? <b>{newFieldType}</b> : 'selected'} field type will be set for the <b>{field}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
+            </p>
+            <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelectedIndexSets} />
+            <StyledLabel>Select Rotation Strategy</StyledLabel>
+            <p>
+              To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+            </p>
           </>
           )
         }
@@ -173,6 +178,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
 ChangeFieldTypeModal.defaultProps = {
   showSelectionTable: true,
   onSubmitCallback: undefined,
+  initialFieldType: null,
 };
 
 export default ChangeFieldTypeModal;

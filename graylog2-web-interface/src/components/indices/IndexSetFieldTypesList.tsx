@@ -40,14 +40,14 @@ export const DEFAULT_LAYOUT = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
-  const [editingField, setEditingField] = useState(null);
+  const [editingField, setEditingField] = useState<IndexSetFieldType | null>(null);
 
   const handleOnClose = useCallback(() => {
     setEditingField(null);
   }, []);
 
-  const handleOnOpen = useCallback((id: string) => {
-    setEditingField(id);
+  const handleOnOpen = useCallback((fieldType: IndexSetFieldType) => {
+    setEditingField(fieldType);
   }, []);
 
   const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
@@ -114,10 +114,9 @@ const IndexSetFieldTypesList = () => {
   }), [fieldTypes]);
 
   const openEditModal = useCallback((fieldType: IndexSetFieldType) => {
-    handleOnOpen(fieldType.fieldName);
+    handleOnOpen(fieldType);
   }, [handleOnOpen]);
 
-  const onRemove = useCallback(() => {}, []);
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <>
       <Button onClick={() => openEditModal(fieldType)}
@@ -127,7 +126,7 @@ const IndexSetFieldTypesList = () => {
               tabIndex={0}>
         {fieldType.isCustom ? 'Edit' : 'Add'}
       </Button>
-      {fieldType.isCustom && (
+      {/* fieldType.isCustom && (
       <Button onClick={onRemove}
               role="button"
               bsSize="xsmall"
@@ -136,9 +135,9 @@ const IndexSetFieldTypesList = () => {
               tabIndex={0}>
         Delete
       </Button>
-      )}
+      ) */}
     </>
-  ), [onRemove, openEditModal]);
+  ), [openEditModal]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -187,13 +186,14 @@ const IndexSetFieldTypesList = () => {
       {
         editingField ? (
           <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
-                                field={editingField}
+                                field={editingField.fieldName}
                                 onClose={handleOnClose}
-                                show={editingField}
+                                show={!!editingField}
                                 showSelectionTable={false}
                                 fieldTypes={fieldTypes}
                                 isOptionsLoading={isOptionsLoading}
-                                onSubmitCallback={refetch} />
+                                onSubmitCallback={refetch}
+                                initialFieldType={editingField.type} />
         ) : null
       }
     </>

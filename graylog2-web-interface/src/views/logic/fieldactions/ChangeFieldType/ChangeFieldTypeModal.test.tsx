@@ -43,6 +43,7 @@ const renderChangeFieldTypeModal = ({
                           fieldTypes={{
                             string: 'String type',
                             int: 'Number(int)',
+                            bool: 'Boolean',
                           }}
                           initialSelectedIndexSets={['id-1', 'id-2']} />
   </TestStoreProvider>,
@@ -105,20 +106,6 @@ const paginatedFieldUsage = ({
   isInitialLoading: false,
   isLoading: false,
 });
-
-const fieldTypes: {
-  data: { fieldTypes: FieldTypes },
-  isLoading: boolean,
-} = {
-  data: {
-    fieldTypes: {
-      string: 'String type',
-      int: 'Number(int)',
-      boolean: 'Boolean',
-    },
-  },
-  isLoading: false,
-};
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
