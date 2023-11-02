@@ -122,6 +122,7 @@ const IndexSetFieldTypesList = () => {
       <Button onClick={() => openEditModal(fieldType)}
               role="button"
               bsSize="xsmall"
+              disabled={fieldType.isReserved}
               title={`${fieldType.isCustom ? 'Edit' : 'Add'} custom field type for ${fieldType.fieldName}`}
               tabIndex={0}>
         {fieldType.isCustom ? 'Edit' : 'Add'}

@@ -30,15 +30,15 @@ const INITIAL_DATA = {
 export type IndexSetFieldTypeJson = {
     field_name: string,
     type: string,
-    is_custom: string,
-    is_reserved: string,
+    is_custom: boolean,
+    is_reserved: boolean,
 }
 
 export type IndexSetFieldType = {
     id: string,
     fieldName: string,
-    isCustom: string,
-    isReserved: string,
+    isCustom: boolean,
+    isReserved: boolean,
     type: string,
 }
 
