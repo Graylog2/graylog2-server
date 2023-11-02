@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Icon, MenuDropdownWrapper, Text } from 'preflight/components/common';
+import { Button, Icon, Text } from 'preflight/components/common';
 import Menu from 'components/bootstrap/Menu';
 
 const StyledButton = styled(Button)(({ theme }) => css`
@@ -35,7 +35,7 @@ const HelpMenu = () => (
         <Icon name="chevron-down" />
       </StyledButton>
     </Menu.Target>
-    <MenuDropdownWrapper>
+    <Menu.Dropdown>
       <Menu.Item component="a"
                  rightSection={<Icon name="arrow-up-right-from-square" />}
                  href="https://docs.graylog.org/docs"
@@ -60,7 +60,7 @@ const HelpMenu = () => (
                  target="_blank">
         Support
       </Menu.Item>
-    </MenuDropdownWrapper>
+    </Menu.Dropdown>
   </Menu>
 );
 
