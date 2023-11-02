@@ -1,4 +1,4 @@
 type = "a"
-message = "cluster name is configurable"
+message = "data node cluster name is configurable"
 
 pulls = ["17143"]
