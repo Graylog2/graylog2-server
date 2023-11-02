@@ -42,7 +42,7 @@ public class OpensearchCommandLineProcess implements Closeable {
     private final CommandLineProcess commandLineProcess;
     private final CommandLineProcessListener resultHandler;
     private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-    private static final String CONFIG = "opensearch.yml";
+    private static final Path CONFIG = Path.of("opensearch.yml");
 
     /**
      * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
@@ -79,8 +79,7 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
         try {
-            final var configFile = config.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve(CONFIG);
-            Files.deleteIfExists(configFile);
+            final Path configFile = config.datanodeDirectories().createOpensearchProcessConfigurationFile(CONFIG);
             mapper.writeValue(configFile.toFile(), getOpensearchConfigurationArguments(config));
         } catch (IOException e) {
             throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
