@@ -20,5 +20,9 @@ import type * as React from 'react';
 export type Perspective = {
   id: string,
   title: string,
-  brandComponent: React.Component,
+  brandComponent: React.ComponentType<{
+    className?: string,
+    disabled?: boolean,
+    href?: string,
+  }>,
 }
