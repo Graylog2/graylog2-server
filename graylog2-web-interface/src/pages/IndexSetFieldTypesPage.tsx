@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Row, Col, Button } from 'components/bootstrap';
@@ -25,14 +26,23 @@ import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
+  const navigate = useNavigate();
   const { indexSet } = useStore(IndexSetsStore);
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
-    IndexSetsActions.get(indexSetId);
-  }, [indexSetId]);
+    const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
+
+    if (!hasMappingPermission) {
+      navigate(Routes.NOTFOUND);
+    } else {
+      IndexSetsActions.get(indexSetId);
+    }
+  }, [currentUser.permissions, indexSetId, navigate]);
 
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>

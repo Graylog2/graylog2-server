@@ -24,6 +24,7 @@ import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 const _onRecalculateIndexRange = (indexSetId: string) => {
   // eslint-disable-next-line no-alert
@@ -47,6 +48,7 @@ type Props = {
 };
 
 const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
+  const currentUser = useCurrentUser();
   const history = useHistory();
   const onCycleDeflector = useCallback(() => _onCycleDeflector(indexSetId), [indexSetId]);
   const onRecalculateIndexRange = useCallback(() => _onRecalculateIndexRange(indexSetId), [indexSetId]);
@@ -55,11 +57,13 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
     history.push(Routes.SYSTEM.INDEX_SETS.FIELD_TYPES(indexSetId));
   }, [history, indexSetId]);
 
+  const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
+
   return (
     <ButtonGroup>
       <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
         <MenuItem eventKey="1" onClick={onRecalculateIndexRange}>Recalculate index ranges</MenuItem>
-        <MenuItem eventKey="1" onClick={onShowFieldTypes}>Show index field types</MenuItem>
+        {hasMappingPermission && <MenuItem eventKey="1" onClick={onShowFieldTypes}>Show index field types</MenuItem>}
         {cycleButton}
       </DropdownButton>
     </ButtonGroup>
