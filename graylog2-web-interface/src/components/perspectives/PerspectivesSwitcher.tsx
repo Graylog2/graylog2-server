@@ -57,6 +57,10 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
   z-index: 1032 !important;
 `;
 
+const DropdownIcon = styled(Icon)(({ theme }) => css`
+  color: ${theme.colors.global.textDefault};
+`);
+
 const Switcher = () => {
   const { setActivePerspective } = useActivePerspective();
   const perspectives = usePerspectives();
@@ -68,7 +72,7 @@ const Switcher = () => {
         <ActivePerspectiveBrand>
           <Menu.Target>
             <DropdownTrigger type="button">
-              <Icon name="caret-down" />
+              <DropdownIcon name="caret-down" />
             </DropdownTrigger>
           </Menu.Target>
         </ActivePerspectiveBrand>
