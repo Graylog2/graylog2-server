@@ -157,13 +157,13 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
               By default the {newFieldType ? <b>{newFieldType}</b> : 'selected'} field type will be set for the <b>{field}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
             </p>
             <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelectedIndexSets} />
-            <StyledLabel>Select Rotation Strategy</StyledLabel>
-            <p>
-              To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
-            </p>
           </>
           )
         }
+        <StyledLabel>Select Rotation Strategy</StyledLabel>
+        <p>
+          To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+        </p>
         <Input type="checkbox"
                id="rotate"
                name="rotate"
