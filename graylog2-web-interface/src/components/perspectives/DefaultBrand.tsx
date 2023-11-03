@@ -17,6 +17,7 @@
 import React from 'react';
 import styled, { useTheme, css } from 'styled-components';
 
+import { Link } from 'components/common/router';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 const Logo = () => {
@@ -49,12 +50,11 @@ const Logo = () => {
   );
 };
 
-const Link = styled.a(({ theme }) => css`
+const BrandLink = styled(Link)(({ theme }) => css`
   display: flex;
   color: ${theme.colors.variant.default};
   align-items: center;
   justify-content: center;
-  padding: 0 15px;
   min-height: ${NAV_ITEM_HEIGHT};
 
   &:hover,
@@ -66,30 +66,16 @@ const Link = styled.a(({ theme }) => css`
 
 type Props = {
   className?: string,
-  disabled?: boolean,
-  href?: string,
 }
 
-const DefaultBrand = ({ className, href, disabled }: Props) => {
-  if (href) {
-    return (
-      <Link href={href} disabled={disabled} className={`${className} navbar-brand`}>
-        <Logo />
-      </Link>
-    );
-  }
-
-  return (
-    <div className={`${className} navbar-brand`}>
-      <Logo />
-    </div>
-  );
-};
+const DefaultBrand = ({ className }: Props) => (
+  <div className={`${className}`}>
+    <Logo />
+  </div>
+);
 
 DefaultBrand.defaultProps = {
   className: '',
-  disabled: false,
-  href: undefined,
 };
 
 export default DefaultBrand;
