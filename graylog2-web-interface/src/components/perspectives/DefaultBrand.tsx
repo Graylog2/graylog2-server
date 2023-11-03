@@ -15,10 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { useTheme, css } from 'styled-components';
-
-import { Link } from 'components/common/router';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import { useTheme } from 'styled-components';
 
 const Logo = () => {
   const theme = useTheme();
@@ -49,20 +46,6 @@ const Logo = () => {
     </svg>
   );
 };
-
-const BrandLink = styled(Link)(({ theme }) => css`
-  display: flex;
-  color: ${theme.colors.variant.default};
-  align-items: center;
-  justify-content: center;
-  min-height: ${NAV_ITEM_HEIGHT};
-
-  &:hover,
-  &:focus {
-    color: ${theme.colors.variant.dark.default};
-    background-color: transparent;
-  }
-`);
 
 type Props = {
   className?: string,

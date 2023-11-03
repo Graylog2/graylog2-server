@@ -65,7 +65,11 @@ const BrandLink = styled(Link)`
   min-height: ${NAV_ITEM_HEIGHT};
 `;
 
-const ActiveBrand = ({ children, className }: PropsWithChildren) => {
+const StyledMenuDropdown = styled(Menu.Dropdown)`
+  z-index: 1032 !important;
+`;
+
+const ActiveBrand = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
   const { availablePerspectives } = useContext(PerspectivesContext);
   const activePerspectiveId = useActivePerspective();
   const activePerspective = availablePerspectives.find(({ id }) => id === activePerspectiveId);
@@ -81,6 +85,10 @@ const ActiveBrand = ({ children, className }: PropsWithChildren) => {
   );
 };
 
+ActiveBrand.defaultProps = {
+  className: '',
+};
+
 const Switcher = () => {
   const [showMenu, setShowMenu] = useState(false);
   const { availablePerspectives, setActivePerspective } = useContext(PerspectivesContext);
@@ -88,7 +96,7 @@ const Switcher = () => {
 
   return (
     <Container className="navbar-brand">
-      <Menu shadow="md" width={300} opened={showMenu} onChange={setShowMenu}>
+      <Menu shadow="md" width={300} opened={showMenu} onChange={setShowMenu} withinPortal>
         <ActiveBrand>
           <Menu.Target>
             <DropdownTrigger type="button" onClick={() => setShowMenu((show) => !show)}>
@@ -96,7 +104,7 @@ const Switcher = () => {
             </DropdownTrigger>
           </Menu.Target>
         </ActiveBrand>
-        <Menu.Dropdown>
+        <StyledMenuDropdown>
           {availablePerspectives.map(({ brandComponent: BrandComponent, title, id }) => (
             <Menu.Item key={id} onClick={onChangePerspective(id)}>
               <ItemContainer>
@@ -104,7 +112,7 @@ const Switcher = () => {
               </ItemContainer>
             </Menu.Item>
           ))}
-        </Menu.Dropdown>
+        </StyledMenuDropdown>
       </Menu>
     </Container>
   );
