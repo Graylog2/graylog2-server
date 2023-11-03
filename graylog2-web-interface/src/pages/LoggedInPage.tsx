@@ -23,18 +23,21 @@ import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
 import NodesProvider from 'contexts/NodesProvider';
 import InputsProvider from 'contexts/InputsProvider';
+import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 
 const LoggedInPage = () => (
   <DefaultQueryClientProvider>
     <ThemeAndUserProvider>
       <TelemetryProvider>
-        <StreamsProvider>
-          <NodesProvider>
-            <InputsProvider>
-              <AppRouter />
-            </InputsProvider>
-          </NodesProvider>
-        </StreamsProvider>
+        <PerspectivesProvider>
+          <StreamsProvider>
+            <NodesProvider>
+              <InputsProvider>
+                <AppRouter />
+              </InputsProvider>
+            </NodesProvider>
+          </StreamsProvider>
+        </PerspectivesProvider>
       </TelemetryProvider>
     </ThemeAndUserProvider>
   </DefaultQueryClientProvider>
