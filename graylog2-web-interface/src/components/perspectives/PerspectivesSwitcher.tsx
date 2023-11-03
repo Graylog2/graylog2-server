@@ -15,18 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { PropsWithChildren } from 'react';
 import { useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import Icon from 'components/common/Icon';
 import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import useFeature from 'hooks/useFeature';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+
+import ActivePerspectiveBrand from './ActivePerspectiveBrand';
+
+const CONTAINER_CLASS = 'navbar-brand';
 
 const Container = styled.span`
   display: flex;
@@ -54,40 +53,9 @@ const DropdownTrigger = styled.button`
   border: 0;
 `;
 
-const BrandContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const BrandLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  min-height: ${NAV_ITEM_HEIGHT};
-`;
-
 const StyledMenuDropdown = styled(Menu.Dropdown)`
   z-index: 1032 !important;
 `;
-
-const ActiveBrand = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
-  const { availablePerspectives } = useContext(PerspectivesContext);
-  const activePerspectiveId = useActivePerspective();
-  const activePerspective = availablePerspectives.find(({ id }) => id === activePerspectiveId);
-  const ActiveBrandComponent = activePerspective.brandComponent;
-
-  return (
-    <BrandContainer className={className}>
-      <BrandLink to={Routes.STARTPAGE}>
-        <ActiveBrandComponent />
-      </BrandLink>
-      {children}
-    </BrandContainer>
-  );
-};
-
-ActiveBrand.defaultProps = {
-  className: '',
-};
 
 const Switcher = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -95,15 +63,15 @@ const Switcher = () => {
   const onChangePerspective = (perspectiveId: string) => () => setActivePerspective(perspectiveId);
 
   return (
-    <Container className="navbar-brand">
+    <Container className={CONTAINER_CLASS}>
       <Menu shadow="md" width={300} opened={showMenu} onChange={setShowMenu} withinPortal>
-        <ActiveBrand>
+        <ActivePerspectiveBrand>
           <Menu.Target>
             <DropdownTrigger type="button" onClick={() => setShowMenu((show) => !show)}>
               <Icon name="caret-down" />
             </DropdownTrigger>
           </Menu.Target>
-        </ActiveBrand>
+        </ActivePerspectiveBrand>
         <StyledMenuDropdown>
           {availablePerspectives.map(({ brandComponent: BrandComponent, title, id }) => (
             <Menu.Item key={id} onClick={onChangePerspective(id)}>
@@ -124,7 +92,7 @@ const PerspectiveSwitcher = () => {
 
   if (!hasPerspectivesFeature || availablePerspectives.length === 1) {
     return (
-      <ActiveBrand className="navbar-brand" />
+      <ActivePerspectiveBrand className="navbar-brand" />
     );
   }
 
