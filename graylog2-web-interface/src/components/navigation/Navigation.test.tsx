@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { mount, mountUnwrapped } from 'wrappedEnzyme';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { Route, Routes, MemoryRouter, useLocation } from 'react-router-dom';
 import DefaultProviders from 'DefaultProviders';
 import Immutable from 'immutable';
@@ -30,6 +30,8 @@ import RoutePaths from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
+import PerspectivesBindings from 'components/perspectives/bindings';
+import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 
 jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
@@ -59,6 +61,10 @@ jest.mock('util/AppConfig', () => ({
 describe('Navigation', () => {
   const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
+  beforeAll(() => {
+    PluginStore.register(new PluginManifest({}, PerspectivesBindings));
+  });
+
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
@@ -68,15 +74,15 @@ describe('Navigation', () => {
     let wrapper;
 
     beforeEach(() => {
-      wrapper = mount(<Navigation />);
+      wrapper = mount(<PerspectivesProvider><Navigation /></PerspectivesProvider>);
     });
 
     it('contains brand icon', () => {
-      const brand = wrapper.find('NavbarBrand');
+      const brand = wrapper.find('.navbar-brand');
 
       expect(brand).toExist();
-      expect(brand.find('LinkContainer')).toHaveProp('to', RoutePaths.STARTPAGE);
-      expect(brand.find('NavigationBrand')).toExist();
+      expect(brand.find('a')).toHaveProp('href', RoutePaths.STARTPAGE);
+      expect(brand.find('DefaultBrand')).toExist();
     });
 
     it('contains user menu including correct user details', () => {
