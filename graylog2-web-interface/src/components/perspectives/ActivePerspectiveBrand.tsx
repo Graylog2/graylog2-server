@@ -38,7 +38,7 @@ const BrandLink = styled(Link)`
 
 const ActivePerspectiveBrand = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
   const { availablePerspectives } = useContext(PerspectivesContext);
-  const activePerspectiveId = useActivePerspective();
+  const { activePerspective: activePerspectiveId } = useActivePerspective();
   const activePerspective = availablePerspectives.find(({ id }) => id === activePerspectiveId);
   const ActiveBrandComponent = activePerspective.brandComponent;
 

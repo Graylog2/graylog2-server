@@ -18,17 +18,14 @@ import { useContext } from 'react';
 
 import PerspectivesContext from '../contexts/PerspectivesContext';
 
-const useActivePerspective = () => {
+const usePerspectives = () => {
   const perspectivesContextValue = useContext(PerspectivesContext);
 
   if (!perspectivesContextValue) {
-    throw new Error('useActivePerspective hook needs to be used inside PerspectivesContext.Provider');
+    throw new Error('usePerspectives hook needs to be used inside PerspectivesContext.Provider');
   }
 
-  return {
-    activePerspective: perspectivesContextValue.activePerspective,
-    setActivePerspective: perspectivesContextValue.setActivePerspective,
-  };
+  return perspectivesContextValue.availablePerspectives;
 };
 
-export default useActivePerspective;
+export default usePerspectives;

@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
-import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
 import useFeature from 'hooks/useFeature';
+import usePerspectives from 'components/perspectives/hooks/usePerspectives';
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 
 import ActivePerspectiveBrand from './ActivePerspectiveBrand';
 
@@ -59,7 +60,8 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
 
 const Switcher = () => {
   const [showMenu, setShowMenu] = useState(false);
-  const { availablePerspectives, setActivePerspective } = useContext(PerspectivesContext);
+  const { setActivePerspective } = useActivePerspective();
+  const perspectives = usePerspectives();
   const onChangePerspective = (perspectiveId: string) => () => setActivePerspective(perspectiveId);
 
   return (
@@ -73,7 +75,7 @@ const Switcher = () => {
           </Menu.Target>
         </ActivePerspectiveBrand>
         <StyledMenuDropdown>
-          {availablePerspectives.map(({ brandComponent: BrandComponent, title, id }) => (
+          {perspectives.map(({ brandComponent: BrandComponent, title, id }) => (
             <Menu.Item key={id} onClick={onChangePerspective(id)}>
               <ItemContainer>
                 <BrandComponent /><Item>{title}</Item>
@@ -87,10 +89,10 @@ const Switcher = () => {
 };
 
 const PerspectiveSwitcher = () => {
-  const { availablePerspectives } = useContext(PerspectivesContext);
+  const perspectives = usePerspectives();
   const hasPerspectivesFeature = useFeature('frontend_perspectives');
 
-  if (!hasPerspectivesFeature || availablePerspectives.length === 1) {
+  if (!hasPerspectivesFeature || perspectives.length === 1) {
     return (
       <ActivePerspectiveBrand className="navbar-brand" />
     );
