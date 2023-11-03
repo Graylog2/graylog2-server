@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
@@ -59,17 +58,16 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
 `;
 
 const Switcher = () => {
-  const [showMenu, setShowMenu] = useState(false);
   const { setActivePerspective } = useActivePerspective();
   const perspectives = usePerspectives();
   const onChangePerspective = (perspectiveId: string) => () => setActivePerspective(perspectiveId);
 
   return (
     <Container className={CONTAINER_CLASS}>
-      <Menu shadow="md" width={300} opened={showMenu} onChange={setShowMenu} withinPortal>
+      <Menu shadow="md" width={300} withinPortal>
         <ActivePerspectiveBrand>
           <Menu.Target>
-            <DropdownTrigger type="button" onClick={() => setShowMenu((show) => !show)}>
+            <DropdownTrigger type="button">
               <Icon name="caret-down" />
             </DropdownTrigger>
           </Menu.Target>

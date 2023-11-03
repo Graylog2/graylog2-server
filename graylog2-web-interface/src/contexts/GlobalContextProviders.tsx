@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useEffect } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 
