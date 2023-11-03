@@ -23,7 +23,10 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import PerspectivesContext from './PerspectivesContext';
 
 const PerspectivesProvider = ({ children }: PropsWithChildren) => {
-  const availablePerspectives = usePluginEntities('perspectives');
+  const availablePerspectivesFn = usePluginEntities('perspectives');
+  const availablePerspectives = availablePerspectivesFn
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true));
+
   const [activePerspective, setActivePerspective] = useState('default');
 
   const contextValue = useMemo(() => ({
