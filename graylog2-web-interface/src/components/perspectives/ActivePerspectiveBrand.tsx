@@ -40,7 +40,11 @@ const ActivePerspectiveBrand = ({ children, className }: PropsWithChildren<{ cla
   const { availablePerspectives } = useContext(PerspectivesContext);
   const { activePerspective: activePerspectiveId } = useActivePerspective();
   const activePerspective = availablePerspectives.find(({ id }) => id === activePerspectiveId);
-  const ActiveBrandComponent = activePerspective.brandComponent;
+  const ActiveBrandComponent = activePerspective?.brandComponent;
+
+  if (!ActiveBrandComponent) {
+    return null;
+  }
 
   return (
     <BrandContainer className={className}>
