@@ -14,15 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { PropsWithChildren } from 'react';
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
 import { useTheme } from 'styled-components';
 
-const Menu = ({ children, ...otherProps }: MenuProps) => {
+type Props = PropsWithChildren<{
+  shadow?: MenuProps['shadow'],
+  width?: number,
+  opened: boolean,
+  onChange: (open: boolean) => void,
+  withinPortal?: boolean,
+}>
+
+const Menu = ({ children, shadow, width, opened, onChange, withinPortal }: Props) => {
   const theme = useTheme();
 
-  const menuStyles = () => ({
+  const styles = () => ({
     dropdown: {
       backgroundColor: theme.colors.global.contentBackground,
       border: `1px solid ${theme.colors.variant.lighter.default}`,
@@ -30,7 +38,12 @@ const Menu = ({ children, ...otherProps }: MenuProps) => {
   });
 
   return (
-    <MantineMenu {...otherProps} styles={menuStyles}>
+    <MantineMenu shadow={shadow}
+                 width={width}
+                 opened={opened}
+                 onChange={onChange}
+                 withinPortal={withinPortal}
+                 styles={styles}>
       {children}
     </MantineMenu>
   );
@@ -40,8 +53,10 @@ Menu.Target = MantineMenu.Target;
 Menu.Dropdown = MantineMenu.Dropdown;
 Menu.Item = MantineMenu.Item;
 
-Menu.propTypes = {
-  children: PropTypes.node.isRequired,
+Menu.defaultProps = {
+  shadow: undefined,
+  width: undefined,
+  withinPortal: false,
 };
 
 export default Menu;
