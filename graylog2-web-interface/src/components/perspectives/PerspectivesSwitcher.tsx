@@ -20,7 +20,7 @@ import { useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
-import { LinkContainer, Link } from 'components/common/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import Icon from 'components/common/Icon';
 import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
