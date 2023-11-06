@@ -70,7 +70,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getDataTargetDir() {
-        return dataTargetDir;
+        return dataTargetDir.toAbsolutePath();
     }
 
     /**
@@ -78,7 +78,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getLogsTargetDir() {
-        return logsTargetDir;
+        return logsTargetDir.toAbsolutePath();
     }
 
 
@@ -107,7 +107,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getConfigurationTargetDir() {
-        return configurationTargetDir;
+        return configurationTargetDir.toAbsolutePath();
     }
 
     public Path createConfigurationFile(Path relativePath) throws IOException {
@@ -130,7 +130,7 @@ public class DatanodeDirectories {
      * @see org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync
      */
     public Path getOpensearchProcessConfigurationDir() {
-        return configurationTargetDir.resolve("opensearch");
+        return configurationTargetDir.toAbsolutePath().resolve("opensearch");
     }
 
     public Path createOpensearchProcessConfigurationDir() throws IOException {
