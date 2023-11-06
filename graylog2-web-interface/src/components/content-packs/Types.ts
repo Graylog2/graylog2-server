@@ -18,10 +18,10 @@
 export type ContentPackInstallation = {
   created_at: string,
   description: string,
-  entities: Array<ContentPackEntity>,
+  entities?: Array<ContentPackEntity>,
   id: string,
   name: string,
-  parameters: Array<any>,
+  parameters?: Array<any>,
   rev: number,
   server_version: string,
   summary: string,

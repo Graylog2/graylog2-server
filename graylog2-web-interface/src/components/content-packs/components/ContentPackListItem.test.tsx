@@ -17,8 +17,8 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import ContentPackListItem from './ContentPackListItem';
 
+import ContentPackListItem from './ContentPackListItem';
 
 describe('<ContentPackListItem />', () => {
   const pack = {
@@ -26,13 +26,11 @@ describe('<ContentPackListItem />', () => {
     name: 'SSH Archive',
     created_at: '2023-10-25T13:33:51.147Z',
     description: 'description',
-    entities: [],
-    parameters: [],
     rev: 3,
     server_version: '6.0.0-SNAPSHOT',
     summary: 'The Open Thread Exchange Lookup Table of the Threat Intel Plugin',
     url: 'https://github.com/Graylog2/graylog2-server',
-    v: '1',
+    v: 1,
     vendor: 'Graylog <hello@graylog.com>',
   };
 
@@ -43,11 +41,12 @@ describe('<ContentPackListItem />', () => {
 
   it('render content pack item', async () => {
     render(
-      <ContentPackListItem
-        pack={pack}
-        contentPackMetadata={metadata}
-        onDeletePack={() => {}}
-        onInstall={() => {}} />);
+      <ContentPackListItem pack={pack}
+                           contentPackMetadata={metadata}
+                           onDeletePack={() => {
+                           }}
+                           onInstall={() => {
+                           }} />);
 
     await screen.findByText('SSH Archive');
   });
@@ -56,11 +55,11 @@ describe('<ContentPackListItem />', () => {
     const deleteFn = jest.fn();
 
     render(
-      <ContentPackListItem
-        pack={pack}
-        contentPackMetadata={metadata}
-        onDeletePack={deleteFn}
-        onInstall={() => {}} />);
+      <ContentPackListItem pack={pack}
+                           contentPackMetadata={metadata}
+                           onDeletePack={deleteFn}
+                           onInstall={() => {
+                           }} />);
 
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
 
@@ -71,15 +70,14 @@ describe('<ContentPackListItem />', () => {
     const deleteFn = jest.fn();
 
     render(
-      <ContentPackListItem
-        pack={pack}
-        contentPackMetadata={metadata}
-        onDeletePack={deleteFn}
-        onInstall={() => {}} />);
+      <ContentPackListItem pack={pack}
+                           contentPackMetadata={metadata}
+                           onDeletePack={deleteFn}
+                           onInstall={() => {
+                           }} />);
 
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
 
     expect(deleteFn).toHaveBeenCalledTimes(1);
   });
-
 });
