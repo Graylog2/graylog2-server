@@ -50,7 +50,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
-    private final String nodeName;
     private final NodeService nodeService;
     private final PreflightConfigService preflightConfigService;
 
@@ -71,7 +70,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
         this.preflightConfigService = preflightConfigService;
-        this.nodeName = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getDatanodeNodeName());
     }
 
     private boolean isPreflight() {
@@ -97,9 +95,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         try {
             ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
 
-            if(localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
+            if (localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
-            } else if(isPreflight()) {
+            } else if (isPreflight()) {
                 final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).collect(Collectors.toSet()));
                 opensearchProperties.put("cluster.initial_master_nodes", nodeList);
             }
@@ -120,8 +118,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
-                    "datanode-cluster",
-                    nodeName,
+                    localConfiguration.getClustername(),
+                    localConfiguration.getDatanodeNodeName(),
                     List.of(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,

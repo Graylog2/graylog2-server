@@ -97,7 +97,7 @@ describe('App', () => {
 
     const resumeStartupButton = await startupButton();
     userEvent.click(resumeStartupButton);
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
     await screen.findByText(/The Graylog server is currently starting./);
   });
 
@@ -114,8 +114,8 @@ describe('App', () => {
     const resumeStartupButton = await startupButton();
     userEvent.click(resumeStartupButton);
 
-    await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node?'));
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+    await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.'));
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
   });
 
   it('should display error when resuming startup failed', async () => {
@@ -128,7 +128,7 @@ describe('App', () => {
       userEvent.click(resumeStartupButton);
     });
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
     await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Resuming startup failed with error: Error: Unexpected error!', 'Could not resume startup'));
   });
 });
