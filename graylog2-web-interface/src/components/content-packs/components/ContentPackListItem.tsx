@@ -76,6 +76,7 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
       <Row className="row-sm">
         <Col md={9}>
           <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(pack.id)}>{pack.name}</Link>
+            {' '}
             <small>Latest
               Version: {pack.rev} <ContentPackStatus contentPackId={pack.id} states={states} />
             </small>
@@ -143,8 +144,6 @@ ContentPackListItem.propTypes = {
   onInstall: PropTypes.func.isRequired,
 };
 
-ContentPackListItem.defaultProps = {
-
-};
+ContentPackListItem.defaultProps = {};
 
 export default ContentPackListItem;
