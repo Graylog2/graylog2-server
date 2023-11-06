@@ -29,9 +29,13 @@ import javax.inject.Inject;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.graylog2.plugin.Message.RESERVED_SETTABLE_FIELDS;
+
 public class FieldTypeMappingsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldTypeMappingsService.class);
+
+    public static final Set<String> BLACKLISTED_FIELDS = RESERVED_SETTABLE_FIELDS;
 
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
@@ -49,6 +53,9 @@ public class FieldTypeMappingsService {
     public void changeFieldType(final CustomFieldMapping customMapping,
                                 final Set<String> indexSetsIds,
                                 final boolean rotateImmediately) {
+        if (BLACKLISTED_FIELDS.contains(customMapping.fieldName())) {
+            throw new IllegalArgumentException("Changing field type of " + customMapping.fieldName() + " is not allowed.");
+        }
         for (String indexSetId : indexSetsIds) {
             try {
                 indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
@@ -59,6 +66,7 @@ public class FieldTypeMappingsService {
                 });
             } catch (Exception ex) {
                 LOG.error("Failed to update field type in index set : " + indexSetId, ex);
+                throw ex;
             }
         }
     }

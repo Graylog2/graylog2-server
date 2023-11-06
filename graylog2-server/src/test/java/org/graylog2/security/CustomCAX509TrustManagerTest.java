@@ -63,7 +63,8 @@ public class CustomCAX509TrustManagerTest {
         }
 
         @Override
-        public void create(Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {}
+        public void create(String organization, Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException {
+        }
 
         @Override
         public void upload(String pass, List<FormDataBodyPart> parts) throws CACreationException {}
@@ -118,7 +119,7 @@ public class CustomCAX509TrustManagerTest {
                 .hasSize(2)
                 .extracting(c -> (X509Certificate) c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=ca", "CN=" + hostname);
+                .contains("CN=Graylog CA", "CN=" + hostname);
 
         // additional Tests
         final var noAdditionalKeystore = new DummyCaService(null);

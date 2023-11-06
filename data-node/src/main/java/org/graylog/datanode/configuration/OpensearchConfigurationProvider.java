@@ -25,7 +25,6 @@ import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
@@ -40,8 +39,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
@@ -51,7 +50,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
-    private final String nodeName;
     private final NodeService nodeService;
     private final PreflightConfigService preflightConfigService;
 
@@ -72,7 +70,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
         this.preflightConfigService = preflightConfigService;
-        this.nodeName = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getDatanodeNodeName());
     }
 
     private boolean isPreflight() {
@@ -84,8 +81,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     @Override
     public OpensearchConfiguration get() {
-        final Path opensearchConfigLocation = Path.of(localConfiguration.getOpensearchConfigLocation());
-
         //TODO: at some point bind the whole list, for now there is too much experiments with order and prerequisites
         List<SecurityConfigurationVariant> securityConfigurationTypes = List.of(
                 inSecureConfiguration,
@@ -94,16 +89,16 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         );
 
         Optional<SecurityConfigurationVariant> chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
-                .filter(s -> s.checkPrerequisites(localConfiguration))
+                .filter(s -> s.isConfigured(localConfiguration))
                 .findFirst();
 
         try {
             ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
 
-            if(localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
+            if (localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
-            } else if(isPreflight()) {
-                final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).toList());
+            } else if (isPreflight()) {
+                final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).collect(Collectors.toSet()));
                 opensearchProperties.put("cluster.initial_master_nodes", nodeList);
             }
             opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
@@ -112,19 +107,19 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             if (chosenSecurityConfigurationVariant.isPresent()) {
                 securityConfiguration = chosenSecurityConfigurationVariant.get()
                         .build()
-                        .configure(localConfiguration, signingKey);
+                        .configure(datanodeConfiguration, signingKey);
                 opensearchProperties.putAll(securityConfiguration.getProperties());
             }
 
             return new OpensearchConfiguration(
-                    datanodeConfiguration.opensearchDistribution().directory(),
-                    opensearchConfigLocation,
+                    datanodeConfiguration.opensearchDistributionProvider().get(),
+                    datanodeConfiguration.datanodeDirectories(),
                     localConfiguration.getBindAddress(),
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
-                    "datanode-cluster",
-                    nodeName,
+                    localConfiguration.getClustername(),
+                    localConfiguration.getDatanodeNodeName(),
                     List.of(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
@@ -137,11 +132,10 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
-        localConfiguration.getOpensearchNetworkHostHost().ifPresent(
+        localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
-        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
+        config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
+        config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
 
         config.put("network.bind_host", localConfiguration.getBindAddress());
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());

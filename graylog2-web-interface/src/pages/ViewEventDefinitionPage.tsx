@@ -33,6 +33,7 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
@@ -73,9 +74,8 @@ const ViewEventDefinitionPage = () => {
   }, [currentUser, history, params]);
 
   const handleDuplicateEvent = () => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, {
       app_pathname: 'event-definition',
-      app_action_value: 'event-definition-action-copy',
     });
 
     EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent) => {

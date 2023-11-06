@@ -101,6 +101,6 @@ class CertutilHttpTest {
                 .hasSize(2)
                 .extracting(c -> (X509Certificate) c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=ca", "CN=" + hostname);
+                .contains("CN=Graylog CA", "CN=" + hostname);
     }
 }

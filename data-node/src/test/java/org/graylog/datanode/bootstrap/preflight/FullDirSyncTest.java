@@ -27,8 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,6 +103,22 @@ class FullDirSyncTest {
                 .extracting(Path::toString)
                 .hasSize(4)
                 .contains("a.txt", "b.txt", "subdir", "subdir/c.txt");
+
+        Assertions.assertThat(afterSyncState)
+                .filteredOn(Files::isDirectory)
+                .allSatisfy(p -> {
+                    final Set<PosixFilePermission> permission = Files.getPosixFilePermissions(p);
+                    Assertions.assertThat(permission).containsExactlyInAnyOrderElementsOf(FullDirSync.DIRECTORY_PERMISSIONS);
+                });
+
+        Assertions.assertThat(afterSyncState)
+                .filteredOn(Files::isRegularFile)
+                .allSatisfy(p -> {
+                    final Set<PosixFilePermission> permission = Files.getPosixFilePermissions(p);
+                    Assertions.assertThat(permission).containsExactlyInAnyOrderElementsOf(FullDirSync.FILE_PERMISSIONS);
+                });
+
+
 
     }
 }
