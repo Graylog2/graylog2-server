@@ -59,6 +59,8 @@ jest.mock('util/AppConfig', () => ({
 }));
 
 describe('Navigation', () => {
+  const SUT = () => <PerspectivesProvider><Navigation /></PerspectivesProvider>;
+
   const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
   beforeAll(() => {
@@ -74,7 +76,7 @@ describe('Navigation', () => {
     let wrapper;
 
     beforeEach(() => {
-      wrapper = mount(<PerspectivesProvider><Navigation /></PerspectivesProvider>);
+      wrapper = mount(<SUT />);
     });
 
     it('contains brand icon', () => {
@@ -147,14 +149,14 @@ describe('Navigation', () => {
     });
 
     it('contains top-level navigation element', () => {
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(findLink(wrapper, 'Perpetuum Mobile')).toExist();
     });
 
     it('prefix plugin navigation item paths with app prefix', () => {
       asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/my/crazy/prefix');
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(findLink(wrapper, 'Perpetuum Mobile')).toHaveProp('path', '/my/crazy/prefix/something');
     });
@@ -164,20 +166,20 @@ describe('Navigation', () => {
         .permissions(Immutable.List([]))
         .build());
 
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(findLink(wrapper, 'Archives')).not.toExist();
     });
 
     it('does not contain navigation elements from plugins when elements require a feature flag to be enabled', () => {
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(findLink(wrapper, 'Feature flag test')).not.toExist();
     });
 
     it('contains navigation elements from plugins when elements require a feature flag which is enabled', () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(findLink(wrapper, 'Feature flag test')).toExist();
     });
@@ -187,7 +189,7 @@ describe('Navigation', () => {
         .permissions(Immutable.List(['archive:read']))
         .build());
 
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(findLink(wrapper, 'Archives')).toExist();
     });
@@ -197,7 +199,7 @@ describe('Navigation', () => {
         .permissions(Immutable.List([]))
         .build());
 
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).not.toExist();
     });
@@ -207,20 +209,20 @@ describe('Navigation', () => {
         .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
         .build());
 
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).toExist();
     });
 
     it('does not render dropdown contributed by plugin if required feature flag is not enabled', () => {
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).not.toExist();
     });
 
     it('renders dropdown contributed by plugin if required feature flag is enabled', () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).toExist();
     });
@@ -234,14 +236,16 @@ describe('Navigation', () => {
 
       const wrapper = mountUnwrapped((
         <DefaultProviders>
-          <MemoryRouter initialEntries={['/somethingelse']}>
-            <Routes>
-              <Route path="/somethingelse"
-                     element={(
-                       <Navigation />
-                   )} />
-            </Routes>
-          </MemoryRouter>
+          <PerspectivesProvider>
+            <MemoryRouter initialEntries={['/somethingelse']}>
+              <Routes>
+                <Route path="/somethingelse"
+                       element={(
+                         <Navigation />
+                     )} />
+              </Routes>
+            </MemoryRouter>
+          </PerspectivesProvider>
         </DefaultProviders>
       ));
 
@@ -251,7 +255,7 @@ describe('Navigation', () => {
 
   describe('uses correct permissions:', () => {
     const verifyPermissions = ({ count, links }) => {
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
       const navigationLinks = wrapper.find('NavItem[active=false]');
 
       expect(navigationLinks).toHaveLength(count);
@@ -270,7 +274,7 @@ describe('Navigation', () => {
         .permissions(Immutable.List())
         .build());
 
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(wrapper.find('NavigationLink[description="Enterprise"]')).not.toExist();
     });
@@ -280,7 +284,7 @@ describe('Navigation', () => {
         .permissions(Immutable.List(['licenseinfos:read']))
         .build());
 
-      const wrapper = mount(<Navigation />);
+      const wrapper = mount(<SUT />);
 
       expect(wrapper.find('NavigationLink[description="Enterprise"]')).toExist();
     });
