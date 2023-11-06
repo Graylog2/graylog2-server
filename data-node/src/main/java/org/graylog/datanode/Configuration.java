@@ -84,14 +84,17 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
+    private static Path DEFAULT_OPENSEARCH_DATA_LOCATION = Path.of("datanode/data");
     @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryWritableValidator.class)
-    private Path opensearchDataLocation = Path.of("datanode/data");
+    private Path opensearchDataLocation = DEFAULT_OPENSEARCH_DATA_LOCATION;
 
+    private static Path DEFAULT_OPENSEARCH_LOGS_LOCATION = Path.of("datanode/logs");
     @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
-    private Path opensearchLogsLocation = Path.of("datanode/logs");
+    private Path opensearchLogsLocation = DEFAULT_OPENSEARCH_LOGS_LOCATION;
 
+    private static Path DEFAULT_OPENSEARCH_CONFIG_LOCATION = Path.of("datanode/config");
     @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
-    private Path opensearchConfigLocation = Path.of("datanode/config");
+    private Path opensearchConfigLocation = DEFAULT_OPENSEARCH_CONFIG_LOCATION;
 
     @Parameter(value = "config_location", validators = DirectoryPathReadableValidator.class)
     private Path configLocation = null;
@@ -246,6 +249,9 @@ public class Configuration extends BaseConfiguration {
         return opensearchConfigLocation;
     }
 
+    public boolean isOpensearchConfigDefaultLocation() {
+        return DEFAULT_OPENSEARCH_CONFIG_LOCATION.equals(getOpensearchConfigLocation());
+    }
 
     /**
      * This is a pointer to a directory holding configuration files (and certificates) for the datanode itself.
@@ -257,6 +263,10 @@ public class Configuration extends BaseConfiguration {
         return configLocation;
     }
 
+    public boolean isDatanodeConfigurationDefaultLocation() {
+        return getDatanodeConfigurationLocation() != null;
+    }
+
     /**
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
@@ -264,11 +274,20 @@ public class Configuration extends BaseConfiguration {
         return opensearchDataLocation;
     }
 
+    public boolean isOpensearchDataDefaultLocation() {
+        return DEFAULT_OPENSEARCH_DATA_LOCATION.equals(getOpensearchDataLocation());
+    }
+
     /**
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
     public Path getOpensearchLogsLocation() {
         return opensearchLogsLocation;
+    }
+
+
+    public boolean isOpensearchLogsDefaultLocation() {
+        return DEFAULT_OPENSEARCH_LOGS_LOCATION.equals(getOpensearchLogsLocation());
     }
 
     public Integer getProcessLogsBufferSize() {

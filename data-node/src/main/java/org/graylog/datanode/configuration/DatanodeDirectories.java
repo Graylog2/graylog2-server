@@ -41,14 +41,12 @@ public class DatanodeDirectories {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDirectories.class);
 
-    private final String nodeId;
     private final Path dataTargetDir;
     private final Path logsTargetDir;
     private final Path configurationSourceDir;
     private final Path configurationTargetDir;
 
-    public DatanodeDirectories(String nodeId, Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
-        this.nodeId = nodeId;
+    public DatanodeDirectories(Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
         this.dataTargetDir = dataTargetDir;
         this.logsTargetDir = logsTargetDir;
         this.configurationSourceDir = configurationSourceDir;
@@ -57,11 +55,10 @@ public class DatanodeDirectories {
 
     public static DatanodeDirectories fromConfiguration(Configuration configuration, NodeId nodeId) {
         final DatanodeDirectories directories = new DatanodeDirectories(
-                nodeId.getNodeId(),
-                configuration.getOpensearchDataLocation(),
-                configuration.getOpensearchLogsLocation(),
-                configuration.getDatanodeConfigurationLocation(),
-                configuration.getOpensearchConfigLocation()
+                configuration.isOpensearchDataDefaultLocation() ? configuration.getOpensearchDataLocation().resolve(nodeId.getNodeId()) : configuration.getOpensearchDataLocation(),
+                configuration.isOpensearchLogsDefaultLocation() ? configuration.getOpensearchLogsLocation().resolve(nodeId.getNodeId()) : configuration.getOpensearchLogsLocation(),
+                configuration.isDatanodeConfigurationDefaultLocation() ? configuration.getDatanodeConfigurationLocation().resolve(nodeId.getNodeId()) : configuration.getDatanodeConfigurationLocation(),
+                configuration.isOpensearchConfigDefaultLocation() ? configuration.getOpensearchConfigLocation().resolve(nodeId.getNodeId()) : configuration.getOpensearchConfigLocation()
         );
 
         LOG.info("Opensearch of the node {} uses following directories as its storage: {}", nodeId.getNodeId(), directories);
@@ -73,7 +70,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getDataTargetDir() {
-        return resolveNodeSubdir(dataTargetDir);
+        return dataTargetDir;
     }
 
     /**
@@ -81,7 +78,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getLogsTargetDir() {
-        return resolveNodeSubdir(logsTargetDir);
+        return logsTargetDir;
     }
 
 
@@ -110,7 +107,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getConfigurationTargetDir() {
-        return resolveNodeSubdir(configurationTargetDir);
+        return configurationTargetDir;
     }
 
     public Path createConfigurationFile(Path relativePath) throws IOException {
@@ -129,10 +126,11 @@ public class DatanodeDirectories {
     /**
      * This is a subdirectory of {@link #getConfigurationTargetDir()}. It's used by us to synchronize and generate opensearch
      * configuration. Opensearch is then instructed to accept this dir as its base configuration dir (OPENSEARCH_PATH_CONF env property).
+     *
      * @see org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync
      */
     public Path getOpensearchProcessConfigurationDir() {
-        return resolveNodeSubdir(configurationTargetDir).resolve("opensearch");
+        return configurationTargetDir.resolve("opensearch");
     }
 
     public Path createOpensearchProcessConfigurationDir() throws IOException {
@@ -147,11 +145,6 @@ public class DatanodeDirectories {
     public Path createOpensearchProcessConfigurationFile(Path relativePath) throws IOException {
         final Path resolvedPath = getOpensearchProcessConfigurationDir().resolve(relativePath);
         return createRestrictedAccessFile(resolvedPath);
-    }
-
-
-    private Path resolveNodeSubdir(Path path) {
-        return path.resolve(nodeId).toAbsolutePath();
     }
 
     @Override

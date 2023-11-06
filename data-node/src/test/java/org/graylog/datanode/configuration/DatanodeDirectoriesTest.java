@@ -29,7 +29,7 @@ class DatanodeDirectoriesTest {
 
     @Test
     void testConfigDirPermissions(@TempDir Path dataDir, @TempDir Path logsDir, @TempDir Path configSourceDir, @TempDir Path configTargetDir) throws IOException {
-        final DatanodeDirectories datanodeDirectories = new DatanodeDirectories("12345", dataDir, logsDir, configSourceDir, configTargetDir);
+        final DatanodeDirectories datanodeDirectories = new DatanodeDirectories(dataDir, logsDir, configSourceDir, configTargetDir);
         final Path dir = datanodeDirectories.createOpensearchProcessConfigurationDir();
         Assertions.assertThat(Files.getPosixFilePermissions(dir)).
                 contains(
