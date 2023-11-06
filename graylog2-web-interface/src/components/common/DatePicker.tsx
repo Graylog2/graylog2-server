@@ -23,7 +23,7 @@ import styled, { css } from 'styled-components';
 import 'react-day-picker/lib/style.css';
 
 import type { DateTime } from 'util/DateTime';
-import { isValidDate } from 'util/DateTime';
+import { isValidDate, adjustFormat } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
@@ -79,7 +79,6 @@ type Props = {
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
-  const { formatTime } = useUserDateTime();
   const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(() => ({
@@ -88,17 +87,18 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
         return false;
       }
 
-      return formatTime(selectedDate, 'date') === formatTime(moddedDate, 'date');
+      return adjustFormat(selectedDate, 'date', 'utc') === adjustFormat(moddedDate, 'date', 'utc');
     },
     disabled: {
       before: new Date(fromDate),
     },
-  }), [formatTime, fromDate, selectedDate]);
+  }), [fromDate, selectedDate]);
 
   return (
     <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
                      onDayClick={onChange}
                      modifiers={modifiers}
+                     selected={selectedDate}
                      showOutsideDays={showOutsideDays} />
   );
 };
