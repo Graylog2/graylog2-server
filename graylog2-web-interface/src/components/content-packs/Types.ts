@@ -29,7 +29,12 @@ export type ContentPackInstallation = {
   v: number,
   vendor: string,
 }
-
+export type ContentPackVersionsType = {
+  contentPacks: Array<ContentPackInstallation>,
+  latest: ContentPackInstallation,
+  latestRevision: number,
+  revisions: Array<number>
+}
 export type ContentPackEntity = {
   id: string,
   type: EntityType,
@@ -39,8 +44,9 @@ export type ContentPackEntity = {
 }
 
 export interface EntityType {
-  name: string
-  version: string
+  name: string;
+
+  version: string;
 }
 
 export interface Data {
@@ -49,12 +55,15 @@ export interface Data {
 
 export interface Type {
   '@type': string,
+
   '@value': string,
 }
 
 export interface Constraint {
   type: string,
+
   plugin?: string,
+
   version: string,
 }
 

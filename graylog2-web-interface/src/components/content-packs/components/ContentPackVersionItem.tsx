@@ -32,8 +32,23 @@ import {
   MenuItem,
   Modal,
 } from 'components/bootstrap';
+import type { ContentPackVersionsType, ContentPackInstallation } from 'components/content-packs/Types';
 
-const ContentPackVersionItem = ({ pack, contentPackRevisions, onChange: onChangeProp, onDeletePack, onInstall: onInstallProp }) => {
+type Props = {
+  pack: ContentPackInstallation
+  contentPackRevisions: ContentPackVersionsType,
+  onDeletePack: (id: string, rev: number) => void,
+  onChange: (id: string) => void,
+  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void,
+};
+
+const ContentPackVersionItem = ({
+  pack,
+  contentPackRevisions,
+  onChange: onChangeProp,
+  onDeletePack,
+  onInstall: onInstallProp,
+}: Props) => {
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState(contentPackRevisions.latestRevision);
@@ -62,11 +77,12 @@ const ContentPackVersionItem = ({ pack, contentPackRevisions, onChange: onChange
 
   return (
     <tr key={pack.id + pack.rev}>
+      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
       <td>
         <input type="radio"
                value={pack.rev}
                onChange={onChange}
-               checked={parseInt(selectedVersion, 10) === pack.rev} />
+               checked={selectedVersion === pack.rev} />
       </td>
       <td>{pack.rev}</td>
       <td className="text-right">
@@ -126,9 +142,12 @@ ContentPackVersionItem.propTypes = {
 };
 
 ContentPackVersionItem.defaultProps = {
-  onChange: () => {},
-  onDeletePack: () => {},
-  onInstall: () => {},
+  onChange: () => {
+  },
+  onDeletePack: () => {
+  },
+  onInstall: () => {
+  },
 };
 
 export default ContentPackVersionItem;
