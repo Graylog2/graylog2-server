@@ -50,7 +50,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
-    private final String nodeName;
     private final NodeService nodeService;
     private final PreflightConfigService preflightConfigService;
 
@@ -71,7 +70,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
         this.preflightConfigService = preflightConfigService;
-        this.nodeName = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getDatanodeNodeName());
     }
 
     private boolean isPreflight() {
@@ -121,7 +119,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
                     "datanode-cluster",
-                    nodeName,
+                    localConfiguration.getDatanodeNodeName(),
                     List.of(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
