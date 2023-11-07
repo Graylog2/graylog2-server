@@ -162,6 +162,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
+    public static final String DATANODE_REMOVE = "datanode:remove";
+
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
     public static final String ENTITY_OWN = "entity:own";
