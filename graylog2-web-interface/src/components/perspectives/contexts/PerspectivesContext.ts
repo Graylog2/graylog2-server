@@ -14,8 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { RefreshStore } from 'views/stores/RefreshStore';
+import * as React from 'react';
 
-const useRefreshConfig = () => useStore(RefreshStore);
-export default useRefreshConfig;
+import { singleton } from 'logic/singleton';
+import type { Perspective } from 'components/perspectives/types';
+
+type PerspectivesContextType = {
+  activePerspective: string,
+  availablePerspectives: Array<Perspective>
+  setActivePerspective: (perspectiveId: string) => void
+}
+
+const PerspectivesContext = React.createContext<PerspectivesContextType | undefined>(undefined);
+
+export default singleton('contexts.PerspectivesContext', () => PerspectivesContext);

@@ -28,6 +28,9 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 type Props = {
   isTestLoading: boolean,
@@ -40,10 +43,11 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
   const [showDialog, setShowDialog] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(undefined);
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   const onDelete = () => {
-    sendTelemetry('input_value_change', {
-      app_pathname: 'events',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_DELETE_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-notification',
       app_action_value: 'notification-delete',
     });

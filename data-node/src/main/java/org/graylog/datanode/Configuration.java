@@ -176,6 +176,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "hostname")
     private String hostname = null;
 
+    @Parameter(value = "clustername")
+    private String clustername = "datanode-cluster";
+
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
 
@@ -248,7 +251,6 @@ public class Configuration extends BaseConfiguration {
      * This is a pointer to a directory holding configuration files (and certificates) for the datanode itself.
      * We treat it as read only for the datanode and should never persist anything in it.
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
-     *
      */
     @Nullable
     public Path getDatanodeConfigurationLocation() {
@@ -310,7 +312,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public String getDatanodeNodeName() {
-        return datanodeNodeName;
+        return datanodeNodeName != null && !datanodeNodeName.isBlank() ? datanodeNodeName : getHostname();
     }
 
     public String getInitialManagerNodes() {
@@ -355,6 +357,10 @@ public class Configuration extends BaseConfiguration {
 
     public int getDatanodeHttpPort() {
         return datanodeHttpPort;
+    }
+
+    public String getClustername() {
+        return clustername;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

@@ -22,7 +22,6 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchInfo;
 import org.graylog.datanode.process.ProcessEvent;
@@ -53,6 +52,7 @@ import java.util.stream.Collectors;
 class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
+    public static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
     private final StateMachineTracerAggregator tracerAggregator;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -70,7 +70,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final Queue<String> stdout;
     private final Queue<String> stderr;
     private final CustomCAX509TrustManager trustManager;
-    private final Path hostsfile;
     private final NodeService nodeService;
     private final Configuration configuration;
 
@@ -85,7 +84,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.trustManager = trustManager;
         this.nodeService = nodeService;
         this.configuration = configuration;
-        this.hostsfile = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve("unicast_hosts.txt");
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
@@ -107,7 +105,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(datanodeConfiguration.nodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
@@ -123,8 +121,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public String getOpensearchClusterUrl() {
-        final var hostname = DatanodeConfigurationProvider.getNodesFromConfig(configuration.getDatanodeNodeName());
-        return hostname + ":" + configuration.getOpensearchTransportPort();
+        return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
     }
 
     public void onEvent(ProcessEvent event) {
@@ -158,10 +155,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private void writeSeedHostsList() {
         try {
+            final Path hostsfile = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(UNICAST_HOSTS_FILE);
             final Set<String> current = nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
             Files.write(hostsfile, current, Charset.defaultCharset(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } catch (IOException iox) {
-            LOG.error("Could not write to file: {} - {}", hostsfile, iox.getMessage());
+            LOG.error("Could not write to file: {} - {}", UNICAST_HOSTS_FILE, iox.getMessage());
         }
 
     }

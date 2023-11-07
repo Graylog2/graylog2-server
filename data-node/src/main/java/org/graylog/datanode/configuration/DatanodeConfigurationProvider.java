@@ -39,15 +39,9 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
         datanodeConfiguration = new DatanodeConfiguration(
                 opensearchDistributionProvider,
                 DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
-                getNodesFromConfig(localConfiguration.getDatanodeNodeName()),
                 localConfiguration.getProcessLogsBufferSize(),
                 jwtTokenProvider
         );
-    }
-
-    public static String getNodesFromConfig(final String configProperty) {
-        if (configProperty != null) return configProperty;
-        return Tools.getLocalCanonicalHostname();
     }
 
     @Override

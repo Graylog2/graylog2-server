@@ -21,7 +21,6 @@ import PropTypes from 'prop-types';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
@@ -36,6 +35,7 @@ import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSea
 import useAppDispatch from 'stores/useAppDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -107,6 +107,7 @@ const MessageList = ({
     pageErrors: [],
     currentPage: 1,
   });
+  const { stopAutoRefresh } = useAutoRefresh();
   const activeQueryId = useActiveQueryId();
   const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
@@ -127,7 +128,7 @@ const MessageList = ({
         },
       };
 
-    RefreshActions.disable();
+    stopAutoRefresh();
     setLoadingState(true);
 
     dispatch(reexecuteSearchTypes(searchTypePayload, effectiveTimerange)).then((response) => {
@@ -139,7 +140,7 @@ const MessageList = ({
         currentPage: pageNo,
       });
     });
-  }, [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState]);
+  }, [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState, stopAutoRefresh]);
 
   const onSortChange = useCallback((newSort: SortConfig[]) => {
     const newConfig = config.toBuilder().sort(newSort).build();
