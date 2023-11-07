@@ -24,8 +24,10 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import okhttp3.Headers;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.ServerStatus;
@@ -70,10 +72,15 @@ public class HttpPollTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(HttpPollTransport.class);
 
     private static final String CK_URL = "target_url";
+    private static final String CK_HTTP_METHOD = "http_method";
     private static final String CK_HEADERS = "headers";
     private static final String CK_ENCRYPTED_HEADERS = "encrypted_headers";
     private static final String CK_TIMEUNIT = "timeunit";
     private static final String CK_INTERVAL = "interval";
+
+    private static final String GET = "GET";
+    private static final String PUT = "PUT";
+    private static final String POST = "POST";
 
     private final Configuration configuration;
     private final EventBus serverEventBus;
@@ -167,7 +174,13 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                 return;
             }
 
-            final Request.Builder requestBuilder = new Request.Builder().get()
+            final Request.Builder requestBuilder = new Request.Builder();
+            switch (configuration.getString(CK_HTTP_METHOD)) {
+                case GET -> requestBuilder.get();
+                case PUT -> requestBuilder.put(RequestBody.create(null, new byte[0]));
+                case POST -> requestBuilder.post(RequestBody.create(null, new byte[0]));
+            }
+            requestBuilder
                     .url(url)
                     .headers(Headers.of(headers));
 
@@ -234,7 +247,17 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                     CK_URL,
                     "URI of JSON resource",
                     "http://example.org/api",
-                    "HTTP resource returning JSON on GET",
+                    "HTTP resource returning JSON on HTTP request",
+                    ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+            r.addField(new DropdownField(
+                    CK_HTTP_METHOD,
+                    "HTTP method",
+                    GET,
+                    Map.of(GET, GET,
+                            PUT, PUT,
+                            POST, POST),
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
