@@ -95,9 +95,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         try {
             ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
 
-            if(localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
+            if (localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
-            } else if(isPreflight()) {
+            } else if (isPreflight()) {
                 final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).collect(Collectors.toSet()));
                 opensearchProperties.put("cluster.initial_master_nodes", nodeList);
             }
@@ -118,7 +118,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
-                    "datanode-cluster",
+                    localConfiguration.getClustername(),
                     localConfiguration.getDatanodeNodeName(),
                     List.of(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
