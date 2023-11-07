@@ -35,6 +35,37 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+const Toolbar = styled(Row)(({ theme }) => css`
+  border-bottom: 1px solid ${theme.colors.gray[90]};
+  padding-bottom: 15px;
+`);
+
+const GlobalStatsCol = styled(Col)`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const GlobalStats = styled.p`
+  margin-bottom: 0;
+`;
+
+const StatsInfoText = styled.span`
+  font-style: italic;
+`;
+
+const formatStatsString = (stats: IndexSetStats) => {
+  if (!stats) {
+    return 'N/A';
+  }
+
+  const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
+  const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
+  const size = NumberUtils.formatBytes(stats.size);
+
+  return `${indices}, ${documents}, ${size}`;
+};
+
 const IndexSetsComponent = () => {
   const DEFAULT_PAGE_NUMBER = 1;
   const DEFAULT_PAGE_SIZE = 10;
@@ -111,37 +142,6 @@ const IndexSetsComponent = () => {
       resetPage();
     });
   };
-
-  const formatStatsString = (stats: IndexSetStats) => {
-    if (!stats) {
-      return 'N/A';
-    }
-
-    const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
-    const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
-    const size = NumberUtils.formatBytes(stats.size);
-
-    return `${indices}, ${documents}, ${size}`;
-  };
-
-  const Toolbar = styled(Row)(({ theme }) => css`
-    border-bottom: 1px solid ${theme.colors.gray[90]};
-    padding-bottom: 15px;
-  `);
-
-  const GlobalStatsCol = styled(Col)`
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  `;
-
-  const GlobalStats = styled.p`
-    margin-bottom: 0;
-  `;
-
-  const StatsInfoText = styled.span`
-    font-style: italic;
-  `;
 
   const statsDisabledText = 'Stats are disabled by default';
 
