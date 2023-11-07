@@ -1,6 +1,0 @@
-type = "fixed"
-message = "Just a test."
-
-issues = [""]
-pulls = ["17202"]
-
