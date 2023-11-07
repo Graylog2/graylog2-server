@@ -17,10 +17,29 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
+import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 
-describe('useActivePerspective', () => {
+jest.mock('hooks/usePluginEntities', () => () => ([
+  {
+    id: 'default',
+    title: 'Default Perspective',
+    brandComponent: () => {},
+  },
+  {
+    id: 'example-perspective',
+    title: 'Example Perspective',
+    brandComponent: () => {},
+  },
+  {
+    id: 'unavailable-perspective',
+    title: 'Unavailable Perspective',
+    brandComponent: () => {},
+    useCondition: () => false,
+  },
+]));
+
+describe('usePerspectives', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -31,15 +50,15 @@ describe('useActivePerspective', () => {
     </PerspectivesProvider>
   );
 
-  it('should return active perspective', async () => {
-    const { result } = renderHook(() => useActivePerspective(), { wrapper });
+  it('should return available perspectives', async () => {
+    const { result } = renderHook(() => usePerspectives(), { wrapper });
 
-    expect(result.current.activePerspective).toEqual('default');
+    expect(result.current.map(({ id }) => id)).toEqual(['default', 'example-perspective']);
   });
 
   it('should throw error when being used outside of PerspectivesContext', async () => {
-    const { result } = renderHook(() => useActivePerspective());
+    const { result } = renderHook(() => usePerspectives());
 
-    expect(result.error).toEqual(Error('useActivePerspective hook needs to be used inside PerspectivesContext.Provider'));
+    expect(result.error).toEqual(Error('usePerspectives hook needs to be used inside PerspectivesContext.Provider'));
   });
 });
