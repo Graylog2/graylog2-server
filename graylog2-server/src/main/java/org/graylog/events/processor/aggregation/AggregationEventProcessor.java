@@ -43,6 +43,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.HasOptionalField;
@@ -61,8 +62,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -93,6 +94,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final EventStreamService eventStreamService;
     private final Messages messages;
     private final NotificationService notificationService;
+    private final PermittedStreams permittedStreams;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -101,7 +103,8 @@ public class AggregationEventProcessor implements EventProcessor {
                                      DBEventProcessorStateService stateService,
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
-                                     Messages messages, NotificationService notificationService) {
+                                     Messages messages, NotificationService notificationService,
+                                     PermittedStreams permittedStreams) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -111,6 +114,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.eventStreamService = eventStreamService;
         this.messages = messages;
         this.notificationService = notificationService;
+        this.permittedStreams = permittedStreams;
     }
 
     @Override
@@ -220,7 +224,10 @@ public class AggregationEventProcessor implements EventProcessor {
 
     private void filterSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                               EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
-        final Set<String> streams = eventStreamService.buildEventSourceStreams(getStreams(parameters), Collections.emptySet());
+        Set<String> streams = getStreams(parameters);
+        if (streams.isEmpty()) {
+            streams = new HashSet<>(permittedStreams.load(streamId -> true));
+        }
 
         final AtomicInteger messageCount = new AtomicInteger(0);
         final MoreSearch.ScrollCallback callback = (messages, continueScrolling) -> {
