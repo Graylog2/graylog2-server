@@ -3633,10 +3633,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/crossfilter@0.0.36":
-  version "0.0.36"
-  resolved "https://registry.yarnpkg.com/@types/crossfilter/-/crossfilter-0.0.36.tgz#3b790e4452eff76b57eddc638166f1dc2c7f3b21"
-  integrity sha512-v9K+a6tfh7zbpUPg6CgPMsHD26omJueJXo+rKDQyqYqRO6xwyMLHw4CQQvX/FyZTSNb3nIjrhPnal+UkMHVDYA==
+"@types/crossfilter@0.0.37":
+  version "0.0.37"
+  resolved "https://registry.yarnpkg.com/@types/crossfilter/-/crossfilter-0.0.37.tgz#41fb598d2bee2d469202c3b92cff5bf068d0c994"
+  integrity sha512-ydw9FGbOHrFHaht/3MU9mvK4zU9SKD2KOrmrCTSmcHjOoiWdGg/UWRIEClumk+bq3wYoLXuReJaJlVI/ZYNRkA==
 
 "@types/enzyme-adapter-react-16@^1.0.6":
   version "1.0.8"
