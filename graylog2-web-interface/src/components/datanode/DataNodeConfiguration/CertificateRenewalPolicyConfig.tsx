@@ -86,7 +86,7 @@ const smallestUnit = (duration: string) => {
 const fetchCurrentConfig = () => ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
 
 const NoExistingPolicy = ({ createPolicy }: { createPolicy: () => void }) => (
-  <span>There is no Certificate Renewal Policy yet. Click
+  <span>There is no Certificate Renewal Policy yet. Click&nbsp;
     <Button onClick={createPolicy}
             bsSize="xsmall"
             bsStyle="primary">here
