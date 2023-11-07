@@ -24,7 +24,14 @@ import { Modal, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
-const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }) => {
+type Props = {
+  contentPackId: string,
+  revision: number,
+  show: boolean,
+  onHide: () => void,
+}
+
+const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: Props) => {
   const [showDownloadModal, setShowDownloadModal] = useState(show);
 
   const getDownloadUrl = () => qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);
@@ -68,7 +75,8 @@ ContentPackDownloadControl.propTypes = {
 
 ContentPackDownloadControl.defaultProps = {
   show: false,
-  onHide: () => {},
+  onHide: () => {
+  },
 };
 
 export default ContentPackDownloadControl;
