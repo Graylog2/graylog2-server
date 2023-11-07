@@ -264,7 +264,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public boolean isDatanodeConfigurationDefaultLocation() {
-        return getDatanodeConfigurationLocation() != null;
+        return getDatanodeConfigurationLocation() == null;
     }
 
     /**
