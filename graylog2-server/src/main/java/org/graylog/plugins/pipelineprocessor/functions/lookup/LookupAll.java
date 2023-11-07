@@ -1,0 +1,87 @@
+package org.graylog.plugins.pipelineprocessor.functions.lookup;
+
+import com.google.common.base.Functions;
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
+import org.graylog2.lookup.LookupTableService;
+import org.graylog2.plugin.lookup.LookupResult;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
+
+public class LookupAll extends AbstractFunction<List<Object>> {
+
+    public static final String NAME = "lookup_all";
+
+    @SuppressWarnings("unchecked")
+    private static final Class<List<Object>> LIST_RETURN_TYPE = (Class<List<Object>>) new TypeToken<List<Object>>() {
+    }.getRawType();
+
+    private final ParameterDescriptor<String, LookupTableService.Function> lookupTableParam;
+    private final ParameterDescriptor<Object, List<Object>> keysParam;
+
+    @Inject
+    public LookupAll(LookupTableService lookupTableService) {
+        lookupTableParam = string("lookup_table", LookupTableService.Function.class)
+                .description("The existing lookup table to use to lookup the given keys")
+                .transform(tableName -> lookupTableService.newBuilder().lookupTable(tableName).build())
+                .build();
+        keysParam = object("keys", LIST_RETURN_TYPE)
+                .description("The keys to lookup in the table")
+                .transform(LookupAll::transformValueToList)
+                .build();
+    }
+
+    @Override
+    public List<Object> evaluate(FunctionArgs args, EvaluationContext context) {
+        final List<Object> keys = keysParam.required(args, context);
+        if (keys == null || keys.isEmpty()) {
+            return List.of();
+        }
+        LookupTableService.Function table = lookupTableParam.required(args, context);
+        if (table == null) {
+            return List.of();
+        }
+        final List<Object> results = new ArrayList<>();
+        for (Object key : keys) {
+            LookupResult result = table.lookup(key);
+            if (result != null && !result.isEmpty()) {
+                results.add(result.singleValue());
+            }
+        }
+        return results;
+    }
+
+    @Override
+    public FunctionDescriptor<List<Object>> descriptor() {
+        return FunctionDescriptor.<List<Object>>builder()
+                .name(NAME)
+                .description("Looks up all provided values in the named lookup table, and returns all results as an array.")
+                .params(lookupTableParam, keysParam)
+                .returnType(LIST_RETURN_TYPE)
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Lookup all values in lookup table")
+                .ruleBuilderTitle("Lookup all values from '${keys}' in '${lookup_table}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
+                .build();
+    }
+
+    private static List<Object> transformValueToList(Object value) {
+        if (value instanceof List) {
+            return Lists.transform((List) value, Functions.toStringFunction());
+        } else {
+            return Collections.singletonList(value.toString());
+        }
+    }
+}
