@@ -17,7 +17,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Badge, BootstrapModalForm, Input } from 'components/bootstrap';
+import { Alert, Badge, BootstrapModalForm, Input } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -70,9 +70,9 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, r
 
   return (
     <div>
-      <p>
+      <Alert>
         After removing the custom filed type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the open search settings will be use
-      </p>
+      </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
       <p>
         To see and use filed type changes for <b>{fieldsStr}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
