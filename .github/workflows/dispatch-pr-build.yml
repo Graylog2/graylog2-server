@@ -13,33 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check if enterprise PR depends on core PR
-        id: retrieve_core_pr
-        if: ${{ github.repository == 'Graylog2/graylog-plugin-enterprise' }}
-        run: |
-          echo "pr=$(jq -r .pull_request.body $GITHUB_EVENT_PATH|grep -E '^/(jenkins-pr-deps|jpd)'|grep -oP '(Graylog2/graylog2-server#|https?://github.com/Graylog2/graylog2-server/pull/)([0-9]+)')" >> $GITHUB_OUTPUT
-      - name: Check if core PR depends on enterprise
-        id: retrieve_enterprise_pr
-        if: ${{ github.repository == 'Graylog2/graylog2-server' }}
-        run: |
-          echo "pr=$(jq -r .pull_request.body $GITHUB_EVENT_PATH|grep -E '^/(jenkins-pr-deps|jpd)'|grep -oP '(Graylog2/graylog-plugin-enterprise#|https?://github.com/Graylog2/graylog-plugin-enterprise/pull/)([0-9]+)')" >> $GITHUB_OUTPUT
       - name: Build pull requests string
         id: pr_string
         shell: bash
         run: |
-          pull_nr=${{ github.event_name == 'pull_request' && github.event.number }}
-          [ "$pull_nr" ] && pull_pr=${{ github.repository }}\#$pull_nr
+          # Add the PR that triggered this workflow
+          pulls=("${{ github.repository }}#${{ github.event.number }}")
 
-          if [ "${{ github.repository }}" = Graylog2/graylog2-server ]; then
-              core_pr=$pull_pr
-              enterprise_pr=${{ steps.retrieve_enterprise_pr.outputs.pr }}
-          else
-              core_pr="${{ steps.retrieve_core_pr.outputs.pr }}"
-              enterprise_pr=$pull_pr
-          fi
-          echo pr_nr="$pull_nr" >> $GITHUB_OUTPUT
-          PRS=( $core_pr $enterprise_pr )
-          echo pr_string=$(echo ${PRS[@]} | tr ' ' ',') >> $GITHUB_OUTPUT
+          # Add any PR dependencies to the list of pulls
+          pulls+=($(grep -P '^/(jenkins-pr-deps|jpd|prd)' <<< "${{ github.event.pull_request.body }}" | \
+            grep -ioP '(Graylog2/\S+?#|https?://github.com/Graylog2/\S+?/pull/)[0-9]+'))
+
+          echo "pr_string=$(tr ' ' ',' <<< "${pulls[@]}")" >> $GITHUB_OUTPUT
 
       - name: dispatch job to graylog-project-internal
         run: >
