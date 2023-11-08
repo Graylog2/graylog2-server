@@ -1,0 +1,4 @@
+type = "s"
+message = "Update Netty to 4.1.100 to fix the [HTTP/2 Rapid Reset attack](https://blog.cloudflare.com/technical-breakdown-http2-rapid-reset-ddos-attack/). [GHSA-xpw8-rcwv-8f8p](https://github.com/netty/netty/security/advisories/GHSA-xpw8-rcwv-8f8p) The security vulnerability affects all Graylog users that run the Graylog Forwarder input on their servers."
+
+pulls = ["16902"]

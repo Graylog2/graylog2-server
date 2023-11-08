@@ -51,7 +51,7 @@ public class DataNodeProvisioningBusEvents implements DataNodeProvisioningServic
     }
 
     @Override
-    public DataNodeProvisioningConfig getPreflightConfigFor(String nodeId) {
+    public Optional<DataNodeProvisioningConfig> getPreflightConfigFor(String nodeId) {
         return delegate.getPreflightConfigFor(nodeId);
     }
 

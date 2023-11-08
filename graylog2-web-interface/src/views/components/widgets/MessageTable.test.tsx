@@ -38,6 +38,12 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
+
 const messages = [
   {
     highlight_ranges: {},

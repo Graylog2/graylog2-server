@@ -17,13 +17,14 @@
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 
-import { RefreshActions } from 'views/stores/RefreshStore';
 import View from 'views/logic/views/View';
 import OriginalShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import mockAction from 'helpers/mocking/MockAction';
 import { createSearch } from 'fixtures/searches';
+import { asMock } from 'helpers/mocking';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useQuery from 'routing/useQuery';
 
 const mockView = createSearch({ queryId: 'somequery' }).toBuilder()
   .type(View.Type.Dashboard)
@@ -31,84 +32,118 @@ const mockView = createSearch({ queryId: 'somequery' }).toBuilder()
   .title('view title')
   .build();
 
-jest.mock('views/stores/RefreshStore', () => ({
-  RefreshActions: {
-    setInterval: jest.fn(),
-    enable: jest.fn(),
-    disable: jest.fn(),
-  },
-}));
-
 jest.mock('views/pages/ShowViewPage', () => ({ children }: React.PropsWithChildren<{}>) => children);
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
+jest.mock('views/hooks/useAutoRefresh');
+jest.mock('routing/useQuery');
 
-const mockLocation = {
-  query: {
-    interval: '30', refresh: '10',
-  },
-};
-
-type SUTProps = {
-  location: typeof mockLocation;
-};
-
-const ShowDashboardInBigDisplayMode = (props: SUTProps) => (
+const ShowDashboardInBigDisplayMode = () => (
   <TestStoreProvider view={mockView} initialQuery="somequery">
-    <OriginalShowDashboardInBigDisplayMode {...props} />
+    <OriginalShowDashboardInBigDisplayMode />
   </TestStoreProvider>
 );
 
 describe('ShowDashboardInBigDisplayMode', () => {
-  beforeAll(loadViewsPlugin);
+  const autoRefreshContextValue = {
+    refreshConfig: null,
+    startAutoRefresh: () => {},
+    stopAutoRefresh: () => {},
+  };
+
+  beforeAll(() => {
+    asMock(useQuery).mockReturnValue({ interval: '30', refresh: '10' });
+    loadViewsPlugin();
+  });
 
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
     jest.clearAllMocks();
-    RefreshActions.disable = mockAction(jest.fn());
+
+    asMock(useAutoRefresh).mockReturnValue({
+      refreshConfig: null,
+      startAutoRefresh: () => {},
+      stopAutoRefresh: () => {},
+    });
   });
 
   it('set refresh interval correctly based on location query', async () => {
-    render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
+    const startAutoRefresh = jest.fn();
 
-    await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledWith(10000));
+    asMock(useAutoRefresh).mockReturnValue({
+      ...autoRefreshContextValue,
+      startAutoRefresh,
+    });
+
+    render(<ShowDashboardInBigDisplayMode />);
+
+    await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledWith(10000));
   });
 
   it('enable refresh actions', async () => {
-    render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
+    const startAutoRefresh = jest.fn();
 
-    await waitFor(() => expect(RefreshActions.enable).toHaveBeenCalledTimes(1));
+    asMock(useAutoRefresh).mockReturnValue({
+      ...autoRefreshContextValue,
+      startAutoRefresh,
+    });
+
+    render(<ShowDashboardInBigDisplayMode />);
+
+    await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledTimes(1));
   });
 
   it('set new refresh interval when location query refresh param changes', async () => {
-    const { rerender } = render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
+    const startAutoRefresh = jest.fn();
 
-    rerender(<ShowDashboardInBigDisplayMode location={{ query: { ...mockLocation.query, refresh: '20' } }} />);
+    asMock(useAutoRefresh).mockReturnValue({
+      ...autoRefreshContextValue,
+      startAutoRefresh,
+    });
 
-    await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledTimes(2));
-    await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledWith(20000));
+    const { rerender } = render(<ShowDashboardInBigDisplayMode />);
+
+    asMock(useQuery).mockReturnValue({ interval: '30', refresh: '20' });
+
+    rerender(<ShowDashboardInBigDisplayMode />);
+
+    await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledWith(20000));
   });
 
-  it('not change RefreshActions when query refresh param did not changed', async () => {
-    const { rerender } = render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
+  it('not change auto refresh when query refresh param did not changed', async () => {
+    const startAutoRefresh = jest.fn();
 
-    rerender(<ShowDashboardInBigDisplayMode location={mockLocation} />);
+    asMock(useAutoRefresh).mockReturnValue({
+      ...autoRefreshContextValue,
+      startAutoRefresh,
+    });
 
-    await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(RefreshActions.enable).toHaveBeenCalledTimes(1));
+    const { rerender } = render(<ShowDashboardInBigDisplayMode />);
+
+    rerender(<ShowDashboardInBigDisplayMode />);
+
+    await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledTimes(1));
   });
 
   it('disable refresh actions on unmount', async () => {
-    const { unmount } = render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
+    const startAutoRefresh = jest.fn();
+
+    asMock(useAutoRefresh).mockReturnValue({
+      ...autoRefreshContextValue,
+      startAutoRefresh,
+    });
+
+    const { unmount } = render(<ShowDashboardInBigDisplayMode />);
 
     unmount();
-    await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledTimes(1));
   });
 
   it('should display view title', async () => {
-    const { findByText } = render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
+    const { findByText } = render(<ShowDashboardInBigDisplayMode />);
 
     await findByText('view title');
   });

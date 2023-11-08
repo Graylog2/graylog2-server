@@ -26,5 +26,5 @@ public interface PrivateKeyEncryptedStorage {
 
     void writeEncryptedKey(char[] password, PrivateKey privateKey) throws IOException, OperatorCreationException;
 
-    PrivateKey readEncryptedKey(char[] password) throws IOException, OperatorCreationException, PKCSException;
+    PrivateKey readEncryptedKey(char[] password) throws IOException, PKCSException;
 }

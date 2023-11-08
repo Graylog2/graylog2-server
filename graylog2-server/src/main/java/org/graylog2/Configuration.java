@@ -35,11 +35,11 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
-import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Period;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -215,6 +215,12 @@ public class Configuration extends CaConfiguration {
 
     @Parameter(value = "system_event_excluded_types", converter = TrimmedStringSetConverter.class)
     private Set<String> systemEventExcludedTypes = Sets.newHashSet(Notification.Type.SIDECAR_STATUS_UNKNOWN.name());
+
+    @Parameter(value = "datanode_proxy_api_allowlist")
+    private boolean datanodeProxyAPIAllowlist = true;
+
+    @Parameter(value = "minimum_auto_refresh_interval", required = true)
+    private Period minimumAutoRefreshInterval = Period.seconds(1);
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
@@ -433,6 +439,10 @@ public class Configuration extends CaConfiguration {
 
     public Duration getFailureHandlingShutdownAwait() {
         return failureHandlingShutdownAwait;
+    }
+
+    public Period getMinimumAutoRefreshInterval() {
+        return minimumAutoRefreshInterval;
     }
 
     /**

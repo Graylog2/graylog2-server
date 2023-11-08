@@ -1,4 +1,4 @@
-### Form & Modal Submit Buttons
+## Form & Modal Submit Buttons
 
 - Rely on the shared components `FormSubmit` and `ModalSubmit` to implement the submit and cancel button.
   The `FormSubmit` can be used for all forms on pages. The `ModalSubmit` can be used for modals and similar element like 
@@ -11,7 +11,7 @@
   - Make sure to write only the first letter uppercase and all other letter lowercase. 
 - Always use `Cancel` for the cancel button name.
 
-### `EmptyEntity` & `NoEntitiesExist` & `NoSearchResults` components
+## `EmptyEntity` & `NoEntitiesExist` & `NoSearchResults` components
 
 - These three components are closely related and maybe confusing to decide which one to use for which situation.
   - `EmptyEntity` should be used to display a message for an entity that does not have any entries in the database yet. This components supports displaying a message explaining what the entity is and can also support including a button link to create one via the children props

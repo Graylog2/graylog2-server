@@ -51,6 +51,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DASHBOARD_WIDGET_DELETE = PREFIX + "dashboard_widget:delete";
     public static final String DASHBOARD_WIDGET_POSITIONS_UPDATE = PREFIX + "dashboard_widget_positions:update";
     public static final String DASHBOARD_WIDGET_UPDATE = PREFIX + "dashboard_widget:update";
+    public static final String DATANODE_API_REQUEST = PREFIX + "data_node:api_request";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
@@ -69,6 +70,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_CREATE = PREFIX + "extractor:create";
     public static final String EXTRACTOR_DELETE = PREFIX + "extractor:delete";
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
+    public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
     public static final String EXTRACTOR_UPDATE = PREFIX + "extractor:update";
     public static final String GETTING_STARTED_GUIDE_OPT_OUT_CREATE = PREFIX + "getting_started_guide_opt_out:create";
     public static final String GRANTS_UPDATE = PREFIX + "grants:update";
@@ -183,6 +185,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DASHBOARD_WIDGET_DELETE)
             .add(DASHBOARD_WIDGET_POSITIONS_UPDATE)
             .add(DASHBOARD_WIDGET_UPDATE)
+            .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)
@@ -202,6 +205,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_DELETE)
             .add(EXTRACTOR_ORDER_UPDATE)
             .add(EXTRACTOR_UPDATE)
+            .add(FIELD_TYPE_MAPPING_CREATE)
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GRANTS_UPDATE)
             .add(GROK_PATTERN_CREATE)

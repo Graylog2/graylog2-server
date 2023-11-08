@@ -34,10 +34,13 @@ import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.system.activities.Activity;
@@ -57,8 +60,6 @@ public class Server extends ServerBootstrap {
 
     protected static final Configuration configuration = new Configuration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
- //   private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
- //   private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
     public Server() {
@@ -80,16 +81,13 @@ public class Server extends ServerBootstrap {
     protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
- //               new VersionAwareStorageModule(),
                 new ConfigurationModule(configuration),
                 new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new RestBindings(),
                 new DataNodeProvisioningBindings(),
                 new PeriodicalBindings(),
-//               new InitializerBindings(),
                 new ObjectMapperModule(chainingClassLoader),
- //               new RestApiBindings(),
                 new PasswordAlgorithmBindings()
         );
         return modules.build();
@@ -99,8 +97,6 @@ public class Server extends ServerBootstrap {
     protected List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 mongoDbConfiguration,
-     ///           versionCheckConfiguration,
-      //          nettyTransportConfiguration,
                 tlsConfiguration);
     }
 
@@ -108,17 +104,14 @@ public class Server extends ServerBootstrap {
         private final ActivityWriter activityWriter;
         private final ServiceManager serviceManager;
         private final GracefulShutdown gracefulShutdown;
-//        private final Service leaderElectionService;
 
         @Inject
         public ShutdownHook(ActivityWriter activityWriter,
                             ServiceManager serviceManager,
                             GracefulShutdown gracefulShutdown) {
- //                           @Named("LeaderElectionService") Service leaderElectionService) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.gracefulShutdown = gracefulShutdown;
- //           this.leaderElectionService = leaderElectionService;
         }
 
         @Override
@@ -129,14 +122,18 @@ public class Server extends ServerBootstrap {
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();
-
-//            leaderElectionService.stopAsync().awaitTerminated();
         }
     }
 
     @Override
     protected void startNodeRegistration(Injector injector) {
-        // not needed, the datanode registers itself via the NodePingPeriodical task.
+        final NodeService nodeService = injector.getInstance(NodeService.class);
+        final NodeId nodeId = injector.getInstance(NodeId.class);
+        // always set leader to "false" on startup and let the NodePingPeriodical take care of it later
+        nodeService.registerServer(nodeId.getNodeId(),
+                false,
+                configuration.getHttpPublishUri(),
+                Tools.getLocalCanonicalHostname());
     }
 
     @Override
