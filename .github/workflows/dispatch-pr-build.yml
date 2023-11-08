@@ -1,0 +1,47 @@
+name: Request dispatched PR Build
+
+on:
+  - pull_request
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dispatchedPR:
+    name: Dispatch wait and check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build pull requests string
+        id: pr_string
+        shell: bash
+        env:
+          PR_BODY: "${{ github.event.pull_request.body }}"
+        run: |
+          # Add the PR that triggered this workflow
+          pulls=("${{ github.repository }}#${{ github.event.number }}")
+
+          # Add any PR dependencies to the list of pulls
+          pulls+=($(grep -P '^/(jenkins-pr-deps|jpd|prd)' <<< "$PR_BODY" | \
+            grep -ioP '(Graylog2/\S+?#|https?://github.com/Graylog2/\S+?/pull/)[0-9]+' || true))
+
+          echo "pr_string=$(tr ' ' ',' <<< "${pulls[@]}")" >> $GITHUB_OUTPUT
+
+      - name: dispatch job to graylog-project-internal
+        run: >
+          gh workflow run -R Graylog2/graylog-project-internal pr-build.yml
+          -f caller_repo=${{ github.repository }}
+          -f caller_pr_nr=${{ github.event.number }}
+          -f caller_base_branch=${{ github.base_ref || github.ref_name }}
+          -f caller_head_branch=${{ github.head_ref }}
+          -f head_sha=${{ github.event.pull_request.head.sha }}
+          -f pull_requests="${{ steps.pr_string.outputs.pr_string }}"
+          -f initial_actor="${{ github.actor }}/${{ github.triggering_actor }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
+
+      - name: Give dispatched build time to add its status
+        run: sleep 20
+        # This is mostly cosmetic. If this workflow finishes before the dispatched
+        # build creates the status on the PR, the build will show up green for a while.
