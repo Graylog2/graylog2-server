@@ -16,6 +16,7 @@
  */
 package org.graylog2.datanode;
 
+import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.events.ClusterEventBus;
@@ -39,8 +40,8 @@ public class DataNodeServiceImpl implements DataNodeService {
 
     @Override
     public void removeNode(String nodeId) throws NodeNotFoundException {
-        nodeService.byNodeId(nodeId);
-        DataNodeRemovalEvent e = DataNodeRemovalEvent.create(nodeId);
+        final Node node = nodeService.byNodeId(nodeId);
+        DataNodeRemovalEvent e = DataNodeRemovalEvent.create(node.getNodeId());
         clusterEventBus.post(e);
     }
 
