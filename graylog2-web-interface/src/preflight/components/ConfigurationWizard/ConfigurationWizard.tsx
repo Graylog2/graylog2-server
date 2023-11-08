@@ -35,6 +35,7 @@ import type FetchError from 'logic/errors/FetchError';
 import CertificateProvisioning from './CertificateProvisioning';
 import CAConfiguration from './CAConfiguration';
 import ConfigurationFinished from './ConfigurationFinished';
+import DataMigration from './DataMigration';
 
 const StepIcon = styled(Icon)<{ $color: string }>(({ $color, theme }) => css`
   color: ${$color};
@@ -52,24 +53,34 @@ const stepIcon = (stepKey: ConfigurationStep, activeStepKey: ConfigurationStep, 
   const stepIndex = CONFIGURATION_STEPS_ORDER.findIndex((key) => key === stepKey);
   const activeStepIndex = CONFIGURATION_STEPS_ORDER.findIndex((key) => key === activeStepKey);
 
-  if (stepIndex < activeStepIndex || activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key) {
-    return {
-      name: 'circle-check',
-      color: theme.colors.variant.success,
-    };
-  }
+  const completedStepIcon: { name: IconName, color: string } = {
+    name: 'circle-check',
+    color: theme.colors.variant.success,
+  };
 
-  if (stepKey === activeStepKey) {
-    return {
-      name: 'circle-exclamation',
-      color: theme.colors.variant.info,
-    };
-  }
+  const progressStepIcon: { name: IconName, color: string } = {
+    name: 'circle-exclamation',
+    color: theme.colors.variant.info,
+  };
 
-  return {
+  const toDoStepIcon: { name: IconName, color: string } = {
     name: 'circle',
     color: theme.colors.gray[90],
   };
+
+  if (stepIndex < activeStepIndex) {
+    return completedStepIcon;
+  }
+
+  if (stepKey === activeStepKey) {
+    if (activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key) {
+      return completedStepIcon;
+    }
+
+    return progressStepIcon;
+  }
+
+  return toDoStepIcon;
 };
 
 type FetchErrorsOverviewProps = {
@@ -92,7 +103,9 @@ type Props = {
 
 const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
   const [isSkippingProvisioning, setIsSkippingProvisioning] = useState(false);
-  const { step: activeStepKey, isLoading: isLoadingConfigurationStep, errors } = useConfigurationStep({ isSkippingProvisioning });
+  const [shouldMigrateData, setShouldMigrateData] = useState(false);
+
+  const { step: activeStepKey, isLoading: isLoadingConfigurationStep, errors } = useConfigurationStep({ isSkippingProvisioning, shouldMigrateData });
   const theme = useTheme();
 
   const onSkipProvisioning = useCallback(() => {
@@ -149,7 +162,11 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
         {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && (
           <ConfigurationFinished setIsWaitingForStartup={setIsWaitingForStartup}
                                  isSkippingProvisioning={isSkippingProvisioning}
-                                 setIsSkippingProvisioning={setIsSkippingProvisioning} />
+                                 setIsSkippingProvisioning={setIsSkippingProvisioning}
+                                 setShouldMigrateData={setShouldMigrateData} />
+        )}
+        {activeStepKey === CONFIGURATION_STEPS.DATA_MIGRATION.key && (
+          <DataMigration setShouldMigrateData={setShouldMigrateData} />
         )}
       </Grid.Col>
     </Grid>

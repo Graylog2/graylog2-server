@@ -30,6 +30,7 @@ const configurationStep = (
   dataNodesCA: DataNodesCA,
   renewalPolicy: RenewalPolicy,
   isSkippingProvisioning: boolean,
+  shouldMigrateData: boolean,
 ) => {
   if (!dataNodesCA) {
     return CONFIGURATION_STEPS.CA_CONFIGURATION.key;
@@ -45,11 +46,16 @@ const configurationStep = (
     return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
   }
 
+  if (shouldMigrateData) {
+    return CONFIGURATION_STEPS.DATA_MIGRATION.key;
+  }
+
   return CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key;
 };
 
 type Props = {
-  isSkippingProvisioning: boolean
+  isSkippingProvisioning: boolean,
+  shouldMigrateData: boolean
 }
 
 type Result = {
@@ -58,11 +64,11 @@ type Result = {
   errors: Array<{ entityName: string, error: FetchError}> | null
 }
 
-const useConfigurationStep = ({ isSkippingProvisioning }: Props): Result => {
+const useConfigurationStep = ({ isSkippingProvisioning, shouldMigrateData }: Props): Result => {
   const { data: dataNodes, isInitialLoading: isLoadingDataNodes, error: dataNodesError } = useDataNodes();
   const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus, error: caError } = useDataNodesCA();
   const { data: renewalPolicy, isInitialLoading: isLoadingRenewalPolicy, error: renewalPolicyError } = useRenewalPolicy();
-  const step = configurationStep(dataNodes, dataNodesCA, renewalPolicy, isSkippingProvisioning);
+  const step = configurationStep(dataNodes, dataNodesCA, renewalPolicy, isSkippingProvisioning, shouldMigrateData);
 
   return useMemo(() => {
     if (dataNodesError || caError || renewalPolicyError) {
