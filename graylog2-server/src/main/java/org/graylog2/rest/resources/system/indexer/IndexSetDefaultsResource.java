@@ -61,6 +61,10 @@ public class IndexSetDefaultsResource extends RestResource {
         this.validator = validator;
     }
 
+    private static String buildFieldError(String field, String message) {
+        return f("Invalid value for field [%s]: %s", field, message);
+    }
+
     /**
      * Save new {@link IndexSetsDefaultConfiguration} cluster configuration object. This method exists to allow additional validation
      * before saving with the {@link ClusterConfigService}.
@@ -92,6 +96,12 @@ public class IndexSetDefaultsResource extends RestResource {
             throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.ROTATION_STRATEGY_CONFIG, violation.message()));
         }
 
+        violation = indexSetValidator.validateDataTiers(config.dataTiers());
+
+        if (violation != null) {
+            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.DATA_TIERS, violation.message()));
+        }
+
         violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategyConfig(),
                 config.retentionStrategyConfig());
         if (violation != null) {
@@ -101,9 +111,5 @@ public class IndexSetDefaultsResource extends RestResource {
 
         clusterConfigService.write(config);
         return Response.ok(config).build();
-    }
-
-    private static String buildFieldError(String field, String message) {
-        return f("Invalid value for field [%s]: %s", field, message);
     }
 }

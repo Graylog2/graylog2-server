@@ -16,6 +16,7 @@
  */
 package org.graylog2.periodical;
 
+import org.graylog2.datatier.DataTierRotation;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -41,14 +42,14 @@ import java.util.Map;
 
 public class IndexRotationThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRotationThread.class);
-
-    private NotificationService notificationService;
     private final IndexSetRegistry indexSetRegistry;
     private final Cluster cluster;
     private final ActivityWriter activityWriter;
     private final Indices indices;
     private final NodeId nodeId;
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
+    private final DataTierRotation dataTierRotation;
+    private final NotificationService notificationService;
 
     @Inject
     public IndexRotationThread(NotificationService notificationService,
@@ -57,7 +58,8 @@ public class IndexRotationThread extends Periodical {
                                Cluster cluster,
                                ActivityWriter activityWriter,
                                NodeId nodeId,
-                               Map<String, Provider<RotationStrategy>> rotationStrategyMap) {
+                               Map<String, Provider<RotationStrategy>> rotationStrategyMap,
+                               DataTierRotation dataTierRotation) {
         this.notificationService = notificationService;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -65,6 +67,7 @@ public class IndexRotationThread extends Periodical {
         this.indices = indices;
         this.nodeId = nodeId;
         this.rotationStrategyMap = rotationStrategyMap;
+        this.dataTierRotation = dataTierRotation;
     }
 
     @Override
@@ -108,23 +111,27 @@ public class IndexRotationThread extends Periodical {
 
     protected void checkForRotation(IndexSet indexSet) {
         final IndexSetConfig config = indexSet.getConfig();
-        final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategyClass());
+        if (indexSet.getConfig().dataTiers() != null) {
+            dataTierRotation.rotate(indexSet);
+        } else {
+            final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategyClass());
 
-        if (rotationStrategyProvider == null) {
-            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategyClass());
-            rotationProblemNotification("Index Rotation Problem!",
-                    "Index rotation strategy " + config.rotationStrategyClass() + " not found! Please fix your index rotation configuration!");
-            return;
+            if (rotationStrategyProvider == null) {
+                LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategyClass());
+                rotationProblemNotification("Index Rotation Problem!",
+                        "Index rotation strategy " + config.rotationStrategyClass() + " not found! Please fix your index rotation configuration!");
+                return;
+            }
+
+            final RotationStrategy rotationStrategy = rotationStrategyProvider.get();
+
+            if (rotationStrategy == null) {
+                LOG.warn("No rotation strategy found, not running index rotation!");
+                return;
+            }
+
+            rotationStrategy.rotate(indexSet);
         }
-
-        final RotationStrategy rotationStrategy = rotationStrategyProvider.get();
-
-        if (rotationStrategy == null) {
-            LOG.warn("No rotation strategy found, not running index rotation!");
-            return;
-        }
-
-        rotationStrategy.rotate(indexSet);
     }
 
     private void rotationProblemNotification(String title, String description) {

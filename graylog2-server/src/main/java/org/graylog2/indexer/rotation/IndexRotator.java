@@ -1,65 +1,40 @@
-/*
- * Copyright (C) 2020 Graylog, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Server Side Public License for more details.
- *
- * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
- * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
-package org.graylog2.indexer.rotation.strategies;
+package org.graylog2.indexer.rotation;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_ROTATION_COMPLETE;
 
-public abstract class AbstractRotationStrategy implements RotationStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractRotationStrategy.class);
+public class IndexRotator {
 
-    public interface Result {
-        String getDescription();
+    private static final Logger LOG = LoggerFactory.getLogger(IndexRotator.class);
 
-        boolean shouldRotate();
-    }
-
+    private final Indices indices;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
-    protected final ElasticsearchConfiguration elasticsearchConfiguration;
-    protected final Indices indices;
 
-    public AbstractRotationStrategy(
-            AuditEventSender auditEventSender, NodeId nodeId, ElasticsearchConfiguration elasticsearchConfiguration, Indices indices) {
-        this.auditEventSender = requireNonNull(auditEventSender);
-        this.nodeId = nodeId;
-        this.elasticsearchConfiguration = elasticsearchConfiguration;
+    @Inject
+    public IndexRotator(Indices indices, AuditEventSender auditEventSender, NodeId nodeId) {
         this.indices = indices;
+        this.auditEventSender = auditEventSender;
+        this.nodeId = nodeId;
     }
 
-    @Nullable
-    protected abstract Result shouldRotate(String indexName, IndexSet indexSet);
+    public static Result createResult(boolean shouldRotate, String message) {
+        return new Result(shouldRotate, message);
+    }
 
-    @Override
-    public void rotate(IndexSet indexSet) {
+    public void rotate(IndexSet indexSet, RotationChecker rotationChecker) {
         requireNonNull(indexSet, "indexSet must not be null");
         final String indexSetTitle = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null").title();
         final String strategyName = this.getClass().getCanonicalName();
@@ -74,7 +49,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         // Refresh so we have current stats on idle indices
         indices.refresh(indexName);
 
-        final Result rotate = shouldRotate(indexName, indexSet);
+        final Result rotate = rotationChecker.shouldRotate(indexName, indexSet);
         if (rotate == null) {
             LOG.error("Cannot perform rotation of index <{}> in index set <{}> with strategy <{}> at this moment", indexName, indexSetTitle, strategyName);
             return;
@@ -92,28 +67,27 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         }
     }
 
-    public Result createResult(boolean shouldRotate, String message) {
-        return new ResultImpl(shouldRotate, message);
+    public interface RotationChecker{
+        Result shouldRotate(String indexName, IndexSet indexSet);
     }
 
-    static class ResultImpl implements Result {
+    public static class Result {
         private final boolean shouldRotate;
         private final String message;
 
-        private ResultImpl(boolean shouldRotate, String message) {
+        public Result(boolean shouldRotate, String message) {
             this.shouldRotate = shouldRotate;
             this.message = message;
             LOG.debug("{} because of: {}", shouldRotate ? "Rotating" : "Not rotating", message);
         }
 
-        @Override
         public String getDescription() {
             return message;
         }
 
-        @Override
         public boolean shouldRotate() {
             return shouldRotate;
         }
     }
+
 }

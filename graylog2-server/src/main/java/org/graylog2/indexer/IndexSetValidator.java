@@ -20,6 +20,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatier.tier.DataTier;
+import org.graylog2.datatier.tier.DataTierValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
@@ -35,8 +37,10 @@ import org.joda.time.Period;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY;
 import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_ROTATION_PERIOD;
@@ -48,11 +52,15 @@ public class IndexSetValidator {
     private static final Duration MINIMUM_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(1L);
     private final IndexSetRegistry indexSetRegistry;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
+    private final Set<DataTierValidator> dataTierValidators;
 
     @Inject
-    public IndexSetValidator(IndexSetRegistry indexSetRegistry, ElasticsearchConfiguration elasticsearchConfiguration) {
+    public IndexSetValidator(IndexSetRegistry indexSetRegistry,
+                             ElasticsearchConfiguration elasticsearchConfiguration,
+                             Set<DataTierValidator> dataTierValidators) {
         this.indexSetRegistry = indexSetRegistry;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
+        this.dataTierValidators = dataTierValidators;
     }
 
     public Optional<Violation> validate(IndexSetConfig newConfig) {
@@ -75,6 +83,12 @@ public class IndexSetValidator {
             return Optional.of(rotationViolation);
         }
 
+        final Violation dataTiersViolation = validateDataTiers(newConfig.dataTiers());
+        if (dataTiersViolation != null){
+            return Optional.of(dataTiersViolation);
+        }
+
+
         final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategy());
         if (retentionConfigViolation != null) {
             return Optional.of(retentionConfigViolation);
@@ -88,7 +102,7 @@ public class IndexSetValidator {
     public Violation validateRefreshInterval(Duration readableDuration) {
         // Ensure fieldTypeRefreshInterval is not shorter than a second, as that may impact performance
         if (readableDuration.isShorterThan(MINIMUM_FIELD_TYPE_REFRESH_INTERVAL)) {
-            return Violation.create("Index field_type_refresh_interval \"" + readableDuration.toString() + "\" is too short. It must be 1 second or longer.");
+            return Violation.create("Index field_type_refresh_interval \"" + readableDuration + "\" is too short. It must be 1 second or longer.");
         }
         return null;
     }
@@ -155,6 +169,18 @@ public class IndexSetValidator {
         return null;
     }
 
+
+    @Nullable
+    public Violation validateDataTiers(List<DataTier> dataTiers) {
+        for (DataTierValidator dataTierValidator : dataTierValidators) {
+            Optional<Violation> violation = dataTierValidator.validate(dataTiers);
+            if (violation.isPresent()) {
+                return violation.get();
+            }
+        }
+        return null;
+    }
+
     @VisibleForTesting
     boolean periodOtherThanDays(Period period) {
         return Arrays.stream(period.getFieldTypes())
@@ -205,10 +231,10 @@ public class IndexSetValidator {
 
     @AutoValue
     public abstract static class Violation {
-        public abstract String message();
-
         public static Violation create(String message) {
             return new AutoValue_IndexSetValidator_Violation(message);
         }
+
+        public abstract String message();
     }
 }

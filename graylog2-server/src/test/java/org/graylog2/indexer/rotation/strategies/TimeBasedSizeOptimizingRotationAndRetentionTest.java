@@ -24,6 +24,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.IndexRotator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -83,7 +84,8 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         clock = new JobSchedulerTestClock(Tools.nowUTC());
 
         elasticsearchConfiguration = new ElasticsearchConfiguration();
-        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, elasticsearchConfiguration, clock);
+        IndexRotator indexRotator = new IndexRotator(indices, auditEventSender, nodeId);
+        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, elasticsearchConfiguration, clock, indexRotator);
         rotationStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder()
                 .indexLifetimeMin(Period.days(4))
                 .indexLifetimeMax(Period.days(6))
@@ -266,6 +268,44 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         return Period.fieldDifference(clock.nowUTC().toLocalDateTime(), i.getClosingDate().toLocalDateTime()).toString();
     }
 
+    static class TestIndex {
+        private final String name;
+        private final DateTime creationDate;
+        private DateTime closingDate;
+        private long size;
+
+        public TestIndex(String name, DateTime creationDate, @Nullable DateTime closingDate, long size) {
+            this.name = name;
+            this.creationDate = creationDate;
+            this.closingDate = closingDate;
+            this.size = size;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public DateTime getCreationDate() {
+            return creationDate;
+        }
+
+        public DateTime getClosingDate() {
+            return closingDate;
+        }
+
+        public void setClosingDate(DateTime closingDate) {
+            this.closingDate = closingDate;
+        }
+
+        public long getSize() {
+            return size;
+        }
+
+        public void setSize(long size) {
+            this.size = size;
+        }
+    }
+
     class TestIndexSet extends org.graylog2.indexer.TestIndexSet {
         private final List<TestIndex> indices;
 
@@ -344,43 +384,5 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
             return config.indexPrefix() + "_" + number;
         }
 
-    }
-
-    static class TestIndex {
-        private final String name;
-        private final DateTime creationDate;
-        private DateTime closingDate;
-        private long size;
-
-        public TestIndex(String name, DateTime creationDate, @Nullable DateTime closingDate, long size) {
-            this.name = name;
-            this.creationDate = creationDate;
-            this.closingDate = closingDate;
-            this.size = size;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public DateTime getCreationDate() {
-            return creationDate;
-        }
-
-        public DateTime getClosingDate() {
-            return closingDate;
-        }
-
-        public void setClosingDate(DateTime closingDate) {
-            this.closingDate = closingDate;
-        }
-
-        public long getSize() {
-            return size;
-        }
-
-        public void setSize(long size) {
-            this.size = size;
-        }
     }
 }

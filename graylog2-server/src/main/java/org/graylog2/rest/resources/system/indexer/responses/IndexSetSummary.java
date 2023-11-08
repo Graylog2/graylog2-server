@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.datatier.tier.DataTier;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -33,6 +34,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -40,6 +42,62 @@ import java.util.Optional;
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class IndexSetSummary {
+    @JsonCreator
+    public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
+                                         @JsonProperty("title") @NotBlank String title,
+                                         @JsonProperty("description") @Nullable String description,
+                                         @JsonProperty("default") boolean isDefault,
+                                         @JsonProperty("writable") boolean isWritable,
+                                         @JsonProperty("can_be_default") boolean canBeDefault,
+                                         @JsonProperty("index_prefix") @Pattern(regexp = IndexSetConfig.INDEX_PREFIX_REGEX) String indexPrefix,
+                                         @JsonProperty("shards") @Min(1) int shards,
+                                         @JsonProperty("replicas") @Min(0) int replicas,
+                                         @JsonProperty("rotation_strategy_class") @NotNull String rotationStrategyClass,
+                                         @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
+                                         @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
+                                         @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
+                                         @JsonProperty("creation_date") @Nullable ZonedDateTime creationDate,
+                                         @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
+                                         @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
+                                         @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
+                                         @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
+                                         @JsonProperty("index_template_type") @Nullable String templateType,
+                                         @JsonProperty("data_tiers") @Nullable List<DataTier> dataTiers) {
+        if (Objects.isNull(creationDate)) {
+            creationDate = ZonedDateTime.now();
+        }
+        return new AutoValue_IndexSetSummary(id, title, description, isDefault, canBeDefault,
+                isWritable, indexPrefix, shards, replicas,
+                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
+                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
+                Optional.ofNullable(templateType), dataTiers);
+    }
+
+    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
+        return create(
+                indexSet.id(),
+                indexSet.title(),
+                indexSet.description(),
+                isDefault,
+                indexSet.isWritable(),
+                indexSet.isRegularIndex(),
+                indexSet.indexPrefix(),
+                indexSet.shards(),
+                indexSet.replicas(),
+                indexSet.rotationStrategyClass(),
+                indexSet.rotationStrategy(),
+                indexSet.retentionStrategyClass(),
+                indexSet.retentionStrategy(),
+                indexSet.creationDate(),
+                indexSet.indexAnalyzer(),
+                indexSet.indexOptimizationMaxNumSegments(),
+                indexSet.indexOptimizationDisabled(),
+                indexSet.fieldTypeRefreshInterval(),
+                indexSet.indexTemplateType().orElse(null),
+                indexSet.dataTiers());
+
+    }
+
     @JsonProperty("id")
     @Nullable
     public abstract String id();
@@ -111,59 +169,9 @@ public abstract class IndexSetSummary {
     @JsonProperty("index_template_type")
     public abstract Optional<String> templateType();
 
-    @JsonCreator
-    public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
-                                         @JsonProperty("title") @NotBlank String title,
-                                         @JsonProperty("description") @Nullable String description,
-                                         @JsonProperty("default") boolean isDefault,
-                                         @JsonProperty("writable") boolean isWritable,
-                                         @JsonProperty("can_be_default") boolean canBeDefault,
-                                         @JsonProperty("index_prefix") @Pattern(regexp = IndexSetConfig.INDEX_PREFIX_REGEX) String indexPrefix,
-                                         @JsonProperty("shards") @Min(1) int shards,
-                                         @JsonProperty("replicas") @Min(0) int replicas,
-                                         @JsonProperty("rotation_strategy_class") @NotNull String rotationStrategyClass,
-                                         @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
-                                         @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
-                                         @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                         @JsonProperty("creation_date") @Nullable ZonedDateTime creationDate,
-                                         @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
-                                         @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
-                                         @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
-                                         @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
-                                         @JsonProperty("index_template_type") @Nullable String templateType) {
-        if (Objects.isNull(creationDate)) {
-            creationDate = ZonedDateTime.now();
-        }
-        return new AutoValue_IndexSetSummary(id, title, description, isDefault, canBeDefault,
-                isWritable, indexPrefix, shards, replicas,
-                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                Optional.ofNullable(templateType));
-    }
-
-    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
-        return create(
-                indexSet.id(),
-                indexSet.title(),
-                indexSet.description(),
-                isDefault,
-                indexSet.isWritable(),
-                indexSet.isRegularIndex(),
-                indexSet.indexPrefix(),
-                indexSet.shards(),
-                indexSet.replicas(),
-                indexSet.rotationStrategyClass(),
-                indexSet.rotationStrategy(),
-                indexSet.retentionStrategyClass(),
-                indexSet.retentionStrategy(),
-                indexSet.creationDate(),
-                indexSet.indexAnalyzer(),
-                indexSet.indexOptimizationMaxNumSegments(),
-                indexSet.indexOptimizationDisabled(),
-                indexSet.fieldTypeRefreshInterval(),
-                indexSet.indexTemplateType().orElse(null));
-
-    }
+    @JsonProperty("data_tiers")
+    @Nullable
+    public abstract List<DataTier> dataTiers();
 
     public IndexSetConfig toIndexSetConfig(boolean isRegular) {
         final IndexSetConfig.Builder builder = IndexSetConfig.builder()
@@ -184,7 +192,8 @@ public abstract class IndexSetSummary {
                 .indexTemplateName(indexPrefix() + "-template")
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
-                .fieldTypeRefreshInterval(fieldTypeRefreshInterval());
+                .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
+                .dataTiers(dataTiers());
 
         final IndexSetConfig.Builder builderWithTemplateType = templateType().map(builder::indexTemplateType).orElse(builder);
         return builderWithTemplateType.build();

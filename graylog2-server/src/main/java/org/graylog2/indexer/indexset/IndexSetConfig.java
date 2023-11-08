@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
+import org.graylog2.datatier.tier.DataTier;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -38,6 +39,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -58,6 +60,128 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
     public static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
+
+    @JsonCreator
+    public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+                                        @JsonProperty("title") @NotBlank String title,
+                                        @JsonProperty("description") @Nullable String description,
+                                        @JsonProperty("writable") @Nullable Boolean isWritable,
+                                        @JsonProperty(FIELD_REGULAR) @Nullable Boolean isRegular,
+                                        @JsonProperty(FIELD_INDEX_PREFIX) @Pattern(regexp = INDEX_PREFIX_REGEX) String indexPrefix,
+                                        @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
+                                        @JsonProperty("index_wildcard") @Nullable String indexWildcard,
+                                        @JsonProperty("shards") @Min(1) int shards,
+                                        @JsonProperty("replicas") @Min(0) int replicas,
+                                        @JsonProperty("rotation_strategy_class") @Nullable String rotationStrategyClass,
+                                        @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
+                                        @JsonProperty("retention_strategy_class") @Nullable String retentionStrategyClass,
+                                        @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
+                                        @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
+                                        @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
+                                        @JsonProperty("index_template_name") @Nullable String indexTemplateName,
+                                        @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable String indexTemplateType,
+                                        @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
+                                        @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
+                                        @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
+                                        @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
+                                        @JsonProperty("data_tiers") @Nullable List<DataTier> dataTiers
+    ) {
+
+        final boolean writableValue = isWritable == null || isWritable;
+
+        Duration fieldTypeRefreshIntervalValue = fieldTypeRefreshInterval;
+        if (fieldTypeRefreshIntervalValue == null) {
+            // No need to periodically refresh the field types for a non-writable index set
+            fieldTypeRefreshIntervalValue = writableValue ? DEFAULT_FIELD_TYPE_REFRESH_INTERVAL : Duration.ZERO;
+        }
+
+        return AutoValue_IndexSetConfig.builder()
+                .id(id)
+                .title(title)
+                .description(description)
+                .isWritable(writableValue)
+                .isRegular(isRegular)
+                .indexPrefix(indexPrefix)
+                .indexMatchPattern(indexMatchPattern)
+                .indexWildcard(indexWildcard)
+                .shards(shards)
+                .replicas(replicas)
+                .rotationStrategyClass(rotationStrategyClass)
+                .rotationStrategy(rotationStrategy)
+                .retentionStrategyClass(retentionStrategyClass)
+                .retentionStrategy(retentionStrategy)
+                .creationDate(creationDate)
+                .indexAnalyzer(isNullOrEmpty(indexAnalyzer) ? "standard" : indexAnalyzer)
+                .indexTemplateName(isNullOrEmpty(indexTemplateName) ? indexPrefix + "-template" : indexTemplateName)
+                .indexTemplateType(indexTemplateType)
+                .indexOptimizationMaxNumSegments(maxNumSegments == null ? 1 : maxNumSegments)
+                .indexOptimizationDisabled(indexOptimizationDisabled != null && indexOptimizationDisabled)
+                .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
+                .customFieldMappings(customFieldMappings == null ? new CustomFieldMappings() : customFieldMappings)
+                .dataTiers(dataTiers)
+                .build();
+    }
+
+    // Compatibility creator after field type refresh interval has been introduced
+    public static IndexSetConfig create(String id,
+                                        String title,
+                                        String description,
+                                        boolean isWritable,
+                                        Boolean isRegular,
+                                        String indexPrefix,
+                                        int shards,
+                                        int replicas,
+                                        String rotationStrategyClass,
+                                        RotationStrategyConfig rotationStrategy,
+                                        String retentionStrategyClass,
+                                        RetentionStrategyConfig retentionStrategy,
+                                        ZonedDateTime creationDate,
+                                        String indexAnalyzer,
+                                        String indexTemplateName,
+                                        String indexTemplateType,
+                                        int indexOptimizationMaxNumSegments,
+                                        boolean indexOptimizationDisabled) {
+        return create(id, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
+                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
+                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null);
+    }
+
+    // Compatibility creator after field type refresh interval has been introduced
+    public static IndexSetConfig create(String title,
+                                        String description,
+                                        boolean isWritable,
+                                        Boolean isRegular,
+                                        String indexPrefix,
+                                        int shards,
+                                        int replicas,
+                                        String rotationStrategyClass,
+                                        RotationStrategyConfig rotationStrategy,
+                                        String retentionStrategyClass,
+                                        RetentionStrategyConfig retentionStrategy,
+                                        ZonedDateTime creationDate,
+                                        String indexAnalyzer,
+                                        String indexTemplateName,
+                                        String indexTemplateType,
+                                        int indexOptimizationMaxNumSegments,
+                                        boolean indexOptimizationDisabled) {
+        return create(null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
+                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
+                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null);
+    }
+
+    /**
+     * For non-UI originating instances, use {@link IndexSetConfigFactory} instead to create an instance with
+     * appropriate defaults.
+     */
+    public static Builder builder() {
+        return new AutoValue_IndexSetConfig.Builder()
+                // Index sets are writable by default.
+                .isWritable(true)
+                .customFieldMappings(new CustomFieldMappings())
+                .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
+    }
 
     @JsonProperty("id")
     @Nullable
@@ -150,120 +274,15 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("custom_field_mappings")
     public abstract CustomFieldMappings customFieldMappings();
 
+    @JsonProperty("data_tiers")
+    @Nullable
+    public abstract List<DataTier> dataTiers();
+
     @JsonIgnore
     public boolean isRegularIndex() {
         final String indexTemplate = indexTemplateType().orElse(null);
         return isWritable() && (indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate) ||
                 isRegular().orElse(false));
-    }
-
-    @JsonCreator
-    public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                        @JsonProperty("title") @NotBlank String title,
-                                        @JsonProperty("description") @Nullable String description,
-                                        @JsonProperty("writable") @Nullable Boolean isWritable,
-                                        @JsonProperty(FIELD_REGULAR) @Nullable Boolean isRegular,
-                                        @JsonProperty(FIELD_INDEX_PREFIX) @Pattern(regexp = INDEX_PREFIX_REGEX) String indexPrefix,
-                                        @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
-                                        @JsonProperty("index_wildcard") @Nullable String indexWildcard,
-                                        @JsonProperty("shards") @Min(1) int shards,
-                                        @JsonProperty("replicas") @Min(0) int replicas,
-                                        @JsonProperty("rotation_strategy_class") @Nullable String rotationStrategyClass,
-                                        @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
-                                        @JsonProperty("retention_strategy_class") @Nullable String retentionStrategyClass,
-                                        @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                        @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
-                                        @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
-                                        @JsonProperty("index_template_name") @Nullable String indexTemplateName,
-                                        @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable String indexTemplateType,
-                                        @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
-                                        @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
-                                        @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
-                                        @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings
-    ) {
-
-        final boolean writableValue = isWritable == null || isWritable;
-
-        Duration fieldTypeRefreshIntervalValue = fieldTypeRefreshInterval;
-        if (fieldTypeRefreshIntervalValue == null) {
-            // No need to periodically refresh the field types for a non-writable index set
-            fieldTypeRefreshIntervalValue = writableValue ? DEFAULT_FIELD_TYPE_REFRESH_INTERVAL : Duration.ZERO;
-        }
-
-        return AutoValue_IndexSetConfig.builder()
-                .id(id)
-                .title(title)
-                .description(description)
-                .isWritable(writableValue)
-                .isRegular(isRegular)
-                .indexPrefix(indexPrefix)
-                .indexMatchPattern(indexMatchPattern)
-                .indexWildcard(indexWildcard)
-                .shards(shards)
-                .replicas(replicas)
-                .rotationStrategyClass(rotationStrategyClass)
-                .rotationStrategy(rotationStrategy)
-                .retentionStrategyClass(retentionStrategyClass)
-                .retentionStrategy(retentionStrategy)
-                .creationDate(creationDate)
-                .indexAnalyzer(isNullOrEmpty(indexAnalyzer) ? "standard" : indexAnalyzer)
-                .indexTemplateName(isNullOrEmpty(indexTemplateName) ? indexPrefix + "-template" : indexTemplateName)
-                .indexTemplateType(indexTemplateType)
-                .indexOptimizationMaxNumSegments(maxNumSegments == null ? 1 : maxNumSegments)
-                .indexOptimizationDisabled(indexOptimizationDisabled != null && indexOptimizationDisabled)
-                .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
-                .customFieldMappings(customFieldMappings == null ? new CustomFieldMappings() : customFieldMappings)
-                .build();
-    }
-
-
-    // Compatibility creator after field type refresh interval has been introduced
-    public static IndexSetConfig create(String id,
-                                        String title,
-                                        String description,
-                                        boolean isWritable,
-                                        Boolean isRegular,
-                                        String indexPrefix,
-                                        int shards,
-                                        int replicas,
-                                        String rotationStrategyClass,
-                                        RotationStrategyConfig rotationStrategy,
-                                        String retentionStrategyClass,
-                                        RetentionStrategyConfig retentionStrategy,
-                                        ZonedDateTime creationDate,
-                                        String indexAnalyzer,
-                                        String indexTemplateName,
-                                        String indexTemplateType,
-                                        int indexOptimizationMaxNumSegments,
-                                        boolean indexOptimizationDisabled) {
-        return create(id, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
-                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings());
-    }
-
-    // Compatibility creator after field type refresh interval has been introduced
-    public static IndexSetConfig create(String title,
-                                        String description,
-                                        boolean isWritable,
-                                        Boolean isRegular,
-                                        String indexPrefix,
-                                        int shards,
-                                        int replicas,
-                                        String rotationStrategyClass,
-                                        RotationStrategyConfig rotationStrategy,
-                                        String retentionStrategyClass,
-                                        RetentionStrategyConfig retentionStrategy,
-                                        ZonedDateTime creationDate,
-                                        String indexAnalyzer,
-                                        String indexTemplateName,
-                                        String indexTemplateType,
-                                        int indexOptimizationMaxNumSegments,
-                                        boolean indexOptimizationDisabled) {
-        return create(null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
-                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings());
     }
 
     @Override
@@ -276,18 +295,6 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     }
 
     public abstract Builder toBuilder();
-
-    /**
-     * For non-UI originating instances, use {@link IndexSetConfigFactory} instead to create an instance with
-     * appropriate defaults.
-     */
-    public static Builder builder() {
-        return new AutoValue_IndexSetConfig.Builder()
-                // Index sets are writable by default.
-                .isWritable(true)
-                .customFieldMappings(new CustomFieldMappings())
-                .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
-    }
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -334,6 +341,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder fieldTypeRefreshInterval(Duration fieldTypeRefreshInterval);
 
         public abstract Builder customFieldMappings(CustomFieldMappings customFieldMappings);
+
+        public abstract Builder dataTiers(List<DataTier> dataTiers);
 
         public abstract IndexSetConfig build();
     }

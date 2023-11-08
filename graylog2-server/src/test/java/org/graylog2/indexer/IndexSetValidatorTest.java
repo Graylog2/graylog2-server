@@ -17,6 +17,8 @@
 package org.graylog2.indexer;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatier.tier.hot.HotTier;
+import org.graylog2.datatier.tier.hot.HotTierValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -24,7 +26,6 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
-import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.Duration;
@@ -40,7 +41,9 @@ import org.mockito.junit.MockitoRule;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -62,7 +65,7 @@ public class IndexSetValidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, Set.of(new HotTierValidator(elasticsearchConfiguration)));
     }
 
     @Test
@@ -86,7 +89,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWhenAlreadyManaged() throws Exception {
+    public void validateWhenAlreadyManaged() {
         final String prefix = "graylog_index";
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
@@ -102,7 +105,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithConflict() throws Exception {
+    public void validateWithConflict() {
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
 
@@ -118,7 +121,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithConflict2() throws Exception {
+    public void validateWithConflict2() {
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
 
@@ -134,7 +137,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithInvalidFieldTypeRefreshInterval() throws Exception {
+    public void validateWithInvalidFieldTypeRefreshInterval() {
         final Duration fieldTypeRefreshInterval = Duration.millis(999);
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
@@ -179,10 +182,10 @@ public class IndexSetValidatorTest {
         // TimeBasedSizeOptimizingRotation validation
         final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                .dataTiers(List.of(HotTier.builder()
                         .indexLifetimeMin(Period.days(2))
                         .indexLifetimeMax(Period.days(30))
-                        .build()
+                        .build())
                 )
                 .build();
         assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
@@ -198,10 +201,10 @@ public class IndexSetValidatorTest {
         when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
         final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                .dataTiers(List.of(HotTier.builder()
                         .indexLifetimeMin(Period.days(2).withHours(2))
                         .indexLifetimeMax(Period.days(30))
-                        .build()
+                        .build())
                 )
                 .build();
 
@@ -223,10 +226,10 @@ public class IndexSetValidatorTest {
         when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
         final IndexSetConfig failingConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                .dataTiers(List.of(HotTier.builder()
                         .indexLifetimeMin(Period.days(10))
                         .indexLifetimeMax(Period.days(19))
-                        .build()
+                        .build())
                 )
                 .build();
 
@@ -236,10 +239,10 @@ public class IndexSetValidatorTest {
 
         final IndexSetConfig successfullConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                .dataTiers(List.of(HotTier.builder()
                         .indexLifetimeMin(Period.days(10))
                         .indexLifetimeMax(Period.days(20))
-                        .build()
+                        .build())
                 )
                 .build();
 

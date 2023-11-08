@@ -1,20 +1,4 @@
-/*
- * Copyright (C) 2020 Graylog, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Server Side Public License, version 1,
- * as published by MongoDB, Inc.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Server Side Public License for more details.
- *
- * You should have received a copy of the Server Side Public License
- * along with this program. If not, see
- * <http://www.mongodb.com/licensing/server-side-public-license>.
- */
-package org.graylog2.indexer.rotation.strategies;
+package org.graylog2.datatier;
 
 import com.github.joschi.jadconfig.util.Size;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -23,9 +7,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.IndexRotator;
-import org.graylog2.indexer.rotation.IndexRotator.Result;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
-import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -40,25 +22,27 @@ import static org.graylog2.indexer.rotation.IndexRotator.createResult;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.humanReadableByteCount;
 
-public class TimeBasedSizeOptimizingStrategy implements RotationStrategy {
-    public static final String NAME = "time-size-optimizing";
-    private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingStrategy.class);
+public class DataTierRotation {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DataTierRotation.class);
+
     private final JobSchedulerClock clock;
     private final org.joda.time.Period rotationPeriod;
+
     private final Indices indices;
-    private final ElasticsearchConfiguration elasticsearchConfiguration;
+
     private final IndexRotator indexRotator;
+
     private final Size maxShardSize;
     private final Size minShardSize;
 
-
     @Inject
-    public TimeBasedSizeOptimizingStrategy(Indices indices,
-                                           ElasticsearchConfiguration elasticsearchConfiguration,
-                                           JobSchedulerClock clock,
-                                           IndexRotator indexRotator) {
+    public DataTierRotation(Indices indices,
+                            ElasticsearchConfiguration elasticsearchConfiguration,
+                            IndexRotator indexRotator,
+                            JobSchedulerClock clock) {
+
         this.indices = indices;
-        this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.indexRotator = indexRotator;
         this.clock = clock;
         this.rotationPeriod = elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod();
@@ -66,27 +50,12 @@ public class TimeBasedSizeOptimizingStrategy implements RotationStrategy {
         this.minShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize();
     }
 
-    @Override
     public void rotate(IndexSet indexSet) {
         indexRotator.rotate(indexSet,this::shouldRotate);
     }
 
-    @Override
-    public Class<? extends RotationStrategyConfig> configurationClass() {
-        return TimeBasedSizeOptimizingStrategyConfig.class;
-    }
-
-    @Override
-    public RotationStrategyConfig defaultConfiguration() {
-        return TimeBasedSizeOptimizingStrategyConfig.builder()
-                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMinLifeTime())
-                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMaxLifeTime())
-                .build();
-    }
-
-
     @Nonnull
-    protected Result shouldRotate(final String index, IndexSet indexSet) {
+    protected IndexRotator.Result shouldRotate(final String index, IndexSet indexSet) {
         final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(()-> new IllegalStateException("No index creation date"));
         final Long sizeInBytes = indices.getStoreSizeInBytes(index).orElseThrow(() -> new IllegalStateException("No index size"));
 
@@ -143,8 +112,5 @@ public class TimeBasedSizeOptimizingStrategy implements RotationStrategy {
         return timePassed.compareTo(limitAsDuration) >= 0;
     }
 
-    @Override
-    public String getStrategyName() {
-        return NAME;
-    }
+
 }

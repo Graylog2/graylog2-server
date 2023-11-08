@@ -20,13 +20,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.datatier.tier.DataTier;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,6 +55,11 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
     public static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
+    public static final String DATA_TIERS = "data_tiers";
+
+    public static Builder builder() {
+        return new AutoValue_IndexSetsDefaultConfiguration.Builder();
+    }
 
     @NotBlank
     @JsonProperty(INDEX_ANALYZER)
@@ -113,9 +121,9 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         return retentionStrategyConfig();
     }
 
-    public static Builder builder() {
-        return new AutoValue_IndexSetsDefaultConfiguration.Builder();
-    }
+    @JsonProperty(DATA_TIERS)
+    @Nullable
+    public abstract List<DataTier> dataTiers();
 
     public abstract Builder toBuilder();
 
@@ -165,6 +173,9 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         public Builder retentionStrategy(RetentionStrategyConfig retentionStrategyConfig) {
             return retentionStrategyConfig(retentionStrategyConfig);
         }
+
+        @JsonProperty(DATA_TIERS)
+        public abstract Builder dataTiers(List<DataTier> dataTiers);
 
         public abstract IndexSetsDefaultConfiguration build();
     }
