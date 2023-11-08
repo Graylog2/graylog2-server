@@ -30,7 +30,7 @@ jobs:
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml
           -f caller_repo=${{ github.repository }}
-          -f caller_pr_nr=${{ steps.pr_string.outputs.pr_nr }}
+          -f caller_pr_nr=${{ github.event.number }}
           -f caller_base_branch=${{ github.base_ref || github.ref_name }}
           -f caller_head_branch=${{ github.head_ref }}
           -f head_sha=${{ github.event.pull_request.head.sha }}
