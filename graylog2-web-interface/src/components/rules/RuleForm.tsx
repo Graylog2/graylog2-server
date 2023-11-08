@@ -42,8 +42,10 @@ const StyledContainer = styled.div`
   }
 
   & .ace_tooltip.ace-graylog {
-    background-color: ${({ theme }) => theme.colors.global.contentBackground};
+    background-color: ${({ theme }) => theme.colors.global.background};
     padding: 4px;
+    padding-left: 0;
+    line-height: 1.5;
   }
 `;
 
