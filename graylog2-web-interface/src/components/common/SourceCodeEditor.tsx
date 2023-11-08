@@ -59,7 +59,7 @@ const Toolbar = styled.div(({ theme }) => css`
 
   .btn-link {
     color: ${theme.colors.variant.dark.info};
-    
+
     &:hover {
       color: ${theme.colors.variant.darkest.info};
       background-color: ${theme.colors.variant.lightest.info};
@@ -68,7 +68,7 @@ const Toolbar = styled.div(({ theme }) => css`
     &.disabled,
     &[disabled] {
       color: ${theme.colors.variant.light.default};
-      
+
       &:hover {
         color: ${theme.colors.variant.light.default};
       }
