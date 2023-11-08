@@ -25,7 +25,10 @@ const useActivePerspective = () => {
     throw new Error('useActivePerspective hook needs to be used inside PerspectivesContext.Provider');
   }
 
-  return perspectivesContextValue.activePerspective;
+  return {
+    activePerspective: perspectivesContextValue.activePerspective,
+    setActivePerspective: perspectivesContextValue.setActivePerspective,
+  };
 };
 
 export default useActivePerspective;

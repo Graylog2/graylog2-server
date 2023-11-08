@@ -14,30 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
-import { useTheme } from 'styled-components';
+import { useContext } from 'react';
 
-const Menu = ({ children, ...otherProps }: MenuProps) => {
-  const theme = useTheme();
+import PerspectivesContext from '../contexts/PerspectivesContext';
 
-  const menuStyles = () => ({
-    dropdown: {
-      backgroundColor: theme.colors.global.contentBackground,
-      border: `1px solid ${theme.colors.variant.lighter.default}`,
-    },
-  });
+const usePerspectives = () => {
+  const perspectivesContextValue = useContext(PerspectivesContext);
 
-  return (
-    <MantineMenu {...otherProps} styles={menuStyles}>
-      {children}
-    </MantineMenu>
-  );
+  if (!perspectivesContextValue) {
+    throw new Error('usePerspectives hook needs to be used inside PerspectivesContext.Provider');
+  }
+
+  return perspectivesContextValue.availablePerspectives;
 };
 
-Menu.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-export default Menu;
+export default usePerspectives;

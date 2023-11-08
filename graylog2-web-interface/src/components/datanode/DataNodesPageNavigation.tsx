@@ -14,16 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export {
-  Anchor,
-  Box,
-  Grid,
-  Divider,
-  Group,
-  Header,
-  NumberInput,
-  Text,
-  UnstyledButton,
-  Collapse,
-} from '@mantine/core';
+import PageNavigation from 'components/common/PageNavigation';
+import Routes from 'routing/Routes';
+import { Row } from 'components/bootstrap';
+
+const NAV_ITEMS = [
+  { title: 'Overview', path: Routes.SYSTEM.DATANODES.OVERVIEW, exactPathMatch: true },
+  { title: 'Monitoring & Management', path: Routes.SYSTEM.DATANODES.OVERVIEW },
+  { title: 'Migrations', path: Routes.SYSTEM.DATANODES.OVERVIEW },
+];
+
+const DataNodesPageNavigation = () => (
+  <Row>
+    <PageNavigation items={NAV_ITEMS} />
+  </Row>
+);
+
+export default DataNodesPageNavigation;
