@@ -22,7 +22,7 @@ jobs:
 
           # Add any PR dependencies to the list of pulls
           pulls+=($(grep -P '^/(jenkins-pr-deps|jpd|prd)' <<< "${{ github.event.pull_request.body }}" | \
-            grep -ioP '(Graylog2/\S+?#|https?://github.com/Graylog2/\S+?/pull/)[0-9]+') || true)
+            grep -ioP '(Graylog2/\S+?#|https?://github.com/Graylog2/\S+?/pull/)[0-9]+' || true))
 
           echo "pr_string=$(tr ' ' ',' <<< "${pulls[@]}")" >> $GITHUB_OUTPUT
 
