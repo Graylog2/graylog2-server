@@ -38,6 +38,11 @@ const StyledSelect = styled(Select)`
   margin-bottom: 20px;
 `;
 
+const StyledLabel = styled.h5`
+  font-weight: bold;
+  margin-bottom: 5px;
+`;
+
 const RedBadge = styled(Badge)(({ theme }) => css`
   background-color: ${theme.colors.variant.light.danger};
 `);
@@ -54,7 +59,7 @@ type Props = {
 
 const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const [rotated, setRotated] = useState(false);
+  const [rotated, setRotated] = useState(true);
   const [newFieldType, setNewFieldType] = useState(null);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
@@ -108,7 +113,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   }, [onClose, sendTelemetry, telemetryPathName]);
 
   return (
-    <BootstrapModalForm title={<span>Change {field} field type <BetaBadge /></span>}
+    <BootstrapModalForm title={<span>Change {field} Field Type <BetaBadge /></span>}
                         submitButtonText="Change field type"
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}
@@ -116,25 +121,31 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                         bsSize="large">
       <div>
         <Alert bsStyle="warning">
-          Changing the type of the field can have a significant impact on the ingestion of future log messages.
+          Changing the type of the field <b>{field}</b> can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
-        <Input label="New Field Type:" id="new-field-type">
+        <StyledLabel>{`Select Field Type For ${field}`}</StyledLabel>
+        <Input id="field_type">
           <StyledSelect inputId="field_type"
                         options={fieldTypeOptions}
                         value={newFieldType}
                         onChange={onChangeFieldType}
                         placeholder="Select field type"
                         disabled={isOptionsLoading}
-                        inputProps={{ 'aria-label': 'Select field type' }}
+                        inputProps={{ 'aria-label': `Select Field Type For ${field}` }}
                         required />
         </Input>
-        <Alert bsStyle="info">
-          By default the type will be changed in all index sets of the current message/search. By expanding the next section, you can select for which index sets you would like to make the change.
-        </Alert>
+        <StyledLabel>Select Targeted Index Sets</StyledLabel>
+        <p>
+          By default the {newFieldType ? <b>{newFieldType}</b> : 'selected'} field type will be set for the <b>{field}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
+        </p>
         <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelection} />
+        <StyledLabel>Select Rotation Strategy</StyledLabel>
+        <p>
+          To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+        </p>
         <Input type="checkbox"
                id="rotate"
                name="rotate"

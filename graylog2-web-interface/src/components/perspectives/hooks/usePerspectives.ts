@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { Menu as MantineMenu, type MenuDropdownProps } from '@mantine/core';
+import { useContext } from 'react';
 
-const MenuDropdownWrapper = ({ children, ...otherProps }: MenuDropdownProps) => (
-  <MantineMenu.Dropdown {...otherProps}>
-    {children}
-  </MantineMenu.Dropdown>
-);
+import PerspectivesContext from '../contexts/PerspectivesContext';
 
-export default MenuDropdownWrapper;
+const usePerspectives = () => {
+  const perspectivesContextValue = useContext(PerspectivesContext);
+
+  if (!perspectivesContextValue) {
+    throw new Error('usePerspectives hook needs to be used inside PerspectivesContext.Provider');
+  }
+
+  return perspectivesContextValue.availablePerspectives;
+};
+
+export default usePerspectives;

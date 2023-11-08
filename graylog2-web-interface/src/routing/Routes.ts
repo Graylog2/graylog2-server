@@ -102,6 +102,9 @@ const Routes = {
       LIST: '/system/nodes',
       SHOW: (nodeId: string) => `/system/nodes/${nodeId}`,
     },
+    DATANODES: {
+      OVERVIEW: '/system/datanodes',
+    },
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',

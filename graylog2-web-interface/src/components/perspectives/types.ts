@@ -14,8 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { RefreshStore } from 'views/stores/RefreshStore';
 
-const useRefreshConfig = () => useStore(RefreshStore);
-export default useRefreshConfig;
+import type * as React from 'react';
+
+export type Perspective = {
+  id: string,
+  title: string,
+  brandComponent: React.ComponentType<{
+    className?: string,
+    disabled?: boolean,
+    href?: string,
+  }>,
+  useCondition?: () => boolean
+}

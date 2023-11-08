@@ -98,6 +98,9 @@ const SystemMenu = () => {
       <HideOnCloud>
         <NavigationLink path={Routes.SYSTEM.NODES.LIST} description="Nodes" />
       </HideOnCloud>
+      <HideOnCloud>
+        <NavigationLink path={Routes.SYSTEM.DATANODES.OVERVIEW} description="Data Nodes" />
+      </HideOnCloud>
       <IfPermitted permissions={['inputs:read']}>
         {showInputs ? <NavigationLink path={Routes.SYSTEM.INPUTS} description="Inputs" /> : null}
       </IfPermitted>
