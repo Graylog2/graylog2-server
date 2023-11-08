@@ -24,7 +24,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.shaded.opensearch2.org.opensearch.common.text.Text;
+import org.graylog.shaded.opensearch2.org.opensearch.core.common.text.Text;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
