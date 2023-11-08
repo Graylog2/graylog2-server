@@ -1,0 +1,11 @@
+rule "array_contains"
+when
+    true
+then
+    set_field("contains_number", array_contains([1, 2, 3, 4, 5], 1));
+    set_field("does_not_contain_number", array_contains([1, 2, 3, 4, 5], 7));
+    set_field("contains_string", array_contains(["test", "test2"], "test"));
+    set_field("contains_string_case_insensitive", array_contains(["test", "test2"], "TEST"));
+    set_field("contains_string_case_sensitive", array_contains(["test", "test2"], "TEST", true));
+    trigger_test();
+end
