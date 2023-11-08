@@ -30,7 +30,7 @@ jobs:
 
       - name: dispatch job to graylog-project-internal
         run: >
-          gh workflow run -R Graylog2/graylog-project-internal pr-build.yml
+          gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo=${{ github.repository }}
           -f caller_pr_nr=${{ github.event.number }}
           -f caller_base_branch=${{ github.base_ref || github.ref_name }}
