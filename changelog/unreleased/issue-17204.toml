@@ -2,4 +2,4 @@ type = "fixed"
 message = "Fix tooltip colors on Rule Editor."
 
 issues = ["17204"]
-pulls = [""]
+pulls = ["17220"]
