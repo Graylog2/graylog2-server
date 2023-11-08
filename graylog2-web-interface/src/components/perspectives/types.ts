@@ -25,4 +25,5 @@ export type Perspective = {
     disabled?: boolean,
     href?: string,
   }>,
+  useCondition?: () => boolean
 }
