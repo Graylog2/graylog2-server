@@ -34,6 +34,7 @@ export { default as KeyboardKey } from './KeyboardKey';
 export { default as Label } from './Label';
 export { default as ListGroup } from './ListGroup';
 export { default as ListGroupItem } from './ListGroupItem';
+export { default as Menu } from './Menu';
 export { default as MenuItem } from './MenuItem';
 export { default as Modal } from './Modal';
 export { default as Nav } from './Nav';
