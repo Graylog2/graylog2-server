@@ -42,8 +42,8 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
 
     public static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(IndexSetFieldType.FIELD_NAME).title("Field name").sortable(true).build(),
-            EntityAttribute.builder().id(IndexSetFieldType.IS_CUSTOM).title("Custom").sortable(true).build(),
-            EntityAttribute.builder().id(IndexSetFieldType.IS_RESERVED).title("Reserved").sortable(true).build(),
+            EntityAttribute.builder().id(IndexSetFieldType.IS_CUSTOM).title("Is Custom").sortable(true).build(),
+            EntityAttribute.builder().id(IndexSetFieldType.IS_RESERVED).title("Is Reserved").sortable(true).build(),
             EntityAttribute.builder().id(IndexSetFieldType.TYPE).title("Type").sortable(true).build()
     );
 
