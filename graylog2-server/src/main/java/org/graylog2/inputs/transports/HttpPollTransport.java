@@ -291,7 +291,7 @@ public class HttpPollTransport extends ThrottleableTransport2 {
             r.addField(new DropdownField(
                     CK_CONTENT_TYPE,
                     "HTTP content type",
-                    APPLICATION_JSON,
+                    "",
                     Map.of(APPLICATION_JSON, APPLICATION_JSON,
                             APPLICATION_FORM_URLENCODED, APPLICATION_FORM_URLENCODED,
                             TEXT_PLAIN, TEXT_PLAIN),
