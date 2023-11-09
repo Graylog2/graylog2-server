@@ -20,7 +20,7 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
-import DataNodesPageNavigation from 'components/datanode/DataNodesPageNavigation';
+import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 
 const DataNodesClusterPage = () => (
   <DocumentTitle title="Data Nodes Cluster">

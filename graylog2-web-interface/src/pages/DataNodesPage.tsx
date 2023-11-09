@@ -19,7 +19,8 @@ import React from 'react';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DataNodesPageNavigation from 'components/datanode/DataNodesPageNavigation';
+import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
+import DataNodeList from 'components/datanode/DataNodeList';
 
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
@@ -35,7 +36,7 @@ const DataNodesPage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        DataNodes List using EntityDataTable
+        <DataNodeList />
       </Col>
     </Row>
   </DocumentTitle>
