@@ -17,10 +17,17 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import type { IndexSetFieldType } from 'hooks/useIndexSetFieldType';
-import { Label, Button } from 'components/bootstrap';
+import { Button } from 'components/bootstrap';
 import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
-import { NoEntitiesExist, NoSearchResult, PaginatedList, SearchForm, Spinner } from 'components/common';
+import {
+  Icon,
+  NoEntitiesExist,
+  NoSearchResult,
+  PaginatedList,
+  SearchForm,
+  Spinner,
+} from 'components/common';
 import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
@@ -34,8 +41,8 @@ export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'field_name', direction: 'asc' } as Sort,
-  displayedColumns: ['field_name', 'type', 'is_custom'],
-  columnsOrder: ['field_name', 'type', 'is_custom'],
+  displayedColumns: ['field_name', 'type', 'is_custom', 'is_reserved'],
+  columnsOrder: ['field_name', 'type', 'is_custom', 'is_reserved'],
 };
 
 const IndexSetFieldTypesList = () => {
@@ -107,8 +114,12 @@ const IndexSetFieldTypesList = () => {
         renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
       },
       is_custom: {
-        renderHeader: () => null,
-        renderCell: (isCustom: boolean) => (isCustom ? <Label bsStyle="primary">custom</Label> : null),
+        renderCell: (isCustom: boolean) => (isCustom ? <Icon name="check" /> : null),
+        staticWidth: 120,
+      },
+      is_reserved: {
+        renderCell: (isCustom: boolean) => (isCustom ? <Icon name="check" /> : null),
+        staticWidth: 120,
       },
     },
   }), [fieldTypes]);
@@ -117,28 +128,20 @@ const IndexSetFieldTypesList = () => {
     handleOnOpen(fieldType);
   }, [handleOnOpen]);
 
-  const renderActions = useCallback((fieldType: IndexSetFieldType) => (
-    <>
+  const renderActions = useCallback((fieldType: IndexSetFieldType) => {
+    const title = fieldType.isReserved ? 'Reserved field is not editable' : `Edit field type for ${fieldType.fieldName}`;
+
+    return (
       <Button onClick={() => openEditModal(fieldType)}
               role="button"
               bsSize="xsmall"
               disabled={fieldType.isReserved}
-              title={`${fieldType.isCustom ? 'Edit' : 'Add'} custom field type for ${fieldType.fieldName}`}
+              title={title}
               tabIndex={0}>
-        {fieldType.isCustom ? 'Edit' : 'Add'}
+        Edit
       </Button>
-      {/* fieldType.isCustom && (
-      <Button onClick={onRemove}
-              role="button"
-              bsSize="xsmall"
-              bsStyle="danger"
-              title="Remove custom type"
-              tabIndex={0}>
-        Delete
-      </Button>
-      ) */}
-    </>
-  ), [openEditModal]);
+    );
+  }, [openEditModal]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
