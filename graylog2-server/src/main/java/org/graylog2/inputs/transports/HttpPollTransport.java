@@ -68,24 +68,24 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 public class HttpPollTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(HttpPollTransport.class);
 
     private static final String CK_URL = "target_url";
-    private static final String CK_HTTP_METHOD = "http_method";
-    private static final String CK_HTTP_BODY = "http_body";
-    private static final String CK_CONTENT_TYPE = "content_type";
+    public static final String CK_HTTP_METHOD = "http_method";
+    public static final String CK_HTTP_BODY = "http_body";
+    public static final String CK_CONTENT_TYPE = "content_type";
     private static final String CK_HEADERS = "headers";
     private static final String CK_ENCRYPTED_HEADERS = "encrypted_headers";
     private static final String CK_TIMEUNIT = "timeunit";
     private static final String CK_INTERVAL = "interval";
 
-    private static final String GET = "GET";
-    private static final String PUT = "PUT";
-    private static final String POST = "POST";
+    public static final String GET = "GET";
+    public static final String PUT = "PUT";
+    public static final String POST = "POST";
 
     private final Configuration configuration;
     private final EventBus serverEventBus;
@@ -179,9 +179,11 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                 return;
             }
 
-            final Request request = getRequest(url, headers);
+            final Request.Builder requestBuilder = getRequestBuilder()
+                    .url(url)
+                    .headers(Headers.of(headers));
 
-            try (final Response r = httpClient.newCall(request).execute()) {
+            try (final Response r = httpClient.newCall(requestBuilder.build()).execute()) {
                 if (!r.isSuccessful()) {
                     LOG.error("Expected successful HTTP status code [2xx], got " + r.code());
                     return;
@@ -211,22 +213,23 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                 .collect(Collectors.joining(","));
     }
 
-    private Request getRequest(String url, Map<String, String> headers) {
+    private Request.Builder getRequestBuilder() {
+        final Request.Builder requestBuilder = new Request.Builder();
+
         final String httpMethod = configuration.getString(CK_HTTP_METHOD);
+        if (httpMethod == null || httpMethod.equals(GET)) {
+            return requestBuilder.get();
+        }
+
         final String body = configuration.getString(CK_HTTP_BODY);
         final MediaType contentType = MediaType.parse(configuration.getString(CK_CONTENT_TYPE));
 
-        final Request.Builder requestBuilder = new Request.Builder();
         switch (httpMethod) {
             case PUT -> requestBuilder.put(RequestBody.create(body, contentType));
             case POST -> requestBuilder.post(RequestBody.create(body, contentType));
-            default -> requestBuilder.get();
         }
 
-        return requestBuilder
-                .url(url)
-                .headers(Headers.of(headers))
-                .build();
+        return requestBuilder;
     }
 
     @Override
@@ -273,15 +276,15 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                     Map.of(GET, GET,
                             PUT, PUT,
                             POST, POST),
-                    "HTTP method used for the requests",
-                    ConfigurationField.Optional.NOT_OPTIONAL
+                    "HTTP method to use for the requests.",
+                    ConfigurationField.Optional.OPTIONAL
             ));
 
             r.addField(new TextField(
                     CK_HTTP_BODY,
                     "HTTP body",
                     "",
-                    "HTTP body type used for POST/PUT requests",
+                    "HTTP body for POST/PUT requests. Required for POST/PUT.",
                     ConfigurationField.Optional.OPTIONAL
             ));
 
@@ -292,8 +295,8 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                     Map.of(APPLICATION_JSON, APPLICATION_JSON,
                             APPLICATION_FORM_URLENCODED, APPLICATION_FORM_URLENCODED,
                             TEXT_PLAIN, TEXT_PLAIN),
-                    "HTTP content type used for POST/PUT requests",
-                    ConfigurationField.Optional.NOT_OPTIONAL
+                    "HTTP content type for POST/PUT requests. Required for POST/PUT.",
+                    ConfigurationField.Optional.OPTIONAL
             ));
 
             r.addField(new TextField(
