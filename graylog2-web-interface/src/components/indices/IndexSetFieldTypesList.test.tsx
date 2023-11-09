@@ -91,6 +91,7 @@ describe('IndexSetFieldTypesList', () => {
         ...layoutPreferences,
         displayedAttributes: ['field_name',
           'is_custom',
+          'is_reserved',
           'type'],
       },
       isInitialLoading: false,
@@ -121,9 +122,9 @@ describe('IndexSetFieldTypesList', () => {
 
       await within(tableRow).findByText('field');
       await within(tableRow).findByText('Boolean');
-      await within(tableRow).findByText('Add');
+      await within(tableRow).findByText('Edit');
 
-      expect(within(tableRow).queryByText('custom')).not.toBeInTheDocument();
+      expect(within(tableRow).queryByTitle('Field has custom field type')).not.toBeInTheDocument();
     });
 
     it('for field with custom type', async () => {
@@ -145,7 +146,51 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('field');
       await within(tableRow).findByText('Boolean');
       await within(tableRow).findByText('Edit');
-      await within(tableRow).findByText('custom');
+      await within(tableRow).findByTitle('Field has custom field type');
+    });
+
+    it('for field with non reserved type', async () => {
+      asMock(useIndexSetFieldTypes).mockReturnValue({
+        isLoading: false,
+        refetch: () => {},
+        data: getData([{
+          id: 'field',
+          fieldName: 'field',
+          type: 'bool',
+          isCustom: true,
+          isReserved: false,
+        }]),
+      });
+
+      renderIndexSetFieldTypesList();
+      const tableRow = await screen.findByTestId('table-row-field');
+
+      const editButton = await within(tableRow).findByText('Edit');
+
+      expect(within(tableRow).queryByTitle('Field has reserved field type')).not.toBeInTheDocument();
+      expect(editButton.hasAttribute('disabled')).toBe(false);
+    });
+
+    it('for field with reserved type', async () => {
+      asMock(useIndexSetFieldTypes).mockReturnValue({
+        isLoading: false,
+        refetch: () => {},
+        data: getData([{
+          id: 'field',
+          fieldName: 'field',
+          type: 'bool',
+          isCustom: true,
+          isReserved: true,
+        }]),
+      });
+
+      renderIndexSetFieldTypesList();
+      const tableRow = await screen.findByTestId('table-row-field');
+
+      const editButton = await within(tableRow).findByText('Edit');
+      await within(tableRow).findByTitle('Field has reserved field type');
+
+      expect(editButton.hasAttribute('disabled')).toBe(true);
     });
   });
 

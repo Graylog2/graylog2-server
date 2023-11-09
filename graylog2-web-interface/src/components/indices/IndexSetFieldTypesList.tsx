@@ -103,11 +103,11 @@ const IndexSetFieldTypesList = () => {
         renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
       },
       is_custom: {
-        renderCell: (isCustom: boolean) => (isCustom ? <Icon name="check" /> : null),
+        renderCell: (isCustom: boolean) => (isCustom ? <Icon title="Field has custom field type" name="check" /> : null),
         staticWidth: 120,
       },
       is_reserved: {
-        renderCell: (isCustom: boolean) => (isCustom ? <Icon name="check" /> : null),
+        renderCell: (isReserved: boolean) => (isReserved ? <Icon title="Field has reserved field type" name="check" /> : null),
         staticWidth: 120,
       },
     },
