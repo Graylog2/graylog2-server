@@ -23,9 +23,7 @@ import useParams from 'routing/useParams';
 import {
   Icon,
   NoEntitiesExist,
-  NoSearchResult,
   PaginatedList,
-  SearchForm,
   Spinner,
 } from 'components/common';
 import EntityDataTable from 'components/common/EntityDataTable';
@@ -34,8 +32,6 @@ import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
-
-import QueryHelper from '../common/QueryHelper';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -58,7 +54,7 @@ const IndexSetFieldTypesList = () => {
   }, []);
 
   const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
-  const [query, setQuery] = useState('');
+  const [query] = useState('');
   const [activePage, setActivePage] = useState(1);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -95,13 +91,6 @@ const IndexSetFieldTypesList = () => {
     setActivePage(1);
     updateTableLayout({ sort: newSort });
   }, [updateTableLayout]);
-
-  const onSearch = useCallback((newQuery: string) => {
-    setActivePage(1);
-    setQuery(newQuery);
-  }, []);
-
-  const onResetSearch = useCallback(() => onSearch(''), [onSearch]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });
@@ -155,22 +144,10 @@ const IndexSetFieldTypesList = () => {
                      activePage={activePage}
                      showPageSizeSelect={false}
                      useQueryParameter={false}>
-        <div style={{ marginBottom: '5px' }}>
-          <SearchForm focusAfterMount
-                      onSearch={onSearch}
-                      queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
-                      topMargin={0}
-                      onReset={onResetSearch} />
-        </div>
         {pagination?.total === 0 && !searchParams.query && (
           <NoEntitiesExist>
             No fields have been created yet.
           </NoEntitiesExist>
-        )}
-        {pagination?.total === 0 && searchParams.query && (
-          <NoSearchResult>
-            No fields have been found.
-          </NoSearchResult>
         )}
         {!!list?.length && (
           <EntityDataTable<IndexSetFieldType> data={list}
