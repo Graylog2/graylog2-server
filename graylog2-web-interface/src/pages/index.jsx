@@ -30,6 +30,7 @@ const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitio
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
+const DataNodesPage = loadAsync(() => import('./DataNodesPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
 const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
@@ -115,6 +116,7 @@ export {
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
+  DataNodesPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
