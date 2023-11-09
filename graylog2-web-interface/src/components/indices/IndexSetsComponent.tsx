@@ -37,14 +37,14 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const Toolbar = styled(Row)(({ theme }) => css`
   border-bottom: 1px solid ${theme.colors.gray[90]};
-  padding-bottom: 15px;
+  padding-bottom: ${theme.spacings.sm};
 `);
 
-const GlobalStatsCol = styled(Col)`
+const GlobalStatsCol = styled(Col)(({ theme }) => css`
   display: flex;
   align-items: center;
-  gap: 10px;
-`;
+  gap: ${theme.spacings.xs};
+`);
 
 const GlobalStats = styled.p`
   margin-bottom: 0;
