@@ -24,7 +24,7 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
-import org.graylog2.datanode.DataNodeRemovalEvent;
+import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -70,6 +70,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
+        process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName()));
         return process;
     }
 
@@ -83,9 +84,12 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void handleNodeRemovalEvent(DataNodeRemovalEvent event) {
+    public void handleNodeLifecycleEvent(DataNodeLifecycleEvent event) {
         if (nodeId.getNodeId().equals(event.nodeId())) {
-            LOG.info("Graylog wants to remove node me. Buhu. {}", event.nodeId());
+            switch (event.trigger()) {
+                case REMOVE -> process.onRemove();
+                case RESET -> process.onReset();
+            }
         }
     }
 
