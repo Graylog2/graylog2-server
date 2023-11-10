@@ -16,12 +16,20 @@
  */
 package org.graylog.plugins.sidecar.rest.models;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
+import java.util.Set;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 @AutoValue
 @JsonAutoDetect
@@ -34,6 +42,12 @@ public abstract class Collector {
     public static final String FIELD_EXECUTE_PARAMETERS = "execute_parameters";
     public static final String FIELD_VALIDATION_PARAMETERS = "validation_parameters";
     public static final String FIELD_DEFAULT_TEMPLATE = "default_template";
+    public static final String FIELD_DEFAULT_TEMPLATE_CRC = "default_template_crc";
+
+    // Set of prior version CRCs for back-compat
+    private static final Set<Long> INITIAL_CRC = ImmutableSet.of(
+            999L // test
+    );
 
     @Id
     @ObjectId
@@ -66,6 +80,26 @@ public abstract class Collector {
     @Nullable
     public abstract String defaultTemplate();
 
+    @JsonProperty(FIELD_DEFAULT_TEMPLATE_CRC)
+    @Nullable
+    public abstract Long defaultTemplateCRC();
+
+    @JsonIgnore
+    public boolean defaultTemplateUpdated() {
+        long crc = checksum(defaultTemplate().getBytes(StandardCharsets.UTF_8));
+        if (defaultTemplateCRC() == null) {
+            return (!INITIAL_CRC.contains(crc));
+        }
+        return (crc != defaultTemplateCRC());
+    }
+
+    @JsonIgnore
+    public static long checksum(byte[] bytes) {
+        Checksum crc32 = new CRC32();
+        crc32.update(bytes, 0, bytes.length);
+        return crc32.getValue();
+    }
+
     public static Builder builder() {
         return new AutoValue_Collector.Builder();
     }
@@ -82,6 +116,8 @@ public abstract class Collector {
         public abstract Builder executeParameters(String executeParameters);
         public abstract Builder validationParameters(String validationParameters);
         public abstract Builder defaultTemplate(String defaultTemplate);
+
+        public abstract Builder defaultTemplateCRC(Long checksum);
         public abstract Collector build();
     }
 
@@ -93,7 +129,8 @@ public abstract class Collector {
                                    @JsonProperty(FIELD_EXECUTABLE_PATH) String executablePath,
                                    @JsonProperty(FIELD_EXECUTE_PARAMETERS) @Nullable String executeParameters,
                                    @JsonProperty(FIELD_VALIDATION_PARAMETERS) @Nullable String validationParameters,
-                                   @JsonProperty(FIELD_DEFAULT_TEMPLATE) @Nullable String defaultTemplate) {
+                                   @JsonProperty(FIELD_DEFAULT_TEMPLATE) @Nullable String defaultTemplate,
+                                   @JsonProperty(FIELD_DEFAULT_TEMPLATE_CRC) @Nullable Long defaultTemplateCRC) {
         return builder()
                 .id(id)
                 .name(name)
@@ -103,6 +140,7 @@ public abstract class Collector {
                 .executeParameters(executeParameters)
                 .validationParameters(validationParameters)
                 .defaultTemplate(defaultTemplate)
+                .defaultTemplateCRC(defaultTemplateCRC)
                 .build();
     }
 }
