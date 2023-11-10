@@ -53,12 +53,10 @@ class IndexFieldTypesListServiceTest {
     IndexSetService indexSetService;
     @Mock
     MongoIndexSet.Factory indexSetFactory;
-    @Mock
-    FieldTypeDTOsMerger fieldTypeDTOsMerger;
 
     @BeforeEach
     void setUp() {
-        toTest = new IndexFieldTypesListService(indexFieldTypesService, indexSetService, indexSetFactory, fieldTypeDTOsMerger);
+        toTest = new IndexFieldTypesListService(indexFieldTypesService, indexSetService, indexSetFactory, new FieldTypeDTOsMerger());
     }
 
     @Test
@@ -122,14 +120,6 @@ class IndexFieldTypesListServiceTest {
                 .when(indexFieldTypesService)
                 .findOneByIndexName("graylog_41");
 
-        doReturn(List.of(
-                FieldTypeDTO.create("field_1", "ip"),
-                FieldTypeDTO.create("field_2", "long"),
-                FieldTypeDTO.create("field_3", "ip"),
-                FieldTypeDTO.create("field_4", "keyword"),
-                FieldTypeDTO.create("field_5", "text")
-
-        )).when(fieldTypeDTOsMerger).merge(deflectorFields, previousFields, customFieldMappings);
 
         PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesList("I_am_fine!", 0, 2, "field_name", Sorting.Direction.ASC);
         assertThat(response.elements())

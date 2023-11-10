@@ -29,10 +29,10 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
                                 @JsonProperty(IS_CUSTOM) boolean isCustom,
                                 @JsonProperty(IS_RESERVED) boolean isReserved) {
 
-    public static final String FIELD_NAME = "field_name";
-    public static final String TYPE = "type";
-    public static final String IS_CUSTOM = "is_custom";
-    public static final String IS_RESERVED = "is_reserved";
+    static final String FIELD_NAME = "field_name";
+    static final String TYPE = "type";
+    static final String IS_CUSTOM = "is_custom";
+    static final String IS_RESERVED = "is_reserved";
 
     public static final String DEFAULT_SORT_FIELD = IndexSetFieldType.FIELD_NAME;
     public static final Sorting DEFAULT_SORT = Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.ASC);
