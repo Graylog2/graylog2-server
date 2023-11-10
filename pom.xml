@@ -203,7 +203,7 @@
 
         <!-- Plugin versions -->
         <license-maven.version>4.0.rc2</license-maven.version>
-        <download-maven-plugin.version>1.6.8</download-maven-plugin.version>
+        <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
     </properties>
 
 
@@ -878,7 +878,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <groupId>org.graylog.repackaged</groupId>
                 <artifactId>download-maven-plugin</artifactId>
                 <version>${download-maven-plugin.version}</version>
                 <configuration>
