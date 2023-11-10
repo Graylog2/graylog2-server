@@ -46,7 +46,13 @@ public abstract class Collector {
 
     // Set of prior version CRCs for back-compat
     private static final Set<Long> INITIAL_CRC = ImmutableSet.of(
-            999L // test
+            3280545580L, // 5.2 filebeat linux
+            3396210381L, // 5.2 filebeat darwin
+            3013497446L, // 5.2 filebeat freebsd
+            4009863009L, // 5.2 winlogbeat windows
+            2023247173L, // 5.2 nxlog linux
+            2491201449L, // 5.2 nxlog windows
+            2487909285L  // 5.2 auditbeat windows
     );
 
     @Id
