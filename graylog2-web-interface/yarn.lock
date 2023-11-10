@@ -3610,10 +3610,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/create-react-class@15.6.5":
-  version "15.6.5"
-  resolved "https://registry.yarnpkg.com/@types/create-react-class/-/create-react-class-15.6.5.tgz#e32a3e7069d578b5835654b97d8bc2d8e130dcca"
-  integrity sha512-siVnXy7YQaOCf52+WjIBI7y1LcZaTZnyq8d3BwMdoUboiiSsL29C/XRAs/Y5rUkkbqYgZSNU6CX4rqM8CEyIqQ==
+"@types/create-react-class@15.6.6":
+  version "15.6.6"
+  resolved "https://registry.yarnpkg.com/@types/create-react-class/-/create-react-class-15.6.6.tgz#08f53503d469bbf2e17991ee3612e3a16773a7cf"
+  integrity sha512-Jf9g3h/qeSZ678DVy0RD77fngh7+hX/AFGf+nLCvWwYS8IL4bJuK4+cnfbvdrOjEIkn4VIleLt+DrpqQyT9u5w==
   dependencies:
     "@types/react" "*"
 
@@ -3629,10 +3629,18 @@
   dependencies:
     "@types/enzyme" "*"
 
-"@types/enzyme@*", "@types/enzyme@3.10.15":
+"@types/enzyme@*":
   version "3.10.15"
   resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.15.tgz#56d1167bb11a2c3f65af790de0cbb0e990b21489"
   integrity sha512-Tdm2XXW7TfyKhb/ddSLMpj8W0UgxbCOOauFNeLJH7+KzsfOBrHF6XPctw11SwGoOPyUglYQpvMoQNFXOF0uTwg==
+  dependencies:
+    "@types/cheerio" "*"
+    "@types/react" "^16"
+
+"@types/enzyme@3.10.16":
+  version "3.10.16"
+  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.16.tgz#100c49093f694545fc903266b2eb410df08859a9"
+  integrity sha512-17uMdJjSKjvdn/MhO/G2lRNPZGvJxFpvgONrsRoS1+khtJ6UcnCwC9v3gk2UqPyAkMZb6a1VYxScc/vOgkDl9w==
   dependencies:
     "@types/cheerio" "*"
     "@types/react" "^16"
@@ -3779,10 +3787,10 @@
     expect "^29.0.0"
     pretty-format "^29.0.0"
 
-"@types/jquery@3.5.26":
-  version "3.5.26"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.26.tgz#af9e5bf442b2ed813eb6a73c06c714621f68e9de"
-  integrity sha512-wWYf2NBI6b+1RPQY86B74HSgZNsLAUtr4eFlGQoOQPJw/B3mCMfwWCflZWQ7OKtAB18MJCcYpL6+0NZbMIXl5g==
+"@types/jquery@3.5.27":
+  version "3.5.27"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.27.tgz#d9d67a003d0292a36fe35868a618c82f8fd12b19"
+  integrity sha512-TR28Y8ezIGgfyA02UOh9x+Fy16/1qWYAnvtRd2gTBJuccX/vmddyti0MezLkTv7f+OLofVc2T961VPyKv1tXJQ==
   dependencies:
     "@types/sizzle" "*"
 
@@ -3890,9 +3898,9 @@
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
 "@types/react-beautiful-dnd@^13.0.0":
-  version "13.1.6"
-  resolved "https://registry.yarnpkg.com/@types/react-beautiful-dnd/-/react-beautiful-dnd-13.1.6.tgz#a616443903bfc370fee298b0144dbce7234d5561"
-  integrity sha512-FXAuaa52ux7HWQDumi3MFSAAsW8OKfDImy1pSZPKe85nV9mZ1f4spVzW0a2boYvkIhphjbWUi5EwUiRG8Rq/Qg==
+  version "13.1.7"
+  resolved "https://registry.yarnpkg.com/@types/react-beautiful-dnd/-/react-beautiful-dnd-13.1.7.tgz#cc8038896ee7dee99b8bfd0eaed0a02a8617bedc"
+  integrity sha512-jQZLov9OkD0xRQkqz8/lx66bHYAYv+g4+POBqnH5Jtt/xo4MygzM879Q9sxAiosPBdNj1JYTdbPxDn3dNRYgow==
   dependencies:
     "@types/react" "*"
 
@@ -9160,8 +9168,8 @@ graphemer@^1.4.0:
   dependencies:
     "@graylog/sawmill" "2.0.7"
     "@tanstack/react-query" "4.36.1"
-    "@types/create-react-class" "15.6.5"
-    "@types/jquery" "3.5.26"
+    "@types/create-react-class" "15.6.6"
+    "@types/jquery" "3.5.27"
     "@types/react" "18.2.20"
     babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
@@ -10764,7 +10772,7 @@ jest-pnp-resolver@^1.2.2:
     "@testing-library/react" "12.1.5"
     "@testing-library/react-hooks" "^8.0.0"
     "@testing-library/user-event" "^13.5.0"
-    "@types/enzyme" "3.10.15"
+    "@types/enzyme" "3.10.16"
     "@types/jest" "29.5.5"
     babel-jest "29.6.2"
     enzyme "3.11.0"
