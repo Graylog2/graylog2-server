@@ -65,10 +65,12 @@ public class IndexFieldTypesService {
     private final JacksonDBCollection<IndexFieldTypesDTO, ObjectId> db;
     private final StreamService streamService;
     private final MongoCollection<Document> mongoCollection;
+
+
     @Inject
-    public IndexFieldTypesService(MongoConnection mongoConnection,
-                                  StreamService streamService,
-                                  MongoJackObjectMapperProvider objectMapperProvider) {
+    public IndexFieldTypesService(final MongoConnection mongoConnection,
+                                  final StreamService streamService,
+                                  final MongoJackObjectMapperProvider objectMapperProvider) {
         this.streamService = streamService;
         this.mongoCollection = mongoConnection.getMongoDatabase().getCollection("index_field_types");
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("index_field_types"),
@@ -114,7 +116,7 @@ public class IndexFieldTypesService {
         } else {
             LinkedList<String> reducedTypeHistory = new LinkedList<>();
             typeHistory.forEach(type -> {
-                if (reducedTypeHistory.isEmpty() || !type.equals(reducedTypeHistory.getLast())) {
+                if (reducedTypeHistory.isEmpty() || (type != null && !type.equals(reducedTypeHistory.getLast()))) {
                     reducedTypeHistory.add(type);
                 }
             });
@@ -204,5 +206,9 @@ public class IndexFieldTypesService {
 
     private Collection<IndexFieldTypesDTO> findByQuery(DBQuery.Query query) {
         return ImmutableList.copyOf((Iterable<IndexFieldTypesDTO>) db.find(query));
+    }
+
+    public IndexFieldTypesDTO findOneByIndexName(final String indexName) {
+        return db.findOne(DBQuery.is(FIELD_INDEX_NAME, indexName));
     }
 }
