@@ -30,12 +30,14 @@ import org.graylog2.shared.security.RestPermissions;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_REMOVE;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_RESET;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -59,6 +61,19 @@ public class DataNodeManagementResource extends RestResource {
     public void removeNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
             dataNodeService.removeNode(nodeId);
+        } catch (NodeNotFoundException e) {
+            throw new NotFoundException("Node " + nodeId + " not found");
+        }
+    }
+
+    @POST
+    @Path("{nodeId}/reset")
+    @ApiOperation("Reset a removed node to rejoin the cluster")
+    @AuditEvent(type = DATANODE_RESET)
+    @RequiresPermissions(RestPermissions.DATANODE_RESET)
+    public void resetNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        try {
+            dataNodeService.resetNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }

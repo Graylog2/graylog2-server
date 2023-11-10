@@ -27,12 +27,19 @@ import javax.validation.Valid;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class DataNodeRemovalEvent {
+public abstract class DataNodeLifecycleEvent {
+
     @JsonProperty("node_id")
     public abstract String nodeId();
 
+    @JsonProperty
+    public abstract DataNodeLifecycleTrigger trigger();
+    
     @JsonCreator
-    public static DataNodeRemovalEvent create(@JsonProperty("node_id") @Valid String nodeId) {
-        return new AutoValue_DataNodeRemovalEvent(nodeId);
+    public static DataNodeLifecycleEvent create(
+            @JsonProperty("node_id") @Valid String nodeId,
+            @JsonProperty("trigger") @Valid DataNodeLifecycleTrigger trigger
+    ) {
+        return new AutoValue_DataNodeLifecycleEvent(nodeId, trigger);
     }
 }

@@ -28,12 +28,13 @@ import javax.ws.rs.NotFoundException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataNodeManagementResourceTest {
 
+    public static final String NODEID = "nodeid";
     private DataNodeManagementResource classUnderTest;
 
     @Mock
@@ -46,9 +47,28 @@ public class DataNodeManagementResourceTest {
 
     @Test
     public void removeUnavailableNode_throwsNotFoundException() throws NodeNotFoundException {
-        doThrow(NodeNotFoundException.class).when(dataNodeService).removeNode(any());
-        Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.removeNode("nodeid"));
-        assertEquals("Node nodeid not found", e.getMessage());
+        doThrow(NodeNotFoundException.class).when(dataNodeService).removeNode(NODEID);
+        Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.removeNode(NODEID));
+        assertEquals("Node " + NODEID + " not found", e.getMessage());
+    }
+
+    @Test
+    public void resetUnavailableNode_throwsNotFoundException() throws NodeNotFoundException {
+        doThrow(NodeNotFoundException.class).when(dataNodeService).resetNode(NODEID);
+        Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.resetNode(NODEID));
+        assertEquals("Node " + NODEID + " not found", e.getMessage());
+    }
+
+    @Test
+    public void verifyRemoveServiceCalled() throws NodeNotFoundException {
+        classUnderTest.removeNode(NODEID);
+        verify(dataNodeService).removeNode(NODEID);
+    }
+
+    @Test
+    public void verifyResetServiceCalled() throws NodeNotFoundException {
+        classUnderTest.resetNode(NODEID);
+        verify(dataNodeService).resetNode(NODEID);
     }
 
 

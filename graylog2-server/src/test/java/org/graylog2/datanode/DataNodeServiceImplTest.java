@@ -51,7 +51,16 @@ public class DataNodeServiceImplTest {
         when(node.getNodeId()).thenReturn("returnedid"); // would be the same in real life
         when(nodeService.byNodeId("nodeid")).thenReturn(node);
         classUnderTest.removeNode("nodeid");
-        verify(clusterEventBus).post(DataNodeRemovalEvent.create(node.getNodeId()));
+        verify(clusterEventBus).post(DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE));
+    }
+
+    @Test
+    public void resetNodePublishesClusterEvent() throws NodeNotFoundException {
+        Node node = mock(Node.class);
+        when(node.getNodeId()).thenReturn("returnedid"); // would be the same in real life
+        when(nodeService.byNodeId("nodeid")).thenReturn(node);
+        classUnderTest.resetNode("nodeid");
+        verify(clusterEventBus).post(DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.RESET));
     }
 
 }

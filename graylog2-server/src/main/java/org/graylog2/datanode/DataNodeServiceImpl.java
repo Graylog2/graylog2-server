@@ -41,7 +41,14 @@ public class DataNodeServiceImpl implements DataNodeService {
     @Override
     public void removeNode(String nodeId) throws NodeNotFoundException {
         final Node node = nodeService.byNodeId(nodeId);
-        DataNodeRemovalEvent e = DataNodeRemovalEvent.create(node.getNodeId());
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE);
+        clusterEventBus.post(e);
+    }
+
+    @Override
+    public void resetNode(String nodeId) throws NodeNotFoundException {
+        final Node node = nodeService.byNodeId(nodeId);
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.RESET);
         clusterEventBus.post(e);
     }
 

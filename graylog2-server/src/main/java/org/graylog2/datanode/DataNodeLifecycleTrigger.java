@@ -16,12 +16,6 @@
  */
 package org.graylog2.datanode;
 
-import com.google.inject.ImplementedBy;
-import org.graylog2.cluster.NodeNotFoundException;
-
-@ImplementedBy(DataNodeServiceImpl.class)
-public interface DataNodeService {
-    void removeNode(String nodeId) throws NodeNotFoundException;
-
-    void resetNode(String nodeId) throws NodeNotFoundException;
+public enum DataNodeLifecycleTrigger {
+    REMOVE, RESET
 }
