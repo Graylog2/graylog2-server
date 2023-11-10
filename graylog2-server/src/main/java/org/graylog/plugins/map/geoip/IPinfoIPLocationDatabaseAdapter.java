@@ -50,19 +50,19 @@ public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapte
         this.reader = new Reader(databaseFile, Reader.FileMode.MEMORY_MAPPED, NoCache.getInstance());
     }
 
-    private ObjectNode get(InetAddress ipAddress, String type) throws IOException, AddressNotFoundException {
+    private <T> T get(InetAddress ipAddress, String type, Class<T> valueClass) throws IOException, AddressNotFoundException {
         final String databaseType = reader.getMetadata().getDatabaseType();
         if (!databaseType.contains(type)) {
             final String caller = Thread.currentThread().getStackTrace()[2].getMethodName();
             throw new UnsupportedOperationException("Invalid attempt to open a \"" + databaseType + "\" database using the " + caller + " method");
         }
 
-        final ObjectNode node = asObjectNode(reader.get(ipAddress));
-        if (node == null) {
+        final T value = reader.get(ipAddress, valueClass);
+        if (value == null) {
             throw new AddressNotFoundException("Address " + ipAddress.getHostAddress() + " not found in database");
         }
 
-        return node;
+        return value;
     }
 
     private ObjectNode asObjectNode(JsonNode node) throws InvalidDatabaseException {
@@ -74,12 +74,12 @@ public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapte
 
     @Override
     public IPinfoStandardLocation ipInfoStandardLocation(InetAddress ipAddress) throws IOException, AddressNotFoundException {
-        return OBJECT_MAPPER.convertValue(get(ipAddress, "ipinfo standard_location"), IPinfoStandardLocation.class);
+        return get(ipAddress, "ipinfo standard_location", IPinfoStandardLocation.class);
     }
 
     @Override
     public IPinfoASN ipInfoASN(InetAddress ipAddress) throws IOException, AddressNotFoundException {
-        return OBJECT_MAPPER.convertValue(get(ipAddress, "ipinfo asn"), IPinfoASN.class);
+        return get(ipAddress, "ipinfo asn", IPinfoASN.class);
     }
 
     @Override
