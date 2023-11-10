@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CheckForCertRenewalJob.RENEWAL_JOB_ID;
 
 @Singleton
@@ -151,11 +152,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
             if(keystore.isPresent()) {
                 final var ks = keystore.get();
                 final var nextRenewal = getNextRenewal();
-                final var rootCert = ks.getCertificate("root");
-                if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) rootCert)) {
-                    notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "root cert");
-                }
-                final var caCert = ks.getCertificate("ca");
+                final var caCert = ks.getCertificate(CA_KEY_ALIAS);
                 if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
                     notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
                 }
@@ -197,8 +194,10 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     @Override
     public void initiateRenewalForNode(final String nodeId) {
         // write new state to MongoDB so that the DataNode picks it up and generates a new CSR request
-        var config = dataNodeProvisioningService.getPreflightConfigFor(nodeId);
-        dataNodeProvisioningService.save(config.toBuilder().state(DataNodeProvisioningConfig.State.CONFIGURED).build());
+        var config = dataNodeProvisioningService.getPreflightConfigFor(nodeId)
+                .map(DataNodeProvisioningConfig::asConfigured)
+                .orElseThrow(() -> new IllegalStateException("No config found for data node " + nodeId));
+        dataNodeProvisioningService.save(config);
     }
 
     @Override
@@ -208,7 +207,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
             final var keystore = loadKeyStoreForNode(node);
             final var certificate = keystore.flatMap(this::getCertificateForNode);
             final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            final var config = getDataNodeProvisioningConfig(node);
+            final var config = getDataNodeProvisioningConfig(node).orElseThrow(() -> new IllegalStateException("No config found for data node " + node.getNodeId()));
             return new DataNode(node.getNodeId(),
                     node.getType(),
                     node.getTransportAddress(),
@@ -220,7 +219,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }).toList();
     }
 
-    private DataNodeProvisioningConfig getDataNodeProvisioningConfig(final Node node) {
+    private Optional<DataNodeProvisioningConfig> getDataNodeProvisioningConfig(final Node node) {
         return dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId());
     }
 

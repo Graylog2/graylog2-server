@@ -41,14 +41,14 @@ const NumberRefExpression = ({
   renderLabel,
   validation,
 }) => {
-  const getSeries = useCallback((seriesId) => eventDefinition.config.series.find((series) => series.id === seriesId), [eventDefinition.config.series]);
+  const getSeries = useCallback((seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId), [eventDefinition?.config?.series]);
 
   const createSeries = useCallback(() => ({ id: expression.ref }), [expression.ref]);
 
   const getOrCreateSeries = useCallback((seriesId) => getSeries(seriesId) || createSeries(), [createSeries, getSeries]);
 
   const handleFieldChange = useCallback((key, value) => {
-    const series = cloneDeep(eventDefinition.config.series);
+    const series = cloneDeep(eventDefinition?.config?.series);
     const nextSeries = cloneDeep(getOrCreateSeries(expression.ref));
 
     if (value !== undefined) {
@@ -82,7 +82,7 @@ const NumberRefExpression = ({
       series: series,
       conditions: nextExpression,
     });
-  }, [eventDefinition.config.series, expression, getOrCreateSeries, onChange]);
+  }, [eventDefinition?.config?.series, expression, getOrCreateSeries, onChange]);
 
   const handleAggregationFunctionChange = useCallback((nextFunction) => {
     handleFieldChange('type', nextFunction);

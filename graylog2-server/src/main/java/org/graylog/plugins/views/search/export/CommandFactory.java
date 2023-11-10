@@ -29,6 +29,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandFactory {
     private final QueryStringDecorators queryStringDecorator;
@@ -58,6 +59,11 @@ public class CommandFactory {
         return builderFrom(resultFormat)
                 .timeRange(resultFormat.timerange().orElse(toAbsolute(query.timerange())))
                 .queryString(queryStringFrom(search, query))
+                .usedSearchFilters(search.queries().stream()
+                        .map(Query::filters)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList())
+                )
                 .streams(query.usedStreamIds())
                 .build();
     }
@@ -81,6 +87,7 @@ public class CommandFactory {
                 .timeRange(resultFormat.timerange().orElse(toAbsolute(timeRangeFrom(query, searchType))))
                 .queryString(queryStringFrom(search, query, searchType))
                 .streams(query.effectiveStreams(searchType))
+                .usedSearchFilters(query.filters())
                 .decorators(decorators);
 
         return commandBuilder.build();

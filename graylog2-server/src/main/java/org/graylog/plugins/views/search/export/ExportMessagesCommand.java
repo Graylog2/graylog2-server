@@ -19,12 +19,14 @@ package org.graylog.plugins.views.search.export;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTimeZone;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,6 +58,8 @@ public abstract class ExportMessagesCommand {
 
     public abstract Set<String> streams();
 
+    public abstract Collection<UsedSearchFilter> usedSearchFilters();
+
     public abstract LinkedHashSet<String> fieldsInOrder();
 
     public abstract List<Decorator> decorators();
@@ -81,6 +85,8 @@ public abstract class ExportMessagesCommand {
         public abstract Builder timeRange(AbsoluteRange timeRange);
 
         public abstract Builder streams(Set<String> streams);
+
+        public abstract Builder usedSearchFilters(final Collection<UsedSearchFilter> usedSearchFilters);
 
         public Builder streams(String... streams) {
             return streams(ImmutableSet.copyOf(streams));
@@ -113,6 +119,7 @@ public abstract class ExportMessagesCommand {
                     .timeRange(defaultTimeRange())
                     .streams(DEFAULT_STREAMS)
                     .queryString(DEFAULT_QUERY)
+                    .usedSearchFilters(List.of())
                     .fieldsInOrder(DEFAULT_FIELDS)
                     .decorators(Collections.emptyList())
                     .chunkSize(DEFAULT_CHUNK_SIZE)

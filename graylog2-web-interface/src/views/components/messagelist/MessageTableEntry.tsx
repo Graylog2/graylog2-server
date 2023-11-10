@@ -31,6 +31,9 @@ import { MESSAGE_FIELD } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { InputsStore } from 'stores/inputs/InputsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -50,11 +53,11 @@ export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: bool
     border-top: 0;
 
     ${$expanded ? css`
-      border-left: 7px solid ${theme.colors.variant.light.info};
+  border-left: 7px solid ${theme.colors.variant.light.info};
 ` : ''}
 
     ${$highlighted ? css`
-      border-left: 7px solid ${theme.colors.variant.light.success};
+  border-left: 7px solid ${theme.colors.variant.light.success};
 ` : ''}
   }
 `);
@@ -131,6 +134,7 @@ const MessageTableEntry = ({
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
+  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = Immutable.List<Stream>(streamsList);
@@ -141,8 +145,8 @@ const MessageTableEntry = ({
     const isSelectingText = !!window.getSelection()?.toString();
 
     if (!isSelectingText) {
-      sendTelemetry('input_button_toggle', {
-        app_pathname: 'search',
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_DETAILS_TOGGLED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'widget',
         app_action_value: 'widget-message-table-toggle-details',
       });

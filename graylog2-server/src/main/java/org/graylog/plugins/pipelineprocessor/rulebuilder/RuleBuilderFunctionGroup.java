@@ -33,6 +33,10 @@ public enum RuleBuilderFunctionGroup {
     HASH("Hash Functions", 39),
     SYSLOG("Syslog Functions", 40),
     EXTRACTORS("Extractor Functions", 50),
+    ARRAY("Array Functions", 60),
+    WATCHLIST("Watchlist Functions", 70),
+    ASSET("Asset Functions", 80),
+    THREATINTEL("Threat Intelligence Functions", 90),
     OTHER("Other", 999);
 
     private String name;

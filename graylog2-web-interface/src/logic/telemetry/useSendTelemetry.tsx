@@ -25,7 +25,7 @@ const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
   const route = useRoutePattern();
 
-  return useCallback((eventType: TelemetryEventType|string, event: Optional<TelemetryEvent, 'app_path_pattern'>) => sendTelemetry(
+  return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => sendTelemetry(
     eventType,
     { app_path_pattern: route, ...event },
   ), [sendTelemetry, route]);

@@ -16,6 +16,11 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-public interface PreflightConfig {
-    PreflightConfigResult result();
+/**
+ * We don't need this wrapper anymore, we could directly return the results itself. This needs some FE changes
+ * that should happen in the same PR.
+ * @param result
+ */
+@Deprecated
+public record PreflightConfig(PreflightConfigResult result) {
 }

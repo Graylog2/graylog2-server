@@ -33,6 +33,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const Flex = styled.div`
   display: flex;
@@ -112,7 +113,7 @@ const RulesPage = () => {
     <ButtonToolbar className="pull-right">
       <Button bsStyle="success"
               onClick={() => {
-                sendTelemetry('Pipeline Create Rule Clicked', {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_RULE_CLICKED, {
                   app_pathname: getPathnameWithoutId(pathname),
                   app_section: 'pipeline-rules',
                   app_action_value: 'create-rule-button',

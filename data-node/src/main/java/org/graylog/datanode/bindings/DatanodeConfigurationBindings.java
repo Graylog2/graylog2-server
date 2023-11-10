@@ -19,10 +19,16 @@ package org.graylog.datanode.bindings;
 import com.google.inject.AbstractModule;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
+import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog.datanode.configuration.OpensearchDistributionProvider;
+import org.graylog.datanode.OpensearchDistribution;
 
 public class DatanodeConfigurationBindings extends AbstractModule {
     @Override
     protected void configure() {
+        bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(DatanodeConfiguration.class).toProvider(DatanodeConfigurationProvider.class);
+        bind(OpensearchDistribution.class).toProvider(OpensearchDistributionProvider.class);
     }
 }

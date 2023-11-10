@@ -79,6 +79,7 @@ import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
@@ -268,7 +269,7 @@ public abstract class CmdLineTool implements CliCommand {
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        pluginLoader = new PluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
+        pluginLoader = getPluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
 
         installCommandConfig();
         installPluginBootstrapConfig(pluginLoader);
@@ -319,12 +320,16 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
 
-        addInstrumentedAppender(metricRegistry, logLevel);
+        addInstrumentedAppender(metricRegistry);
         // Report metrics via JMX.
         final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build();
         reporter.start();
 
         startCommand();
+    }
+
+    protected PluginLoader getPluginLoader(File pluginDir, ChainingClassLoader classLoader) {
+        return new PluginLoader(pluginDir, classLoader);
     }
 
     private void installPluginBootstrapConfig(PluginLoader pluginLoader) {
@@ -391,13 +396,13 @@ public abstract class CmdLineTool implements CliCommand {
         context.updateLoggers(config);
     }
 
-    private void addInstrumentedAppender(final MetricRegistry metrics, final Level level) {
+    private void addInstrumentedAppender(final MetricRegistry metrics) {
         final InstrumentedAppender appender = new InstrumentedAppender(metrics, null, null, false);
         appender.start();
 
         final LoggerContext context = (LoggerContext) LogManager.getContext(false);
         final org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
-        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, level, null);
+        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, null, null);
         context.updateLoggers(config);
     }
 
