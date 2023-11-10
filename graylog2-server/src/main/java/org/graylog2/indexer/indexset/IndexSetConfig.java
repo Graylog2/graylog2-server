@@ -19,7 +19,6 @@ package org.graylog2.indexer.indexset;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
@@ -47,9 +46,6 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-// Ignore deprecated "default" message field. Only relevant for Graylog 2.2.0-beta.[12] users.
-// TODO: Remove in Graylog 3.0.0
-@JsonIgnoreProperties({"default"})
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
           readPermission = INDEXSETS_READ)
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {

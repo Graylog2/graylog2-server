@@ -17,6 +17,8 @@
 package org.graylog2.bootstrap.preflight.web;
 
 import org.graylog2.Configuration;
+import org.graylog2.bootstrap.preflight.PreflightConfig;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 
 import javax.inject.Inject;
@@ -56,10 +58,15 @@ public class PreflightBoot {
             return false;
         }
 
-        if (preflightConfigServiceIf.getPersistedConfig().isPresent()) {
+        if (preflightFinishedOrSkipped()) {
             return false;
         }
 
         return true;
+    }
+
+    private boolean preflightFinishedOrSkipped() {
+        final PreflightConfigResult result = preflightConfigServiceIf.getPreflightConfigResult();
+        return result == PreflightConfigResult.FINISHED || result == PreflightConfigResult.SKIPPED;
     }
 }

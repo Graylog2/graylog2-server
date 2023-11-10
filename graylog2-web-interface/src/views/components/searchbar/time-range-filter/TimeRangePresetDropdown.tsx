@@ -29,6 +29,9 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import ToolsStore from 'stores/tools/ToolsStore';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 type PresetOption = {
   eventKey?: TimeRange,
@@ -123,23 +126,32 @@ type Props = {
   onChange?: (timerange: TimeRange) => void,
 };
 
-const TimeRangePresetDropdown = ({ disabled, onChange, onToggle: onToggleProp, className, displayTitle, bsSize, header }: Props) => {
+const TimeRangePresetDropdown = ({
+  disabled,
+  onChange,
+  onToggle: onToggleProp,
+  className,
+  displayTitle,
+  bsSize,
+  header,
+}: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { formatTime } = useUserDateTime();
+  const location = useLocation();
   const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled);
 
   const _onChange = useCallback((timerange: TimeRange) => {
     if (timerange !== null && timerange !== undefined) {
-      sendTelemetry('input_value_change', {
-        app_pathname: 'search',
-        app_section: 'search-bar',
-        app_action_value: 'timerange-preset-selector',
-        event_details: { timerange },
-      });
-
       onChange(onInitializingTimerange(timerange, formatTime));
     }
-  }, [formatTime, onChange, sendTelemetry]);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_SELECTED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_section: 'search-bar',
+      app_action_value: 'timerange-preset-selector',
+      event_details: { timerange },
+    });
+  }, [formatTime, location.pathname, onChange, sendTelemetry]);
 
   const onToggle = useCallback(async (isOpen: boolean) => {
     if (typeof onToggleProp === 'function') {

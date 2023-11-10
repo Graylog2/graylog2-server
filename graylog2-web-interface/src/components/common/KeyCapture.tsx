@@ -14,31 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
-import { useEffect } from 'react';
-import Mousetrap from 'mousetrap';
+import React from 'react';
+import type { PropsWithChildren } from 'react';
 
-type Props = {
-  children?: React.ReactElement,
-  shortcuts: { [key: string ]: () => void },
-}
+import type { HotkeysProps } from 'hooks/useHotkey';
+import useHotkey from 'hooks/useHotkey';
 
-const _executeForEachKey = (shortcuts, callback) => Object.entries(shortcuts).forEach(([key, onKeyPress]) => callback(key, onKeyPress));
+type Props = PropsWithChildren<{
+  shortcuts: Array<HotkeysProps>,
+}>;
 
-const KeyCapture = ({ children, shortcuts } : Props) => {
-  useEffect(() => {
-    _executeForEachKey(shortcuts, (key, onKeyPress) => Mousetrap.bind(key, onKeyPress));
+const HotkeyComponent = ({ shortcut }: { shortcut: HotkeysProps }) => {
+  useHotkey(shortcut);
 
-    return () => {
-      _executeForEachKey(shortcuts, (key) => Mousetrap.unbind(key));
-    };
-  }, [shortcuts]);
+  return null;
+};
 
-  if (!children) {
-    return null;
-  }
+const KeyCapture = ({ children, shortcuts } : Props) => (
+  <>
+    {shortcuts.map((shortcut) => <HotkeyComponent key={`${shortcut.scope}.${shortcut.actionKey}`} shortcut={shortcut} />)}
+    {children}
+  </>
+);
 
-  return children;
+KeyCapture.defaultProps = {
+  children: null,
 };
 
 export default KeyCapture;

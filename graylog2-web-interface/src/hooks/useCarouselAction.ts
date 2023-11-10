@@ -15,14 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import EmblaCarousel from 'embla-carousel';
-import { useCallback, useMemo, useEffect, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 
 const useCarouselAction = (carouselElementClass: string) => {
   const [carousel, setCarousel] = useState<HTMLElement>(undefined);
 
   useEffect(() => {
-    setCarousel(document.querySelector<HTMLElement>(carouselElementClass));
-  }, [carouselElementClass]);
+    if (!carousel) {
+      setInterval(() => {
+        setCarousel(document.querySelector<HTMLElement>(carouselElementClass));
+      }, 200);
+    }
+  }, [carousel, carouselElementClass]);
 
   const emblaApi = useMemo(() => carousel && EmblaCarousel(carousel, { containScroll: 'trimSnaps' }), [carousel]);
 

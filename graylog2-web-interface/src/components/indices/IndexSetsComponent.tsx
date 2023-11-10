@@ -30,7 +30,10 @@ import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSetsStoreState, IndexSet, IndexSetStats } from 'stores/indices/IndexSetsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const IndexSetsComponent = () => {
   const DEFAULT_PAGE_NUMBER = 1;
@@ -39,6 +42,7 @@ const IndexSetsComponent = () => {
   const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } = useStore<IndexSetsStoreState>(IndexSetsStore);
   const { page, resetPage }: PaginationQueryParameterResult = usePaginationQueryParameter();
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   const [statsEnabled, setStatsEnabled] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>(undefined);
@@ -83,8 +87,8 @@ const IndexSetsComponent = () => {
   };
 
   const onSetDefault = (indexSet: IndexSet) => () => {
-    sendTelemetry('click', {
-      app_pathname: 'indices',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_DEFAULT_SET, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'index-sets',
       app_action_value: 'set-default-index-set',
     });
@@ -97,8 +101,8 @@ const IndexSetsComponent = () => {
   };
 
   const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {
-    sendTelemetry('form_submit', {
-      app_pathname: 'indices',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_DELETED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'index-sets',
       app_action_value: 'delete-index-set',
     });

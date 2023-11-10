@@ -53,9 +53,9 @@ const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => cs
   cursor: pointer;
   display: flex;
   align-items: center;
-  margin: 0px;
+  margin: 0;
   height: ${theme.spacings.xl};
-  background-color: ${$hovered ? '#f5f5f5' : 'transparent'};
+  background-color: ${$hovered ? theme.colors.table.backgroundHover : 'transparent'};
   border-left: solid 1px ${theme.colors.gray[80]};
 `);
 
@@ -76,7 +76,7 @@ const ErrorMessage = styled.p(({ theme }) => css`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  margin: 0px;
+  margin: 0;
 `);
 
 const ActionsContainer = styled.div`

@@ -111,18 +111,20 @@ public class JerseyService extends AbstractIdleService {
 
     @Subscribe
     public synchronized void handleOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) throws Exception {
-        LOG.info("Opensearch config changed, restarting jersey service to apply security changes");
+        if(apiHttpServer == null) {
+            // this is the very first start of the jersey service
+            LOG.info("Starting Data node REST API");
+        } else {
+            // jersey service has been running for some time, now we received new configuration. We'll reboot the service
+            LOG.info("Server configuration changed, restarting Data node REST API to apply security changes");
+        }
         shutDown();
         doStartup(extractSslConfiguration(event.config()));
     }
 
-    /**
-     * TODO: replace this map magic with proper types in OpensearchConfiguration
-     */
     private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
         final OpensearchSecurityConfiguration securityConfiguration = config.opensearchSecurityConfiguration();
         if (securityConfiguration != null && securityConfiguration.securityEnabled()) {
-            // caution, this path is relative to the opensearch config directory!
             return buildSslEngineConfigurator(securityConfiguration.getHttpCertificate());
         } else {
             return null;
@@ -144,7 +146,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void shutDown() {
-        shutdownHttpServer(apiHttpServer, configuration.getHttpBindAddress());
+        shutdownHttpServer(apiHttpServer, HostAndPort.fromParts(configuration.getBindAddress(), configuration.getDatanodeHttpPort()));
     }
 
     private void shutdownHttpServer(HttpServer httpServer, HostAndPort bindAddress) {
@@ -155,13 +157,12 @@ public class JerseyService extends AbstractIdleService {
     }
 
     private void startUpApi(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
-        final HostAndPort bindAddress = configuration.getHttpBindAddress();
         final String contextPath = configuration.getHttpPublishUri().getPath();
         final URI listenUri = new URI(
                 configuration.getUriScheme(),
                 null,
-                bindAddress.getHost(),
-                bindAddress.getPort(),
+                configuration.getBindAddress(),
+                configuration.getDatanodeHttpPort(),
                 isNullOrEmpty(contextPath) ? "/" : contextPath,
                 null,
                 null
@@ -178,7 +179,7 @@ public class JerseyService extends AbstractIdleService {
 
         apiHttpServer.start();
 
-        LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
+        LOG.info("Started REST API at <{}:{}>", configuration.getBindAddress(), configuration.getDatanodeHttpPort());
     }
 
     private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {

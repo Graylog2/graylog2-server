@@ -14,13 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+import type { SystemConfigurationComponentProps } from 'views/types';
+import type { RetentionJsonSchema } from 'components/indices/Types';
+
 type IndexRetentionConfigProp = object;
 
-type IndexRetentionConfigComponentProps = {
+interface IndexRetentionConfigComponentProps extends SystemConfigurationComponentProps {
   config: IndexRetentionConfig;
-  jsonSchema: object;
+  jsonSchema: RetentionJsonSchema;
   updateConfig: (update: IndexRetentionConfigProp) => void;
-};
+  useMaxNumberOfIndices: () => [
+    number | undefined,
+    React.Dispatch<React.SetStateAction<number>>
+  ]
+}
 
 type IndexRetentionSummaryComponentProps = {
   config: IndexRetentionConfig;

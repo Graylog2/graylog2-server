@@ -29,6 +29,7 @@ const defaultComponentIgnore = [
 ];
 
 module.exports = {
+  skipComponentsWithoutExample: true,
   require: [
     'core-js/stable',
     'regenerator-runtime/runtime',
@@ -71,6 +72,10 @@ module.exports = {
     {
       name: 'UX Patterns - Best Practices',
       content: 'docs/ux-patterns.md',
+    },
+    {
+      name: 'Common functionality',
+      content: 'docs/common-functionality.md',
     },
     {
       name: 'Shared Components',

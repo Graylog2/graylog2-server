@@ -25,6 +25,7 @@ import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import Errors from './Errors';
 import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
@@ -52,10 +53,10 @@ const BlockDescription = styled.p(({ theme }) => css`
 `);
 
 const SelectedBlock = styled.div(({ theme }) => css`
-  border-left:  1px solid ${theme.colors.gray['90']};
-  border-right:  1px solid ${theme.colors.gray['90']};
-  border-bottom:  1px solid ${theme.colors.gray['90']};
-  border-radius: 0px 0px 10px 10px;
+  border-left: 1px solid ${theme.colors.gray['90']};
+  border-right: 1px solid ${theme.colors.gray['90']};
+  border-bottom: 1px solid ${theme.colors.gray['90']};
+  border-radius: 0 0 10px 10px;
   padding: ${theme.spacings.md};
 `);
 
@@ -126,12 +127,15 @@ const RuleBlockForm = ({
   }, [selectedBlockDict, existingBlock]);
 
   const handleChange = (option: string, resetForm: () => void) => {
-    sendTelemetry(`Pipeline RuleBuilder New ${type} Selected`, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
-      app_action_value: `select-${type}`,
-      event_details: { option },
-    });
+    sendTelemetry(
+      type === 'condition'
+        ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_CONDITION_SELECTED
+        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_ACTION_SELECTED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'pipeline-rule-builder',
+        app_action_value: `select-${type}`,
+        event_details: { option },
+      });
 
     resetForm();
     onSelect(option);
@@ -142,15 +146,27 @@ const RuleBlockForm = ({
   };
 
   const onSubmit = (values: { [key: string]: any }) => {
-    sendTelemetry(`Pipeline RuleBuilder ${existingBlock ? 'Update' : 'Add'} ${type} Clicked`, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
-      app_action_value: `${existingBlock ? 'update' : 'add'}-${type}-button`,
-    });
-
     if (existingBlock) {
+      sendTelemetry(
+        type === 'condition'
+          ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_CONDITION_CLICKED
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_ACTION_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'pipeline-rule-builder',
+          app_action_value: `update-${type}-button`,
+        });
+
       onUpdate(values, selectedBlockDict?.name);
     } else {
+      sendTelemetry(
+        type === 'condition'
+          ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_CONDITION_CLICKED
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_ACTION_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'pipeline-rule-builder',
+          app_action_value: `add-${type}-button`,
+        });
+
       onAdd(values);
     }
   };

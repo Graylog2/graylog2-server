@@ -19,8 +19,10 @@ package org.graylog.datanode.management;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -38,23 +40,23 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
     private final Provider<OpensearchConfiguration> configurationProvider;
-    private final CustomCAX509TrustManager trustManager;
     private final EventBus eventBus;
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
                                     final Provider<OpensearchConfiguration> configurationProvider,
                                     final EventBus eventBus,
-                                    final CustomCAX509TrustManager trustManager) {
+                                    final CustomCAX509TrustManager trustManager,
+                                    final NodeService nodeService,
+                                    final Configuration configuration) {
         this.configurationProvider = configurationProvider;
-        this.trustManager = trustManager;
-        this.process = createOpensearchProcess(datanodeConfiguration);
         this.eventBus = eventBus;
+        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
         eventBus.register(this);
     }
 
-    private OpensearchProcess createOpensearchProcess(DatanodeConfiguration datanodeConfiguration) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager);
+    private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService nodeService) {
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
@@ -78,7 +80,16 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         if (config.securityConfigured()) {
             this.process.startWithConfig(config);
         } else {
-            LOG.warn("Opensearch process not started. Please provide proper security configuration, using certificate provisioning in the pre-flight mode, by manual certificate creation or by disabling security in the config.");
+
+            String noConfigMessage = """
+                \n
+                ========================================================================================================
+                It seems you are starting Data node for the first time. The current configuration is not sufficient to
+                start the indexer process because a security configuration is missing. You have to either provide http
+                and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
+                ========================================================================================================
+                """;
+            LOG.info(noConfigMessage);
         }
         eventBus.post(new OpensearchConfigurationChangeEvent(config));
     }

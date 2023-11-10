@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.periodicals;
 
+import org.graylog.datanode.Configuration;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -31,12 +32,18 @@ class NodePingPeriodicalTest {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
+        final String cluster = "localhost:9300";
         final NodeService nodeService = Mockito.mock(NodeService.class);
+
+        Configuration configuration = Mockito.mock(Configuration.class);
+        Mockito.when(configuration.getHostname()).thenReturn("localhost");
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
+                configuration,
                 () -> uri,
+                () -> cluster,
                 () -> true
         );
 
@@ -45,7 +52,8 @@ class NodePingPeriodicalTest {
         Mockito.verify(nodeService).markAsAlive(
                 Mockito.eq(nodeID),
                 Mockito.eq(true),
-                Mockito.eq(uri));
+                Mockito.eq(uri),
+                Mockito.eq(cluster));
     }
 
 
@@ -54,15 +62,21 @@ class NodePingPeriodicalTest {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
+        final String cluster = "localhost:9300";
 
         final NodeService nodeService = Mockito.mock(NodeService.class);
 
-        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri);
+        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri, cluster);
+
+        Configuration configuration = Mockito.mock(Configuration.class);
+        Mockito.when(configuration.getHostname()).thenReturn("hostname.setting.from.config");
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
+                configuration,
                 () -> uri,
+                () -> cluster,
                 () -> true
         );
 
@@ -72,7 +86,8 @@ class NodePingPeriodicalTest {
                 Mockito.eq(nodeID.getNodeId()),
                 Mockito.eq(true),
                 Mockito.eq(uri),
-                Mockito.any()
+                Mockito.eq(cluster),
+                Mockito.eq("hostname.setting.from.config")
         );
     }
 }

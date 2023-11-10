@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>6.0.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.graylog.plugins</groupId>
@@ -38,9 +38,6 @@
     <properties>
         <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
         <web.build-dir>${project.build.directory}/web/build</web.build-dir>
-
-        <!-- Dependencies -->
-        <auto-service.version>1.0-rc4</auto-service.version>
 
         <!-- Plugin versions -->
         <jdeb.version>1.10</jdeb.version>
@@ -69,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value</artifactId>
+            <artifactId>auto-value-annotations</artifactId>
             <version>${auto-value.version}</version>
             <scope>provided</scope>
         </dependency>

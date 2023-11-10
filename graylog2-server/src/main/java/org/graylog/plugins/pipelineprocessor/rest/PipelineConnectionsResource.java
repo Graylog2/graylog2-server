@@ -118,7 +118,6 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
             if (!connection.streamIds().contains(pipelineConnection.streamId())) {
                 final Set<String> pipelines = pipelineConnection.pipelineIds();
                 pipelines.remove(connection.pipelineId());
-                pipelineConnection.toBuilder().pipelineIds(pipelines).build();
 
                 updatedConnections.add(pipelineConnection);
                 connectionsService.save(pipelineConnection);
@@ -141,7 +140,6 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
 
             final Set<String> pipelines = updatedConnection.pipelineIds();
             pipelines.add(pipelineId);
-            updatedConnection.toBuilder().pipelineIds(pipelines).build();
 
             updatedConnections.add(updatedConnection);
             connectionsService.save(updatedConnection);

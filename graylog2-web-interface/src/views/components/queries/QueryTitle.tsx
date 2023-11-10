@@ -36,13 +36,13 @@ type Props = {
   active: boolean,
   allowsClosing?: boolean,
   id: QueryId,
-  onClose: () => Promise<void | ViewState>,
+  onRemove: () => Promise<void | ViewState>,
   openEditModal: (title: string) => void,
   openCopyToDashboardModal: (isOpen: boolean) => void,
   title: string,
 };
 
-const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCopyToDashboardModal, title }: Props) => {
+const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCopyToDashboardModal, title }: Props) => {
   const [titleValue, setTitleValue] = useState(title);
   const { setDashboardPage } = useContext(DashboardPageContext);
   const dispatch = useAppDispatch();
@@ -68,7 +68,7 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
             Copy to Dashboard
           </MenuItem>
           <MenuItem divider />
-          <MenuItem onSelect={onClose} disabled={!allowsClosing}>Delete</MenuItem>
+          <MenuItem onSelect={onRemove} disabled={!allowsClosing}>Delete</MenuItem>
         </QueryActionDropdown>
       )}
     </>
@@ -77,7 +77,7 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
 
 QueryTitle.propTypes = {
   allowsClosing: PropTypes.bool,
-  onClose: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   openEditModal: PropTypes.func.isRequired,
 };
