@@ -90,7 +90,7 @@ const Switcher = () => {
   );
 };
 
-const PerspectiveSwitcher = () => {
+const PerspectivesSwitcher = () => {
   const perspectives = usePerspectives();
   const hasPerspectivesFeature = useFeature('frontend_perspectives');
 
@@ -103,4 +103,4 @@ const PerspectiveSwitcher = () => {
   return <Switcher />;
 };
 
-export default PerspectiveSwitcher;
+export default PerspectivesSwitcher;

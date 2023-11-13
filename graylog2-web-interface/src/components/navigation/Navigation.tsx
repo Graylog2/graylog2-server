@@ -30,7 +30,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import { Icon } from 'components/common';
-import PerspectiveSwitcher from 'components/perspectives/PerspectivesSwitcher';
+import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -140,7 +140,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
     <StyledNavbar fluid fixedTop collapseOnSelect>
       <Navbar.Header>
         <Navbar.Brand>
-          <PerspectiveSwitcher />
+          <PerspectivesSwitcher />
         </Navbar.Brand>
         <Navbar.Toggle />
         <DevelopmentHeaderBadge smallScreen />
