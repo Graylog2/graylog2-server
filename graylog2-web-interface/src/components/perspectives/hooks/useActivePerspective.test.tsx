@@ -34,7 +34,7 @@ describe('useActivePerspective', () => {
   it('should return active perspective', async () => {
     const { result } = renderHook(() => useActivePerspective(), { wrapper });
 
-    expect(result.current).toEqual('default');
+    expect(result.current.activePerspective).toEqual('default');
   });
 
   it('should throw error when being used outside of PerspectivesContext', async () => {
