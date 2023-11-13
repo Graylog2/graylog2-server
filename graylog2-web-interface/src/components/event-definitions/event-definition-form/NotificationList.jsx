@@ -21,20 +21,20 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';
 
+const getNotificationPlugin = (type) => {
+  if (type === undefined) {
+    return {};
+  }
+
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
+};
+
 class NotificationList extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
     onAddNotificationClick: PropTypes.func.isRequired,
     onRemoveNotificationClick: PropTypes.func.isRequired,
-  };
-
-  getNotificationPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-
-    return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
   handleRemoveClick = (notificationId) => () => {
@@ -58,7 +58,7 @@ class NotificationList extends React.Component {
       );
     }
 
-    const plugin = this.getNotificationPlugin(notification.config.type);
+    const plugin = getNotificationPlugin(notification.config.type);
 
     return (
       <tr key={notification.id}>
@@ -83,7 +83,7 @@ class NotificationList extends React.Component {
       });
     const addNotificationButton = (
       <Button bsStyle="success" onClick={onAddNotificationClick}>
-        New notification
+        Add notification
       </Button>
     );
 
