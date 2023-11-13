@@ -24,6 +24,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +36,8 @@ import java.util.zip.Checksum;
 @AutoValue
 @JsonAutoDetect
 public abstract class Collector {
+    private static final Logger LOG = LoggerFactory.getLogger(Collector.class);
+
     public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_SERVICE_TYPE = "service_type";
@@ -94,7 +98,12 @@ public abstract class Collector {
     public boolean defaultTemplateUpdated() {
         long crc = checksum(defaultTemplate().getBytes(StandardCharsets.UTF_8));
         if (defaultTemplateCRC() == null) {
-            return (!INITIAL_CRC.contains(crc));
+            if (INITIAL_CRC.contains(crc)) {
+                return false; // known old version
+            } else {
+                LOG.info("{} collector default template on {} is an unrecognized version - not updating automatically.", name(), nodeOperatingSystem());
+                return true;  // changed or really old standard default template
+            }
         }
         return (crc != defaultTemplateCRC());
     }
