@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.management;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
@@ -106,7 +107,7 @@ public class OpensearchRemovalTracer implements StateMachineTracer {
                         clusterClient.putSettings(settings, RequestOptions.DEFAULT);
                 if (response.isAcknowledged()) {
                     allocationExcludeChecked = false; // reset to rejoin cluster in case of failure
-                    executorService = Executors.newSingleThreadScheduledExecutor();
+                    executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("datanode-removal").build());
                     executorService.scheduleAtFixedRate(this::checkRemovalStatus, 10, 10, TimeUnit.SECONDS);
                 } else {
                     process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
