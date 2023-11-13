@@ -57,7 +57,7 @@ public class DatanodeDirectories {
         final DatanodeDirectories directories = new DatanodeDirectories(
                 backwardsCompatible(configuration.getOpensearchDataLocation(), nodeId, "opensearch_data_location"),
                 backwardsCompatible(configuration.getOpensearchLogsLocation(), nodeId, "opensearch_logs_location"),
-                backwardsCompatible(configuration.getDatanodeConfigurationLocation(), nodeId, "config_location"),
+                configuration.getDatanodeConfigurationLocation(),
                 backwardsCompatible(configuration.getOpensearchConfigLocation(), nodeId, "opensearch_config_location")
         );
 
@@ -74,11 +74,8 @@ public class DatanodeDirectories {
      * TODO: Remove in 6.0 release
      */
     @Deprecated(forRemoval = true)
-    @Nullable
-    protected static Path backwardsCompatible(@Nullable Path path, NodeId nodeId, String configProperty) {
-        if (path == null) { // config source path is optional and may be null
-            return null;
-        }
+    @NotNull
+    protected static Path backwardsCompatible(@NotNull Path path, NodeId nodeId, String configProperty) {
         final Path nodeIdSubdir = path.resolve(nodeId.getNodeId());
         if(Files.exists(nodeIdSubdir) && Files.isDirectory(nodeIdSubdir)) {
             LOG.warn("Caution, this datanode instance uses old format of directories. Please configure {} to point directly to {}", configProperty, nodeIdSubdir.toAbsolutePath());
