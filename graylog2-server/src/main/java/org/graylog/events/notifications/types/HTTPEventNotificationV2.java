@@ -129,6 +129,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         final Request.Builder builder = new Request.Builder();
         addAuthHeader(builder, config.basicAuth());
         addApiKey(builder, httpUrl, config.apiKey(), config.apiSecret());
+        addHeaders(builder, config.headers());
 
         final String body;
         try {

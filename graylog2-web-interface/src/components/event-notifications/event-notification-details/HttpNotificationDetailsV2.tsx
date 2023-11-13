@@ -18,6 +18,9 @@ import * as React from 'react';
 
 import { ReadOnlyFormGroup } from 'components/common';
 import type { HttpEventNotificationV2 } from 'components/event-notifications/types';
+import { Well } from 'components/bootstrap';
+
+import styles from '../event-notification-types/EmailNotificationSummary.css';
 
 type Props = {
   notification: HttpEventNotificationV2,
@@ -32,7 +35,15 @@ const HttpNotificationDetailsV2 = ({ notification } : Props) => (
     <ReadOnlyFormGroup label="Method" value={notification.config.method} />
     {notification.config.time_zone && (<ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />)}
     {notification.config.content_type && (<ReadOnlyFormGroup label="Content Type" value={notification.config.content_type} />)}
-    {notification.config.body_template && (<ReadOnlyFormGroup label="Body Template" value={notification.config.body_template} />)}
+    {notification.config.headers && (<ReadOnlyFormGroup label="Headers" value={notification.config.headers} />)}
+    {notification.config.body_template && (
+    <ReadOnlyFormGroup label="Body Template"
+                       value={(
+                         <Well bsSize="small" className={styles.bodyPreview}>
+                           {notification.config.body_template}
+                         </Well>
+    )} />
+    )}
   </>
 );
 

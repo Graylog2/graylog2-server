@@ -76,6 +76,17 @@ public class HTTPNotification {
         }
     }
 
+    public void addHeaders(Request.Builder builder, String headerString) {
+        if (!Strings.isNullOrEmpty(headerString)) {
+            for (String nameVal : headerString.split(";")) {
+                String[] nameValArr = nameVal.split(":", 2);
+                String name = nameValArr[0].trim();
+                String val = nameValArr[1].trim();
+                builder.addHeader(name, val);
+            }
+        }
+    }
+
     private String getBasicAuthHeaderValue(EncryptedValue auth) {
         EncryptedValue basicAuth = auth == null ? EncryptedValue.createUnset() : auth;
         String credentials = encryptedValueService.decrypt(basicAuth);

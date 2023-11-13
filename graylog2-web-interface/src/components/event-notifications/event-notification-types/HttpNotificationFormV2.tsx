@@ -49,6 +49,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     time_zone: 'UTC',
     body_template: '',
     content_type: 'JSON',
+    headers: '',
   };
 
   constructor(props: Props) {
@@ -242,6 +243,18 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                        </Button>
                      ) : undefined} />
             )}
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <Input id="headers"
+                   name="headers"
+                   label={<span>Headers <small className="text-muted">(Optional)</small></span>}
+                   type="text"
+                   onChange={this.handleChange}
+                   bsStyle={validation.errors.headers ? 'error' : null}
+                   help={get(validation, 'errors.headers[0]', 'Semicolon delimited list of HTTP headers to add to the notification')}
+                   value={config.headers} />
           </Col>
         </Row>
         <Row>

@@ -36,6 +36,7 @@ export type HttpNotificationConfigV2 = {
   method: string,
   content_type?: string,
   body_template?: string,
+  headers?: string,
 };
 
 export type HttpNotificationValidationV2 = {

@@ -16,7 +16,10 @@
  */
 import React from 'react';
 
+import { Well } from 'components/bootstrap';
+
 import CommonNotificationSummary from './CommonNotificationSummary';
+import styles from './EmailNotificationSummary.css';
 
 type Props = {
   type: string,
@@ -36,14 +39,28 @@ const HttpNotificationSummaryV2 = ({ type, notification, definitionNotification 
       <td>Method</td>
       <td><code>{notification.config.method}</code></td>
     </tr>
+    {notification.config.content_type && (
     <tr>
       <td>Content Type</td>
       <td><code>{notification.config.content_type}</code></td>
     </tr>
+    )}
+    {notification.config.headers && (
+    <tr>
+      <td>Headers</td>
+      <td><code>{notification.config.headers}</code></td>
+    </tr>
+    )}
+    {notification.config.body_template && (
     <tr>
       <td>Body Template</td>
-      <td><code>{notification.config.body_template}</code></td>
+      <td>
+        <Well bsSize="small" className={styles.bodyPreview}>
+          {notification.config.body_template}
+        </Well>
+      </td>
     </tr>
+    )}
   </CommonNotificationSummary>
 );
 

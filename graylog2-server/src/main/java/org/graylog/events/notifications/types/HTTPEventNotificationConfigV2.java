@@ -50,6 +50,7 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
     public static final String FIELD_METHOD = "method";
     public static final String FIELD_TIME_ZONE = "time_zone";
     public static final String FIELD_CONTENT_TYPE = "content_type";
+    public static final String FIELD_HEADERS = "headers";
     public static final String FIELD_BODY_TEMPLATE = "body_template";
     public static final String FIELD_SKIP_TLS_VERIFICATION = "skip_tls_verification";
     private static final String FIELD_BASIC_AUTH = "basic_auth";
@@ -92,6 +93,10 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
     @Nullable
     public abstract ContentType contentType();
 
+    @JsonProperty(FIELD_HEADERS)
+    @Nullable
+    public abstract String headers();
+
     @JsonProperty(FIELD_BODY_TEMPLATE)
     @Nullable
     public abstract String bodyTemplate();
@@ -121,6 +126,21 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
         }
         if (!Strings.isNullOrEmpty(apiKey()) && (apiSecret() == null || (!apiSecret().isSet()) && !apiSecret().isKeepValue())) {
             validation.addError(FIELD_API_SECRET, "HTTP Notification cannot specify API key without API secret");
+        }
+        if (!Strings.isNullOrEmpty(headers())) {
+            for (String nameVal : headers().split(";")) {
+                String[] nameValArr = nameVal.split(":", 2);
+                if (nameValArr.length != 2) {
+                    validation.addError(FIELD_HEADERS, "Headers must be semi-colon delimited string in the form of 'Header1: Value1; Header2: Value2'");
+                    break;
+                }
+                String name = nameValArr[0].trim();
+                String val = nameValArr[1].trim();
+                if (name.isEmpty() || val.isEmpty()) {
+                    validation.addError(FIELD_HEADERS, "Header names and values cannot be empty.");
+                    break;
+                }
+            }
         }
         if (!httpMethod().equals(HttpMethod.GET) && contentType() == null) {
             validation.addError(FIELD_CONTENT_TYPE, "Content Type must not be null for PUT/POST methods.");
@@ -208,6 +228,9 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
 
         @JsonProperty(FIELD_CONTENT_TYPE)
         public abstract Builder contentType(ContentType contentType);
+
+        @JsonProperty(FIELD_HEADERS)
+        public abstract Builder headers(String headers);
 
         @JsonProperty(FIELD_BODY_TEMPLATE)
         public abstract Builder bodyTemplate(String bodyTemplate);
