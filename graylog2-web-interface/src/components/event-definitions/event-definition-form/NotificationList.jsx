@@ -50,8 +50,8 @@ class NotificationList extends React.Component {
         <tr>
           <td colSpan={2}>Could not find information for Notification <em>{notification.title}</em></td>
           <td className="actions">
-            <Button bsStyle="info" bsSize="xsmall" onClick={this.handleRemoveClick(notification.title)}>
-              Remove from Event
+            <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(notification.title)}>
+              Delete
             </Button>
           </td>
         </tr>
@@ -65,8 +65,8 @@ class NotificationList extends React.Component {
         <td>{notification.title}</td>
         <td>{plugin.displayName || notification.config.type}</td>
         <td className="actions">
-          <Button bsStyle="info" bsSize="xsmall" onClick={this.handleRemoveClick(notification.id)}>
-            Remove from Event
+          <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(notification.id)}>
+            Delete
           </Button>
         </td>
       </tr>
@@ -83,7 +83,7 @@ class NotificationList extends React.Component {
       });
     const addNotificationButton = (
       <Button bsStyle="success" onClick={onAddNotificationClick}>
-        Add Notification
+        New notification
       </Button>
     );
 
