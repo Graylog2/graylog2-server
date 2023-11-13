@@ -49,7 +49,7 @@ public class TestNodeService implements NodeService {
 
     @Override
     public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
-        return nodes.add(new NodeRecord(type, nodeId, isLeader, httpPublishUri.toString(), clusterUri, hostname, DateTime.now(DateTimeZone.UTC)));
+        return nodes.add(new NodeRecord(type, nodeId, isLeader, httpPublishUri.toString(), clusterUri, hostname, DateTime.now(DateTimeZone.UTC), null));
     }
 
     @Override
@@ -94,11 +94,12 @@ public class TestNodeService implements NodeService {
     }
 
     @Override
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress) {
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress, DataNodeStatus dataNodeStatus) {
         throw new UnsupportedOperationException("Unsupported operation");
     }
 
-    record NodeRecord(Type type, String nodeId, boolean isLeader, String transportAddress, String clusterAddress, String hostname, DateTime lastSeen) implements Node {
+    record NodeRecord(Type type, String nodeId, boolean isLeader, String transportAddress, String clusterAddress,
+                      String hostname, DateTime lastSeen, DataNodeStatus dataNodeStatus) implements Node {
 
         @Override
         public String getNodeId() {
@@ -133,6 +134,11 @@ public class TestNodeService implements NodeService {
         @Override
         public String getHostname() {
             return hostname;
+        }
+
+        @Override
+        public DataNodeStatus getDataNodeStatus() {
+            return null;
         }
     }
 }

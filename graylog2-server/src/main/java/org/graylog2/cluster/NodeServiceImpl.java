@@ -181,11 +181,12 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      */
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress) throws NodeNotFoundException {
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress, DataNodeStatus dataNodeStatus) throws NodeNotFoundException {
         BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
         final var params = addClusterUriToMap(Map.of(
                 "is_leader", isLeader,
-                "transport_address", restTransportAddress.toString()
+                "transport_address", restTransportAddress.toString(),
+                "datanode_status", dataNodeStatus.toString()
         ), clusterAddress);
 
         final BasicDBObject update = new BasicDBObject(Map.of(

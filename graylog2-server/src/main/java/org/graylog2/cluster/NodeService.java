@@ -16,7 +16,6 @@
  */
 package org.graylog2.cluster;
 
-import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
@@ -49,9 +48,9 @@ public interface NodeService {
 
     void dropOutdated();
 
-    void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress) throws NodeNotFoundException;
+    void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress, DataNodeStatus dataNodeStatus) throws NodeNotFoundException;
     default void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException {
-        markAsAlive(node, isLeader, restTransportAddress, null);
+        markAsAlive(node, isLeader, restTransportAddress, null, null);
     }
 
     boolean isOnlyLeader(NodeId nodeIde);

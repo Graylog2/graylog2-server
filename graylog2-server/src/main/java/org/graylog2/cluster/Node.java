@@ -53,6 +53,8 @@ public interface Node {
 
     String getHostname();
 
+    DataNodeStatus getDataNodeStatus();
+
     default String getShortNodeId() {
         return getNodeId().split("-")[0];
     }
@@ -61,4 +63,5 @@ public interface Node {
     default String getTitle() {
         return StringUtils.f("%s / %s", getShortNodeId(), getHostname());
     }
+
 }
