@@ -121,6 +121,12 @@ const ListWithOwnState = ({
     }
   }, [activePage, currentPage]);
 
+  useEffect(() => {
+    if (propPageSize !== currentPageSize) {
+      setPagination((cur) => ({ ...cur, pageSize: propPageSize }));
+    }
+  }, [currentPageSize, propPageSize]);
+
   return (
     <ListBase {...props}
               currentPage={currentPage}
