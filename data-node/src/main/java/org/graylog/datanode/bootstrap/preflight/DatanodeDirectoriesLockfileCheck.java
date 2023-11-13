@@ -23,10 +23,16 @@ import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * To prevent two or more datanodes using the same directories, we are writing a datanode.lock files into the dirs.
@@ -58,29 +64,74 @@ public class DatanodeDirectoriesLockfileCheck implements PreflightCheck {
 
     private void checkDatanodeLock(Path dir) {
         final Path lockfile = dir.resolve(DATANODE_LOCKFILE);
-        if (Files.exists(lockfile)) {
-            checkExistingLock(dir, lockfile);
-        } else {
-            writeLockFile(lockfile);
+        try (FileChannel channel = FileChannel.open(lockfile, StandardOpenOption.READ, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+            doCheckLockFile(channel, dir);
+        } catch (IOException e) {
+            throw new DatanodeLockFileException("Failed to open channel to lock file " + lockfile.toAbsolutePath(), e);
         }
     }
 
-    private void checkExistingLock(Path dir, Path lockfile) {
+    private void doCheckLockFile(FileChannel channel, Path dir) {
+        FileLock lock = null;
         try {
-            final String dirLockedFor = Files.readString(lockfile);
-            if(!Objects.equals(nodeId, dirLockedFor)) {
-                throw new DatanodeLockFileException("Directory " + dir + " locked for datanode " + dirLockedFor + ", access with datanode " + nodeId + " rejected. Please check your configuration and make sure that there is only one datanode instance using this directory.");
+            lock = channel.lock();
+            // now we are the only process that can access the lock file.
+            verifyOrCreateLockFile(channel, dir);
+        } catch (IOException e) {
+            throw new DatanodeLockFileException("Failed to obtain lock", e);
+        } finally {
+            releaseLock(lock);
+        }
+    }
+
+    private void verifyOrCreateLockFile(FileChannel channel, Path dir) {
+        readChannel(channel).ifPresentOrElse(
+                lockedForID -> verifyLockFileContent(lockedForID, dir),
+                () -> writeLockFile(channel)
+        );
+    }
+
+    private void releaseLock(FileLock lock) {
+        try {
+            if (lock != null) {
+                lock.release();
             }
         } catch (IOException e) {
-            throw new DatanodeLockFileException("Failed to read lockfile " + lockfile, e);
+            throw new DatanodeLockFileException("Failed to release lock file", e);
         }
     }
 
-    private void writeLockFile(Path lockfile) {
+    private void verifyLockFileContent(String lockedForID, Path dir) {
+        if (!Objects.equals(lockedForID, nodeId)) {
+            throw new DatanodeLockFileException("Directory " + dir + " locked for datanode " + lockedForID + ", access with datanode " + nodeId + " rejected. Please check your configuration and make sure that there is only one datanode instance using this directory.");
+        }
+    }
+
+    private void writeLockFile(FileChannel channel) {
         try {
-            Files.writeString(lockfile, nodeId);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(nodeId.getBytes(StandardCharsets.UTF_8));
+            channel.write(byteBuffer);
         } catch (IOException e) {
-            throw new DatanodeLockFileException("Failed to create datanode lockfile " + lockfile, e);
+            throw new DatanodeLockFileException("Failed to write node ID to the lock file", e);
+        }
+    }
+
+    private Optional<String> readChannel(FileChannel channel) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            int bufferSize = 36;
+            if (bufferSize > channel.size()) {
+                bufferSize = (int) channel.size();
+            }
+            ByteBuffer buff = ByteBuffer.allocate(bufferSize);
+            while (channel.read(buff) > 0) {
+                out.write(buff.array(), 0, buff.position());
+                buff.clear();
+            }
+            final String value = out.toString(StandardCharsets.UTF_8);
+            return Optional.ofNullable(value).filter(v -> !v.isBlank());
+        } catch (IOException e) {
+            throw new DatanodeLockFileException("Failed to read content of lock file", e);
         }
     }
 }
