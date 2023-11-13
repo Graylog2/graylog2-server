@@ -31,6 +31,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
@@ -48,6 +49,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class StreamReferenceFacade extends StreamFacade {
     private static final Logger LOG = LoggerFactory.getLogger(StreamReferenceFacade.class);
@@ -149,6 +152,22 @@ public class StreamReferenceFacade extends StreamFacade {
                     ? "Stream with title <" + streamEntity.title().asString(parameters) + "> does not exist!"
                     : "Multiple Streams with title <" + streamEntity.title().asString(parameters) + "> exist!");
         }
+    }
+
+    @Override
+    public EntityExcerpt createExcerpt(Stream stream) {
+        return EntityExcerpt.builder()
+                .id(ModelId.of(stream.getId()))
+                .type(ModelTypes.STREAM_REF_V1)
+                .title(stream.getTitle())
+                .build();
+    }
+
+    @Override
+    public Set<EntityExcerpt> listEntityExcerpts() {
+        return streamService.loadAll().stream()
+                .map(this::createExcerpt)
+                .collect(Collectors.toSet());
     }
 
     public static Entity resolveStreamEntity(String id, Map<EntityDescriptor, Entity> entities) {
