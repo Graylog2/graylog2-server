@@ -30,7 +30,7 @@ import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFie
 const attributes: Attributes = [
   {
     id: 'field_name',
-    title: 'Field name',
+    title: 'Field Name',
     type: 'STRING',
     sortable: true,
   },

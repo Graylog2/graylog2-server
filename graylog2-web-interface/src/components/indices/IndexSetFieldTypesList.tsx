@@ -21,6 +21,7 @@ import { Button } from 'components/bootstrap';
 import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
 import {
+  HoverForHelp,
   Icon,
   NoEntitiesExist,
   PaginatedList,
@@ -117,20 +118,22 @@ const IndexSetFieldTypesList = () => {
     handleOnOpen(fieldType);
   }, [handleOnOpen]);
 
-  const renderActions = useCallback((fieldType: IndexSetFieldType) => {
-    const title = fieldType.isReserved ? 'Reserved field is not editable' : `Edit field type for ${fieldType.fieldName}`;
-
-    return (
-      <Button onClick={() => openEditModal(fieldType)}
-              role="button"
-              bsSize="xsmall"
-              disabled={fieldType.isReserved}
-              title={title}
-              tabIndex={0}>
-        Edit
-      </Button>
-    );
-  }, [openEditModal]);
+  const renderActions = useCallback((fieldType: IndexSetFieldType) => (
+    <Button onClick={() => openEditModal(fieldType)}
+            role="button"
+            bsSize="xsmall"
+            disabled={fieldType.isReserved}
+            title={`Edit field type for ${fieldType.fieldName}`}
+            tabIndex={0}>
+      Edit {
+          fieldType.isReserved && (
+          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+            We use reserved fields internally and expect a certain structure from them. Changing the field type for reserved fields might impact the stability of Graylog
+          </HoverForHelp>
+          )
+      }
+    </Button>
+  ), [openEditModal]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;

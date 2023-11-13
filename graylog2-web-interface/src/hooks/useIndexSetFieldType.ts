@@ -66,13 +66,13 @@ const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchP
 };
 
 const useIndexSetFieldTypes = (indexSetId: string, searchParams: SearchParams, { enabled }): {
-    data: {
-        list: Readonly<Array<IndexSetFieldType>>,
-        pagination: { total: number },
-        attributes: Array<Attribute>
-    },
-    isLoading: boolean,
-    refetch: () => void,
+  data: {
+    list: Readonly<Array<IndexSetFieldType>>,
+    pagination: { total: number },
+    attributes: Array<Attribute>
+  },
+  isLoading: boolean,
+  refetch: () => void,
 } => {
   const { data, isLoading, refetch } = useQuery(
     ['indexSetFieldTypes', searchParams],
