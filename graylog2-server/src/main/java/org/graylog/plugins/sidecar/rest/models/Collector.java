@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 import org.slf4j.Logger;
@@ -49,14 +48,26 @@ public abstract class Collector {
     public static final String FIELD_DEFAULT_TEMPLATE_CRC = "default_template_crc";
 
     // Set of prior version CRCs for back-compat
-    private static final Set<Long> INITIAL_CRC = ImmutableSet.of(
+    private static final Set<Long> INITIAL_CRC = java.util.Set.of(
             3280545580L, // 5.2 filebeat linux
             3396210381L, // 5.2 filebeat darwin
             3013497446L, // 5.2 filebeat freebsd
             4009863009L, // 5.2 winlogbeat windows
             2023247173L, // 5.2 nxlog linux
             2491201449L, // 5.2 nxlog windows
-            2487909285L  // 5.2 auditbeat windows
+            2487909285L, // 5.2 auditbeat windows
+
+            4049210961L, // 5.1 and 5.0 filebeat linux/darwin/freebsd
+            2306685777L, // 5.1 and 5.0 winlogbeat windows
+            639836274L,  // 5.1 and 5.0 nxlog linux
+            2157898695L, // 5.1 and 5.0 nxlog windows
+            1490581247L, // 5.1 and 5.0 filebeat windows
+
+            1256873081L, // 4.3 filebeat linux
+            3852098581L, // 4.3 winlogbeat windows
+            3676599312L, // 4.3 nxlog linux
+            4293222217L, // 4.3 nxlog windows
+            2559816928L  // 4.3 filebeat windows
     );
 
     @Id
