@@ -26,6 +26,8 @@ import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCaches
 import useScopePermissions from 'hooks/useScopePermissions';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type TitleProps = {
   title: string,
@@ -65,6 +67,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
+  const sendTelemetry = useSendTelemetry();
 
   const plugin = React.useMemo(() => PluginStore.exports('lookupTableCaches').find((p) => p.type === type), [type]);
 
@@ -117,7 +120,17 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
       ? LookupTableCachesActions.create(values)
       : LookupTableCachesActions.update(values);
 
-    return promise.then(() => saved());
+    return promise.then(() => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CACHE_CREATED' : 'CACHE_UPDATED'], {
+        app_pathname: 'lut',
+        app_section: 'lut_cache',
+        event_details: {
+          type: values?.config?.type,
+        },
+      });
+
+      saved();
+    });
   };
 
   const history = useHistory();

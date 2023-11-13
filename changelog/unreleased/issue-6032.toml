@@ -1,0 +1,13 @@
+type = "added"
+message = "Added 4 pipeline functions for general use that were previously only available to Illuminate."
+
+issues = ["Graylog2/graylog-plugin-enterprise#6032"]
+pulls = ["6112"]
+
+details.user = """
+The following pipeline functions were added:
+- array_contains
+- array_remove
+- string_array_add
+- lookup_all
+"""

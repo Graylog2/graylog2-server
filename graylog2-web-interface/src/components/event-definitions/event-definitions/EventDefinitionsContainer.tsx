@@ -26,6 +26,10 @@ import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import SchedulingCell from './SchedulingCell';
@@ -87,6 +91,9 @@ const EventDefinitionsContainer = () => {
     [paginatedEventDefinitions?.attributes],
   );
 
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
     setQuery(newQuery);
@@ -97,18 +104,39 @@ const EventDefinitionsContainer = () => {
   }, [onSearch]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.COLUMNS_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-list',
+      app_action_value: 'columns-select',
+      columns: displayedAttributes,
+    });
+
     updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  }, [pathname, sendTelemetry, updateTableLayout]);
 
   const onPageSizeChange = useCallback((newPageSize: number) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.PAGE_SIZE_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-list',
+      app_action_value: 'page-size-select',
+      page_size: newPageSize,
+    });
+
     paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
     updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
+  }, [paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.SORT_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-list',
+      app_action_value: 'sort-select',
+      sort: newSort,
+    });
+
     paginationQueryParameter.resetPage();
     updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
+  }, [paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
 
   const renderEventDefinitionActions = useCallback((listItem: EventDefinition) => (
     <EventDefinitionActions eventDefinition={listItem} refetchEventDefinitions={refetchEventDefinitions} />

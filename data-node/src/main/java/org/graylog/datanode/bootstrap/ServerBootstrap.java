@@ -198,6 +198,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
 
+        startNodeRegistration(injector);
+
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
         try {
@@ -217,8 +219,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         Runtime.getRuntime().addShutdownHook(new Thread(injector.getInstance(shutdownHook())));
 
         // Start services.
-//        final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
-//        serviceManager.addListener(serviceManagerListener, MoreExecutors.directExecutor());
         try {
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
@@ -239,7 +239,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             Thread.currentThread().join();
         } catch (InterruptedException e) {
-            return;
         }
     }
 
@@ -269,13 +268,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> result = super.getSharedBindingsModules();
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
-//        result.add(new SecurityBindings());
-//        result.add(new ValidatorModule());
-//        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new DatanodeConfigurationBindings());
-//        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 
         return result;
     }

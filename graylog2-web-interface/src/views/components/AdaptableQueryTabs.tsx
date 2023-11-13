@@ -44,18 +44,24 @@ import type { GetState } from 'views/types';
 import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { QueryTabsProps } from './QueryTabs';
 
 interface Props extends QueryTabsProps {
   maxWidth: number,
+
   queryTitleEditModal: React.RefObject<QueryTitleEditModal>
 }
 
 interface TabsTypes {
   navItems: OrderedSet<ReactNode>,
+
   menuItems: OrderedSet<ReactNode>,
+
   lockedItems: OrderedSet<ReactNode>,
+
   queriesList: OrderedSet<{ id: string, title: string }>,
 }
 
@@ -82,7 +88,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
       > a {
         color: ${theme.colors.variant.dark.default};
         border: none;
-        
+
         &:hover,
         &:active,
         &:focus {
@@ -218,13 +224,23 @@ const _onCopyToDashboard = (selectedDashboardId: string | undefined | null) => a
     .then(addPageToDashboard(targetDashboard, view, queryId));
 };
 
-const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove, onSelect, queryTitleEditModal, dashboardId }: Props) => {
+const AdaptableQueryTabs = ({
+  maxWidth,
+  queries,
+  titles,
+  activeQueryId,
+  onRemove,
+  onSelect,
+  queryTitleEditModal,
+  dashboardId,
+}: Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
   const toggleCopyToDashboardModal = useCallback(() => {
     setShowCopyToDashboardModal((cur) => !cur);
@@ -253,7 +269,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
       const tabTitle = (
         <QueryTitle active={id === activeQueryId}
                     id={id}
-                    onClose={() => onRemove(id)}
+                    onRemove={() => onRemove(id)}
                     openEditModal={openTitleEditModal}
                     openCopyToDashboardModal={toggleCopyToDashboardModal}
                     allowsClosing={queries.size > 1}
@@ -327,18 +343,36 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
         <NavItem key="new"
                  eventKey="new"
                  title="Create New Page"
-                 onClick={() => onSelect('new')}
+                 onClick={() => {
+                   sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
+                     app_pathname: 'dashboard',
+                     app_section: 'dashboard',
+                     app_action_value: 'dashboard-create-page-button',
+                   });
+
+                   onSelect('new');
+                 }}
                  className="query-tabs-new">
           <Icon name="plus" />
         </NavItem>
       </StyledQueryNav>
-      <IconButton title="Open pages configuration" name="cog" onClick={() => setShowConfigurationModal(true)} />
+      <IconButton title="Open pages configuration"
+                  name="cog"
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION, {
+                      app_pathname: 'dashboard',
+                      app_section: 'dashboard',
+                      app_action_value: 'dashboard-page-configuration-button',
+                    });
+
+                    setShowConfigurationModal(true);
+                  }} />
       {showConfigurationModal && (
         <AdaptableQueryTabsConfiguration show={showConfigurationModal}
                                          setShow={setShowConfigurationModal}
+                                         dashboardId={dashboardId}
                                          queriesList={currentTabs.queriesList}
-                                         activeQueryId={activeQueryId}
-                                         dashboardId={dashboardId} />
+                                         activeQueryId={activeQueryId} />
       )}
       {showCopyToDashboardModal && (
         <CopyToDashboardForm onSubmit={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}

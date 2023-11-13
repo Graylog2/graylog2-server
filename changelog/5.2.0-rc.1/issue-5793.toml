@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixes search export, so that it takes search filters into consideration."
+
+issues = ["5793"]
+pulls = ["16896"]

@@ -108,7 +108,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -333,7 +332,7 @@ public class Server extends ServerBootstrap {
                             GracefulShutdown gracefulShutdown,
                             AuditEventSender auditEventSender,
                             Journal journal,
-                            @Named("LeaderElectionService") Service leaderElectionService) {
+                            LeaderElectionService leaderElectionService) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.nodeId = nodeId;
