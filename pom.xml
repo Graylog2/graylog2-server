@@ -372,6 +372,22 @@
                 <artifactId>okhttp-tls</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
+            <!-- Explicitly manage avro to fix CVE-2023-39410. We are using this only as a transitive dependency in
+                 plugins. Remove once its usages are updated and the fixed version is pulled in automatically. -->
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>1.11.3</version>
+            </dependency>
+            <!-- Explicitly manage commons-compress to fix CVE-2023-42503. We are using this only as a transitive
+                 dependency in plugins. Remove once its usages are updated and the fixed version is pulled in
+                 automatically. -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.24.0</version>
+            </dependency>
+
             <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
