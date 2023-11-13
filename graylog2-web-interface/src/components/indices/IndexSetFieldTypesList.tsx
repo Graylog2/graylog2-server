@@ -119,36 +119,38 @@ const IndexSetFieldTypesList = () => {
     handleOnOpen(fieldType);
   }, [handleOnOpen]);
 
-    const openDeletingModal = useCallback((fields: Array<string>) => {
-        setDeletingFieldTypes(fields);
-    }, []);
-    const onCloseDeleting = useCallback(() => setDeletingFieldTypes(null), []);
+  const openDeletingModal = useCallback((fields: Array<string>) => {
+    setDeletingFieldTypes(fields);
+  }, []);
+  const onCloseDeleting = useCallback(() => setDeletingFieldTypes(null), []);
 
   const renderActions = useCallback((fieldType: IndexSetFieldType) => {
     const title = fieldType.isReserved ? 'Reserved field is not editable' : `Edit field type for ${fieldType.fieldName}`;
 
     return (
-        <>
-      <Button onClick={() => openEditModal(fieldType)}
-              role="button"
-              bsSize="xsmall"
-              disabled={fieldType.isReserved}
-              title={title}
-              tabIndex={0}>
-        Edit
-      </Button>
+      <>
+        <Button onClick={() => openEditModal(fieldType)}
+                role="button"
+                bsSize="xsmall"
+                disabled={fieldType.isReserved}
+                title={title}
+                tabIndex={0}>
+          Edit
+        </Button>
         {fieldType.isCustom && (
-            <Button onClick={() => openDeletingModal([fieldType.fieldName])}
-                    role="button"
-                    bsSize="xsmall"
-                    bsStyle="danger"
-                    title="Remove custom type"
-                    tabIndex={0}>
-                Remove
-            </Button>
+          <Button onClick={() => openDeletingModal([fieldType.fieldName])}
+                  role="button"
+                  bsSize="xsmall"
+                  bsStyle="danger"
+                  title="Remove custom type"
+                  tabIndex={0}>
+            Remove
+          </Button>
         )}
-    </>
-  )}, [openDeletingModal, openEditModal]);
+      </>
+    );
+  }, [openDeletingModal, openEditModal]);
+  const indexSetsDeleting = useMemo(() => [indexSetId], [indexSetId]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
