@@ -2,4 +2,4 @@ type = "c"
 message = "Enable sidecar default configurations to be updated on existing installs."
 
 issues = ["17040"]
-pulls = ["9999"]
+pulls = ["17246"]
