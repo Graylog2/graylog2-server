@@ -93,7 +93,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchConfigLocation = Path.of("datanode/config");
 
-    @Parameter(value = "config_location", validators = DirectoryPathReadableValidator.class)
+    @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
     private Path configLocation = null;
 
     @Parameter(value = "process_logs_buffer_size")
