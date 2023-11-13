@@ -28,6 +28,7 @@ import org.mongojack.DBSort;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -102,7 +103,7 @@ public class CollectorService extends PaginatedDbService<Collector> {
                 request.executeParameters(),
                 request.validationParameters(),
                 request.defaultTemplate(),
-                request.defaultTemplateCRC());
+                request.defaultTemplate() == null ? null : Collector.checksum(request.defaultTemplate().getBytes(StandardCharsets.UTF_8)));
     }
 
     public Collector fromRequest(String id, Collector request) {

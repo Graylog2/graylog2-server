@@ -107,6 +107,10 @@ public abstract class Collector {
 
     @JsonIgnore
     public boolean defaultTemplateUpdated() {
+        if (defaultTemplate() == null) {
+            return false;
+        }
+
         long crc = checksum(defaultTemplate().getBytes(StandardCharsets.UTF_8));
         if (defaultTemplateCRC() == null) {
             if (INITIAL_CRC.contains(crc)) {
