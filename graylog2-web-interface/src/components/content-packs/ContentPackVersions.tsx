@@ -69,12 +69,10 @@ ContentPackVersions.propTypes = {
 };
 
 ContentPackVersions.defaultProps = {
-  onChange: () => {
-  },
-  onDeletePack: () => {
-  },
-  onInstall: () => {
-  },
+  onChange: () => {},
+  onDeletePack: () => {},
+  onInstall: () => {},
 };
 
 export default ContentPackVersions;
+

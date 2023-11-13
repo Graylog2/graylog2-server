@@ -43,10 +43,8 @@ describe('<ContentPackListItem />', () => {
     render(
       <ContentPackListItem pack={pack}
                            contentPackMetadata={metadata}
-                           onDeletePack={() => {
-                           }}
-                           onInstall={() => {
-                           }} />);
+                           onDeletePack={() => {}}
+                           onInstall={() => {}} />);
 
     await screen.findByText('SSH Archive');
   });
@@ -58,8 +56,7 @@ describe('<ContentPackListItem />', () => {
       <ContentPackListItem pack={pack}
                            contentPackMetadata={metadata}
                            onDeletePack={deleteFn}
-                           onInstall={() => {
-                           }} />);
+                           onInstall={() => {}} />);
 
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
 
@@ -73,8 +70,7 @@ describe('<ContentPackListItem />', () => {
       <ContentPackListItem pack={pack}
                            contentPackMetadata={metadata}
                            onDeletePack={deleteFn}
-                           onInstall={() => {
-                           }} />);
+                           onInstall={() => {}} />);
 
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
 

@@ -70,7 +70,7 @@ const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onI
     setFilteredContentPacks(filteredItems);
   };
 
-  const itemsShownChange = (pageSize: number) => {
+  const onItemsShownChange = (pageSize: number) => {
     setPaginationOption({ ...paginationOption, perPage: pageSize });
   };
 
@@ -87,7 +87,7 @@ const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onI
   );
 
   const pageSizeSelect = (
-    <StyledPageSizeSelect onChange={itemsShownChange}
+    <StyledPageSizeSelect onChange={onItemsShownChange}
                           pageSize={paginationOption.perPage}
                           pageSizes={[10, 25, 50, 100]} />
   );
@@ -95,6 +95,7 @@ const ContentPacksList = ({ contentPacks, contentPackMetadata, onDeletePack, onI
   const noContentMessage = contentPacks.length <= 0
     ? <NoEntitiesExist>No content packs found. Please create or upload one</NoEntitiesExist>
     : <NoSearchResult>No matching content packs have been found</NoSearchResult>;
+
   const content = filteredContentPacks.length <= 0
     ? (<div className="has-bm">{noContentMessage}</div>)
     : (
