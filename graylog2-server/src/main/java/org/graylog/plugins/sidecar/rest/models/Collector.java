@@ -122,7 +122,6 @@ public abstract class Collector {
         public abstract Builder executeParameters(String executeParameters);
         public abstract Builder validationParameters(String validationParameters);
         public abstract Builder defaultTemplate(String defaultTemplate);
-
         public abstract Builder defaultTemplateCRC(Long checksum);
         public abstract Collector build();
     }

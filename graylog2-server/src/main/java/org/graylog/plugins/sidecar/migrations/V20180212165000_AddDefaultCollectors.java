@@ -82,7 +82,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     @Override
     public void upgrade() {
-
         removeConfigPath();
         ensureConfigurationVariable("graylog_host", "Graylog Host.", httpExternalUri.getHost());
 
@@ -505,15 +504,18 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 throw new IllegalArgumentException();
             }
             if (!collector.defaultTemplateUpdated()) {
-                LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
-                try {
-                    return Optional.of(collectorService.save(
-                            collector.toBuilder()
-                                    .defaultTemplate(defaultTemplate)
-                                    .defaultTemplateCRC(Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8)))
-                                    .build()));
-                } catch (Exception e) {
-                    LOG.error("Can't save collector '{}'!", collectorName, e);
+                long newCRC = Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8));
+                if (newCRC != collector.defaultTemplateCRC()) {
+                    LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
+                    try {
+                        return Optional.of(collectorService.save(
+                                collector.toBuilder()
+                                        .defaultTemplate(defaultTemplate)
+                                        .defaultTemplateCRC(Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8)))
+                                        .build()));
+                    } catch (Exception e) {
+                        LOG.error("Can't save collector '{}'!", collectorName, e);
+                    }
                 }
             }
         } catch (IllegalArgumentException ignored) {
