@@ -75,4 +75,3 @@ ContentPackVersions.defaultProps = {
 };
 
 export default ContentPackVersions;
-
