@@ -125,6 +125,7 @@ interface ProviderType {
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     systemnavigation?: Array<SystemNavigationItem>;
     globalNotifications?: Array<GlobalNotification>

@@ -111,6 +111,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
   const { activePerspective } = useActivePerspective();
   const { permissions, fullName, readOnly, id: userId } = currentUser || {};
 
+  const defaultPluginExports = PluginStore.exports('defaultNavigation');
   const pluginExports = PluginStore.exports('navigation');
 
   const enterpriseMenuIsMissing = !pluginMenuItemExists(ENTERPRISE_ROUTE_DESCRIPTION);
@@ -134,6 +135,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
     });
   }
 
+  const defaultPluginNavigations = defaultPluginExports
+    .map((pluginRoute) => formatPluginRoute(pluginRoute, currentUser.permissions, pathname));
+
   const pluginNavigations = filterByPerspective(pluginExports, activePerspective)
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map((pluginRoute) => formatPluginRoute(pluginRoute, currentUser.permissions, pathname, activePerspective));
@@ -151,21 +155,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav className="navbar-main">
-          <LinkContainer relativeActive to={Routes.SEARCH}>
-            <NavItem to="search">Search</NavItem>
-          </LinkContainer>
-
-          <LinkContainer relativeActive to={Routes.STREAMS}>
-            <NavItem>Streams</NavItem>
-          </LinkContainer>
-
-          <LinkContainer relativeActive to={Routes.ALERTS.LIST}>
-            <NavItem>Alerts</NavItem>
-          </LinkContainer>
-
-          <LinkContainer relativeActive to={Routes.DASHBOARDS}>
-            <NavItem>Dashboards</NavItem>
-          </LinkContainer>
+          {defaultPluginNavigations}
 
           {pluginNavigations}
 
