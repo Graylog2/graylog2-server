@@ -33,6 +33,7 @@ import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import TelemetryInit from 'logic/telemetry/TelemetryInit';
 import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
+import PerspectivesBindings from 'components/perspectives/bindings';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
@@ -40,6 +41,7 @@ PluginStore.register(new PluginManifest({}, ViewsBindings));
 PluginStore.register(new PluginManifest({}, ThreatIntelBindings));
 PluginStore.register(new PluginManifest({}, AwsBindings));
 PluginStore.register(new PluginManifest({}, IntegrationsBindings));
+PluginStore.register(new PluginManifest({}, PerspectivesBindings));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(

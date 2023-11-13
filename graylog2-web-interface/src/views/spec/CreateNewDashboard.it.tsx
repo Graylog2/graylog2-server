@@ -83,6 +83,22 @@ jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>
 
 jest.unmock('logic/rest/FetchProvider');
 
+jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
+  data: 'PT1S',
+  isInitialLoading: false,
+}));
+
+jest.mock('hooks/useSearchConfiguration', () => () => ({
+  config: {
+    auto_refresh_timerange_options: {
+      PT1S: '1 second',
+      PT1M: 'Only a minute',
+    },
+    default_auto_refresh_option: 'PT5S',
+  },
+  refresh: jest.fn(),
+}));
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   createBrowserRouter: jest.fn(),

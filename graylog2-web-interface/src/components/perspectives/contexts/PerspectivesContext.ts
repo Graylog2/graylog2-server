@@ -14,16 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export {
-  Anchor,
-  Box,
-  Grid,
-  Divider,
-  Group,
-  Header,
-  NumberInput,
-  Text,
-  UnstyledButton,
-  Collapse,
-} from '@mantine/core';
+import { singleton } from 'logic/singleton';
+import type { Perspective } from 'components/perspectives/types';
+
+type PerspectivesContextType = {
+  activePerspective: string,
+  availablePerspectives: Array<Perspective>
+  setActivePerspective: (perspectiveId: string) => void
+}
+
+const PerspectivesContext = React.createContext<PerspectivesContextType | undefined>(undefined);
+
+export default singleton('contexts.PerspectivesContext', () => PerspectivesContext);

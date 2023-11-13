@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { Menu as MantineMenu, type MenuTargetProps } from '@mantine/core';
+import { useContext } from 'react';
 
-const MenuTarget = ({ children, ...otherProps }: MenuTargetProps) => (
-  <MantineMenu.Target {...otherProps}>
-    {children}
-  </MantineMenu.Target>
-);
+import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 
-export default MenuTarget;
+const useAutoRefresh = () => {
+  const autoRefresh = useContext(AutoRefreshContext);
+
+  if (!autoRefresh) {
+    throw new Error('useAutoRefresh hook needs to be used inside AutoRefreshContext.Provider');
+  }
+
+  return autoRefresh;
+};
+
+export default useAutoRefresh;

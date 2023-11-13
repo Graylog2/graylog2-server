@@ -1,0 +1,37 @@
+{
+  "loggedOnUsers": [
+    {
+      "accountName": "user01",
+      "domainName": "DESKTOP"
+    }
+  ],
+  "evidence": [
+    {
+      "accountName": "Administrator",
+      "detectionStatus": "Detected"
+    },
+    {
+      "accountName": "Administrator",
+      "detectionStatus": "Detected"
+    },
+    {
+      "accountName": "Administrator",
+      "detectionStatus": "Detected"
+    },
+    {
+      "accountName": "Administrator",
+      "detectionStatus": "Detected"
+    }
+  ],
+  "mixedTypes": [
+    {
+      "value": false
+    },
+    {
+      "value": 10
+    },
+    {
+      "value": "text"
+    }
+  ]
+}

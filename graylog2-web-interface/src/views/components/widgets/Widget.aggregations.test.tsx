@@ -63,6 +63,12 @@ jest.mock('views/stores/StreamsStore', () => ({
 
 jest.mock('views/hooks/useViewType');
 
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
+
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
   updateWidget: jest.fn(() => async () => {}),
