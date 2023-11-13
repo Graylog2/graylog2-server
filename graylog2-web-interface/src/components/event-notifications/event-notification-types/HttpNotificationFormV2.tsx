@@ -25,6 +25,8 @@ import { Button, Checkbox, Col, ControlLabel, FormGroup, HelpBlock, Input, Row }
 import * as FormsUtils from 'util/FormsUtils';
 import type { HttpNotificationConfigV2, HttpNotificationValidationV2 } from 'components/event-notifications/types';
 
+import { DEFAULT_JSON_TEMPLATE, DEFAULT_FORM_PARAM_TEMPLATE, DEFAULT_PLAIN_TEXT_TEMPLATE } from './templates';
+
 const StyledButton = styled(Button)`
   clear: both;
   display: block;
@@ -47,7 +49,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     skip_tls_verification: false,
     method: 'POST',
     time_zone: 'UTC',
-    body_template: '',
+    body_template: DEFAULT_JSON_TEMPLATE,
     content_type: 'JSON',
     headers: '',
   };
@@ -123,7 +125,19 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
   };
 
   handleContentTypeChange = (nextValue: string) => {
-    this.propagateChange('content_type', nextValue);
+    const { config, onChange } = this.props;
+    const nextConfig = cloneDeep(config);
+    nextConfig.content_type = nextValue;
+
+    if (nextValue === 'JSON') {
+      nextConfig.body_template = DEFAULT_JSON_TEMPLATE;
+    } else if (nextValue === 'FORM_DATA') {
+      nextConfig.body_template = DEFAULT_FORM_PARAM_TEMPLATE;
+    } else {
+      nextConfig.body_template = DEFAULT_PLAIN_TEXT_TEMPLATE;
+    }
+
+    onChange(nextConfig);
   };
 
   handleSecretInputChange = (event: { target: { name: string }}) => {

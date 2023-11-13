@@ -36,7 +36,10 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.jackson.TypeReferences;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
@@ -93,6 +96,8 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
     private final EventsConfigurationProvider configurationProvider;
     private final ParameterizedHttpClientProvider parameterizedHttpClientProvider;
     private final Engine templateEngine;
+    private final NotificationService notificationService;
+    private final NodeId nodeId;
 
     @Inject
     public HTTPEventNotificationV2(EventNotificationService notificationCallbackService, ObjectMapperProvider objectMapperProvider,
@@ -101,6 +106,8 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                                    EncryptedValueService encryptedValueService,
                                    EventsConfigurationProvider configurationProvider,
                                    Engine templateEngine,
+                                   NotificationService notificationService,
+                                   NodeId nodeId,
                                    final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
         super(whitelistService, urlWhitelistNotificationService, encryptedValueService);
         this.notificationCallbackService = notificationCallbackService;
@@ -108,6 +115,8 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         this.configurationProvider = configurationProvider;
         this.parameterizedHttpClientProvider = parameterizedHttpClientProvider;
         this.templateEngine = templateEngine;
+        this.notificationService = notificationService;
+        this.nodeId = nodeId;
     }
 
     /**
@@ -132,12 +141,17 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         addHeaders(builder, config.headers());
 
         final String body;
+        final String errorMessage;
         try {
             body = buildRequestBody(modelData, config);
         } catch (JsonProcessingException processingErr) {
-            throw new PermanentEventNotificationException("Unable to serialize notification", processingErr);
+            errorMessage = "Unable to serialize notification";
+            createSystemErrorNotification(errorMessage + "for notification [" + ctx.notificationId() + "]");
+            throw new PermanentEventNotificationException(errorMessage, processingErr);
         } catch (UnsupportedEncodingException encodingErr) {
-            throw new PermanentEventNotificationException("Unable to URL encode notification body", encodingErr);
+            errorMessage = "Unable to URL encode notification body";
+            createSystemErrorNotification(errorMessage + "for notification [" + ctx.notificationId() + "]");
+            throw new PermanentEventNotificationException(errorMessage, encodingErr);
         }
 
         switch (config.httpMethod()) {
@@ -151,12 +165,23 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         final OkHttpClient httpClient = selectClient(config);
         try (final Response r = httpClient.newCall(builder.build()).execute()) {
             if (!r.isSuccessful()) {
-                throw new PermanentEventNotificationException(
-                        "Expected successful HTTP response [2xx] but got [" + r.code() + "]. " + config.url());
+                errorMessage = "Expected successful HTTP response [2xx] but got [" + r.code() + "]. " + config.url();
+                createSystemErrorNotification(errorMessage + "for notification [" + ctx.notificationId() + "]");
+                throw new PermanentEventNotificationException(errorMessage);
             }
         } catch (IOException e) {
             throw new PermanentEventNotificationException(e.getMessage());
         }
+    }
+
+    private void createSystemErrorNotification(String message) {
+        final Notification systemNotification = notificationService.buildNow()
+                .addNode(nodeId.getNodeId())
+                .addType(Notification.Type.GENERIC)
+                .addSeverity(Notification.Severity.URGENT)
+                .addDetail("title", "Custom HTTP Notification Failed")
+                .addDetail("description", message);
+        notificationService.publishIfFirst(systemNotification);
     }
 
     private MediaType getMediaType(HTTPEventNotificationConfigV2.ContentType contentType) {
