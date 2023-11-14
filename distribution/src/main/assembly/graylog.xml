@@ -14,17 +14,34 @@
             <includes>
                 <include>README.markdown</include>
                 <include>LICENSE</include>
-                <include>UPGRADING.rst</include>
+                <include>UPGRADING.md</include>
             </includes>
         </fileSet>
 
         <!-- empty directories -->
         <fileSet>
             <directory>./</directory>
-            <outputDirectory>log</outputDirectory>
+            <outputDirectory>etc/graylog/server</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
+            <directoryMode>0775</directoryMode>
+        </fileSet>
+        <fileSet>
+            <directory>./</directory>
+            <outputDirectory>var/log/graylog</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <directoryMode>0775</directoryMode>
+        </fileSet>
+        <fileSet>
+            <directory>./</directory>
+            <outputDirectory>var/lib/graylog-server</outputDirectory>
+            <excludes>
+                <exclude>*/**</exclude>
+            </excludes>
+            <directoryMode>0775</directoryMode>
         </fileSet>
         <fileSet>
             <directory>./</directory>
@@ -49,6 +66,18 @@
             <source>${project.basedir}/../misc/graylog.conf</source>
             <destName>graylog.conf.example</destName>
             <outputDirectory>.</outputDirectory>
+        </file>
+        <file>
+            <source>${project.basedir}/../misc/.env</source>
+            <destName>.env</destName>
+            <outputDirectory>.</outputDirectory>
+            <fileMode>0640</fileMode>
+        </file>
+        <file>
+            <source>${project.basedir}/../misc/graylog-server.service</source>
+            <destName>graylog-server.service.example</destName>
+            <outputDirectory>.</outputDirectory>
+            <fileMode>0640</fileMode>
         </file>
         <file>
             <source>${project.basedir}/../graylog-storage-elasticsearch7/target/graylog-storage-elasticsearch7-${project.version}.jar</source>
