@@ -20,7 +20,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
 
-export const urlPrefix = '/system/indices/mappings/remove_mappings';
+export const urlPrefix = '/system/indices/mappings/remove_mapping';
 
 export type RemoveFieldTypeBody = {
     indexSets: Array<string>,
@@ -34,7 +34,7 @@ export type RemoveFieldTypeBodyJson = {
     rotate: boolean,
 }
 
-const putFiledType = async ({
+const putFieldType = async ({
   indexSets,
   fields,
   rotated,
@@ -49,8 +49,8 @@ const putFiledType = async ({
   return fetch('PUT', url, body);
 };
 
-const useRemoveCustomFiledTypeMutation = () => {
-  const put = useMutation(putFiledType, {
+const useRemoveCustomFieldTypeMutation = () => {
+  const put = useMutation(putFieldType, {
     onError: (errorThrown) => {
       UserNotification.error(`Removing custom field type failed with status: ${errorThrown}`,
         'Could Removing custom the field type');
@@ -60,7 +60,7 @@ const useRemoveCustomFiledTypeMutation = () => {
     },
   });
 
-  return { removeCustomFiledTypeMutation: put.mutateAsync, isLoading: put.isLoading };
+  return { removeCustomFieldTypeMutation: put.mutateAsync, isLoading: put.isLoading };
 };
 
-export default useRemoveCustomFiledTypeMutation;
+export default useRemoveCustomFieldTypeMutation;

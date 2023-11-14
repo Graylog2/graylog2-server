@@ -26,7 +26,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Spinner } from 'components/common';
 import { Alert, BootstrapModalForm, Input, Badge } from 'components/bootstrap';
-import useRemoveCustomFiledTypeMutation from 'hooks/useRemoveCustomFiledTypeMutation';
+import useRemoveCustomFieldTypeMutation from 'hooks/useRemoveCustomFieldTypeMutation';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -71,11 +71,11 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, r
   return (
     <div>
       <Alert>
-        After removing the custom filed type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the open search settings will be use
+        After removing the custom field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the open search settings will be use
       </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
       <p>
-        To see and use filed type changes for <b>{fieldsStr}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+        To see and use field type changes for <b>{fieldsStr}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
       </p>
       <Input type="checkbox"
              id="rotate"
@@ -90,14 +90,14 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, r
 const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds }: Props) => {
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
   const [rotated, setRotated] = useState(true);
-  const { removeCustomFiledTypeMutation } = useRemoveCustomFiledTypeMutation();
+  const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
 
-    removeCustomFiledTypeMutation({ fields, indexSets: indexSetIds, rotated })
+    removeCustomFieldTypeMutation({ fields, indexSets: indexSetIds, rotated })
       .then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_REMOVED, {
           app_pathname: telemetryPathName,
@@ -109,7 +109,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
         });
       })
       .then(onClose);
-  }, [fields, indexSetIds, onClose, removeCustomFiledTypeMutation, rotated, sendTelemetry, telemetryPathName]);
+  }, [fields, indexSetIds, onClose, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_CLOSED, { app_pathname: telemetryPathName, app_action_value: 'removed-custom-field-type-closed' });

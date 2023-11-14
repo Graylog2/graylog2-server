@@ -25,7 +25,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import type { Attributes } from 'stores/PaginationTypes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
-import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 
 const attributes: Attributes = [
   {
@@ -97,7 +97,7 @@ describe('IndexSetFieldTypesList', () => {
       isInitialLoading: false,
     });
 
-    asMock(useFiledTypes).mockReturnValue({
+    asMock(useFieldTypes).mockReturnValue({
       data: {
         fieldTypes: {
           string: 'String type',

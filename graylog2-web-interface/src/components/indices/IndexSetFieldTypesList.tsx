@@ -32,7 +32,7 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
-import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetCustomFieldTypeRemoveModal';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
@@ -59,7 +59,7 @@ const IndexSetFieldTypesList = () => {
   const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const [query] = useState('');
   const [activePage, setActivePage] = useState(1);
-  const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
+  const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFieldTypes();
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
