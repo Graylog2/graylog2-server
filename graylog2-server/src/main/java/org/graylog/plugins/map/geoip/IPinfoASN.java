@@ -40,13 +40,11 @@ public class IPinfoASN {
     private final String domain;
 
     @MaxMindDbConstructor
-    public IPinfoASN(
-            @MaxMindDbParameter(name = "name") String name,
-            @MaxMindDbParameter(name = "route") String route,
-            @MaxMindDbParameter(name = "type") String type,
-            @MaxMindDbParameter(name = "asn") String asn,
-            @MaxMindDbParameter(name = "domain") String domain
-    ) {
+    public IPinfoASN(@MaxMindDbParameter(name = "name") String name,
+                     @MaxMindDbParameter(name = "route") String route,
+                     @MaxMindDbParameter(name = "type") String type,
+                     @MaxMindDbParameter(name = "asn") String asn,
+                     @MaxMindDbParameter(name = "domain") String domain) {
         this.name = name;
         this.route = route;
         this.type = type;

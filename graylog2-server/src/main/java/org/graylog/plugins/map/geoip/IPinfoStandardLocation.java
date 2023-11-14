@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.maxmind.db.MaxMindDbConstructor;
 import com.maxmind.db.MaxMindDbParameter;
 
+import javax.annotation.Nullable;
+
 // IPInfo standard location response:
 //
 // {
@@ -42,15 +44,13 @@ public class IPinfoStandardLocation {
     private final Double longitude;
 
     @MaxMindDbConstructor
-    public IPinfoStandardLocation(
-            @MaxMindDbParameter(name = "city") String city,
-            @MaxMindDbParameter(name = "country") String country,
-            @MaxMindDbParameter(name = "timezone") String timezone,
-            @MaxMindDbParameter(name = "region") String region,
-            @MaxMindDbParameter(name = "geoname_id") String geoNameId,
-            @MaxMindDbParameter(name = "lat") String latitude,
-            @MaxMindDbParameter(name = "lng") String longitude
-    ) {
+    public IPinfoStandardLocation(@MaxMindDbParameter(name = "city") String city,
+                                  @MaxMindDbParameter(name = "country") String country,
+                                  @MaxMindDbParameter(name = "timezone") String timezone,
+                                  @MaxMindDbParameter(name = "region") String region,
+                                  @MaxMindDbParameter(name = "geoname_id") String geoNameId,
+                                  @MaxMindDbParameter(name = "lat") String latitude,
+                                  @MaxMindDbParameter(name = "lng") String longitude) {
         this.city = city;
         this.country = country;
         this.timezone = timezone;
@@ -61,41 +61,49 @@ public class IPinfoStandardLocation {
     }
 
     @JsonProperty("coordinates")
+    @Nullable
     public String coordinates() {
         return latitude() + "," + longitude();
     }
 
     @JsonProperty("city")
+    @Nullable
     public String city() {
         return city;
     }
 
     @JsonProperty("country")
+    @Nullable
     public String country() {
         return country;
     }
 
     @JsonProperty("timezone")
+    @Nullable
     public String timezone() {
         return timezone;
     }
 
     @JsonProperty("region")
+    @Nullable
     public String region() {
         return region;
     }
 
     @JsonProperty("geoname_id")
+    @Nullable
     public Long geoNameId() {
         return geoNameId;
     }
 
     @JsonProperty("lat")
+    @Nullable
     public Double latitude() {
         return latitude;
     }
 
     @JsonProperty("lng")
+    @Nullable
     public Double longitude() {
         return longitude;
     }
