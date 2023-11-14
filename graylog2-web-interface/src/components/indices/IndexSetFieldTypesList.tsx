@@ -33,6 +33,7 @@ import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetCustomFieldTypeRemoveModal';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -45,6 +46,7 @@ export const DEFAULT_LAYOUT = {
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
   const [editingField, setEditingField] = useState<IndexSetFieldType | null>(null);
+  const [deletingFieldTypes, setDeletingFieldTypes] = useState<Array<string> | null>(null);
 
   const handleOnClose = useCallback(() => {
     setEditingField(null);
@@ -118,22 +120,40 @@ const IndexSetFieldTypesList = () => {
     handleOnOpen(fieldType);
   }, [handleOnOpen]);
 
+  const openDeletingModal = useCallback((fields: Array<string>) => {
+    setDeletingFieldTypes(fields);
+  }, []);
+  const onCloseDeleting = useCallback(() => setDeletingFieldTypes(null), []);
+
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
-    <Button onClick={() => openEditModal(fieldType)}
-            role="button"
-            bsSize="xsmall"
-            disabled={fieldType.isReserved}
-            title={`Edit field type for ${fieldType.fieldName}`}
-            tabIndex={0}>
-      Edit {
-          fieldType.isReserved && (
-          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-            We use reserved fields internally and expect a certain structure from them. Changing the field type for reserved fields might impact the stability of Graylog
-          </HoverForHelp>
-          )
-      }
-    </Button>
-  ), [openEditModal]);
+    <>
+      <Button onClick={() => openEditModal(fieldType)}
+              role="button"
+              bsSize="xsmall"
+              disabled={fieldType.isReserved}
+              title={`Edit field type for ${fieldType.fieldName}`}
+              tabIndex={0}>
+        Edit {
+            fieldType.isReserved && (
+            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+              We use reserved fields internally and expect a certain structure from them. Changing the field type for reserved fields might impact the stability of Graylog
+            </HoverForHelp>
+            )
+        }
+      </Button>
+      {fieldType.isCustom && (
+        <Button onClick={() => openDeletingModal([fieldType.fieldName])}
+                role="button"
+                bsSize="xsmall"
+                bsStyle="danger"
+                title="Remove custom type"
+                tabIndex={0}>
+          Remove
+        </Button>
+      )}
+    </>
+  ), [openDeletingModal, openEditModal]);
+  const indexSetsDeleting = useMemo(() => [indexSetId], [indexSetId]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -168,18 +188,23 @@ const IndexSetFieldTypesList = () => {
         )}
       </PaginatedList>
       {
-        editingField ? (
-          <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
-                                field={editingField.fieldName}
-                                onClose={handleOnClose}
-                                show={!!editingField}
-                                showSelectionTable={false}
-                                fieldTypes={fieldTypes}
-                                isOptionsLoading={isOptionsLoading}
-                                onSubmitCallback={refetch}
-                                initialFieldType={editingField.type} />
-        ) : null
-      }
+          editingField ? (
+            <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
+                                  field={editingField.fieldName}
+                                  onClose={handleOnClose}
+                                  show={!!editingField}
+                                  showSelectionTable={false}
+                                  fieldTypes={fieldTypes}
+                                  isOptionsLoading={isOptionsLoading}
+                                  onSubmitCallback={refetch}
+                                  initialFieldType={editingField.type} />
+          ) : null
+        }
+      {
+          deletingFieldTypes ? (
+            <IndexSetCustomFieldTypeRemoveModal show={!!deletingFieldTypes} fields={deletingFieldTypes} onClose={onCloseDeleting} indexSetIds={indexSetsDeleting} />
+          ) : null
+        }
     </>
   );
 };
