@@ -99,6 +99,8 @@ const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
 const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
 
+const IndexSetFieldTypesPage = loadAsync(() => import('./IndexSetFieldTypesPage'));
+
 export {
   AuthenticationCreatePage,
   AuthenticationPage,
@@ -132,6 +134,7 @@ export {
   IndexerFailuresPage,
   IndexSetConfigurationPage,
   IndexSetCreationPage,
+  IndexSetFieldTypesPage,
   IndexSetPage,
   IndicesPage,
   InputsPage,
