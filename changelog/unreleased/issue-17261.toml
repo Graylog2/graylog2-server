@@ -1,4 +1,4 @@
 type = "f"
-message = "Add logic to change perPage in component ListWithOwnState states when new perPage prop arrives"
+message = "Properly persist selected page size for paginated lists"
 issues = ["17261"]
 pulls = ["17278"]
