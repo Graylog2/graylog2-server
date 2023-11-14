@@ -22,21 +22,22 @@ import { Row, Col, Button } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
-import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
+import { useStore } from 'stores/connect';
 
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 
-const fetchExtractors = (inputId, callback) => {
-  ExtractorsActions.list.triggerPromise(inputId).then((data) => callback(data?.extractors));
+const fetchExtractors = (inputId) => {
+  ExtractorsActions.list.triggerPromise(inputId);
 };
 
 const ExtractorsList = ({ input, node }) => {
-  const [extractors, setExtractors] = useState(null);
   const [showSortModal, setShowSortModal] = useState(false);
+  const extractors = useStore(ExtractorsStore, (state) => state.extractors);
 
   useEffect(() => {
-    fetchExtractors(input.id, setExtractors);
+    fetchExtractors(input.id);
   }, [input.id]);
 
   const _formatExtractor = (extractor) => (
@@ -92,7 +93,7 @@ const ExtractorsList = ({ input, node }) => {
         <ExtractorsSortModal input={input}
                              extractors={extractors}
                              onClose={() => setShowSortModal(false)}
-                             onSort={() => fetchExtractors(input.id, setExtractors)} />
+                             onSort={() => fetchExtractors(input.id)} />
       )}
     </div>
   );

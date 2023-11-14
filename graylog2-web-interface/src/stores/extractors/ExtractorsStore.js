@@ -62,8 +62,23 @@ export const ExtractorsStore = singletonStore(
     extractors: undefined,
     extractor: undefined,
 
+    getInitialState() {
+      return this.getState();
+    },
+
     init() {
-      this.trigger({ extractors: this.extractors, extractor: this.extractor });
+      this.trigger({ extractors: this.extractors, extractor: this.extractory });
+    },
+
+    getState() {
+      return {
+        extractors: this.extractors,
+        extractor: this.extractor,
+      };
+    },
+
+    propagateState() {
+      this.trigger(this.getState());
     },
 
     list(inputId) {
@@ -71,7 +86,7 @@ export const ExtractorsStore = singletonStore(
 
       promise.then((response) => {
         this.extractors = response.extractors;
-        this.trigger({ extractors: this.extractors });
+        this.propagateState();
       });
 
       ExtractorsActions.list.promise(promise);
@@ -97,7 +112,7 @@ export const ExtractorsStore = singletonStore(
 
       promise.then((response) => {
         this.extractor = response;
-        this.trigger({ extractor: this.extractor });
+        this.propagateState();
       });
 
       ExtractorsActions.get.promise(promise);
@@ -235,6 +250,8 @@ export const ExtractorsStore = singletonStore(
         if (failedImports === 0) {
           UserNotification.success(`Import results: ${successfulImports} extractor(s) imported.`,
             'Import operation successful');
+
+          this.propagateState();
         } else {
           UserNotification.warning(`Import results: ${successfulImports} extractor(s) imported, ${failedImports} error(s).`,
             'Import operation completed');
