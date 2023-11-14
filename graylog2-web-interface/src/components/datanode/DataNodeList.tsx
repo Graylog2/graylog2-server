@@ -17,8 +17,8 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryParam, StringParam } from 'use-query-params';
-import type { DataNode, DataNodeStatus } from 'preflight/types';
 
+import type { DataNode, DataNodeStatus } from 'preflight/types';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
