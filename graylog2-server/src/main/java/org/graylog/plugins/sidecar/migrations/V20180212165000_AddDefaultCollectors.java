@@ -513,7 +513,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         return Optional.of(collectorService.save(
                                 collector.toBuilder()
                                         .defaultTemplate(defaultTemplate)
-                                        .defaultTemplateCRC(Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8)))
+                                        .defaultTemplateCRC(newCRC)
                                         .build()));
                     } catch (Exception e) {
                         LOG.error("Can't save collector '{}'!", collectorName, e);
