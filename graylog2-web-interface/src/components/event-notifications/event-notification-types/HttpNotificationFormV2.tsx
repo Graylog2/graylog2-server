@@ -40,6 +40,23 @@ type Props = {
   setIsSubmitEnabled: any,
 };
 
+// Only populate the new template if no changes have been made to the existing body or it is empty
+const shouldPopulateTemplate = (currentType: string, currentBody: string): boolean => {
+  if (currentBody === '') {
+    return true;
+  }
+
+  if (currentType === 'JSON') {
+    return currentBody === DEFAULT_JSON_TEMPLATE;
+  }
+
+  if (currentType === 'FORM_DATA') {
+    return currentBody === DEFAULT_FORM_PARAM_TEMPLATE;
+  }
+
+  return currentBody === DEFAULT_PLAIN_TEXT_TEMPLATE;
+};
+
 class HttpNotificationFormV2 extends React.Component<Props, any> {
   static defaultConfig = {
     url: '',
@@ -129,12 +146,14 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     const nextConfig = cloneDeep(config);
     nextConfig.content_type = nextValue;
 
-    if (nextValue === 'JSON') {
-      nextConfig.body_template = DEFAULT_JSON_TEMPLATE;
-    } else if (nextValue === 'FORM_DATA') {
-      nextConfig.body_template = DEFAULT_FORM_PARAM_TEMPLATE;
-    } else {
-      nextConfig.body_template = DEFAULT_PLAIN_TEXT_TEMPLATE;
+    if (shouldPopulateTemplate(config.content_type, config.body_template)) {
+      if (nextValue === 'JSON') {
+        nextConfig.body_template = DEFAULT_JSON_TEMPLATE;
+      } else if (nextValue === 'FORM_DATA') {
+        nextConfig.body_template = DEFAULT_FORM_PARAM_TEMPLATE;
+      } else {
+        nextConfig.body_template = DEFAULT_PLAIN_TEXT_TEMPLATE;
+      }
     }
 
     onChange(nextConfig);
