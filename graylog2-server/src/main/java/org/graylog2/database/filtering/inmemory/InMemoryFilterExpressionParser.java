@@ -14,27 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.filtering;
+package org.graylog2.database.filtering.inmemory;
 
-import com.mongodb.client.model.Filters;
 import org.bson.conversions.Bson;
-import org.graylog2.database.filtering.inmemory.SingleFilterParser;
+import org.graylog2.database.filtering.Filter;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
-public class DbFilterExpressionParser {
+public class InMemoryFilterExpressionParser {
 
     private final SingleFilterParser singleFilterParser = new SingleFilterParser();
 
-    public List<Bson> parse(final List<String> filterExpressions,
-                            final List<EntityAttribute> attributes) {
+    public Predicate<InMemoryFilterable> parsePredicate(final List<String> filterExpressions,
+                                                        final List<EntityAttribute> attributes) {
         if (filterExpressions == null || filterExpressions.isEmpty()) {
-            return List.of();
+            return o -> true;
         }
         final Map<String, List<Filter>> groupedByField = filterExpressions.stream()
                 .map(expr -> singleFilterParser.parseSingleExpression(expr, attributes))
@@ -42,23 +42,14 @@ public class DbFilterExpressionParser {
 
         return groupedByField.values().stream()
                 .map(grouped -> grouped.stream()
-                        .map(Filter::toBson)
+                        .map(Filter::toPredicate)
                         .collect(Collectors.toList()))
-                .map(groupedFilters -> {
-                    if (groupedFilters.size() == 1) {
-                        return groupedFilters.get(0);
-                    } else {
-                        return Filters.or(groupedFilters);
-                    }
-                })
-                .toList();
+                .map(groupedPredicates -> groupedPredicates.stream().reduce(Predicate::or).orElse(o -> true))
+                .reduce(Predicate::and).orElse(o -> true);
     }
 
     public Bson parseSingleExpression(final String filterExpression, final List<EntityAttribute> attributes) {
         final Filter filter = singleFilterParser.parseSingleExpression(filterExpression, attributes);
         return filter.toBson();
     }
-
-
-
 }

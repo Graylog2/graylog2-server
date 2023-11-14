@@ -14,25 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.filtering;
+package org.graylog2.database.filtering.inmemory;
 
-import com.mongodb.client.model.Filters;
-import org.bson.conversions.Bson;
-import org.graylog2.database.filtering.inmemory.InMemoryFilterable;
+import java.util.Optional;
 
-import java.util.function.Predicate;
+public interface InMemoryFilterable {
 
-public record SingleValueFilter(String field, Object value) implements Filter {
-
-    @Override
-    public Bson toBson() {
-        return Filters.eq(field(), value());
-    }
-
-    @Override
-    public Predicate<InMemoryFilterable> toPredicate() {
-        return o -> o.extractFieldValue(field)
-                .map(fieldValue -> fieldValue.equals(value))
-                .orElse(false);
-    }
+    Optional<Object> extractFieldValue(final String fieldName);
 }
