@@ -187,6 +187,7 @@ const ConfigurationForm = ({
       nextFormData.template = defaultTemplate;
     }
 
+    _debouncedValidateFormData(nextFormData, false);
     setFormData(nextFormData);
   };
 
