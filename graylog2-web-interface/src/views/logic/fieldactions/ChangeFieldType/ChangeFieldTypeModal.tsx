@@ -20,7 +20,6 @@ import styled, { css } from 'styled-components';
 import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
-import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
 import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import useStream from 'components/streams/hooks/useStream';
@@ -31,7 +30,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
+import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -54,14 +53,19 @@ const failureStreamId = '000000000000000000000004';
 type Props = {
   show: boolean,
   field: string,
-  onClose: () => void
+  onClose: () => void,
+  onSubmitCallback?: () => void,
+  initialSelectedIndexSets: Array<string>,
+  showSelectionTable?: boolean,
+  fieldTypes: FieldTypes,
+  isOptionsLoading: boolean,
+  initialFieldType?: string,
 }
 
-const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
+const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoading, initialSelectedIndexSets, onClose, field, showSelectionTable, initialFieldType }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
   const [newFieldType, setNewFieldType] = useState(null);
-  const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
     .sort(([, label1], [, label2]) => defaultCompare(label1, label2))
     .map(([value, label]) => ({
@@ -73,7 +77,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
   const { putFiledTypeMutation } = usePutFiledTypeMutation();
-  const initialSelection = useInitialSelection();
+
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback((e: React.FormEvent) => {
@@ -91,13 +95,13 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
           {
             value: 'change-field-type',
             rotated,
-            isAllIndexesSelected: indexSetSelection.length === initialSelection.length,
+            isAllIndexesSelected: indexSetSelection.length === initialSelectedIndexSets.length,
           },
       });
 
       onClose();
-    });
-  }, [field, indexSetSelection, initialSelection.length, newFieldType, onClose, putFiledTypeMutation, rotated, sendTelemetry, telemetryPathName]);
+    }).then(() => onSubmitCallback && onSubmitCallback());
+  }, [field, indexSetSelection, initialSelectedIndexSets.length, newFieldType, onClose, onSubmitCallback, putFiledTypeMutation, rotated, sendTelemetry, telemetryPathName]);
 
   const onChangeFieldType = useCallback((value: string) => {
     setNewFieldType(value);
@@ -111,6 +115,14 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CLOSED, { app_pathname: telemetryPathName, app_action_value: 'change-field-type-closed' });
     onClose();
   }, [onClose, sendTelemetry, telemetryPathName]);
+
+  useEffect(() => {
+    setIndexSetSelection(initialSelectedIndexSets);
+  }, [initialSelectedIndexSets, setIndexSetSelection]);
+
+  useEffect(() => {
+    if (initialFieldType) setNewFieldType(initialFieldType);
+  }, [initialFieldType]);
 
   return (
     <BootstrapModalForm title={<span>Change {field} Field Type <BetaBadge /></span>}
@@ -137,11 +149,17 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
                         inputProps={{ 'aria-label': `Select Field Type For ${field}` }}
                         required />
         </Input>
-        <StyledLabel>Select Targeted Index Sets</StyledLabel>
-        <p>
-          By default the {newFieldType ? <b>{newFieldType}</b> : 'selected'} field type will be set for the <b>{field}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
-        </p>
-        <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelection} />
+        {
+          showSelectionTable && (
+          <>
+            <StyledLabel>Select Targeted Index Sets</StyledLabel>
+            <p>
+              By default the {newFieldType ? <b>{newFieldType}</b> : 'selected'} field type will be set for the <b>{field}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
+            </p>
+            <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelectedIndexSets} />
+          </>
+          )
+        }
         <StyledLabel>Select Rotation Strategy</StyledLabel>
         <p>
           To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
@@ -155,6 +173,12 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
       </div>
     </BootstrapModalForm>
   );
+};
+
+ChangeFieldTypeModal.defaultProps = {
+  showSelectionTable: true,
+  onSubmitCallback: undefined,
+  initialFieldType: null,
 };
 
 export default ChangeFieldTypeModal;

@@ -93,6 +93,7 @@ const Routes = {
         return `/system/index_sets/${indexSetId}/configuration`;
       },
       SHOW: (indexSetId: string) => `/system/index_sets/${indexSetId}`,
+      FIELD_TYPES: (indexSetId: string) => `/system/index_sets/${indexSetId}/field-types`,
       CREATE: '/system/index_sets/create',
     },
     INPUTS: '/system/inputs',

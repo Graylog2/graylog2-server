@@ -1,0 +1,5 @@
+type = "added"
+message = "Add index set field type management page"
+
+issues = ["17160"]
+pulls = ["17070"]
