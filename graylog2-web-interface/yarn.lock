@@ -3816,9 +3816,9 @@
     "@types/node" "*"
 
 "@types/chroma-js@^2.1.3":
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.4.2.tgz#5c57e9f9ce5343f134e376fb76e07fd3271f150f"
-  integrity sha512-gbiHvCuBS9aXkE3OEDfS69bscNLTYtbbx2TQf6WyOu+4eCH1AH1gPSiDGF2UzwkRFAbqKNsC5F0mY0xcaEHCbg==
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.4.3.tgz#2f10bd16483a87d8ead68764fc439550e9c4cbb6"
+  integrity sha512-1ly5ly/7S/YF8aD7MxUQnFOZxdegimuOunJl0xDsLlguu5JrwuSTVGVH3UpIUlh6YauI0RMNT4cqjBonhgbdIQ==
 
 "@types/classnames@^2.2.9":
   version "2.2.9"
@@ -4073,9 +4073,9 @@
   integrity sha512-y9euML0cim1JrykNxADLfaG0FgD1g/yTHwUs/Jg9ZIU7WKj2/4IW9Lbb1WZbvck78W/lfGXFfe+u2EGfIJXdLQ==
 
 "@types/md5@^2.3.0":
-  version "2.3.4"
-  resolved "https://registry.yarnpkg.com/@types/md5/-/md5-2.3.4.tgz#48f2372f0aed1341c196ebc75eb1e13a00f16fd7"
-  integrity sha512-e/L4hvpCK8GavKXmP02QlNilZOj8lpmZGGA9QGMMPZjCUoKgi1B4BvhXcbruIi6r+PqzpcjLfda/tocpHFKqDA==
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@types/md5/-/md5-2.3.5.tgz#481cef0a896e3a5dcbfc5a8a8b02c05958af48a5"
+  integrity sha512-/i42wjYNgE6wf0j2bcTX6kuowmdL/6PE4IVitMpm2eYKBUuYCprdcWVK+xEF0gcV6ufMCRhtxmReGfc6hIK7Jw==
 
 "@types/mime@*":
   version "3.0.1"
@@ -4225,9 +4225,9 @@
     "@types/react" "*"
 
 "@types/react-sticky-el@^1.0.3":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@types/react-sticky-el/-/react-sticky-el-1.0.5.tgz#882c8d6016ef5d5ab1dc168207c24871233324d5"
-  integrity sha512-aaR8feNGPZqC+GDB0ieW9xmvP6qRqNc0RsyqtYgrWObaGGVjdo/x2Ft8rJQaHzh8RbKynCd5FK3gJGuElR/iww==
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@types/react-sticky-el/-/react-sticky-el-1.0.6.tgz#36ffec271872dcd53de3782f8199fe9c2ec44659"
+  integrity sha512-ermllRAXMOLxrIcIxMZWssz3hcod+Jbr30+jTfPUf5ORmDwR845vjX4qJU4suf4YXHFxZg56PijUg7qhaT6bNg==
   dependencies:
     "@types/react" "*"
 
