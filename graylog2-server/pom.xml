@@ -873,7 +873,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.4</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -989,9 +989,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <useLastCommittedRevision>true</useLastCommittedRevision>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
