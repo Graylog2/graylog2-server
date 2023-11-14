@@ -53,7 +53,7 @@ public interface StreamService extends PersistedService {
     List<Stream> loadAllEnabled();
 
     default List<Stream> loadAllByTitle(String title) {
-        throw new UnsupportedOperationException("loadAllByTitle method not implemented");
+        return loadAll().stream().filter(s -> title.equals(s.getTitle())).toList();
     }
 
     /**
