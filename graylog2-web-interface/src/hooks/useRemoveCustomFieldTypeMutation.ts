@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -50,6 +50,8 @@ const putFieldType = async ({
 };
 
 const useRemoveCustomFieldTypeMutation = () => {
+  const queryClient = useQueryClient();
+
   const put = useMutation(putFieldType, {
     onError: (errorThrown) => {
       UserNotification.error(`Removing custom field type failed with status: ${errorThrown}`,
@@ -57,6 +59,7 @@ const useRemoveCustomFieldTypeMutation = () => {
     },
     onSuccess: () => {
       UserNotification.success('Custom field type removed successfully', 'Success!');
+      queryClient.refetchQueries({ queryKey: ['indexSetFieldTypes'], type: 'active' });
     },
   });
 
