@@ -1,4 +1,4 @@
 type = "f"
-message = "Updating title of dashboard is now properly saved.Add logic to change perPage in component ListWithOwnState states when new perPage prop arrives
+message = "Add logic to change perPage in component ListWithOwnState states when new perPage prop arrives"
 issues = ["17261"]
 pulls = ["17278"]
