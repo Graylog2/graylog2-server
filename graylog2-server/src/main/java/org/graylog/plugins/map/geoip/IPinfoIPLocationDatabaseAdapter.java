@@ -16,12 +16,6 @@
  */
 package org.graylog.plugins.map.geoip;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.maxmind.db.InvalidDatabaseException;
 import com.maxmind.db.NoCache;
 import com.maxmind.db.Reader;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
@@ -39,11 +33,6 @@ import java.net.InetAddress;
  * database type identifier and a different data format than the MaxMind databases.
  */
 public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapter {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-            .configure(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS, false)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
-
     private final Reader reader;
 
     public IPinfoIPLocationDatabaseAdapter(File databaseFile) throws IOException {
@@ -63,13 +52,6 @@ public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapte
         }
 
         return value;
-    }
-
-    private ObjectNode asObjectNode(JsonNode node) throws InvalidDatabaseException {
-        if (node == null || node instanceof ObjectNode) {
-            return (ObjectNode) node;
-        }
-        throw new InvalidDatabaseException("Unexpected data type returned. The IPinfo database may be corrupt.");
     }
 
     @Override
