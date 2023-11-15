@@ -110,15 +110,20 @@ public class DatanodeDirectoriesLockfileCheck implements PreflightCheck {
     }
 
     private void writeLockFile(FileChannel channel) {
-        try (final Writer writer = Channels.newWriter(channel, StandardCharsets.UTF_8)) {
+        try {
+            // do not close the writer, otherwise it will close the underlying channel. We do that explicitly elsewhere.
+            final Writer writer = Channels.newWriter(channel, StandardCharsets.UTF_8);
             writer.write(nodeId);
+            writer.flush();
         } catch (IOException e) {
             throw new DatanodeLockFileException("Failed to write node ID to the lock file", e);
         }
     }
 
     private Optional<String> readChannel(FileChannel channel) {
-        try (final Reader reader = Channels.newReader(channel, StandardCharsets.UTF_8)) {
+        try {
+            // do not close the reader, otherwise it will close the underlying channel. We do that explicitly elsewhere.
+            final Reader reader = Channels.newReader(channel, StandardCharsets.UTF_8);
             return Optional.of(CharStreams.toString(reader)).filter(v -> !v.isBlank()).map(String::trim);
         } catch (IOException e) {
             throw new DatanodeLockFileException("Failed to read content of lock file", e);
