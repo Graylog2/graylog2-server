@@ -18,7 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 
 export const urlPrefix = '/system/indices/mappings/remove_mapping';
 
@@ -55,7 +55,7 @@ const useRemoveCustomFieldTypeMutation = () => {
   const put = useMutation(putFieldType, {
     onError: (errorThrown) => {
       UserNotification.error(`Removing custom field type failed with status: ${errorThrown}`,
-        'Could Removing custom the field type');
+        'Could not remove custom field type');
     },
     onSuccess: () => {
       UserNotification.success('Custom field type removed successfully', 'Success!');
