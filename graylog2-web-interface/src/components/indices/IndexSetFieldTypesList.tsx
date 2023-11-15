@@ -24,7 +24,7 @@ import {
   HoverForHelp,
   Icon,
   NoEntitiesExist,
-  PaginatedList,
+  PaginatedList, SearchForm,
   Spinner,
 } from 'components/common';
 import EntityDataTable from 'components/common/EntityDataTable';
@@ -33,6 +33,10 @@ import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import EntityFilters from 'components/common/EntityFilters';
+import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
+import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -55,7 +59,8 @@ const IndexSetFieldTypesList = () => {
   }, []);
 
   const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
-  const [query] = useState('');
+  const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
+  const [query, setQuery] = useState('');
   const [activePage, setActivePage] = useState(1);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -69,7 +74,8 @@ const IndexSetFieldTypesList = () => {
     page: activePage,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
-  }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
+    filters: urlQueryFilters,
+  }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters]);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const onPageChange = useCallback(
     (newPage: number, newPageSize: number) => {
@@ -135,6 +141,13 @@ const IndexSetFieldTypesList = () => {
     </Button>
   ), [openEditModal]);
 
+  const onSearch = useCallback((val: string) => setQuery(val), []);
+  const onSearchReset = useCallback(() => setQuery(''), []);
+  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
+    setActivePage(1);
+    setUrlQueryFilters(newUrlQueryFilters);
+  }, [setUrlQueryFilters]);
+
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
@@ -147,6 +160,16 @@ const IndexSetFieldTypesList = () => {
                      activePage={activePage}
                      showPageSizeSelect={false}
                      useQueryParameter={false}>
+        <div style={{ marginBottom: 5 }}>
+          <SearchForm onSearch={onSearch}
+                      onReset={onSearchReset}
+                      query={query}>
+            <EntityFilters attributes={attributes}
+                           urlQueryFilters={urlQueryFilters}
+                           setUrlQueryFilters={onChangeFilters}
+                           filterValueRenderers={FilterValueRenderers} />
+          </SearchForm>
+        </div>
         {pagination?.total === 0 && !searchParams.query && (
           <NoEntitiesExist>
             No fields have been created yet.
