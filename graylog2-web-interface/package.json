@@ -74,7 +74,6 @@
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "immutable": "^3.8.1",
     "interactjs": "^1.4.0-rc.13",
-    "intersection-observer": "^0.12.0",
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
     "marked": "^9.0.0",
