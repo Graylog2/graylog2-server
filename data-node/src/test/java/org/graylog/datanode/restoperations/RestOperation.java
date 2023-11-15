@@ -70,7 +70,7 @@ public abstract class RestOperation {
         }
         final boolean responseOk = Arrays.stream(predicates).allMatch(p -> p.test(response));
         if (!responseOk) {
-            LOG.info(response.extract().body().toString());
+            LOG.error(serializeResponse(response.extract()));
             Assertions.fail(errorMessage);
         }
 

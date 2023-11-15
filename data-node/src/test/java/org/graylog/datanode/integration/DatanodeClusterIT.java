@@ -21,6 +21,7 @@ import com.github.rholder.retry.RetryException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.restoperations.DatanodeOpensearchWait;
+import org.graylog.datanode.restoperations.DatanodeRestApiWait;
 import org.graylog.datanode.restoperations.DatanodeStatusChangeOperation;
 import org.graylog.datanode.restoperations.OpensearchTestIndexCreation;
 import org.graylog.datanode.restoperations.RestOperationParameters;
@@ -177,7 +178,15 @@ public class DatanodeClusterIT {
         final Optional<DatanodeContainerizedBackend> replica = nodes.stream().filter(n -> shardNodes.get(1).equals(n.getNodeName())).findFirst();
         assertTrue(replica.isPresent());
 
-        // remove node for primary shard
+        // remove node for primary shard, waiting for it to be in AVAILABLE state first
+        new DatanodeRestApiWait(
+                RestOperationParameters.builder()
+                        .port(primary.get().getDatanodeRestPort())
+                        .truststore(trustStore)
+                        .username(restAdminUsername)
+                        .password(ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT)
+                        .build())
+                .waitForAvailableStatus();
         new DatanodeStatusChangeOperation(
                 RestOperationParameters.builder()
                         .port(primary.get().getDatanodeRestPort())
