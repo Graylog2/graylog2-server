@@ -34,7 +34,7 @@ const logger = {
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
-  error: jest.fn((...rest) => console.log('EDDDDDDDDDDDDDDDDD', { rest })),
+  error: jest.fn(),
   success: jest.fn(),
 }));
 
@@ -72,7 +72,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
       const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation(), { queryClientOptions: { logger } });
 
       act(() => {
-        result.current.removeCustomFieldTypeMutation(requestBody);
+        result.current.removeCustomFieldTypeMutation(requestBody).catch(() => {});
       });
 
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
