@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Check if PR edit changed deps string
-        if: ${{ github.event.action == edited }}
+        if: ${{ github.event.action == 'edited' }}
         id: pr-string-changed
         continue-on-error: true
         run: |
