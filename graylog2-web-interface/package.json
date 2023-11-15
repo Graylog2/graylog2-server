@@ -84,7 +84,6 @@
     "numeral": "^2.0.6",
     "plotly.js": "2.27.0",
     "posthog-js": "^1.52.0",
-    "promise-polyfill": "^8.2.0",
     "qs": "^6.3.0",
     "react-ace": "10.1.0",
     "react-beautiful-dnd": "^13.1.0",
