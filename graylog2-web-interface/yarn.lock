@@ -4232,9 +4232,9 @@
     "@types/react" "*"
 
 "@types/react-ultimate-pagination@^1.2.1":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@types/react-ultimate-pagination/-/react-ultimate-pagination-1.2.2.tgz#02d6a476318f2af36d193ecd0d3016a0ca9e77de"
-  integrity sha512-t2q8nLhWA73RmKghiOkDBeP36J8dOAX2Y6cmRWoreKBMvydL+fIOTEHuV+KG8szMOj+PpEfNT3ayyLlnhitUBQ==
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/@types/react-ultimate-pagination/-/react-ultimate-pagination-1.2.4.tgz#a287a52eb964a55445a26980b62e07852ba91e3d"
+  integrity sha512-1y9jLt3KEFGzFD+99qVpJUI/Eu4cEx48sClB957eGoepWRLVVi+r1UBj0157Mg7HYZcIF4I1/qGZYaBBQWhaqg==
   dependencies:
     "@types/react" "*"
 
@@ -9996,11 +9996,6 @@ interpret@^3.1.1:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-3.1.1.tgz#5be0ceed67ca79c6c4bc5cf0d7ee843dcea110c4"
   integrity sha512-6xwYfHbajpoF0xLW+iwLkhwgvLoZDfjYfoFNu8ftMoXINzwuymNLd9u/KmwtdT2GbR+/Cz66otEGEVVUHX9QLQ==
 
-intersection-observer@^0.12.0:
-  version "0.12.2"
-  resolved "https://registry.yarnpkg.com/intersection-observer/-/intersection-observer-0.12.2.tgz#4a45349cc0cd91916682b1f44c28d7ec737dc375"
-  integrity sha512-7m1vEcPCxXYI8HqnL8CKI6siDyD+eIWSwgB3DZA+ZTogxk9I4CDnj4wilt9x/+/QbHI4YG5YZNmC6458/e9Ktg==
-
 invariant@^2.2.2, invariant@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.4.tgz#610f3c92c9359ce1db616e538008d23ff35158e6"
@@ -13325,11 +13320,6 @@ progress@2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
-
-promise-polyfill@^8.2.0:
-  version "8.3.0"
-  resolved "https://registry.yarnpkg.com/promise-polyfill/-/promise-polyfill-8.3.0.tgz#9284810268138d103807b11f4e23d5e945a4db63"
-  integrity sha512-H5oELycFml5yto/atYqmjyigJoAo3+OXwolYiH7OfQuYlAqhxNvTfiNMbV9hsC6Yp83yE5r2KTVmtrG6R9i6Pg==
 
 prompts@^2.0.1:
   version "2.3.1"
@@ -16805,11 +16795,6 @@ whatwg-encoding@^2.0.0:
   integrity sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==
   dependencies:
     iconv-lite "0.6.3"
-
-whatwg-fetch@^3.6.2:
-  version "3.6.19"
-  resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-3.6.19.tgz#caefd92ae630b91c07345537e67f8354db470973"
-  integrity sha512-d67JP4dHSbm2TrpFj8AbO8DnL1JXL5J9u0Kq2xW6d0TFDbCA3Muhdt8orXC22utleTVj7Prqt82baN6RBvnEgw==
 
 whatwg-mimetype@^2.1.0, whatwg-mimetype@^2.2.0:
   version "2.3.0"
