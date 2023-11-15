@@ -1,0 +1,5 @@
+type = "added"
+message = "Add removing custom field type action"
+
+issues = ["17284"]
+pulls = ["17281"]
