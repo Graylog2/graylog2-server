@@ -21,6 +21,7 @@ import DefaultProviders from 'DefaultProviders';
 import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
 import { defaultUser } from 'defaultMockValues';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -73,8 +74,20 @@ const setInitialPath = (path: string) => {
 };
 
 describe('AppRouter', () => {
+  const defaultPlugins = {
+    perspectives: [
+      {
+        id: 'default',
+        title: 'Default Perspective',
+        brandComponent: () => <div />,
+      },
+    ],
+  };
+
+  const mockPluginEntity = (plugin: PluginExports) => (entityKey: string) => ({ ...defaultPlugins, ...plugin }[entityKey] ?? []);
+
   beforeEach(() => {
-    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(usePluginEntities).mockImplementation((entityKey) => (defaultPlugins[entityKey] ?? []));
     AppConfig.isFeatureEnabled = jest.fn(() => false);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });
@@ -94,7 +107,7 @@ describe('AppRouter', () => {
 
   describe('plugin routes', () => {
     it('renders simple plugin routes', async () => {
-      asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route' }]);
+      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ component: () => <span>Hey there!</span>, path: '/a-plugin-route' }] }));
       setInitialPath('/a-plugin-route');
       const { findByText } = render(<AppRouterWithContext />);
 
@@ -102,7 +115,7 @@ describe('AppRouter', () => {
     });
 
     it('renders null-parent component plugin routes without application chrome', async () => {
-      asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/without-chrome' }]);
+      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/without-chrome' }] }));
 
       setInitialPath('/without-chrome');
       const { findByText, queryByTitle } = render(<AppRouterWithContext />);
@@ -113,7 +126,7 @@ describe('AppRouter', () => {
     });
 
     it('does not render plugin route when required feature flag is not enabled', async () => {
-      asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
+      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }] }));
       setInitialPath('/a-plugin-route');
       render(<AppRouterWithContext />);
 
@@ -124,7 +137,7 @@ describe('AppRouter', () => {
 
     it('render plugin route when required feature flag is enabled', async () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
+      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }] }));
       setInitialPath('/a-plugin-route');
       const { findByText } = render(<AppRouterWithContext />);
 
@@ -141,7 +154,7 @@ describe('AppRouter', () => {
         return <span>Current context value is {contextValue}</span>;
       };
 
-      asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: TestComponent, path: '/test' }]);
+      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ parentComponent: null, component: TestComponent, path: '/test' }] }));
 
       setInitialPath('/test');
       const { findByText } = render(<AppRouterWithContext />);

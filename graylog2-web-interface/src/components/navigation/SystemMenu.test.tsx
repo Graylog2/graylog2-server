@@ -45,6 +45,8 @@ jest.mock('react-router-dom', () => ({
   useLocation: jest.fn(),
 }));
 
+jest.mock('components/perspectives/hooks/useActivePerspective', () => () => ({ activePerspective: 'default', setActivePerspective: () => {} }));
+
 describe('SystemMenu', () => {
   let exports;
 
