@@ -67,7 +67,7 @@ const PerspectivesProvider = ({ children }: PropsWithChildren) => {
     activePerspective,
     availablePerspectives,
     setActivePerspective: setActivePerspectiveWithPersistence,
-  }), [activePerspective, availablePerspectives]);
+  }), [activePerspective, availablePerspectives, setActivePerspectiveWithPersistence]);
 
   return (
     <PerspectivesContext.Provider value={contextValue}>
