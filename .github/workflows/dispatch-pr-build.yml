@@ -30,7 +30,7 @@ jobs:
           fi
           exit 1
         env:
-          OLD_PR_BODY: "${{ github.event.changes.body }}"
+          OLD_PR_BODY: "${{ github.event.changes.body.from }}"
           NEW_PR_BODY: "${{ github.event.pull_request.body }}"
 
       - name: Dispatch job to graylog-project-internal
