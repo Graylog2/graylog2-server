@@ -104,7 +104,7 @@
     "react-redux": "^8.0.5",
     "react-resizable": "^3.0.4",
     "react-rnd": "^10.1.1",
-    "react-select": "5.7.7",
+    "react-select": "5.8.0",
     "react-slider": "^2.0.4",
     "react-sortable-hoc": "^1.7.1",
     "react-sticky-el": "^2.0.9",
