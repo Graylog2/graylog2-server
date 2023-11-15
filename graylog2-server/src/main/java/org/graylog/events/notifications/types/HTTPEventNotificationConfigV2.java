@@ -202,7 +202,10 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
                     .apiKey("")
                     .skipTLSVerification(false)
                     .type(TYPE_NAME)
-                    .httpMethod(HttpMethod.POST);
+                    .httpMethod(HttpMethod.POST)
+                    .contentType(ContentType.JSON)
+                    .bodyTemplate("")
+                    .timeZone(DateTimeZone.UTC);
         }
 
         @JsonProperty(FIELD_BASIC_AUTH)
@@ -244,7 +247,8 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
                 .url(ValueReference.of(url()))
                 .skipTLSVerification(ValueReference.of(skipTLSVerification()))
                 .httpMethod(ValueReference.of(httpMethod()))
-                .timeZone(ValueReference.of(timeZone()));
+                .timeZone(ValueReference.of(timeZone().getID()))
+                .headers(ValueReference.of(headers()));
         if (contentType() != null) {
             builder.contentType(ValueReference.of(contentType()));
             if (bodyTemplate() != null) {
