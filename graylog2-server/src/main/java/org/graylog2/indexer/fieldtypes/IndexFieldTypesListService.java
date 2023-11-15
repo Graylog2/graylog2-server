@@ -100,7 +100,7 @@ public class IndexFieldTypesListService {
                         )
                 )
                 .filter(indexSetFieldType -> indexSetFieldType.fieldName().contains(fieldNameQuery))
-                .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parsePredicate(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
+                .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parse(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
                 .sorted(IndexSetFieldType.getComparator(sort, order))
                 .skip((long) Math.max(0, page - 1) * perPage)
                 .limit(perPage)

@@ -20,6 +20,7 @@ import com.mongodb.client.model.Filters;
 import org.bson.conversions.Bson;
 import org.graylog2.database.filtering.inmemory.InMemoryFilterable;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public record SingleValueFilter(String field, Object value) implements Filter {
@@ -34,5 +35,18 @@ public record SingleValueFilter(String field, Object value) implements Filter {
         return o -> o.extractFieldValue(field)
                 .map(fieldValue -> fieldValue.equals(value))
                 .orElse(false);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final SingleValueFilter that = (SingleValueFilter) o;
+        return Objects.equals(field, that.field) && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field, value);
     }
 }
