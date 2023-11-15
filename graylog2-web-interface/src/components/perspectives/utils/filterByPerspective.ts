@@ -16,7 +16,11 @@
  */
 
 const filterByPerspective = <T extends { perspective?: string }>(items: Array<T>, perspective: string | undefined): Array<T> => (
-  items.filter(({ perspective: itemPerspective }) => (itemPerspective ? itemPerspective === perspective : true))
+  items.filter(
+    ({ perspective: itemPerspective }) => (
+      perspective === 'default' ? !itemPerspective || itemPerspective === 'default' : perspective === itemPerspective
+    ),
+  )
 );
 
 export default filterByPerspective;
