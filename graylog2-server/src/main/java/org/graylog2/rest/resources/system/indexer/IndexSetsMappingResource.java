@@ -46,6 +46,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -76,6 +77,8 @@ public class IndexSetsMappingResource extends RestResource {
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets list of field_name-field_type pairs for given index set")
     public PageListResponse<IndexSetFieldType> indexSetFieldTypesList(@ApiParam(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
+                                                                      @ApiParam(name = "fieldNameQuery") @QueryParam("query") @DefaultValue("") String fieldNameQuery,
+                                                                      @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                                       @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                       @ApiParam(name = "sort",
@@ -88,6 +91,8 @@ public class IndexSetsMappingResource extends RestResource {
                                                                       @Context SearchUser searchUser) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
         return indexFieldTypesListService.getIndexSetFieldTypesList(indexSetId,
+                fieldNameQuery,
+                filters,
                 page,
                 perPage,
                 sort,
