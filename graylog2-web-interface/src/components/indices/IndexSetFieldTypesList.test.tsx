@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
 
+import { MockStore } from 'helpers/mocking';
+import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
 import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -75,6 +77,18 @@ const renderIndexSetFieldTypesList = () => render(
   </TestStoreProvider>,
 );
 
+jest.mock('stores/indices/IndexSetsStore', () => ({
+  IndexSetsActions: {
+    list: jest.fn(),
+  },
+  IndexSetsStore: MockStore(['getInitialState', () => ({
+    indexSets: [
+      { id: '111', title: 'index set title' },
+    ],
+  })]),
+}));
+
+jest.mock('routing/useParams', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
 jest.mock('hooks/useIndexSetFieldType', () => jest.fn());
 
@@ -194,7 +208,7 @@ describe('IndexSetFieldTypesList', () => {
     });
   });
 
-  it('Shows modal on action click', async () => {
+  it('Shows modal on edit action click', async () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
@@ -216,5 +230,33 @@ describe('IndexSetFieldTypesList', () => {
     await within(modal).findByText('Boolean');
 
     expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
+  });
+
+  it('Shows modal on remove action click', async () => {
+    asMock(useParams).mockImplementation(() => ({
+      indexSetId: '111',
+    }));
+
+    asMock(useIndexSetFieldTypes).mockReturnValue({
+      isLoading: false,
+      refetch: () => {},
+      data: getData([{
+        id: 'field',
+        fieldName: 'field',
+        type: 'bool',
+        isCustom: true,
+        isReserved: false,
+      }]),
+    });
+
+    renderIndexSetFieldTypesList();
+    const tableRow = await screen.findByTestId('table-row-field');
+    const removeButton = await within(tableRow).findByText('Remove');
+    fireEvent.click(removeButton);
+    await screen.findByText(/remove custom field type/i);
+    const modal = await screen.findByTestId('modal-form');
+    await within(modal).findByText('Rotate affected indices after change');
+
+    expect(modal).toHaveTextContent('After removing the custom field type for field in index set title the open search settings will be use');
   });
 });
