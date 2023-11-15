@@ -18,7 +18,7 @@
 import Routes from 'routing/Routes';
 
 const navigationBindings = {
-  defaultNavigation: [
+  navigation: [
     {
       path: Routes.SEARCH,
       description: 'Search',
