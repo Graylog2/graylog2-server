@@ -43,11 +43,13 @@ interface PluginNavigationDropdownItem {
 interface PluginNavigationItems {
   key: string;
   component: React.ComponentType<{ smallScreen?: boolean }>;
+  perspective?: string,
 }
 interface SystemNavigationItem {
   description: string;
   path: string;
   permissions: string | Array<string>;
+  perspective?: string,
 }
 interface GlobalNotification {
   key: string;

@@ -25,6 +25,9 @@ import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
+import usePluginEntities from 'hooks/usePluginEntities';
+import filterByPerspective from 'components/perspectives/utils/filterByPerspective';
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 
 import NavigationLink from './NavigationLink';
 
@@ -69,6 +72,8 @@ const _systemTitle = (pathname: string) => {
 };
 
 const SystemMenu = () => {
+  const navigationItems = usePluginEntities('systemnavigation');
+  const { activePerspective } = useActivePerspective();
   const location = useLocation();
   let showInputs = true;
 
@@ -76,7 +81,7 @@ const SystemMenu = () => {
     showInputs = AppConfig.isFeatureEnabled('cloud_inputs');
   }
 
-  const pluginSystemNavigations = PluginStore.exports('systemnavigation')
+  const pluginSystemNavigations = filterByPerspective(navigationItems, activePerspective)
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(({ description, path, permissions }) => {
       const prefixedPath = appPrefixed(path);

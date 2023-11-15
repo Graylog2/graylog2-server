@@ -185,7 +185,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />
-            {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
+            {filterByPerspective(pluginItems, activePerspective).map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
           <ScratchpadToggle />
 
