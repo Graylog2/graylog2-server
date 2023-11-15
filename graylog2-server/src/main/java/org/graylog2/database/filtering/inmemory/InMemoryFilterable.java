@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.database.filtering.inmemory;
 
-// When adding a polyfill it is probably necessary to extend the polyfill list in the eslint-config-graylog package.
-// Otherwise ESLint does not know about the polyfill and throws a warning because of the compat/compat rule.
+import java.util.Optional;
 
-import 'core-js';
-import 'regenerator-runtime/runtime';
+public interface InMemoryFilterable {
+
+    Optional<Object> extractFieldValue(final String fieldName);
+}
