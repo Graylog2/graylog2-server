@@ -36,24 +36,17 @@ const Container = styled.div`
   white-space: break-spaces;
   height: 100%;
   display: grid;
-  display: -ms-grid;
   grid-template-columns: 1fr;
   grid-template-rows: max-content 1fr;
-  -ms-grid-columns: 1fr;
-  -ms-grid-rows: max-content 1fr;
 
   > *:nth-child(1) {
     grid-column: 1;
-    -ms-grid-column: 1;
     grid-row: 1;
-    -ms-grid-row: 1;
   }
 
   > *:nth-child(2) {
     grid-column: 1;
-    -ms-grid-column: 1;
     grid-row: 2;
-    -ms-grid-row: 2;
   }
 `;
 

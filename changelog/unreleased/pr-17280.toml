@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Sidecar collector configuration form submit button not being clickable."
+
+issues = ["17185"]
+pulls = ["17280"]

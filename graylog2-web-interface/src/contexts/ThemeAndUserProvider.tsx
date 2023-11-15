@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
@@ -24,7 +24,7 @@ import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 import CurrentUserProvider from './CurrentUserProvider';
 import UserDateTimeProvider from './UserDateTimeProvider';
 
-const ThemeAndUserProvider = ({ children }) => (
+const ThemeAndUserProvider = ({ children }: React.PropsWithChildren<{}>) => (
   <CurrentUserProvider>
     <UserDateTimeProvider>
       <CurrentUserPreferencesProvider>

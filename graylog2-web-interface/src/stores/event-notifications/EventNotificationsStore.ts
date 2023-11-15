@@ -30,9 +30,11 @@ export type TestResult = {
   error?: boolean,
   message?: string,
 };
+
 export type TestResults ={
     [key: string]: TestResult
 };
+
 export type EventNotification = {
   id: string,
   title: string,
@@ -40,12 +42,12 @@ export type EventNotification = {
   config: {
     type?: string
   },
-}
+};
 
 export type LegacyEventNotification = {
   name: string,
   configuration: {}
-}
+};
 
 type EventNotificationsActionsType = {
   listAll: () => Promise<{ notifications: Array<EventNotification> }>,
@@ -58,7 +60,8 @@ type EventNotificationsActionsType = {
   delete: (eventNotification: EventNotification) => Promise<void>,
   test: (eventNotification: EventNotification) => Promise<void>,
   testPersisted: (eventNotification: EventNotification) => Promise<void>,
-}
+};
+
 export const EventNotificationsActions = singletonActions(
   'core.EventNotifications',
   () => Reflux.createActions<EventNotificationsActionsType>({
@@ -87,7 +90,8 @@ type EventNotificationsStoreState = {
     total: number,
     grandTotal: number,
   }
-}
+};
+
 export const EventNotificationsStore = singletonStore(
   'core.EventNotifications',
   () => Reflux.createStore<EventNotificationsStoreState>({

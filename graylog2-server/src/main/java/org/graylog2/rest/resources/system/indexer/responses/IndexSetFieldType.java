@@ -17,17 +17,23 @@
 package org.graylog2.rest.resources.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.database.filtering.inmemory.InMemoryFilterable;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.search.SearchQueryField;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
                                 @JsonProperty(TYPE) String type,
                                 @JsonProperty(IS_CUSTOM) boolean isCustom,
-                                @JsonProperty(IS_RESERVED) boolean isReserved) {
+                                @JsonProperty(IS_RESERVED) boolean isReserved) implements InMemoryFilterable {
 
     static final String FIELD_NAME = "field_name";
     static final String TYPE = "type";
@@ -41,11 +47,39 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
             .build();
 
     public static final List<EntityAttribute> ATTRIBUTES = List.of(
-            EntityAttribute.builder().id(IndexSetFieldType.FIELD_NAME).title("Field name").sortable(true).build(),
-            EntityAttribute.builder().id(IndexSetFieldType.IS_CUSTOM).title("Is Custom").sortable(true).build(),
-            EntityAttribute.builder().id(IndexSetFieldType.IS_RESERVED).title("Is Reserved").sortable(true).build(),
-            EntityAttribute.builder().id(IndexSetFieldType.TYPE).title("Type").sortable(true).build()
+            EntityAttribute.builder().id(IndexSetFieldType.FIELD_NAME).title("Field name")
+                    .sortable(true)
+                    .build(),
+            EntityAttribute.builder().id(IndexSetFieldType.IS_CUSTOM).title("Is Custom")
+                    .type(SearchQueryField.Type.BOOLEAN)
+                    .sortable(true)
+                    .filterable(true)
+                    .build(),
+            EntityAttribute.builder().id(IndexSetFieldType.IS_RESERVED).title("Is Reserved")
+                    .type(SearchQueryField.Type.BOOLEAN)
+                    .sortable(true)
+                    .filterable(true)
+                    .build(),
+            EntityAttribute.builder().id(IndexSetFieldType.TYPE).title("Type")
+                    .sortable(true)
+                    .filterable(true)
+                    .filterOptions(CustomFieldMappings.AVAILABLE_TYPES.entrySet().stream()
+                            .map(entry -> FilterOption.create(entry.getKey(), entry.getValue().description()))
+                            .collect(Collectors.toSet())
+                    )
+                    .build()
     );
+
+    @Override
+    public Optional<Object> extractFieldValue(final String fieldName) {
+        return switch (fieldName) {
+            case FIELD_NAME -> Optional.ofNullable(fieldName());
+            case TYPE -> Optional.ofNullable(type());
+            case IS_CUSTOM -> Optional.of(isCustom());
+            case IS_RESERVED -> Optional.of(isReserved());
+            default -> Optional.empty();
+        };
+    }
 
     public static Comparator<IndexSetFieldType> getComparator(final String sort,
                                                               final Sorting.Direction order) {
