@@ -19,6 +19,8 @@ package org.graylog2.telemetry.rest;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.HashCode;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;
@@ -65,7 +67,7 @@ public class TelemetryService {
     private final boolean isTelemetryEnabled;
     private final TelemetryClusterService telemetryClusterService;
     private final String installationSource;
-
+    private final NodeService nodeService;
 
     @Inject
     public TelemetryService(
@@ -80,7 +82,8 @@ public class TelemetryService {
             DBTelemetryUserSettingsService dbTelemetryUserSettingsService,
             EventBus eventBus,
             TelemetryClusterService telemetryClusterService,
-            @Named("installation_source") String installationSource) {
+            @Named("installation_source") String installationSource,
+            NodeService nodeService) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
         this.enterpriseDataProvider = enterpriseDataProvider;
@@ -92,6 +95,7 @@ public class TelemetryService {
         this.dbTelemetryUserSettingsService = dbTelemetryUserSettingsService;
         this.telemetryClusterService = telemetryClusterService;
         this.installationSource = installationSource;
+        this.nodeService = nodeService;
         eventBus.register(this);
     }
 
@@ -108,7 +112,8 @@ public class TelemetryService {
                     getPluginInfo(),
                     getSearchClusterInfo(),
                     licenseStatuses,
-                    telemetryUserSettings);
+                    telemetryUserSettings,
+                    getDataNodeInfo());
         } else {
             return telemetryResponseFactory.createTelemetryDisabledResponse(telemetryUserSettings);
         }
@@ -205,5 +210,12 @@ public class TelemetryService {
                 nodesInfo.size(),
                 elasticsearchVersion.toString(),
                 nodesInfo);
+    }
+
+    private Map<String, Object> getDataNodeInfo() {
+        final var dataNodes = nodeService.allActive(Node.Type.DATANODE);
+        return Map.of(
+                "data_nodes_count", dataNodes.size()
+        );
     }
 }
