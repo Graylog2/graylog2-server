@@ -1,7 +1,8 @@
 name: Request dispatched PR Build
 
 on:
-  - pull_request
+  pull_request:
+    types: [ opened, reopened, synchronize, edited ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,7 +14,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: dispatch job to graylog-project-internal
+      - name: Check if PR edit changed deps string
+        if: ${{ github.event.action == edited }}
+        id: pr-string-changed
+        continue-on-error: true
+        run: |
+          old_pr_string=$(grep -P '^/(jenkins-pr-deps|jpd|prd)' <<< "$OLD_PR_BODY" | \
+            grep -ioP '(Graylog2/\S+?#|https?://github.com/Graylog2/\S+?/pull/)[0-9]+' || true)
+          new_pr_string=$(grep -P '^/(jenkins-pr-deps|jpd|prd)' <<< "$NEW_PR_BODY" | \
+            grep -ioP '(Graylog2/\S+?#|https?://github.com/Graylog2/\S+?/pull/)[0-9]+' || true)
+          if [ "$old_pr_string" != "$new_pr_string" ]; then
+            echo "PR deps string change detected: \"$old_pr_string\" -> \"$new_pr_string\""
+            echo "Re-triggering PR build..."
+            exit 0
+          fi
+          exit 1
+        env:
+          OLD_PR_BODY: "${{ github.event.changes.body }}"
+          NEW_PR_BODY: "${{ github.event.pull_request.body }}"
+
+      - name: Dispatch job to graylog-project-internal
+        if: ${{ github.event.action != 'edited' || steps.pr-string-changed.outcome == 'success' }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo=${{ github.repository }}
