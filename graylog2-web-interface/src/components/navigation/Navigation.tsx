@@ -135,7 +135,6 @@ const Navigation = React.memo(({ pathname }: Props) => {
   }
 
   const pluginNavigations = filterByPerspective(pluginExports, activePerspective)
-    .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map((pluginRoute) => formatPluginRoute(pluginRoute, currentUser.permissions, pathname, activePerspective));
   const pluginItems = PluginStore.exports('navigationItems');
 
