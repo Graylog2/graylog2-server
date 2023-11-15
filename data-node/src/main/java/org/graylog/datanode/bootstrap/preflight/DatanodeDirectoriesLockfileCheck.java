@@ -17,7 +17,6 @@
 package org.graylog.datanode.bootstrap.preflight;
 
 import com.google.common.io.CharStreams;
-import org.apache.commons.io.IOUtils;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
@@ -25,16 +24,12 @@ import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
