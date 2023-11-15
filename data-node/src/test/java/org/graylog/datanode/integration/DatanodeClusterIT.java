@@ -179,21 +179,15 @@ public class DatanodeClusterIT {
         assertTrue(replica.isPresent());
 
         // remove node for primary shard, waiting for it to be in AVAILABLE state first
-        new DatanodeRestApiWait(
-                RestOperationParameters.builder()
-                        .port(primary.get().getDatanodeRestPort())
-                        .truststore(trustStore)
-                        .username(restAdminUsername)
-                        .password(ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT)
-                        .build())
+        final RestOperationParameters datanodeRestParameters = RestOperationParameters.builder()
+                .port(primary.get().getDatanodeRestPort())
+                .truststore(trustStore)
+                .username(restAdminUsername)
+                .password(ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT)
+                .build();
+        new DatanodeRestApiWait(datanodeRestParameters)
                 .waitForAvailableStatus();
-        new DatanodeStatusChangeOperation(
-                RestOperationParameters.builder()
-                        .port(primary.get().getDatanodeRestPort())
-                        .truststore(trustStore)
-                        .username(restAdminUsername)
-                        .password(ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT)
-                        .build())
+        new DatanodeStatusChangeOperation(datanodeRestParameters)
                 .triggerNodeRemoval();
 
 
