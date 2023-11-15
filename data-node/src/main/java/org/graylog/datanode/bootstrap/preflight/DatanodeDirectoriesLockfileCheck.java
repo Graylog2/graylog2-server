@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.google.common.io.CharStreams;
+import org.apache.commons.io.IOUtils;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
@@ -25,9 +27,14 @@ import org.graylog2.plugin.system.NodeId;
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channel;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -108,28 +115,16 @@ public class DatanodeDirectoriesLockfileCheck implements PreflightCheck {
     }
 
     private void writeLockFile(FileChannel channel) {
-        try {
-            ByteBuffer byteBuffer = ByteBuffer.wrap(nodeId.getBytes(StandardCharsets.UTF_8));
-            channel.write(byteBuffer);
+        try (final Writer writer = Channels.newWriter(channel, StandardCharsets.UTF_8)) {
+            writer.write(nodeId);
         } catch (IOException e) {
             throw new DatanodeLockFileException("Failed to write node ID to the lock file", e);
         }
     }
 
     private Optional<String> readChannel(FileChannel channel) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            int bufferSize = 36;
-            if (bufferSize > channel.size()) {
-                bufferSize = (int) channel.size();
-            }
-            ByteBuffer buff = ByteBuffer.allocate(bufferSize);
-            while (channel.read(buff) > 0) {
-                out.write(buff.array(), 0, buff.position());
-                buff.clear();
-            }
-            final String value = out.toString(StandardCharsets.UTF_8);
-            return Optional.ofNullable(value).filter(v -> !v.isBlank());
+        try (final Reader reader = Channels.newReader(channel, StandardCharsets.UTF_8)) {
+            return Optional.of(CharStreams.toString(reader)).filter(v -> !v.isBlank()).map(String::trim);
         } catch (IOException e) {
             throw new DatanodeLockFileException("Failed to read content of lock file", e);
         }
