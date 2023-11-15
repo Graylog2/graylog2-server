@@ -20,6 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import type { PluginNavigationDropdownItem, PluginNavigation } from 'graylog-web-plugin';
 import type * as Immutable from 'immutable';
 
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer } from 'components/common/router';
 import { appPrefixed } from 'util/URLUtils';
@@ -31,6 +32,7 @@ import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import { Icon } from 'components/common';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
+import filterByPerspective from 'components/perspectives/utils/filterByPerspective';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -71,7 +73,7 @@ const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatu
   );
 };
 
-const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions: Immutable.List<string>, pathname: string) => {
+const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions: Immutable.List<string>, pathname: string, activePerspective: string) => {
   if (pluginRoute.requiredFeatureFlag && !AppConfig.isFeatureEnabled(pluginRoute.requiredFeatureFlag)) {
     return null;
   }
@@ -92,7 +94,7 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
                    badge={renderBadge ? BadgeComponent : null}
                    id="enterprise-dropdown"
                    inactiveTitle={pluginRoute.description}>
-        {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
+        {filterByPerspective(pluginRoute.children, activePerspective).map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
       </NavDropdown>
     );
   }
@@ -106,6 +108,7 @@ type Props = {
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const currentUser = useCurrentUser();
+  const { activePerspective } = useActivePerspective();
   const { permissions, fullName, readOnly, id: userId } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');
@@ -131,9 +134,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
     });
   }
 
-  const pluginNavigations = pluginExports
+  const pluginNavigations = filterByPerspective(pluginExports, activePerspective)
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
-    .map((pluginRoute) => formatPluginRoute(pluginRoute, currentUser.permissions, pathname));
+    .map((pluginRoute) => formatPluginRoute(pluginRoute, currentUser.permissions, pathname, activePerspective));
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (

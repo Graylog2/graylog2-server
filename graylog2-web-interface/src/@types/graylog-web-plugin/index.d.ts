@@ -29,6 +29,7 @@ interface PluginNavigation {
   path: string;
   description: string;
   requiredFeatureFlag?: string;
+  perspective?: string;
   children?: Array<PluginNavigationDropdownItem>
 }
 
