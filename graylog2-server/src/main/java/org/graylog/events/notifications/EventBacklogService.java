@@ -53,7 +53,7 @@ public class EventBacklogService {
                     eventDto.eventDefinitionType());
         }
         final EventDefinition eventDefinition = eventDefinitionService.get(eventDto.eventDefinitionId()).orElseThrow(() ->
-                new NotFoundException("Could not find event definintion <" +
+                new NotFoundException("Could not find event definition <" +
                         eventDto.eventDefinitionId() + ">"));
         final EventProcessor eventProcessor = factory.create(eventDefinition);
 
