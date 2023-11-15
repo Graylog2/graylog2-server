@@ -47,10 +47,8 @@ public class OpensearchTestIndexCreation extends RestOperation {
                 null, "Could not retrieve shard info for test index",
                 r -> r.extract().statusCode() == 200);
         final JsonPath jsonPath = response.extract().body().jsonPath();
-        assertEquals(jsonPath.getList(".").size(), 2);
-        return List.of(
-                jsonPath.getString("find {it.prirep=='p'}.node"),
-                jsonPath.getString("find {it.prirep=='r'}.node")
-        );
+        final List<String> nodes = jsonPath.getList("node", String.class);
+        assertEquals(nodes.size(), 2);
+        return nodes;
     }
 }
