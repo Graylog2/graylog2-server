@@ -14,17 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.filtering;
+package org.graylog2.database.filtering.inmemory;
 
-import org.bson.conversions.Bson;
-import org.graylog2.database.filtering.inmemory.InMemoryFilterable;
+import java.util.Optional;
 
-import java.util.function.Predicate;
+public interface InMemoryFilterable {
 
-public interface Filter {
-    String field();
-
-    Bson toBson();
-
-    Predicate<InMemoryFilterable> toPredicate();
+    Optional<Object> extractFieldValue(final String fieldName);
 }

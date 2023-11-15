@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.filtering;
+package org.graylog2.database.filtering.inmemory;
 
-import com.mongodb.client.model.Filters;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.filtering.RangeFilter;
+import org.graylog2.database.filtering.SingleValueFilter;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQueryField;
 import org.joda.time.DateTime;
@@ -28,110 +28,22 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.database.filtering.inmemory.SingleFilterParser.FIELD_AND_VALUE_SEPARATOR;
 import static org.graylog2.database.filtering.inmemory.SingleFilterParser.RANGE_VALUES_SEPARATOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class DbFilterExpressionParserTest {
+class SingleFilterParserTest {
 
-    private DbFilterExpressionParser toTest;
+    SingleFilterParser toTest;
 
     @BeforeEach
     void setUp() {
-        toTest = new DbFilterExpressionParser();
-    }
-
-    @Test
-    void returnsEmptyListOnNullFilterList() {
-        assertThat(toTest.parse(null, List.of()))
-                .isEmpty();
-    }
-
-    @Test
-    void returnsEmptyListOnEmptyFilterList() {
-        assertThat(toTest.parse(List.of(), List.of()))
-                .isEmpty();
-    }
-
-    @Test
-    void throwsExceptionOnFieldThatDoesNotExistInAttributeList() {
-
-        assertThrows(IllegalArgumentException.class, () ->
-                toTest.parseSingleExpression("strange_field:blabla",
-                        List.of(EntityAttribute.builder()
-                                .id("owner")
-                                .title("Owner")
-                                .filterable(true)
-                                .build())
-                ));
-    }
-
-    @Test
-    void throwsExceptionOnFieldThatIsNotFilterable() {
-
-        assertThrows(IllegalArgumentException.class, () ->
-                toTest.parseSingleExpression("owner:juan",
-                        List.of(EntityAttribute.builder()
-                                .id("owner")
-                                .title("Owner")
-                                .filterable(false)
-                                .build())
-                ));
-    }
-
-    @Test
-    void throwsExceptionOnWrongFilterFormat() {
-        final List<EntityAttribute> attributes = List.of(
-                EntityAttribute.builder().id("good").title("Good").filterable(true).build(),
-                EntityAttribute.builder().id("another").title("Hidden and dangerous").filterable(true).build()
-        );
-        assertThrows(IllegalArgumentException.class, () -> toTest.parse(List.of("No separator"), attributes));
-        assertThrows(IllegalArgumentException.class, () -> toTest.parseSingleExpression("No separator", attributes));
-        assertThrows(IllegalArgumentException.class, () -> toTest.parse(List.of(FIELD_AND_VALUE_SEPARATOR + "no field name"), attributes));
-        assertThrows(IllegalArgumentException.class, () -> toTest.parseSingleExpression(FIELD_AND_VALUE_SEPARATOR + "no field name", attributes));
-        assertThrows(IllegalArgumentException.class, () -> toTest.parse(List.of("no field value" + FIELD_AND_VALUE_SEPARATOR), attributes));
-        assertThrows(IllegalArgumentException.class, () -> toTest.parseSingleExpression("no field value" + FIELD_AND_VALUE_SEPARATOR, attributes));
-        assertThrows(IllegalArgumentException.class, () -> toTest.parse(
-                List.of("good" + FIELD_AND_VALUE_SEPARATOR + "one",
-                        "another" + FIELD_AND_VALUE_SEPARATOR + "good_one",
-                        "single wrong one is enough to throw exception"),
-                attributes)
-        );
-    }
-
-    @Test
-    void groupsMultipleFilterForTheSameFieldUsingOrLogic() {
-
-        final List<EntityAttribute> attributes = List.of(EntityAttribute.builder()
-                        .id("owner")
-                        .title("Owner")
-                        .filterable(true)
-                        .build(),
-                EntityAttribute.builder()
-                        .id("title")
-                        .title("Title")
-                        .filterable(true)
-                        .build());
-
-
-        final List<Bson> expectedResult = List.of(
-                Filters.or(
-                        Filters.eq("owner", "baldwin"),
-                        Filters.eq("owner", "beomund")
-                ),
-                Filters.eq("title", "crusade")
-
-        );
-        assertEquals(expectedResult,
-                toTest.parse(List.of("owner:baldwin", "owner:beomund", "title:crusade"), attributes));
+        toTest = new SingleFilterParser();
     }
 
     @Test
     void parsesFilterExpressionCorrectlyForStringType() {
 
-        assertEquals(Filters.eq("owner", "baldwin"),
+        assertEquals(new SingleValueFilter("owner", "baldwin"),
                 toTest.parseSingleExpression("owner:baldwin",
                         List.of(EntityAttribute.builder()
                                 .id("owner")
@@ -144,7 +56,7 @@ class DbFilterExpressionParserTest {
     @Test
     void parsesFilterExpressionCorrectlyForBoolType() {
 
-        assertEquals(Filters.eq("away", true),
+        assertEquals(new SingleValueFilter("away", true),
                 toTest.parseSingleExpression("away:true",
                         List.of(EntityAttribute.builder()
                                 .id("away")
@@ -158,7 +70,7 @@ class DbFilterExpressionParserTest {
     @Test
     void parsesFilterExpressionCorrectlyForObjectIdType() {
 
-        assertEquals(Filters.eq("id", new ObjectId("5f4dfb9c69be46153b9a9a7b")),
+        assertEquals(new SingleValueFilter("id", new ObjectId("5f4dfb9c69be46153b9a9a7b")),
                 toTest.parseSingleExpression("id:5f4dfb9c69be46153b9a9a7b",
                         List.of(EntityAttribute.builder()
                                 .id("id")
@@ -172,7 +84,7 @@ class DbFilterExpressionParserTest {
     @Test
     void parsesFilterExpressionCorrectlyForDateType() {
 
-        assertEquals(Filters.eq("created_at", new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate()),
+        assertEquals(new SingleValueFilter("created_at", new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate()),
                 toTest.parseSingleExpression("created_at:2012-12-12 12:12:12",
                         List.of(EntityAttribute.builder()
                                 .id("created_at")
@@ -186,7 +98,7 @@ class DbFilterExpressionParserTest {
     @Test
     void parsesFilterExpressionCorrectlyForIntType() {
 
-        assertEquals(Filters.eq("num", 42),
+        assertEquals(new SingleValueFilter("num", 42),
                 toTest.parseSingleExpression("num:42",
                         List.of(EntityAttribute.builder()
                                 .id("num")
@@ -210,11 +122,9 @@ class DbFilterExpressionParserTest {
                 .build());
 
         assertEquals(
-                Filters.and(
-                        Filters.gte("created_at",
-                                new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate()),
-                        Filters.lte("created_at",
-                                new DateTime(2022, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate())
+                new RangeFilter("created_at",
+                        new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate(),
+                        new DateTime(2022, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate()
                 ),
 
                 toTest.parseSingleExpression("created_at:" + fromString + RANGE_VALUES_SEPARATOR + toString,
@@ -235,17 +145,13 @@ class DbFilterExpressionParserTest {
                 .build());
 
         assertEquals(
-                Filters.and(
-                        Filters.gte("created_at", dateObject.toDate())
-                ),
+                new RangeFilter("created_at", dateObject.toDate(), null),
                 toTest.parseSingleExpression("created_at:" + dateString + RANGE_VALUES_SEPARATOR,
                         entityAttributes
                 ));
 
         assertEquals(
-                Filters.and(
-                        Filters.lte("created_at", dateObject.toDate())
-                ),
+                new RangeFilter("created_at", null, dateObject.toDate()),
                 toTest.parseSingleExpression("created_at:" + RANGE_VALUES_SEPARATOR + dateString,
                         entityAttributes
                 ));
@@ -261,11 +167,7 @@ class DbFilterExpressionParserTest {
                 .build());
 
         assertEquals(
-                Filters.and(
-                        Filters.gte("number", 42),
-                        Filters.lte("number", 53)
-                ),
-
+                new RangeFilter("number", 42, 53),
                 toTest.parseSingleExpression("number:42" + RANGE_VALUES_SEPARATOR + "53",
                         entityAttributes
                 ));
@@ -281,10 +183,11 @@ class DbFilterExpressionParserTest {
                 .build());
 
         assertEquals(
-                Filters.eq("text", "42" + RANGE_VALUES_SEPARATOR + "53"),
+                new SingleValueFilter("text", "42" + RANGE_VALUES_SEPARATOR + "53"),
 
                 toTest.parseSingleExpression("text:42" + RANGE_VALUES_SEPARATOR + "53",
                         entityAttributes
                 ));
     }
+
 }
