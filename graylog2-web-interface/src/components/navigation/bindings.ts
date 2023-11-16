@@ -19,6 +19,8 @@ import Routes from 'routing/Routes';
 import filterMenuItems, { filterCloudMenuItems } from 'util/conditional/filterMenuItems';
 import AppConfig from 'util/AppConfig';
 
+export const SYSTEM_DROPDOWN_TITLE = 'System';
+
 const navigationBindings = {
   navigation: [
     {
@@ -38,7 +40,7 @@ const navigationBindings = {
       description: 'Dashboards',
     },
     {
-      description: 'System',
+      description: SYSTEM_DROPDOWN_TITLE,
       position: 'last' as const,
       children: filterCloudMenuItems(
         filterMenuItems(
