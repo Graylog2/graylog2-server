@@ -100,6 +100,10 @@ describe('IndexSetFieldTypesList', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
+    asMock(useParams).mockImplementation(() => ({
+      indexSetId: '111',
+    }));
+
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
@@ -233,10 +237,6 @@ describe('IndexSetFieldTypesList', () => {
   });
 
   it('Shows modal on remove action click', async () => {
-    asMock(useParams).mockImplementation(() => ({
-      indexSetId: '111',
-    }));
-
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
