@@ -17,6 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import type { ColorVariant } from '@graylog/sawmill';
 
 import { Alert, Button, Col, Row } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -33,7 +34,7 @@ const Container = styled.div<{ margin: number }>(({ margin }) => `
 type Props = {
   onClose: (msg?: string) => void,
   children: React.ReactNode,
-  bsStyle: string,
+  bsStyle: ColorVariant,
   marginTopBottom: number,
   runtimeError: boolean,
 };
