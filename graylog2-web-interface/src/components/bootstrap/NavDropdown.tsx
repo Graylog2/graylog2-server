@@ -24,10 +24,12 @@ import PropTypes from 'prop-types';
 
 import Menu from 'components/bootstrap/Menu';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import NavItemStateIndicator, {
+  hoverIndicatorStyles,
+  activeIndicatorStyles,
+} from 'components/common/NavItemStateIndicator';
 
 import menuItemStyles from './styles/menuItem';
-
-import Icon from '../common/Icon';
 
 class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   // eslint-disable-next-line class-methods-use-this
@@ -62,21 +64,32 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
   z-index: 1032 !important;
 `;
 
-const DropdownIcon = styled(Icon)(({ theme }) => css`
-  padding-left: 0.1rem;
-  color: ${theme.colors.global.textDefault};
-`);
-const DropdownTrigger = styled.button(({ theme }) => css`
+const DropdownTrigger = styled.button(({ theme, $active }) => css`
   font-family: ${theme.fonts.family.navigation};
   font-size: ${theme.fonts.size.navigation};
   background: transparent;
   border: 0;
+  padding: 15px;
+
+  &:hover {
+    ${hoverIndicatorStyles(theme)}
+  }
+
+  ${$active ? activeIndicatorStyles(theme) : ''}
+
+
+  &:hover,
+  &:focus {
+    color: ${theme.colors.variant.darker.default};
+    background-color: transparent;
+  }
 `);
 
 const NavItem = styled.span`
   display: inline-flex;
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};
+  padding: 0;
 `;
 
 const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children }: React.PropsWithChildren<Props>) => {
@@ -86,8 +99,12 @@ const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children }: 
     <Menu>
       <NavItem>
         <Menu.Target>
-          <DropdownTrigger>
-            {Badge ? <Badge text={title} /> : title} {noCaret ? null : <DropdownIcon name="caret-down" />}
+          <DropdownTrigger $active={isActive}>
+            <NavItemStateIndicator>
+              {Badge ? <Badge text={title} /> : title}
+            </NavItemStateIndicator>
+            {' '}
+            {noCaret ? null : <span className="caret" />}
           </DropdownTrigger>
         </Menu.Target>
       </NavItem>
