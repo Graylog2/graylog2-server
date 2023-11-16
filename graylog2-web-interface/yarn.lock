@@ -4232,9 +4232,9 @@
     "@types/react" "*"
 
 "@types/react-ultimate-pagination@^1.2.1":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@types/react-ultimate-pagination/-/react-ultimate-pagination-1.2.2.tgz#02d6a476318f2af36d193ecd0d3016a0ca9e77de"
-  integrity sha512-t2q8nLhWA73RmKghiOkDBeP36J8dOAX2Y6cmRWoreKBMvydL+fIOTEHuV+KG8szMOj+PpEfNT3ayyLlnhitUBQ==
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/@types/react-ultimate-pagination/-/react-ultimate-pagination-1.2.4.tgz#a287a52eb964a55445a26980b62e07852ba91e3d"
+  integrity sha512-1y9jLt3KEFGzFD+99qVpJUI/Eu4cEx48sClB957eGoepWRLVVi+r1UBj0157Mg7HYZcIF4I1/qGZYaBBQWhaqg==
   dependencies:
     "@types/react" "*"
 
