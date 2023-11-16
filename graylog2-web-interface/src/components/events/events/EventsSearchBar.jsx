@@ -19,10 +19,9 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import max from 'lodash/max';
 
-import { ButtonGroup, ControlLabel, FormControl, FormGroup, Button } from 'components/bootstrap';
+import { ButtonGroup, Button } from 'components/bootstrap';
 import { SearchForm, TimeUnitInput, Icon } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import * as FormsUtils from 'util/FormsUtils';
 
 import styles from './EventsSearchBar.css';
 
@@ -31,12 +30,9 @@ const TIME_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
 class EventsSearchBar extends React.Component {
   static propTypes = {
     parameters: PropTypes.object.isRequired,
-    pageSize: PropTypes.number.isRequired,
-    pageSizes: PropTypes.array.isRequired,
     onQueryChange: PropTypes.func.isRequired,
     onAlertFilterChange: PropTypes.func.isRequired,
     onTimeRangeChange: PropTypes.func.isRequired,
-    onPageSizeChange: PropTypes.func.isRequired,
     onSearchReload: PropTypes.func.isRequired,
   };
 
@@ -60,12 +56,6 @@ class EventsSearchBar extends React.Component {
     this.setState({ timeRangeDuration: nextValue, timeRangeUnit: nextUnit });
   };
 
-  handlePageSizeChange = (event) => {
-    const { onPageSizeChange } = this.props;
-
-    onPageSizeChange(FormsUtils.getValueFromInput(event.target));
-  };
-
   resetLoadingState = () => {
     this.setState({ isReloadingResults: false });
   };
@@ -78,7 +68,7 @@ class EventsSearchBar extends React.Component {
   };
 
   render() {
-    const { parameters, pageSize, pageSizes, onQueryChange, onAlertFilterChange } = this.props;
+    const { parameters, onQueryChange, onAlertFilterChange } = this.props;
     const { isReloadingResults, timeRangeUnit, timeRangeDuration } = this.state;
 
     const filterAlerts = parameters.filter.alerts;
@@ -113,13 +103,6 @@ class EventsSearchBar extends React.Component {
             <Button active={filterAlerts === 'exclude'} onClick={onAlertFilterChange('exclude')}>Events</Button>
             <Button active={filterAlerts === 'include'} onClick={onAlertFilterChange('include')}>Both</Button>
           </ButtonGroup>
-
-          <FormGroup className="form-inline">
-            <ControlLabel>Show</ControlLabel>
-            <FormControl componentClass="select" bsSize="small" value={pageSize} onChange={this.handlePageSizeChange}>
-              {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
-            </FormControl>
-          </FormGroup>
         </div>
       </div>
     );

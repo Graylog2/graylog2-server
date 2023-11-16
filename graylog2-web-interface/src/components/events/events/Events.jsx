@@ -146,7 +146,6 @@ class Events extends React.Component {
     onAlertFilterChange: PropTypes.func.isRequired,
     onTimeRangeChange: PropTypes.func.isRequired,
     onSearchReload: PropTypes.func.isRequired,
-    paginationQueryParameter: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -156,14 +155,6 @@ class Events extends React.Component {
       expanded: [],
     };
   }
-
-  handlePageSizeChange = (nextPageSize) => {
-    const { onPageChange } = this.props;
-    const { setPageSize } = this.props.paginationQueryParameter;
-
-    setPageSize(nextPageSize);
-    onPageChange(1, nextPageSize);
-  };
 
   expandRow = (eventId) => {
     return () => {
@@ -230,7 +221,6 @@ class Events extends React.Component {
       onAlertFilterChange,
       onTimeRangeChange,
       onSearchReload,
-      paginationQueryParameter,
     } = this.props;
 
     const eventList = events.map((e) => e.event);
@@ -260,11 +250,8 @@ class Events extends React.Component {
                            onQueryChange={onQueryChange}
                            onAlertFilterChange={onAlertFilterChange}
                            onTimeRangeChange={onTimeRangeChange}
-                           onPageSizeChange={this.handlePageSizeChange}
-                           onSearchReload={onSearchReload}
-                           pageSize={paginationQueryParameter.pageSize}
-                           pageSizes={PAGE_SIZES} />
-          <PaginatedList showPageSizeSelect={false}
+                           onSearchReload={onSearchReload} />
+          <PaginatedList pageSizes={PAGE_SIZES}
                          totalItems={totalEvents}
                          onChange={onPageChange}>
             {eventList.length === 0 ? (
@@ -286,4 +273,4 @@ class Events extends React.Component {
   }
 }
 
-export default withPaginationQueryParameter(Events, { pageSizes: PAGE_SIZES });
+export default withPaginationQueryParameter(Events);
