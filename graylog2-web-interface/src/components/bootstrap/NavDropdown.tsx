@@ -49,7 +49,16 @@ const StyledNavDropdown = styled(BootstrapNavDropdown)`
   ${menuItemStyles}
 `;
 
-const NavDropdown = ({ title, inactiveTitle, badge: Badge, ...props }) => {
+type Props = {
+  title?: React.ReactNode,
+  id: string,
+  inactiveTitle?: string,
+  badge?: React.ComponentType<{ text: React.ReactNode }>,
+  active?: boolean,
+  noCaret?: boolean,
+}
+
+const NavDropdown = ({ title, inactiveTitle, badge: Badge, ...props }: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
   return (
@@ -68,6 +77,8 @@ NavDropdown.propTypes = {
 NavDropdown.defaultProps = {
   inactiveTitle: undefined,
   badge: undefined,
+  noCaret: false,
+  active: false,
 };
 
 const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
