@@ -166,8 +166,7 @@ const StreamActions = ({
                              disabled={isNotEditable}
                              dropdownZIndex={1000}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
-          <MenuItem bsStyle="success"
-                    onSelect={onToggleStreamStatus}
+          <MenuItem onSelect={onToggleStreamStatus}
                     disabled={isDefaultStream || isNotEditable}>
             {changingStatus
               ? <span>{stream.disabled ? 'Starting Stream...' : 'Stopping Stream...'}</span>

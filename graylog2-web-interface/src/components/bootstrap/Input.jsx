@@ -19,7 +19,8 @@ import React from 'react';
 
 import InputDescription from 'components/common/InputDescription';
 
-import { Checkbox, Radio } from './imports';
+import Checkbox from './Checkbox';
+import { Radio } from './imports';
 import ControlLabel from './ControlLabel';
 import FormControl from './FormControl';
 import FormGroup from './FormGroup';
