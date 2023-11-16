@@ -194,7 +194,7 @@
         <mockito.version>5.7.0</mockito.version>
         <restassured.version>5.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.19.1</testcontainers.version>
+        <testcontainers.version>1.19.2</testcontainers.version>
         <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
