@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import { Checkbox as BootstrapCheckbox } from 'react-bootstrap';
 
 type BootstrapCheckboxProps = React.ComponentProps<typeof BootstrapCheckbox>;
