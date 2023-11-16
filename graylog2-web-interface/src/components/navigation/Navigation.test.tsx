@@ -33,7 +33,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import PerspectivesBindings from 'components/perspectives/bindings';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 
-jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));

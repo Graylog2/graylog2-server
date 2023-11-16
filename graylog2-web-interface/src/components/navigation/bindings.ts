@@ -16,6 +16,8 @@
  */
 
 import Routes from 'routing/Routes';
+import filterMenuItems, { filterCloudMenuItems } from 'util/conditional/filterMenuItems';
+import AppConfig from 'util/AppConfig';
 
 const navigationBindings = {
   navigation: [
@@ -35,7 +37,35 @@ const navigationBindings = {
       path: Routes.DASHBOARDS,
       description: 'Dashboards',
     },
+    {
+      description: 'System',
+      children: filterCloudMenuItems(
+        filterMenuItems(
+          [
+            { path: Routes.SYSTEM.OVERVIEW, description: 'Overview' },
+            { path: Routes.SYSTEM.CONFIGURATIONS, description: 'Configurations', permissions: ['clusterconfigentry:read'] },
+            { path: Routes.SYSTEM.NODES.LIST, description: 'Nodes' },
+            { path: Routes.SYSTEM.DATANODES.OVERVIEW, description: 'Data Nodes' },
+            { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
+            { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
+            { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },
+            { path: Routes.SYSTEM.LOGGING, description: 'Logging', permissions: ['loggers:read'] },
+            { path: Routes.SYSTEM.USERS.OVERVIEW, description: 'Users and Teams', permissions: ['users:list'] },
+            { path: Routes.SYSTEM.AUTHZROLES.OVERVIEW, description: 'Roles', permissions: ['roles:read'] },
+            { path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE, description: 'Authentication', permissions: ['authentication:edit'] },
+            { path: Routes.SYSTEM.CONTENTPACKS.LIST, description: 'Content Packs', permissions: ['contentpack:read'] },
+            { path: Routes.SYSTEM.GROKPATTERNS, description: 'Grok Patterns', permissions: ['grok_pattern:read'] },
+            { path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, description: 'Lookup Tables', permissions: ['lookuptables:read'] },
+            { path: Routes.SYSTEM.PIPELINES.OVERVIEW, description: 'Pipelines', permissions: ['pipeline:read', 'pipeline_connection:read'] },
+            { path: Routes.SYSTEM.SIDECARS.OVERVIEW, description: 'Sidecars', permissions: ['sidecars:read'] },
+          ],
+          AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
+        ),
+        [Routes.SYSTEM.NODES.LIST, Routes.SYSTEM.DATANODES.OVERVIEW, Routes.SYSTEM.OUTPUTS, Routes.SYSTEM.LOGGING, Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE],
+      ),
+    },
   ],
+
 };
 
 export default navigationBindings;

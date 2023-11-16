@@ -21,7 +21,6 @@ import type { PluginNavigationDropdownItem, PluginNavigation } from 'graylog-web
 import type * as Immutable from 'immutable';
 
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer } from 'components/common/router';
 import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
@@ -33,13 +32,13 @@ import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from
 import { Icon } from 'components/common';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 import filterByPerspective from 'components/perspectives/utils/filterByPerspective';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
 import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
-import SystemMenu from './SystemMenu';
 import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
@@ -106,21 +105,51 @@ type Props = {
   pathname: string,
 };
 
+const _existingDropdownItemIndex = (result, current) => {
+  if (!current.children) {
+    return null;
+  }
+
+  return result.findIndex(({ description, children }) => current.description === description && children);
+};
+
+const mergeDuplicateDropdowns = (inputArray) => inputArray.reduce((result, current) => {
+  const existingDropdownItemIndex = _existingDropdownItemIndex(result, current);
+
+  if (existingDropdownItemIndex > 0) {
+    const existingDropdownItem = result[existingDropdownItemIndex];
+    const newDropdownItem = {
+      ...existingDropdownItem,
+      children: [
+        ...existingDropdownItem.children,
+        ...current.children,
+      ],
+    };
+    const newResult = [...result];
+    newResult[existingDropdownItemIndex] = newDropdownItem;
+
+    return newResult;
+  }
+
+  return [...result, current];
+}, []);
+
 const Navigation = React.memo(({ pathname }: Props) => {
   const currentUser = useCurrentUser();
+  const { permissions, fullName, readOnly, id: userId } = currentUser;
   const { activePerspective } = useActivePerspective();
-  const { permissions, fullName, readOnly, id: userId } = currentUser || {};
+  const allNavigationItems = usePluginEntities('navigation');
+  const pluginItems = usePluginEntities('navigationItems');
 
-  const pluginExports = PluginStore.exports('navigation');
+  const navigationItems = mergeDuplicateDropdowns(allNavigationItems);
 
   const enterpriseMenuIsMissing = !pluginMenuItemExists(ENTERPRISE_ROUTE_DESCRIPTION);
   const securityMenuIsMissing = !pluginMenuItemExists(SECURITY_ROUTE_DESCRIPTION);
-
   const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
 
   if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
     // no enterprise plugin menu, so we will add one
-    pluginExports.push({
+    navigationItems.push({
       path: Routes.SYSTEM.ENTERPRISE,
       description: ENTERPRISE_ROUTE_DESCRIPTION,
     });
@@ -128,15 +157,14 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
   if (securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
     // no security plugin menu, so we will add one
-    pluginExports.push({
+    navigationItems.push({
       path: Routes.SECURITY,
       description: SECURITY_ROUTE_DESCRIPTION,
     });
   }
 
-  const pluginNavigations = filterByPerspective(pluginExports, activePerspective)
+  const pluginNavigations = filterByPerspective(navigationItems, activePerspective)
     .map((pluginRoute) => formatPluginRoute(pluginRoute, currentUser.permissions, pathname, activePerspective));
-  const pluginItems = PluginStore.exports('navigationItems');
 
   return (
     <StyledNavbar fluid fixedTop collapseOnSelect>
@@ -151,7 +179,6 @@ const Navigation = React.memo(({ pathname }: Props) => {
       <Navbar.Collapse>
         <Nav className="navbar-main">
           {pluginNavigations}
-          <SystemMenu />
         </Nav>
 
         <NotificationBadge />
@@ -167,7 +194,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />
-            {filterByPerspective(pluginItems, activePerspective).map(({ key, component: Item }) => <Item key={key} />)}
+            {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
           <ScratchpadToggle />
 
