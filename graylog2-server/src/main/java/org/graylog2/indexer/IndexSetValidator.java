@@ -17,53 +17,49 @@
 package org.graylog2.indexer;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatier.tier.DataTier;
-import org.graylog2.datatier.tier.DataTierValidator;
+import org.graylog2.datatier.DataTierOrchestrator;
+import org.graylog2.datatier.DataTiersConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidation;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
-import org.joda.time.DurationFieldType;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
-import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY;
-import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_ROTATION_PERIOD;
-import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_MAX;
-import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_MIN;
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY_CLASS;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
     private static final Duration MINIMUM_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(1L);
     private final IndexSetRegistry indexSetRegistry;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
-    private final Set<DataTierValidator> dataTierValidators;
+    private final DataTierOrchestrator dataTierOrchestrator;
 
     @Inject
     public IndexSetValidator(IndexSetRegistry indexSetRegistry,
                              ElasticsearchConfiguration elasticsearchConfiguration,
-                             Set<DataTierValidator> dataTierValidators) {
+                             DataTierOrchestrator dataTierOrchestrator) {
         this.indexSetRegistry = indexSetRegistry;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
-        this.dataTierValidators = dataTierValidators;
+        this.dataTierOrchestrator = dataTierOrchestrator;
     }
 
     public Optional<Violation> validate(IndexSetConfig newConfig) {
+
 
         // Don't validate prefix conflicts in case of an update
         if (Strings.isNullOrEmpty(newConfig.id())) {
@@ -78,24 +74,45 @@ public class IndexSetValidator {
             return Optional.of(refreshIntervalViolation);
         }
 
-        final Violation  rotationViolation = validateRotation(newConfig.rotationStrategy());
-        if (rotationViolation != null) {
-            return Optional.of(rotationViolation);
+        if (newConfig.dataTiers() != null) {
+            final Violation dataTiersViolation = validateDataTiers(newConfig.dataTiers());
+            if (dataTiersViolation != null) {
+                return Optional.of(dataTiersViolation);
+            }
+        } else {
+            if (newConfig.retentionStrategy() == null) {
+                return Optional.of(Violation.create(FIELD_RETENTION_STRATEGY + " cannot be null!"));
+            }
+
+            if (newConfig.retentionStrategyClass() == null) {
+                return Optional.of(Violation.create(FIELD_RETENTION_STRATEGY_CLASS + " cannot be null!"));
+            }
+
+            if (newConfig.rotationStrategy() == null) {
+                return Optional.of(Violation.create(FIELD_ROTATION_STRATEGY + " cannot be null!"));
+            }
+
+            if (newConfig.rotationStrategyClass() == null) {
+                return Optional.of(Violation.create(FIELD_ROTATION_STRATEGY_CLASS + " cannot be null!"));
+            }
+
+            final Violation rotationViolation = validateRotation(newConfig.rotationStrategy());
+            if (rotationViolation != null) {
+                return Optional.of(rotationViolation);
+            }
+
+
+            final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategy());
+            if (retentionConfigViolation != null) {
+                return Optional.of(retentionConfigViolation);
+            }
+
+            return Optional.ofNullable(validateRetentionPeriod(newConfig.rotationStrategy(),
+                    newConfig.retentionStrategy()));
         }
 
-        final Violation dataTiersViolation = validateDataTiers(newConfig.dataTiers());
-        if (dataTiersViolation != null){
-            return Optional.of(dataTiersViolation);
-        }
+        return Optional.empty();
 
-
-        final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategy());
-        if (retentionConfigViolation != null) {
-            return Optional.of(retentionConfigViolation);
-        }
-
-        return Optional.ofNullable(validateRetentionPeriod(newConfig.rotationStrategy(),
-                newConfig.retentionStrategy()));
     }
 
     @Nullable
@@ -131,61 +148,18 @@ public class IndexSetValidator {
     @Nullable
     public Violation validateRotation(RotationStrategyConfig rotationStrategyConfig) {
         if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
-            final Period leeway = config.indexLifetimeMax().minus(config.indexLifetimeMin());
-            if (leeway.toStandardSeconds().getSeconds() < 0) {
-                return Violation.create(f("%s <%s> is shorter than %s <%s>", INDEX_LIFETIME_MAX, config.indexLifetimeMax(),
-                        INDEX_LIFETIME_MIN, config.indexLifetimeMin()));
-            }
-
-            if (leeway.toStandardSeconds().isLessThan(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod().toStandardSeconds())) {
-                return Violation.create(f("The duration between %s and %s <%s> cannot be shorter than %s <%s>", INDEX_LIFETIME_MAX, INDEX_LIFETIME_MIN,
-                        leeway, TIME_SIZE_OPTIMIZING_ROTATION_PERIOD, elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()));
-            }
-
-            Period fixedLeeway = elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway();
-            if (Objects.nonNull(fixedLeeway) && leeway.toStandardSeconds().isLessThan(fixedLeeway.toStandardSeconds())) {
-                return Violation.create(f("The duration between %s and %s <%s> cannot be shorter than %s <%s>", INDEX_LIFETIME_MAX, INDEX_LIFETIME_MIN,
-                        leeway, TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY, fixedLeeway));
-            }
-
-
-            final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
-            if (maxRetentionPeriod != null
-                    && config.indexLifetimeMax().toStandardSeconds().isGreaterThan(maxRetentionPeriod.toStandardSeconds())) {
-                return Violation.create(f("Lifetime setting %s <%s> exceeds the configured maximum of %s=%s.",
-                        INDEX_LIFETIME_MAX, config.indexLifetimeMax(),
-                        ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
-            }
-
-            if (periodOtherThanDays(config.indexLifetimeMax())) {
-                return Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
-                        INDEX_LIFETIME_MAX, config.indexLifetimeMax()));
-            }
-            if (periodOtherThanDays(config.indexLifetimeMin())) {
-                return Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
-                        INDEX_LIFETIME_MIN, config.indexLifetimeMin()));
-            }
+            return TimeSizeOptimizingValidation.validate(
+                    elasticsearchConfiguration,
+                    config.indexLifetimeMin(),
+                    config.indexLifetimeMax()).orElse(null);
         }
         return null;
     }
 
 
     @Nullable
-    public Violation validateDataTiers(List<DataTier> dataTiers) {
-        for (DataTierValidator dataTierValidator : dataTierValidators) {
-            Optional<Violation> violation = dataTierValidator.validate(dataTiers);
-            if (violation.isPresent()) {
-                return violation.get();
-            }
-        }
-        return null;
-    }
-
-    @VisibleForTesting
-    boolean periodOtherThanDays(Period period) {
-        return Arrays.stream(period.getFieldTypes())
-                .filter(type -> !type.equals(DurationFieldType.days()))
-                .anyMatch(type -> period.get(type) != 0);
+    public Violation validateDataTiers(DataTiersConfig dataTiersConfig) {
+        return dataTierOrchestrator.validate(dataTiersConfig).orElse(null);
     }
 
     @Nullable

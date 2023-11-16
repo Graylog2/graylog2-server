@@ -22,7 +22,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.rotation.IndexRotator;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;

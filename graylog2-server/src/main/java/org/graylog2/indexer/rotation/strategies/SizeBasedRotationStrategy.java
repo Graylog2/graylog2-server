@@ -18,7 +18,7 @@ package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.rotation.IndexRotator;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
@@ -28,7 +28,7 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.graylog2.indexer.rotation.IndexRotator.createResult;
+import static org.graylog2.indexer.rotation.common.IndexRotator.createResult;
 
 public class SizeBasedRotationStrategy implements RotationStrategy {
     public static final String NAME = "size";

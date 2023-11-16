@@ -19,7 +19,7 @@ package org.graylog2.indexer.rotation.strategies;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.rotation.IndexRotator;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.slf4j.Logger;
@@ -30,8 +30,8 @@ import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Locale;
 
-import static org.graylog2.indexer.rotation.IndexRotator.*;
-import static org.graylog2.indexer.rotation.IndexRotator.createResult;
+import static org.graylog2.indexer.rotation.common.IndexRotator.*;
+import static org.graylog2.indexer.rotation.common.IndexRotator.createResult;
 
 public class MessageCountRotationStrategy implements RotationStrategy {
     public static final String NAME = "count";

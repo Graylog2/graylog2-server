@@ -24,7 +24,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.IndexRotator;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;

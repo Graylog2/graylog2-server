@@ -22,8 +22,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.IndexRotator;
-import org.graylog2.indexer.rotation.IndexRotator.Result;
+import org.graylog2.indexer.rotation.common.IndexRotator;
+import org.graylog2.indexer.rotation.common.IndexRotator.Result;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.DateTime;
@@ -36,7 +36,7 @@ import javax.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 
-import static org.graylog2.indexer.rotation.IndexRotator.createResult;
+import static org.graylog2.indexer.rotation.common.IndexRotator.createResult;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.humanReadableByteCount;
 

@@ -17,7 +17,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatier.DataTierRetention;
+import org.graylog2.datatier.DataTierOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
@@ -45,7 +45,7 @@ public class IndexRetentionThread extends Periodical {
     private final NodeId nodeId;
     private final NotificationService notificationService;
     private final Map<String, Provider<RetentionStrategy>> retentionStrategyMap;
-    private final DataTierRetention dataTierRetention;
+    private final DataTierOrchestrator dataTierOrchestrator;
 
     @Inject
     public IndexRetentionThread(ElasticsearchConfiguration configuration,
@@ -54,14 +54,14 @@ public class IndexRetentionThread extends Periodical {
                                 NodeId nodeId,
                                 NotificationService notificationService,
                                 Map<String, Provider<RetentionStrategy>> retentionStrategyMap,
-                                DataTierRetention dataTierRetention) {
+                                DataTierOrchestrator dataTierOrchestrator) {
         this.configuration = configuration;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
         this.nodeId = nodeId;
         this.notificationService = notificationService;
         this.retentionStrategyMap = retentionStrategyMap;
-        this.dataTierRetention = dataTierRetention;
+        this.dataTierOrchestrator = dataTierOrchestrator;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class IndexRetentionThread extends Periodical {
             }
             final IndexSetConfig config = indexSet.getConfig();
             if (config.dataTiers() != null) {
-                dataTierRetention.retain(indexSet);
+                dataTierOrchestrator.retain(indexSet);
             }else{
                 final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());
 

@@ -96,12 +96,6 @@ public class IndexSetDefaultsResource extends RestResource {
             throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.ROTATION_STRATEGY_CONFIG, violation.message()));
         }
 
-        violation = indexSetValidator.validateDataTiers(config.dataTiers());
-
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.DATA_TIERS, violation.message()));
-        }
-
         violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategyConfig(),
                 config.retentionStrategyConfig());
         if (violation != null) {

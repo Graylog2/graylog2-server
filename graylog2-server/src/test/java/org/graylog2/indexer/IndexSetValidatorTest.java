@@ -17,15 +17,13 @@
 package org.graylog2.indexer;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatier.tier.hot.HotTier;
-import org.graylog2.datatier.tier.hot.HotTierValidator;
+import org.graylog2.datatier.DataTierOrchestrator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.Duration;
@@ -41,9 +39,7 @@ import org.mockito.junit.MockitoRule;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -61,11 +57,14 @@ public class IndexSetValidatorTest {
     @Mock
     private ElasticsearchConfiguration elasticsearchConfiguration;
 
+    @Mock
+    private DataTierOrchestrator dataTierOrchestrator;
+
     private IndexSetValidator validator;
 
     @Before
     public void setUp() throws Exception {
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, Set.of(new HotTierValidator(elasticsearchConfiguration)));
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTierOrchestrator);
     }
 
     @Test
@@ -178,75 +177,6 @@ public class IndexSetValidatorTest {
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
                 .build();
         assertThat(validator.validate(modifiedConfig)).isNotPresent();
-
-        // TimeBasedSizeOptimizingRotation validation
-        final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .dataTiers(List.of(HotTier.builder()
-                        .indexLifetimeMin(Period.days(2))
-                        .indexLifetimeMax(Period.days(30))
-                        .build())
-                )
-                .build();
-        assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
-                assertThat(v.message()).contains(
-                        "Lifetime setting index_lifetime_max <P30D> exceeds the configured maximum of max_index_retention_period=P9D")
-        );
-    }
-
-    @Test
-    public void timeBasedSizeOptimizingOnlyWithMultipleOfDays() {
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-
-        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
-        final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .dataTiers(List.of(HotTier.builder()
-                        .indexLifetimeMin(Period.days(2).withHours(2))
-                        .indexLifetimeMax(Period.days(30))
-                        .build())
-                )
-                .build();
-
-        assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
-                assertThat(v.message()).contains(
-                        "Lifetime setting index_lifetime_min <P2DT2H> can only be a multiple of days")
-        );
-
-        assertThat(validator.periodOtherThanDays(Period.days(5))).isFalse();
-        assertThat(validator.periodOtherThanDays(Period.weeks(5))).isTrue();
-        assertThat(validator.periodOtherThanDays(Period.days(5).withHours(3))).isTrue();
-    }
-
-    @Test
-    public void timeBasedSizeOptimizingHonorsFixedLeeWay() {
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(10));
-
-        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
-        final IndexSetConfig failingConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .dataTiers(List.of(HotTier.builder()
-                        .indexLifetimeMin(Period.days(10))
-                        .indexLifetimeMax(Period.days(19))
-                        .build())
-                )
-                .build();
-
-        assertThat(validator.validate(failingConfig)).hasValueSatisfying(v -> assertThat(v.message())
-                .contains("The duration between index_lifetime_max and index_lifetime_min <P9D> " +
-                        "cannot be shorter than time_size_optimizing_retention_fixed_leeway <P10D>"));
-
-        final IndexSetConfig successfullConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .dataTiers(List.of(HotTier.builder()
-                        .indexLifetimeMin(Period.days(10))
-                        .indexLifetimeMax(Period.days(20))
-                        .build())
-                )
-                .build();
-
-        assertThat(validator.validate(successfullConfig)).isEmpty();
     }
 
     @Test
@@ -269,6 +199,28 @@ public class IndexSetValidatorTest {
 
         assertThat(violation).isPresent();
     }
+
+    @Test
+    public void testStrategiesPresentIfDataTiersIsNull() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+
+
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().retentionStrategy(null).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("retention_strategy cannot be null")
+        );
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().retentionStrategyClass(null).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("retention_strategy_class cannot be null")
+        );
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().rotationStrategy(null).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("rotation_strategy cannot be null")
+        );
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().rotationStrategyClass(null).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("rotation_strategy_class cannot be null")
+        );
+    }
+
 
     private IndexSetConfig testIndexSetConfig() {
         return IndexSetConfig.builder()

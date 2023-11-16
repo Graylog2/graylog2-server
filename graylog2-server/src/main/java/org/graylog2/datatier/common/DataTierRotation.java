@@ -1,30 +1,27 @@
-package org.graylog2.datatier;
+package org.graylog2.datatier.common;
 
 import com.github.joschi.jadconfig.util.Size;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatier.common.tier.HotTierConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.IndexRotator;
-import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 
-import static org.graylog2.indexer.rotation.IndexRotator.createResult;
+import static org.graylog2.indexer.rotation.common.IndexRotator.createResult;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.humanReadableByteCount;
 
 public class DataTierRotation {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DataTierRotation.class);
 
     private final JobSchedulerClock clock;
     private final org.joda.time.Period rotationPeriod;
@@ -36,11 +33,14 @@ public class DataTierRotation {
     private final Size maxShardSize;
     private final Size minShardSize;
 
-    @Inject
+    private final HotTierConfig hotTierConfig;
+
+    @AssistedInject
     public DataTierRotation(Indices indices,
                             ElasticsearchConfiguration elasticsearchConfiguration,
                             IndexRotator indexRotator,
-                            JobSchedulerClock clock) {
+                            JobSchedulerClock clock,
+                            @Assisted HotTierConfig hotTierConfig) {
 
         this.indices = indices;
         this.indexRotator = indexRotator;
@@ -48,20 +48,17 @@ public class DataTierRotation {
         this.rotationPeriod = elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod();
         this.maxShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize();
         this.minShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize();
+        this.hotTierConfig = hotTierConfig;
     }
 
     public void rotate(IndexSet indexSet) {
-        indexRotator.rotate(indexSet,this::shouldRotate);
+        indexRotator.rotate(indexSet, this::shouldRotate);
     }
 
     @Nonnull
-    protected IndexRotator.Result shouldRotate(final String index, IndexSet indexSet) {
-        final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(()-> new IllegalStateException("No index creation date"));
+    private IndexRotator.Result shouldRotate(final String index, IndexSet indexSet) {
+        final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(() -> new IllegalStateException("No index creation date"));
         final Long sizeInBytes = indices.getStoreSizeInBytes(index).orElseThrow(() -> new IllegalStateException("No index size"));
-
-        if (!(indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
-            throw new IllegalStateException(f("Unsupported RotationStrategyConfig type <%s>", indexSet.getConfig().rotationStrategy()));
-        }
 
         if (indices.numberOfMessages(index) == 0) {
             return createResult(false, "Index is empty");
@@ -78,7 +75,7 @@ public class DataTierRotation {
 
         // If no retention is selected, we have an "indefinite" optimization leeway
         if (!(indexSet.getConfig().retentionStrategy() instanceof NoopRetentionStrategyConfig)) {
-            Period leeWay = config.indexLifetimeMax().minus(config.indexLifetimeMin());
+            Period leeWay = hotTierConfig.indexLifetimeMax().minus(hotTierConfig.indexLifetimeMin());
             if (indexExceedsLeeWay(creationDate, leeWay)) {
                 return createResult(true,
                         f("Index creation date <%s> exceeds optimization leeway <%s>",
@@ -110,6 +107,11 @@ public class DataTierRotation {
         final Duration limitAsDuration = Duration.ofSeconds(limit.toStandardSeconds().getSeconds());
 
         return timePassed.compareTo(limitAsDuration) >= 0;
+    }
+
+    public interface Factory {
+        DataTierRotation create(HotTierConfig hotTierConfig);
+
     }
 
 

@@ -1,4 +1,4 @@
-package org.graylog2.indexer.rotation;
+package org.graylog2.indexer.rotation.common;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;

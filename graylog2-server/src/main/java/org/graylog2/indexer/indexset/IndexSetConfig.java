@@ -24,7 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
-import org.graylog2.datatier.tier.DataTier;
+import org.graylog2.datatier.DataTiersConfig;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -39,7 +39,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -55,6 +54,11 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_CREATION_DATE = "creation_date";
     public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
     public static final String FIELD_REGULAR = "regular";
+    public static final String FIELD_ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
+    public static final String FIELD_ROTATION_STRATEGY = "rotation_strategy";
+    public static final String FIELD_RETENTION_STRATEGY_CLASS = "retention_strategy_class";
+    public static final String FIELD_RETENTION_STRATEGY = "retention_strategy";
+    public static final String FIELD_DATA_TIERS = "data_tiers";
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
@@ -72,10 +76,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_wildcard") @Nullable String indexWildcard,
                                         @JsonProperty("shards") @Min(1) int shards,
                                         @JsonProperty("replicas") @Min(0) int replicas,
-                                        @JsonProperty("rotation_strategy_class") @Nullable String rotationStrategyClass,
-                                        @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
-                                        @JsonProperty("retention_strategy_class") @Nullable String retentionStrategyClass,
-                                        @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
+                                        @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS) @Nullable String rotationStrategyClass,
+                                        @JsonProperty(FIELD_ROTATION_STRATEGY) @Nullable RotationStrategyConfig rotationStrategy,
+                                        @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS) @Nullable String retentionStrategyClass,
+                                        @JsonProperty(FIELD_RETENTION_STRATEGY) @Nullable RetentionStrategyConfig retentionStrategy,
                                         @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
                                         @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
                                         @JsonProperty("index_template_name") @Nullable String indexTemplateName,
@@ -84,7 +88,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
                                         @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
-                                        @JsonProperty("data_tiers") @Nullable List<DataTier> dataTiers
+                                        @JsonProperty(FIELD_DATA_TIERS) @Nullable DataTiersConfig dataTiers
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;
@@ -229,20 +233,20 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @Min(0)
     public abstract int replicas();
 
-    @JsonProperty("rotation_strategy_class")
+    @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS)
     @Nullable
     public abstract String rotationStrategyClass();
 
-    @JsonProperty("rotation_strategy")
-    @NotNull
+    @JsonProperty(FIELD_ROTATION_STRATEGY)
+    @Nullable
     public abstract RotationStrategyConfig rotationStrategy();
 
-    @JsonProperty("retention_strategy_class")
+    @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS)
     @Nullable
     public abstract String retentionStrategyClass();
 
-    @JsonProperty("retention_strategy")
-    @NotNull
+    @JsonProperty(FIELD_RETENTION_STRATEGY)
+    @Nullable
     public abstract RetentionStrategyConfig retentionStrategy();
 
     @JsonProperty(FIELD_CREATION_DATE)
@@ -274,9 +278,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("custom_field_mappings")
     public abstract CustomFieldMappings customFieldMappings();
 
-    @JsonProperty("data_tiers")
     @Nullable
-    public abstract List<DataTier> dataTiers();
+    @JsonProperty(FIELD_DATA_TIERS)
+    public abstract DataTiersConfig dataTiers();
 
     @JsonIgnore
     public boolean isRegularIndex() {
@@ -318,13 +322,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder replicas(int replicas);
 
-        public abstract Builder rotationStrategyClass(String rotationStrategyClass);
+        public abstract Builder rotationStrategyClass(@Nullable String rotationStrategyClass);
 
-        public abstract Builder rotationStrategy(RotationStrategyConfig rotationStrategy);
+        public abstract Builder rotationStrategy(@Nullable RotationStrategyConfig rotationStrategy);
 
-        public abstract Builder retentionStrategyClass(String retentionStrategyClass);
+        public abstract Builder retentionStrategyClass(@Nullable String retentionStrategyClass);
 
-        public abstract Builder retentionStrategy(RetentionStrategyConfig retentionStrategy);
+        public abstract Builder retentionStrategy(@Nullable RetentionStrategyConfig retentionStrategy);
 
         public abstract Builder creationDate(ZonedDateTime creationDate);
 
@@ -342,7 +346,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder customFieldMappings(CustomFieldMappings customFieldMappings);
 
-        public abstract Builder dataTiers(List<DataTier> dataTiers);
+        public abstract Builder dataTiers(@Nullable DataTiersConfig dataTiers);
 
         public abstract IndexSetConfig build();
     }
