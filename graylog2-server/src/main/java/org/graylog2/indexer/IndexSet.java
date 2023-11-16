@@ -170,6 +170,25 @@ public interface IndexSet extends Comparable<IndexSet> {
      */
     IndexSetConfig getConfig();
 
+    default String getNthIndexBeforeActiveIndexSet(final int n) {
+        final String activeWriteIndex = getActiveWriteIndex();
+        if (activeWriteIndex != null) {
+            final Optional<Integer> deflectorNumber = extractIndexNumber(activeWriteIndex);
+            final String indexPrefix = getIndexPrefix();
+            return deflectorNumber
+                    .map(num -> {
+                        final int indexNumber = num - n;
+                        if (indexNumber >= 0) {
+                            return indexPrefix + MongoIndexSet.SEPARATOR + indexNumber;
+                        }
+                        return null;
+                    })
+                    .orElse(null);
+        }
+
+        return null;
+    }
+
     class IndexNameComparator implements Comparator<String> {
         private final IndexSet indexSet;
 

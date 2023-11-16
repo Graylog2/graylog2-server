@@ -35,7 +35,6 @@ import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
-import DataNodeConfiguration from 'components/configurations/DataNodeConfiguration/DataNodeConfiguration';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
 import KeyboardShortcutsSection from 'pages/configurations/KeyboardShortcutsSection';
@@ -162,15 +161,6 @@ const ConfigurationsPage = () => {
       props: {
         ConfigurationComponent: UserConfig,
         title: 'Index Set Defaults',
-      },
-    },
-    {
-      name: 'Data Node',
-      hide: isCloud,
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: DataNodeConfiguration,
-        title: 'Certificate Renewal Policy',
       },
     },
     {

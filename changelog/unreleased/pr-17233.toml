@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix redirect after creating contentpack revision."
+
+issues = ["17071"]
+pulls = ["17233"]
+

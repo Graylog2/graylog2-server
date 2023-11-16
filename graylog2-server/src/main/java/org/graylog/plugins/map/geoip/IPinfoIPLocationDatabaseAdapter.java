@@ -16,12 +16,6 @@
  */
 package org.graylog.plugins.map.geoip;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.maxmind.db.InvalidDatabaseException;
 import com.maxmind.db.NoCache;
 import com.maxmind.db.Reader;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
@@ -39,47 +33,35 @@ import java.net.InetAddress;
  * database type identifier and a different data format than the MaxMind databases.
  */
 public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapter {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-            .configure(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS, false)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
-
     private final Reader reader;
 
     public IPinfoIPLocationDatabaseAdapter(File databaseFile) throws IOException {
         this.reader = new Reader(databaseFile, Reader.FileMode.MEMORY_MAPPED, NoCache.getInstance());
     }
 
-    private ObjectNode get(InetAddress ipAddress, String type) throws IOException, AddressNotFoundException {
+    private <T> T get(InetAddress ipAddress, String type, Class<T> valueClass) throws IOException, AddressNotFoundException {
         final String databaseType = reader.getMetadata().getDatabaseType();
         if (!databaseType.contains(type)) {
             final String caller = Thread.currentThread().getStackTrace()[2].getMethodName();
             throw new UnsupportedOperationException("Invalid attempt to open a \"" + databaseType + "\" database using the " + caller + " method");
         }
 
-        final ObjectNode node = asObjectNode(reader.get(ipAddress));
-        if (node == null) {
+        final T value = reader.get(ipAddress, valueClass);
+        if (value == null) {
             throw new AddressNotFoundException("Address " + ipAddress.getHostAddress() + " not found in database");
         }
 
-        return node;
-    }
-
-    private ObjectNode asObjectNode(JsonNode node) throws InvalidDatabaseException {
-        if (node == null || node instanceof ObjectNode) {
-            return (ObjectNode) node;
-        }
-        throw new InvalidDatabaseException("Unexpected data type returned. The IPinfo database may be corrupt.");
+        return value;
     }
 
     @Override
     public IPinfoStandardLocation ipInfoStandardLocation(InetAddress ipAddress) throws IOException, AddressNotFoundException {
-        return OBJECT_MAPPER.convertValue(get(ipAddress, "ipinfo standard_location"), IPinfoStandardLocation.class);
+        return get(ipAddress, "ipinfo standard_location", IPinfoStandardLocation.class);
     }
 
     @Override
     public IPinfoASN ipInfoASN(InetAddress ipAddress) throws IOException, AddressNotFoundException {
-        return OBJECT_MAPPER.convertValue(get(ipAddress, "ipinfo asn"), IPinfoASN.class);
+        return get(ipAddress, "ipinfo asn", IPinfoASN.class);
     }
 
     @Override

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, useState } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import usePaginationQueryParameter, { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
@@ -110,16 +110,23 @@ const ListWithOwnState = ({
   pageSize: propPageSize,
   ...props
 }: Required<Props> & { activePage: number, pageSize: number }) => {
-  const [{ page: currentPage, pageSize: currentPageSize }, setPagination] = React.useState({
-    page: Math.max(activePage, INITIAL_PAGE),
-    pageSize: propPageSize,
-  });
+  const [currentPage, setCurrentPage] = useState<number>(Math.max(activePage, INITIAL_PAGE));
+  const [currentPageSize, setCurrentPageSize] = useState<number>(propPageSize);
 
   useEffect(() => {
-    if (activePage > 0 && activePage !== currentPage) {
-      setPagination((cur) => ({ ...cur, page: activePage }));
+    if (activePage > 0) {
+      setCurrentPage(activePage);
     }
-  }, [activePage, currentPage]);
+  }, [activePage]);
+
+  useEffect(() => {
+    setCurrentPageSize(propPageSize);
+  }, [propPageSize]);
+
+  const setPagination = useCallback(({ page, pageSize }) => {
+    setCurrentPageSize(pageSize);
+    setCurrentPage(page);
+  }, []);
 
   return (
     <ListBase {...props}

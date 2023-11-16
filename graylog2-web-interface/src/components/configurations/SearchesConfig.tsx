@@ -39,9 +39,12 @@ import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
-import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
+import Alert from 'components/bootstrap/Alert';
+import useLocation from 'routing/useLocation';
+import ReadableDuration from 'components/common/ReadableDuration';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
@@ -50,9 +53,7 @@ const queryTimeRangeLimitValidator = (milliseconds: number) => milliseconds >= 1
 
 const surroundingTimeRangeValidator = (milliseconds: number) => milliseconds >= 1;
 
-function autoRefreshTimeRangeValidator(milliseconds: number) {
-  return milliseconds >= 1000;
-}
+const autoRefreshTimeRangeValidator = (minimumRefreshIntervalMS: number) => (milliseconds: number) => milliseconds >= 1000 && milliseconds >= minimumRefreshIntervalMS;
 
 const splitStringList = (stringList: string) => stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
 
@@ -68,7 +69,9 @@ const mapQuickAccessBEData = (items: Array<TimeRangePreset>, formatTime: (time: 
 
 const SearchesConfig = () => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const isLimitEnabled = (config) => moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
+  const isLimitEnabled = (config: { query_time_range_limit: number }) => moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
+  const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumRefreshInterval } = useMinimumRefreshInterval();
+  const minimumRefreshIntervalMS = moment.duration(minimumRefreshInterval).asMilliseconds();
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<SearchConfig | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<SearchConfig | undefined>(undefined);
@@ -343,7 +346,7 @@ const SearchesConfig = () => {
                    required />
             <TimeRangeOptionsForm options={autoRefreshOptions(formConfig)}
                                   update={onAutoRefreshTimeRangeOptionsUpdate}
-                                  validator={autoRefreshTimeRangeValidator}
+                                  validator={autoRefreshTimeRangeValidator(minimumRefreshIntervalMS)}
                                   title="Auto-Refresh Interval Options"
                                   help={<span>Configure the available options for the <strong>auto-refresh</strong> interval selector as <strong>ISO8601 duration</strong></span>} />
             <Input label="Default Auto-Refresh Option"
@@ -359,6 +362,12 @@ const SearchesConfig = () => {
                       onChange={onAutoRefreshDefaultOptionsUpdate}
                       value={defaultAutoRefreshOption(formConfig)} />
             </Input>
+            {!isLoadingMinimumRefreshInterval && (
+              <Alert bsStyle="warning">
+                Please note, a minimum refresh interval of <ReadableDuration duration={minimumRefreshInterval} /> ({minimumRefreshInterval}) has been configured in the graylog.conf.
+                Only intervals which are equal or above the minimum can be used.
+              </Alert>
+            )}
           </fieldset>
         </BootstrapModalForm>
       )}

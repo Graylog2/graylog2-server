@@ -54,15 +54,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     setShowModal(false);
   };
 
-  const confirmProcessAction = (doneCallback?: () => void) => {
-    const callback = () => {
-      if (doneCallback && typeof doneCallback === 'function') {
-        doneCallback();
-      }
-
-      cancelProcessAction();
-    };
-
+  const confirmProcessAction = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.PROCESS_ACTION_SET, {
       app_pathname: 'sidecars',
       app_section: 'administration',
@@ -71,7 +63,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
       },
     });
 
-    onProcessAction(selectedAction, selectedSidecarCollectorPairs, callback);
+    onProcessAction(selectedAction, selectedSidecarCollectorPairs, cancelProcessAction);
   };
 
   const hideConfigurationWarning = () => {

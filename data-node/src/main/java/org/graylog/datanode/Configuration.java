@@ -24,8 +24,6 @@ import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
-import com.github.joschi.jadconfig.validators.DirectoryPathWritableValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
@@ -93,7 +91,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchConfigLocation = Path.of("datanode/config");
 
-    @Parameter(value = "config_location", validators = DirectoryPathReadableValidator.class)
+    @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
     private Path configLocation = null;
 
     @Parameter(value = "process_logs_buffer_size")
@@ -176,6 +174,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "hostname")
     private String hostname = null;
 
+    @Parameter(value = "clustername")
+    private String clustername = "datanode-cluster";
+
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
 
@@ -248,7 +249,6 @@ public class Configuration extends BaseConfiguration {
      * This is a pointer to a directory holding configuration files (and certificates) for the datanode itself.
      * We treat it as read only for the datanode and should never persist anything in it.
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
-     *
      */
     @Nullable
     public Path getDatanodeConfigurationLocation() {
@@ -355,6 +355,10 @@ public class Configuration extends BaseConfiguration {
 
     public int getDatanodeHttpPort() {
         return datanodeHttpPort;
+    }
+
+    public String getClustername() {
+        return clustername;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

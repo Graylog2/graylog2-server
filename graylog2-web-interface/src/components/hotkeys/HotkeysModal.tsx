@@ -73,6 +73,7 @@ const ModalHotkeyCollectionSection = ({ collection, scope }: ModalHotkeyCollecti
     <HotkeyCollectionSection sectionActions={filtratedActions}
                              description={description}
                              title={title} />
+
   );
 };
 

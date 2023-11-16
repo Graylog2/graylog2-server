@@ -26,13 +26,13 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -125,25 +125,30 @@ const _getFormattedMessages = (messages): Array<Message> => messages.map((m) => 
   decoration_stats: m.decoration_stats,
 }));
 
-const _toggleMessageDetail = (id: string, expandedMessages: Immutable.Set<string>, setExpandedMessages: (newValue: Immutable.Set<string>) => void) => {
+const _toggleMessageDetail = (
+  id: string,
+  expandedMessages: Immutable.Set<string>,
+  setExpandedMessages: (newValue: Immutable.Set<string>) => void,
+  stopAutoRefresh: () => void,
+) => {
   let newSet;
 
   if (expandedMessages.contains(id)) {
     newSet = expandedMessages.delete(id);
   } else {
     newSet = expandedMessages.add(id);
-    RefreshActions.disable();
+    stopAutoRefresh();
   }
 
   setExpandedMessages(newSet);
 };
 
 const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, setLoadingState, scrollContainerRef }: Props) => {
+  const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
   const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
-
-  const toggleDetail = useCallback((id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages), [expandedMessages]);
+  const toggleDetail = useCallback((id: string) => _toggleMessageDetail(id, expandedMessages, setExpandedMessages, stopAutoRefresh), [expandedMessages, stopAutoRefresh]);
 
   return (
     <MessageTableProviders>
