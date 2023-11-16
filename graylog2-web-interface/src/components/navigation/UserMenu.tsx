@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { LinkContainer } from 'components/common/router';
@@ -23,16 +22,12 @@ import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import useHistory from 'routing/useHistory';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
-type Props = {
-  fullName: string,
-  userId: string,
-  readOnly: boolean,
-};
-
-const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
+const UserMenu = () => {
+  const { fullName, readOnly, id: userId } = useCurrentUser();
   const history = useHistory();
   const route = readOnly
     ? Routes.SYSTEM.USERS.show(userId)
@@ -67,11 +62,6 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
       <MenuItem onSelect={onLogoutClicked} icon="sign-out-alt">Log out</MenuItem>
     </NavDropdown>
   );
-};
-
-UserMenu.propTypes = {
-  userId: PropTypes.string.isRequired,
-  fullName: PropTypes.string.isRequired,
 };
 
 export default UserMenu;

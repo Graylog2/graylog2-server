@@ -30,7 +30,8 @@ interface PluginNavigation {
   description: string;
   requiredFeatureFlag?: string;
   perspective?: string;
-  children?: Array<PluginNavigationDropdownItem>
+  children?: Array<PluginNavigationDropdownItem>;
+  BadgeComponent?: React.ComponentType<{ text: string }>;
 }
 
 interface PluginNavigationDropdownItem {
