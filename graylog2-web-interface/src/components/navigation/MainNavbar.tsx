@@ -22,7 +22,7 @@ import { useMemo } from 'react';
 import { Nav, NavDropdown } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
-import filterByPerspective from 'components/perspectives/utils/filterByPerspective';
+import filterByPerspective from 'components/perspectives/util/filterByPerspective';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -155,7 +155,7 @@ const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, descript
   return !!navigationItems.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 };
 
-const sortItemsByPosition = <T extends { position: LAST_POSITION | undefined }>(navigationItems: Array<T>) => navigationItems.sort((route1, route2) => {
+const sortItemsByPosition = <T extends { position: typeof LAST_POSITION | undefined }>(navigationItems: Array<T>) => navigationItems.sort((route1, route2) => {
   if (route1.position === LAST_POSITION) {
     return 1;
   }
