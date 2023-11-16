@@ -18,6 +18,7 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.inmemory.InMemoryFilterExpressionParser;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
@@ -45,21 +46,27 @@ public class IndexFieldTypesListService {
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
 
+    private final InMemoryFilterExpressionParser inMemoryFilterExpressionParser;
+
     private FieldTypeDTOsMerger fieldTypeDTOsMerger;
 
     @Inject
     public IndexFieldTypesListService(final IndexFieldTypesService indexFieldTypesService,
                                       final IndexSetService indexSetService,
                                       final MongoIndexSet.Factory indexSetFactory,
-                                      final FieldTypeDTOsMerger fieldTypeDTOsMerger) {
+                                      final FieldTypeDTOsMerger fieldTypeDTOsMerger,
+                                      final InMemoryFilterExpressionParser inMemoryFilterExpressionParser) {
         this.indexFieldTypesService = indexFieldTypesService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
         this.fieldTypeDTOsMerger = fieldTypeDTOsMerger;
+        this.inMemoryFilterExpressionParser = inMemoryFilterExpressionParser;
     }
 
     public PageListResponse<IndexSetFieldType> getIndexSetFieldTypesList(
             final String indexSetId,
+            final String fieldNameQuery,
+            final List<String> filters,
             final int page,
             final int perPage,
             final String sort,
@@ -92,6 +99,8 @@ public class IndexFieldTypesListService {
                                 FieldTypeMappingsService.BLACKLISTED_FIELDS.contains(fieldTypeDTO.fieldName())
                         )
                 )
+                .filter(indexSetFieldType -> indexSetFieldType.fieldName().contains(fieldNameQuery))
+                .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parse(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
                 .sorted(IndexSetFieldType.getComparator(sort, order))
                 .skip((long) Math.max(0, page - 1) * perPage)
                 .limit(perPage)
