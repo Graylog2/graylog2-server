@@ -23,16 +23,22 @@ import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
 import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
+import type { ExtractorType, InputSummary, NodeSummary } from 'stores/extractors/ExtractorsStore';
 import { useStore } from 'stores/connect';
 
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 
-const fetchExtractors = (inputId) => {
-  ExtractorsActions.list.triggerPromise(inputId);
+type Props = {
+  input: InputSummary,
+  node: NodeSummary,
 };
 
-const ExtractorsList = ({ input, node }) => {
+const fetchExtractors = (inputId: string) => {
+  ExtractorsActions.list(inputId);
+};
+
+const ExtractorsList = ({ input, node }: Props) => {
   const [showSortModal, setShowSortModal] = useState(false);
   const extractors = useStore(ExtractorsStore, (state) => state.extractors);
 
@@ -40,7 +46,7 @@ const ExtractorsList = ({ input, node }) => {
     fetchExtractors(input.id);
   }, [input.id]);
 
-  const _formatExtractor = (extractor) => (
+  const _formatExtractor = (extractor: ExtractorType) => (
     <ExtractorsListItem key={extractor.id}
                         extractor={extractor}
                         inputId={input.id}
