@@ -30,8 +30,8 @@ type Props = {
 
 const DataNodeBulkActions = ({ setSelectedDataNodeIds }: Props) => (
   <BulkActionsDropdown selectedEntities={['']} setSelectedEntities={setSelectedDataNodeIds}>
-    <MenuItem onSelect={() => { } }>Restart</MenuItem>
-    <MenuItem onSelect={() => { } }>Remove</MenuItem>
+    <MenuItem onSelect={() => { }}>Restart</MenuItem>
+    <MenuItem onSelect={() => { }}>Remove</MenuItem>
   </BulkActionsDropdown>
 );
 
