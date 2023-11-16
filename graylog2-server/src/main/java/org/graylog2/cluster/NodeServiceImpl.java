@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
@@ -72,24 +73,25 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         return Node.Type.SERVER;
     }
 
-    private Map<String, Object> addClusterUriToMap(final Map<String, Object> orig, final String clusterUri) {
-        if(clusterUri == null) {
-            return orig;
-        }
+    private Map<String, Object> addDataNodeInfoToMap(final Map<String, Object> orig, final String clusterUri, DataNodeStatus dataNodeStatus) {
         var newMap = new HashMap<>(orig);
-        newMap.put("cluster_address", clusterUri);
+        if (Objects.nonNull(clusterUri)) {
+            newMap.put("cluster_address", clusterUri);
+        } else if (Objects.nonNull(dataNodeStatus)) {
+            newMap.put("datanode_status", dataNodeStatus.toString());
+        }
         return Map.copyOf(newMap);
     }
 
     @Override
     public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
-        final var params = addClusterUriToMap(Map.of(
+        final var params = addDataNodeInfoToMap(Map.of(
                 "node_id", nodeId,
                 "type", type().toString(),
                 "is_leader", isLeader,
                 "transport_address", httpPublishUri.toString(),
                 "hostname", hostname
-        ), clusterUri);
+        ), clusterUri, null);
 
         final Map<String, Object> fields = Map.of(
                 "$set", params,
@@ -181,12 +183,12 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      */
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress) throws NodeNotFoundException {
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress, DataNodeStatus dataNodeStatus) throws NodeNotFoundException {
         BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
-        final var params = addClusterUriToMap(Map.of(
+        final var params = addDataNodeInfoToMap(Map.of(
                 "is_leader", isLeader,
                 "transport_address", restTransportAddress.toString()
-        ), clusterAddress);
+        ), clusterAddress, dataNodeStatus);
 
         final BasicDBObject update = new BasicDBObject(Map.of(
                 "$set", params,

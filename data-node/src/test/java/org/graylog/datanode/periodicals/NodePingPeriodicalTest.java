@@ -17,6 +17,7 @@
 package org.graylog.datanode.periodicals;
 
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.process.ProcessState;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -44,7 +45,8 @@ class NodePingPeriodicalTest {
                 configuration,
                 () -> uri,
                 () -> cluster,
-                () -> true
+                () -> true,
+                () -> ProcessState.AVAILABLE
         );
 
         task.doRun();
@@ -53,7 +55,8 @@ class NodePingPeriodicalTest {
                 Mockito.eq(nodeID),
                 Mockito.eq(true),
                 Mockito.eq(uri),
-                Mockito.eq(cluster));
+                Mockito.eq(cluster),
+                Mockito.eq(ProcessState.AVAILABLE.getDataNodeStatus()));
     }
 
 
@@ -66,7 +69,7 @@ class NodePingPeriodicalTest {
 
         final NodeService nodeService = Mockito.mock(NodeService.class);
 
-        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri, cluster);
+        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri, cluster, ProcessState.STARTING.getDataNodeStatus());
 
         Configuration configuration = Mockito.mock(Configuration.class);
         Mockito.when(configuration.getHostname()).thenReturn("hostname.setting.from.config");
@@ -77,7 +80,8 @@ class NodePingPeriodicalTest {
                 configuration,
                 () -> uri,
                 () -> cluster,
-                () -> true
+                () -> true,
+                () -> ProcessState.STARTING
         );
 
         task.doRun();
