@@ -2,4 +2,4 @@ type = "fixed"
 message = "Show correct throughput when messages are routed via a pipeline rule."
 
 issues = ["Graylog2/graylog-plugin-enterprise#6138"]
-pulls = ["1111"]
+pulls = ["17347"]
