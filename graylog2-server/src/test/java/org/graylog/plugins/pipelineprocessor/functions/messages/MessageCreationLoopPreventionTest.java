@@ -44,6 +44,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.streams.StreamMetrics;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Test;
@@ -122,7 +123,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
                 SetField.NAME, new SetField(),
                 LongConversion.NAME, new LongConversion(),
                 RemoveFromStream.NAME, new RemoveFromStream(streamCacheService, defaultStreamProvider),
-                RouteToStream.NAME, new RouteToStream(streamCacheService, defaultStreamProvider)
+                RouteToStream.NAME, new RouteToStream(streamCacheService, defaultStreamProvider, mock(StreamMetrics.class))
         );
 
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);

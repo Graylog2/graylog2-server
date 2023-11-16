@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamMetrics;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -44,15 +45,20 @@ public class RouteToStream extends AbstractFunction<Void> {
     private static final String REMOVE_FROM_DEFAULT = "remove_from_default";
     private final StreamCacheService streamCacheService;
     private final Provider<Stream> defaultStreamProvider;
+    private final StreamMetrics streamMetrics;
+
     private final ParameterDescriptor<Message, Message> messageParam;
     private final ParameterDescriptor<String, String> nameParam;
     private final ParameterDescriptor<String, String> idParam;
     private final ParameterDescriptor<Boolean, Boolean> removeFromDefault;
 
     @Inject
-    public RouteToStream(StreamCacheService streamCacheService, @DefaultStream Provider<Stream> defaultStreamProvider) {
+    public RouteToStream(StreamCacheService streamCacheService,
+                         @DefaultStream Provider<Stream> defaultStreamProvider,
+                         StreamMetrics streamMetrics) {
         this.streamCacheService = streamCacheService;
         this.defaultStreamProvider = defaultStreamProvider;
+        this.streamMetrics = streamMetrics;
 
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
         nameParam = string(NAME_ARG).optional().description("The name of the stream to route the message to, must match exactly").build();
@@ -86,6 +92,7 @@ public class RouteToStream extends AbstractFunction<Void> {
         streams.forEach(stream -> {
             if (!stream.isPaused()) {
                 message.addStream(stream);
+                streamMetrics.markIncomingMeter(stream.getId());
             }
         });
         if (removeFromDefault.optional(args, context).orElse(Boolean.FALSE)) {
