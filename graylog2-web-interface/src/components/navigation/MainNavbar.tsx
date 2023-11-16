@@ -32,6 +32,7 @@ import isActiveRoute from 'components/navigation/util/isActiveRoute';
 
 import NavigationLink from './NavigationLink';
 
+const LAST_POSITION = 'last';
 const requiredFeatureFlagIsEnabled = (requiredFeatureFlag: undefined | string) => (requiredFeatureFlag ? AppConfig.isFeatureEnabled(requiredFeatureFlag) : true);
 
 type PluginRouteProps = {
@@ -154,33 +155,49 @@ const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, descript
   return !!navigationItems.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 };
 
+const sortItemsByPosition = <T extends { position: LAST_POSITION | undefined }>(navigationItems: Array<T>) => navigationItems.sort((route1, route2) => {
+  if (route1.position === LAST_POSITION) {
+    return 1;
+  }
+
+  if (route2.position === LAST_POSITION) {
+    return -1;
+  }
+
+  return 0;
+});
+
 const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
   const { activePerspective } = useActivePerspective();
   const allNavigationItems = usePluginEntities('navigation');
-  const navigationItems = useMemo(() => mergeDuplicateDropdowns(allNavigationItems), [allNavigationItems]);
 
-  const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, ENTERPRISE_ROUTE_DESCRIPTION);
-  const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, SECURITY_ROUTE_DESCRIPTION);
-  const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
+  return useMemo(() => {
+    const navigationItems = mergeDuplicateDropdowns(allNavigationItems);
+    const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, ENTERPRISE_ROUTE_DESCRIPTION);
+    const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, SECURITY_ROUTE_DESCRIPTION);
+    const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
 
-  if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
-    // no enterprise plugin menu, so we will add one
-    navigationItems.push({
-      path: Routes.SYSTEM.ENTERPRISE,
-      description: ENTERPRISE_ROUTE_DESCRIPTION,
-    });
-  }
+    if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
+      // no enterprise plugin menu, so we will add one
+      navigationItems.push({
+        path: Routes.SYSTEM.ENTERPRISE,
+        description: ENTERPRISE_ROUTE_DESCRIPTION,
+      });
+    }
 
-  if (securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
-    // no security plugin menu, so we will add one
-    navigationItems.push({
-      path: Routes.SECURITY,
-      description: SECURITY_ROUTE_DESCRIPTION,
-    });
-  }
+    if (securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
+      // no security plugin menu, so we will add one
+      navigationItems.push({
+        path: Routes.SECURITY,
+        description: SECURITY_ROUTE_DESCRIPTION,
+      });
+    }
 
-  return filterByPerspective(navigationItems, activePerspective);
+    const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective);
+
+    return sortItemsByPosition(itemsForActivePerspective);
+  }, [activePerspective, allNavigationItems, permissions]);
 };
 
 const MainNavbar = ({ pathname }: { pathname: string }) => {
@@ -197,7 +214,7 @@ const MainNavbar = ({ pathname }: { pathname: string }) => {
           return <PluginNavDropdown navigationItem={navigationItem} pathname={pathname} />;
         }
 
-        return <PluginRoute navigationItem={navigationItem} />;
+        return <PluginRoute navigationItem={navigationItem} topLevel />;
       })}
     </Nav>
   );

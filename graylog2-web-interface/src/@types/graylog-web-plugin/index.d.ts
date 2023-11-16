@@ -32,6 +32,7 @@ interface PluginNavigation {
   perspective?: string;
   children?: Array<PluginNavigationDropdownItem>;
   BadgeComponent?: React.ComponentType<{ text: string }>;
+  position?: 'last' | undefined,
 }
 
 interface PluginNavigationDropdownItem {
