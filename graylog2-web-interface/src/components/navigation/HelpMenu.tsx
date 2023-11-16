@@ -37,6 +37,10 @@ const HelpMenu = ({ active }: Props) => (
       <ExternalLink>Documentation</ExternalLink>
     </MenuItem>
 
+    <MenuItem href={Routes.KEYBOARD_SHORTCUTS} target="_blank">
+      Keyboard Shortcuts
+    </MenuItem>
+
     {AppConfig.isCloud() && (
     <MenuItem href={Routes.global_api_browser()} target="_blank">
       <ExternalLink>Cluster Global API browser</ExternalLink>

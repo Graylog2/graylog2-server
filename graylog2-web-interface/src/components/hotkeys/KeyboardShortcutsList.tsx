@@ -27,12 +27,11 @@ const StyledSectionGrid = styled(SectionGrid)`
   margin-top: 10px;
 `;
 
-const KeyboardShortcutsSection = () => {
+const KeyboardShortcutsList = () => {
   const { hotKeysCollections } = useHotkeysContext();
 
   return (
     <div>
-      <h2>Graylog Keyboard Shortcuts</h2>
       <StyledSectionGrid>
         {Object.entries(hotKeysCollections).map(([scope, collection]: [ScopeName, HotkeyCollection]) => {
           const { title, description, actions } = collection;
@@ -52,4 +51,4 @@ const KeyboardShortcutsSection = () => {
   );
 };
 
-export default KeyboardShortcutsSection;
+export default KeyboardShortcutsList;

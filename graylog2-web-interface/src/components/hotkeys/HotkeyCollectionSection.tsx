@@ -59,23 +59,23 @@ const keyMapper = (key: string, isMacOS: boolean) => {
 };
 
 type KeyProps = {
-    combinationKey: string,
-    description: string,
-    isEnabled: boolean,
-    isMacOS: boolean,
-    keys: string | Array<string>,
-    splitKey: string,
+  combinationKey: string,
+  description: string,
+  isEnabled: boolean,
+  isMacOS: boolean,
+  keys: string | Array<string>,
+  splitKey: string,
 }
 
 type ShortcutKeysProps = {
-    keys: string | Array<string>,
-    splitKey: string,
-    combinationKey: string,
-    isEnabled: boolean,
-    isMacOS: boolean
+  keys: string | Array<string>,
+  splitKey: string,
+  combinationKey: string,
+  isEnabled?: boolean,
+  isMacOS: boolean
 }
 
-const ShortcutKeys = ({ keys, splitKey, combinationKey, isEnabled, isMacOS }: ShortcutKeysProps) => {
+const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysProps) => {
   const shortcutsArray = isArray(keys) ? keys : [keys];
   const splitShortcutsArray = flattenDeep(shortcutsArray.map((key) => key.split(splitKey)));
 
@@ -92,7 +92,7 @@ const ShortcutKeys = ({ keys, splitKey, combinationKey, isEnabled, isMacOS }: Sh
 
               return (
                 <React.Fragment key={key}>
-                  <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key, isMacOS)}</KeyboardKey>
+                  <KeyboardKey>{keyMapper(key, isMacOS)}</KeyboardKey>
                   {!isLast && <KeySeparator>{combinationKey}</KeySeparator>}
                 </React.Fragment>
               );
@@ -114,16 +114,16 @@ const Key = ({ description, keys, combinationKey, splitKey, isEnabled, isMacOS }
   </ShortcutListItem>
 );
 type Props = {
-    title: string,
-    description: string,
-    sectionActions: Array<{
-        keyDescription: string,
-        reactKey: string,
-        keys: string | Array<string>,
-        splitKey: string,
-        combinationKey: string,
-        isEnabled: boolean,
-    }>
+  title: string,
+  description: string,
+  sectionActions: Array<{
+    keyDescription: string,
+    reactKey: string,
+    keys: string | Array<string>,
+    splitKey: string,
+    combinationKey: string,
+    isEnabled: boolean,
+  }>
 };
 
 const HotkeyCollectionSection = ({ title, description, sectionActions }: Props) => {

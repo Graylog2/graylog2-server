@@ -112,7 +112,7 @@ const HotkeysModal = ({ onToggle }: Props) => {
       </Modal.Body>
       <Modal.Footer>
         <Footer>
-          <Link to={Routes.SYSTEM.configurationsSection('Keyboard Shortcuts')} target="_blank">View all keyboard shortcuts</Link>
+          <Link to={Routes.KEYBOARD_SHORTCUTS} target="_blank">View all keyboard shortcuts</Link>
           <Button onClick={() => onToggle()}>Close</Button>
         </Footer>
       </Modal.Footer>

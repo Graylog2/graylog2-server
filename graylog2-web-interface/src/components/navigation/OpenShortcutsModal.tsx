@@ -14,28 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
+import styled, { css } from 'styled-components';
 
-import React, { useCallback } from 'react';
-
-import useHotkey from 'hooks/useHotkey';
-import HotkeyModal from 'components/hotkeys/HotkeysModal';
+import { IconButton } from 'components/common';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 
-const HotkeysModalContainer = () => {
-  const { showHotkeysModal, setShowHotkeysModal } = useHotkeysContext();
-  const toggleModal = useCallback(() => setShowHotkeysModal((cur) => !cur), [setShowHotkeysModal]);
+const StyledIconButton = styled(IconButton)(({ theme }) => css`
+  color: ${theme.colors.global.textDefault};
+  margin-right: 9px;
+`);
 
-  useHotkey({
-    actionKey: 'show-hotkeys-modal',
-    callback: () => setShowHotkeysModal(true),
-    scope: 'general',
-  });
+const OpenShortcutsModal = () => {
+  const { setShowHotkeysModal } = useHotkeysContext();
 
-  if (!showHotkeysModal) {
-    return null;
-  }
-
-  return <HotkeyModal onToggle={() => toggleModal()} />;
+  return <StyledIconButton onClick={() => setShowHotkeysModal(true)} name="keyboard" title="Keyboard Shortcuts" size="lg" />;
 };
 
-export default HotkeysModalContainer;
+export default OpenShortcutsModal;

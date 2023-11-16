@@ -17,6 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 
 import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';
@@ -49,6 +50,7 @@ type Props = {
   className?: string,
   name: IconName,
   disabled?: boolean,
+  size?: SizeProp | undefined,
 };
 
 const handleClick = (onClick) => {
@@ -77,6 +79,7 @@ IconButton.defaultProps = {
   title: undefined,
   name: undefined,
   disabled: false,
+  size: undefined,
 };
 
 export default IconButton;

@@ -1,5 +1,5 @@
 type = "added"
-message = "Added a page in the configuration section where are all app shortcuts"
+message = "Added a keyboard shortcuts page"
 
 issues = ["17082"]
 pulls = ["17083"]

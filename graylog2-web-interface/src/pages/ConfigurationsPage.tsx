@@ -37,7 +37,6 @@ import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
-import KeyboardShortcutsSection from 'pages/configurations/KeyboardShortcutsSection';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -168,14 +167,6 @@ const ConfigurationsPage = () => {
       SectionComponent: PluginsConfig,
       showCaret: true,
       catchAll: true,
-    },
-    {
-      name: 'Keyboard Shortcuts',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: KeyboardShortcutsSection,
-        title: 'Graylog Keyboard Shortcuts',
-      },
     },
   ].filter(({ hide }) => !hide), [currentUser?.permissions, isCloud]);
 
