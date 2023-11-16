@@ -39,7 +39,7 @@ const navigationBindings = {
     },
     {
       description: 'System',
-      position: 'last',
+      position: 'last' as const,
       children: filterCloudMenuItems(
         filterMenuItems(
           [
@@ -66,7 +66,6 @@ const navigationBindings = {
       ),
     },
   ],
-
 };
 
 export default navigationBindings;

@@ -25,15 +25,6 @@ interface PluginRoute {
   permissions?: string | Array<string>;
   requiredFeatureFlag?: string;
 }
-interface PluginNavigation {
-  path: string;
-  description: string;
-  requiredFeatureFlag?: string;
-  perspective?: string;
-  children?: Array<PluginNavigationDropdownItem>;
-  BadgeComponent?: React.ComponentType<{ text: string }>;
-  position?: 'last' | undefined,
-}
 
 interface PluginNavigationDropdownItem {
   description: string,
@@ -42,10 +33,25 @@ interface PluginNavigationDropdownItem {
   requiredFeatureFlag?: string,
 }
 
+type PluginNavigationLink = {
+  path: string;
+}
+
+type PluginNavigationDropdown = {
+  children: Array<PluginNavigationDropdownItem>;
+}
+
+type PluginNavigation = {
+  description: string;
+  requiredFeatureFlag?: string;
+  perspective?: string;
+  BadgeComponent?: React.ComponentType<{ text: string }>;
+  position?: 'last' | undefined,
+} & (PluginNavigationLink | PluginNavigationDropdown)
+
 interface PluginNavigationItems {
   key: string;
   component: React.ComponentType<{ smallScreen?: boolean }>;
-  perspective?: string,
 }
 interface SystemNavigationItem {
   description: string;
