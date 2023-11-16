@@ -113,7 +113,7 @@ const PluginNavDropdown = ({
                  badge={renderBadge ? BadgeComponent : null}
                  id="enterprise-dropdown"
                  inactiveTitle={description}>
-      {children.map((childNavigationItem) => <PluginRoute navigationItem={childNavigationItem} />)}
+      {children.map((childNavigationItem) => <PluginRoute navigationItem={childNavigationItem} key={childNavigationItem.description} />)}
     </NavDropdown>
   );
 };
@@ -206,15 +206,19 @@ const MainNavbar = ({ pathname }: { pathname: string }) => {
   return (
     <Nav className="navbar-main">
       {navigationItems.map((navigationItem) => {
-        if (navigationItem.requiredFeatureFlag && !AppConfig.isFeatureEnabled(navigationItem.requiredFeatureFlag)) {
-          return null;
-        }
-
         if (navigationItem.children) {
-          return <PluginNavDropdown navigationItem={navigationItem} pathname={pathname} />;
+          return (
+            <PluginNavDropdown navigationItem={navigationItem}
+                               pathname={pathname}
+                               key={navigationItem.description} />
+          );
         }
 
-        return <PluginRoute navigationItem={navigationItem} topLevel />;
+        return (
+          <PluginRoute navigationItem={navigationItem}
+                       key={navigationItem.description}
+                       topLevel />
+        );
       })}
     </Nav>
   );
