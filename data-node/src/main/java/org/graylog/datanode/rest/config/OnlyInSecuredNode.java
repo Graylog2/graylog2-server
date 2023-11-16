@@ -14,22 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.restoperations;
+package org.graylog.datanode.rest.config;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.ws.rs.HttpMethod;
-
-public class DatanodeStatusChangeOperation extends RestOperation {
-
-    public DatanodeStatusChangeOperation(RestOperationParameters waitingRestOperationParameters) {
-        super(waitingRestOperationParameters);
-    }
-
-    public void triggerNodeRemoval() {
-        validatedResponse("/management", HttpMethod.DELETE, null,
-                "Could not trigger node removal",
-                r -> r.extract().statusCode() < 300
-        );
-    }
-
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface OnlyInSecuredNode {
 }

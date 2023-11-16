@@ -41,8 +41,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This process watchdog follows transitions of the state machine and will try to restart the process in case of termination.
- * If the process is actually stopped, it won't restart it and will automatically deactivate itself.
+ * This tracer triggers functionality for node removal.
+ * It triggers removal on PROCESS_REMOVE and will reset the allocation exclude setting in OS on successful start of OS,
+ * which cannot be done after the removal due to the unavailability of the OS REST api.
  */
 public class OpensearchRemovalTracer implements StateMachineTracer {
 

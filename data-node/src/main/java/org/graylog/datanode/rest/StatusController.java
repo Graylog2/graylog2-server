@@ -21,7 +21,6 @@ import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog2.plugin.Version;
 
 import javax.inject.Inject;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -50,8 +49,4 @@ public class StatusController {
         );
     }
 
-    @DELETE
-    public void remove() {
-        openSearch.onRemove();
-    }
 }

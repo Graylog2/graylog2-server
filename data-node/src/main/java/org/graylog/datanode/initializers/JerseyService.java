@@ -42,6 +42,7 @@ import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -231,6 +232,7 @@ public class JerseyService extends AbstractIdleService {
         if(isSecuredInstance) {
             resourceConfig.register(new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode"));
         }
+        resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));
 
         final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(
                 listenUri,

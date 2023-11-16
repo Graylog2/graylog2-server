@@ -14,22 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.restoperations;
+package org.graylog.datanode.rest;
 
+import org.graylog.datanode.management.OpensearchProcess;
+import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 
-import javax.ws.rs.HttpMethod;
+import javax.inject.Inject;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-public class DatanodeStatusChangeOperation extends RestOperation {
+@Path("/management")
+@Produces(MediaType.APPLICATION_JSON)
+public class ManagementController {
 
-    public DatanodeStatusChangeOperation(RestOperationParameters waitingRestOperationParameters) {
-        super(waitingRestOperationParameters);
+    private final OpensearchProcess openSearch;
+
+    @Inject
+    public ManagementController(OpensearchProcess openSearch) {
+        this.openSearch = openSearch;
     }
 
-    public void triggerNodeRemoval() {
-        validatedResponse("/management", HttpMethod.DELETE, null,
-                "Could not trigger node removal",
-                r -> r.extract().statusCode() < 300
-        );
+    @DELETE
+    @OnlyInSecuredNode
+    public void remove() {
+        openSearch.onRemove();
     }
 
 }
