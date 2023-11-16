@@ -1,0 +1,5 @@
+type = "fixed" 
+message = "Fix page size select on Alerts & Events page"
+
+issues = ["17199"]
+pulls = ["17342"]
