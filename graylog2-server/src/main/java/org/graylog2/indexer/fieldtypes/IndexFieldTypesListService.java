@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
 import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
@@ -90,7 +91,7 @@ public class IndexFieldTypesListService {
                 .orElse(ImmutableSet.of());
 
         final Collection<FieldTypeDTO> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos, previousFieldDtos, customFieldMappings);
-        final List<IndexSetFieldType> retrievedPage = allFields
+        final List<IndexSetFieldType> filteredFields = allFields
                 .stream()
                 .map(fieldTypeDTO -> new IndexSetFieldType(
                                 fieldTypeDTO.fieldName(),
@@ -101,12 +102,14 @@ public class IndexFieldTypesListService {
                 )
                 .filter(indexSetFieldType -> indexSetFieldType.fieldName().contains(fieldNameQuery))
                 .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parse(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
+                .collect(Collectors.toList());
+        final List<IndexSetFieldType> retrievedPage = filteredFields.stream()
                 .sorted(IndexSetFieldType.getComparator(sort, order))
                 .skip((long) Math.max(0, page - 1) * perPage)
                 .limit(perPage)
                 .toList();
 
-        final int total = allFields.size();
+        final int total = filteredFields.size();
 
         return PageListResponse.create("",
                 PaginatedList.PaginationInfo.create(

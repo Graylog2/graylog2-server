@@ -105,7 +105,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     onChange(nextConfig);
   };
 
-  handleChange = (event: { target: { name: string }}) => {
+  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     const inputValue = FormsUtils.getValueFromInput(event.target);
 

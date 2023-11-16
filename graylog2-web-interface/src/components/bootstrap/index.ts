@@ -21,6 +21,7 @@ export { default as BootstrapModalForm } from './BootstrapModalForm';
 export { default as BootstrapModalWrapper } from './BootstrapModalWrapper';
 export { default as Button } from './Button';
 export { default as ButtonToolbar } from './ButtonToolbar';
+export { default as Checkbox } from './Checkbox';
 export { default as ControlLabel } from './ControlLabel';
 export { default as DropdownButton } from './DropdownButton';
 export { default as FormControl } from './FormControl';

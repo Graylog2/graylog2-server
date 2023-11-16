@@ -180,7 +180,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
 
   private reactAce: AceEditor;
 
-  private readonly overlayContainerRef: React.RefObject<React.ReactElement>;
+  private readonly overlayContainerRef: React.RefObject<any>;
 
   constructor(props) {
     super(props);
