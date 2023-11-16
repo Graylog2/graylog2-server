@@ -16,14 +16,18 @@
  */
 
 import * as React from 'react';
+
 // eslint-disable-next-line no-restricted-imports
 import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
+import Menu from 'components/bootstrap/Menu';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import menuItemStyles from './styles/menuItem';
+
+import Icon from '../common/Icon';
 
 class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   // eslint-disable-next-line class-methods-use-this
@@ -45,10 +49,6 @@ class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   }
 }
 
-const StyledNavDropdown = styled(BootstrapNavDropdown)`
-  ${menuItemStyles}
-`;
-
 type Props = {
   title?: React.ReactNode,
   id: string,
@@ -58,13 +58,43 @@ type Props = {
   noCaret?: boolean,
 }
 
-const NavDropdown = ({ title, inactiveTitle, badge: Badge, ...props }: React.PropsWithChildren<Props>) => {
+const StyledMenuDropdown = styled(Menu.Dropdown)`
+  z-index: 1032 !important;
+`;
+
+const DropdownIcon = styled(Icon)(({ theme }) => css`
+  padding-left: 0.1rem;
+  color: ${theme.colors.global.textDefault};
+`);
+const DropdownTrigger = styled.button(({ theme }) => css`
+  font-family: ${theme.fonts.family.navigation};
+  font-size: ${theme.fonts.size.navigation};
+  background: transparent;
+  border: 0;
+`);
+
+const NavItem = styled.span`
+  display: inline-flex;
+  align-items: center;
+  min-height: ${NAV_ITEM_HEIGHT};
+`;
+
+const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children }: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
   return (
-    <StyledNavDropdown {...props}
-                       title={<NavItemStateIndicator>{Badge ? <Badge text={title} /> : title}</NavItemStateIndicator>}
-                       active={isActive} />
+    <Menu>
+      <NavItem>
+        <Menu.Target>
+          <DropdownTrigger>
+            {Badge ? <Badge text={title} /> : title} {noCaret ? null : <DropdownIcon name="caret-down" />}
+          </DropdownTrigger>
+        </Menu.Target>
+      </NavItem>
+      <StyledMenuDropdown>
+        {children}
+      </StyledMenuDropdown>
+    </Menu>
   );
 };
 

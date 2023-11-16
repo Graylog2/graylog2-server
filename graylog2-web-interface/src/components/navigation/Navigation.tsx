@@ -42,7 +42,7 @@ import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
 
-const _isActive = (requestPath, path, end = undefined) => (
+const _isActive = (requestPath: string, path: string, end = undefined) => (
   end ? requestPath === appPrefixed(path) : requestPath.indexOf(appPrefixed(path)) === 0
 );
 
