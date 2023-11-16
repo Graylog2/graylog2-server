@@ -23,7 +23,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { OrderedSet } from 'immutable';
 
 import UserNotification from 'util/UserNotification';
-import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
+import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/ModifiedNavDropdown';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 import { Nav, NavItem, MenuItem } from 'components/bootstrap';

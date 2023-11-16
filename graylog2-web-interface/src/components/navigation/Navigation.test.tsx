@@ -201,7 +201,7 @@ describe('Navigation', () => {
 
       const wrapper = mount(<SUT />);
 
-      expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).not.toExist();
+      expect(wrapper.findWhere((node: any) => (node.type() && node.text() === 'Neat Stuff'))).not.toExist();
     });
 
     it('renders dropdown contributed by plugin if permissions are sufficient', () => {
@@ -211,20 +211,20 @@ describe('Navigation', () => {
 
       const wrapper = mount(<SUT />);
 
-      expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).toExist();
+      expect(wrapper.findWhere((node: any) => (node.type() && node.text() === 'Neat Stuff'))).toExist();
     });
 
     it('does not render dropdown contributed by plugin if required feature flag is not enabled', () => {
       const wrapper = mount(<SUT />);
 
-      expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).not.toExist();
+      expect(wrapper.findWhere((node: any) => (node.type() && node.text() === 'Feature flag dropdown test'))).not.toExist();
     });
 
     it('renders dropdown contributed by plugin if required feature flag is enabled', () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
       const wrapper = mount(<SUT />);
 
-      expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).toExist();
+      expect(wrapper.findWhere((node: any) => (node.type() && node.text() === 'Feature flag dropdown test'))).toExist();
     });
 
     it('sets dropdown title based on match', () => {
@@ -249,7 +249,7 @@ describe('Navigation', () => {
         </DefaultProviders>
       ));
 
-      expect(wrapper.find('NavDropdown[title="Neat Stuff / Something Else"]')).toExist();
+      expect(wrapper.findWhere((node: any) => (node.type() && node.text() === 'Neat Stuff / Something Else'))).toExist();
     });
   });
 
