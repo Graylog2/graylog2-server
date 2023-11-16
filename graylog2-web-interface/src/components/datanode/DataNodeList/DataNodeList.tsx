@@ -15,14 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useQueryParam, StringParam } from 'use-query-params';
 
-import type { DataNode, DataNodeStatus } from 'preflight/types';
-import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
+import type { DataNode } from 'preflight/types';
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
-import MenuItem from 'components/bootstrap/MenuItem';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -32,11 +28,11 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { Sort } from 'stores/PaginationTypes';
 import useTableEventHandlers from 'hooks/useTableEventHandlers';
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
 
-import BulkActionsDropdown from '../common/EntityDataTable/BulkActionsDropdown';
-import { MORE_ACTIONS_HOVER_TITLE, MORE_ACTIONS_TITLE } from '../common/EntityDataTable/Constants';
-import OverlayDropdownButton from '../common/OverlayDropdownButton';
+import DataNodeBulkActions from './DataNodeBulkActions';
+import DataNodeActions from './DataNodeActions';
+
+import useDataNodes from '../hooks/useDataNodes';
 
 export const ENTITY_TABLE_ID = 'datanodes';
 export const DEFAULT_LAYOUT = {
@@ -53,58 +49,6 @@ export const ATTRIBUTES = [
   { id: 'cert_valid_until', title: 'Certificate valid until', sortable: true },
   { id: 'last_seen', title: 'Last seen', sortable: true },
 ];
-
-export const fetchDataNodes = () => fetchPeriodically<Array<DataNode>>('GET', qualifyUrl('/certrenewal'));
-
-const useDataNodes = () => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['data-nodes', 'overview'],
-    queryFn: fetchDataNodes,
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading data nodes failed with status: ${errorThrown}`,
-        'Could not load datanodes');
-    },
-    keepPreviousData: true,
-    refetchInterval: 3000,
-
-  });
-
-  const mockData = [
-    {
-      id: '1',
-      is_leader: false,
-      is_master: false,
-      last_seen: '2023-11-02T13:20:58',
-      cert_valid_until: '2053-11-02T13:20:58',
-      error_msg: null,
-      hostname: 'datanode1',
-      node_id: '3af165ef-87a9-467f-b7db-435f4748eb75',
-      short_node_id: '3af165ef',
-      status: 'CONNECTED' as DataNodeStatus,
-      transport_address: 'http://datanode1:9200',
-      type: 'DATANODE',
-    },
-    {
-      id: '2',
-      is_leader: false,
-      is_master: false,
-      last_seen: '2023-11-02T13:20:58',
-      cert_valid_until: '2053-11-02T13:20:58',
-      error_msg: null,
-      hostname: 'datanode2',
-      node_id: '9597fd2f-9c44-466b-ae47-e49ba54d3aeb',
-      short_node_id: '9597fd2f',
-      status: 'CONNECTED' as DataNodeStatus,
-      transport_address: 'http://datanode2:9200',
-      type: 'DATANODE',
-    },
-  ];
-
-  return ({
-    data: mockData || data,
-    isInitialLoading,
-  });
-};
 
 const DataNodeList = () => {
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -134,24 +78,16 @@ const DataNodeList = () => {
   const bulkSelection: any = {
     // eslint-disable-next-line react/no-unstable-nested-components
     actions: () => (
-      <BulkActionsDropdown selectedEntities={['']} setSelectedEntities={() => {}}>
-        <MenuItem onSelect={() => {}}>Restart</MenuItem>
-        <MenuItem onSelect={() => {}}>Remove</MenuItem>
-      </BulkActionsDropdown>
+      <DataNodeBulkActions selectedDataNodeIds={[]}
+                           setSelectedDataNodeIds={() => {}}
+                           dataNodes={[]} />
     ),
     onChangeSelection: () => {},
     initialSelection: [],
   };
+
   const entityActions = () => (
-    <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                           bsSize="xsmall"
-                           buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                           disabled={false}
-                           dropdownZIndex={1000}>
-      <MenuItem onSelect={() => {}}>Edit</MenuItem>
-      <MenuItem onSelect={() => {}}>Restart</MenuItem>
-      <MenuItem onSelect={() => {}}>Remove</MenuItem>
-    </OverlayDropdownButton>
+    <DataNodeActions />
   );
   const columnRenderers = useMemo(() => ({ attributes: {} }), []);
   const columnDefinitions = useMemo(() => ATTRIBUTES, []);

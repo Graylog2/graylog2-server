@@ -20,7 +20,7 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
-import DataNodeList from 'components/datanode/DataNodeList';
+import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
 
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
