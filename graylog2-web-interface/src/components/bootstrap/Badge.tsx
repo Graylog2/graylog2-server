@@ -33,7 +33,8 @@ const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
 `;
 });
 
-const Badge = forwardRef(({ ...props }, ref) => (
+type Props = React.ComponentProps<typeof StyledBadge>;
+const Badge = forwardRef(({ ...props }: Props, ref: React.ForwardedRef<typeof StyledBadge>) => (
   <StyledBadge ref={ref} {...props} />
 ));
 
