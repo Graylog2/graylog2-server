@@ -48,7 +48,7 @@ type Props = {
   onClick?: () => void,
   className?: string,
   name: IconName,
-  disabled?: boolean
+  disabled?: boolean,
 };
 
 const handleClick = (onClick) => {
