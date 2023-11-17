@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_CREATE;
+import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_DELETE;
 import static org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService.BLACKLISTED_FIELDS;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -92,6 +93,23 @@ public class FieldTypeMappingsResource extends RestResource {
         var customMapping = new CustomFieldMapping(request.fieldName(), request.type());
         fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
 
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/remove_mapping")
+    @Timed
+    @ApiOperation(value = "Remove custom field mapping for certain index sets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized")
+    })
+    @AuditEvent(type = FIELD_TYPE_MAPPING_DELETE)
+    public Response removeCustomMapping(@ApiParam(name = "request")
+                                        @Valid
+                                        @NotNull(message = "Request body is mandatory") final CustomFieldMappingRemovalRequest request) {
+        checkPermissionsForCreation(request.indexSetsIds());
+
+        fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
         return Response.ok().build();
     }
 

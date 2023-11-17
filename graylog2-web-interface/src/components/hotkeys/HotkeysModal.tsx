@@ -75,7 +75,6 @@ const keyMapper = (key: string, isMacOS: boolean) => {
 type KeyProps = {
   combinationKey: string,
   description: string,
-  isEnabled: boolean,
   isMacOS: boolean,
   keys: string | Array<string>,
   splitKey: string,
@@ -85,11 +84,10 @@ type ShortcutKeysProps = {
   keys: string | Array<string>,
   splitKey: string,
   combinationKey: string,
-  isEnabled: boolean,
   isMacOS: boolean
 }
 
-const ShortcutKeys = ({ keys, splitKey, combinationKey, isEnabled, isMacOS }: ShortcutKeysProps) => {
+const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysProps) => {
   const shortcutsArray = isArray(keys) ? keys : [keys];
   const splitShortcutsArray = flattenDeep(shortcutsArray.map((key) => key.split(splitKey)));
 
@@ -106,7 +104,7 @@ const ShortcutKeys = ({ keys, splitKey, combinationKey, isEnabled, isMacOS }: Sh
 
               return (
                 <React.Fragment key={key}>
-                  <KeyboardKey bsStyle={isEnabled ? 'info' : 'default'}>{keyMapper(key, isMacOS)}</KeyboardKey>
+                  <KeyboardKey>{keyMapper(key, isMacOS)}</KeyboardKey>
                   {!isLast && <KeySeparator>{combinationKey}</KeySeparator>}
                 </React.Fragment>
               );
@@ -119,11 +117,11 @@ const ShortcutKeys = ({ keys, splitKey, combinationKey, isEnabled, isMacOS }: Sh
   );
 };
 
-const Key = ({ description, keys, combinationKey, splitKey, isEnabled, isMacOS }: KeyProps) => (
+const Key = ({ description, keys, combinationKey, splitKey, isMacOS }: KeyProps) => (
   <ShortcutListItem>
     {description}
     <KeysList>
-      <ShortcutKeys keys={keys} combinationKey={combinationKey} splitKey={splitKey} isEnabled={isEnabled} isMacOS={isMacOS} />
+      <ShortcutKeys keys={keys} combinationKey={combinationKey} splitKey={splitKey} isMacOS={isMacOS} />
     </KeysList>
   </ShortcutListItem>
 );
@@ -152,7 +150,6 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectio
       <p className="description">{description}</p>
       <ShortcutList>
         {filtratedActions.map(([actionKey, { description: keyDescription, keys, displayKeys }]) => {
-          const isEnabled = !!activeHotkeys.get(`${scope}.${actionKey}`)?.options?.enabled;
           const splitKey = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.splitKey;
           const combinationKey = activeHotkeys.get(`${scope}.${actionKey}`)?.options?.combinationKey;
           const reactKey = isArray(keys) ? keys.join(',') : keys;
@@ -162,7 +159,6 @@ const HotkeyCollectionSection = ({ collection, scope, isMacOS }: HotkeyCollectio
                  keys={displayKeys ?? keys}
                  combinationKey={combinationKey}
                  splitKey={splitKey}
-                 isEnabled={isEnabled}
                  isMacOS={isMacOS}
                  key={reactKey} />
           );

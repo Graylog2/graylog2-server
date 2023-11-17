@@ -116,18 +116,23 @@ type Props = React.ComponentProps<typeof Checkbox> & {
   children?: React.ReactNode,
   padded?: boolean,
   readOnly?: boolean,
-  onChange?: (e: React.MouseEvent<Checkbox>) => void,
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
 };
 
 type State = {
   expanded: boolean,
 };
 
+interface CheckboxInstance {
+  indeterminate: boolean,
+  click: () => void,
+}
+
 /**
  * The ExpandableListItem is needed to render a ExpandableList.
  */
 class ExpandableListItem extends React.Component<Props, State> {
-  private _checkbox: Checkbox | undefined;
+  private _checkbox: CheckboxInstance | undefined;
 
   static propTypes = {
     /** Is the Item checked */

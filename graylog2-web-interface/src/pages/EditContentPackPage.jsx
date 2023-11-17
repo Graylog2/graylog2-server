@@ -22,6 +22,7 @@ import createReactClass from 'create-react-class';
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 
+import withHistory from 'routing/withHistory';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
@@ -221,4 +222,4 @@ const EditContentPackPage = createReactClass({
   },
 });
 
-export default withParams(EditContentPackPage);
+export default withHistory(withParams(EditContentPackPage));

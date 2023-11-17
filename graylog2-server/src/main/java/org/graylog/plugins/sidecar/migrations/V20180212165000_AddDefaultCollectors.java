@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -81,7 +82,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     @Override
     public void upgrade() {
-
         removeConfigPath();
         ensureConfigurationVariable("graylog_host", "Graylog Host.", httpExternalUri.getHost());
 
@@ -503,6 +503,23 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 LOG.debug(msg, collectorName, nodeOperatingSystem);
                 throw new IllegalArgumentException();
             }
+            if (!collector.defaultTemplateUpdated()) {
+                long newCRC = Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8));
+                if (collector.defaultTemplateCRC() == null      // known obsolete version of template
+                        || newCRC != collector.defaultTemplateCRC() // new standard template
+                ) {
+                    LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
+                    try {
+                        return Optional.of(collectorService.save(
+                                collector.toBuilder()
+                                        .defaultTemplate(defaultTemplate)
+                                        .defaultTemplateCRC(newCRC)
+                                        .build()));
+                    } catch (Exception e) {
+                        LOG.error("Can't save collector '{}'!", collectorName, e);
+                    }
+                }
+            }
         } catch (IllegalArgumentException ignored) {
             LOG.info("{} collector on {} is missing, adding it.", collectorName, nodeOperatingSystem);
             try {
@@ -514,7 +531,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         executablePath,
                         executeParameters,
                         validationCommand,
-                        defaultTemplate
+                        defaultTemplate,
+                        Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8))
                 )));
             } catch (Exception e) {
                 LOG.error("Can't save collector '{}'!", collectorName, e);
@@ -577,5 +595,4 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             LOG.error("Unable to access '{}' sidecar default configuration!", name);
         }
     }
-
 }
