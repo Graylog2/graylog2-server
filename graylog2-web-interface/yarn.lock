@@ -3858,21 +3858,13 @@
   integrity sha512-ydw9FGbOHrFHaht/3MU9mvK4zU9SKD2KOrmrCTSmcHjOoiWdGg/UWRIEClumk+bq3wYoLXuReJaJlVI/ZYNRkA==
 
 "@types/enzyme-adapter-react-16@^1.0.6":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@types/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.0.8.tgz#85bec6a9827110fb7299be8eed3a092f101c1dcc"
-  integrity sha512-nzYumRvxSh2Vbk7mkseYbInmpMbVZRc1EJQVeQmXhNCNVmLg2VOKAJujc7YJ/gDdPW+X03wYrDGa1Bj0Q/NTaw==
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@types/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.0.9.tgz#337d85f0e91be2654b246ec11701dcf75af30afc"
+  integrity sha512-z24MMxGtUL8HhXdye3tWzjp+19QTsABqLaX2oOZpxMPHRJgLfahQmOeTTrEBQd9ogW20+UmPBXD9j+XOasFHvw==
   dependencies:
     "@types/enzyme" "*"
 
-"@types/enzyme@*":
-  version "3.10.15"
-  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.15.tgz#56d1167bb11a2c3f65af790de0cbb0e990b21489"
-  integrity sha512-Tdm2XXW7TfyKhb/ddSLMpj8W0UgxbCOOauFNeLJH7+KzsfOBrHF6XPctw11SwGoOPyUglYQpvMoQNFXOF0uTwg==
-  dependencies:
-    "@types/cheerio" "*"
-    "@types/react" "^16"
-
-"@types/enzyme@3.10.16":
+"@types/enzyme@*", "@types/enzyme@3.10.16":
   version "3.10.16"
   resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.16.tgz#100c49093f694545fc903266b2eb410df08859a9"
   integrity sha512-17uMdJjSKjvdn/MhO/G2lRNPZGvJxFpvgONrsRoS1+khtJ6UcnCwC9v3gk2UqPyAkMZb6a1VYxScc/vOgkDl9w==
