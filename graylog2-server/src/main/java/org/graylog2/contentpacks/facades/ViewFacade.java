@@ -42,6 +42,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
+import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
@@ -216,6 +217,13 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
         viewEntity.search().usedStreamIds().stream()
+                .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(stream -> mutableGraph.putEdge(entity, stream));
+        viewEntity.state().values().stream()
+                .flatMap(s -> s.widgets().stream())
+                .flatMap(w -> w.streams().stream())
                 .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
                 .map(entities::get)
                 .filter(Objects::nonNull)
