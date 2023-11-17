@@ -17,7 +17,7 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
-import { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 type Props = PropsWithChildren<{
   position?: MenuProps['position'],
@@ -33,6 +33,8 @@ const Menu = ({ children, shadow, width, withinPortal, position }: Props) => {
     dropdown: {
       backgroundColor: theme.colors.global.contentBackground,
       border: `1px solid ${theme.colors.variant.lighter.default}`,
+      fontFamily: theme.fonts.family.navigation,
+      fontSize: theme.fonts.size.navigation,
     },
   });
 
@@ -47,9 +49,27 @@ const Menu = ({ children, shadow, width, withinPortal, position }: Props) => {
   );
 };
 
+const StyledMenuItem = styled(MantineMenu.Item)(({ theme }) => css`
+  color: ${theme.colors.global.textDefault};
+  font-family: ${theme.fonts.family.navigation};
+  font-size: ${theme.fonts.size.navigation};
+  padding-left: 20px;
+  padding-right: 20px;
+`);
+
+const StyledMenuDivider = styled(MantineMenu.Divider)(({ theme }) => css`
+  border-color: ${theme.colors.global.textDefault};
+`);
+
+const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
+  font-size: ${theme.fonts.size.navigation};
+`);
+
 Menu.Target = MantineMenu.Target;
 Menu.Dropdown = MantineMenu.Dropdown;
-Menu.Item = MantineMenu.Item;
+Menu.Item = StyledMenuItem;
+Menu.Divider = StyledMenuDivider;
+Menu.Label = StyledMenuLabel;
 
 Menu.defaultProps = {
   position: undefined,

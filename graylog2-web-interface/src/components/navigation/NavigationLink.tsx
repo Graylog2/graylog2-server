@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, {css} from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
 import { LinkContainer } from 'components/common/router';
@@ -30,15 +29,9 @@ type Props = {
   topLevel: boolean,
 }
 
-const StyledMenuItem = styled(Menu.Item)(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  font-family: ${theme.fonts.family.navigation};
-  font-size: ${theme.fonts.size.navigation};
-`);
-
 const NavigationLink = ({ description, path, topLevel, ...rest }: Props) => (
   <LinkContainer key={path} to={path} {...rest}>
-    {topLevel ? <NavItem>{description}</NavItem> : <StyledMenuItem>{description}</StyledMenuItem>}
+    {topLevel ? <NavItem>{description}</NavItem> : <Menu.Item>{description}</Menu.Item>}
   </LinkContainer>
 );
 

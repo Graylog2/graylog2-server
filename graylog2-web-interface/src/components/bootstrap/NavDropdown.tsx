@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
-
 // eslint-disable-next-line no-restricted-imports
 import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
@@ -65,8 +63,6 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
 `;
 
 const DropdownTrigger = styled.button(({ theme, $active }) => css`
-  font-family: ${theme.fonts.family.navigation};
-  font-size: ${theme.fonts.size.navigation};
   background: transparent;
   border: 0;
   padding: 15px;

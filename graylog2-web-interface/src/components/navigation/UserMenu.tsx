@@ -16,13 +16,15 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
-import { NavDropdown, MenuItem } from 'components/bootstrap';
+import { NavDropdown } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import useHistory from 'routing/useHistory';
+import Menu from 'components/bootstrap/Menu';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -31,6 +33,11 @@ type Props = {
   userId: string,
   readOnly: boolean,
 };
+
+const FullName = styled.span`
+  text-transform: uppercase;
+  font-weight: 700;
+`;
 
 const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
   const history = useHistory();
@@ -55,16 +62,16 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
                  aria-label={`User Menu for ${fullName}`}
                  id="user-menu-dropdown"
                  noCaret>
-      <MenuItem header>{fullName}</MenuItem>
-      <MenuItem divider />
-      <MenuItem header>
+      <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
+      <Menu.Divider />
+      <Menu.Label>
         <ThemeModeToggle />
-      </MenuItem>
-      <MenuItem divider />
+      </Menu.Label>
+      <Menu.Divider />
       <LinkContainer to={route}>
-        <MenuItem>{label}</MenuItem>
+        <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <MenuItem onSelect={onLogoutClicked} icon="sign-out-alt">Log out</MenuItem>
+      <Menu.Item onSelect={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
     </NavDropdown>
   );
 };
