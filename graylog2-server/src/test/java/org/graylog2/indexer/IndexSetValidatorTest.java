@@ -69,20 +69,9 @@ public class IndexSetValidatorTest {
 
     @Test
     public void validate() throws Exception {
-        final String prefix = "graylog_index";
-        final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);
-        final IndexSetConfig newConfig = mock(IndexSetConfig.class);
-        final IndexSet indexSet = mock(IndexSet.class);
-        final RetentionStrategyConfig retentionStrategyConfig = mock(RetentionStrategyConfig.class);
+        IndexSetConfig validConfig = testIndexSetConfig();
 
-        when(indexSet.getIndexPrefix()).thenReturn("foo");
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
-        when(newConfig.indexPrefix()).thenReturn(prefix);
-        when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
-        when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
-        when(retentionStrategyConfig.validate(elasticsearchConfiguration)).thenReturn(new ValidationResult());
-
-        final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
+        final Optional<IndexSetValidator.Violation> violation = validator.validate(validConfig);
 
         assertThat(violation).isNotPresent();
     }

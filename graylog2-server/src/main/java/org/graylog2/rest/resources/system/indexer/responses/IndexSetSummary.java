@@ -137,16 +137,16 @@ public abstract class IndexSetSummary {
     public abstract int replicas();
 
     @Nullable
-    @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS)
-    public abstract String retentionStrategyClass();
+    @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS)
+    public abstract String rotationStrategyClass();
 
     @Nullable
     @JsonProperty(FIELD_ROTATION_STRATEGY)
     public abstract RotationStrategyConfig rotationStrategy();
 
     @Nullable
-    @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS)
-    public abstract String rotationStrategyClass();
+    @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS)
+    public abstract String retentionStrategyClass();
 
     @Nullable
     @JsonProperty(FIELD_RETENTION_STRATEGY)
