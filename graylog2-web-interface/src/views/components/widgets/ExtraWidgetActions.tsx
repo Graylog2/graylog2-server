@@ -28,11 +28,10 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 
 type Props = {
-  onSelect: (eventKey: string, e: MouseEvent) => void,
   widget: Widget,
 };
 
-const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
+const ExtraWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
   const dispatch = useAppDispatch();
@@ -41,7 +40,7 @@ const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
     .map(({ title, action, type, disabled = () => false }) => {
-      const _onSelect = (eventKey: string, e: MouseEvent) => {
+      const _onSelect = () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
           app_pathname: getPathnameWithoutId(pathname),
           app_section: 'search-widget',
@@ -49,12 +48,11 @@ const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
         });
 
         dispatch(action(widget, { widgetFocusContext }));
-        onSelect(eventKey, e);
       };
 
       return (
         <MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
-    }), [dispatch, onSelect, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext]);
+    }), [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext]);
 
   return extraWidgetActions.length > 0
     ? (

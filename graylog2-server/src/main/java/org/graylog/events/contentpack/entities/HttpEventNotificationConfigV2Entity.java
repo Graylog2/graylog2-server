@@ -51,6 +51,9 @@ public abstract class HttpEventNotificationConfigV2Entity implements EventNotifi
     @JsonProperty(HTTPEventNotificationConfigV2.FIELD_CONTENT_TYPE)
     public abstract ValueReference contentType();
 
+    @JsonProperty(HTTPEventNotificationConfigV2.FIELD_HEADERS)
+    public abstract ValueReference headers();
+
     @JsonProperty(HTTPEventNotificationConfigV2.FIELD_BODY_TEMPLATE)
     public abstract ValueReference bodyTemplate();
 
@@ -84,6 +87,9 @@ public abstract class HttpEventNotificationConfigV2Entity implements EventNotifi
         @JsonProperty(HTTPEventNotificationConfigV2.FIELD_CONTENT_TYPE)
         public abstract Builder contentType(ValueReference contentType);
 
+        @JsonProperty(HTTPEventNotificationConfigV2.FIELD_HEADERS)
+        public abstract Builder headers(ValueReference headers);
+
         @JsonProperty(HTTPEventNotificationConfigV2.FIELD_BODY_TEMPLATE)
         public abstract Builder bodyTemplate(ValueReference bodyTemplate);
 
@@ -98,6 +104,7 @@ public abstract class HttpEventNotificationConfigV2Entity implements EventNotifi
                 .httpMethod(HTTPEventNotificationConfigV2.HttpMethod.valueOf(httpMethod().asString(parameters)))
                 .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
                 .contentType(HTTPEventNotificationConfigV2.ContentType.valueOf(contentType().asString(parameters)))
+                .headers(headers().asString(parameters))
                 .bodyTemplate(bodyTemplate().asString(parameters))
                 .build();
     }

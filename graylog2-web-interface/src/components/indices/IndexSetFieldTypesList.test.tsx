@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
+import { useQueryParam, QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import asMock from 'helpers/mocking/AsMock';
 import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
@@ -70,15 +72,22 @@ const getData = (list = [{
   }
 );
 const renderIndexSetFieldTypesList = () => render(
-  <TestStoreProvider>
-    <IndexSetFieldTypesList />
-  </TestStoreProvider>,
+  <QueryParamProvider adapter={ReactRouter6Adapter}>
+    <TestStoreProvider>
+      <IndexSetFieldTypesList />
+    </TestStoreProvider>,
+  </QueryParamProvider>,
 );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
 jest.mock('hooks/useIndexSetFieldType', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+
+jest.mock('use-query-params', () => ({
+  ...jest.requireActual('use-query-params'),
+  useQueryParam: jest.fn(),
+}));
 
 describe('IndexSetFieldTypesList', () => {
   beforeAll(loadViewsPlugin);
@@ -107,6 +116,8 @@ describe('IndexSetFieldTypesList', () => {
       },
       isLoading: false,
     });
+
+    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
   });
 
   describe('Shows list of set field types with correct data', () => {

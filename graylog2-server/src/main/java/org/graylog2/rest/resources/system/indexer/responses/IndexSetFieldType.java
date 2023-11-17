@@ -28,6 +28,7 @@ import org.graylog2.search.SearchQueryField;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
@@ -54,11 +55,23 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
                     .type(SearchQueryField.Type.BOOLEAN)
                     .sortable(true)
                     .filterable(true)
+                    .filterOptions(
+                            Set.of(
+                                    FilterOption.create("true", "yes"),
+                                    FilterOption.create("false", "no")
+                            )
+                    )
                     .build(),
             EntityAttribute.builder().id(IndexSetFieldType.IS_RESERVED).title("Is Reserved")
                     .type(SearchQueryField.Type.BOOLEAN)
                     .sortable(true)
                     .filterable(true)
+                    .filterOptions(
+                            Set.of(
+                                    FilterOption.create("true", "yes"),
+                                    FilterOption.create("false", "no")
+                            )
+                    )
                     .build(),
             EntityAttribute.builder().id(IndexSetFieldType.TYPE).title("Type")
                     .sortable(true)

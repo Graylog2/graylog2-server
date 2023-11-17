@@ -41,14 +41,12 @@ public class DatanodeDirectories {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDirectories.class);
 
-    private final String nodeId;
     private final Path dataTargetDir;
     private final Path logsTargetDir;
     private final Path configurationSourceDir;
     private final Path configurationTargetDir;
 
-    public DatanodeDirectories(String nodeId, Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
-        this.nodeId = nodeId;
+    public DatanodeDirectories(Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
         this.dataTargetDir = dataTargetDir;
         this.logsTargetDir = logsTargetDir;
         this.configurationSourceDir = configurationSourceDir;
@@ -57,11 +55,10 @@ public class DatanodeDirectories {
 
     public static DatanodeDirectories fromConfiguration(Configuration configuration, NodeId nodeId) {
         final DatanodeDirectories directories = new DatanodeDirectories(
-                nodeId.getNodeId(),
-                configuration.getOpensearchDataLocation(),
-                configuration.getOpensearchLogsLocation(),
+                backwardsCompatible(configuration.getOpensearchDataLocation(), nodeId, "opensearch_data_location"),
+                backwardsCompatible(configuration.getOpensearchLogsLocation(), nodeId, "opensearch_logs_location"),
                 configuration.getDatanodeConfigurationLocation(),
-                configuration.getOpensearchConfigLocation()
+                backwardsCompatible(configuration.getOpensearchConfigLocation(), nodeId, "opensearch_config_location")
         );
 
         LOG.info("Opensearch of the node {} uses following directories as its storage: {}", nodeId.getNodeId(), directories);
@@ -69,11 +66,30 @@ public class DatanodeDirectories {
     }
 
     /**
+     * Originally we created a subdir named by the node ID for each of the data/config/logs directories and automatically
+     * used that subdir. Later we discovered that this won't allow us to run rolling upgrades for opensearch, as we
+     * are unable to point the configuration to an exact directory. This method works as a backwards compatible
+     * fallback, detecting the presence of the node ID subdir and using it, if available. It also logs a warning with
+     * configuration change suggestion.
+     * TODO: Remove in 6.0 release
+     */
+    @Deprecated(forRemoval = true)
+    @NotNull
+    protected static Path backwardsCompatible(@NotNull Path path, NodeId nodeId, String configProperty) {
+        final Path nodeIdSubdir = path.resolve(nodeId.getNodeId());
+        if(Files.exists(nodeIdSubdir) && Files.isDirectory(nodeIdSubdir)) {
+            LOG.warn("Caution, this datanode instance uses old format of directories. Please configure {} to point directly to {}", configProperty, nodeIdSubdir.toAbsolutePath());
+            return nodeIdSubdir;
+        }
+        return path;
+    }
+
+    /**
      * This directory is used by the managed opensearch to store its data in it.
      * Read-write permissions required.
      */
     public Path getDataTargetDir() {
-        return resolveNodeSubdir(dataTargetDir);
+        return dataTargetDir.toAbsolutePath();
     }
 
     /**
@@ -81,7 +97,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getLogsTargetDir() {
-        return resolveNodeSubdir(logsTargetDir);
+        return logsTargetDir.toAbsolutePath();
     }
 
 
@@ -110,7 +126,7 @@ public class DatanodeDirectories {
      * Read-write permissions required.
      */
     public Path getConfigurationTargetDir() {
-        return resolveNodeSubdir(configurationTargetDir);
+        return configurationTargetDir.toAbsolutePath();
     }
 
     public Path createConfigurationFile(Path relativePath) throws IOException {
@@ -132,12 +148,12 @@ public class DatanodeDirectories {
      * @see org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync
      */
     public Path getOpensearchProcessConfigurationDir() {
-        return resolveNodeSubdir(configurationTargetDir).resolve("opensearch");
+        return getConfigurationTargetDir().resolve("opensearch");
     }
 
     public Path createOpensearchProcessConfigurationDir() throws IOException {
         final Path dir = getOpensearchProcessConfigurationDir();
-        // TODO: should we always delete existing process configuration dir and recreate if here? IMHO yes
+        // TODO: should we always delete existing process configuration dir and recreate it here? IMHO yes
         final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
         final FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
         Files.createDirectories(dir, fileAttributes);
@@ -147,11 +163,6 @@ public class DatanodeDirectories {
     public Path createOpensearchProcessConfigurationFile(Path relativePath) throws IOException {
         final Path resolvedPath = getOpensearchProcessConfigurationDir().resolve(relativePath);
         return createRestrictedAccessFile(resolvedPath);
-    }
-
-
-    private Path resolveNodeSubdir(Path path) {
-        return path.resolve(nodeId).toAbsolutePath();
     }
 
     @Override
