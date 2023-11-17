@@ -31,6 +31,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
+import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -60,9 +61,10 @@ type Props = {
   fieldTypes: FieldTypes,
   isOptionsLoading: boolean,
   initialFieldType?: string,
+  onFieldChange?: (param: { field: string, currentFieldType: string }) => void
 }
 
-const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoading, initialSelectedIndexSets, onClose, field, showSelectionTable, initialFieldType }: Props) => {
+const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoading, initialSelectedIndexSets, onClose, field, showSelectionTable, initialFieldType, onFieldChange }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
   const [newFieldType, setNewFieldType] = useState(null);
@@ -132,6 +134,9 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
                         show={show}
                         bsSize="large">
       <div>
+        {
+          onFieldChange && <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={onFieldChange} field={field} />
+        }
         <Alert bsStyle="warning">
           Changing the type of the field <b>{field}</b> can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
@@ -179,6 +184,7 @@ ChangeFieldTypeModal.defaultProps = {
   showSelectionTable: true,
   onSubmitCallback: undefined,
   initialFieldType: null,
+  onFieldChange: undefined,
 };
 
 export default ChangeFieldTypeModal;

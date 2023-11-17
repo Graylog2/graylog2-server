@@ -70,17 +70,22 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
-  const [editingField, setEditingField] = useState<IndexSetFieldType | null>(null);
-
+  const [editingField, setEditingField] = useState<{
+    type: string,
+    fieldName: string,
+  } | null>(null);
+  const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const handleOnClose = useCallback(() => {
     setEditingField(null);
   }, []);
 
   const handleOnOpen = useCallback((fieldType: IndexSetFieldType) => {
-    setEditingField(fieldType);
+    setEditingField({
+      fieldName: fieldType.fieldName,
+      type: fieldType.type,
+    });
   }, []);
 
-  const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
@@ -162,6 +167,10 @@ const IndexSetFieldTypesList = () => {
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
+  const onFieldChange = useCallback(({ field, currentFieldType }: { field: string, currentFieldType: string }) => {
+    setEditingField({ fieldName: field, type: currentFieldType });
+  }, []);
+
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
@@ -212,7 +221,9 @@ const IndexSetFieldTypesList = () => {
                                 fieldTypes={fieldTypes}
                                 isOptionsLoading={isOptionsLoading}
                                 onSubmitCallback={refetch}
-                                initialFieldType={editingField.type} />
+                                initialFieldType={editingField.type}
+                                onFieldChange={onFieldChange}
+                                showFiledInput={showFiledInput} />
         ) : null
       }
     </>

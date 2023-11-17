@@ -53,9 +53,12 @@ const IndexSetFieldTypesPage = () => {
                       path: DocsHelper.PAGES.INDEX_MODEL,
                     }}
                     topActions={(
-                      <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}>
-                        <Button bsStyle="info">Index set overview</Button>
-                      </LinkContainer>
+                      <>
+                        <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}>
+                          <Button bsStyle="info">Index set overview</Button>
+                        </LinkContainer>
+                        <Button bsStyle="info">Add custom filed type</Button>
+                      </>
                     )}>
           <span>
             Modify the current field types configuration for this index set.
