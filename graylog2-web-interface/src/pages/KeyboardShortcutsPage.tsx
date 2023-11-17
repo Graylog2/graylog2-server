@@ -16,9 +16,9 @@
  */
 import React from 'react';
 
-import {DocumentTitle, PageHeader} from "components/common";
-import {Col, Row} from "components/bootstrap";
-import KeyboardShortcutsList from "components/hotkeys/KeyboardShortcutsList";
+import { DocumentTitle, PageHeader } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import KeyboardShortcutsList from 'components/hotkeys/KeyboardShortcutsList';
 
 const KeyboardShortcutsPage = () => (
   <DocumentTitle title="Graylog Keyboard Shortcuts">
@@ -27,13 +27,12 @@ const KeyboardShortcutsPage = () => (
         A list of all available shortcuts in Graylog
       </span>
     </PageHeader>
-
     <Row className="content">
       <Col md={12}>
         <KeyboardShortcutsList />
       </Col>
     </Row>
   </DocumentTitle>
-)
+);
 
 export default KeyboardShortcutsPage;

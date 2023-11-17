@@ -61,7 +61,6 @@ const keyMapper = (key: string, isMacOS: boolean) => {
 type KeyProps = {
   combinationKey: string,
   description: string,
-  isEnabled: boolean,
   isMacOS: boolean,
   keys: string | Array<string>,
   splitKey: string,
@@ -71,7 +70,6 @@ type ShortcutKeysProps = {
   keys: string | Array<string>,
   splitKey: string,
   combinationKey: string,
-  isEnabled?: boolean,
   isMacOS: boolean
 }
 
@@ -105,11 +103,11 @@ const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysP
   );
 };
 
-const Key = ({ description, keys, combinationKey, splitKey, isEnabled, isMacOS }: KeyProps) => (
+const Key = ({ description, keys, combinationKey, splitKey, isMacOS }: KeyProps) => (
   <ShortcutListItem>
     {description}
     <KeysList>
-      <ShortcutKeys keys={keys} combinationKey={combinationKey} splitKey={splitKey} isEnabled={isEnabled} isMacOS={isMacOS} />
+      <ShortcutKeys keys={keys} combinationKey={combinationKey} splitKey={splitKey} isMacOS={isMacOS} />
     </KeysList>
   </ShortcutListItem>
 );
@@ -133,12 +131,11 @@ const HotkeyCollectionSection = ({ title, description, sectionActions }: Props) 
     <SectionComponent title={title}>
       <p className="description">{description}</p>
       <ShortcutList>
-        {sectionActions.map(({ keyDescription, keys, combinationKey, splitKey, isEnabled, reactKey }) => (
+        {sectionActions.map(({ keyDescription, keys, combinationKey, splitKey, reactKey }) => (
           <Key description={keyDescription}
                keys={keys}
                combinationKey={combinationKey}
                splitKey={splitKey}
-               isEnabled={isEnabled}
                isMacOS={isMacOS}
                key={reactKey} />
         ))}
