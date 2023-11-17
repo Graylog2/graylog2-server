@@ -161,6 +161,7 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.streams.StreamMetrics;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -260,7 +261,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         streamCacheService = new StreamCacheService(eventBus, streamService, null);
         streamCacheService.startAsync().awaitRunning();
         final Provider<Stream> defaultStreamProvider = () -> defaultStream;
-        functions.put(RouteToStream.NAME, new RouteToStream(streamCacheService, defaultStreamProvider));
+        functions.put(RouteToStream.NAME, new RouteToStream(streamCacheService, defaultStreamProvider, mock(StreamMetrics.class)));
         functions.put(RemoveFromStream.NAME, new RemoveFromStream(streamCacheService, defaultStreamProvider));
 
         lookupTableService = mock(LookupTableService.class, RETURNS_DEEP_STUBS);
