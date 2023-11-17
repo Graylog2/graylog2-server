@@ -18,6 +18,7 @@ import React from 'react';
 
 import type { Attribute } from 'stores/PaginationTypes';
 import MenuItem from 'components/bootstrap/MenuItem';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 type Props = {
   attribute: Attribute,
@@ -27,11 +28,13 @@ type Props = {
 
 const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit }: Props) => (
   <>
-    {attribute.filter_options.map(({ title, value }) => (
-      <MenuItem onSelect={() => onSubmit({ value, title })} key={`filter-value-${title}`}>
-        {filterValueRenderer ? filterValueRenderer(value, title) : title}
-      </MenuItem>
-    ))}
+    {attribute.filter_options
+      .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1.toLowerCase(), title2.toLowerCase()))
+      .map(({ title, value }) => (
+        <MenuItem onSelect={() => onSubmit({ value, title })} key={`filter-value-${title}`}>
+          {filterValueRenderer ? filterValueRenderer(value, title) : title}
+        </MenuItem>
+      ))}
   </>
 );
 
