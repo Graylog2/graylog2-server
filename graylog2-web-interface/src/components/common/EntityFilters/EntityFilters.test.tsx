@@ -111,6 +111,29 @@ describe('<EntityFilters />', () => {
     });
 
     it('should update active filter on click', async () => {
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ disabled: [{ title: 'Running', value: 'false' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(
+        <EntityFilters attributes={attributes}
+                       setUrlQueryFilters={() => {}}
+                       urlQueryFilters={OrderedMap({ disabled: ['false'] })} />,
+      );
+
+      await screen.findByTestId('disabled-filter-false');
+
+      userEvent.click(await screen.findByRole('button', {
+        name: /create filter/i,
+      }));
+
+      // eslint-disable-next-line testing-library/no-node-access
+      expect(screen.getByRole('menuitem', { name: /status/i }).closest('li')).toHaveClass('disabled');
+    });
+
+    it('should prevent creating multiple filter for boolean value', async () => {
       const setUrlQueryFilters = jest.fn();
 
       asMock(useFiltersWithTitle).mockReturnValue({
