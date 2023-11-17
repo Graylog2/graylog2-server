@@ -24,30 +24,32 @@ import Routes from 'routing/Routes';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import Menu from 'components/bootstrap/Menu';
 
-const HelpMenuItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
+const HelpMenuLinkItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
   <Menu.Item component="a" href={href} target="_blank" icon={<Icon name="external-link-alt" />}>
     {children}
   </Menu.Item>
 );
+
 const HelpMenu = () => {
   const { setShowHotkeysModal } = useHotkeysContext();
+
   return (
     <NavDropdown title={<Icon name="question-circle" size="lg" />}
                  aria-label="Help"
                  noCaret>
 
-      <HelpMenuItem href={DocsHelper.versionedDocsHomePage()}>
+      <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>
         Documentation
-      </HelpMenuItem>
+      </HelpMenuLinkItem>
 
-      <Menu.Item onSelect={() => setShowHotkeysModal(true)}>
+      <Menu.Item onClick={() => setShowHotkeysModal(true)}>
         Keyboard Shortcuts
-      </MenuItem>
+      </Menu.Item>
 
       {AppConfig.isCloud() && (
-      <HelpMenuItem href={Routes.global_api_browser()}>
+      <HelpMenuLinkItem href={Routes.global_api_browser()}>
         Cluster Global API browser
-      </HelpMenuItem>
+      </HelpMenuLinkItem>
       )}
     </NavDropdown>
   );
