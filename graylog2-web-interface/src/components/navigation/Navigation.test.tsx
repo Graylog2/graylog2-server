@@ -17,12 +17,13 @@
 import * as React from 'react';
 import { mount, mountUnwrapped } from 'wrappedEnzyme';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import { Route, Routes, MemoryRouter, useLocation } from 'react-router-dom';
+import { Route, Routes, MemoryRouter } from 'react-router-dom';
 import DefaultProviders from 'DefaultProviders';
 import Immutable from 'immutable';
 import type { Location } from 'history';
 import { defaultUser } from 'defaultMockValues';
 
+import useLocation from 'routing/useLocation';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
@@ -44,13 +45,7 @@ jest.mock('hooks/useCurrentUser');
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(() => ({
-    pathname: '',
-  })),
-}));
+jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
