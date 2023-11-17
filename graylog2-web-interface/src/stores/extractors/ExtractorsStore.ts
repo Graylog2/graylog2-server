@@ -69,7 +69,8 @@ type TimerMetricsResponse = {
   '95th_percentile': number,
   '99th_percentile': number,
   '98th_percentile': number,
-}
+};
+
 type TimerRateMetricsResponse = {
   rate: RateMetricsResponse,
   rate_unit: string,
@@ -169,7 +170,7 @@ export const ExtractorsStore = singletonStore(
     },
 
     init() {
-      this.trigger({ extractors: this.extractors, extractor: this.extractory });
+      this.trigger({ extractors: this.extractors, extractor: this.extractor });
     },
 
     getState() {
