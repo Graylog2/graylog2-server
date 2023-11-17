@@ -60,6 +60,7 @@ const shouldPopulateTemplate = (currentType: string, currentBody: string): boole
 class HttpNotificationFormV2 extends React.Component<Props, any> {
   static defaultConfig = {
     url: '',
+    api_key_as_header: false,
     api_key: '',
     api_secret: { keep_value: true },
     basic_auth: { keep_value: true },
@@ -252,6 +253,12 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                    bsStyle={validation.errors.api_key ? 'error' : null}
                    help={get(validation, 'errors.api_key[0]', 'Must be set if an API secret is set')}
                    value={config.api_key} />
+            <Checkbox id="api_key_as_header"
+                      name="api_key_as_header"
+                      onChange={this.handleChange}
+                      checked={config.api_key_as_header}>
+              Send API Key/Secret as Header
+            </Checkbox>
           </Col>
           <Col md={6}>
             {api_secret?.keep_value ? (
