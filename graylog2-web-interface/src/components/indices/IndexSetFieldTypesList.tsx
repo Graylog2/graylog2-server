@@ -188,23 +188,23 @@ const IndexSetFieldTypesList = () => {
         )}
       </PaginatedList>
       {
-          editingField ? (
-            <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
-                                  field={editingField.fieldName}
-                                  onClose={handleOnClose}
-                                  show={!!editingField}
-                                  showSelectionTable={false}
-                                  fieldTypes={fieldTypes}
-                                  isOptionsLoading={isOptionsLoading}
-                                  onSubmitCallback={refetch}
-                                  initialFieldType={editingField.type} />
-          ) : null
-        }
+        editingField ? (
+          <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
+                                field={editingField.fieldName}
+                                onClose={handleOnClose}
+                                show={!!editingField}
+                                showSelectionTable={false}
+                                fieldTypes={fieldTypes}
+                                isOptionsLoading={isOptionsLoading}
+                                onSubmitCallback={refetch}
+                                initialFieldType={editingField.type} />
+        ) : null
+      }
       {
-          deletingFieldTypes ? (
-            <IndexSetCustomFieldTypeRemoveModal show={!!deletingFieldTypes} fields={deletingFieldTypes} onClose={onCloseDeleting} indexSetIds={indexSetsDeleting} />
-          ) : null
-        }
+        deletingFieldTypes ? (
+          <IndexSetCustomFieldTypeRemoveModal show={!!deletingFieldTypes} fields={deletingFieldTypes} onClose={onCloseDeleting} indexSetIds={indexSetsDeleting} />
+        ) : null
+      }
     </>
   );
 };

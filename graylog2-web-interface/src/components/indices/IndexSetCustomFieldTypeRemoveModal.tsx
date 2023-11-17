@@ -40,28 +40,24 @@ const RedBadge = styled(Badge)(({ theme }) => css`
 const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
 
 type Props = {
-    show: boolean,
-    fields: Array<string>,
-    onClose: () => void,
-    indexSetIds: Array<string>,
+  show: boolean,
+  fields: Array<string>,
+  onClose: () => void,
+  indexSetIds: Array<string>,
 }
 
 type ContentProps = {
-    fields: Array<string>,
-    indexSetIds: Array<string>,
-    indexSets: Record<string, IndexSet>,
-    setRotated: React.Dispatch<React.SetStateAction<boolean>>
-    rotated: boolean,
+  fields: Array<string>,
+  indexSetIds: Array<string>,
+  indexSets: Record<string, IndexSet>,
+  setRotated: React.Dispatch<React.SetStateAction<boolean>>
+  rotated: boolean,
 }
 
 const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string, IndexSet> => {
   if (!indexSets) return null;
 
-  return indexSets.reduce((res, indexSet) => {
-    res[indexSet.id] = indexSet;
-
-    return res;
-  }, {});
+  return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
 };
 
 const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, rotated, indexSetIds }: ContentProps) => {
@@ -71,7 +67,7 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, r
   return (
     <div>
       <Alert>
-        After removing the custom field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the open search settings will be use
+        After removing the custom field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the settings of your search engine will be used
       </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
       <p>

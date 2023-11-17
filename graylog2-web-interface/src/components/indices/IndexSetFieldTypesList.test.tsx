@@ -257,6 +257,6 @@ describe('IndexSetFieldTypesList', () => {
     const modal = await screen.findByTestId('modal-form');
     await within(modal).findByText('Rotate affected indices after change');
 
-    expect(modal).toHaveTextContent('After removing the custom field type for field in index set title the open search settings will be use');
+    expect(modal).toHaveTextContent('After removing the custom field type for field in index set title the settings of your search engine will be used');
   });
 });

@@ -23,15 +23,15 @@ import UserNotification from 'util/UserNotification';
 export const urlPrefix = '/system/indices/mappings/remove_mapping';
 
 export type RemoveFieldTypeBody = {
-    indexSets: Array<string>,
-    fields: Array<string>,
-    rotated: boolean,
+  indexSets: Array<string>,
+  fields: Array<string>,
+  rotated: boolean,
 }
 
 export type RemoveFieldTypeBodyJson = {
-    index_sets: Array<string>,
-    fields: Array<string>,
-    rotate: boolean,
+  index_sets: Array<string>,
+  fields: Array<string>,
+  rotate: boolean,
 }
 
 const putFieldType = async ({
