@@ -60,7 +60,6 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
   return (
     <NavDropdown title={<Icon name="user" size="lg" />}
                  aria-label={`User Menu for ${fullName}`}
-                 id="user-menu-dropdown"
                  noCaret>
       <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
       <Menu.Divider />

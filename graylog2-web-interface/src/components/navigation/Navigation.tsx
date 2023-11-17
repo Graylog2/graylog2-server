@@ -90,7 +90,6 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
       <NavDropdown key={title}
                    title={title}
                    badge={renderBadge ? BadgeComponent : null}
-                   id="enterprise-dropdown"
                    inactiveTitle={pluginRoute.description}>
         {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
       </NavDropdown>
@@ -186,7 +185,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
           </InactiveNavItem>
           <ScratchpadToggle />
 
-          <HelpMenu active={_isActive(pathname, Routes.WELCOME)} />
+          <HelpMenu />
 
           <LinkContainer relativeActive to={Routes.WELCOME}>
             <NavItem id="welcome-nav-link" aria-label="Welcome">

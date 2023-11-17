@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 
 import { NavDropdown } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -24,19 +23,13 @@ import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import Menu from 'components/bootstrap/Menu';
 
-type Props = {
-  active: boolean,
-}
-
 const HelpMenuItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
   <Menu.Item component="a" href={href} target="_blank" icon={<Icon name="external-link-alt" />}>
     {children}
   </Menu.Item>
 );
-const HelpMenu = ({ active }: Props) => (
-  <NavDropdown active={active}
-               id="help-menu-dropdown"
-               title={<Icon name="question-circle" size="lg" />}
+const HelpMenu = () => (
+  <NavDropdown title={<Icon name="question-circle" size="lg" />}
                aria-label="Help"
                noCaret>
 
@@ -51,9 +44,5 @@ const HelpMenu = ({ active }: Props) => (
     )}
   </NavDropdown>
 );
-
-HelpMenu.propTypes = {
-  active: PropTypes.bool.isRequired,
-};
 
 export default HelpMenu;
