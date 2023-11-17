@@ -22,32 +22,38 @@ import { ExternalLink, Icon } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import useHotkeysContext from 'hooks/useHotkeysContext';
 
 type Props = {
   active: boolean,
 }
-const HelpMenu = ({ active }: Props) => (
-  <NavDropdown active={active}
-               id="help-menu-dropdown"
-               title={<Icon name="question-circle" size="lg" />}
-               aria-label="Help"
-               noCaret>
 
-    <MenuItem href={DocsHelper.versionedDocsHomePage()} target="_blank">
-      <ExternalLink>Documentation</ExternalLink>
-    </MenuItem>
+const HelpMenu = ({ active }: Props) => {
+  const { setShowHotkeysModal } = useHotkeysContext();
 
-    <MenuItem href={Routes.KEYBOARD_SHORTCUTS} target="_blank">
-      Keyboard Shortcuts
-    </MenuItem>
+  return (
+    <NavDropdown active={active}
+                 id="help-menu-dropdown"
+                 title={<Icon name="question-circle" size="lg" />}
+                 aria-label="Help"
+                 noCaret>
 
-    {AppConfig.isCloud() && (
-    <MenuItem href={Routes.global_api_browser()} target="_blank">
-      <ExternalLink>Cluster Global API browser</ExternalLink>
-    </MenuItem>
-    )}
-  </NavDropdown>
-);
+      <MenuItem href={DocsHelper.versionedDocsHomePage()} target="_blank">
+        <ExternalLink>Documentation</ExternalLink>
+      </MenuItem>
+
+      <MenuItem onSelect={() => setShowHotkeysModal(true)}>
+        Keyboard Shortcuts
+      </MenuItem>
+
+      {AppConfig.isCloud() && (
+        <MenuItem href={Routes.global_api_browser()} target="_blank">
+          <ExternalLink>Cluster Global API browser</ExternalLink>
+        </MenuItem>
+      )}
+    </NavDropdown>
+  );
+};
 
 HelpMenu.propTypes = {
   active: PropTypes.bool.isRequired,

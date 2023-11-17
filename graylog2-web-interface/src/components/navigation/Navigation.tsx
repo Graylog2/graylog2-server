@@ -31,7 +31,6 @@ import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import { Icon } from 'components/common';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
-import OpenShortcutsModal from 'components/navigation/OpenShortcutsModal';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -186,8 +185,6 @@ const Navigation = React.memo(({ pathname }: Props) => {
             {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
           <ScratchpadToggle />
-
-          <OpenShortcutsModal />
 
           <HelpMenu active={_isActive(pathname, Routes.WELCOME)} />
 
