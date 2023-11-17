@@ -61,10 +61,11 @@ type Props = {
   fieldTypes: FieldTypes,
   isOptionsLoading: boolean,
   initialFieldType?: string,
-  onFieldChange?: (param: { field: string, currentFieldType: string }) => void
+  onFieldChange?: (param: { fieldName: string, type: string }) => void,
+  showFiledInput?: boolean,
 }
 
-const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoading, initialSelectedIndexSets, onClose, field, showSelectionTable, initialFieldType, onFieldChange }: Props) => {
+const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoading, initialSelectedIndexSets, onClose, field, showSelectionTable, initialFieldType, onFieldChange, showFiledInput }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
   const [newFieldType, setNewFieldType] = useState(null);
@@ -135,7 +136,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
                         bsSize="large">
       <div>
         {
-          onFieldChange && <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={onFieldChange} field={field} />
+          showFiledInput && <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={onFieldChange} field={field} />
         }
         <Alert bsStyle="warning">
           Changing the type of the field <b>{field}</b> can have a significant impact on the ingestion of future log messages.
@@ -185,6 +186,7 @@ ChangeFieldTypeModal.defaultProps = {
   onSubmitCallback: undefined,
   initialFieldType: null,
   onFieldChange: undefined,
+  showFiledInput: undefined,
 };
 
 export default ChangeFieldTypeModal;

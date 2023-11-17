@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -28,11 +28,18 @@ import Routes from 'routing/Routes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
 import useCurrentUser from 'hooks/useCurrentUser';
 
+export type EditingField = {
+  type: string,
+  fieldName: string,
+  showFiledInput: boolean,
+}
+
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
   const navigate = useNavigate();
   const { indexSet } = useStore(IndexSetsStore);
   const currentUser = useCurrentUser();
+  const [editingField, setEditingField] = useState<EditingField | null>(null);
 
   useEffect(() => {
     const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
@@ -43,6 +50,10 @@ const IndexSetFieldTypesPage = () => {
       IndexSetsActions.get(indexSetId);
     }
   }, [currentUser.permissions, indexSetId, navigate]);
+
+  const onAddCustomFieldClick = useCallback(() => {
+    setEditingField({ fieldName: undefined, showFiledInput: true, type: undefined });
+  }, []);
 
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
@@ -57,7 +68,7 @@ const IndexSetFieldTypesPage = () => {
                         <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}>
                           <Button bsStyle="info">Index set overview</Button>
                         </LinkContainer>
-                        <Button bsStyle="info">Add custom filed type</Button>
+                        <Button bsStyle="info" onClick={onAddCustomFieldClick}>Add custom filed type</Button>
                       </>
                     )}>
           <span>
@@ -67,7 +78,7 @@ const IndexSetFieldTypesPage = () => {
 
         <Row className="content">
           <Col md={12}>
-            <IndexSetFieldTypesList />
+            <IndexSetFieldTypesList editingField={editingField} setEditingField={setEditingField} />
           </Col>
         </Row>
       </div>

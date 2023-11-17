@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
@@ -39,6 +39,7 @@ import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import type { EditingField } from 'pages/IndexSetFieldTypesPage';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -68,23 +69,25 @@ const FilterValueRenderers = {
   ),
 };
 
-const IndexSetFieldTypesList = () => {
+type Props = {
+  editingField: EditingField,
+  setEditingField: React.Dispatch<React.SetStateAction<EditingField | null>>,
+}
+
+const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
   const { indexSetId } = useParams();
-  const [editingField, setEditingField] = useState<{
-    type: string,
-    fieldName: string,
-  } | null>(null);
   const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const handleOnClose = useCallback(() => {
     setEditingField(null);
-  }, []);
+  }, [setEditingField]);
 
   const handleOnOpen = useCallback((fieldType: IndexSetFieldType) => {
     setEditingField({
       fieldName: fieldType.fieldName,
       type: fieldType.type,
+      showFiledInput: false,
     });
-  }, []);
+  }, [setEditingField]);
 
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -167,9 +170,9 @@ const IndexSetFieldTypesList = () => {
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
-  const onFieldChange = useCallback(({ field, currentFieldType }: { field: string, currentFieldType: string }) => {
-    setEditingField({ fieldName: field, type: currentFieldType });
-  }, []);
+  const onFieldChange = useCallback(({ fieldName, type }: { fieldName: string, type: string }) => {
+    setEditingField({ fieldName, type, showFiledInput: true });
+  }, [setEditingField]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -223,7 +226,7 @@ const IndexSetFieldTypesList = () => {
                                 onSubmitCallback={refetch}
                                 initialFieldType={editingField.type}
                                 onFieldChange={onFieldChange}
-                                showFiledInput={showFiledInput} />
+                                showFiledInput={editingField.showFiledInput} />
         ) : null
       }
     </>
