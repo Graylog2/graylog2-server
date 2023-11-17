@@ -17,13 +17,18 @@
 package org.graylog.datanode.restoperations;
 
 
+import com.github.rholder.retry.RetryException;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
 
 import javax.ws.rs.HttpMethod;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class OpensearchTestIndexCreation extends RestOperation {
 
@@ -42,13 +47,16 @@ public class OpensearchTestIndexCreation extends RestOperation {
         );
     }
 
-    public List<String> getShardNodes() {
-        final ValidatableResponse response = validatedResponse("/_cat/shards/" + IT_TEST_INDEX + "?h=node,prirep&format=json", HttpMethod.GET,
-                null, "Could not retrieve shard info for test index",
-                r -> r.extract().statusCode() == 200);
+    public List<String> getShardNodes() throws ExecutionException, RetryException {
+
+        final ValidatableResponse response = new OpensearchTestIndexCreationWait(this.parameters).waitForIndexCreation();
         final JsonPath jsonPath = response.extract().body().jsonPath();
-        final List<String> nodes = jsonPath.getList("node", String.class);
-        assertEquals(nodes.size(), 2);
-        return nodes;
+
+        List<Map<String, String>> shards = jsonPath.getList("$");
+        assertEquals(shards.size(), 2, "Expecting one primary and one replica shard.");
+        return shards.stream()
+                .peek(shard -> assertNotEquals("UNASSIGNED", shard.get("state")))
+                .map(shard -> shard.get("node"))
+                .collect(Collectors.toList());
     }
 }

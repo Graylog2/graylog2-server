@@ -112,8 +112,12 @@ public class DatanodeClusterIT {
 
     @AfterEach
     void tearDown() {
-        nodeB.stop();
-        nodeA.stop();
+        if (nodeB != null) {
+            nodeB.stop();
+        }
+        if (nodeA != null) {
+            nodeA.stop();
+        }
         mongoDBTestService.close();
         network.close();
     }
