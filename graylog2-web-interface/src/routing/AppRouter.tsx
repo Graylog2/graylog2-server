@@ -300,7 +300,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId'), element: <SidecarEditConfigurationPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
-            { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage />},
+            { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
             ...standardPluginRoutes,
             { path: '*', element: <NotFoundPage displayPageLayout={false} /> },
           ].filter((route) => !!route),
