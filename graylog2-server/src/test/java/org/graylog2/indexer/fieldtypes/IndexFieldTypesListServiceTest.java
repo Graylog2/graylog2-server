@@ -64,7 +64,7 @@ class IndexFieldTypesListServiceTest {
     void testReturnsEmptyPageOnWrongIndexId() {
         doReturn(Optional.empty()).when(indexSetService).get("I_do_not_exist!");
 
-        final PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesList("I_do_not_exist!", "", List.of(), 0, 10, "index_set_id", Sorting.Direction.ASC);
+        final PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesListPage("I_do_not_exist!", "", List.of(), 0, 10, "index_set_id", Sorting.Direction.ASC);
 
         assertEquals(0, response.total());
         assertTrue(response.elements().isEmpty());
@@ -81,7 +81,7 @@ class IndexFieldTypesListServiceTest {
         doReturn(null).when(indexSetFactory).create(indexSetConfig);
 
 
-        final PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesList("I_am_strangely_broken!", "", List.of(), 0, 10, "index_set_id", Sorting.Direction.ASC);
+        final PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesListPage("I_am_strangely_broken!", "", List.of(), 0, 10, "index_set_id", Sorting.Direction.ASC);
 
         assertEquals(0, response.total());
         assertTrue(response.elements().isEmpty());
@@ -122,14 +122,14 @@ class IndexFieldTypesListServiceTest {
                 .findOneByIndexName("graylog_41");
 
 
-        PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesList("I_am_fine!", "", List.of(), 0, 2, "field_name", Sorting.Direction.ASC);
+        PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "", List.of(), 0, 2, "field_name", Sorting.Direction.ASC);
         assertThat(response.elements())
                 .containsExactly(
                         new IndexSetFieldType("field_1", "ip", true, false),
                         new IndexSetFieldType("field_2", "long", false, false)
                 );
 
-        response = toTest.getIndexSetFieldTypesList("I_am_fine!", "", List.of(), 0, 2, "field_name", Sorting.Direction.DESC);
+        response = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "", List.of(), 0, 2, "field_name", Sorting.Direction.DESC);
         assertThat(response.elements())
                 .containsExactly(
                         new IndexSetFieldType("field_5", "string_fts", false, false),
@@ -164,7 +164,7 @@ class IndexFieldTypesListServiceTest {
                 .when(indexFieldTypesService)
                 .findOneByIndexName("graylog_0");
 
-        PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesList("I_am_fine!", "field", List.of("type:long", "is_custom:false"), 0, 50, "field_name", Sorting.Direction.ASC);
+        PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "field", List.of("type:long", "is_custom:false"), 0, 50, "field_name", Sorting.Direction.ASC);
         assertThat(response.elements())
                 .containsExactly(
                         new IndexSetFieldType("field_1", "long", false, false),
