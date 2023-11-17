@@ -78,7 +78,7 @@ Menu.defaultProps = {
   shadow: undefined,
   width: undefined,
   withinPortal: false,
-  opened: false,
+  opened: undefined,
 };
 
 export default Menu;
