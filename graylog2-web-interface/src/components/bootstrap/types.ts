@@ -14,23 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Row as BootstrapRow } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import type { DropdownButton } from 'components/bootstrap';
 
-export const RowContentStyles = css(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  margin-bottom: ${theme.spacings.xs};
-  border-radius: 4px;
-`);
-
-type RowProps = React.ComponentProps<typeof BootstrapRow>;
-const Row: React.ComponentType<RowProps> = styled(BootstrapRow)`
-  &.content {
-    ${RowContentStyles}
-  }
-`;
-
-/** @component */
-export default Row;
+export type SelectCallback = (eventKey: any) => void;
+export type Sizes = React.ComponentProps<typeof DropdownButton>['bsSize'];

@@ -22,6 +22,7 @@ import type { $PropertyType } from 'utility-types';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/bootstrap';
 import type { Step } from 'components/common/Wizard';
+import type { SelectCallback } from 'components/bootstrap/types';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
 import { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
@@ -69,7 +70,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
     <StyledPanelGroup accordion
                       activeKey={activeKey}
                       id="sidebar-server-response"
-                      onSelect={setActiveKey}>
+                      onSelect={setActiveKey as SelectCallback}>
       <Panel eventKey={SERVER_CONFIG_KEY}>
         <Panel.Heading>
           <Panel.Title toggle>Server Connection Check</Panel.Title>
