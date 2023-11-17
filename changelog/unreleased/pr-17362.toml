@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Prevent adding multiple entity data table filters for boolean values."
+
+pulls = ["17362"]
