@@ -51,10 +51,8 @@ class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
 
 type Props = {
   title?: React.ReactNode,
-  id: string,
   inactiveTitle?: string,
   badge?: React.ComponentType<{ text: React.ReactNode }>,
-  active?: boolean,
   noCaret?: boolean,
 }
 
@@ -121,7 +119,6 @@ NavDropdown.defaultProps = {
   inactiveTitle: undefined,
   badge: undefined,
   noCaret: false,
-  active: false,
 };
 
 const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`

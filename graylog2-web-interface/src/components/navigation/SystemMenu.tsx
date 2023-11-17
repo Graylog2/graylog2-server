@@ -25,9 +25,9 @@ import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import NavigationLink from './NavigationLink';
-import usePluginEntities from 'hooks/usePluginEntities';
 
 const TITLE_PREFIX = 'System';
 const PATH_PREFIX = '/system';
@@ -93,7 +93,7 @@ const SystemMenu = () => {
     });
 
   return (
-    <NavDropdown title={_systemTitle(location.pathname, _pluginSystemNavigations)} id="system-menu-dropdown" inactiveTitle={TITLE_PREFIX}>
+    <NavDropdown title={_systemTitle(location.pathname, _pluginSystemNavigations)} inactiveTitle={TITLE_PREFIX}>
       <NavigationLink path={Routes.SYSTEM.OVERVIEW} description="Overview" />
       <IfPermitted permissions={['clusterconfigentry:read']}>
         <NavigationLink path={Routes.SYSTEM.CONFIGURATIONS} description="Configurations" />
