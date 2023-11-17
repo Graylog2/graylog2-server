@@ -34,7 +34,6 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetCustomFieldTypeRemoveModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import EntityFilters from 'components/common/EntityFilters';
