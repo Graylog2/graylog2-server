@@ -17,15 +17,22 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { MenuItem, NavDropdown } from 'components/bootstrap';
-import { ExternalLink, Icon } from 'components/common';
+import { NavDropdown } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import Menu from 'components/bootstrap/Menu';
 
 type Props = {
   active: boolean,
 }
+
+const HelpMenuItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
+  <Menu.Item component="a" href={href} target="_blank" icon={<Icon name="external-link-alt" />}>
+    {children}
+  </Menu.Item>
+);
 const HelpMenu = ({ active }: Props) => (
   <NavDropdown active={active}
                id="help-menu-dropdown"
@@ -33,14 +40,14 @@ const HelpMenu = ({ active }: Props) => (
                aria-label="Help"
                noCaret>
 
-    <MenuItem href={DocsHelper.versionedDocsHomePage()} target="_blank">
-      <ExternalLink>Documentation</ExternalLink>
-    </MenuItem>
+    <HelpMenuItem href={DocsHelper.versionedDocsHomePage()}>
+      Documentation
+    </HelpMenuItem>
 
     {AppConfig.isCloud() && (
-    <MenuItem href={Routes.global_api_browser()} target="_blank">
-      <ExternalLink>Cluster Global API browser</ExternalLink>
-    </MenuItem>
+    <HelpMenuItem href={Routes.global_api_browser()}>
+      Cluster Global API browser
+    </HelpMenuItem>
     )}
   </NavDropdown>
 );
