@@ -97,7 +97,7 @@ const CollectorConfigurationModalContainer = ({
     setShowConfirmModal(false);
   };
 
-  const confirmConfigurationChange = (doneCallback: () => void) => {
+  const confirmConfigurationChange = () => {
     const assignedConfigurationsToSave = configurations.filter((config) => nextAssignedConfigurations.includes(config.name));
 
     selectedSidecarCollectorPairs.forEach((sidecarCollectorPair) => {
@@ -116,7 +116,7 @@ const CollectorConfigurationModalContainer = ({
         app_section: 'administration',
       });
 
-      onConfigurationSelectionChange([sidecarCollectorPair], configs, doneCallback);
+      onConfigurationSelectionChange([sidecarCollectorPair], configs, () => {});
     });
 
     cancelConfigurationChange();

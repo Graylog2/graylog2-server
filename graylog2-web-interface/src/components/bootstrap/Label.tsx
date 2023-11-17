@@ -37,8 +37,9 @@ const StyledLabel = styled(BootstrapLabel)(({ bsStyle, theme }) => css`
   ${getColorStyles(theme, bsStyle)}
   padding: 0.3em 0.6em;
 `);
+type Props = React.ComponentProps<typeof StyledLabel>;
 
-const Label = forwardRef(({ ...props }, ref) => (
+const Label = forwardRef((props: Props, ref: React.ForwardedRef<typeof StyledLabel>) => (
   <StyledLabel ref={ref} {...props} />
 ));
 

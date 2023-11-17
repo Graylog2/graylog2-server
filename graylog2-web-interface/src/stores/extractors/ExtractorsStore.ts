@@ -23,9 +23,112 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
+export type InputSummary = {
+  creator_user_id: string;
+  node: string;
+  name: string;
+  created_at: string;
+  global: boolean;
+  attributes: {
+    [_key: string]: Object;
+  };
+  id: string;
+  title: string;
+  type: string;
+  content_pack: string;
+  static_fields: {
+    [_key: string]: string;
+  };
+};
+
+export type NodeSummary = {
+  cluster_id: string,
+  hostname: string,
+  is_leader: boolean,
+  is_master: boolean,
+  last_seen: string,
+  node_id: string,
+  short_node_id: string,
+  transport_address: string,
+  type: string,
+};
+
+type RateMetricsResponse = {
+  total: number,
+  mean: number,
+  five_minute: number,
+  fifteen_minute: number,
+  one_minute: number,
+};
+
+type TimerMetricsResponse = {
+  min: number,
+  max: number,
+  std_dev: number,
+  mean: number,
+  '95th_percentile': number,
+  '99th_percentile': number,
+  '98th_percentile': number,
+};
+
+type TimerRateMetricsResponse = {
+  rate: RateMetricsResponse,
+  rate_unit: string,
+  time: TimerMetricsResponse,
+  duration_unit: string,
+};
+
+export type ExtractorMetrics = {
+  condition_misses: number,
+  execution: TimerRateMetricsResponse,
+  total: TimerRateMetricsResponse,
+  condition: TimerRateMetricsResponse,
+  condition_hits: number,
+  converters: TimerRateMetricsResponse,
+};
+
+export type ExtractorType = {
+  creator_user_id: string,
+  extractor_type?: string,
+  source_field: string,
+  condition_type: string,
+  converter_exceptions: number,
+  title: string,
+  type: string,
+  cursor_strategy: string,
+  exceptions: number,
+  target_field: string,
+  extractor_config: {
+    [_key: string]: Object,
+  },
+  condition_value: string,
+  converters: {
+    [_key: string]: Object,
+  }[],
+  id?: string,
+  metrics: ExtractorMetrics,
+  order: number,
+};
+
+type ExtractorsActionsType = {
+  list: (inputId: string) => Promise<Array<ExtractorType>>,
+  get: (inputId: string, extractorId: string) => Promise<ExtractorType>,
+  create: (inputId: string, extractor: ExtractorType, calledFromMethod: boolean) => Promise<unknown>,
+  save: (inputId: string, extractor: ExtractorType) => Promise<unknown>,
+  update: (inputId: string, extractor: ExtractorType, calledFromMethod: boolean) => Promise<unknown>,
+  delete: (inputId: string, extractor: ExtractorType) => Promise<unknown>,
+  order: { asyncResult: true },
+  import: (inputId: string, orderedExtractors: Array<ExtractorType>) => Promise<unknown>,
+};
+
+export type ExtractorsStoreState = {
+  extractors: Array<ExtractorType>,
+  extractor: ExtractorType,
+};
+
 export const ExtractorsActions = singletonActions(
   'core.Extractors',
-  () => Reflux.createActions({
+  () => Reflux.createActions<ExtractorsActionsType>({
     list: { asyncResult: true },
     get: { asyncResult: true },
     create: { asyncResult: true },
@@ -33,11 +136,11 @@ export const ExtractorsActions = singletonActions(
     update: { asyncResult: true },
     delete: { asyncResult: true },
     order: { asyncResult: true },
-    import: {},
+    import: { asyncResult: true },
   }),
 );
 
-function getExtractorDTO(extractor) {
+function getExtractorDTO(extractor: ExtractorType) {
   const conditionValue = extractor.condition_type && extractor.condition_type !== 'none' ? extractor.condition_value : '';
 
   return {
@@ -56,29 +159,44 @@ function getExtractorDTO(extractor) {
 
 export const ExtractorsStore = singletonStore(
   'core.Extractors',
-  () => Reflux.createStore({
+  () => Reflux.createStore<ExtractorsStoreState>({
     listenables: [ExtractorsActions],
     sourceUrl: '/system/inputs/',
     extractors: undefined,
     extractor: undefined,
 
+    getInitialState() {
+      return this.getState();
+    },
+
     init() {
       this.trigger({ extractors: this.extractors, extractor: this.extractor });
     },
 
-    list(inputId) {
+    getState() {
+      return {
+        extractors: this.extractors,
+        extractor: this.extractor,
+      };
+    },
+
+    propagateState() {
+      this.trigger(this.getState());
+    },
+
+    list(inputId: string) {
       const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors')));
 
       promise.then((response) => {
         this.extractors = response.extractors;
-        this.trigger({ extractors: this.extractors });
+        this.propagateState();
       });
 
       ExtractorsActions.list.promise(promise);
     },
 
     // Creates an basic extractor object that we can use to create new extractors.
-    new(type, field) {
+    new(type: string, field: string) {
       if (ExtractorUtils.EXTRACTOR_TYPES.indexOf(type) === -1) {
         throw new Error(`Invalid extractor type provided: ${type}`);
       }
@@ -92,18 +210,18 @@ export const ExtractorsStore = singletonStore(
       };
     },
 
-    get(inputId, extractorId) {
+    get(inputId: string, extractorId: string) {
       const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)));
 
       promise.then((response) => {
         this.extractor = response;
-        this.trigger({ extractor: this.extractor });
+        this.propagateState();
       });
 
       ExtractorsActions.get.promise(promise);
     },
 
-    save(inputId, extractor) {
+    save(inputId: string, extractor: ExtractorType) {
       let promise;
 
       if (extractor.id) {
@@ -115,13 +233,13 @@ export const ExtractorsStore = singletonStore(
       ExtractorsActions.save.promise(promise);
     },
 
-    _silentExtractorCreate(inputId, extractor) {
+    _silentExtractorCreate(inputId: string, extractor: ExtractorType) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.create(inputId).url);
 
       return fetch('POST', url, getExtractorDTO(extractor));
     },
 
-    create(inputId, extractor, calledFromMethod) {
+    create(inputId: string, extractor: ExtractorType, calledFromMethod: boolean) {
       const promise = this._silentExtractorCreate(inputId, extractor);
 
       promise
@@ -144,7 +262,7 @@ export const ExtractorsStore = singletonStore(
       return promise;
     },
 
-    update(inputId, extractor, calledFromMethod) {
+    update(inputId: string, extractor: ExtractorType, calledFromMethod: boolean) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.update(inputId, extractor.id).url);
 
       const promise = fetch('PUT', url, getExtractorDTO(extractor));
@@ -169,7 +287,7 @@ export const ExtractorsStore = singletonStore(
       return promise;
     },
 
-    delete(inputId, extractor) {
+    delete(inputId: string, extractor: ExtractorType) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.delete(inputId, extractor.id).url);
 
       const promise = fetch('DELETE', url);
@@ -190,7 +308,7 @@ export const ExtractorsStore = singletonStore(
       ExtractorsActions.delete.promise(promise);
     },
 
-    order(inputId, orderedExtractors) {
+    order(inputId: string, orderedExtractors: Array<ExtractorType>) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.order(inputId).url);
       const orderedExtractorsMap = {};
 
@@ -216,7 +334,7 @@ export const ExtractorsStore = singletonStore(
       ExtractorsActions.order.promise(promise);
     },
 
-    import(inputId, extractors) {
+    import(inputId: string, extractors: Array<ExtractorType>) {
       let successfulImports = 0;
       let failedImports = 0;
       const promises = [];
@@ -235,6 +353,8 @@ export const ExtractorsStore = singletonStore(
         if (failedImports === 0) {
           UserNotification.success(`Import results: ${successfulImports} extractor(s) imported.`,
             'Import operation successful');
+
+          this.propagateState();
         } else {
           UserNotification.warning(`Import results: ${successfulImports} extractor(s) imported, ${failedImports} error(s).`,
             'Import operation completed');
