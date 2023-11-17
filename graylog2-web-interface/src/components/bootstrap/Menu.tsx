@@ -24,9 +24,10 @@ type Props = PropsWithChildren<{
   shadow?: MenuProps['shadow'],
   width?: number,
   withinPortal?: boolean,
+  opened?: boolean,
 }>
 
-const Menu = ({ children, shadow, width, withinPortal, position }: Props) => {
+const Menu = ({ children, shadow, width, withinPortal, position, opened }: Props) => {
   const theme = useTheme();
 
   const styles = () => ({
@@ -40,6 +41,7 @@ const Menu = ({ children, shadow, width, withinPortal, position }: Props) => {
 
   return (
     <MantineMenu shadow={shadow}
+                 opened={opened}
                  width={width}
                  position={position}
                  withinPortal={withinPortal}
@@ -76,6 +78,7 @@ Menu.defaultProps = {
   shadow: undefined,
   width: undefined,
   withinPortal: false,
+  opened: false,
 };
 
 export default Menu;
