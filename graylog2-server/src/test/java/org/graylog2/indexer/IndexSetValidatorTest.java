@@ -69,6 +69,9 @@ public class IndexSetValidatorTest {
 
     @Test
     public void validate() throws Exception {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
         IndexSetConfig validConfig = testIndexSetConfig();
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(validConfig);
