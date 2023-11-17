@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { useLocation } from 'react-router-dom';
+import type { SystemNavigationItem } from 'graylog-web-plugin';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { NavDropdown } from 'components/bootstrap';
@@ -27,6 +27,7 @@ import { appPrefixed } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
 import NavigationLink from './NavigationLink';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const TITLE_PREFIX = 'System';
 const PATH_PREFIX = '/system';
@@ -52,14 +53,14 @@ const titleMap = {
   '/roles': 'Roles',
 };
 
-const _systemTitle = (pathname: string) => {
+const _systemTitle = (pathname: string, systemNavigations: Array<SystemNavigationItem>) => {
   const pageSpecificTitle = Object.entries(titleMap).find(([route]) => _isActive(pathname, `${PATH_PREFIX}${route}`))?.[1];
 
   if (pageSpecificTitle) {
     return `${TITLE_PREFIX} / ${pageSpecificTitle}`;
   }
 
-  const pluginRoute = PluginStore.exports('systemnavigation').filter((route) => _isActive(pathname, route.path))[0];
+  const pluginRoute = systemNavigations.filter((route) => _isActive(pathname, route.path))[0];
 
   if (pluginRoute) {
     return `${TITLE_PREFIX} / ${pluginRoute.description}`;
@@ -76,7 +77,9 @@ const SystemMenu = () => {
     showInputs = AppConfig.isFeatureEnabled('cloud_inputs');
   }
 
-  const pluginSystemNavigations = PluginStore.exports('systemnavigation')
+  const _pluginSystemNavigations = usePluginEntities('systemnavigation');
+
+  const pluginSystemNavigations = _pluginSystemNavigations
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(({ description, path, permissions }) => {
       const prefixedPath = appPrefixed(path);
@@ -90,7 +93,7 @@ const SystemMenu = () => {
     });
 
   return (
-    <NavDropdown title={_systemTitle(location.pathname)} id="system-menu-dropdown" inactiveTitle={TITLE_PREFIX}>
+    <NavDropdown title={_systemTitle(location.pathname, _pluginSystemNavigations)} id="system-menu-dropdown" inactiveTitle={TITLE_PREFIX}>
       <NavigationLink path={Routes.SYSTEM.OVERVIEW} description="Overview" />
       <IfPermitted permissions={['clusterconfigentry:read']}>
         <NavigationLink path={Routes.SYSTEM.CONFIGURATIONS} description="Configurations" />

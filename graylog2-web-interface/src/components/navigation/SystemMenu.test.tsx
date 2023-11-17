@@ -16,20 +16,17 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 import type { Location } from 'history';
-import type { ReactWrapper } from 'enzyme';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
+import usePluginEntities from 'hooks/usePluginEntities';
+import SystemMenu from 'components/navigation/SystemMenu';
 
 import AppConfig from '../../util/AppConfig';
-
-const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
-const containsLink = (wrapper, title, length = 1) => expect(findLink(wrapper, title)).toHaveLength(length);
-const containsAllLinks = (wrapper, titles) => titles.forEach((title) => containsLink(wrapper, title));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -45,151 +42,147 @@ jest.mock('react-router-dom', () => ({
   useLocation: jest.fn(),
 }));
 
+jest.mock('hooks/usePluginEntities');
+
+const openSystemMenu = async () => {
+  const systemMenu = await screen.findByRole('button', { name: /system/i });
+  systemMenu.click();
+};
+
+const findSystemMenuItem = (name: string) => screen.findByRole('menuitem', { name });
+const querySystemMenuItem = (name: string) => screen.queryByRole('menuitem', { name });
+
 describe('SystemMenu', () => {
-  let exports;
-
   beforeEach(() => {
-    exports = {};
-
-    const PluginStore = { exports: jest.fn((key) => exports[key] || []) };
-
-    jest.doMock('graylog-web-plugin/plugin', () => ({ PluginStore }));
-    AppConfig.gl2AppPathPrefix = jest.fn(() => '');
+    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('');
     asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
     asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
   });
 
   describe('uses correct permissions:', () => {
-    let SystemMenu;
-
-    beforeEach(() => {
-      // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu').default;
-    });
-
     it.each`
-    permissions                    | count | links
-    ${[]}                          | ${3}  | ${['Overview', 'Nodes', 'Data Nodes']}
-    ${['clusterconfigentry:read']} | ${4}  | ${['Configurations']}
-    ${['inputs:read']}             | ${4}  | ${['Inputs']}
-    ${['grok_pattern:read']}       | ${4}  | ${['Grok Patterns']}
-    ${['outputs:read']}            | ${4}  | ${['Outputs']}
-    ${['indices:read']}            | ${4}  | ${['Indices']}
-    ${['loggers:read']}            | ${4}  | ${['Logging']}
-    ${['authentication:edit']}     | ${4}  | ${['Authentication']}
-    ${['users:list']}              | ${4}  | ${['Users and Teams']}
-    ${['roles:read']}              | ${4}  | ${['Roles']}
-    ${['contentpack:read']}        | ${4}  | ${['Content Packs']}
-    ${['lookuptables:read']}       | ${4}  | ${['Lookup Tables']}
-    ${['sidecars:read']}           | ${4}  | ${['Sidecars']}
-    ${['pipeline:read', 'pipeline_connection:read']} | ${4}  | ${['Pipelines']}
-  `('shows $links for user with $permissions permissions', ({ permissions, count, links }) => {
+    permissions                    | name
+    ${[]}                          | ${'Overview'}
+    ${[]}                          | ${'Nodes'}
+    ${[]}                          | ${'Data Nodes'}
+    ${['clusterconfigentry:read']} | ${'Configurations'}
+    ${['inputs:read']}             | ${'Inputs'}
+    ${['grok_pattern:read']}       | ${'Grok Patterns'}
+    ${['outputs:read']}            | ${'Outputs'}
+    ${['indices:read']}            | ${'Indices'}
+    ${['loggers:read']}            | ${'Logging'}
+    ${['authentication:edit']}     | ${'Authentication'}
+    ${['users:list']}              | ${'Users and Teams'}
+    ${['roles:read']}              | ${'Roles'}
+    ${['contentpack:read']}        | ${'Content Packs'}
+    ${['lookuptables:read']}       | ${'Lookup Tables'}
+    ${['sidecars:read']}           | ${'Sidecars'}
+    ${['pipeline:read', 'pipeline_connection:read']} | ${'Pipelines'}
+  `('shows $name for user with $permissions permissions', async ({ permissions, name }) => {
       asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
         .permissions(Immutable.List(permissions))
         .build());
 
-      const wrapper = mount(<SystemMenu />);
-      const navigationLinks = wrapper.find('NavigationLink');
+      render(<SystemMenu />);
+      await openSystemMenu();
 
-      expect(navigationLinks).toHaveLength(count);
-
-      containsAllLinks(navigationLinks, links);
+      await screen.findByRole('menuitem', { name });
     });
   });
 
   describe('uses items from plugins:', () => {
-    let SystemMenu;
-
-    beforeEach(() => {
-      exports.systemnavigation = [
+    const pluginExports = {
+      systemnavigation: [
         { path: '/system/licenses', description: 'Licenses', permissions: 'inputs:create' },
         { path: '/system/auditlog', description: 'Audit Log' },
-      ];
+      ],
+    };
 
-      // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu').default;
+    beforeEach(() => {
+      asMock(usePluginEntities).mockImplementation((key: string) => pluginExports[key]);
     });
 
-    afterEach(() => {
-      exports.systemnavigation = [];
+    it('includes plugin item in system navigation', async () => {
+      render(<SystemMenu />);
+
+      await openSystemMenu();
+
+      const auditLog = await findSystemMenuItem('Audit Log');
+
+      expect(querySystemMenuItem('Licenses')).not.toBeInTheDocument();
+
+      expect(auditLog).toHaveAttribute('href', '/system/auditlog');
     });
 
-    it('includes plugin item in system navigation', () => {
-      const wrapper = mount(<SystemMenu />);
-      containsLink(wrapper, 'Audit Log');
-
-      expect(findLink(wrapper, 'Audit Log')).toHaveProp('path', '/system/auditlog');
-      expect(wrapper.find('NavigationLink[description="Licenses"]')).not.toExist();
-    });
-
-    it('includes plugin item in system navigation if required permissions are present', () => {
+    // eslint-disable-next-line jest/expect-expect
+    it('includes plugin item in system navigation if required permissions are present', async () => {
       asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
         .permissions(Immutable.List(['inputs:create']))
         .build());
 
-      const wrapper = mount(<SystemMenu />);
+      render(<SystemMenu />);
+      await openSystemMenu();
 
-      expect(findLink(wrapper, 'Audit Log')).toHaveLength(1);
-      expect(findLink(wrapper, 'Licenses')).toHaveLength(1);
+      await findSystemMenuItem('Audit Log');
+      await findSystemMenuItem('Licenses');
     });
 
-    it('does not include plugin item in system navigation if required permissions are not present', () => {
+    it('does not include plugin item in system navigation if required permissions are not present', async () => {
       asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
         .permissions(Immutable.List([]))
         .build());
 
-      const wrapper = mount(<SystemMenu />);
+      render(<SystemMenu />);
+      await openSystemMenu();
 
-      expect(findLink(wrapper, 'Licenses')).not.toExist();
+      await findSystemMenuItem('Overview');
+
+      expect(querySystemMenuItem('Licenses')).not.toBeInTheDocument();
     });
 
-    it('prefixes plugin path with current application path prefix', () => {
-      AppConfig.gl2AppPathPrefix = jest.fn(() => '/my/fancy/prefix');
-      const wrapper = mount(<SystemMenu />);
+    it('prefixes plugin path with current application path prefix', async () => {
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/my/fancy/prefix');
 
-      expect(findLink(wrapper, 'Audit Log')).toHaveProp('path', '/my/fancy/prefix/system/auditlog');
+      render(<SystemMenu />);
+      await openSystemMenu();
+
+      const auditLogLink = await findSystemMenuItem('Audit Log');
+
+      expect(auditLogLink).toHaveAttribute('href', '/my/fancy/prefix/system/auditlog');
     });
   });
 
   describe('sets a location-specific title for the dropdown', () => {
-    const getDropdownTitle = (wrapper: ReactWrapper) => wrapper.find('NavDropdown')
-      .at(1)
-      .prop<React.ReactElement>('title')
-      .props.children;
-    let SystemMenu;
-
-    beforeEach(() => {
-      exports.systemnavigation = [
+    const pluginExports = {
+      systemnavigation: [
         { path: '/system/licenses', description: 'Licenses', permissions: 'inputs:create' },
         { path: '/system/auditlog', description: 'Audit Log' },
-      ];
+      ],
+    };
 
-      // eslint-disable-next-line global-require
-      SystemMenu = require('./SystemMenu').default;
+    beforeEach(() => {
+      asMock(usePluginEntities).mockImplementation((key: string) => pluginExports[key]);
     });
 
-    afterEach(() => {
-      exports.systemnavigation = [];
+    it('uses a default title if location is not matched', async () => {
+      render(<SystemMenu />);
+
+      await screen.findByRole('button', { name: 'System' });
     });
 
-    it('uses a default title if location is not matched', () => {
-      const wrapper = mount(<SystemMenu />);
-
-      expect(getDropdownTitle(wrapper)).toBe('System');
-    });
-
-    it('uses a custom title if location is matched', () => {
+    it('uses a custom title if location is matched', async () => {
       asMock(useLocation).mockReturnValue({ pathname: '/system/overview' } as Location);
-      const wrapper = mount(<SystemMenu />);
+      render(<SystemMenu />);
 
-      expect(getDropdownTitle(wrapper)).toBe('System / Overview');
+      await screen.findByRole('button', { name: 'System / Overview' });
     });
 
-    it('uses a custom title for a plugin route if location is matched', () => {
+    it('uses a custom title for a plugin route if location is matched', async () => {
       asMock(useLocation).mockReturnValue({ pathname: '/system/licenses' } as Location);
-      const wrapper = mount(<SystemMenu />);
+      render(<SystemMenu />);
 
-      expect(getDropdownTitle(wrapper)).toBe('System / Licenses');
+      await screen.findByRole('button', { name: 'System / Licenses' });
     });
   });
 });
