@@ -62,7 +62,7 @@ describe('IndexSetFieldTypesList', () => {
     it('Runs mockedRemoveCustomFieldTypeMutation on submit with rotation', async () => {
       renderIndexSetCustomFieldTypeRemoveModal();
 
-      const submit = await screen.findByTitle(/remove custom field type/i);
+      const submit = await screen.findByTitle(/reset custom field type/i);
       fireEvent.click(submit);
 
       expect(mockedRemoveCustomFieldTypeMutation).toHaveBeenCalledWith({
@@ -76,7 +76,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetCustomFieldTypeRemoveModal();
 
       const checkbox = await screen.findByText(/rotate affected indices after change/i);
-      const submit = await screen.findByTitle(/remove custom field type/i);
+      const submit = await screen.findByTitle(/reset custom field type/i);
       fireEvent.click(checkbox);
       fireEvent.click(submit);
 

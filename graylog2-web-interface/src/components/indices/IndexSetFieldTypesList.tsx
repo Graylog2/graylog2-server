@@ -162,10 +162,9 @@ const IndexSetFieldTypesList = () => {
         <Button onClick={() => openDeletingModal([fieldType.fieldName])}
                 role="button"
                 bsSize="xsmall"
-                bsStyle="danger"
-                title="Remove custom type"
+                title="Reset custom type"
                 tabIndex={0}>
-          Remove
+          Reset
         </Button>
       )}
     </>
