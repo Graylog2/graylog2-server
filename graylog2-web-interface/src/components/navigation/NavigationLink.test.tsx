@@ -19,23 +19,38 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { appPrefixed } from 'util/URLUtils';
 import { asMock } from 'helpers/mocking';
+import Menu from 'components/bootstrap/Menu';
 
-import NavigationLink from './NavigationLink';
+import OriginalNavigationLink from './NavigationLink';
 
 jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path), qualifyUrl: jest.fn((path) => path) }));
 
+const NavigationLink = (props: React.ComponentProps<typeof OriginalNavigationLink>) => (props.topLevel
+  ? <OriginalNavigationLink {...props} />
+  : (
+    <Menu opened>
+      <Menu.Dropdown>
+        <OriginalNavigationLink {...props} />
+      </Menu.Dropdown>
+    </Menu>
+  ));
+
 describe('NavigationLink', () => {
-  it('renders with simple props', () => {
+  it('renders with simple props', async () => {
     render(<NavigationLink description="Hello there!" path="/hello" />);
 
-    expect(screen.getByText('Hello there!')).toHaveAttribute('href', '/hello');
+    const link = await screen.findByRole('menuitem', { name: 'Hello there!' });
+
+    expect(link).toHaveAttribute('href', '/hello');
   });
 
-  it('does not prefix URL with app prefix', () => {
+  it('does not prefix URL with app prefix', async () => {
     asMock(appPrefixed).mockImplementation((path) => `/someprefix${path}`);
     render(<NavigationLink description="Hello there!" path="/hello" />);
 
-    expect(screen.getByText('Hello there!')).toHaveAttribute('href', '/hello');
+    const link = await screen.findByRole('menuitem', { name: 'Hello there!' });
+
+    expect(link).toHaveAttribute('href', '/hello');
     expect(appPrefixed).not.toHaveBeenCalled();
   });
 
