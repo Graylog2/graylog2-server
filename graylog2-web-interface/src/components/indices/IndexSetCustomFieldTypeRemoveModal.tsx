@@ -67,7 +67,7 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, r
   return (
     <div>
       <Alert>
-        After resetting the custom field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the settings of your search engine will be used
+        After removing the custom field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the settings of your search engine will be used
       </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
       <p>
@@ -118,8 +118,8 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   }, [sendTelemetry, telemetryPathName]);
 
   return (
-    <BootstrapModalForm title={<span>Reset {fields} Custom Field Type <BetaBadge /></span>}
-                        submitButtonText="Reset custom field type"
+    <BootstrapModalForm title={<span>Remove {fields} Custom Field Type <BetaBadge /></span>}
+                        submitButtonText="Remove custom field type"
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}
                         show={show}

@@ -264,10 +264,10 @@ describe('IndexSetFieldTypesList', () => {
     const tableRow = await screen.findByTestId('table-row-field');
     const resetButton = await within(tableRow).findByText('Reset');
     fireEvent.click(resetButton);
-    await screen.findByText(/reset custom field type/i);
+    await screen.findByText(/remove custom field type/i);
     const modal = await screen.findByTestId('modal-form');
     await within(modal).findByText('Rotate affected indices after change');
 
-    expect(modal).toHaveTextContent('After resetting the custom field type for field in index set title the settings of your search engine will be used');
+    expect(modal).toHaveTextContent('After removing the custom field type for field in index set title the settings of your search engine will be used');
   });
 });
