@@ -26,7 +26,7 @@ import { NavItem } from 'components/bootstrap';
 type Props = {
   description: string,
   path: string,
-  topLevel: boolean,
+  topLevel?: boolean,
 }
 
 const NavigationLink = ({ description, path, topLevel, ...rest }: Props) => (
