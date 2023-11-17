@@ -15,16 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
-import { NavDropdown, MenuItem } from 'components/bootstrap';
+import { NavDropdown } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import useHistory from 'routing/useHistory';
 import useCurrentUser from 'hooks/useCurrentUser';
+import Menu from 'components/bootstrap/Menu';
 
 import ThemeModeToggle from './ThemeModeToggle';
+
+const FullName = styled.span`
+  text-transform: uppercase;
+  font-weight: 700;
+`;
 
 const UserMenu = () => {
   const { fullName, readOnly, id: userId } = useCurrentUser();
@@ -48,18 +55,17 @@ const UserMenu = () => {
   return (
     <NavDropdown title={<Icon name="user" size="lg" />}
                  aria-label={`User Menu for ${fullName}`}
-                 id="user-menu-dropdown"
                  noCaret>
-      <MenuItem header>{fullName}</MenuItem>
-      <MenuItem divider />
-      <MenuItem header>
+      <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
+      <Menu.Divider />
+      <Menu.Label>
         <ThemeModeToggle />
-      </MenuItem>
-      <MenuItem divider />
+      </Menu.Label>
+      <Menu.Divider />
       <LinkContainer to={route}>
-        <MenuItem>{label}</MenuItem>
+        <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <MenuItem onSelect={onLogoutClicked} icon="sign-out-alt">Log out</MenuItem>
+      <Menu.Item onSelect={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
     </NavDropdown>
   );
 };

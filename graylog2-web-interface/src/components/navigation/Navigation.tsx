@@ -26,7 +26,6 @@ import { Icon } from 'components/common';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
-import isActiveRoute from 'components/navigation/util/isActiveRoute';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -73,7 +72,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
           </InactiveNavItem>
           <ScratchpadToggle />
 
-          <HelpMenu active={isActiveRoute(pathname, Routes.WELCOME)} />
+          <HelpMenu />
 
           <LinkContainer relativeActive to={Routes.WELCOME}>
             <NavItem id="welcome-nav-link" aria-label="Welcome">

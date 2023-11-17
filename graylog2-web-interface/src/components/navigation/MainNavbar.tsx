@@ -111,7 +111,6 @@ const PluginNavDropdown = ({
     <NavDropdown key={title}
                  title={title}
                  badge={renderBadge ? BadgeComponent : null}
-                 id="enterprise-dropdown"
                  inactiveTitle={description}>
       {children.map((childNavigationItem) => <PluginRoute navigationItem={childNavigationItem} key={childNavigationItem.description} />)}
     </NavDropdown>

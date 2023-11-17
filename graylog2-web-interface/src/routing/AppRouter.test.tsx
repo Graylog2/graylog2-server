@@ -73,6 +73,13 @@ const setInitialPath = (path: string) => {
   }));
 };
 
+const mockRoutes = (routes: PluginExports['routes']) => {
+  const pluginExports: PluginExports = {
+    routes,
+  };
+  asMock(usePluginEntities).mockImplementation((key: keyof PluginExports) => pluginExports[key] ?? []);
+};
+
 describe('AppRouter', () => {
   const defaultPlugins = {
     perspectives: [
@@ -83,8 +90,6 @@ describe('AppRouter', () => {
       },
     ],
   };
-
-  const mockPluginEntity = (plugin: PluginExports) => (entityKey: string) => ({ ...defaultPlugins, ...plugin }[entityKey] ?? []);
 
   beforeEach(() => {
     asMock(usePluginEntities).mockImplementation((entityKey) => (defaultPlugins[entityKey] ?? []));
@@ -107,7 +112,7 @@ describe('AppRouter', () => {
 
   describe('plugin routes', () => {
     it('renders simple plugin routes', async () => {
-      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ component: () => <span>Hey there!</span>, path: '/a-plugin-route' }] }));
+      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route' }]);
       setInitialPath('/a-plugin-route');
       const { findByText } = render(<AppRouterWithContext />);
 
@@ -115,7 +120,7 @@ describe('AppRouter', () => {
     });
 
     it('renders null-parent component plugin routes without application chrome', async () => {
-      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/without-chrome' }] }));
+      mockRoutes([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/without-chrome' }]);
 
       setInitialPath('/without-chrome');
       const { findByText, queryByTitle } = render(<AppRouterWithContext />);
@@ -126,7 +131,7 @@ describe('AppRouter', () => {
     });
 
     it('does not render plugin route when required feature flag is not enabled', async () => {
-      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }] }));
+      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
       setInitialPath('/a-plugin-route');
       render(<AppRouterWithContext />);
 
@@ -137,7 +142,7 @@ describe('AppRouter', () => {
 
     it('render plugin route when required feature flag is enabled', async () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }] }));
+      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
       setInitialPath('/a-plugin-route');
       const { findByText } = render(<AppRouterWithContext />);
 
@@ -154,7 +159,7 @@ describe('AppRouter', () => {
         return <span>Current context value is {contextValue}</span>;
       };
 
-      asMock(usePluginEntities).mockImplementation(mockPluginEntity({ routes: [{ parentComponent: null, component: TestComponent, path: '/test' }] }));
+      mockRoutes([{ parentComponent: null, component: TestComponent, path: '/test' }]);
 
       setInitialPath('/test');
       const { findByText } = render(<AppRouterWithContext />);

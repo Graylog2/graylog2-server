@@ -17,19 +17,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Menu from 'components/bootstrap/Menu';
 import { LinkContainer } from 'components/common/router';
-import { MenuItem, NavItem } from 'components/bootstrap';
+import { NavItem } from 'components/bootstrap';
 
 // We render a NavItem if topLevel is set to avoid errors when the NavigationLink is place in the navigation
 // bar instead of a navigation drop-down menu.
 type Props = {
   description: React.ReactNode,
   path: string,
-  topLevel: boolean,
+  topLevel?: boolean,
 }
+
 const NavigationLink = ({ description, path, topLevel, ...rest }: Props) => (
   <LinkContainer key={path} to={path} {...rest}>
-    {topLevel ? <NavItem>{description}</NavItem> : <MenuItem>{description}</MenuItem>}
+    {topLevel ? <NavItem>{description}</NavItem> : <Menu.Item>{description}</Menu.Item>}
   </LinkContainer>
 );
 
