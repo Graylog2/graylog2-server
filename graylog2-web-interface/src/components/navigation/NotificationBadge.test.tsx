@@ -15,25 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor, act } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
-import { MockStore, asMock } from 'helpers/mocking';
-import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import { asMock } from 'helpers/mocking';
+import { NotificationsActions } from 'stores/notifications/NotificationsStore';
 
 import NotificationBadge from './NotificationBadge';
 
 jest.mock('stores/notifications/NotificationsStore', () => ({
-  NotificationsActions: { list: jest.fn() },
-  NotificationsStore: MockStore(),
+  NotificationsActions: { list: jest.fn(async () => ({ total: 0 })) },
 }));
 
 const BADGE_ID = 'notification-badge';
-
-type NotificationsStoreType = ReturnType<typeof NotificationsStore.getInitialState>;
-
-const setNotificationCount = (count: number) => {
-  asMock(NotificationsStore.getInitialState).mockReturnValue({ total: count } as NotificationsStoreType);
-};
 
 describe('NotificationBadge', () => {
   beforeAll(() => {
@@ -44,28 +37,21 @@ describe('NotificationBadge', () => {
     jest.useRealTimers();
   });
 
-  beforeEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it('triggers update of notifications', async () => {
     expect(NotificationsActions.list).not.toHaveBeenCalled();
 
     render(<NotificationBadge />);
 
+    await waitFor(() => { expect(NotificationsActions.list).toHaveBeenCalled(); });
+
+    asMock(NotificationsActions.list).mockClear();
+
     jest.advanceTimersByTime(3000);
     await waitFor(() => { expect(NotificationsActions.list).toHaveBeenCalled(); });
   });
 
-  it('renders nothing when there are no notifications', () => {
-    setNotificationCount(0);
-    render(<NotificationBadge />);
-
-    expect(screen.queryByTestId(BADGE_ID)).not.toBeInTheDocument();
-  });
-
   it('renders count when there are notifications', async () => {
-    setNotificationCount(42);
+    asMock(NotificationsActions.list).mockResolvedValue({ total: 42 });
 
     render(<NotificationBadge />);
 
@@ -76,7 +62,7 @@ describe('NotificationBadge', () => {
   });
 
   it('updates notification count when triggered by store', async () => {
-    setNotificationCount(42);
+    asMock(NotificationsActions.list).mockResolvedValue({ total: 42 });
 
     render(<NotificationBadge />);
 
@@ -84,14 +70,20 @@ describe('NotificationBadge', () => {
 
     expect(badgeBefore.innerHTML).toEqual('42');
 
-    const cb = asMock(NotificationsStore.listen).mock.calls[0][0];
+    asMock(NotificationsActions.list).mockResolvedValue({ total: 23 });
 
-    act(() => {
-      cb({ total: 23 } as NotificationsStoreType);
-    });
+    jest.advanceTimersByTime(3000);
 
     const badgeAfter = await screen.findByTestId(BADGE_ID);
 
     await waitFor(() => { expect(badgeAfter.innerHTML).toEqual('23'); });
+  });
+
+  it('renders nothing when there are no notifications', () => {
+    asMock(NotificationsActions.list).mockResolvedValue({ total: 0 });
+
+    render(<NotificationBadge />);
+
+    expect(screen.queryByTestId(BADGE_ID)).not.toBeInTheDocument();
   });
 });

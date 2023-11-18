@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import styled from 'styled-components';
+import { useQuery } from '@tanstack/react-query';
 
 import { LinkContainer } from 'components/common/router';
 import { Badge, Nav } from 'components/bootstrap';
-import { useStore } from 'stores/connect';
 import Routes from 'routing/Routes';
-import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import { NotificationsActions } from 'stores/notifications/NotificationsStore';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import InactiveNavItem from './InactiveNavItem';
@@ -44,18 +43,17 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
   }
 `;
 
+type NotificationsResponse = {
+  total: number,
+};
+
 const POLL_INTERVAL = 3000;
+const fetchNotificationCount = () => NotificationsActions.list().then((response: NotificationsResponse) => response.total);
 
 const NotificationBadge = () => {
-  const total = useStore(NotificationsStore, (notifications) => notifications?.total);
-
-  useEffect(() => {
-    const interval = setInterval(NotificationsActions.list, POLL_INTERVAL);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  const { data: total } = useQuery(['notifications.count'], fetchNotificationCount, {
+    refetchInterval: POLL_INTERVAL,
+  });
 
   return total
     ? (
