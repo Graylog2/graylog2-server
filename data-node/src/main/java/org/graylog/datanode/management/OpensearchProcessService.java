@@ -24,6 +24,9 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
+import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
@@ -41,18 +46,23 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final OpensearchProcess process;
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final EventBus eventBus;
+    private final NodeId nodeId;
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
                                     final Provider<OpensearchConfiguration> configurationProvider,
                                     final EventBus eventBus,
+                                    final ClusterEventBus clusterEventBus,
                                     final CustomCAX509TrustManager trustManager,
                                     final NodeService nodeService,
-                                    final Configuration configuration) {
+                                    final Configuration configuration,
+                                    final NodeId nodeId) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
+        this.nodeId = nodeId;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
         eventBus.register(this);
+        checkNotNull(clusterEventBus).registerClusterEventSubscriber(this);
     }
 
     private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService nodeService) {
@@ -60,13 +70,26 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
+        process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName()));
         return process;
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
             case STORED -> startWithConfig();
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleNodeLifecycleEvent(DataNodeLifecycleEvent event) {
+        if (nodeId.getNodeId().equals(event.nodeId())) {
+            switch (event.trigger()) {
+                case REMOVE -> process.onRemove();
+                case RESET -> process.onReset();
+            }
         }
     }
 

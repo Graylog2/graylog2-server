@@ -14,14 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.restoperations;
 
-public enum ProcessEvent {
-    PROCESS_STARTED,
-    HEALTH_CHECK_OK,
-    HEALTH_CHECK_FAILED,
-    PROCESS_STOPPED,
-    PROCESS_REMOVE,
-    RESET, // user-triggered action
-    PROCESS_TERMINATED // failure from outside, not requested
+
+import javax.ws.rs.HttpMethod;
+
+public class DatanodeStatusChangeOperation extends RestOperation {
+
+    public DatanodeStatusChangeOperation(RestOperationParameters waitingRestOperationParameters) {
+        super(waitingRestOperationParameters);
+    }
+
+    public void triggerNodeRemoval() {
+        validatedResponse("/management", HttpMethod.DELETE, null,
+                "Could not trigger node removal",
+                r -> r.extract().statusCode() < 300
+        );
+    }
+
 }

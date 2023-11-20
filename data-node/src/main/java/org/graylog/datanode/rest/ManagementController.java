@@ -16,37 +16,30 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
-import org.graylog2.plugin.Version;
+import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/")
+@Path("/management")
 @Produces(MediaType.APPLICATION_JSON)
-public class StatusController {
+public class ManagementController {
 
-    private final Version version = Version.CURRENT_CLASSPATH;
-
-    private final DatanodeConfiguration datanodeConfiguration;
     private final OpensearchProcess openSearch;
 
     @Inject
-    public StatusController(DatanodeConfiguration datanodeConfiguration, OpensearchProcess openSearch) {
-        this.datanodeConfiguration = datanodeConfiguration;
+    public ManagementController(OpensearchProcess openSearch) {
         this.openSearch = openSearch;
     }
 
-    @GET
-    public DataNodeStatus status() {
-        return new DataNodeStatus(
-                version,
-                new StatusResponse(datanodeConfiguration.opensearchDistributionProvider().get().version(), openSearch.processInfo())
-        );
+    @DELETE
+    @OnlyInSecuredNode
+    public void remove() {
+        openSearch.onRemove();
     }
 
 }

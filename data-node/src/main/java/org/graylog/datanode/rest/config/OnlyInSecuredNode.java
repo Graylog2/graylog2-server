@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.rest.config;
 
-public enum ProcessEvent {
-    PROCESS_STARTED,
-    HEALTH_CHECK_OK,
-    HEALTH_CHECK_FAILED,
-    PROCESS_STOPPED,
-    PROCESS_REMOVE,
-    RESET, // user-triggered action
-    PROCESS_TERMINATED // failure from outside, not requested
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface OnlyInSecuredNode {
 }

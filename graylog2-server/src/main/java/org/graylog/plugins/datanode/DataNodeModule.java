@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.plugins.datanode;
 
-public enum ProcessEvent {
-    PROCESS_STARTED,
-    HEALTH_CHECK_OK,
-    HEALTH_CHECK_FAILED,
-    PROCESS_STOPPED,
-    PROCESS_REMOVE,
-    RESET, // user-triggered action
-    PROCESS_TERMINATED // failure from outside, not requested
+import org.graylog2.datanode.DataNodeService;
+import org.graylog2.datanode.DataNodeServiceImpl;
+import org.graylog2.migrations.V20231107164300_CreateDataNodeManagerRole;
+import org.graylog2.plugin.PluginModule;
+
+public class DataNodeModule extends PluginModule {
+
+    @Override
+    protected void configure() {
+        bind(DataNodeService.class).to(DataNodeServiceImpl.class);
+        addMigration(V20231107164300_CreateDataNodeManagerRole.class);
+    }
+
 }
