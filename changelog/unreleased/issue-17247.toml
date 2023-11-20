@@ -1,3 +1,5 @@
 type = "a"
-message = "Provide backend for data node table including status information."
+message = "Data nodes now publish state machine state. Provides a backend for data node table including state information."
 issues = ["17247"]
+pulls = ["17382"]
+
