@@ -18,13 +18,23 @@ import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import type { DataNode, DataNodeStatus } from 'preflight/types';
+import { fetchPeriodically } from 'logic/rest/FetchProvider';
+import type { Attribute } from 'stores/PaginationTypes';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 export const fetchDataNodes = () => fetchPeriodically<Array<DataNode>>('GET', qualifyUrl('/certrenewal'));
 
-const useDataNodes = () => {
-  const { data, isInitialLoading } = useQuery({
+const useDataNodes = () : {
+  data: {
+    elements: Array<DataNode>,
+    total: number,
+    attributes: Array<Attribute>
+  },
+  refetch: () => void,
+  isInitialLoading: boolean,
+} => {
+  const { data, refetch, isInitialLoading } = useQuery({
     queryKey: ['data-nodes', 'overview'],
     queryFn: fetchDataNodes,
     onError: (errorThrown) => {
@@ -35,6 +45,9 @@ const useDataNodes = () => {
     refetchInterval: 3000,
 
   });
+
+  const elements = data?.sort((d1, d2) => defaultCompare(d1.cert_valid_until, d2.cert_valid_until));
+  const total = elements?.length || 0;
 
   const mockData = [
     {
@@ -68,7 +81,12 @@ const useDataNodes = () => {
   ];
 
   return ({
-    data: mockData || data,
+    data: {
+      elements: mockData || data,
+      attributes: [],
+      total,
+    },
+    refetch,
     isInitialLoading,
   });
 };
