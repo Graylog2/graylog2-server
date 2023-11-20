@@ -329,7 +329,7 @@ const AdaptableQueryTabs = ({
                      title={<Icon name="ellipsis-h" />}
                      className="query-tabs-more"
                      id="query-tabs-more"
-                     hoverTitle="More Dashboard Pages"
+                     aria-label="More Dashboard Pages"
                      noCaret
                      pullRight
                      active={openedMore}
