@@ -23,14 +23,14 @@ import type User from 'logic/users/User';
 import AppConfig from 'util/AppConfig';
 import isReservedField from 'views/logic/IsReservedField';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
-import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 
 const ChangeFieldType = ({
   field,
   onClose,
 }: ActionComponentProps) => {
   const [show, setShow] = useState(true);
-  const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
+  const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFieldTypes();
   const handleOnClose = useCallback(() => {
     setShow(false);
     onClose();

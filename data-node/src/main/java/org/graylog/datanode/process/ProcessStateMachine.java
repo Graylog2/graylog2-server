@@ -62,6 +62,7 @@ public class ProcessStateMachine {
                 .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.NOT_RESPONDING)
                 .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
+                .permit(ProcessEvent.PROCESS_REMOVE, ProcessState.REMOVING)
                 .ignore(ProcessEvent.PROCESS_STARTED);
 
         // if the REST api is not responding, we'll jump to this state and count how many times the failure
@@ -89,6 +90,15 @@ public class ProcessStateMachine {
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
                 .ignore(ProcessEvent.PROCESS_STOPPED)
                 .ignore(ProcessEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
+
+        config.configure(ProcessState.REMOVING)
+                .ignore(ProcessEvent.HEALTH_CHECK_OK)
+                .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.FAILED)
+                .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.REMOVED);
+
+        config.configure(ProcessState.REMOVED)
+                .permit(ProcessEvent.RESET, ProcessState.WAITING_FOR_CONFIGURATION)
+                .ignore(ProcessEvent.PROCESS_STOPPED);
 
         return new StateMachine<>(ProcessState.WAITING_FOR_CONFIGURATION, config);
     }

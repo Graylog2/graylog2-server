@@ -74,6 +74,7 @@ export const hotKeysCollections: HotkeyCollections = {
 const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   const [activeHotkeys, setActiveHotkeys] = useState<ActiveHotkeys>(Immutable.Map());
   const { enabledScopes } = useOriginalHotkeysContext();
+  const [showHotkeysModal, setShowHotkeysModal] = useState(false);
 
   const addActiveHotkey = useCallback(({ scope, actionKey, options }: {
     scope: ScopeName,
@@ -93,12 +94,9 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
     activeHotkeys,
     addActiveHotkey,
     removeActiveHotkey,
-  }), [
-    activeHotkeys,
-    addActiveHotkey,
-    enabledScopes,
-    removeActiveHotkey,
-  ]);
+    showHotkeysModal,
+    setShowHotkeysModal,
+  }), [activeHotkeys, addActiveHotkey, enabledScopes, removeActiveHotkey, showHotkeysModal]);
 
   return (
     <HotkeysContext.Provider value={value}>

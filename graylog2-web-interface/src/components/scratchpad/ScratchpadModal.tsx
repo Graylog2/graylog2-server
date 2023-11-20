@@ -216,7 +216,7 @@ const Scratchpad = () => {
                        position={position}>
       <ContentArea>
         {!isSecurityWarningConfirmed && (
-          <StyledAlert bsStyle="warning" bsSize="sm">
+          <StyledAlert bsStyle="warning">
             <AlertNote>
               We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in
               this area.

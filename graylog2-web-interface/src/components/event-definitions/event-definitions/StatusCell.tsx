@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { Label, BootstrapModalConfirm } from 'components/bootstrap';
@@ -24,11 +24,12 @@ import { Icon } from 'components/common';
 
 import type { EventDefinition } from '../event-definitions-types';
 
-const StatusLabel = styled(Label)`
+const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
+  cursor: ${$clickable ? 'pointer' : 'default'};
   display: inline-flex;
   justify-content: center;
   gap: 4px;
-`;
+`);
 
 const Spacer = styled.div`
   border-left: 1px solid currentColor;

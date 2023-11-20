@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Label as BootstrapLabel } from 'react-bootstrap';
@@ -33,14 +32,13 @@ const getColorStyles = (theme, bsStyle) => {
 `;
 };
 
-const StyledLabel = styled(BootstrapLabel)(({ bsStyle, theme }) => css`
+type StyledLabelProps = {
+  bsStyle?: string,
+};
+type Props = React.ComponentProps<typeof BootstrapLabel> & StyledLabelProps;
+const StyledLabel: React.ComponentType<Props> = styled(BootstrapLabel)<StyledLabelProps>(({ bsStyle, theme }) => css`
   ${getColorStyles(theme, bsStyle)}
   padding: 0.3em 0.6em;
 `);
-type Props = React.ComponentProps<typeof StyledLabel>;
 
-const Label = forwardRef((props: Props, ref: React.ForwardedRef<typeof StyledLabel>) => (
-  <StyledLabel ref={ref} {...props} />
-));
-
-export default Label;
+export default StyledLabel;

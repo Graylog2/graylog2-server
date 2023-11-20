@@ -17,7 +17,6 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import ClipboardJS from 'clipboard';
-import { act } from 'react-dom/test-utils';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
@@ -25,7 +24,7 @@ import Scratchpad from './Scratchpad';
 
 const setScratchpadVisibility = jest.fn();
 
-const renderSUT = () => (
+const SUT = () => (
   <ScratchpadContext.Provider value={{
     isScratchpadVisible: true,
     localStorageItem: 'gl-scratchpad-jest',
@@ -38,24 +37,18 @@ const renderSUT = () => (
 jest.mock('clipboard');
 
 describe('<Scratchpad />', () => {
-  it('properly renders', () => {
-    render(renderSUT());
+  it('properly renders', async () => {
+    render(<SUT />);
 
-    const modal = screen.getByRole('dialog');
-    const header = screen.getByRole('heading', { name: /scratchpad/i });
-    const btnCopy = screen.getByRole('button', { name: /copy/i });
-    const btnClear = screen.getByRole('button', { name: /clear/i });
-    const textarea = screen.getByRole('textbox');
-
-    expect(modal).toBeInTheDocument();
-    expect(header).toBeInTheDocument();
-    expect(btnCopy).toBeInTheDocument();
-    expect(btnClear).toBeInTheDocument();
-    expect(textarea).toBeInTheDocument();
+    await screen.findByRole('dialog');
+    await screen.findByRole('heading', { name: /scratchpad/i });
+    await screen.findByRole('button', { name: /copy/i });
+    await screen.findByRole('button', { name: /clear/i });
+    await screen.findByRole('textbox');
   });
 
   it('renders & dismisses alert', () => {
-    const { rerender } = render(renderSUT());
+    const { rerender } = render(<SUT />);
 
     const alert = screen.getByRole('alert');
     const btnGotIt = screen.getByRole('button', {
@@ -66,13 +59,13 @@ describe('<Scratchpad />', () => {
 
     fireEvent.click(btnGotIt);
 
-    rerender(renderSUT());
+    rerender(<SUT />);
 
     expect(alert).not.toBeInTheDocument();
   });
 
   it('calls setScratchpadVisibility on close', () => {
-    render(renderSUT());
+    render(<SUT />);
 
     const btnClose = screen.getByRole('button', { name: /close/i });
 
@@ -82,7 +75,7 @@ describe('<Scratchpad />', () => {
   });
 
   it('changes textarea & shows auto saved message', async () => {
-    render(renderSUT());
+    render(<SUT />);
 
     const textarea = screen.getByRole('textbox');
     textarea.focus();
@@ -93,7 +86,7 @@ describe('<Scratchpad />', () => {
   });
 
   it('shows copied status', () => {
-    render(renderSUT());
+    render(<SUT />);
 
     const textarea = screen.getByRole('textbox');
     textarea.focus();
@@ -103,9 +96,7 @@ describe('<Scratchpad />', () => {
 
     const clipboard = new ClipboardJS(btnCopy);
 
-    act(() => {
-      fireEvent.click(btnCopy);
-    });
+    fireEvent.click(btnCopy);
 
     clipboard.on('success', () => {
       expect(screen.getByText(/copied!/i)).toBeInTheDocument();
@@ -115,7 +106,7 @@ describe('<Scratchpad />', () => {
   });
 
   it('confirms before clearing data', async () => {
-    render(renderSUT());
+    render(<SUT />);
 
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     textarea.focus();
@@ -125,14 +116,15 @@ describe('<Scratchpad />', () => {
 
     fireEvent.click(btnClear);
 
+    await screen.findByRole('alertdialog', { hidden: true });
+
+    const confirmBtn = screen.getByRole('button', { name: /confirm/i, hidden: true });
+
+    fireEvent.click(confirmBtn);
+
+    await screen.findByText(/cleared\./i);
+
     await waitFor(() => {
-      expect(screen.getByRole('alertdialog', { hidden: true })).toBeInTheDocument();
-
-      const confirmBtn = screen.getByRole('button', { name: /confirm/i, hidden: true });
-
-      fireEvent.click(confirmBtn);
-
-      expect(screen.getByText(/cleared\./i)).toBeInTheDocument();
       expect(textarea.value).toBe('');
     });
   });

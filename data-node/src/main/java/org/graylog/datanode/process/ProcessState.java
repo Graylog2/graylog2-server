@@ -39,6 +39,16 @@ public enum ProcessState {
      * Failed to reach the opensearch REST API, but the underlying process is still alive
      */
     FAILED,
+
+    /**
+     * Removal of node from Opensearch cluster requested
+     */
+    REMOVING,
+    /**
+     * Removal of node from Opensearch cluster completed
+     */
+    REMOVED,
+    
     /**
      * The OS process is not running anymore on the underlying system, it has been terminated
      */

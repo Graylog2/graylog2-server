@@ -34,6 +34,7 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
+import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetCustomFieldTypeRemoveModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
@@ -71,6 +72,7 @@ const FilterValueRenderers = {
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
   const [editingField, setEditingField] = useState<IndexSetFieldType | null>(null);
+  const [deletingFieldTypes, setDeletingFieldTypes] = useState<Array<string> | null>(null);
 
   const handleOnClose = useCallback(() => {
     setEditingField(null);
@@ -135,22 +137,39 @@ const IndexSetFieldTypesList = () => {
     handleOnOpen(fieldType);
   }, [handleOnOpen]);
 
+  const openDeletingModal = useCallback((fields: Array<string>) => {
+    setDeletingFieldTypes(fields);
+  }, []);
+  const onCloseDeleting = useCallback(() => setDeletingFieldTypes(null), []);
+
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
-    <Button onClick={() => openEditModal(fieldType)}
-            role="button"
-            bsSize="xsmall"
-            disabled={fieldType.isReserved}
-            title={`Edit field type for ${fieldType.fieldName}`}
-            tabIndex={0}>
-      Edit {
-          fieldType.isReserved && (
-          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-            We use reserved fields internally and expect a certain structure from them. Changing the field type for reserved fields might impact the stability of Graylog
-          </HoverForHelp>
-          )
-      }
-    </Button>
-  ), [openEditModal]);
+    <>
+      <Button onClick={() => openEditModal(fieldType)}
+              role="button"
+              bsSize="xsmall"
+              disabled={fieldType.isReserved}
+              title={`Edit field type for ${fieldType.fieldName}`}
+              tabIndex={0}>
+        Edit {
+            fieldType.isReserved && (
+            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+              We use reserved fields internally and expect a certain structure from them. Changing the field type for reserved fields might impact the stability of Graylog
+            </HoverForHelp>
+            )
+        }
+      </Button>
+      {fieldType.isCustom && (
+        <Button onClick={() => openDeletingModal([fieldType.fieldName])}
+                role="button"
+                bsSize="xsmall"
+                title="Reset custom type"
+                tabIndex={0}>
+          Reset
+        </Button>
+      )}
+    </>
+  ), [openDeletingModal, openEditModal]);
+  const indexSetsDeleting = useMemo(() => [indexSetId], [indexSetId]);
 
   const onSearch = useCallback((val: string) => {
     paginationQueryParameter.resetPage();
@@ -213,6 +232,11 @@ const IndexSetFieldTypesList = () => {
                                 isOptionsLoading={isOptionsLoading}
                                 onSubmitCallback={refetch}
                                 initialFieldType={editingField.type} />
+        ) : null
+      }
+      {
+        deletingFieldTypes ? (
+          <IndexSetCustomFieldTypeRemoveModal show={!!deletingFieldTypes} fields={deletingFieldTypes} onClose={onCloseDeleting} indexSetIds={indexSetsDeleting} />
         ) : null
       }
     </>
