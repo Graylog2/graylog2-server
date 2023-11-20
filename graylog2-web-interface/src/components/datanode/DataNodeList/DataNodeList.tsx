@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useQueryParam, StringParam } from 'use-query-params';
 
 import type { DataNode } from 'preflight/types';
@@ -75,22 +75,23 @@ const DataNodeList = () => {
 
   const elements = dataNodes?.sort((d1, d2) => defaultCompare(d1.cert_valid_until, d2.cert_valid_until));
   const total = elements?.length || 0;
-  const bulkSelection: any = {
-    // eslint-disable-next-line react/no-unstable-nested-components
-    actions: () => (
-      <DataNodeBulkActions selectedDataNodeIds={[]}
-                           setSelectedDataNodeIds={() => {}}
-                           dataNodes={[]} />
-    ),
-    onChangeSelection: () => {},
-    initialSelection: [],
-  };
-
+  const bulkActions: any = () => (
+    <DataNodeBulkActions selectedDataNodeIds={[]}
+                         setSelectedDataNodeIds={() => {}}
+                         dataNodes={[]} />
+  );
   const entityActions = () => (
     <DataNodeActions />
   );
-  const columnRenderers = useMemo(() => ({ attributes: {} }), []);
-  const columnDefinitions = useMemo(() => ATTRIBUTES, []);
+  const columnRenderers = {
+    attributes: {
+      status: {
+        renderCell: () => null,
+        staticWidth: 100,
+      },
+    },
+  };
+  const columnDefinitions = [...ATTRIBUTES];
 
   if (isLoadingLayoutPreferences || isInitialLoadingDataNodes) {
     return <Spinner />;
@@ -117,7 +118,9 @@ const DataNodeList = () => {
                                      onSortChange={onSortChange}
                                      onPageSizeChange={onPageSizeChange}
                                      pageSize={layoutConfig.pageSize}
-                                     bulkSelection={bulkSelection}
+                                     bulkSelection={{
+                                       actions: bulkActions,
+                                     }}
                                      activeSort={layoutConfig.sort}
                                      rowActions={entityActions}
                                      actionsCellWidth={160}
