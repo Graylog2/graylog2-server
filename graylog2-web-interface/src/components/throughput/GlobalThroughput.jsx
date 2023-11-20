@@ -102,7 +102,7 @@ const GlobalThroughput = (props) => {
     const outputNumeral = NumberUtils.formatNumber(throughput.output);
 
     output = (
-      <ContentWrap aria-label={`Throughput: In ${inputNumeral} / Out ${outputNumeral} msg/s`} >
+      <ContentWrap aria-label={`Throughput: In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
         <ThroughputData $dataIn>
           <span>{inputNumeral}</span> <i>in</i>
         </ThroughputData>
