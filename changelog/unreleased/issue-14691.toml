@@ -1,0 +1,5 @@
+type = "added"
+message = "Added support for sending HTTP Notification API Key/Secret as a header"
+
+issues = ["14691"]
+pulls = ["17369"]
