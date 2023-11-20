@@ -221,6 +221,12 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                 .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> mutableGraph.putEdge(entity, stream));
+        viewEntity.state().values().stream()
+                .flatMap(s -> s.widgets().stream())
+                .flatMap(w -> w.streams().stream())
+                .map(id -> resolveStreamEntity(id, entities))
+                .filter(Objects::nonNull)
+                .forEach(stream -> mutableGraph.putEdge(entity, stream));
         return ImmutableGraph.copyOf(mutableGraph);
     }
 }
