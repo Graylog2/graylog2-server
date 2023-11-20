@@ -54,6 +54,7 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
     public static final String FIELD_BODY_TEMPLATE = "body_template";
     public static final String FIELD_SKIP_TLS_VERIFICATION = "skip_tls_verification";
     private static final String FIELD_BASIC_AUTH = "basic_auth";
+    private static final String FIELD_API_KEY_AS_HEADER = "api_key_as_header";
     private static final String FIELD_API_KEY = "api_key";
     private static final String FIELD_API_SECRET = "api_secret";
 
@@ -68,6 +69,9 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
     @JsonProperty(FIELD_BASIC_AUTH)
     @Nullable
     public abstract EncryptedValue basicAuth();
+
+    @JsonProperty(FIELD_API_KEY_AS_HEADER)
+    public abstract boolean apiKeyAsHeader();
 
     @JsonProperty(FIELD_API_KEY)
     @Nullable
@@ -200,6 +204,7 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
                     .basicAuth(EncryptedValue.createUnset())
                     .apiSecret(EncryptedValue.createUnset())
                     .apiKey("")
+                    .apiKeyAsHeader(false)
                     .skipTLSVerification(false)
                     .type(TYPE_NAME)
                     .httpMethod(HttpMethod.POST)
@@ -210,6 +215,9 @@ public abstract class HTTPEventNotificationConfigV2 implements EventNotification
 
         @JsonProperty(FIELD_BASIC_AUTH)
         public abstract Builder basicAuth(EncryptedValue basicAuth);
+
+        @JsonProperty(FIELD_API_KEY_AS_HEADER)
+        public abstract Builder apiKeyAsHeader(boolean apiKeyAsHeader);
 
         @JsonProperty(FIELD_API_KEY)
         public abstract Builder apiKey(String apiKey);

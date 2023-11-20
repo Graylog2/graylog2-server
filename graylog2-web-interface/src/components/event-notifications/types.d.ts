@@ -29,6 +29,7 @@ export type HttpNotificationConfigV2 = {
   type: 'http-notification-v2',
   url: string,
   basic_auth?: EncryptedValue,
+  api_key_as_header: boolean,
   api_key?: string,
   api_secret?: EncryptedValue,
   skip_tls_verification: boolean,
