@@ -20,9 +20,9 @@ import { useCallback } from 'react';
 
 import { Icon } from 'components/common';
 import { Label } from 'components/bootstrap';
-import { DataNode } from 'preflight/types';
+import type { DataNode } from 'preflight/types';
 
-const StatusLabel = styled(Label)(({ $clickable }: { $clickable: boolean }) => css`
+const StatusLabel = styled(Label)(({ $clickable }: any) => css`
   cursor: ${$clickable ? 'pointer' : 'default'};
   display: inline-flex;
   justify-content: center;
@@ -69,7 +69,7 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
                  title={title}
                  aria-label={title}
                  role="button"
-                 $clickable={!disableChange}>
+                 $clickable={!disableChange as any}>
       {datanodeDisabled ? 'Paused' : 'Running'}
       {!disableChange && (
         <>
