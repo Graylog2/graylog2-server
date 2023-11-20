@@ -14,12 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Badge as BootstrapBadge } from 'react-bootstrap';
+import type { ColorVariant } from '@graylog/sawmill';
 
-const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
+type BadgeProps = {
+  bsStyle?: ColorVariant,
+};
+type MergedProps = React.ComponentProps<typeof BootstrapBadge> & BadgeProps;
+const Badge: React.ComponentType<MergedProps> = styled(BootstrapBadge)<BadgeProps>(({ bsStyle, theme }) => {
   if (!bsStyle) {
     return undefined;
   }
@@ -33,10 +37,5 @@ const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
 `;
 });
 
-type Props = React.ComponentProps<typeof StyledBadge>;
-const Badge = forwardRef(({ ...props }: Props, ref: React.ForwardedRef<typeof StyledBadge>) => (
-  <StyledBadge ref={ref} {...props} />
-));
-
 export default Badge;
-export { StyledBadge };
+export { Badge as StyledBadge };
