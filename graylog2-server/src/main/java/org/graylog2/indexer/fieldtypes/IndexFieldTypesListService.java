@@ -29,6 +29,7 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -36,7 +37,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
 import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
@@ -64,7 +64,7 @@ public class IndexFieldTypesListService {
         this.inMemoryFilterExpressionParser = inMemoryFilterExpressionParser;
     }
 
-    public PageListResponse<IndexSetFieldType> getIndexSetFieldTypesList(
+    public PageListResponse<IndexSetFieldType> getIndexSetFieldTypesListPage(
             final String indexSetId,
             final String fieldNameQuery,
             final List<String> filters,
@@ -73,6 +73,41 @@ public class IndexFieldTypesListService {
             final String sort,
             final Sorting.Direction order) {
 
+        final List<IndexSetFieldType> filteredFields = getFilteredList(indexSetId, fieldNameQuery, filters, sort, order);
+        final int total = filteredFields.size();
+
+        final List<IndexSetFieldType> retrievedPage = filteredFields.stream()
+                .skip((long) Math.max(0, page - 1) * perPage)
+                .limit(perPage)
+                .toList();
+
+        return PageListResponse.create("",
+                PaginatedList.PaginationInfo.create(
+                        total,
+                        retrievedPage.size(),
+                        page,
+                        perPage),
+                total,
+                sort,
+                order.toString().toLowerCase(Locale.ROOT),
+                retrievedPage,
+                IndexSetFieldType.ATTRIBUTES,
+                IndexSetFieldType.ENTITY_DEFAULTS);
+
+    }
+
+    public List<IndexSetFieldType> getIndexSetFieldTypesList(
+            final String indexSetId,
+            final String fieldNameQuery,
+            final List<String> filters,
+            final String sort,
+            final Sorting.Direction order) {
+
+        return getFilteredList(indexSetId, fieldNameQuery, filters, sort, order);
+    }
+
+    @NotNull
+    private List<IndexSetFieldType> getFilteredList(String indexSetId, String fieldNameQuery, List<String> filters, String sort, Sorting.Direction order) {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
         final Optional<IndexSet> mongoIndexSet = indexSetConfig.map(indexSetFactory::create);
 
@@ -102,28 +137,9 @@ public class IndexFieldTypesListService {
                 )
                 .filter(indexSetFieldType -> indexSetFieldType.fieldName().contains(fieldNameQuery))
                 .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parse(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
-                .collect(Collectors.toList());
-        final List<IndexSetFieldType> retrievedPage = filteredFields.stream()
                 .sorted(IndexSetFieldType.getComparator(sort, order))
-                .skip((long) Math.max(0, page - 1) * perPage)
-                .limit(perPage)
                 .toList();
-
-        final int total = filteredFields.size();
-
-        return PageListResponse.create("",
-                PaginatedList.PaginationInfo.create(
-                        total,
-                        retrievedPage.size(),
-                        page,
-                        perPage),
-                total,
-                sort,
-                order.toString().toLowerCase(Locale.ROOT),
-                retrievedPage,
-                IndexSetFieldType.ATTRIBUTES,
-                IndexSetFieldType.ENTITY_DEFAULTS);
-
+        return filteredFields;
     }
 
     private String getPreviousActiveIndexSet(final IndexSet indexSet) {
