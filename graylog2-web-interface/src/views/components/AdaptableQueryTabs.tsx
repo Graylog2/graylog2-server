@@ -323,7 +323,7 @@ const AdaptableQueryTabs = ({
   return (
     <Container>
       <StyledQueryNav bsStyle="tabs" activeKey={activeQueryId} id="dashboard-tabs">
-        {currentTabs.navItems}
+        {currentTabs.navItems.toArray()}
 
         <NavDropdown eventKey="more"
                      title={<Icon name="ellipsis-h" />}
@@ -335,10 +335,10 @@ const AdaptableQueryTabs = ({
                      active={openedMore}
                      open={openedMore}
                      onToggle={(isOpened) => setOpenedMore(isOpened)}>
-          {currentTabs.menuItems}
+          {currentTabs.menuItems.toArray()}
         </NavDropdown>
 
-        {currentTabs.lockedItems}
+        {currentTabs.lockedItems.toArray()}
 
         <NavItem key="new"
                  eventKey="new"
