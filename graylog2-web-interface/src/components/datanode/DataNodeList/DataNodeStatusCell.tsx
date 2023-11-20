@@ -15,19 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useCallback } from 'react';
 
 import { Icon } from 'components/common';
 import { Label } from 'components/bootstrap';
 import type { DataNode } from 'preflight/types';
 
-const StatusLabel = styled(Label)(({ $clickable }: any) => css`
-  cursor: ${$clickable ? 'pointer' : 'default'};
+const StatusLabel = styled(Label)`
+  cursor: 'pointer';
   display: inline-flex;
   justify-content: center;
   gap: 4px;
-`);
+`;
 
 const Spacer = styled.div`
   border-left: 1px solid currentColor;
@@ -68,8 +68,7 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
                  onClick={disableChange ? undefined : toggleStreamStatus}
                  title={title}
                  aria-label={title}
-                 role="button"
-                 $clickable={!disableChange as any}>
+                 role="button">
       {datanodeDisabled ? 'Paused' : 'Running'}
       {!disableChange && (
         <>

@@ -35,8 +35,11 @@ describe('StyledComponentsTyping', () => {
     Therefore, we are testing if missing props, wrong types or additional props are raising errors.
    */
   it('Make sure that typing works', async () => {
+    // @ts-expect-error
     render(<StyledFoo />);
+    // @ts-expect-error
     render(<StyledFoo name={23} />);
+    // @ts-expect-error
     render(<StyledFoo name="Ruth Lichterman" missingAttribute={23} />);
     await screen.findByText('Ruth Lichterman');
   });
