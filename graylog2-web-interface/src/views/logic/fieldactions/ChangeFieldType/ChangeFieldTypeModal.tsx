@@ -21,7 +21,7 @@ import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
-import usePutFiledTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
+import usePutFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import useStream from 'components/streams/hooks/useStream';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
@@ -76,14 +76,14 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
-  const { putFiledTypeMutation } = usePutFiledTypeMutation();
+  const { putFieldTypeMutation } = usePutFieldTypeMutation();
 
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
 
-    putFiledTypeMutation({
+    putFieldTypeMutation({
       indexSetSelection,
       newFieldType,
       rotated,
@@ -101,7 +101,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
 
       onClose();
     }).then(() => onSubmitCallback && onSubmitCallback());
-  }, [field, indexSetSelection, initialSelectedIndexSets.length, newFieldType, onClose, onSubmitCallback, putFiledTypeMutation, rotated, sendTelemetry, telemetryPathName]);
+  }, [field, indexSetSelection, initialSelectedIndexSets.length, newFieldType, onClose, onSubmitCallback, putFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
 
   const onChangeFieldType = useCallback((value: string) => {
     setNewFieldType(value);

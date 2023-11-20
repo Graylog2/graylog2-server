@@ -20,9 +20,10 @@ import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
-import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
+import useRemoveCustomFieldTypeMutation from 'hooks/useRemoveCustomFieldTypeMutation';
 
-const urlPrefix = '/system/indices/mappings';
+const urlPrefix = '/system/indices/mappings/remove_mapping';
+
 const logger = {
   // eslint-disable-next-line no-console
   log: console.log,
@@ -30,7 +31,6 @@ const logger = {
   warn: console.warn,
   error: () => {},
 };
-
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
@@ -38,47 +38,46 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-describe('useFieldTypeMutation', () => {
+describe('useRemoveCustomFieldTypeMutation', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('putFieldTypeMutation', () => {
+  describe('removeCustomFieldTypeMutation', () => {
     const putUrl = qualifyUrl(`${urlPrefix}`);
-    const requestBody = { rotated: true, field: 'field', newFieldType: 'int', indexSetSelection: ['001'] };
+    const requestBody = { rotated: true, fields: ['field'], indexSets: ['001'] };
 
     const requestBodyJSON = {
       index_sets: ['001'],
-      type: 'int',
       rotate: true,
-      field: 'field',
+      fields: ['field'],
     };
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
-      const { result, waitFor } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation(), { queryClientOptions: { logger } });
 
       act(() => {
-        result.current.putFieldTypeMutation(requestBody);
+        result.current.removeCustomFieldTypeMutation(requestBody);
       });
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('The field type changed successfully', 'Success!'));
+      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Custom field type removed successfully', 'Success!'));
     });
 
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation(), { queryClientOptions: { logger } });
 
       act(() => {
-        result.current.putFieldTypeMutation(requestBody).catch(() => {});
+        result.current.removeCustomFieldTypeMutation(requestBody).catch(() => {});
       });
 
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Changing the field type failed with status: Error: Error',
-        'Could not change the field type'));
+        'Removing custom field type failed with status: Error: Error',
+        'Could not remove custom field type'));
     });
   });
 });
