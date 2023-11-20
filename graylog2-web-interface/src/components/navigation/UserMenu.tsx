@@ -68,7 +68,7 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
       <LinkContainer to={route}>
         <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <Menu.Item onSelect={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
+      <Menu.Item onClick={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
     </NavDropdown>
   );
 };
