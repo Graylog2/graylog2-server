@@ -21,6 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
+import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -43,13 +44,13 @@ export type IndexSetFieldType = {
 }
 
 const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams) => {
-  const indexSetFiledTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
+  const indexSetFieldTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
   const url = PaginationURL(
-    indexSetFiledTypeUrl,
+    indexSetFieldTypeUrl,
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+    { filters: FiltersForQueryParams(searchParams.filters), sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
   return fetch('GET', url).then(
     ({ elements, total, attributes }) => ({

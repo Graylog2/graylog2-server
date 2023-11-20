@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2020 Graylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,20 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.datanode.bootstrap.preflight;
 
-// eslint-disable-next-line no-restricted-imports
-export {
-  /* 👇 no custom theme colors needed 👇 */
-  ButtonGroup,
-  Checkbox, // NOTE: do we want custom or keep OS styles
-  Clearfix,
-  Col,
-  Collapse,
-  Dropdown,
-  Form,
-  Grid,
-  Pager,
-  PanelGroup,
-  Radio, // NOTE: do we want custom or keep OS styles
-  /* 👆 no custom theme colors needed 👆 */
-} from 'react-bootstrap';
+public class DatanodeLockFileException extends RuntimeException {
+    public DatanodeLockFileException(String message, Exception cause) {
+        super(message, cause);
+    }
+
+    public DatanodeLockFileException(String message) {
+        super(message);
+    }
+}

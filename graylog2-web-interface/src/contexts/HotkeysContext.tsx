@@ -68,6 +68,8 @@ type HotkeysContextType = {
   activeHotkeys: ActiveHotkeys,
   addActiveHotkey: (props: { scope: ScopeName, actionKey: string, options: Options & { scope: ScopeName } }) => void,
   removeActiveHotkey: (props: { scope: ScopeName, actionKey: string }) => void,
+  showHotkeysModal: boolean,
+  setShowHotkeysModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const HotkeysContext = React.createContext<HotkeysContextType | undefined>(undefined);

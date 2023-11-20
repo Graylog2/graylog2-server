@@ -14,32 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
-import { Label as BootstrapLabel } from 'react-bootstrap';
+import { Badge as BootstrapBadge } from 'react-bootstrap';
+import type { ColorVariant } from '@graylog/sawmill';
 
-const getColorStyles = (theme, bsStyle) => {
+type BadgeProps = {
+  bsStyle?: ColorVariant,
+};
+type MergedProps = React.ComponentProps<typeof BootstrapBadge> & BadgeProps;
+const Badge: React.ComponentType<MergedProps> = styled(BootstrapBadge)<BadgeProps>(({ bsStyle, theme }) => {
   if (!bsStyle) {
-    return '';
+    return undefined;
   }
 
   const backgroundColor = theme.colors.variant[bsStyle];
-  const textColor = theme.utils.contrastingColor(backgroundColor);
+  const textColor = theme.utils.readableColor(backgroundColor);
 
   return css`
     background-color: ${backgroundColor};
     color: ${textColor};
 `;
-};
+});
 
-const StyledLabel = styled(BootstrapLabel)(({ bsStyle, theme }) => css`
-  ${getColorStyles(theme, bsStyle)}
-  padding: 0.3em 0.6em;
-`);
-
-const Label = forwardRef(({ ...props }, ref) => (
-  <StyledLabel ref={ref} {...props} />
-));
-
-export default Label;
+export default Badge;
+export { Badge as StyledBadge };

@@ -50,7 +50,7 @@ public enum ProcessState {
      * Removal of node from Opensearch cluster completed
      */
     REMOVED(DataNodeStatus.REMOVED),
-
+    
     /**
      * The OS process is not running anymore on the underlying system, it has been terminated
      */

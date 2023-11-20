@@ -14,14 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
+import Menu from 'components/bootstrap/Menu';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import NavItemStateIndicator, {
+  hoverIndicatorStyles,
+  activeIndicatorStyles,
+} from 'components/common/NavItemStateIndicator';
 
 import menuItemStyles from './styles/menuItem';
 
@@ -45,17 +49,63 @@ class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
   }
 }
 
-const StyledNavDropdown = styled(BootstrapNavDropdown)`
-  ${menuItemStyles}
+type Props = {
+  title?: React.ReactNode,
+  inactiveTitle?: string,
+  badge?: React.ComponentType<{ text: React.ReactNode }>,
+  noCaret?: boolean,
+}
+
+const StyledMenuDropdown = styled(Menu.Dropdown)`
+  z-index: 1032 !important;
 `;
 
-const NavDropdown = ({ title, inactiveTitle, badge: Badge, ...props }) => {
+const DropdownTrigger = styled.button<{ $active: boolean }>(({ theme, $active }) => css`
+  background: transparent;
+  border: 0;
+  padding: 15px;
+
+  &:hover {
+    ${hoverIndicatorStyles(theme)}
+  }
+
+  ${$active ? activeIndicatorStyles(theme) : ''}
+
+
+  &:hover,
+  &:focus {
+    color: ${theme.colors.variant.darker.default};
+    background-color: transparent;
+  }
+`);
+
+const NavItem = styled.span`
+  display: inline-flex;
+  align-items: center;
+  min-height: ${NAV_ITEM_HEIGHT};
+  padding: 0;
+`;
+
+const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children }: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
   return (
-    <StyledNavDropdown {...props}
-                       title={<NavItemStateIndicator>{Badge ? <Badge text={title} /> : title}</NavItemStateIndicator>}
-                       active={isActive} />
+    <Menu>
+      <NavItem>
+        <Menu.Target>
+          <DropdownTrigger $active={isActive}>
+            <NavItemStateIndicator>
+              {Badge ? <Badge text={title} /> : title}
+            </NavItemStateIndicator>
+            {' '}
+            {noCaret ? null : <span className="caret" />}
+          </DropdownTrigger>
+        </Menu.Target>
+      </NavItem>
+      <StyledMenuDropdown>
+        {children}
+      </StyledMenuDropdown>
+    </Menu>
   );
 };
 
@@ -68,6 +118,7 @@ NavDropdown.propTypes = {
 NavDropdown.defaultProps = {
   inactiveTitle: undefined,
   badge: undefined,
+  noCaret: false,
 };
 
 const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`

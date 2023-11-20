@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -68,6 +69,39 @@ public class FieldTypeMappingsService {
                 LOG.error("Failed to update field type in index set : " + indexSetId, ex);
                 throw ex;
             }
+        }
+    }
+
+    public void removeCustomMappingForFields(final List<String> fieldNames,
+                                             final Set<String> indexSetsIds,
+                                             final boolean rotateImmediately) {
+        for (String indexSetId : indexSetsIds) {
+            try {
+                indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
+                    var updatedIndexSetConfig = removeMappings(fieldNames, indexSetConfig);
+                    if (rotateImmediately) {
+                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                    }
+                });
+                LOG.debug("Removed custom mappings for fields " + fieldNames.toString() + " in index set : " + indexSetId);
+            } catch (Exception ex) {
+                LOG.error("Failed to remove custom mappings for fields " + fieldNames.toString() + " in index set : " + indexSetId, ex);
+                throw ex;
+            }
+        }
+    }
+
+    private Optional<IndexSetConfig> removeMappings(final List<String> fieldNames, final IndexSetConfig indexSetConfig) {
+        final CustomFieldMappings previousCustomFieldMappings = indexSetConfig.customFieldMappings();
+        final boolean removedSmth = previousCustomFieldMappings.removeIf(customFieldMapping -> fieldNames.stream().anyMatch(fieldName -> customFieldMapping.fieldName().equals(fieldName)));
+        if (removedSmth) {
+            return Optional.of(mongoIndexSetService.save(
+                    indexSetConfig.toBuilder()
+                            .customFieldMappings(previousCustomFieldMappings)
+                            .build()
+            ));
+        } else {
+            return Optional.empty();
         }
     }
 
