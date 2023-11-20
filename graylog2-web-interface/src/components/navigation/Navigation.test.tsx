@@ -27,15 +27,18 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import PerspectivesBindings from 'components/perspectives/bindings';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import useLocation from 'routing/useLocation';
+import HotkeysProvider from 'contexts/HotkeysProvider';
 
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
+jest.mock('routing/withLocation', () => (x) => x);
+jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 
 describe('Navigation', () => {
-  const SUT = () => <PerspectivesProvider><Navigation /></PerspectivesProvider>;
+  const SUT = () => <HotkeysProvider><PerspectivesProvider><Navigation /></PerspectivesProvider></HotkeysProvider>;
 
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, PerspectivesBindings));

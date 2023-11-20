@@ -29,6 +29,7 @@ import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import HotkeysProvider from 'contexts/HotkeysProvider';
 
 import AppRouter from './AppRouter';
 
@@ -41,6 +42,7 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('hooks/usePluginEntities');
 jest.mock('contexts/GlobalContextProviders', () => jest.fn(({ children }: React.PropsWithChildren<{}>) => children));
+jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -56,11 +58,13 @@ jest.mock('react-router-dom', () => ({
 }));
 
 const AppRouterWithContext = () => (
-  <DefaultProviders>
-    <CurrentUserContext.Provider value={defaultUser}>
-      <AppRouter />
-    </CurrentUserContext.Provider>
-  </DefaultProviders>
+  <HotkeysProvider>
+    <DefaultProviders>
+      <CurrentUserContext.Provider value={defaultUser}>
+        <AppRouter />
+      </CurrentUserContext.Provider>
+    </DefaultProviders>
+  </HotkeysProvider>
 );
 
 AppRouterWithContext.defaultProps = {

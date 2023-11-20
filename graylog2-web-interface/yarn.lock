@@ -3858,21 +3858,13 @@
   integrity sha512-ydw9FGbOHrFHaht/3MU9mvK4zU9SKD2KOrmrCTSmcHjOoiWdGg/UWRIEClumk+bq3wYoLXuReJaJlVI/ZYNRkA==
 
 "@types/enzyme-adapter-react-16@^1.0.6":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@types/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.0.8.tgz#85bec6a9827110fb7299be8eed3a092f101c1dcc"
-  integrity sha512-nzYumRvxSh2Vbk7mkseYbInmpMbVZRc1EJQVeQmXhNCNVmLg2VOKAJujc7YJ/gDdPW+X03wYrDGa1Bj0Q/NTaw==
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@types/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.0.9.tgz#337d85f0e91be2654b246ec11701dcf75af30afc"
+  integrity sha512-z24MMxGtUL8HhXdye3tWzjp+19QTsABqLaX2oOZpxMPHRJgLfahQmOeTTrEBQd9ogW20+UmPBXD9j+XOasFHvw==
   dependencies:
     "@types/enzyme" "*"
 
-"@types/enzyme@*":
-  version "3.10.15"
-  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.15.tgz#56d1167bb11a2c3f65af790de0cbb0e990b21489"
-  integrity sha512-Tdm2XXW7TfyKhb/ddSLMpj8W0UgxbCOOauFNeLJH7+KzsfOBrHF6XPctw11SwGoOPyUglYQpvMoQNFXOF0uTwg==
-  dependencies:
-    "@types/cheerio" "*"
-    "@types/react" "^16"
-
-"@types/enzyme@3.10.16":
+"@types/enzyme@*", "@types/enzyme@3.10.16":
   version "3.10.16"
   resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.16.tgz#100c49093f694545fc903266b2eb410df08859a9"
   integrity sha512-17uMdJjSKjvdn/MhO/G2lRNPZGvJxFpvgONrsRoS1+khtJ6UcnCwC9v3gk2UqPyAkMZb6a1VYxScc/vOgkDl9w==
@@ -4112,10 +4104,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*", "@types/plotly.js@2.12.29":
-  version "2.12.29"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.29.tgz#ae16313ada6f644860f56377151cf22a6ce4c906"
-  integrity sha512-eaZGh/DFrjBKE6FnWT/CU2Hx1CQ9hT01LvVpiHHB20iVOLmgM5qPV74y08JrM4VjyF7Gx7hAx91dxusqQzE+nQ==
+"@types/plotly.js@*", "@types/plotly.js@2.12.30":
+  version "2.12.30"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.30.tgz#e0ce5231189a360b0be29445117789fbd75831fe"
+  integrity sha512-/yeGIFTrh5e5Q9HUCVZWDwwxqGyWHYsi4IVhG/1YKaOScslMlimLBIoce/F/Tjw7YahRTbh4xHNDfGxvq51w7Q==
 
 "@types/prop-types@*":
   version "15.7.3"
@@ -6342,9 +6334,9 @@ core-js-pure@^3.0.0:
   integrity sha512-lacdXOimsiD0QyNf9BC/mxivNJ/ybBGJXQFKzRekp1WTHoVUWsUHEn+2T8GJAzzIhyOuXA+gOxCVN3l+5PLPUA==
 
 core-js@3:
-  version "3.33.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.33.1.tgz#ef3766cfa382482d0a2c2bc5cb52c6d88805da52"
-  integrity sha512-qVSq3s+d4+GsqN0teRCJtM6tdEEXyWxjzbhVrCHmBS5ZTM0FS2MOS0D13dUXAWDUN6a+lHI/N1hF9Ytz6iLl9Q==
+  version "3.33.3"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.33.3.tgz#3c644a323f0f533a0d360e9191e37f7fc059088d"
+  integrity sha512-lo0kOocUlLKmm6kv/FswQL8zbkH7mVsLJ/FULClOhv8WRVmKLVcs6XPNQAzstfeJTCHMyButEwG+z1kHxHoDZw==
 
 core-js@^2.6.5:
   version "2.6.11"
@@ -11020,6 +11012,7 @@ jest-pnp-resolver@^1.2.2:
     jest-enzyme "^7.1.2"
     jest-styled-components "7.2.0"
     react-select-event "^5.0.0"
+    resize-observer-polyfill "^1.5.1"
 
 jest-regex-util@^24.9.0:
   version "24.9.0"
@@ -13075,10 +13068,10 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-plotly.js@2.27.0:
-  version "2.27.0"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.27.0.tgz#cf3235fb5ca513cbbd37cd760f96719525b26250"
-  integrity sha512-48LjCf+A7MmgNTPBBomYdIcFaY/oWjIdRT7k+qmXz9opcMCAJiBrpbslWyfmR8HwmTxJRGdeyoWWlO8AHkvq5A==
+plotly.js@2.27.1:
+  version "2.27.1"
+  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.27.1.tgz#064d80d17ad8f9cde400d6f7df45926f520dac06"
+  integrity sha512-XeE0zTJWTxURYrUJqzf73l8lTb+HnyRvvhHkoSIEvWf58ins4saopo9l25kCm+xHAGz8E/2EOncE4DyXsJ34kA==
   dependencies:
     "@plotly/d3" "3.8.1"
     "@plotly/d3-sankey" "0.7.2"

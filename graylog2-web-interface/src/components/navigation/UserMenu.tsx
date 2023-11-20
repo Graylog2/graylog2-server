@@ -54,7 +54,7 @@ const UserMenu = () => {
 
   return (
     <NavDropdown title={<Icon name="user" size="lg" />}
-                 aria-label={`User Menu for ${fullName}`}
+                 hoverTitle={`User Menu for ${fullName}`}
                  noCaret>
       <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
       <Menu.Divider />

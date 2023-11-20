@@ -21,28 +21,38 @@ import { Icon } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import useHotkeysContext from 'hooks/useHotkeysContext';
 import Menu from 'components/bootstrap/Menu';
 
-const HelpMenuItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
+const HelpMenuLinkItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
   <Menu.Item component="a" href={href} target="_blank" icon={<Icon name="external-link-alt" />}>
     {children}
   </Menu.Item>
 );
-const HelpMenu = () => (
-  <NavDropdown title={<Icon name="question-circle" size="lg" />}
-               aria-label="Help"
-               noCaret>
 
-    <HelpMenuItem href={DocsHelper.versionedDocsHomePage()}>
-      Documentation
-    </HelpMenuItem>
+const HelpMenu = () => {
+  const { setShowHotkeysModal } = useHotkeysContext();
 
-    {AppConfig.isCloud() && (
-    <HelpMenuItem href={Routes.global_api_browser()}>
-      Cluster Global API browser
-    </HelpMenuItem>
-    )}
-  </NavDropdown>
-);
+  return (
+    <NavDropdown title={<Icon name="question-circle" size="lg" />}
+                 hoverTitle="Help"
+                 noCaret>
+
+      <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>
+        Documentation
+      </HelpMenuLinkItem>
+
+      <Menu.Item onClick={() => setShowHotkeysModal(true)}>
+        Keyboard Shortcuts
+      </Menu.Item>
+
+      {AppConfig.isCloud() && (
+      <HelpMenuLinkItem href={Routes.global_api_browser()}>
+        Cluster Global API browser
+      </HelpMenuLinkItem>
+      )}
+    </NavDropdown>
+  );
+};
 
 export default HelpMenu;
