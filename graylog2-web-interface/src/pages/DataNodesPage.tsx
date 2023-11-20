@@ -16,16 +16,23 @@
  */
 import React from 'react';
 
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
+import { LinkContainer } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
     <DataNodesPageNavigation />
     <PageHeader title="Data Nodes"
+                actions={(
+                  <LinkContainer to={Routes.SYSTEM.DATANODES.CREATE}>
+                    <Button bsStyle="success">Add new Datanode</Button>
+                  </LinkContainer>
+                )}
                 documentationLink={{
                   title: 'Data Nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
