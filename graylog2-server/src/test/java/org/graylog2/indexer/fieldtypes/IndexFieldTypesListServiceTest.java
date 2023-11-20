@@ -74,6 +74,17 @@ class IndexFieldTypesListServiceTest {
     }
 
     @Test
+    void testReturnsEmptyResultOnWrongIndexIdForAllCall() {
+        doReturn(Optional.empty()).when(indexSetService).get("I_do_not_exist!");
+
+        final List<IndexSetFieldType> response = toTest.getIndexSetFieldTypesList("I_do_not_exist!", "", List.of(), "index_set_id", Sorting.Direction.ASC);
+        assertTrue(response.isEmpty());
+
+        verifyNoInteractions(indexFieldTypesService);
+        verifyNoInteractions(indexSetFactory);
+    }
+
+    @Test
     void testReturnsEmptyPageIfCannotCreateIndexSetFromConfig() {
         IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         doReturn(Optional.of(indexSetConfig)).when(indexSetService).get("I_am_strangely_broken!");
@@ -85,6 +96,21 @@ class IndexFieldTypesListServiceTest {
 
         assertEquals(0, response.total());
         assertTrue(response.elements().isEmpty());
+
+        verifyNoInteractions(indexFieldTypesService);
+    }
+
+    @Test
+    void testReturnsEmptyListIfCannotCreateIndexSetFromConfigForAllCall() {
+        IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+        doReturn(Optional.of(indexSetConfig)).when(indexSetService).get("I_am_strangely_broken!");
+        doReturn(new CustomFieldMappings()).when(indexSetConfig).customFieldMappings();
+        doReturn(null).when(indexSetFactory).create(indexSetConfig);
+
+
+        final List<IndexSetFieldType> response = toTest.getIndexSetFieldTypesList("I_am_strangely_broken!", "", List.of(), "index_set_id", Sorting.Direction.ASC);
+
+        assertTrue(response.isEmpty());
 
         verifyNoInteractions(indexFieldTypesService);
     }
@@ -128,12 +154,32 @@ class IndexFieldTypesListServiceTest {
                         new IndexSetFieldType("field_1", "ip", true, false),
                         new IndexSetFieldType("field_2", "long", false, false)
                 );
+        List<IndexSetFieldType> allResponse = toTest.getIndexSetFieldTypesList("I_am_fine!", "", List.of(), "field_name", Sorting.Direction.ASC);
+        assertThat(allResponse)
+                .containsExactly(
+                        new IndexSetFieldType("field_1", "ip", true, false),
+                        new IndexSetFieldType("field_2", "long", false, false),
+                        new IndexSetFieldType("field_3", "ip", false, false),
+                        new IndexSetFieldType("field_4", "string", false, false),
+                        new IndexSetFieldType("field_5", "string_fts", false, false)
+                );
+
 
         response = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "", List.of(), 0, 2, "field_name", Sorting.Direction.DESC);
         assertThat(response.elements())
                 .containsExactly(
                         new IndexSetFieldType("field_5", "string_fts", false, false),
                         new IndexSetFieldType("field_4", "string", false, false)
+                );
+
+        allResponse = toTest.getIndexSetFieldTypesList("I_am_fine!", "", List.of(), "field_name", Sorting.Direction.DESC);
+        assertThat(allResponse)
+                .containsExactly(
+                        new IndexSetFieldType("field_5", "string_fts", false, false),
+                        new IndexSetFieldType("field_4", "string", false, false),
+                        new IndexSetFieldType("field_3", "ip", false, false),
+                        new IndexSetFieldType("field_2", "long", false, false),
+                        new IndexSetFieldType("field_1", "ip", true, false)
                 );
 
 
