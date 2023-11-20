@@ -49,6 +49,7 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -203,13 +204,19 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     @Override
     public List<DataNode> findNodes() {
         final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
-        return activeDataNodes.values().stream().map(node -> {
+        return addProvisioningInformation(activeDataNodes.values());
+    }
+
+    @Override
+    public List<DataNode> addProvisioningInformation(Collection<Node> nodes) {
+        return nodes.stream().map(node -> {
             final var keystore = loadKeyStoreForNode(node);
             final var certificate = keystore.flatMap(this::getCertificateForNode);
             final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
             final var config = getDataNodeProvisioningConfig(node).orElseThrow(() -> new IllegalStateException("No config found for data node " + node.getNodeId()));
             return new DataNode(node.getNodeId(),
                     node.getType(),
+                    node.getDataNodeStatus(),
                     node.getTransportAddress(),
                     config.state(),
                     config.errorMsg(),

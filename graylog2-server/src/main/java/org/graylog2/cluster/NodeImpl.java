@@ -16,8 +16,10 @@
  */
 package org.graylog2.cluster;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.undercouch.bson4jackson.types.Timestamp;
 import org.bson.types.BSONTimestamp;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
@@ -33,6 +35,8 @@ import java.util.Map;
 @DbEntity(collection = "nodes", titleField = "node_id")
 public class NodeImpl extends PersistedImpl implements Node {
 
+
+    @JsonCreator
     public NodeImpl(Map<String, Object> fields) {
         super(fields);
     }
@@ -70,6 +74,9 @@ public class NodeImpl extends PersistedImpl implements Node {
         }
         if (rawLastSeen instanceof BSONTimestamp) {
             return new DateTime(((BSONTimestamp) rawLastSeen).getTime() * 1000L, DateTimeZone.UTC);
+        }
+        if (rawLastSeen instanceof Timestamp ts) {
+            return new DateTime(ts.getTime() * 1000L, DateTimeZone.UTC);
         }
         return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
     }

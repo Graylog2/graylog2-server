@@ -77,8 +77,9 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         var newMap = new HashMap<>(orig);
         if (Objects.nonNull(clusterUri)) {
             newMap.put("cluster_address", clusterUri);
-        } else if (Objects.nonNull(dataNodeStatus)) {
-            newMap.put("datanode_status", dataNodeStatus.toString());
+        }
+        if (Objects.nonNull(dataNodeStatus)) {
+            newMap.put("datanode_status", dataNodeStatus);
         }
         return Map.copyOf(newMap);
     }

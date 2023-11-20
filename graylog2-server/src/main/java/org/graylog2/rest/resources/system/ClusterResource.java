@@ -18,29 +18,43 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.eaio.uuid.UUID;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.events.notifications.NotificationDto;
+import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.PaginatedNodeService;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,14 +67,39 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterResource extends RestResource {
     private final NodeService nodeService;
+    private final PaginatedNodeService paginatedNodeService;
+    private final SearchQueryParser searchQueryParser;
+    private final CertRenewalService certRenewalService;
+
     private final NodeId nodeId;
     private final ClusterId clusterId;
 
+    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
+            .put("title", SearchQueryField.create(NotificationDto.FIELD_TITLE))
+            .put("description", SearchQueryField.create(NotificationDto.FIELD_DESCRIPTION))
+            .build();
+
+    private static final String DEFAULT_SORT_FIELD = "title";
+    private static final String DEFAULT_SORT_DIRECTION = "asc";
+    private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id("title").title("Title").build(),
+            EntityAttribute.builder().id("description").title("Description").build(),
+            EntityAttribute.builder().id("type").title("Type").build()
+    );
+    private static final EntityDefaults settings = EntityDefaults.builder()
+            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
+            .build();
+
     @Inject
     public ClusterResource(final NodeService nodeService,
-                           final ClusterConfigService clusterConfigService,
+                           final PaginatedNodeService paginatedNodeService,
+                           CertRenewalService certRenewalService, final ClusterConfigService clusterConfigService,
                            final NodeId nodeId) {
         this.nodeService = nodeService;
+        this.paginatedNodeService = paginatedNodeService;
+        this.certRenewalService = certRenewalService;
+        this.searchQueryParser = new SearchQueryParser(NotificationDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.nodeId = nodeId;
         this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
     }
@@ -77,6 +116,33 @@ public class ClusterResource extends RestResource {
         }
 
         return NodeSummaryList.create(nodeList);
+    }
+
+    @GET
+    @Timed
+    @Path("/datanodes")
+    @ApiOperation(value = "Get a paginated list of all datanodes in this cluster")
+    public PageListResponse<CertRenewalService.DataNode> dataNodes(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                                   @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                                   @ApiParam(name = "sort",
+                                                                             value = "The field to sort the result on",
+                                                                             required = true,
+                                                                             allowableValues = "title,description,type")
+                                                                   @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                                   @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order
+
+    ) {
+        final SearchQuery searchQuery = searchQueryParser.parse(query);
+        final PaginatedList<Node> result = paginatedNodeService.searchPaginatedDatanodes(searchQuery, sort, order, page, perPage);
+
+
+        final List<Node> nodes = result.delegate();
+        final List<CertRenewalService.DataNode> dataNodes = certRenewalService.addProvisioningInformation(nodes);
+
+        return PageListResponse.create(query, result.pagination(),
+                result.grandTotal().orElse(0L), sort, order, dataNodes, attributes, settings);
     }
 
     @GET
@@ -111,7 +177,8 @@ public class ClusterResource extends RestResource {
                 node.getTransportAddress(),
                 Tools.getISO8601String(node.getLastSeen()),
                 node.getShortNodeId(),
-                node.getHostname()
+                node.getHostname(),
+                node.getDataNodeStatus()
         );
     }
 }

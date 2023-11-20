@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.cluster.DataNodeStatus;
+
+import javax.annotation.Nullable;
 
 @AutoValue
 @WithBeanGetter
@@ -56,6 +59,10 @@ public abstract class NodeSummary {
     @JsonProperty
     public abstract String hostname();
 
+    @JsonProperty
+    @Nullable
+    public abstract DataNodeStatus datanodeStatus();
+
     @JsonCreator
     public static NodeSummary create(@JsonProperty("cluster_id") String clusterId,
                                      @JsonProperty("node_id") String nodeId,
@@ -64,7 +71,8 @@ public abstract class NodeSummary {
                                      @JsonProperty("transport_address") String transportAddress,
                                      @JsonProperty("last_seen") String lastSeen,
                                      @JsonProperty("short_node_id") String shortNodeId,
-                                     @JsonProperty("hostname") String hostname) {
-        return new AutoValue_NodeSummary(clusterId, nodeId, type, isLeader, transportAddress, lastSeen, shortNodeId, hostname);
+                                     @JsonProperty("hostname") String hostname,
+                                     @Nullable @JsonProperty("datanode_status") DataNodeStatus datanodeStatus) {
+        return new AutoValue_NodeSummary(clusterId, nodeId, type, isLeader, transportAddress, lastSeen, shortNodeId, hostname, datanodeStatus);
     }
 }
