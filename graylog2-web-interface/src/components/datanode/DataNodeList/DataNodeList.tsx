@@ -22,27 +22,28 @@ import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import EntityDataTable from 'components/common/EntityDataTable';
+import EntityDataTable, { ColumnRenderers } from 'components/common/EntityDataTable';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import { defaultCompare } from 'logic/DefaultCompare';
 import type { Sort } from 'stores/PaginationTypes';
 import useTableEventHandlers from 'hooks/useTableEventHandlers';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 import DataNodeBulkActions from './DataNodeBulkActions';
 import DataNodeActions from './DataNodeActions';
+import DataNodeStatusCell from './DataNodeStatusCell';
 
 import useDataNodes from '../hooks/useDataNodes';
 
-export const ENTITY_TABLE_ID = 'datanodes';
-export const DEFAULT_LAYOUT = {
+const ENTITY_TABLE_ID = 'datanodes';
+const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
   displayedColumns: ['hostname', 'transport_address', 'status', 'cert_valid_until', 'last_seen'],
   columnsOrder: ['hostname', 'transport_address', 'status', 'cert_valid_until', 'last_seen'],
 };
-
-export const ATTRIBUTES = [
+const ATTRIBUTES = [
   { id: 'hostname', title: 'Name', sortable: true, permissions: [] },
   { id: 'transport_address', title: 'Transport address' },
   { id: 'status', title: 'Status', sortable: true },
@@ -60,7 +61,7 @@ const DataNodeList = () => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: dataNodes, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes();
+  const { data: { elements, total }, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes();
   const {
     onPageSizeChange,
     onSearch,
@@ -73,8 +74,6 @@ const DataNodeList = () => {
     setQuery,
   });
 
-  const elements = dataNodes?.sort((d1, d2) => defaultCompare(d1.cert_valid_until, d2.cert_valid_until));
-  const total = elements?.length || 0;
   const bulkActions: any = () => (
     <DataNodeBulkActions selectedDataNodeIds={[]}
                          setSelectedDataNodeIds={() => {}}
@@ -83,10 +82,17 @@ const DataNodeList = () => {
   const entityActions = () => (
     <DataNodeActions />
   );
-  const columnRenderers = {
+  const columnRenderers: ColumnRenderers<DataNode> = {
     attributes: {
+      hostname: {
+        renderCell: (dataNode: DataNode) => (
+          <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(dataNode.id)}>
+            {dataNode.hostname}
+          </Link>
+        ),
+      },
       status: {
-        renderCell: () => null,
+        renderCell: (dataNode: DataNode) => <DataNodeStatusCell dataNode={dataNode} />,
         staticWidth: 100,
       },
     },
