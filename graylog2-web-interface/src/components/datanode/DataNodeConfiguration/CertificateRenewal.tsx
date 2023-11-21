@@ -87,7 +87,7 @@ const renewalWording = {
   errorActionTitle: 'renewal',
   telemetryAppSection: 'renewing-certificate',
   buttonStyle: 'primary',
-};
+} as const;
 
 const provisioningWording = {
   buttonTitle: 'Provision certificate',
@@ -96,7 +96,7 @@ const provisioningWording = {
   errorActionTitle: 'provisioning',
   telemetryAppSection: 'provisioning-certificate',
   buttonStyle: 'success',
-};
+} as const;
 
 const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNode['status'] }) => {
   const sendTelemetry = useSendTelemetry();

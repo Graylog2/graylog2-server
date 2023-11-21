@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import type { ButtonProps } from 'components/bootstrap';
 import { Button } from 'components/bootstrap';
+
+type ButtonProps = React.ComponentProps<typeof Button>;
 
 type Props = ButtonProps & {
   to: string,

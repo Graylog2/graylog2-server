@@ -19,9 +19,9 @@ import { Button as MantineButton } from '@mantine/core';
 import type { ColorVariant } from '@graylog/sawmill';
 import styled from 'styled-components';
 
-type BootstrapSizes = 'xs' | 'sm' | 'lg' | 'xsmall' | 'small' | 'large';
+import type { BsSize } from 'components/bootstrap/types';
 
-const sizeForMantine = (size: BootstrapSizes) => {
+const sizeForMantine = (size: BsSize) => {
   switch (size) {
     case 'xs':
     case 'xsmall': return 'xs';
@@ -33,24 +33,73 @@ const sizeForMantine = (size: BootstrapSizes) => {
   }
 };
 
+export type StyleProps = ColorVariant | 'link';
+
+const styleProps = (style: StyleProps) => {
+  switch (style) {
+    case 'link': return { variant: 'subtle' };
+    default: return { color: style };
+  }
+};
+
 const StyledButton = styled(MantineButton)`
   height: auto;
   padding: 6px 12px;
   font-weight: 400;
 `;
 
-type Props = {
-  bsStyle?: ColorVariant,
-  bsSize?: BootstrapSizes,
-  onClick: () => void,
-}
-const Button = ({ bsStyle, bsSize, onClick, children }: React.PropsWithChildren<Props>) => (
-  <StyledButton color={bsStyle} size={sizeForMantine(bsSize)} onClick={onClick}>{children}</StyledButton>
+type Props = React.PropsWithChildren<{
+  active?: boolean,
+  bsStyle?: StyleProps,
+  bsSize?: BsSize,
+  className?: string,
+  disabled?: boolean,
+  form?: string,
+  id?: string,
+  name?: string,
+  onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void),
+  role?: string,
+  tabIndex?: number,
+  title?: string,
+  type?: 'button' | 'reset' | 'submit',
+}>;
+
+const Button = React.forwardRef<HTMLButtonElement, Props>(
+  ({
+    active, bsStyle, bsSize, className, id, onClick, disabled, title, form,
+    type, role, name, tabIndex, children,
+  }, ref) => (
+    <StyledButton ref={ref}
+                  id={id}
+                  className={className}
+                  {...styleProps(bsStyle)}
+                  disabled={disabled}
+                  form={form}
+                  name={name}
+                  onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+                  role={role}
+                  size={sizeForMantine(bsSize)}
+                  tabIndex={tabIndex}
+                  title={title}
+                  type={type}>{children}
+    </StyledButton>
+  ),
 );
 
 Button.defaultProps = {
+  active: undefined,
   bsStyle: 'default',
   bsSize: undefined,
+  className: undefined,
+  disabled: false,
+  form: undefined,
+  id: undefined,
+  name: undefined,
+  onClick: undefined,
+  role: undefined,
+  tabIndex: undefined,
+  title: undefined,
+  type: undefined,
 };
 
 export default Button;

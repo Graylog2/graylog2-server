@@ -61,7 +61,7 @@ type Props = {
   isSubmitting?: boolean,
   leftCol?: React.ReactNode,
   onSubmit?: (event?: SyntheticEvent) => void,
-  submitButtonText: string|React.ReactNode,
+  submitButtonText: string,
   submitButtonType?: 'submit' | 'button',
   submitIcon?: IconName,
 } & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
