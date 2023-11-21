@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import type { CSSProperties } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import { Alert as MantineAlert, useMantineTheme } from '@mantine/core';
+import { Alert as MantineAlert } from '@mantine/core';
 
 import Icon from 'components/common/Icon';
 
@@ -32,7 +32,7 @@ type Props = {
 }
 
 const StyledAlert = styled(MantineAlert)(({ theme }) => css`
-  margin: ${theme.mantine.spacing.md} 0;
+  margin: ${theme.spacings.md} 0;
 `);
 
 const iconNameForType = (bsStyle: ColorVariant) => {
@@ -48,23 +48,23 @@ const iconNameForType = (bsStyle: ColorVariant) => {
 };
 
 const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props) => {
-  const theme = useMantineTheme();
+  const theme = useTheme();
   const displayCloseButton = typeof onDismiss === 'function';
   const iconName = iconNameForType(bsStyle);
 
   const alertStyles = () => ({
     root: {
-      border: `1px solid ${theme.other.shades.lighter(bsStyle)}`,
+      border: `1px solid ${theme.colors.variant.lighter[bsStyle]}`,
     },
     message: {
-      fontSize: theme.fontSizes.md,
+      fontSize: theme.fonts.size.body,
     },
     title: {
-      fontSize: theme.fontSizes.md,
-      color: theme.other.colors.global.textDefault,
+      fontSize: theme.fonts.size.body,
+      color: theme.colors.global.textDefault,
     },
     closeButton: {
-      color: theme.other.colors.global.textDefault,
+      color: theme.colors.global.textDefault,
     },
   });
 
