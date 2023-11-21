@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
@@ -81,7 +81,7 @@ const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
   const handleOnClose = useCallback(() => {
     setEditingField(null);
   }, [setEditingField]);
-const [deletingFieldTypes, setDeletingFieldTypes] = useState<Array<string> | null>(null);
+  const [deletingFieldTypes, setDeletingFieldTypes] = useState<Array<string> | null>(null);
   const handleOnOpen = useCallback((fieldType: IndexSetFieldType) => {
     setEditingField({
       fieldName: fieldType.fieldName,
