@@ -84,12 +84,12 @@ const ExportExtractors = createReactClass({
               <h2>Extractors JSON</h2>
             </Col>
             <Col md={4}>
-              <ClipboardButton title="Copy extractors" className="pull-right" target="#extractor-export-textarea" />
+              <ClipboardButton title="Copy extractors" className="pull-right" text={formattedJSON} />
             </Col>
           </Row>
           <Row>
             <Col md={12}>
-              <Input type="textarea" id="extractor-export-textarea" rows={30} defaultValue={formattedJSON} />
+              <Input type="textarea" id="extractor-export-textarea" rows={30} value={formattedJSON} />
             </Col>
           </Row>
         </Col>
