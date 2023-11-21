@@ -126,7 +126,7 @@ const MessageActions = ({
   return (
     <ButtonGroup>
       {showChanges}
-      <a href={messageUrl}><Button bsSize="small">Permalink</Button></a>
+      <Button bsSize="small" href={messageUrl}>Permalink</Button>
       {menuActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />

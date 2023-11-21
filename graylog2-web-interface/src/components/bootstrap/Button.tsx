@@ -56,6 +56,7 @@ type Props = React.PropsWithChildren<{
   className?: string,
   disabled?: boolean,
   form?: string,
+  href?: string,
   id?: string,
   name?: string,
   onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void),
@@ -67,25 +68,28 @@ type Props = React.PropsWithChildren<{
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
-    bsStyle, bsSize, className, id, onClick, disabled, title, form,
+    bsStyle, bsSize, className, id, onClick, disabled, href, title, form,
     type, role, name, tabIndex, children,
-  }, ref) => (
-    <StyledButton ref={ref}
-                  id={id}
-                  className={className}
-                  {...styleProps(bsStyle)}
-                  disabled={disabled}
-                  form={form}
-                  name={name}
-                  onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-                  role={role}
-                  size={sizeForMantine(bsSize)}
-                  tabIndex={tabIndex}
-                  title={title}
-                  type={type}>{children}
-    </StyledButton>
-  ),
-);
+  }, ref) => {
+    const button = (
+      <StyledButton ref={ref}
+                    id={id}
+                    className={className}
+                    {...styleProps(bsStyle)}
+                    disabled={disabled}
+                    form={form}
+                    name={name}
+                    onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+                    role={role}
+                    size={sizeForMantine(bsSize)}
+                    tabIndex={tabIndex}
+                    title={title}
+                    type={type}>{children}
+      </StyledButton>
+    );
+
+    return href ? <a href={href}>{button}</a> : button;
+  });
 
 Button.defaultProps = {
   active: undefined,
