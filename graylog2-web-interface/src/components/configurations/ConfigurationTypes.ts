@@ -25,5 +25,5 @@ enum ConfigurationType {
   USER_CONFIG = 'org.graylog2.users.UserConfiguration',
   CERTIFICATE_RENEWAL_POLICY_CONFIG = 'org.graylog2.plugin.certificates.RenewalPolicy',
 }
-
+export default ConfigurationType;
 export { ConfigurationType };
