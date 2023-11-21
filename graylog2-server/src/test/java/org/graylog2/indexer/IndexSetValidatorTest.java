@@ -17,7 +17,8 @@
 package org.graylog2.indexer;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatier.DataTierOrchestrator;
+import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -58,13 +59,13 @@ public class IndexSetValidatorTest {
     private ElasticsearchConfiguration elasticsearchConfiguration;
 
     @Mock
-    private DataTierOrchestrator dataTierOrchestrator;
+    private DataTieringOrchestrator dataTieringOrchestrator;
 
     private IndexSetValidator validator;
 
     @Before
     public void setUp() throws Exception {
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTierOrchestrator);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, false);
     }
 
     @Test
@@ -213,6 +214,17 @@ public class IndexSetValidatorTest {
         );
     }
 
+    @Test
+    public void testDataTieringNotSupportedInCloud() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, true);
+
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().dataTiers(mock(DataTieringConfig.class)).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("cloud"));
+    }
 
     private IndexSetConfig testIndexSetConfig() {
         return IndexSetConfig.builder()

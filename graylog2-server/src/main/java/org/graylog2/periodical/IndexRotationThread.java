@@ -16,7 +16,7 @@
  */
 package org.graylog2.periodical;
 
-import org.graylog2.datatier.DataTierOrchestrator;
+import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -48,7 +48,7 @@ public class IndexRotationThread extends Periodical {
     private final Indices indices;
     private final NodeId nodeId;
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
-    private final DataTierOrchestrator dataTierOrchestrator;
+    private final DataTieringOrchestrator dataTieringOrchestrator;
     private final NotificationService notificationService;
 
     @Inject
@@ -59,7 +59,7 @@ public class IndexRotationThread extends Periodical {
                                ActivityWriter activityWriter,
                                NodeId nodeId,
                                Map<String, Provider<RotationStrategy>> rotationStrategyMap,
-                               DataTierOrchestrator dataTierOrchestrator) {
+                               DataTieringOrchestrator dataTieringOrchestrator) {
         this.notificationService = notificationService;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -67,7 +67,7 @@ public class IndexRotationThread extends Periodical {
         this.indices = indices;
         this.nodeId = nodeId;
         this.rotationStrategyMap = rotationStrategyMap;
-        this.dataTierOrchestrator = dataTierOrchestrator;
+        this.dataTieringOrchestrator = dataTieringOrchestrator;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class IndexRotationThread extends Periodical {
     protected void checkForRotation(IndexSet indexSet) {
         final IndexSetConfig config = indexSet.getConfig();
         if (indexSet.getConfig().dataTiers() != null) {
-            dataTierOrchestrator.rotate(indexSet);
+            dataTieringOrchestrator.rotate(indexSet);
         } else {
             final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategyClass());
 

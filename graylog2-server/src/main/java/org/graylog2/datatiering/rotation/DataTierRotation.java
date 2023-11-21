@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatier.common;
+package org.graylog2.datatiering.rotation;
 
 import com.github.joschi.jadconfig.util.Size;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatier.common.tier.HotTierConfig;
+import org.graylog2.datatiering.config.HotTierConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;

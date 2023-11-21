@@ -14,19 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatier;
+package org.graylog2.datatiering;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetValidator;
 
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = DataTiersConfig.FIELD_TYPE, visible = true)
-public interface DataTiersConfig {
+public interface DataTieringOrchestrator {
 
-    String FIELD_TYPE = "type";
-    String FIELD_HOT_TIER = "hot_tier";
+    DataTieringState getState();
 
-    @JsonProperty(FIELD_TYPE)
-    String type();
+    void rotate(IndexSet indexSet);
+
+    void retain(IndexSet indexSet);
+
+    Optional<IndexSetValidator.Violation> validate(@NotNull DataTieringConfig config);
 
 }

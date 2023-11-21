@@ -24,15 +24,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidation.periodOtherThanDays;
-import static org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidation.validate;
+import static org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidator.periodOtherThanDays;
+import static org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidator.validate;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TimeSizeOptimizingValidationTest {
+public class TimeSizeOptimizingValidatorTest {
 
     @Mock
     private ElasticsearchConfiguration config;
+
+    @Test
+    public void validateLifetimeMaxIsShorterThanLifetimeMin() {
+        assertThat(validate(config, Period.days(5), Period.days(4))).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("is shorter than index_lifetime_min")
+        );
+    }
 
     @Test
     public void validateMaxRetentionPeriod() {

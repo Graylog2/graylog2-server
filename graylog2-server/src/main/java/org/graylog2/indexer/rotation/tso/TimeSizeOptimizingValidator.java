@@ -17,7 +17,7 @@
 package org.graylog2.indexer.rotation.tso;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatier.common.tier.HotTierConfig;
+import org.graylog2.datatiering.config.HotTierConfig;
 import org.graylog2.indexer.IndexSetValidator;
 import org.joda.time.DurationFieldType;
 import org.joda.time.Period;
@@ -30,7 +30,7 @@ import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OP
 import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_ROTATION_PERIOD;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class TimeSizeOptimizingValidation {
+public class TimeSizeOptimizingValidator {
 
     public static Optional<IndexSetValidator.Violation> validate(ElasticsearchConfiguration elasticsearchConfiguration,
                                                           Period indexLifetimeMin,

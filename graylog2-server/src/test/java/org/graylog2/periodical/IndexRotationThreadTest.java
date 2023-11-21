@@ -17,7 +17,7 @@
 package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.datatier.DataTierOrchestrator;
+import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -62,7 +62,7 @@ public class IndexRotationThreadTest {
     @Mock
     private IndexSetRegistry indexSetRegistry;
     @Mock
-    private DataTierOrchestrator dataTierOrchestrator;
+    private DataTieringOrchestrator dataTieringOrchestrator;
 
     @Before
     public void setUp() throws Exception {
@@ -86,7 +86,7 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTierOrchestrator);
+                dataTieringOrchestrator);
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
         rotationThread.checkForRotation(indexSet);
@@ -106,7 +106,7 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTierOrchestrator);
+                dataTieringOrchestrator);
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
         rotationThread.checkForRotation(indexSet);
@@ -127,7 +127,7 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTierOrchestrator);
+                dataTieringOrchestrator);
         rotationThread.doRun();
 
         verify(indexSet, never()).cycle();

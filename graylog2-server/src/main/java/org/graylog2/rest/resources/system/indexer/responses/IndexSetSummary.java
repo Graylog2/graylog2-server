@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.datatier.DataTiersConfig;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -66,7 +66,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                          @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
                                          @JsonProperty("index_template_type") @Nullable String templateType,
-                                         @JsonProperty("data_tiers") @Nullable DataTiersConfig dataTiers) {
+                                         @JsonProperty("data_tiers") @Nullable DataTieringConfig dataTiers) {
         if (Objects.isNull(creationDate)) {
             creationDate = ZonedDateTime.now();
         }
@@ -175,7 +175,7 @@ public abstract class IndexSetSummary {
 
     @Nullable
     @JsonProperty("data_tiers")
-    public abstract DataTiersConfig dataTiers();
+    public abstract DataTieringConfig dataTiers();
 
     public IndexSetConfig toIndexSetConfig(boolean isRegular) {
         final IndexSetConfig.Builder builder = IndexSetConfig.builder()

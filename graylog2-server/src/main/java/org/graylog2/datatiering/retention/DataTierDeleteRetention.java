@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatier.open;
+package org.graylog2.datatiering.retention;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.datatier.common.DataTierRetention;
-import org.graylog2.datatier.common.tier.HotTierConfig;
+import org.graylog2.datatiering.config.HotTierConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.system.NodeId;
@@ -34,11 +33,11 @@ import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_DELETE;
 
-public class OpenDataTierRetention {
+public class DataTierDeleteRetention {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpenDataTierRetention.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataTierDeleteRetention.class);
 
-    private final DataTierRetention dataTierRetention;
+    private final RetentionExecutor retentionExecutor;
     private final Indices indices;
 
     private final AuditEventSender auditEventSender;
@@ -46,32 +45,30 @@ public class OpenDataTierRetention {
     private final NodeId nodeId;
 
     @Inject
-    public OpenDataTierRetention(DataTierRetention dataTierRetention,
-                                 Indices indices,
-                                 AuditEventSender auditEventSender,
-                                 NodeId nodeId) {
-        this.dataTierRetention = dataTierRetention;
+    public DataTierDeleteRetention(RetentionExecutor retentionExecutor,
+                                   Indices indices,
+                                   AuditEventSender auditEventSender,
+                                   NodeId nodeId) {
+        this.retentionExecutor = retentionExecutor;
         this.indices = indices;
         this.auditEventSender = auditEventSender;
         this.nodeId = nodeId;
     }
 
     public void retain(IndexSet indexSet, HotTierConfig config) {
-        dataTierRetention.retain(indexSet, config, this::retain);
+        retentionExecutor.retain(indexSet, config, this::retain);
     }
 
-    private void retain(List<String> indexNames, IndexSet indexSet) {
+    private void retain(List<String> indexNames) {
         indexNames.forEach(indexName -> {
             final Stopwatch sw = Stopwatch.createStarted();
 
             indices.delete(indexName);
             auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RETENTION_DELETE, ImmutableMap.of(
-                    "index_name", indexName,
-                    "data_tier_retention", OpenDataTiersConfig.TYPE_OPEN
+                    "index_name", indexName
             ));
 
-            LOG.info("Finished {} data tier retention for index <{}> in {}ms.", OpenDataTiersConfig.TYPE_OPEN, indexName,
-                    sw.stop().elapsed(TimeUnit.MILLISECONDS));
+            LOG.info("Finished delete retention for index <{}> in {}ms.", indexName, sw.stop().elapsed(TimeUnit.MILLISECONDS));
         });
     }
 }

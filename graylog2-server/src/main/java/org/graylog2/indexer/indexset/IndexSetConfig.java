@@ -24,7 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
-import org.graylog2.datatier.DataTiersConfig;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -88,7 +88,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
                                         @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
-                                        @JsonProperty(FIELD_DATA_TIERS) @Nullable DataTiersConfig dataTiers
+                                        @JsonProperty(FIELD_DATA_TIERS) @Nullable DataTieringConfig dataTiers
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;
@@ -280,7 +280,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     @Nullable
     @JsonProperty(FIELD_DATA_TIERS)
-    public abstract DataTiersConfig dataTiers();
+    public abstract DataTieringConfig dataTiers();
 
     @JsonIgnore
     public boolean isRegularIndex() {
@@ -346,7 +346,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder customFieldMappings(CustomFieldMappings customFieldMappings);
 
-        public abstract Builder dataTiers(@Nullable DataTiersConfig dataTiers);
+        public abstract Builder dataTiers(@Nullable DataTieringConfig dataTiers);
 
         public abstract IndexSetConfig build();
     }

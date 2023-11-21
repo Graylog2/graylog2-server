@@ -14,53 +14,45 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatier.common.tier;
+package org.graylog2.datatiering.open;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.joda.time.Period;
+import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.datatiering.config.HotTierConfig;
 
 import javax.validation.constraints.NotNull;
 
-@JsonAutoDetect
+
 @AutoValue
 @WithBeanGetter
-@JsonDeserialize(builder = HotTierConfig.Builder.class)
-public abstract class HotTierConfig {
+@JsonDeserialize(builder = OpenDataTieringConfig.Builder.class)
+public abstract class OpenDataTieringConfig implements DataTieringConfig {
 
-    public static final String INDEX_LIFETIME_MIN = "index_lifetime_min";
-    public static final String INDEX_LIFETIME_MAX = "index_lifetime_max";
+    public final static String TYPE_OPEN = "data_tiering_open";
 
     public static Builder builder() {
-        return new AutoValue_HotTierConfig.Builder();
+        return Builder.create();
     }
-
-    @NotNull
-    @JsonProperty(INDEX_LIFETIME_MIN)
-    public abstract Period indexLifetimeMin();
-
-    @NotNull
-    @JsonProperty(INDEX_LIFETIME_MAX)
-    public abstract Period indexLifetimeMax();
 
     @AutoValue.Builder
     public abstract static class Builder {
 
         @JsonCreator
-        public static HotTierConfig.Builder create() {
-            return new AutoValue_HotTierConfig.Builder();
+        public static Builder create() {
+            return new AutoValue_OpenDataTieringConfig.Builder()
+                    .type(TYPE_OPEN);
         }
 
-        @JsonProperty(INDEX_LIFETIME_MIN)
-        public abstract Builder indexLifetimeMin(Period indexLifetimeMin);
+        @JsonProperty(FIELD_TYPE)
+        public abstract Builder type(@NotNull String type);
 
-        @JsonProperty(INDEX_LIFETIME_MAX)
-        public abstract Builder indexLifetimeMax(Period indexLifetimeMax);
+        @JsonProperty(DataTieringConfig.FIELD_HOT_TIER)
+        public abstract Builder hotTier(@NotNull HotTierConfig hotTier);
 
-        public abstract HotTierConfig build();
+        public abstract OpenDataTieringConfig build();
     }
 }

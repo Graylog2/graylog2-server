@@ -19,12 +19,12 @@ package org.graylog2.indexer;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatier.DataTierOrchestrator;
-import org.graylog2.datatier.DataTiersConfig;
+import org.graylog2.datatiering.DataTieringOrchestrator;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
-import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidation;
+import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidator;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -35,6 +35,7 @@ import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Optional;
 
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
@@ -47,15 +48,18 @@ public class IndexSetValidator {
     private static final Duration MINIMUM_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(1L);
     private final IndexSetRegistry indexSetRegistry;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
-    private final DataTierOrchestrator dataTierOrchestrator;
+    private final DataTieringOrchestrator dataTieringOrchestrator;
+    private final boolean isCloud;
 
     @Inject
     public IndexSetValidator(IndexSetRegistry indexSetRegistry,
                              ElasticsearchConfiguration elasticsearchConfiguration,
-                             DataTierOrchestrator dataTierOrchestrator) {
+                             DataTieringOrchestrator dataTieringOrchestrator,
+                             @Named("is_cloud") boolean isCloud) {
         this.indexSetRegistry = indexSetRegistry;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
-        this.dataTierOrchestrator = dataTierOrchestrator;
+        this.dataTieringOrchestrator = dataTieringOrchestrator;
+        this.isCloud = isCloud;
     }
 
     public Optional<Violation> validate(IndexSetConfig newConfig) {
@@ -75,6 +79,9 @@ public class IndexSetValidator {
         }
 
         if (newConfig.dataTiers() != null) {
+            if (isCloud) {
+                return Optional.of(Violation.create("data tiering is not supported in cloud"));
+            }
             final Violation dataTiersViolation = validateDataTiers(newConfig.dataTiers());
             if (dataTiersViolation != null) {
                 return Optional.of(dataTiersViolation);
@@ -148,7 +155,7 @@ public class IndexSetValidator {
     @Nullable
     public Violation validateRotation(RotationStrategyConfig rotationStrategyConfig) {
         if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
-            return TimeSizeOptimizingValidation.validate(
+            return TimeSizeOptimizingValidator.validate(
                     elasticsearchConfiguration,
                     config.indexLifetimeMin(),
                     config.indexLifetimeMax()).orElse(null);
@@ -158,8 +165,8 @@ public class IndexSetValidator {
 
 
     @Nullable
-    public Violation validateDataTiers(DataTiersConfig dataTiersConfig) {
-        return dataTierOrchestrator.validate(dataTiersConfig).orElse(null);
+    private Violation validateDataTiers(DataTieringConfig dataTieringConfig) {
+        return dataTieringOrchestrator.validate(dataTieringConfig).orElse(null);
     }
 
     @Nullable

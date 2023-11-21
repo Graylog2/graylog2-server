@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatier.common;
+package org.graylog2.datatiering.retention;
 
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog2.datatier.common.tier.HotTierConfig;
+import org.graylog2.datatiering.config.HotTierConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
@@ -40,16 +39,16 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class DataTierRetention {
+public class RetentionExecutor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataTierRetention.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RetentionExecutor.class);
 
     private final Indices indices;
     private final JobSchedulerClock clock;
     private final ActivityWriter activityWriter;
 
     @Inject
-    public DataTierRetention(Indices indices,
+    public RetentionExecutor(Indices indices,
                              JobSchedulerClock clock,
                              ActivityWriter activityWriter) {
         this.indices = indices;
@@ -78,7 +77,7 @@ public class DataTierRetention {
         if (removeCount > 0) {
             final String msg = "Running retention for " + removeCount + " aged-out indices.";
             LOG.info(msg);
-            activityWriter.write(new Activity(msg, DataTierRetention.class));
+            activityWriter.write(new Activity(msg, RetentionExecutor.class));
 
             runRetention(indexSet, deflectorIndices, removeCount, retention);
         }
@@ -105,9 +104,9 @@ public class DataTierRetention {
 
         final String msg = "Running data tier retention for indices <" + indexNamesAsString + ">";
         LOG.info(msg);
-        activityWriter.write(new Activity(msg, DataTierRetention.class));
+        activityWriter.write(new Activity(msg, RetentionExecutor.class));
 
-        retention.retain(orderedIndicesDescending, indexSet);
+        retention.retain(orderedIndicesDescending);
     }
 
     private boolean exceedsAgeLimit(String indexName, long cutoffSoft, long cutoffHard) {
@@ -126,7 +125,7 @@ public class DataTierRetention {
     }
 
     public interface Retention{
-        void retain(List<String> indexNames, IndexSet indexSet);
+        void retain(List<String> indexNames);
     }
 
 }
