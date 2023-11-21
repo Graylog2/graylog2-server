@@ -24,4 +24,8 @@ public interface DataNodeService {
     void removeNode(String nodeId) throws NodeNotFoundException;
 
     void resetNode(String nodeId) throws NodeNotFoundException;
+
+    void stopNode(String nodeId) throws NodeNotFoundException;
+
+    void startNode(String nodeId) throws NodeNotFoundException;
 }

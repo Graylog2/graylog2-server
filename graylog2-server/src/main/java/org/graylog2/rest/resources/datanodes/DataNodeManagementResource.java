@@ -38,6 +38,8 @@ import javax.ws.rs.core.MediaType;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_REMOVE;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_RESET;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_START;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -74,6 +76,32 @@ public class DataNodeManagementResource extends RestResource {
     public void resetNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
             dataNodeService.resetNode(nodeId);
+        } catch (NodeNotFoundException e) {
+            throw new NotFoundException("Node " + nodeId + " not found");
+        }
+    }
+
+    @POST
+    @Path("{nodeId}/stop")
+    @ApiOperation("Stop the OpenSearch process of a data node")
+    @AuditEvent(type = DATANODE_STOP)
+    @RequiresPermissions(RestPermissions.DATANODE_STOP)
+    public void stopNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        try {
+            dataNodeService.stopNode(nodeId);
+        } catch (NodeNotFoundException e) {
+            throw new NotFoundException("Node " + nodeId + " not found");
+        }
+    }
+
+    @POST
+    @Path("{nodeId}/start")
+    @ApiOperation("Start the OpenSearch process of a data node")
+    @AuditEvent(type = DATANODE_START)
+    @RequiresPermissions(RestPermissions.DATANODE_START)
+    public void startNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        try {
+            dataNodeService.startNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }

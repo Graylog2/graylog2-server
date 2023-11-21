@@ -89,6 +89,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             switch (event.trigger()) {
                 case REMOVE -> process.onRemove();
                 case RESET -> process.onReset();
+                case STOP -> this.shutDown();
+                case START -> this.startUp();
             }
         }
     }

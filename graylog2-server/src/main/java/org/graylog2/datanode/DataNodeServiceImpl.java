@@ -52,4 +52,18 @@ public class DataNodeServiceImpl implements DataNodeService {
         clusterEventBus.post(e);
     }
 
+    @Override
+    public void stopNode(String nodeId) throws NodeNotFoundException {
+        final Node node = nodeService.byNodeId(nodeId);
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.STOP);
+        clusterEventBus.post(e);
+    }
+
+    @Override
+    public void startNode(String nodeId) throws NodeNotFoundException {
+        final Node node = nodeService.byNodeId(nodeId);
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.START);
+        clusterEventBus.post(e);
+    }
+
 }
