@@ -3361,9 +3361,9 @@
     react-select "*"
 
 "@types/react-slider@^1.3.1":
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/@types/react-slider/-/react-slider-1.3.4.tgz#acba82354b62195d73d21499ae734e7adc48f4d1"
-  integrity sha512-r744XX7HAnsDXH8wfSBTBWC0I4v5laRJOTRwDF2JbSWIvfxhh5psGJa2cl9gOEisJoTlCcHJw6/C7GNDYwX7Xw==
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/@types/react-slider/-/react-slider-1.3.5.tgz#d13142fd2f491661004f875de413e1c4d27aa532"
+  integrity sha512-Hhp+YTvc1bALrow07DkpahC4KqlCwKem2/5MsP6AXoPBHBzfRB6OIv+Kr4DFqeP1onmUfdrN04DbyI9/QU6X1A==
   dependencies:
     "@types/react" "*"
 
