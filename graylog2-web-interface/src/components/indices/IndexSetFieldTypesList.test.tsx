@@ -225,7 +225,6 @@ describe('IndexSetFieldTypesList', () => {
     });
   });
 
-
   it('Runs setEditingField with correct params', async () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
