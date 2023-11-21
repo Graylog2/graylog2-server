@@ -27,8 +27,6 @@ import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
@@ -41,6 +39,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
 
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfigEntity.TYPE_NAME)
@@ -129,8 +130,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                                                Map<EntityDescriptor, Object> nativeEntities) {
         final ImmutableSet<String> streamSet = ImmutableSet.copyOf(
                 streams().stream()
-                        .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
-                        .map(nativeEntities::get)
+                        .map(id -> resolveStreamEntityObject(id, nativeEntities))
                         .map(object -> {
                             if (object == null) {
                                 throw new ContentPackException("Missing Stream for event definition");
@@ -162,9 +162,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                                        Map<EntityDescriptor, Entity> entities,
                                        MutableGraph<Entity> graph) {
         streams().stream()
-                .map(ModelId::of)
-                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM_V1))
-                .map(entities::get)
+                .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> graph.putEdge(entity, stream));
     }
