@@ -37,6 +37,7 @@ import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
+import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
@@ -126,8 +127,18 @@ public class HTTPEventNotification implements EventNotification {
 
         if (!Strings.isNullOrEmpty(config.apiKey())) {
             final String apiKeyValue = getApiKeyValue(config);
-            HttpUrl urlWithApiKey = httpUrl.newBuilder().addQueryParameter(config.apiKey(), apiKeyValue).build();
-            builder.url(urlWithApiKey);
+            if (apiKeyValue == null) {
+                // Invalid state, should never happen
+                throw new PermanentEventNotificationException(
+                        StringUtils.f("HTTP Notification '%s' cannot have empty API Key Value with API Key set", ctx.notificationId()));
+            }
+            if (config.apiKeyAsHeader()) {
+                builder.url(httpUrl);
+                builder.addHeader(config.apiKey(), apiKeyValue);
+            } else {
+                HttpUrl urlWithApiKey = httpUrl.newBuilder().addQueryParameter(config.apiKey(), apiKeyValue).build();
+                builder.url(urlWithApiKey);
+            }
         }
         else {
             builder.url(httpUrl);
