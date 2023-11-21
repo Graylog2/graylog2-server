@@ -48,4 +48,5 @@ public class StatusController {
                 new StatusResponse(datanodeConfiguration.opensearchDistributionProvider().get().version(), openSearch.processInfo())
         );
     }
+
 }

@@ -93,7 +93,7 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
 
         final Request.Builder builder = new Request.Builder();
         addAuthHeader(builder, config.basicAuth());
-        addApiKey(builder, httpUrl, config.apiKey(), config.apiSecret());
+        addApiKey(builder, httpUrl, config.apiKey(), config.apiSecret(), config.apiKeyAsHeader());
 
         final byte[] body;
         try {

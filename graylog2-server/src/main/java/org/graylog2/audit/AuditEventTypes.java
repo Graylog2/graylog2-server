@@ -52,6 +52,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DASHBOARD_WIDGET_POSITIONS_UPDATE = PREFIX + "dashboard_widget_positions:update";
     public static final String DASHBOARD_WIDGET_UPDATE = PREFIX + "dashboard_widget:update";
     public static final String DATANODE_API_REQUEST = PREFIX + "data_node:api_request";
+    public static final String DATANODE_REMOVE = PREFIX + "data_node:remove";
+    public static final String DATANODE_RESET = PREFIX + "data_node:reset";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
@@ -186,6 +188,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DASHBOARD_WIDGET_DELETE)
             .add(DASHBOARD_WIDGET_POSITIONS_UPDATE)
             .add(DASHBOARD_WIDGET_UPDATE)
+            .add(DATANODE_API_REQUEST)
+            .add(DATANODE_REMOVE)
+            .add(DATANODE_RESET)
             .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
