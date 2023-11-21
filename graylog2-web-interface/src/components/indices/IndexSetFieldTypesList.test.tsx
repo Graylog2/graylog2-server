@@ -71,10 +71,12 @@ const getData = (list = [{
     attributes,
   }
 );
+
+const mockedSetEditingField = jest.fn();
 const renderIndexSetFieldTypesList = () => render(
   <QueryParamProvider adapter={ReactRouter6Adapter}>
     <TestStoreProvider>
-      <IndexSetFieldTypesList />
+      <IndexSetFieldTypesList editingField={undefined} setEditingField={mockedSetEditingField} />
     </TestStoreProvider>,
   </QueryParamProvider>,
 );
@@ -205,13 +207,20 @@ describe('IndexSetFieldTypesList', () => {
     });
   });
 
-  it('Shows modal on action click', async () => {
+  it('Runs setEditingField with correct params', async () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
       data: getData([{
         id: 'field',
         fieldName: 'field',
+        type: 'bool',
+        isCustom: true,
+        isReserved: false,
+      },
+      {
+        id: 'field-2',
+        fieldName: 'field-2',
         type: 'bool',
         isCustom: true,
         isReserved: false,
@@ -222,10 +231,7 @@ describe('IndexSetFieldTypesList', () => {
     const tableRow = await screen.findByTestId('table-row-field');
     const editButton = await within(tableRow).findByText('Edit');
     fireEvent.click(editButton);
-    await screen.findByText(/change field field type/i);
-    const modal = await screen.findByTestId('modal-form');
-    await within(modal).findByText('Boolean');
 
-    expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
+    expect(mockedSetEditingField).toHaveBeenCalledWith({ fieldName: 'field', type: 'bool', showFiledInput: false });
   });
 });

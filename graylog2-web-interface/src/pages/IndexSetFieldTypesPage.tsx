@@ -68,7 +68,7 @@ const IndexSetFieldTypesPage = () => {
                         <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}>
                           <Button bsStyle="info">Index set overview</Button>
                         </LinkContainer>
-                        <Button bsStyle="info" onClick={onAddCustomFieldClick}>Add custom filed type</Button>
+                        <Button bsStyle="success" onClick={onAddCustomFieldClick}>Change filed type</Button>
                       </>
                     )}>
           <span>

@@ -144,7 +144,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
-        <StyledLabel>{`Select Field Type For ${field}`}</StyledLabel>
+        <StyledLabel>{`Select Field Type For ${field ?? ''}`}</StyledLabel>
         <Input id="field_type">
           <StyledSelect inputId="field_type"
                         options={fieldTypeOptions}
