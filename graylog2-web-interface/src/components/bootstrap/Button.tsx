@@ -37,6 +37,7 @@ export type StyleProps = ColorVariant | 'link';
 
 const styleProps = (style: StyleProps) => {
   switch (style) {
+    case 'default': return { color: 'gray.6' };
     case 'link': return { variant: 'subtle' };
     default: return { color: style };
   }
@@ -66,7 +67,7 @@ type Props = React.PropsWithChildren<{
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
-    active, bsStyle, bsSize, className, id, onClick, disabled, title, form,
+    bsStyle, bsSize, className, id, onClick, disabled, title, form,
     type, role, name, tabIndex, children,
   }, ref) => (
     <StyledButton ref={ref}
