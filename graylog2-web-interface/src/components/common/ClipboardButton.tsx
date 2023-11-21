@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { CopyButton } from '@mantine/core';
+import { CopyButton, Tooltip } from '@mantine/core';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
@@ -38,20 +38,31 @@ type Props = {
   title: React.ReactNode,
 }
 
-const ClipboardButton = ({ bsSize, bsStyle, buttonTitle, className, disabled, onSuccess, text, title }: Props) => (
-  <CopyButton value={text} timeout={2000}>
-    {({ copied, copy }) => (
-      <Button bsSize={bsSize}
-              bsStyle={bsStyle}
-              className={className}
-              disabled={disabled}
-              title={buttonTitle}
-              onClick={() => { copy(); onSuccess?.(); }}>
-        {copied ? 'Copied!' : title}
-      </Button>
-    )}
-  </CopyButton>
-);
+const ClipboardButton = ({ bsSize, bsStyle, buttonTitle, className, disabled, onSuccess, text, title }: Props) => {
+  const button = (copy: () => void) => (
+    <Button bsSize={bsSize}
+            bsStyle={bsStyle}
+            className={className}
+            disabled={disabled}
+            title={buttonTitle}
+            onClick={() => {
+              copy();
+              onSuccess?.();
+            }}>
+      {title}
+    </Button>
+  );
+
+  return (
+    <CopyButton value={text} timeout={2000}>
+      {({ copied, copy }) => (copied ? (
+        <Tooltip label="Copied!" withArrow position="top" opened>
+          {button(copy)}
+        </Tooltip>
+      ) : button(copy))}
+    </CopyButton>
+  );
+};
 
 ClipboardButton.defaultProps = {
   bsSize: undefined,
