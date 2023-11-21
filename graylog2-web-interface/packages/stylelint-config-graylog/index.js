@@ -28,6 +28,7 @@ module.exports = {
     'function-name-case': null,
     'function-whitespace-after': null,
     'max-empty-lines': 2,
+    'media-query-no-invalid': null,
     'no-descending-specificity': null,
     'no-empty-first-line': null,
     'no-empty-source': null,
