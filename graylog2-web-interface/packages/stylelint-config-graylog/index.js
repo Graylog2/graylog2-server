@@ -27,7 +27,6 @@ module.exports = {
     'declaration-empty-line-before': null,
     'function-name-case': null,
     'function-whitespace-after': null,
-    indentation: null,
     'max-empty-lines': 2,
     'no-descending-specificity': null,
     'no-empty-first-line': null,
