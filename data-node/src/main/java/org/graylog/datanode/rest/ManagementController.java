@@ -51,14 +51,14 @@ public class ManagementController {
 
     @POST
     @Path("/start")
-//    @OnlyInSecuredNode
+    @OnlyInSecuredNode
     public void start() {
         postEvent(DataNodeLifecycleTrigger.START);
     }
 
     @POST
     @Path("/stop")
-//    @OnlyInSecuredNode
+    @OnlyInSecuredNode
     public void stop() {
         postEvent(DataNodeLifecycleTrigger.STOP);
     }
