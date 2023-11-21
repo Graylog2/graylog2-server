@@ -72,53 +72,85 @@ export type WidgetPositions = { [widgetId: string]: WidgetPosition };
 
 export interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetConfig> {
   children: React.ReactNode,
+
   config: Config,
+
   editing: boolean;
+
   id: string;
+
   type: string;
+
   fields: Immutable.List<FieldTypeMapping>,
+
   onChange: (newConfig: Config) => void,
+
   onSubmit: () => void,
+
   onCancel: () => void,
 }
 
 export interface WidgetResults {
- [key: string]: Result,
+  [key: string]: Result,
 }
 
 export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Results = WidgetResults> {
   config: Config;
+
   data: Results;
+
   editing: boolean;
+
   fields: Immutable.List<FieldTypeMapping>;
+
   filter: string;
+
   queryId: string;
+
   onConfigChange: (newConfig: Config) => Promise<void>;
+
   setLoadingState: (loading: boolean) => void;
+
   title: string;
+
   toggleEdit: () => void;
+
   type: string;
+
   id: string;
 }
 
 export interface WidgetExport {
   type: string;
+
   displayName?: string;
+
   defaultHeight?: number;
+
   defaultWidth?: number;
+
   visualizationComponent: React.ComponentType<WidgetComponentProps<any, any>>;
+
   editComponent: React.ComponentType<EditWidgetComponentProps<any>>;
+
   hasEditSubmitButton?: boolean,
+
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
+
   searchResultTransformer?: (data: Array<unknown>) => unknown;
+
   searchTypes: (widget: Widget) => Array<any>;
+
   titleGenerator?: (widget: { config: Widget['config'] }) => string;
+
   reportStyle?: () => { width: React.CSSProperties['width'] };
+
   exportComponent?: React.ComponentType<{ widget: Widget }>;
 }
 
 export interface VisualizationConfigProps {
   config: WidgetConfig;
+
   onChange: (newConfig: WidgetConfig) => void;
 }
 
@@ -163,10 +195,15 @@ export type VisualizationCapability = keyof VisualizationCapabilities;
 
 export interface VisualizationType<Type extends string, ConfigType extends VisualizationConfig = VisualizationConfig, ConfigFormValuesType extends VisualizationConfigFormValues = VisualizationConfigFormValues> {
   type: string;
+
   displayName: string;
+
   component: VisualizationComponent<Type>;
+
   config?: VisualizationConfigDefinition<ConfigType, ConfigFormValuesType>;
+
   capabilities?: Array<VisualizationCapability>;
+
   validate?: (formValues: WidgetConfigFormValues) => FormikErrors<VisualizationFormValues>;
 }
 
@@ -176,25 +213,35 @@ interface ResultHandler<T, R> {
 
 interface SearchType<T, R> {
   type: string;
+
   handler: ResultHandler<T, R>;
+
   defaults: {};
 }
 
 interface ExportFormat {
   type: string;
+
   displayName: () => string;
+
   disabled?: () => boolean;
+
   mimeType: string;
+
   fileExtension: string;
 }
 
 export interface SystemConfigurationComponentProps {
   config: any,
+
   updateConfig: (newConfig: any) => any,
 }
 
 export interface SystemConfiguration {
   configType: string;
+
+  displayName?: string;
+
   component: React.ComponentType<SystemConfigurationComponentProps>;
 }
 
@@ -211,18 +258,27 @@ export type MessageResult = {
 
 export interface SearchTypeResultTypes {
   generic: SearchTypeResult,
+
   messages: MessageResult,
 }
 
 export interface ActionContexts {
   view: View,
+
   analysisDisabledFields: Array<string>,
+
   currentUser: User,
+
   widget: Widget,
+
   message: Message,
+
   valuePath: ValuePath,
+
   isLocalNode: boolean,
+
   parameters?: Immutable.Set<Parameter>,
+
   parameterBindings?: ParameterBindings,
 }
 
@@ -238,10 +294,10 @@ export type MessagePreviewOption = {
 }
 
 type ExternalActionsHookData = {
-      error: Error | null;
-      externalValueActions: Array<ActionDefinition> | null;
-      isLoading: boolean;
-      isError: boolean
+  error: Error | null;
+  externalValueActions: Array<ActionDefinition> | null;
+  isLoading: boolean;
+  isError: boolean
 }
 
 type MessageAugmentation = {
@@ -298,30 +354,43 @@ type RemovingWidgetHook = (widgetId: string, dashboardId: string) => boolean;
 
 interface MessageRowOverrideProps {
   messageFields: Message['fields'],
+
   config: MessagesWidgetConfig,
+
   renderMessageRow: () => React.ReactNode,
 }
 
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride,
+
   streams?: Array<string>,
+
   queryString?: string,
 }
 
 export interface HandlerContext {
   view: View;
+
   executionState: SearchExecutionState;
 }
 
 export interface SearchBarControl {
   component: React.ComponentType;
+
   id: string;
+
   onSearchSubmit?: <T extends Query | undefined>(values: CombinedSearchBarFormValues, dispatch: AppDispatch, currentQuery?: T) => Promise<T>,
+
   onDashboardWidgetSubmit: (values: CombinedSearchBarFormValues, dispatch: AppDispatch, currentWidget: Widget) => Promise<Widget | void>,
+
   onValidate?: (values: CombinedSearchBarFormValues, context: HandlerContext) => FormikErrors<{}>,
+
   placement: 'left' | 'right';
+
   useInitialSearchValues?: (currentQuery?: Query) => ({ [key: string]: any }),
+
   useInitialDashboardWidgetValues?: (currentWidget: Widget) => ({ [key: string]: any }),
+
   validationPayload?: (values: CombinedSearchBarFormValues, context: HandlerContext) => ({ [key: string]: any }),
 }
 
@@ -351,8 +420,11 @@ export type CustomCommandContextProvider<T extends keyof CustomCommandContext> =
 
 export interface ViewState {
   activeQuery: QueryId;
+
   view: View;
+
   isDirty: boolean;
+
   isNew: boolean;
 }
 
@@ -363,21 +435,28 @@ export type SearchExecutionResult = {
 
 export interface SearchExecution {
   executionState: SearchExecutionState;
+
   result: SearchExecutionResult;
+
   isLoading: boolean;
+
   widgetsToSearch: Array<string>,
 }
 
 export interface SearchMetadataState {
   isLoading: boolean;
+
   metadata: SearchMetadata;
 }
 
 export interface RootState {
   view: ViewState;
+
   searchExecution: SearchExecution;
+
   searchMetadata: SearchMetadataState;
-  undoRedo: UndoRedoState
+
+  undoRedo: UndoRedoState;
 }
 
 export type GetState = () => RootState;
@@ -392,76 +471,124 @@ export type Widgets = Immutable.OrderedMap<string, Widget>;
 export interface WidgetCreatorArgs {
   view: View;
 }
+
 export interface WidgetCreator {
   title: string;
+
   func: (args: WidgetCreatorArgs) => Widget;
+
   icon: React.ComponentType<{}>,
 }
 
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
+
     enterpriseWidgets?: Array<WidgetExport>;
+
     useExternalActions?: Array<() => ExternalActionsHookData>,
+
     fieldActions?: Array<ActionDefinition>;
+
     messageAugmentations?: Array<MessageAugmentation>;
+
     searchTypes?: Array<SearchType<any, any>>;
+
     systemConfigurations?: Array<SystemConfiguration>;
+
     valueActions?: Array<ActionDefinition>;
+
     'views.completers'?: Array<Completer>;
+
     'views.components.assetInformationActions'?: Array<AssetInformation>;
+
     'views.components.dashboardActions'?: Array<DashboardAction>;
+
     'views.components.eventActions'?: Array<{
       component: React.ComponentType<EventActionComponentProps>,
       key: string,
     }>;
+
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
+
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
+
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<MessageDetailContextProviderProps>>>;
+
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
+
     'views.components.widgets.messageTable.messageActions'?: Array<{
       component: React.ComponentType<MessageActionComponentProps>,
       key: string,
     }>;
+
     'views.components.searchActions'?: Array<{
       component: React.ComponentType<SearchActionComponentProps>,
       key: string,
     }>;
+
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
+
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
+
     'views.elements.header'?: Array<React.ComponentType>;
+
     'views.elements.queryBar'?: Array<React.ComponentType>;
+
     'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
+
     'views.export.formats'?: Array<ExportFormat>;
+
     'views.hooks.confirmDeletingDashboard'?: Array<(view: View) => Promise<boolean | null>>,
-    'views.hooks.confirmDeletingDashboardPage'?: Array<(dashboardId: string, queryId: string, widgetIds: { [queryId: string]: Array<string> }) => Promise<boolean | null>>,
+
+    'views.hooks.confirmDeletingDashboardPage'?: Array<(dashboardId: string, queryId: string, widgetIds: {
+      [queryId: string]: Array<string>
+    }) => Promise<boolean | null>>,
+
     'views.hooks.confirmDeletingWidget'?: Array<(widget: Widget, view: View, title: string) => Promise<boolean | null>>,
+
     'views.hooks.executingView'?: Array<ViewHook>;
+
     'views.hooks.loadingView'?: Array<ViewHook>;
+
     'views.hooks.copyWidgetToDashboard'?: Array<CopyParamsToView>;
+
     'views.hooks.copyPageToDashboard'?: Array<CopyParamsToView>;
+
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
+
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
+
     'views.widgets.actions'?: Array<WidgetActionType>;
+
     'views.reducers'?: Array<ViewsReducer>;
+
     'views.requires.provided'?: Array<string>;
+
     'views.queryInput.commands'?: Array<CustomCommand>;
+
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,
+
     visualizationTypes?: Array<VisualizationType<any>>;
+
     widgetCreators?: Array<WidgetCreator>;
   }
 }
+
 export interface ViewActions {
   save: {
     isShown: boolean,
   };
+
   saveAs: {
     isShown: boolean,
   };
+
   share: {
     isShown: boolean,
-  }
+  };
+
   actionsDropdown: {
     isShown: boolean,
-  }
+  };
 }
