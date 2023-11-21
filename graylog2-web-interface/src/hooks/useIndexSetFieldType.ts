@@ -44,9 +44,9 @@ export type IndexSetFieldType = {
 }
 
 const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams) => {
-  const indexSetFiledTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
+  const indexSetFieldTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
   const url = PaginationURL(
-    indexSetFiledTypeUrl,
+    indexSetFieldTypeUrl,
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,

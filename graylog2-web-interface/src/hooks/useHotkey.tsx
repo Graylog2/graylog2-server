@@ -27,13 +27,15 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+export const DEFAULT_SPLIT_KEY = ',';
+export const DEFAULT_COMBINATION_KEY = '+';
 const defaultOptions: ReactHotKeysHookOptions & Options = {
   preventDefault: true,
   enabled: true,
   enableOnFormTags: false,
   enableOnContentEditable: false,
-  combinationKey: '+',
-  splitKey: ',',
+  combinationKey: DEFAULT_COMBINATION_KEY,
+  splitKey: DEFAULT_SPLIT_KEY,
   keyup: undefined,
   keydown: true,
   description: undefined,

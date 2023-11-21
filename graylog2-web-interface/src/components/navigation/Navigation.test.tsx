@@ -32,6 +32,7 @@ import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
 import PerspectivesBindings from 'components/perspectives/bindings';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
+import HotkeysProvider from 'contexts/HotkeysProvider';
 
 jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
@@ -42,6 +43,7 @@ jest.mock('components/navigation/NotificationBadge', () => mockComponent('Notifi
 jest.mock('hooks/useCurrentUser');
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
 jest.mock('routing/withLocation', () => (x) => x);
+jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -59,7 +61,7 @@ jest.mock('util/AppConfig', () => ({
 }));
 
 describe('Navigation', () => {
-  const SUT = () => <PerspectivesProvider><Navigation /></PerspectivesProvider>;
+  const SUT = () => <HotkeysProvider><PerspectivesProvider><Navigation /></PerspectivesProvider></HotkeysProvider>;
 
   const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
@@ -235,18 +237,20 @@ describe('Navigation', () => {
       asMock(useLocation).mockReturnValue({ pathname: '/somethingelse' } as Location);
 
       const wrapper = mountUnwrapped((
-        <DefaultProviders>
-          <PerspectivesProvider>
-            <MemoryRouter initialEntries={['/somethingelse']}>
-              <Routes>
-                <Route path="/somethingelse"
-                       element={(
-                         <Navigation />
+        <HotkeysProvider>
+          <DefaultProviders>
+            <PerspectivesProvider>
+              <MemoryRouter initialEntries={['/somethingelse']}>
+                <Routes>
+                  <Route path="/somethingelse"
+                         element={(
+                           <Navigation />
                      )} />
-              </Routes>
-            </MemoryRouter>
-          </PerspectivesProvider>
-        </DefaultProviders>
+                </Routes>
+              </MemoryRouter>
+            </PerspectivesProvider>
+          </DefaultProviders>
+        </HotkeysProvider>
       ));
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff / Something Else"]')).toExist();

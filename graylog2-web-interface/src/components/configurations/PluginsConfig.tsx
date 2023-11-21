@@ -30,6 +30,7 @@ import { Col, Nav, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
+import type { SelectCallback } from 'components/bootstrap/types';
 
 const pluginDisplayNames = [
   {
@@ -106,7 +107,7 @@ const PluginsConfig = () => {
         <Nav bsStyle="pills"
              stacked
              activeKey={activeSectionKey}
-             onSelect={setActiveSectionKey}>
+             onSelect={setActiveSectionKey as SelectCallback}>
           {pluginSystemConfigs.map(({ configType }) => {
             const obj = pluginDisplayNames.find((entry) => entry.configType === configType);
             const displayName = obj?.displayName ?? configType;

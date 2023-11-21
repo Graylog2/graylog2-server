@@ -120,14 +120,14 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation',
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 describe('ChangeFieldTypeModal', () => {
-  const putFiledTypeMutationMock = jest.fn(() => Promise.resolve());
+  const putFieldTypeMutationMock = jest.fn(() => Promise.resolve());
 
   beforeAll(loadViewsPlugin);
 
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFiledTypeMutation: putFiledTypeMutationMock });
+    asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFieldTypeMutation: putFieldTypeMutationMock });
     asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
 
     asMock(useUserLayoutPreferences).mockReturnValue({
@@ -169,7 +169,7 @@ describe('ChangeFieldTypeModal', () => {
     await screen.findByText('Number(int)');
   });
 
-  it('run putFiledTypeMutationMock with selected type and indexes', async () => {
+  it('run putFieldTypeMutationMock with selected type and indexes', async () => {
     renderChangeFieldTypeModal({});
 
     const typeSelect = await screen.findByLabelText(/select field type for field/i);
@@ -182,7 +182,7 @@ describe('ChangeFieldTypeModal', () => {
     fireEvent.click(rowCheckboxes[1]);
     fireEvent.click(submit);
 
-    await waitFor(() => expect(putFiledTypeMutationMock).toHaveBeenCalledWith({
+    await waitFor(() => expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
       indexSetSelection: ['id-1'],
       newFieldType: 'int',
       rotated: true,
@@ -190,7 +190,7 @@ describe('ChangeFieldTypeModal', () => {
     }));
   });
 
-  it('run putFiledTypeMutationMock with selected type and indexes when showSelectionTable false', async () => {
+  it('run putFieldTypeMutationMock with selected type and indexes when showSelectionTable false', async () => {
     renderChangeFieldTypeModal({ initialSelectedIndexSets: ['id-2'] });
 
     const typeSelect = await screen.findByLabelText(/select field type for field/i);
@@ -201,7 +201,7 @@ describe('ChangeFieldTypeModal', () => {
 
     fireEvent.click(submit);
 
-    await waitFor(() => expect(putFiledTypeMutationMock).toHaveBeenCalledWith({
+    await waitFor(() => expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
       indexSetSelection: ['id-2'],
       newFieldType: 'int',
       rotated: true,
