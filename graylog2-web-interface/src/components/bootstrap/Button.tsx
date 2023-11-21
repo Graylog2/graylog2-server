@@ -51,6 +51,7 @@ const StyledButton = styled(MantineButton)`
 
 type Props = React.PropsWithChildren<{
   active?: boolean,
+  'aria-label'?: string,
   bsStyle?: StyleProps,
   bsSize?: BsSize,
   className?: string,
@@ -68,12 +69,13 @@ type Props = React.PropsWithChildren<{
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
-    bsStyle, bsSize, className, id, onClick, disabled, href, title, form,
+    'aria-label': ariaLabel, bsStyle, bsSize, className, id, onClick, disabled, href, title, form,
     type, role, name, tabIndex, children,
   }, ref) => {
     const button = (
       <StyledButton ref={ref}
                     id={id}
+                    aria-label={ariaLabel}
                     className={className}
                     {...styleProps(bsStyle)}
                     disabled={disabled}
@@ -93,11 +95,13 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
 Button.defaultProps = {
   active: undefined,
+  'aria-label': undefined,
   bsStyle: 'default',
   bsSize: undefined,
   className: undefined,
   disabled: false,
   form: undefined,
+  href: undefined,
   id: undefined,
   name: undefined,
   onClick: undefined,
