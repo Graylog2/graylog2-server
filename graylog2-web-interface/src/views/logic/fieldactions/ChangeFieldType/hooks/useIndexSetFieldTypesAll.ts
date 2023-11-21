@@ -21,7 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { IndexSetFieldTypeJson } from 'hooks/useIndexSetFieldType';
 
-export type FieldOptions = Array<{ value: string, label: string }>;
+export type FieldOptions = Array<{ value: string, label: string, disabled: boolean }>;
 export type CurrentTypes = Record<string, string>;
 const INITIAL_DATA = {
   options: [],
@@ -37,6 +37,7 @@ const fetchIndexSetFieldTypesAll = async (indexSetId: string) => {
       options: elements.map((fieldType: IndexSetFieldTypeJson) => ({
         value: fieldType.field_name,
         label: fieldType.field_name,
+        disabled: fieldType.is_reserved === true,
       })),
     }));
 };
