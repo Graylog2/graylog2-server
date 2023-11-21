@@ -32,7 +32,6 @@ type Props = {
   buttonTitle?: string,
   className?: string,
   disabled?: boolean,
-  fixedWidth?: boolean,
   onSuccess?: () => void,
   text: string,
   title: React.ReactNode,
@@ -70,7 +69,6 @@ ClipboardButton.defaultProps = {
   buttonTitle: undefined,
   className: undefined,
   disabled: undefined,
-  fixedWidth: undefined,
   onSuccess: undefined,
 };
 
