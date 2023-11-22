@@ -20,7 +20,7 @@ import org.graylog.testing.completebackend.SearchServerBuilder;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
 
-public class OpenSearch13InstanceBuilder  extends SearchServerBuilder {
+public class OpenSearch13InstanceBuilder extends SearchServerBuilder {
     public OpenSearch13InstanceBuilder(SearchVersion version) {
         super(version);
     }
@@ -28,5 +28,10 @@ public class OpenSearch13InstanceBuilder  extends SearchServerBuilder {
     @Override
     protected SearchServerInstance instantiate() {
         return new OpenSearch13Instance(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags()).init();
+    }
+
+    @Override
+    protected SearchServerInstance create() {
+        return new OpenSearch13Instance(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags());
     }
 }

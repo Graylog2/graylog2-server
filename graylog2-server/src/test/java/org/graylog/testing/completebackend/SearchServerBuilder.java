@@ -18,7 +18,6 @@ package org.graylog.testing.completebackend;
 
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.util.ArrayList;
@@ -108,7 +107,10 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
 
     protected abstract T instantiate();
 
+    protected abstract T create();
+
     public T build() {
-        return instantiate();
+        return create();
+        //return instantiate();
     }
 }

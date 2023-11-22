@@ -142,7 +142,8 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         return this.container.getHost() + ":" + this.container.getMappedPort(9200);
     }
 
-    public TestableSearchServerInstance init() {
+    @Override
+    public SearchServerInstance init() {
         createContainer();
         return this;
     }

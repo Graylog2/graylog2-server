@@ -34,4 +34,9 @@ public class OpenSearchInstanceBuilder extends SearchServerBuilder<OpenSearchIns
     protected OpenSearchInstance instantiate() {
         return new OpenSearchInstance(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags()).init();
     }
+
+    @Override
+    protected OpenSearchInstance create() {
+        return new OpenSearchInstance(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags());
+    }
 }

@@ -342,4 +342,15 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                 .map(HealthStatus::fromString)
                 .min(HealthStatus::compareTo);
     }
+
+    @Override
+    public boolean wipeCluster() {
+        final Request deleteAllIndices = new Request("DELETE", "/_all");
+        var response = jsonApi.perform(deleteAllIndices, "No response for DELETE");
+
+        final Request deleteAllIndexTemplates = new Request("DELETE", "/_template/*"); // TODO might not work
+        response = jsonApi.perform(deleteAllIndices, "No response for DELETE");
+
+        return true;
+    }
 }

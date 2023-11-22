@@ -61,4 +61,6 @@ public interface ClusterAdapter {
     ShardStats shardStats();
 
     Optional<HealthStatus> deflectorHealth(Collection<String> indices);
+
+    boolean wipeCluster();
 }

@@ -42,6 +42,8 @@ public interface SearchServerInstance extends Closeable {
 
     String getHttpHostAddress();
 
+    SearchServerInstance init();
+
     void cleanUp();
 
     @Override

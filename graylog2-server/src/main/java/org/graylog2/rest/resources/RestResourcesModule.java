@@ -66,6 +66,7 @@ import org.graylog2.rest.resources.system.SystemProcessingResource;
 import org.graylog2.rest.resources.system.SystemShutdownResource;
 import org.graylog2.rest.resources.system.TrafficResource;
 import org.graylog2.rest.resources.system.UrlWhitelistResource;
+import org.graylog2.rest.resources.system.WipeOutResource;
 import org.graylog2.rest.resources.system.contentpacks.CatalogResource;
 import org.graylog2.rest.resources.system.contentpacks.ContentPackResource;
 import org.graylog2.rest.resources.system.debug.DebugEventsResource;
@@ -148,10 +149,11 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(ContentStreamResource.class);
         addSystemRestResource(CertificateRenewalResource.class);
         addSystemRestResource(DataNodeApiProxyResource.class);
+        addSystemRestResource(WipeOutResource.class);
     }
 
     private void addDebugResources() {
-        if(Boolean.parseBoolean(System.getenv("GRAYLOG_ENABLE_DEBUG_RESOURCES"))) {
+        if (Boolean.parseBoolean(System.getenv("GRAYLOG_ENABLE_DEBUG_RESOURCES"))) {
             // TODO: move the DebugEventsResource under this env property check as well?
             addSystemRestResource(DebugStreamsResource.class);
         }

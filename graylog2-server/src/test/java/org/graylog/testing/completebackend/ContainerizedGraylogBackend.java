@@ -34,6 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
@@ -48,7 +50,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     private MailServerContainer emailServerInstance;
     private NodeInstance node;
 
-    private ContainerizedGraylogBackend() {}
+    private ContainerizedGraylogBackend() {
+    }
 
     public synchronized static ContainerizedGraylogBackend createStarted(final SearchVersion version,
                                                                          final MongodbServer mongodbVersion,
@@ -64,26 +67,33 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     }
 
     private ContainerizedGraylogBackend create(final SearchVersion version,
-                                        final MongodbServer mongodbVersion,
-                                        final int[] extraPorts,
-                                        final List<URL> mongoDBFixtures,
-                                        final PluginJarsProvider pluginJarsProvider,
-                                        final MavenProjectDirProvider mavenProjectDirProvider,
-                                        final List<String> enabledFeatureFlags,
-                                        final boolean preImportLicense,
-                                        final boolean withMailServerEnabled) {
+                                               final MongodbServer mongodbVersion,
+                                               final int[] extraPorts,
+                                               final List<URL> mongoDBFixtures,
+                                               final PluginJarsProvider pluginJarsProvider,
+                                               final MavenProjectDirProvider mavenProjectDirProvider,
+                                               final List<String> enabledFeatureFlags,
+                                               final boolean preImportLicense,
+                                               final boolean withMailServerEnabled) {
         final var network = Network.newNetwork();
         final var builder = SearchServerInstanceProvider.getBuilderFor(version).orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
 
+        LOG.info("Starting mongo");
         MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
+        LOG.info("Done starting mongo");
         if (withMailServerEnabled) {
             this.emailServerInstance = MailServerContainer.createStarted(network);
         }
+        LOG.info("dropping mongo");
         mongoDB.dropDatabase();
+        LOG.info("done dropping mongo");
+        LOG.info("mongo fixtures");
         mongoDB.importFixtures(mongoDBFixtures);
+        LOG.info("done mongo fixtures");
 
         MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
 
+        LOG.info("Starting SearchServerInstance version <{}>", version);
         SearchServerInstance searchServer = builder
                 .network(network)
                 .mongoDbUri(mongoDB.internalUri())
@@ -92,10 +102,20 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                 .featureFlags(enabledFeatureFlags)
                 .build();
 
+        CompletableFuture<Void> searchServerFuture = CompletableFuture.runAsync(searchServer::init);
+        try {
+            searchServerFuture.get();
+            LOG.info("Done Starting SearchServerInstance version <{}>", version);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+
+
         if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
+        LOG.info("Starting Graylog");
         try {
             var nodeContainerConfig = new NodeContainerConfig(network, mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags);
             NodeInstance node = NodeInstance.createStarted(nodeContainerConfig);
@@ -113,12 +133,13 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
             LOG.error("------------------------------ Search Server logs: --------------------------------------\n{}", searchServer.getLogs());
             throw ex;
         }
+        LOG.info("Done Starting Graylog");
         return this;
     }
 
     private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {
         final List<String> licenses = Arrays.stream(licenseStrs).map(System::getenv).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-        if(!licenses.isEmpty()) {
+        if (!licenses.isEmpty()) {
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
             loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
         }
@@ -166,6 +187,10 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public String getSearchLogs() {
         return searchServer.getLogs();
+    }
+
+    public void wipeForNextTest() {
+
     }
 
     @Override

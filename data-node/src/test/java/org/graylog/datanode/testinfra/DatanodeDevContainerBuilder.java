@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.images.PullPolicy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.IOException;
@@ -120,12 +119,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     public GenericContainer<?> build() {
         final Path graylog = getPath().resolve("graylog-datanode-" + getProjectVersion() + ".jar");
-        if(!Files.exists(graylog)) {
+        if (!Files.exists(graylog)) {
             LOG.info("Searching for {} failed.", graylog.toAbsolutePath());
             LOG.info("Project repos path: {}, absolute path: {}", getProjectReposPath(), getProjectReposPath().toAbsolutePath());
-            if(Files.exists(getPath())) {
+            if (Files.exists(getPath())) {
                 LOG.info("contents of base path {}:", getPath());
-                try(var files = Files.list(getPath())) {
+                try (var files = Files.list(getPath())) {
                     files.forEach(file -> LOG.info("{}", file.toString()));
                 } catch (IOException ex) {
                     LOG.info("listing files failed with exception: {}", ex.getMessage());
@@ -135,6 +134,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
             }
             throw new RuntimeException("Failed to link graylog-datanode.jar to the datanode docker image, path " + graylog.toAbsolutePath() + " does not exist! Basepath, it was resolved from is: " + getProjectReposPath());
         }
+        LOG.info("Starting data node with jar <{}>", graylog);
 
         GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
                 .withExposedPorts(restPort, openSearchHttpPort)

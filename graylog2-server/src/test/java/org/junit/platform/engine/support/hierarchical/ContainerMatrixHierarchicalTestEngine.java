@@ -49,7 +49,8 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
             return providerClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
             throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
         }
     }
@@ -72,7 +73,11 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
 
                 if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer)) {
-                        this.execute(request, descriptor.getChildren(), backend);
+                        for (TestDescriptor td : containerMatrixTestsDescriptor.getChildren()) {
+                            //backend.cleanup();
+                            this.execute(request, List.of(td), backend);
+                            LOG.info("Here be a cleanup for {}", td.getDisplayName());
+                        }
                     } catch (Exception exception) {
                         /* Fail hard if the containerized backend failed to start. */
                         LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
@@ -80,6 +85,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
 //                        throw new JUnitException("Error executing tests for engine " + getId(), exception);
                     }
                 } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
+                    LOG.info("execute loop children {}", containerMatrixTestsDescriptor.getChildren());
                     for (TestDescriptor td : containerMatrixTestsDescriptor.getChildren()) {
                         List<URL> fixtures = mongoDBFixtures;
                         boolean preImportLicense = ContainerMatrixTestsConfiguration.defaultImportLicenses;

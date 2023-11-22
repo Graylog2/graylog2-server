@@ -17,16 +17,11 @@
 package org.graylog.testing.graylognode;
 
 import com.google.common.base.Stopwatch;
-import org.graylog.testing.completebackend.MavenProjectDirProvider;
-import org.graylog.testing.completebackend.PluginJarsProvider;
-import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 
 import java.io.Closeable;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
