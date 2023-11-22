@@ -7091,7 +7091,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../Library/Caches/Yarn/v6/npm-eslint-config-graylog-1.3.0-ab9ecc23-fda3-4c1d-824f-f0bbb63db479-1700571374721/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.6.0"
     eslint-plugin-jest-dom "5.1.0"
@@ -8536,13 +8536,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.6"
     "@types/jquery" "3.5.27"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-d55fe2f5-488c-476b-829d-cd67a6825725-1700571374684/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-d55fe2f5-488c-476b-829d-cd67a6825725-1700571374684/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-d55fe2f5-488c-476b-829d-cd67a6825725-1700571374684/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -12355,9 +12355,9 @@ postcss@^8.4.21, postcss@^8.4.28, postcss@^8.4.31:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.92.0"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.92.0.tgz#012a97a32048323385a7b210c20725928df71b61"
-  integrity sha512-87bZ/qwBbIqvkIV4YYn65oIPEsRcWihA3jX7WV33LvZWaU1InlE6cwj95SleIVLiND4Ofm+cKXZeWwcRnrXkKA==
+  version "1.92.1"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.92.1.tgz#2f3c370c649411cd04b90d085435a8f4bd190264"
+  integrity sha512-xtuTfM/acfDauiEfIdKF6d911KUZQ7RLii2COAYEoPWr3cVUFoNUoRQz9QJvgDlV2j22Zwl+mnXacUeua+Yi1A==
   dependencies:
     fflate "^0.4.1"
 
@@ -14610,7 +14610,7 @@ styled-components@6.1.1:
     stylis "^4.3.0"
     tslib "^2.5.0"
 
-"stylelint-config-graylog@file:./packages/stylelint-config-graylog":
+"stylelint-config-graylog@file:packages/stylelint-config-graylog":
   version "1.0.0"
   dependencies:
     postcss-styled-syntax "0.5.0"
