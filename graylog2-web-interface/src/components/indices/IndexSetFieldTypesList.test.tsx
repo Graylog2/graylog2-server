@@ -19,6 +19,8 @@ import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
 import { useQueryParam, QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
+import { MockStore } from 'helpers/mocking';
+import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
 import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -27,7 +29,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import type { Attributes } from 'stores/PaginationTypes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
-import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 
 const attributes: Attributes = [
   {
@@ -79,6 +81,18 @@ const renderIndexSetFieldTypesList = () => render(
   </QueryParamProvider>,
 );
 
+jest.mock('stores/indices/IndexSetsStore', () => ({
+  IndexSetsActions: {
+    list: jest.fn(),
+  },
+  IndexSetsStore: MockStore(['getInitialState', () => ({
+    indexSets: [
+      { id: '111', title: 'index set title' },
+    ],
+  })]),
+}));
+
+jest.mock('routing/useParams', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
 jest.mock('hooks/useIndexSetFieldType', () => jest.fn());
 
@@ -95,6 +109,10 @@ describe('IndexSetFieldTypesList', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
+    asMock(useParams).mockImplementation(() => ({
+      indexSetId: '111',
+    }));
+
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
@@ -106,7 +124,7 @@ describe('IndexSetFieldTypesList', () => {
       isInitialLoading: false,
     });
 
-    asMock(useFiledTypes).mockReturnValue({
+    asMock(useFieldTypes).mockReturnValue({
       data: {
         fieldTypes: {
           string: 'String type',
@@ -205,7 +223,7 @@ describe('IndexSetFieldTypesList', () => {
     });
   });
 
-  it('Shows modal on action click', async () => {
+  it('Shows modal on edit action click', async () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
@@ -227,5 +245,29 @@ describe('IndexSetFieldTypesList', () => {
     await within(modal).findByText('Boolean');
 
     expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
+  });
+
+  it('Shows modal on reset action click', async () => {
+    asMock(useIndexSetFieldTypes).mockReturnValue({
+      isLoading: false,
+      refetch: () => {},
+      data: getData([{
+        id: 'field',
+        fieldName: 'field',
+        type: 'bool',
+        isCustom: true,
+        isReserved: false,
+      }]),
+    });
+
+    renderIndexSetFieldTypesList();
+    const tableRow = await screen.findByTestId('table-row-field');
+    const resetButton = await within(tableRow).findByText('Reset');
+    fireEvent.click(resetButton);
+    await screen.findByText(/remove custom field type/i);
+    const modal = await screen.findByTestId('modal-form');
+    await within(modal).findByText('Rotate affected indices after change');
+
+    expect(modal).toHaveTextContent('After removing the custom field type for field in index set title the settings of your search engine will be used');
   });
 });

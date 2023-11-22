@@ -58,9 +58,7 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
   };
 
   return (
-    <NavDropdown title={<Icon name="user" size="lg" />}
-                 aria-label={`User Menu for ${fullName}`}
-                 noCaret>
+    <NavDropdown title={<Icon name="user" size="lg" title={`User Menu for ${fullName}`} />} noCaret>
       <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
       <Menu.Divider />
       <Menu.Label>
@@ -70,7 +68,7 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
       <LinkContainer to={route}>
         <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <Menu.Item onSelect={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
+      <Menu.Item onClick={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
     </NavDropdown>
   );
 };

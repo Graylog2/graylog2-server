@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = {
-  customSyntax: '@stylelint/postcss-css-in-js',
+  customSyntax: 'postcss-styled-syntax',
   extends: [
     'stylelint-config-standard',
     'stylelint-config-styled-components',

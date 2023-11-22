@@ -65,13 +65,17 @@ public class HTTPNotification {
         }
     }
 
-    public void addApiKey(Request.Builder builder, HttpUrl httpUrl, String apiKey, EncryptedValue apiSecret) {
+    public void addApiKey(Request.Builder builder, HttpUrl httpUrl, String apiKey, EncryptedValue apiSecret, boolean sendAsHeader) {
         // Add API key if it exists
         if (!Strings.isNullOrEmpty(apiKey)) {
             final String apiKeyValue = getApiKeyValue(apiSecret);
-            builder.url(httpUrl.newBuilder().addQueryParameter(apiKey, apiKeyValue).build());
-        }
-        else {
+            if (sendAsHeader) {
+                builder.url(httpUrl);
+                builder.addHeader(apiKey, apiKeyValue);
+            } else {
+                builder.url(httpUrl.newBuilder().addQueryParameter(apiKey, apiKeyValue).build());
+            }
+        } else {
             builder.url(httpUrl);
         }
     }
