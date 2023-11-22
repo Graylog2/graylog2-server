@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import type { Location } from 'react-router-dom';
-import { unstable_useBlocker as useBlocker } from 'react-router-dom';
+import { useBlocker } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
 
 import AppConfig from 'util/AppConfig';
