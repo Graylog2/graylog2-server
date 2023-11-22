@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import selectEvent from 'react-select-event';
 
-import 'helpers/mocking/react-dom_mock';
 import Entity from 'logic/content-packs/Entity';
 import ContentPackApplyParameter from 'components/content-packs/ContentPackApplyParameter';
 
@@ -39,76 +39,86 @@ describe('<ContentPackApplyParameter />', () => {
   const appliedParameter = { configKey: 'configuration.port', paramName: parameter.name };
   const appliedParameterReadOnly = { configKey: 'configuration.port', paramName: parameter.name, readOnly: true };
 
-  it('should render with full props', () => {
-    const wrapper = mount(<ContentPackApplyParameter entity={entity}
-                                                     parameters={[parameter]}
-                                                     appliedParameter={[appliedParameter]} />);
+  it('should render with full props', async () => {
+    render(<ContentPackApplyParameter entity={entity}
+                                      parameters={[parameter]}
+                                      appliedParameter={[appliedParameter]} />);
 
-    expect(wrapper).toExist();
+    await screen.findByLabelText('Parameter');
   });
 
-  it('should render with readOnly', () => {
-    const wrapper = mount(<ContentPackApplyParameter entity={entity}
-                                                     parameters={[parameter]}
-                                                     appliedParameter={[appliedParameterReadOnly]} />);
+  it('should render with readOnly', async () => {
+    render(<ContentPackApplyParameter entity={entity}
+                                      parameters={[parameter]}
+                                      appliedParameter={[appliedParameterReadOnly]} />);
 
-    expect(wrapper).toExist();
+    await screen.findByLabelText('Parameter');
   });
 
-  it('should render with minimal props', () => {
-    const wrapper = mount(<ContentPackApplyParameter entity={entity} />);
+  it('should render with minimal props', async () => {
+    render(<ContentPackApplyParameter entity={entity} />);
 
-    expect(wrapper).toExist();
+    await screen.findByLabelText('Parameter');
   });
 
-  it('should apply a parameter', () => {
-    const applyFn = jest.fn((configKey, paramName) => {
-      expect(configKey).toEqual('configuration.port');
-      expect(paramName).toEqual('PORT');
+  it('should apply a parameter', async () => {
+    const applyFn = jest.fn();
+
+    render(<ContentPackApplyParameter entity={entity}
+                                      parameters={[parameter]}
+                                      appliedParameter={[]}
+                                      onParameterApply={applyFn} />);
+
+    const selectConfigKey = await screen.findByLabelText('Config Key');
+    selectEvent.openMenu(selectConfigKey);
+    selectEvent.select(selectConfigKey, 'configuration.port');
+
+    const selectParameter = await screen.findByLabelText('Parameter');
+    selectEvent.openMenu(selectParameter);
+    selectEvent.select(selectParameter, 'Port (PORT)');
+
+    (await screen.findByRole('button', { name: 'Apply' })).click();
+
+    await waitFor(() => {
+      expect(applyFn).toHaveBeenCalledWith('configuration.port', 'PORT');
     });
-
-    const wrapper = mount(<ContentPackApplyParameter entity={entity}
-                                                     parameters={[parameter]}
-                                                     appliedParameter={[]}
-                                                     onParameterApply={applyFn} />);
-
-    wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
-    wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
-    wrapper.find('form').simulate('submit');
-
-    expect(applyFn.mock.calls.length).toBe(1);
   });
 
-  it('should apply a parameter only once', () => {
-    const applyFn = jest.fn((configKey, paramName) => {
-      expect(configKey).toEqual('configuration.port');
-      expect(paramName).toEqual('PORT');
-    });
+  it('should apply a parameter only once', async () => {
+    const applyFn = jest.fn();
 
-    const wrapper = mount(<ContentPackApplyParameter entity={entity}
-                                                     parameters={[parameter]}
-                                                     appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
-                                                     onParameterApply={applyFn} />);
+    render(<ContentPackApplyParameter entity={entity}
+                                      parameters={[parameter]}
+                                      appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
+                                      onParameterApply={applyFn} />);
 
-    wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
-    wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
-    wrapper.find('form').simulate('submit');
+    const selectConfigKey = await screen.findByLabelText('Config Key');
+    selectEvent.openMenu(selectConfigKey);
+    selectEvent.select(selectConfigKey, 'configuration.port');
 
-    expect(applyFn.mock.calls.length).toBe(0);
+    const selectParameter = await screen.findByLabelText('Parameter');
+    selectEvent.openMenu(selectParameter);
+    selectEvent.select(selectParameter, 'Port (PORT)');
+
+    (await screen.findByRole('button', { name: 'Apply' })).click();
+
+    expect(applyFn).not.toHaveBeenCalled();
   });
 
-  it('should clear a parameter', () => {
+  it('should clear a parameter', async () => {
     const clearFn = jest.fn((configKey) => {
       expect(configKey).toEqual('configuration.port');
     });
 
-    const wrapper = mount(<ContentPackApplyParameter entity={entity}
-                                                     parameters={[parameter]}
-                                                     appliedParameter={[appliedParameter]}
-                                                     onParameterClear={clearFn} />);
+    render(<ContentPackApplyParameter entity={entity}
+                                      parameters={[parameter]}
+                                      appliedParameter={[appliedParameter]}
+                                      onParameterClear={clearFn} />);
 
-    wrapper.find('button[children="Clear"]').simulate('click');
+    (await screen.findByRole('button', { name: 'Clear' })).click();
 
-    expect(clearFn.mock.calls.length).toBe(1);
+    await waitFor(() => {
+      expect(clearFn).toHaveBeenCalledWith('configuration.port');
+    });
   });
 });
