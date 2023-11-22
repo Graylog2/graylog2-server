@@ -78,7 +78,7 @@ describe('RuleForm', () => {
       end`,
     };
 
-    const setRawMessage = jest.fn();
+    const _setRawMessage = jest.fn();
     const ruleInput = 'new_test';
 
     const PipelineRulesContextProvider = ({ children, setRawMessage }: React.PropsWithChildren<{ setRawMessage: (message: string) => void }>) => {
@@ -105,7 +105,7 @@ describe('RuleForm', () => {
     };
 
     renderWithDataRouter(
-      <PipelineRulesContextProvider setRawMessage={setRawMessage}>
+      <PipelineRulesContextProvider setRawMessage={_setRawMessage}>
         <RuleForm create={false} />
       </PipelineRulesContextProvider>,
     );
@@ -123,6 +123,6 @@ describe('RuleForm', () => {
 
     userEvent.click(runSimulationButton);
 
-    expect(setRawMessage).toHaveBeenCalledWith(ruleInput);
+    expect(_setRawMessage).toHaveBeenCalledWith(ruleInput);
   });
 });
