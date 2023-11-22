@@ -66,7 +66,7 @@ const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string
                     bsSize="small"
                     title="Test against stream"
                     id="select-stream-dropdown">
-      {streamList || <MenuItem header>No streams available</MenuItem>}
+      {(streamList && !streamList.isEmpty()) ? streamList.toArray() : <MenuItem header>No streams available</MenuItem>}
     </DropdownButton>
   );
 };

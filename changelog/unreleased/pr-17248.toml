@@ -1,0 +1,5 @@
+type = "a"
+message = "data node life cycle management: removal of nodes"
+
+issues = ["16820"]
+pulls = ["17248"]

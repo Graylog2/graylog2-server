@@ -106,7 +106,7 @@ const Time = ({ index }: Props) => (
                              max={10}
                              step={0.5}
                              value={value.scaling ? (1 / value.scaling) : 1.0}
-                             onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat(e.target.value) } } })} />
+                             onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat((e.target as HTMLInputElement).value) } } })} />
           <Icon name="search-plus" size="lg" style={{ paddingLeft: '0.5rem' }} />
           <CurrentScale>
             {value.scaling ? (1 / value.scaling) : 1.0}x
@@ -119,7 +119,7 @@ const Time = ({ index }: Props) => (
                        value={value.value}
                        step="1"
                        min="1"
-                       onChange={(e) => onChange({ target: { name, value: { ...value, value: e.target.value } } })} />
+                       onChange={(e) => onChange({ target: { name, value: { ...value, value: (e.target as HTMLInputElement).value } } })} />
           <InputGroup.Button>
             <OverlayDropdownButton title={TimeUnits[value.unit] || ''}>
               {Object.keys(TimeUnits).map((unit) => (

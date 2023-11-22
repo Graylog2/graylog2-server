@@ -53,7 +53,7 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
   z-index: 1032 !important;
 `;
 
-const DropdownTrigger = styled.button(({ theme, $active }) => css`
+const DropdownTrigger = styled.button<{ $active: boolean }>(({ theme, $active }) => css`
   background: transparent;
   border: 0;
   padding: 15px;
