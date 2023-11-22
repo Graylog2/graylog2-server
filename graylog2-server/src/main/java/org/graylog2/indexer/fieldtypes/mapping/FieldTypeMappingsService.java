@@ -91,7 +91,7 @@ public class FieldTypeMappingsService {
                 );
             } catch (Exception ex) {
                 LOG.error("Failed to remove custom mappings for fields " + fieldNames.toString() + " in index set : " + indexSetId, ex);
-                result.put(indexSetId, new BulkOperationResponse(List.of("Exception while removing remove custom field mappings for index set : " + indexSetId + ": " + ex.getMessage())));
+                result.put(indexSetId, new BulkOperationResponse(List.of("Exception while removing custom field mappings for index set : " + indexSetId + ": " + ex.getMessage())));
             }
         }
         return result;
