@@ -43,6 +43,7 @@ const BooleanOperatorSelector = ({ initialText, operator, onOperatorChange }) =>
       <BooleanOperatorSelect isFirstElement={!initialText}>
         <Select className="boolean-operator"
                 matchProp="label"
+                aria-label="Boolean Operator"
                 size="small"
                 onChange={onOperatorChange}
                 options={[
