@@ -16,10 +16,15 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import Wizard from 'components/common/Wizard';
 
 import 'helpers/mocking/react-dom_mock';
+import asMock from '../../../test/helpers/mocking/AsMock';
+
+const previousButton = () => screen.findByRole('button', { name: /Previous/i });
+const nextButton = () => screen.findByRole('button', { name: /Next/i });
 
 describe('<Wizard />', () => {
   const steps = [
@@ -28,205 +33,228 @@ describe('<Wizard />', () => {
     { key: 'Key3', title: 'Title3', component: (<div>Component3</div>) },
   ];
 
-  it('should render with 3 steps', () => {
-    const wrapper = mount(<Wizard steps={steps} />);
+  it('should render with 3 steps', async () => {
+    render(<Wizard steps={steps} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Component1');
   });
 
-  it('should render with 3 steps and children', () => {
-    const wrapper = mount(<Wizard steps={steps}><span>Preview</span></Wizard>);
+  it('should render with 3 steps and children', async () => {
+    render(<Wizard steps={steps}><span>Preview</span></Wizard>);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Preview');
   });
 
-  it('should render in horizontal mode with 3 steps', () => {
-    const wrapper = mount(<Wizard steps={steps} horizontal />);
+  it('should render in horizontal mode with 3 steps', async () => {
+    render(<Wizard steps={steps} horizontal />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Component1');
   });
 
-  it('should render in horizontal mode with 3 steps and children', () => {
-    const wrapper = mount(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
+  it('should render in horizontal mode with 3 steps and children', async () => {
+    render(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Preview');
   });
 
   describe('When used in an uncontrolled way', () => {
-    it('should render step 1 when nothing was clicked', () => {
-      const wrapper = mount(<Wizard steps={steps} />);
+    it('should render step 1 when nothing was clicked', async () => {
+      render(<Wizard steps={steps} />);
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(true);
-      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
+      await screen.findByText('Component1');
+
+      expect(screen.queryByText('Component2')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
+
+      expect(await previousButton()).toBeDisabled();
+      expect(await nextButton()).not.toBeDisabled();
     });
 
-    it('should render step 2 when clicked on step 2', () => {
-      const wrapper = mount(<Wizard steps={steps} />);
+    it('should render step 2 when clicked on step 2', async () => {
+      render(<Wizard steps={steps} />);
 
-      wrapper.find('div[children="Title2"]').simulate('click');
+      await screen.findByText('Title1');
+      screen.getByText('Title2').click();
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
-      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
+      await screen.findByText('Component2');
+
+      expect(screen.queryByText('Component1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
+
+      expect(await previousButton()).not.toBeDisabled();
+      expect(await nextButton()).not.toBeDisabled();
     });
 
-    it('should render step 2 when clicked on next', () => {
-      const wrapper = mount(<Wizard steps={steps} />);
+    it('should render step 2 when clicked on next', async () => {
+      render(<Wizard steps={steps} />);
 
-      wrapper.find('button[children="Next"]').simulate('click');
+      (await nextButton()).click();
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
-      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
+      await screen.findByText('Component2');
+
+      expect(screen.queryByText('Component1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
+
+      expect(await previousButton()).not.toBeDisabled();
+      expect(await nextButton()).not.toBeDisabled();
     });
 
-    it('should render step 3 when two times clicked on next', () => {
-      const wrapper = mount(<Wizard steps={steps} />);
+    it('should render step 3 when two times clicked on next', async () => {
+      render(<Wizard steps={steps} />);
 
-      wrapper.find('button[children="Next"]').simulate('click');
-      wrapper.find('button[children="Next"]').simulate('click');
+      (await nextButton()).click();
+      await screen.findByText('Component2');
+      (await nextButton()).click();
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(true);
-      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
-      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(true);
+      await screen.findByText('Component3');
+
+      expect(screen.queryByText('Component1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component2')).not.toBeInTheDocument();
+
+      expect(await previousButton()).not.toBeDisabled();
+      expect(await nextButton()).toBeDisabled();
     });
 
-    it('should render step 2 when two times clicked on next and one time clicked on previous', () => {
+    it('should render step 2 when two times clicked on next and one time clicked on previous', async () => {
       const changeFn = jest.fn(() => {});
-      const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
+      render(<Wizard steps={steps} onStepChange={changeFn} />);
 
-      wrapper.find('button[children="Next"]').simulate('click');
-      wrapper.find('button[children="Next"]').simulate('click');
-      wrapper.find('button[children="Previous"]').simulate('click');
+      (await nextButton()).click();
+      await screen.findByText('Component2');
+      (await nextButton()).click();
+      await screen.findByText('Component3');
+      (await previousButton()).click();
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
-      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
-      expect(changeFn.mock.calls.length).toBe(3);
+      await screen.findByText('Component2');
+
+      expect(screen.queryByText('Component1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
+
+      expect(await previousButton()).not.toBeDisabled();
+      expect(await nextButton()).not.toBeDisabled();
+      expect(changeFn).toHaveBeenCalledTimes(3);
     });
   });
 
   describe('When used in a controlled way', () => {
-    it('should render active step given from prop', () => {
-      const wrapper = mount(<Wizard steps={steps} activeStep="Key2" />);
+    it('should render active step given from prop', async () => {
+      render(<Wizard steps={steps} activeStep="Key2" />);
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      await screen.findByText('Component2');
 
-      wrapper.find('button[children="Next"]').simulate('click');
+      expect(screen.queryByText('Component1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      (await nextButton()).click();
+
+      await screen.findByText('Component2');
+
+      expect(screen.queryByText('Component1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
     });
 
-    it('should change the active step when prop changes', () => {
-      const wrapper = mount(<Wizard steps={steps} activeStep="Key2" />);
+    it('should change the active step when prop changes', async () => {
+      const { rerender } = render(<Wizard steps={steps} activeStep="Key2" />);
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      await screen.findByText('Component2');
 
-      wrapper.setProps({ activeStep: 'Key1' });
+      expect(screen.queryByText('Component1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      rerender(<Wizard steps={steps} activeStep="Key1" />);
+
+      await screen.findByText('Component1');
+
+      expect(screen.queryByText('Component2')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
     });
 
-    it('should show a warning when activeStep is not a key in steps', () => {
+    it('should show a warning when activeStep is not a key in steps', async () => {
       /* eslint-disable no-console */
       const consoleWarn = console.warn;
 
       console.warn = jest.fn();
-      const wrapper = mount(<Wizard steps={steps} activeStep={0} />);
+      const { rerender } = render(<Wizard steps={steps} activeStep={0} />);
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-      expect(console.warn.mock.calls.length).toBe(1);
+      await screen.findByText('Component1');
 
-      wrapper.setProps({ activeStep: 'Key12314' });
+      expect(screen.queryByText('Component2')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
+      expect(console.warn).toHaveBeenCalledTimes(1);
 
-      expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
-      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-      expect(console.warn.mock.calls.length).toBe(2);
+      rerender(<Wizard steps={steps} activeStep="Key12314" />);
+
+      await screen.findByText('Component1');
+
+      expect(screen.queryByText('Component2')).not.toBeInTheDocument();
+      expect(screen.queryByText('Component3')).not.toBeInTheDocument();
+      expect(console.warn).toHaveBeenCalledTimes(2);
 
       console.warn = consoleWarn;
       /* eslint-enable no-console */
     });
   });
 
-  it('should give callback step when changing the step', () => {
+  it('should give callback step when changing the step', async () => {
     const changeFn = jest.fn((step) => {
       expect(step).toEqual('Key2');
     });
 
-    const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
+    const { rerender } = render(<Wizard steps={steps} onStepChange={changeFn} />);
 
-    wrapper.find('button[children="Next"]').simulate('click');
+    (await nextButton()).click();
 
-    expect(changeFn.mock.calls.length).toBe(1);
+    expect(changeFn).toHaveBeenCalled();
 
-    const controlledWrapped = mount(<Wizard steps={steps} onStepChange={changeFn} activeStep="Key1" />);
+    rerender(<Wizard steps={steps} onStepChange={changeFn} activeStep="Key1" />);
 
-    controlledWrapped.find('button[children="Next"]').simulate('click');
+    asMock(changeFn).mockClear();
+    (await nextButton()).click();
 
-    expect(changeFn.mock.calls.length).toBe(2);
+    expect(changeFn).toHaveBeenCalled();
   });
 
-  it('should respect disabled flag for a step', () => {
+  it('should respect disabled flag for a step', async () => {
     steps[1].disabled = true;
     steps[2].disabled = true;
-    const wrapper = mount(<Wizard steps={steps} />);
+    render(<Wizard steps={steps} />);
 
-    wrapper.find('button[children="Next"]').simulate('click');
+    (await nextButton()).click();
 
-    expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
-    expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-    expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+    await screen.findByText('Component1');
 
-    wrapper.find('div[children="Title2"]').simulate('click');
+    expect(screen.queryByText('Component2')).not.toBeInTheDocument();
+    expect(screen.queryByText('Component3')).not.toBeInTheDocument();
 
-    expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
-    expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-    expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+    (await screen.findByText('Title2')).click();
+
+    await screen.findByText('Component1');
+
+    expect(screen.queryByText('Component2')).not.toBeInTheDocument();
+    expect(screen.queryByText('Component3')).not.toBeInTheDocument();
   });
 
-  it('should render next/previous buttons by default', () => {
-    const wrapperV = mount(<Wizard steps={steps} />);
+  it('should render next/previous buttons by default', async () => {
+    const { rerender } = render(<Wizard steps={steps} />);
 
-    expect(wrapperV.find('button[children="Next"]').exists()).toBe(true);
-    expect(wrapperV.find('button[children="Previous"]').exists()).toBe(true);
+    expect(await nextButton()).toBeInTheDocument();
+    expect(await previousButton()).toBeInTheDocument();
 
-    const wrapperH = mount(<Wizard steps={steps} horizontal />);
+    rerender(<Wizard steps={steps} horizontal />);
 
-    expect(wrapperH.find('svg.fa-caret-left').exists()).toBe(true);
-    expect(wrapperH.find('svg.fa-caret-right').exists()).toBe(true);
+    expect(screen.getByLabelText('Next')).toBeInTheDocument();
+    expect(screen.getByLabelText('Previous')).toBeInTheDocument();
   });
 
-  it('should hide next/previous buttons if hidePreviousNextButtons is set', () => {
-    const wrapperV = mount(<Wizard steps={steps} hidePreviousNextButtons />);
+  it('should hide next/previous buttons if hidePreviousNextButtons is set', async () => {
+    const { rerender } = render(<Wizard steps={steps} hidePreviousNextButtons />);
 
-    expect(wrapperV.find('button[children="Next"]').exists()).toBe(false);
-    expect(wrapperV.find('button[children="Previous"]').exists()).toBe(false);
+    expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Previous' })).not.toBeInTheDocument();
 
-    const wrapperH = mount(<Wizard steps={steps} horizontal hidePreviousNextButtons />);
+    rerender(<Wizard steps={steps} horizontal hidePreviousNextButtons />);
 
-    expect(wrapperH.find('button > svg.fa-caret-left').exists()).toBe(false);
-    expect(wrapperH.find('button > svg.fa-caret-right').exists()).toBe(false);
+    expect(screen.queryByLabelText('Next')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Previous')).not.toBeInTheDocument();
   });
 });
