@@ -17,9 +17,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
-import { useLocation } from 'react-router-dom';
 import type { Location } from 'history';
 
+import useLocation from 'routing/useLocation';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
@@ -36,12 +36,7 @@ jest.mock('util/AppConfig', () => ({
 }));
 
 jest.mock('hooks/useCurrentUser');
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(),
-}));
-
+jest.mock('routing/useLocation', () => jest.fn());
 jest.mock('hooks/usePluginEntities');
 
 const openSystemMenu = async () => {

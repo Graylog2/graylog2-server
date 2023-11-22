@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type { PluginNavigationDropdownItem, PluginNavigation } from 'graylog-web-plugin';
 import type * as Immutable from 'immutable';
 
+import useLocation from 'routing/useLocation';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { LinkContainer } from 'components/common/router';
 import { appPrefixed } from 'util/URLUtils';

@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import type { SystemNavigationItem } from 'graylog-web-plugin';
 
+import useLocation from 'routing/useLocation';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { NavDropdown } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';

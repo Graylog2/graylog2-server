@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import type { Subtract } from 'utility-types';
+
+import useLocation from 'routing/useLocation';
 
 import useQuery from './useQuery';
 
