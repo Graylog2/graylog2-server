@@ -118,7 +118,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   }, [sendTelemetry, telemetryPathName]);
 
   return (
-    <BootstrapModalForm title={<span>Remove {fields} Custom Field Type <BetaBadge /></span>}
+    <BootstrapModalForm title={<span>Remove Custom Field Type <BetaBadge /></span>}
                         submitButtonText="Remove custom field type"
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}

@@ -40,6 +40,8 @@ import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import MenuItem from 'components/bootstrap/MenuItem';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -53,7 +55,7 @@ const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }
   color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
   margin-right: 5px;
 `);
-
+const isEntitySelectable = (field: IndexSetFieldType) => !field.isReserved;
 const FilterValueRenderers = {
   is_custom: (value: 'true' | 'false', title: string) => (
     <>
@@ -181,6 +183,19 @@ const IndexSetFieldTypesList = () => {
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
+  const renderBulkActions = useCallback((
+    selectedFields: Array<string>,
+    setSelectedEntities: (fieldName: Array<string>) => void,
+  ) => {
+    const onRemove = () => setDeletingFieldTypes(selectedFields);
+
+    return (
+      <BulkActionsDropdown selectedEntities={selectedFields} setSelectedEntities={setSelectedEntities}>
+        <MenuItem onSelect={onRemove}>Remove</MenuItem>
+      </BulkActionsDropdown>
+    );
+  }, []);
+
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
@@ -218,7 +233,11 @@ const IndexSetFieldTypesList = () => {
                                               actionsCellWidth={120}
                                               columnRenderers={customColumnRenderers}
                                               columnDefinitions={attributes}
-                                              rowActions={renderActions} />
+                                              rowActions={renderActions}
+                                              bulkSelection={{
+                                                actions: renderBulkActions,
+                                                isEntitySelectable,
+                                              }} />
         )}
       </PaginatedList>
       {
