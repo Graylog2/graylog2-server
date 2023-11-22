@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
@@ -48,6 +48,7 @@ type Props<Entity extends EntityBase> = {
   onToggleEntitySelect: (entityId: string) => void,
   rowActions?: (entity: Entity) => React.ReactNode,
   entityAttributesAreCamelCase: boolean,
+  isEntitySelectable: (entity: Entity) => boolean
 };
 
 const TableRow = <Entity extends EntityBase>({
@@ -62,6 +63,7 @@ const TableRow = <Entity extends EntityBase>({
   index,
   actionsRef,
   entityAttributesAreCamelCase,
+  isEntitySelectable,
 }: Props<Entity>) => {
   const toggleRowSelect = useCallback(
     () => onToggleEntitySelect(entity.id),
@@ -70,13 +72,16 @@ const TableRow = <Entity extends EntityBase>({
 
   const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
 
+  const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
+
   return (
     <tr>
       {displaySelect && (
         <td>
           <RowCheckbox onChange={toggleRowSelect}
                        title={`${isSelected ? 'Deselect' : 'Select'} entity`}
-                       checked={isSelected} />
+                       checked={isSelected}
+                       disabled={isSelectDisabled} />
         </td>
       )}
       {columns.map((column) => {

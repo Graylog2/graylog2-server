@@ -26,7 +26,6 @@ type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
 const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entity>>, selectedEntityIds: Array<string>) => {
   const checkboxRef = useRef<HTMLInputElement>();
-
   const checkboxStatus: CheckboxStatus = useMemo(() => {
     const selectedEntities = data.filter(({ id }) => selectedEntityIds.includes(id));
 
@@ -60,22 +59,22 @@ const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entit
 };
 
 type Props<Entity extends EntityBase> = {
-  data: Readonly<Array<Entity>>,
+  selectableData: Readonly<Array<Entity>>,
   selectedEntities: Array<string>,
   setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>,
 }
 
 const BulkSelectHead = <Entity extends EntityBase>({
-  data,
+  selectableData,
   setSelectedEntities,
   selectedEntities,
 }: Props<Entity>) => {
-  const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
+  const { checkboxRef, checkboxStatus } = useCheckboxStatus(selectableData, selectedEntities);
   const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
 
   const onBulkSelect = () => {
     setSelectedEntities((cur) => {
-      const entityIds = data.map(({ id }) => id);
+      const entityIds = selectableData.map(({ id }) => id);
 
       if (checkboxStatus === 'CHECKED') {
         return cur.filter((itemId) => !entityIds.includes(itemId));
@@ -91,7 +90,7 @@ const BulkSelectHead = <Entity extends EntityBase>({
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
                    title={title}
-                   disabled={!data?.length} />
+                   disabled={!selectableData?.length} />
     </td>
   );
 };
