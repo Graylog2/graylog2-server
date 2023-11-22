@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import userEvent from '@testing-library/user-event';
 
 import Entity from 'logic/content-packs/Entity';
 import ContentPackApplyParameter from 'components/content-packs/ContentPackApplyParameter';
@@ -70,14 +70,18 @@ describe('<ContentPackApplyParameter />', () => {
                                       onParameterApply={applyFn} />);
 
     const selectConfigKey = await screen.findByLabelText('Config Key');
-    selectEvent.openMenu(selectConfigKey);
-    selectEvent.select(selectConfigKey, 'configuration.port');
+    userEvent.selectOptions(selectConfigKey, 'configuration.port');
 
     const selectParameter = await screen.findByLabelText('Parameter');
-    selectEvent.openMenu(selectParameter);
-    selectEvent.select(selectParameter, 'Port (PORT)');
+    userEvent.selectOptions(selectParameter, 'Port (PORT)');
 
-    (await screen.findByRole('button', { name: 'Apply' })).click();
+    const submitButton = await screen.findByRole('button', { name: 'Apply' });
+
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
+
+    submitButton.click();
 
     await waitFor(() => {
       expect(applyFn).toHaveBeenCalledWith('configuration.port', 'PORT');
@@ -92,17 +96,7 @@ describe('<ContentPackApplyParameter />', () => {
                                       appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
                                       onParameterApply={applyFn} />);
 
-    const selectConfigKey = await screen.findByLabelText('Config Key');
-    selectEvent.openMenu(selectConfigKey);
-    selectEvent.select(selectConfigKey, 'configuration.port');
-
-    const selectParameter = await screen.findByLabelText('Parameter');
-    selectEvent.openMenu(selectParameter);
-    selectEvent.select(selectParameter, 'Port (PORT)');
-
-    (await screen.findByRole('button', { name: 'Apply' })).click();
-
-    expect(applyFn).not.toHaveBeenCalled();
+    expect(screen.queryByRole('option', { name: 'configuration.port' })).not.toBeInTheDocument();
   });
 
   it('should clear a parameter', async () => {
