@@ -55,6 +55,7 @@ type Props = React.PropsWithChildren<{
   bsStyle?: StyleProps,
   bsSize?: BsSize,
   className?: string,
+  'data-testid'?: string,
   disabled?: boolean,
   form?: string,
   href?: string,
@@ -69,8 +70,8 @@ type Props = React.PropsWithChildren<{
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
-    'aria-label': ariaLabel, bsStyle, bsSize, className, id, onClick, disabled, href, title, form,
-    type, role, name, tabIndex, children,
+    'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
+    title, form, type, role, name, tabIndex, children,
   }, ref) => {
     const button = (
       <StyledButton ref={ref}
@@ -78,6 +79,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
                     aria-label={ariaLabel}
                     className={className}
                     {...styleProps(bsStyle)}
+                    data-testid={dataTestId}
                     disabled={disabled}
                     form={form}
                     name={name}
