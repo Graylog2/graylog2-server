@@ -17,9 +17,9 @@
 package org.graylog2.datatiering.retention;
 
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog2.datatiering.config.HotTierConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
@@ -60,7 +60,7 @@ public class RetentionExecutor {
         return deflectorIndices.getOrDefault(indexName, Collections.emptySet()).contains(indexSet.getWriteIndexAlias());
     }
 
-    public void retain(IndexSet indexSet, HotTierConfig config, Retention retention) {
+    public void retain(IndexSet indexSet, IndexLifetimeConfig config, Retention retention) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
         // Account for DST and time zones in determining age

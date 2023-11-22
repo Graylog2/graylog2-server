@@ -32,21 +32,31 @@ import static org.mockito.Mockito.when;
 public class TimeSizeOptimizingValidatorTest {
 
     @Mock
-    private ElasticsearchConfiguration config;
+    private ElasticsearchConfiguration elasticConfig;
 
     @Test
     public void validateLifetimeMaxIsShorterThanLifetimeMin() {
-        assertThat(validate(config, Period.days(5), Period.days(4))).hasValueSatisfying(v ->
+        IndexLifetimeConfig config = IndexLifetimeConfig.builder()
+                .indexLifetimeMin(Period.days(5))
+                .indexLifetimeMax(Period.days(4))
+                .build();
+
+        assertThat(validate(this.elasticConfig, config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("is shorter than index_lifetime_min")
         );
     }
 
     @Test
     public void validateMaxRetentionPeriod() {
-        when(config.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-        when(config.getMaxIndexRetentionPeriod()).thenReturn(Period.days(9));
+        when(elasticConfig.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+        when(elasticConfig.getMaxIndexRetentionPeriod()).thenReturn(Period.days(9));
 
-        assertThat(validate(config, Period.days(2).withHours(2), Period.days(30))).hasValueSatisfying(v ->
+        IndexLifetimeConfig config = IndexLifetimeConfig.builder()
+                .indexLifetimeMin(Period.days(2).withHours(2))
+                .indexLifetimeMax(Period.days(30))
+                .build();
+
+        assertThat(validate(elasticConfig, config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains(
                         "Lifetime setting index_lifetime_max <P30D> exceeds the configured maximum of max_index_retention_period=P9D")
         );
@@ -54,9 +64,14 @@ public class TimeSizeOptimizingValidatorTest {
 
     @Test
     public void timeBasedSizeOptimizingOnlyWithMultipleOfDays() {
-        when(config.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+        when(elasticConfig.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
 
-        assertThat(validate(config, Period.days(2).withHours(2), Period.days(30))).hasValueSatisfying(v ->
+        IndexLifetimeConfig config = IndexLifetimeConfig.builder()
+                .indexLifetimeMin(Period.days(2).withHours(2))
+                .indexLifetimeMax(Period.days(30))
+                .build();
+
+        assertThat(validate(elasticConfig, config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains(
                         "Lifetime setting index_lifetime_min <P2DT2H> can only be a multiple of days")
         );
@@ -64,15 +79,19 @@ public class TimeSizeOptimizingValidatorTest {
 
     @Test
     public void timeBasedSizeOptimizingHonorsFixedLeeWay() {
-        when(config.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-        when(config.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(10));
+        when(elasticConfig.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+        when(elasticConfig.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(10));
 
+        IndexLifetimeConfig config = IndexLifetimeConfig.builder()
+                .indexLifetimeMin(Period.days(10))
+                .indexLifetimeMax(Period.days(19))
+                .build();
 
-        assertThat(validate(config, Period.days(10), Period.days(19))).hasValueSatisfying(v -> assertThat(v.message())
+        assertThat(validate(elasticConfig, config)).hasValueSatisfying(v -> assertThat(v.message())
                 .contains("The duration between index_lifetime_max and index_lifetime_min <P9D> " +
                         "cannot be shorter than time_size_optimizing_retention_fixed_leeway <P10D>"));
 
-        assertThat(validate(config, Period.days(10), Period.days(20))).isEmpty();
+        assertThat(validate(elasticConfig, config.toBuilder().indexLifetimeMax(Period.days(20)).build())).isEmpty();
     }
 
     @Test

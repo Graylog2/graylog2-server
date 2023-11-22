@@ -19,11 +19,12 @@ package org.graylog2.indexer;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidator;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -157,8 +158,10 @@ public class IndexSetValidator {
         if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
             return TimeSizeOptimizingValidator.validate(
                     elasticsearchConfiguration,
-                    config.indexLifetimeMin(),
-                    config.indexLifetimeMax()).orElse(null);
+                    IndexLifetimeConfig.builder()
+                            .indexLifetimeMin(config.indexLifetimeMin())
+                            .indexLifetimeMax(config.indexLifetimeMax())
+                            .build()).orElse(null);
         }
         return null;
     }

@@ -16,20 +16,16 @@
  */
 package org.graylog2.datatiering;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.datatiering.config.HotTierConfig;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@JsonAutoDetect
+
 @AutoValue
 @WithBeanGetter
-@JsonDeserialize(builder = HotTierConfig.Builder.class)
 public abstract class DataTieringState {
 
     private final static String FIELD_TYPE = "type";

@@ -21,11 +21,11 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.datatiering.config.HotTierConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.common.IndexRotator;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
@@ -49,14 +49,14 @@ public class DataTierRotation {
     private final Size maxShardSize;
     private final Size minShardSize;
 
-    private final HotTierConfig hotTierConfig;
+    private final IndexLifetimeConfig indexLifetimeConfig;
 
     @AssistedInject
     public DataTierRotation(Indices indices,
                             ElasticsearchConfiguration elasticsearchConfiguration,
                             IndexRotator indexRotator,
                             JobSchedulerClock clock,
-                            @Assisted HotTierConfig hotTierConfig) {
+                            @Assisted IndexLifetimeConfig indexLifetimeConfig) {
 
         this.indices = indices;
         this.indexRotator = indexRotator;
@@ -64,7 +64,7 @@ public class DataTierRotation {
         this.rotationPeriod = elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod();
         this.maxShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize();
         this.minShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize();
-        this.hotTierConfig = hotTierConfig;
+        this.indexLifetimeConfig = indexLifetimeConfig;
     }
 
     public void rotate(IndexSet indexSet) {
@@ -91,7 +91,7 @@ public class DataTierRotation {
 
         // If no retention is selected, we have an "indefinite" optimization leeway
         if (!(indexSet.getConfig().retentionStrategy() instanceof NoopRetentionStrategyConfig)) {
-            Period leeWay = hotTierConfig.indexLifetimeMax().minus(hotTierConfig.indexLifetimeMin());
+            Period leeWay = indexLifetimeConfig.indexLifetimeMax().minus(indexLifetimeConfig.indexLifetimeMin());
             if (indexExceedsLeeWay(creationDate, leeWay)) {
                 return createResult(true,
                         f("Index creation date <%s> exceeds optimization leeway <%s>",
@@ -126,9 +126,7 @@ public class DataTierRotation {
     }
 
     public interface Factory {
-        DataTierRotation create(HotTierConfig hotTierConfig);
+        DataTierRotation create(IndexLifetimeConfig retentionConfig);
 
     }
-
-
 }

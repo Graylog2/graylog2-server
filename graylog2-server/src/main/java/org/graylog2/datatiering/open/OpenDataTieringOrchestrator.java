@@ -25,6 +25,7 @@ import org.graylog2.datatiering.retention.DataTierDeleteRetention;
 import org.graylog2.datatiering.rotation.DataTierRotation;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidator;
 
 import javax.inject.Inject;
@@ -48,6 +49,13 @@ public class OpenDataTieringOrchestrator implements DataTieringOrchestrator {
         this.dataTierDeleteRetention = dataTierDeleteRetention;
     }
 
+    private static IndexLifetimeConfig toIndexLifetimeConfig(DataTieringConfig config) {
+        return IndexLifetimeConfig.builder()
+                .indexLifetimeMin(config.indexLifetimeMin())
+                .indexLifetimeMax(config.indexLifetimeMax())
+                .build();
+    }
+
     @Override
     public DataTieringState getState() {
         return DataTieringState.builder()
@@ -60,7 +68,7 @@ public class OpenDataTieringOrchestrator implements DataTieringOrchestrator {
     public void rotate(IndexSet indexSet) {
         DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiers();
         Preconditions.checkNotNull(dataTieringConfig);
-        DataTierRotation dataTierRotation = dataTierRotationFactory.create(dataTieringConfig.hotTier());
+        DataTierRotation dataTierRotation = dataTierRotationFactory.create(toIndexLifetimeConfig(dataTieringConfig));
         dataTierRotation.rotate(indexSet);
     }
 
@@ -68,7 +76,7 @@ public class OpenDataTieringOrchestrator implements DataTieringOrchestrator {
     public void retain(IndexSet indexSet) {
         DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiers();
         Preconditions.checkNotNull(dataTieringConfig);
-        dataTierDeleteRetention.retain(indexSet, dataTieringConfig.hotTier());
+        dataTierDeleteRetention.retain(indexSet, toIndexLifetimeConfig(dataTieringConfig));
     }
 
     @Override
@@ -76,8 +84,7 @@ public class OpenDataTieringOrchestrator implements DataTieringOrchestrator {
         Preconditions.checkNotNull(config);
         return TimeSizeOptimizingValidator.validate(
                 elasticsearchConfiguration,
-                config.hotTier().indexLifetimeMin(),
-                config.hotTier().indexLifetimeMax());
+                toIndexLifetimeConfig(config));
 
     }
 

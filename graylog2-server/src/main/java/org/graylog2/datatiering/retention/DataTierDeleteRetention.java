@@ -20,9 +20,9 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.datatiering.config.HotTierConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class DataTierDeleteRetention {
         this.nodeId = nodeId;
     }
 
-    public void retain(IndexSet indexSet, HotTierConfig config) {
+    public void retain(IndexSet indexSet, IndexLifetimeConfig config) {
         retentionExecutor.retain(indexSet, config, this::retain);
     }
 
