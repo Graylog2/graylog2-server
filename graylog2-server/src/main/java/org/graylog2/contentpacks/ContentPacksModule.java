@@ -32,6 +32,7 @@ import org.graylog2.contentpacks.facades.SearchFacade;
 import org.graylog2.contentpacks.facades.SidecarCollectorConfigurationFacade;
 import org.graylog2.contentpacks.facades.SidecarCollectorFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
+import org.graylog2.contentpacks.facades.StreamReferenceFacade;
 import org.graylog2.contentpacks.facades.UrlWhitelistFacade;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
@@ -61,6 +62,7 @@ public class ContentPacksModule extends PluginModule {
         addEntityFacade(PipelineRuleFacade.TYPE_V1, PipelineRuleFacade.class);
         addEntityFacade(RootEntityFacade.TYPE, RootEntityFacade.class);
         addEntityFacade(StreamFacade.TYPE_V1, StreamFacade.class);
+        addEntityFacade(StreamReferenceFacade.TYPE_V1, StreamReferenceFacade.class);
         addEntityFacade(DashboardFacade.TYPE_V2, DashboardFacade.class);
         addEntityFacade(DashboardV1Facade.TYPE_V1, DashboardV1Facade.class);
         addEntityFacade(SearchFacade.TYPE_V1, SearchFacade.class);

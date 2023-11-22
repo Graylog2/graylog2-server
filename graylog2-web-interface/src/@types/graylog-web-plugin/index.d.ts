@@ -25,12 +25,6 @@ interface PluginRoute {
   permissions?: string | Array<string>;
   requiredFeatureFlag?: string;
 }
-interface PluginNavigation {
-  path: string;
-  description: string;
-  requiredFeatureFlag?: string;
-  children?: Array<PluginNavigationDropdownItem>
-}
 
 interface PluginNavigationDropdownItem {
   description: string,
@@ -38,6 +32,22 @@ interface PluginNavigationDropdownItem {
   permissions?: string | Array<string>,
   requiredFeatureFlag?: string,
 }
+
+type PluginNavigationLink = {
+  path: string;
+}
+
+type PluginNavigationDropdown = {
+  children: Array<PluginNavigationDropdownItem>;
+}
+
+type PluginNavigation = {
+  description: string;
+  requiredFeatureFlag?: string;
+  perspective?: string;
+  BadgeComponent?: React.ComponentType<{ text: string }>;
+  position?: 'last' | undefined,
+} & (PluginNavigationLink | PluginNavigationDropdown)
 
 interface PluginNavigationItems {
   key: string;
@@ -47,6 +57,7 @@ interface SystemNavigationItem {
   description: string;
   path: string;
   permissions: string | Array<string>;
+  perspective?: string,
 }
 interface GlobalNotification {
   key: string;
@@ -122,6 +133,7 @@ interface ProviderType {
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     systemnavigation?: Array<SystemNavigationItem>;
     globalNotifications?: Array<GlobalNotification>

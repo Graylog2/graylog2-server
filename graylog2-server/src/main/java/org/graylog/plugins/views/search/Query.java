@@ -40,7 +40,6 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -60,6 +59,7 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamEntityIdOrThrow;
 
 @AutoValue
 @JsonAutoDetect
@@ -290,8 +290,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                             .map(filter -> {
                                 if (filter.type().equals(StreamFilter.NAME)) {
                                     final StreamFilter streamFilter = (StreamFilter) filter;
-                                    final String streamId = entityDescriptorIds.
-                                            getOrThrow(streamFilter.streamId(), ModelTypes.STREAM_V1);
+                                    final String streamId = getStreamEntityIdOrThrow(streamFilter.streamId(), entityDescriptorIds);
                                     return streamFilter.toBuilder().streamId(streamId).build();
                                 }
                                 return filter;

@@ -289,7 +289,7 @@ public class PipelineFacadeTest {
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(
                 descriptor,
-                EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1),
+                EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_REF_V1),
                 EntityDescriptor.create("2342353045938450345", ModelTypes.PIPELINE_RULE_V1));
     }
 
@@ -387,7 +387,7 @@ public class PipelineFacadeTest {
 
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(pipelineEntity);
 
-        final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
+        final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_REF_V1);
         final EntityDescriptor ruleEntity1 = EntityDescriptor.create("2342353045938450345", ModelTypes.PIPELINE_RULE_V1);
         final EntityDescriptor ruleEntity2 = EntityDescriptor.create("2342353045938450346", ModelTypes.PIPELINE_RULE_V1);
         assertThat(graph.nodes())
