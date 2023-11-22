@@ -21,6 +21,7 @@ import com.google.inject.multibindings.MapBinder;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync;
+import org.graylog.datanode.bootstrap.preflight.SysCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 
 public class PreflightChecksBindings extends AbstractModule {
@@ -31,6 +32,7 @@ public class PreflightChecksBindings extends AbstractModule {
         addPreflightCheck(OpensearchConfigSync.class);
         addPreflightCheck(OpensearchBinPreflightCheck.class);
         addPreflightCheck(DatanodeDirectoriesLockfileCheck.class);
+        addPreflightCheck(SysCheck.class);
     }
 
 
