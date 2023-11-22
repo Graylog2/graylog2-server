@@ -14,26 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AppConfig from '../AppConfig';
 
-type MenuItem = {
-  path: string,
-};
+const filterByPerspective = <T extends { perspective?: string }>(items: Array<T>, perspective: string | undefined): Array<T> => (
+  items.filter(
+    ({ perspective: itemPerspective }) => (
+      perspective === 'default' ? !itemPerspective || itemPerspective === 'default' : perspective === itemPerspective
+    ),
+  )
+);
 
-const filterMenuItems = <T extends MenuItem>(
-  menuItems: Array<T>,
-  toExclude: Array<string>,
-): Array<T> => menuItems.filter((item) => !toExclude.includes(item.path));
-
-export const filterCloudMenuItems = <T extends MenuItem>(
-  menuItems: Array<T>,
-  toExclude: Array<string>,
-): Array<T> => {
-  if (!AppConfig.isCloud()) {
-    return menuItems;
-  }
-
-  return filterMenuItems(menuItems, toExclude);
-};
-
-export default filterMenuItems;
+export default filterByPerspective;
