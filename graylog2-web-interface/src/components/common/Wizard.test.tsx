@@ -15,19 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import type { Steps } from 'components/common/Wizard';
 import Wizard from 'components/common/Wizard';
-
-import 'helpers/mocking/react-dom_mock';
-import asMock from '../../../test/helpers/mocking/AsMock';
+import asMock from 'helpers/mocking/AsMock';
 
 const previousButton = () => screen.findByRole('button', { name: /Previous/i });
 const nextButton = () => screen.findByRole('button', { name: /Next/i });
 
 describe('<Wizard />', () => {
-  const steps = [
+  const steps: Steps = [
     { key: 'Key1', title: 'Title1', component: (<div>Component1</div>) },
     { key: 'Key2', title: 'Title2', component: (<div>Component2</div>) },
     { key: 'Key3', title: 'Title3', component: (<div>Component3</div>) },

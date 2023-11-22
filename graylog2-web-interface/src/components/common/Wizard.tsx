@@ -154,7 +154,7 @@ export type StepKey = number | string;
 
 export type Step = {
   key: StepKey,
-  title: React.ReactElement,
+  title: React.ReactNode,
   component: React.ReactElement,
   disabled?: boolean,
 };
