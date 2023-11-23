@@ -64,12 +64,12 @@ const IndexSetFieldTypesPage = () => {
                       path: DocsHelper.PAGES.INDEX_MODEL,
                     }}
                     topActions={(
-                      <>
-                        <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}>
-                          <Button bsStyle="info">Index set overview</Button>
-                        </LinkContainer>
-                        <Button bsStyle="success" onClick={onAddCustomFieldClick}>Change filed type</Button>
-                      </>
+                      <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}>
+                        <Button bsStyle="info">Index set overview</Button>
+                      </LinkContainer>
+                    )}
+                    actions={(
+                      <Button bsStyle="success" onClick={onAddCustomFieldClick}>Change field type</Button>
                     )}>
           <span>
             Modify the current field types configuration for this index set.

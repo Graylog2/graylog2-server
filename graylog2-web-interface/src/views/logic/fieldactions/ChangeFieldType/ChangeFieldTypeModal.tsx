@@ -79,7 +79,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
-  const { putFieldTypeMutation } = usePutFieldTypeMutation();
+  const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLading } = usePutFieldTypeMutation();
 
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
@@ -133,7 +133,8 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}
                         show={show}
-                        bsSize="large">
+                        bsSize="large"
+                        submitButtonDisabled={fieldTypeMutationIsLading}>
       <div>
         {
           showFiledInput && <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={onFieldChange} field={field} />

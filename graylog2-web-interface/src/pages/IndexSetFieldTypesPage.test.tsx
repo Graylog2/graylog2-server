@@ -25,44 +25,11 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import type { Attributes } from 'stores/PaginationTypes';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import { customFiled, defaultFiled, attributes } from 'fixtures/indexSetFieldTypes';
 
-const attributes: Attributes = [
-  {
-    id: 'field_name',
-    title: 'Field Name',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'is_custom',
-    title: 'Custom',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'is_reserved',
-    title: 'Reserved',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'type',
-    title: 'Type',
-    type: 'STRING',
-    sortable: true,
-  },
-];
-
-const getData = (list = [{
-  id: 'field',
-  fieldName: 'field',
-  type: 'bool',
-  isCustom: false,
-  isReserved: false,
-}]) => (
+const getData = (list = [defaultFiled]) => (
   {
     list,
     pagination: {
@@ -125,13 +92,7 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([{
-        id: 'field',
-        fieldName: 'field',
-        type: 'bool',
-        isCustom: true,
-        isReserved: false,
-      }]),
+      data: getData([customFiled]),
 
     });
 
@@ -150,18 +111,12 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([{
-        id: 'field',
-        fieldName: 'field',
-        type: 'bool',
-        isCustom: true,
-        isReserved: false,
-      }]),
+      data: getData([customFiled]),
 
     });
 
     renderIndexSetFieldTypesPage();
-    const editButton = await screen.findByText(/change filed type/i);
+    const editButton = await screen.findByText(/change field type/i);
     fireEvent.click(editButton);
 
     const modal = await screen.findByTestId('modal-form');

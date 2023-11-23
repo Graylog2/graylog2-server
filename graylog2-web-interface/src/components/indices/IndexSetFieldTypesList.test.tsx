@@ -27,44 +27,11 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import type { Attributes } from 'stores/PaginationTypes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
 import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import { customFiled, defaultFiled, reservedFiled, secondCustomFiled, attributes } from 'fixtures/indexSetFieldTypes';
 
-const attributes: Attributes = [
-  {
-    id: 'field_name',
-    title: 'Field Name',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'is_custom',
-    title: 'Custom',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'is_reserved',
-    title: 'Reserved',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'type',
-    title: 'Type',
-    type: 'STRING',
-    sortable: true,
-  },
-];
-
-const getData = (list = [{
-  id: 'field',
-  fieldName: 'field',
-  type: 'bool',
-  isCustom: false,
-  isReserved: false,
-}]) => (
+const getData = (list = [defaultFiled]) => (
   {
     list,
     pagination: {
@@ -162,13 +129,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: false,
-        }]),
+        data: getData([customFiled]),
       });
 
       renderIndexSetFieldTypesList();
@@ -184,13 +145,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: false,
-        }]),
+        data: getData([customFiled]),
       });
 
       renderIndexSetFieldTypesList();
@@ -206,13 +161,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: true,
-        }]),
+        data: getData([reservedFiled]),
       });
 
       renderIndexSetFieldTypesList();
@@ -229,20 +178,7 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([{
-        id: 'field',
-        fieldName: 'field',
-        type: 'bool',
-        isCustom: true,
-        isReserved: false,
-      },
-      {
-        id: 'field-2',
-        fieldName: 'field-2',
-        type: 'bool',
-        isCustom: true,
-        isReserved: false,
-      }]),
+      data: getData([customFiled, secondCustomFiled]),
     });
 
     renderIndexSetFieldTypesList();
@@ -257,13 +193,7 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([{
-        id: 'field',
-        fieldName: 'field',
-        type: 'bool',
-        isCustom: true,
-        isReserved: false,
-      }]),
+      data: getData([customFiled]),
     });
 
     renderIndexSetFieldTypesList();
