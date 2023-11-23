@@ -169,7 +169,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
         }
         <StyledLabel>Select Rotation Strategy</StyledLabel>
         <p>
-          To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field || 'field'}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+          To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type{field ? <> for <b>{field}</b></> : ''}, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
         </p>
         <Input type="checkbox"
                id="rotate"
