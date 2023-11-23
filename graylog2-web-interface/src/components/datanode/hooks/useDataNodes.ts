@@ -23,6 +23,32 @@ import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, PaginatedListJSON, SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 
+export const removeDataNode = async (datanodeId: string) => {
+  try {
+    await fetch(
+      'DELETE',
+      qualifyUrl(`/datanode/${datanodeId}`),
+    );
+
+    UserNotification.success(`Datanode "${datanodeId}" removed successfully`);
+  } catch (errorThrown) {
+    UserNotification.error(`Removing Datanode failed with status: ${errorThrown}`, 'Could not Remove the Datanode.');
+  }
+};
+
+export const rejoinDataNode = async (datanodeId: string) => {
+  try {
+    await fetch(
+      'POST',
+      qualifyUrl(`/datanode/${datanodeId}/reset`),
+    );
+
+    UserNotification.success(`Datanode "${datanodeId}" rejoined successfully`);
+  } catch (errorThrown) {
+    UserNotification.error(`Rejoining Datanode failed with status: ${errorThrown}`, 'Could not Rejoin the Datanode.');
+  }
+};
+
 type Options = {
   enabled: boolean,
 }
@@ -50,12 +76,10 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
         UserNotification.error(`Loading datanodes failed with status: ${errorThrown}`,
           'Could not load datanodes');
       },
-      keepPreviousData: true,
+      notifyOnChangeProps: ['data', 'error'],
       enabled,
     },
   );
-
-  console.log(params, data);
 
   return ({
     data: data || {
