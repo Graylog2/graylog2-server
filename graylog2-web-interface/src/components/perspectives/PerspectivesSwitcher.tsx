@@ -16,12 +16,14 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useCallback } from 'react';
 
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
 import useFeature from 'hooks/useFeature';
 import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
+import useHistory from 'routing/useHistory';
 
 import ActivePerspectiveBrand from './ActivePerspectiveBrand';
 
@@ -64,7 +66,14 @@ const DropdownIcon = styled(Icon)(({ theme }) => css`
 const Switcher = () => {
   const { setActivePerspective } = useActivePerspective();
   const perspectives = usePerspectives();
-  const onChangePerspective = (perspectiveId: string) => () => setActivePerspective(perspectiveId);
+  const history = useHistory();
+
+  const onChangePerspective = useCallback((nextPerspectiveId: string) => () => {
+    const { brandLink } = perspectives.find(({ id }) => id === nextPerspectiveId);
+
+    history.push(brandLink);
+    setActivePerspective(nextPerspectiveId);
+  }, [history, perspectives, setActivePerspective]);
 
   return (
     <Container className={CONTAINER_CLASS}>
