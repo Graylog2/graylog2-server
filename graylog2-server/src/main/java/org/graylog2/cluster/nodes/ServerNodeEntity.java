@@ -14,13 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog2.cluster.nodes;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import org.bson.types.ObjectId;
+import org.graylog2.database.DbEntity;
 
-/**
- * @deprecated Please use the generic org.graylog2.cluster.nodes.NodeService specifying the type of node
- * to be returned (either server or data node).
- */
-@Deprecated(since = "6.0")
-public interface NodeService extends org.graylog2.cluster.nodes.NodeService<Node> {
+import java.util.Map;
+
+@DbEntity(collection = "nodes", titleField = "node_id")
+public class ServerNodeEntity extends AbstractNode {
+
+    @JsonCreator
+    public ServerNodeEntity(Map<String, Object> fields) {
+        super(fields);
+    }
+
+    public ServerNodeEntity(ObjectId id, Map<String, Object> fields) {
+        super(id, fields);
+    }
+
 }

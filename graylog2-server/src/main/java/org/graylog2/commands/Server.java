@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
@@ -63,8 +64,9 @@ import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
@@ -240,7 +242,7 @@ public class Server extends ServerBootstrap {
     @Override
     protected void startNodeRegistration(Injector injector) {
         // Register this node.
-        final NodeService nodeService = injector.getInstance(NodeService.class);
+        final NodeService<ServerNodeEntity> nodeService = injector.getInstance(new Key<NodeService<ServerNodeEntity>>() {});
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         final LeaderElectionService leaderElectionService = injector.getInstance(LeaderElectionService.class);

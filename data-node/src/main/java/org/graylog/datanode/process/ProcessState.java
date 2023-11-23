@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.process;
 
-import org.graylog2.cluster.DataNodeStatus;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 
 public enum ProcessState {
     /**
@@ -50,7 +50,7 @@ public enum ProcessState {
      * Removal of node from Opensearch cluster completed
      */
     REMOVED(DataNodeStatus.REMOVED),
-    
+
     /**
      * The OS process is not running anymore on the underlying system, it has been terminated
      */

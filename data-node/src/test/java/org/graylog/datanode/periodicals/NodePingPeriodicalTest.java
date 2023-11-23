@@ -19,7 +19,7 @@ package org.graylog.datanode.periodicals;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

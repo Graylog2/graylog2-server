@@ -25,7 +25,8 @@ import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.notifications.Notification;
@@ -65,7 +66,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     private final ClusterConfigService clusterConfigService;
     private final KeystoreMongoStorage keystoreMongoStorage;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeEntity> nodeService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NotificationService notificationService;
     private final DBJobTriggerService jobTriggerService;
@@ -79,7 +80,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     @Inject
     public CertRenewalServiceImpl(final ClusterConfigService clusterConfigService,
                                   final KeystoreMongoStorage keystoreMongoStorage,
-                                  final NodeService nodeService,
+                                  final NodeService<DataNodeEntity> nodeService,
                                   final DataNodeProvisioningService dataNodeProvisioningService,
                                   final NotificationService notificationService,
                                   final DBJobTriggerService jobTriggerService,
@@ -179,9 +180,9 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         }
     }
 
-    protected List<Node> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
+    protected List<DataNodeEntity> findNodesThatNeedCertificateRenewal(final RenewalPolicy renewalPolicy) {
         final var nextRenewal = getNextRenewal();
-        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        final Map<String, DataNodeEntity> activeDataNodes = nodeService.allActive();
         return activeDataNodes.values().stream().map(node -> {
             final var keystore = loadKeyStoreForNode(node);
             final var certificate = keystore.flatMap(this::getCertificateForNode);
@@ -203,19 +204,18 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     @Override
     public List<DataNode> findNodes() {
-        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        final Map<String, DataNodeEntity> activeDataNodes = nodeService.allActive();
         return addProvisioningInformation(activeDataNodes.values());
     }
 
     @Override
-    public List<DataNode> addProvisioningInformation(Collection<Node> nodes) {
+    public List<DataNode> addProvisioningInformation(Collection<DataNodeEntity> nodes) {
         return nodes.stream().map(node -> {
             final var keystore = loadKeyStoreForNode(node);
             final var certificate = keystore.flatMap(this::getCertificateForNode);
             final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
             final var config = getDataNodeProvisioningConfig(node).orElseThrow(() -> new IllegalStateException("No config found for data node " + node.getNodeId()));
             return new DataNode(node.getNodeId(),
-                    node.getType(),
                     node.getDataNodeStatus(),
                     node.getTransportAddress(),
                     config.state(),
@@ -230,7 +230,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         return dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId());
     }
 
-    private void notifyManualRenewalForNode(final List<Node> nodes) {
+    private void notifyManualRenewalForNode(final List<DataNodeEntity> nodes) {
         final var key = String.join(",", nodes.stream().map(Node::getNodeId).toList());
         if(!notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)) {
             notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL);

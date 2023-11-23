@@ -16,16 +16,11 @@
  */
 package org.graylog2.configuration;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.TestNodeService;
-import org.graylog2.plugin.database.ValidationException;
-import org.jetbrains.annotations.NotNull;
+import org.graylog2.cluster.nodes.NodeService;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nullable;
@@ -33,7 +28,6 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 class IndexerDiscoveryProviderTest {
@@ -95,7 +89,7 @@ class IndexerDiscoveryProviderTest {
     }
 
     private NodeService nodes(String... transportAddress) {
-        final NodeService service = new TestNodeService(Node.Type.DATANODE);
+        final NodeService service = new TestNodeService();
         Arrays.stream(transportAddress)
                 .map(URI::create)
                 .forEach(address -> service.registerServer(UUID.randomUUID().toString(), false, address, "localhost"));

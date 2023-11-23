@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog2.cluster.nodes;
 
 import com.mongodb.DBCollection;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.system.NodeId;
@@ -35,21 +37,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
-import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.AbstractMap;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class NodeServiceImplTest {
+public class ServerNodeClusterServiceTest {
     public static final int STALE_LEADER_TIMEOUT_MS = 2000;
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -65,12 +57,12 @@ public class NodeServiceImplTest {
     private Configuration configuration;
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
-    private NodeServiceImpl nodeService;
+    private ServerNodeClusterService nodeService;
 
     @Before
     public void setUp() throws Exception {
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
-        this.nodeService = new NodeServiceImpl(mongodb.mongoConnection(), configuration);
+        this.nodeService = new ServerNodeClusterService(mongodb.mongoConnection(), configuration);
     }
 
     @Test
@@ -145,7 +137,7 @@ public class NodeServiceImplTest {
     @Test
     public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
         nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
-        final NodeImpl node = (NodeImpl) nodeService.byNodeId(nodeId);
+        final ServerNodeEntity node = nodeService.byNodeId(nodeId);
 
         final long lastSeenMs = System.currentTimeMillis() - 2 * STALE_LEADER_TIMEOUT_MS;
         node.getFields().put("last_seen", (int)(lastSeenMs / 1000));
@@ -155,7 +147,7 @@ public class NodeServiceImplTest {
         final long lastSeenFromDb = nodeAfterUpdate.getLastSeen().toInstant().getMillis();
         Assertions.assertThat(lastSeenMs - lastSeenFromDb).isLessThan(1000); // make sure that our lastSeen from int is the same valid date
 
-        final Map<String, Node> activeNodes = nodeService.allActive();
+        final Map<String, ServerNodeEntity> activeNodes = nodeService.allActive();
 
         // the node is stale, should not be present here
         Assertions.assertThat(activeNodes).isEmpty();

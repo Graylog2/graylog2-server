@@ -17,10 +17,15 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
-import org.graylog2.cluster.PaginatedNodeService;
+import org.graylog2.cluster.nodes.DataNodeClusterService;
+import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.DataNodePaginatedService;
+import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.nodes.ServerNodeClusterService;
+import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.database.suggestions.MongoEntitySuggestionService;
 import org.graylog2.indexer.IndexFailureService;
@@ -54,8 +59,10 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(SystemMessageService.class).to(SystemMessageServiceImpl.class).asEagerSingleton();
         bind(NotificationService.class).to(NotificationServiceImpl.class).asEagerSingleton();
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class).asEagerSingleton();
-        bind(NodeService.class).to(NodeServiceImpl.class);
-        bind(PaginatedNodeService.class).asEagerSingleton();
+        bind(org.graylog2.cluster.NodeService.class).to(NodeServiceImpl.class);
+        bind(new TypeLiteral<NodeService<ServerNodeEntity>>() {}).to(ServerNodeClusterService.class);
+        bind(new TypeLiteral<NodeService<DataNodeEntity>>() {}).to(DataNodeClusterService.class);
+        bind(DataNodePaginatedService.class).asEagerSingleton();
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();
         bind(InputService.class).to(InputServiceImpl.class);
         bind(UserService.class).to(UserServiceImpl.class).asEagerSingleton();

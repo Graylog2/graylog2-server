@@ -14,44 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog2.cluster.nodes;
 
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class PaginatedNodeService extends PaginatedDbService<NodeImpl> {
-    private static final String NODE_COLLECTION_NAME = "nodes";
+public class DataNodePaginatedService extends PaginatedDbService<DataNodeEntity> {
+    private static final String NODE_COLLECTION_NAME = "datanodes";
 
     @Inject
-    public PaginatedNodeService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, NodeImpl.class, NODE_COLLECTION_NAME);
+    public DataNodePaginatedService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
+        super(mongoConnection, mapper, DataNodeEntity.class, NODE_COLLECTION_NAME);
     }
 
     public PaginatedList<Node> searchPaginated(SearchQuery query,
                                                String sortByField, String sortOrder, int page, int perPage) {
-        final PaginatedList<NodeImpl> results = findPaginatedWithQueryFilterAndSort(query.toDBQuery(), node -> true,
+        final PaginatedList<DataNodeEntity> results = findPaginatedWithQueryFilterAndSort(query.toDBQuery(), node -> true,
                 getSortBuilder(sortOrder, sortByField), page, perPage);
         return new PaginatedList<>(results.delegate().stream().map(n -> (Node) n).toList(),
                 results.pagination().total(), results.pagination().page(), results.pagination().perPage());
     }
-
-    public PaginatedList<Node> searchPaginatedDatanodes(SearchQuery query,
-                                                        String sortByField, String sortOrder, int page, int perPage) {
-        final DBQuery.Query dbQuery = DBQuery.and(query.toDBQuery(),
-                DBQuery.is("type", Node.Type.DATANODE));
-        final PaginatedList<NodeImpl> results = findPaginatedWithQueryFilterAndSort(dbQuery, node -> true,
-                getSortBuilder(sortOrder, sortByField), page, perPage);
-        return new PaginatedList<>(results.delegate().stream().map(n -> (Node) n).toList(),
-                results.pagination().total(), results.pagination().page(), results.pagination().perPage());
-    }
-
 
 }

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog2.cluster.nodes;
 
 public enum DataNodeStatus {
     UNCONFIGURED, STARTING, AVAILABLE, UNAVAILABLE, REMOVING, REMOVED

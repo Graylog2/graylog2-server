@@ -17,8 +17,9 @@
 package org.graylog2.periodical;
 
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -34,13 +35,13 @@ import javax.inject.Singleton;
 public class NodePingThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingThread.class);
-    private final NodeService nodeService;
+    private final NodeService<ServerNodeEntity> nodeService;
     private final HttpConfiguration httpConfiguration;
     private final ServerStatus serverStatus;
     private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public NodePingThread(NodeService nodeService,
+    public NodePingThread(NodeService<ServerNodeEntity> nodeService,
                           HttpConfiguration httpConfiguration,
                           ServerStatus serverStatus, LeaderElectionService leaderElectionService) {
         this.nodeService = nodeService;

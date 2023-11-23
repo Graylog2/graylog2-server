@@ -18,7 +18,7 @@ package org.graylog2.datanode;
 
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.events.ClusterEventBus;
 import org.junit.Before;
 import org.junit.Test;

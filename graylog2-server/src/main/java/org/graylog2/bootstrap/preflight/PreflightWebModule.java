@@ -35,10 +35,11 @@ import org.graylog2.bootstrap.preflight.web.resources.PreflightAssetsResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.cluster.nodes.DataNodeClusterService;
+import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
@@ -70,7 +71,7 @@ public class PreflightWebModule extends Graylog2Module {
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
-        bind(NodeService.class).to(NodeServiceImpl.class);
+        bind(new TypeLiteral<NodeService<DataNodeEntity>>() {}).to(DataNodeClusterService.class);
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class);
         bind(CaService.class).to(CaServiceImpl.class);

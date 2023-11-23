@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog2.cluster.nodes;
 
+import org.graylog2.Configuration;
+import org.graylog2.database.MongoConnection;
 
-/**
- * @deprecated Please use the generic org.graylog2.cluster.nodes.NodeService specifying the type of node
- * to be returned (either server or data node).
- */
-@Deprecated(since = "6.0")
-public interface NodeService extends org.graylog2.cluster.nodes.NodeService<Node> {
+import javax.inject.Inject;
+
+public class DataNodeClusterService extends AbstractNodeService<DataNodeEntity> {
+
+    @Inject
+    public DataNodeClusterService(MongoConnection mongoConnection, Configuration configuration) {
+        super(mongoConnection, configuration, DataNodeEntity.class);
+    }
+
 }

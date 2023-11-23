@@ -20,7 +20,8 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ import java.util.function.Supplier;
 public class NodePingPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingPeriodical.class);
-    private final NodeService nodeService;
+    private final NodeService<DataNodeEntity> nodeService;
     private final NodeId nodeId;
     private final Supplier<URI> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
@@ -44,12 +45,12 @@ public class NodePingPeriodical extends Periodical {
 
 
     @Inject
-    public NodePingPeriodical(NodeService nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch) {
+    public NodePingPeriodical(NodeService<DataNodeEntity> nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch) {
         this(nodeService, nodeId, configuration, managedOpenSearch::getOpensearchBaseUrl, managedOpenSearch::getOpensearchClusterUrl, managedOpenSearch::isLeaderNode, () -> managedOpenSearch.processInfo().state());
     }
 
     NodePingPeriodical(
-            NodeService nodeService,
+            NodeService<DataNodeEntity> nodeService,
             NodeId nodeId,
             Configuration configuration,
             Supplier<URI> opensearchBaseUri,

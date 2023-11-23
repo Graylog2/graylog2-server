@@ -23,9 +23,6 @@ import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 
 public interface Node {
-    enum Type {
-        SERVER, DATANODE
-    }
 
     String getNodeId();
 
@@ -45,15 +42,9 @@ public interface Node {
     boolean isLeader();
 
     String getTransportAddress();
-    String getClusterAddress();
-
     DateTime getLastSeen();
-
-    Node.Type getType();
-
+    
     String getHostname();
-
-    DataNodeStatus getDataNodeStatus();
 
     default String getShortNodeId() {
         return getNodeId().split("-")[0];
