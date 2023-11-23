@@ -77,7 +77,7 @@ const Switcher = () => {
 
   return (
     <Container className={CONTAINER_CLASS}>
-      <Menu shadow="md" width={300} withinPortal>
+      <Menu shadow="md" withinPortal>
         <ActivePerspectiveBrand>
           <Menu.Target>
             <DropdownTrigger type="button">
