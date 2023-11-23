@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
@@ -38,10 +38,6 @@ import DataNodeStatusCell from './DataNodeStatusCell';
 
 import useDataNodes from '../hooks/useDataNodes';
 
-const SearchContainer = styled.div`
-  margin-bottom: 5px;
-`;
-
 const ENTITY_TABLE_ID = 'datanodes';
 const DEFAULT_LAYOUT = {
   pageSize: 10,
@@ -49,12 +45,35 @@ const DEFAULT_LAYOUT = {
   displayedColumns: ['hostname', 'transport_address', 'status', 'cert_valid_until'],
   columnsOrder: ['hostname', 'transport_address', 'status', 'cert_valid_until'],
 };
-const ATTRIBUTES = [
+
+const columnDefinitions = [
   { id: 'hostname', title: 'Name', sortable: true, permissions: [] },
   { id: 'transport_address', title: 'Transport address' },
   { id: 'status', title: 'Status', sortable: true },
   { id: 'cert_valid_until', title: 'Certificate valid until', sortable: true },
 ];
+
+const columnRenderers: ColumnRenderers<DataNode> = {
+  attributes: {
+    hostname: {
+      renderCell: (_hostname: string, dataNode: DataNode) => (
+        <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(dataNode.id)}>
+          {dataNode.hostname}
+        </Link>
+      ),
+    },
+    status: {
+      renderCell: (_status: DataNodeStatus, dataNode: DataNode) => <DataNodeStatusCell dataNode={dataNode} />,
+    },
+    cert_valid_until: {
+      renderCell: (_cert_valid_until: string, dataNode: DataNode) => <RelativeTime dateTime={dataNode.cert_valid_until} />,
+    },
+  },
+};
+
+const SearchContainer = styled.div`
+  margin-bottom: 5px;
+`;
 
 const DataNodeList = () => {
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -66,12 +85,17 @@ const DataNodeList = () => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: { elements, pagination: { total } }, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes({
+  const { data: { elements, pagination: { total } }, isInitialLoading: isInitialLoadingDataNodes, refetch } = useDataNodes({
     query: query,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
   }, { enabled: !isLoadingLayoutPreferences });
+
+  useEffect(() => {
+    refetch();
+  }, [query, paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, refetch]);
+
   const {
     onPageSizeChange,
     onSearch,
@@ -84,7 +108,7 @@ const DataNodeList = () => {
     setQuery,
   });
 
-  const bulkActions = (selectedDataNodeIds, setSelectedDataNodeIds) => (
+  const bulkActions = (selectedDataNodeIds: string[], setSelectedDataNodeIds: (ids: string[]) => void) => (
     <DataNodeBulkActions selectedDataNodeIds={selectedDataNodeIds}
                          setSelectedDataNodeIds={setSelectedDataNodeIds}
                          dataNodes={elements} />
@@ -92,24 +116,6 @@ const DataNodeList = () => {
   const entityActions = () => (
     <DataNodeActions />
   );
-  const columnRenderers: ColumnRenderers<DataNode> = {
-    attributes: {
-      hostname: {
-        renderCell: (_hostname: string, dataNode: DataNode) => (
-          <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(dataNode.id)}>
-            {dataNode.hostname}
-          </Link>
-        ),
-      },
-      status: {
-        renderCell: (_status: DataNodeStatus, dataNode: DataNode) => <DataNodeStatusCell dataNode={dataNode} />,
-      },
-      cert_valid_until: {
-        renderCell: (_cert_valid_until: string, dataNode: DataNode) => <RelativeTime dateTime={dataNode.cert_valid_until} />,
-      },
-    },
-  };
-  const columnDefinitions = [...ATTRIBUTES];
 
   if (isLoadingLayoutPreferences || isInitialLoadingDataNodes) {
     return <Spinner />;
