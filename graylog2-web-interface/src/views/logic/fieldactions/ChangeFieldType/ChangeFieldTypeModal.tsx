@@ -140,12 +140,12 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
           showFiledInput && <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={onFieldChange} field={field} />
         }
         <Alert bsStyle="warning">
-          Changing the type of the field <b>{field ?? 'field'}</b> can have a significant impact on the ingestion of future log messages.
+          Changing the type of the field <b>{field}</b> can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
-        <StyledLabel>{`Select Field Type For ${field ?? 'Field'}`}</StyledLabel>
+        <StyledLabel>{`Select Field Type For ${field || 'Field'}`}</StyledLabel>
         <Input id="field_type">
           <StyledSelect inputId="field_type"
                         options={fieldTypeOptions}
@@ -153,7 +153,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
                         onChange={onChangeFieldType}
                         placeholder="Select field type"
                         disabled={isOptionsLoading}
-                        inputProps={{ 'aria-label': `Select Field Type For ${field ?? 'Field'}` }}
+                        inputProps={{ 'aria-label': `Select Field Type For ${field || 'Field'}` }}
                         required />
         </Input>
         {
@@ -169,7 +169,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
         }
         <StyledLabel>Select Rotation Strategy</StyledLabel>
         <p>
-          To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field ?? 'field'}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+          To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field || 'field'}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
         </p>
         <Input type="checkbox"
                id="rotate"
