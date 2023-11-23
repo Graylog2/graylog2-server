@@ -17,7 +17,6 @@
 package org.graylog2.cluster;
 
 import org.graylog2.cluster.nodes.DataNodeStatus;
-import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.plugin.system.NodeId;
 
@@ -34,10 +33,10 @@ import java.util.stream.Collectors;
 @Deprecated(since = "6.0")
 public class NodeServiceImpl implements NodeService {
 
-    private final ServerNodeClusterService delegate;
+    private final org.graylog2.cluster.nodes.NodeService<ServerNodeEntity> delegate;
 
     @Inject
-    public NodeServiceImpl(ServerNodeClusterService delegate) {
+    public NodeServiceImpl(org.graylog2.cluster.nodes.NodeService<ServerNodeEntity> delegate) {
         this.delegate = delegate;
     }
 
@@ -91,7 +90,7 @@ public class NodeServiceImpl implements NodeService {
                 .collect(
                         Collectors.toMap(
                                 Map.Entry::getKey,
-                                n -> (Node) n
+                                Map.Entry::getValue
                         ));
     }
 }
