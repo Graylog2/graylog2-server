@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
@@ -49,33 +49,35 @@ describe('<ContentPackInstallations />', () => {
     },
   ];
 
-  it('should render without installations', () => {
-    const wrapper = mount(<ContentPackInstallations />);
+  it('should render without installations', async () => {
+    render(<ContentPackInstallations />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('No data available.');
   });
 
-  it('should render with empty installations', () => {
-    const wrapper = mount(<ContentPackInstallations installations={[]} />);
+  it('should render with empty installations', async () => {
+    render(<ContentPackInstallations installations={[]} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('No data available.');
   });
 
-  it('should render with a installation', () => {
-    const wrapper = mount(<ContentPackInstallations installations={installations} />);
+  it('should render with a installation', async () => {
+    render(<ContentPackInstallations installations={installations} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('The fake input');
   });
 
-  it('should uninstall a installation', () => {
+  it('should uninstall a installation', async () => {
     const uninstallFn = jest.fn((contentPackId, installId) => {
       expect(contentPackId).toEqual(installations[0].content_pack_id);
       expect(installId).toEqual(installations[0]._id);
     });
-    const wrapper = mount(<ContentPackInstallations installations={installations} onUninstall={uninstallFn} />);
+    render(<ContentPackInstallations installations={installations} onUninstall={uninstallFn} />);
 
-    wrapper.find('button[children="Uninstall"]').simulate('click');
+    const uninstall = await screen.findByRole('button', { name: 'Uninstall' });
 
-    expect(uninstallFn.mock.calls.length).toBe(1);
+    uninstall.click();
+
+    expect(uninstallFn).toHaveBeenCalled();
   });
 });
