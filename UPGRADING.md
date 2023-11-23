@@ -18,7 +18,6 @@ Now this can be achieved by registering a `navigation` plugin.
 The plugin entity needs the `description` `System` and `children` (array).
 Every child represents a dropdown option and needs a `path` and `description` attribute.
 
-
 ## Java API Changes
 
 The following Java Code API changes have been made.
