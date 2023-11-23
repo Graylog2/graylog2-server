@@ -1,0 +1,5 @@
+type = "f"
+
+message = "Fixing problem with legacy theme mode in local storage, which can occur for read-only users when downgrading Graylog."
+
+pulls = ["17444"]
