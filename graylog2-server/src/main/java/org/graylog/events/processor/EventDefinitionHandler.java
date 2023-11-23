@@ -187,7 +187,8 @@ public class EventDefinitionHandler {
         final EventDefinitionDto eventDefinition = getEventDefinitionOrThrowIAE(eventDefinitionId);
 
         if (SystemNotificationEventEntityScope.NAME.equals(eventDefinition.scope())) {
-            throw new IllegalArgumentException("Cannot disable system notification events");
+            LOG.debug("Ignoring disable for system notification events");
+	    return;
         }
 
         getJobDefinition(eventDefinition)
