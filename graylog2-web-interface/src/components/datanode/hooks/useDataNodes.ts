@@ -18,73 +18,50 @@ import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
-import type { DataNode, DataNodeStatus } from 'preflight/types';
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
-import type { Attribute } from 'stores/PaginationTypes';
-import { defaultCompare } from 'logic/DefaultCompare';
+import type { DataNode } from 'preflight/types';
+import fetch from 'logic/rest/FetchProvider';
+import type { Attribute, PaginatedListJSON, SearchParams } from 'stores/PaginationTypes';
+import PaginationURL from 'util/PaginationURL';
 
-export const fetchDataNodes = () => fetchPeriodically<Array<DataNode>>('GET', qualifyUrl('/certrenewal'));
+type Options = {
+  enabled: boolean,
+}
 
-const useDataNodes = () : {
+const fetchDataNodes = async (params?: SearchParams) => {
+  const url = PaginationURL('/system/cluster/datanodes', params?.page, params?.pageSize, params?.query, { sort: params?.sort?.attributeId, order: params?.sort?.direction });
+
+  return fetch('GET', qualifyUrl(url));
+};
+
+const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: true }) : {
   data: {
     elements: Array<DataNode>,
-    total: number,
+    pagination: PaginatedListJSON,
     attributes: Array<Attribute>
   },
   refetch: () => void,
   isInitialLoading: boolean,
 } => {
-  const { data, refetch, isInitialLoading } = useQuery({
-    queryKey: ['data-nodes', 'overview'],
-    queryFn: fetchDataNodes,
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading data nodes failed with status: ${errorThrown}`,
-        'Could not load datanodes');
-    },
-    keepPreviousData: true,
-    refetchInterval: 3000,
-
-  });
-
-  const elements = data?.sort((d1, d2) => defaultCompare(d1.cert_valid_until, d2.cert_valid_until));
-  const total = elements?.length || 0;
-
-  const mockData = [
+  const { data, refetch, isInitialLoading } = useQuery(
+    ['datanodes'],
+    () => fetchDataNodes(params),
     {
-      id: '1',
-      is_leader: false,
-      is_master: false,
-      last_seen: '2023-11-02T13:20:58',
-      cert_valid_until: '2053-11-02T13:20:58',
-      error_msg: null,
-      hostname: 'datanode1',
-      node_id: '3af165ef-87a9-467f-b7db-435f4748eb75',
-      short_node_id: '3af165ef',
-      status: 'CONNECTED' as DataNodeStatus,
-      transport_address: 'http://datanode1:9200',
-      type: 'DATANODE',
+      onError: (errorThrown) => {
+        UserNotification.error(`Loading datanodes failed with status: ${errorThrown}`,
+          'Could not load datanodes');
+      },
+      keepPreviousData: true,
+      enabled,
     },
-    {
-      id: '2',
-      is_leader: false,
-      is_master: false,
-      last_seen: '2023-11-02T13:20:58',
-      cert_valid_until: '2053-11-02T13:20:58',
-      error_msg: null,
-      hostname: 'datanode2',
-      node_id: '9597fd2f-9c44-466b-ae47-e49ba54d3aeb',
-      short_node_id: '9597fd2f',
-      status: 'CONNECTED' as DataNodeStatus,
-      transport_address: 'http://datanode2:9200',
-      type: 'DATANODE',
-    },
-  ];
+  );
+
+  console.log(params, data);
 
   return ({
-    data: {
-      elements: mockData || data,
+    data: data || {
       attributes: [],
-      total,
+      elements: [],
+      pagination: { total: 0 },
     },
     refetch,
     isInitialLoading,

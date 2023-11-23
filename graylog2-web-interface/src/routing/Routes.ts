@@ -113,7 +113,6 @@ const Routes = {
     },
     DATANODES: {
       LIST: '/system/datanodes',
-      CREATE: '/system/datanodes/new',
       SHOW: (datanodeId: string) => `/system/datanodes/${datanodeId}`,
       CLUSTER: '/system/datanodes/cluster',
       MIGRATION: '/system/datanodes/migration',

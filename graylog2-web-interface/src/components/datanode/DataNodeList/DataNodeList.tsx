@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
-import type { DataNode } from 'preflight/types';
-import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
+import type { DataNode, DataNodeStatus } from 'preflight/types';
+import { PaginatedList, SearchForm, NoSearchResult, RelativeTime } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -37,19 +38,22 @@ import DataNodeStatusCell from './DataNodeStatusCell';
 
 import useDataNodes from '../hooks/useDataNodes';
 
+const SearchContainer = styled.div`
+  margin-bottom: 5px;
+`;
+
 const ENTITY_TABLE_ID = 'datanodes';
 const DEFAULT_LAYOUT = {
-  pageSize: 20,
+  pageSize: 10,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['hostname', 'transport_address', 'status', 'cert_valid_until', 'last_seen'],
-  columnsOrder: ['hostname', 'transport_address', 'status', 'cert_valid_until', 'last_seen'],
+  displayedColumns: ['hostname', 'transport_address', 'status', 'cert_valid_until'],
+  columnsOrder: ['hostname', 'transport_address', 'status', 'cert_valid_until'],
 };
 const ATTRIBUTES = [
   { id: 'hostname', title: 'Name', sortable: true, permissions: [] },
   { id: 'transport_address', title: 'Transport address' },
   { id: 'status', title: 'Status', sortable: true },
   { id: 'cert_valid_until', title: 'Certificate valid until', sortable: true },
-  { id: 'last_seen', title: 'Last seen', sortable: true },
 ];
 
 const DataNodeList = () => {
@@ -62,7 +66,12 @@ const DataNodeList = () => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: { elements, total }, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes();
+  const { data: { elements, pagination: { total } }, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes({
+    query: query,
+    page: paginationQueryParameter.page,
+    pageSize: layoutConfig.pageSize,
+    sort: layoutConfig.sort,
+  }, { enabled: !isLoadingLayoutPreferences });
   const {
     onPageSizeChange,
     onSearch,
@@ -75,10 +84,10 @@ const DataNodeList = () => {
     setQuery,
   });
 
-  const bulkActions: any = () => (
-    <DataNodeBulkActions selectedDataNodeIds={[]}
-                         setSelectedDataNodeIds={() => {}}
-                         dataNodes={[]} />
+  const bulkActions = (selectedDataNodeIds, setSelectedDataNodeIds) => (
+    <DataNodeBulkActions selectedDataNodeIds={selectedDataNodeIds}
+                         setSelectedDataNodeIds={setSelectedDataNodeIds}
+                         dataNodes={elements} />
   );
   const entityActions = () => (
     <DataNodeActions />
@@ -86,15 +95,17 @@ const DataNodeList = () => {
   const columnRenderers: ColumnRenderers<DataNode> = {
     attributes: {
       hostname: {
-        renderCell: (dataNode: DataNode) => (
+        renderCell: (_hostname: string, dataNode: DataNode) => (
           <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(dataNode.id)}>
             {dataNode.hostname}
           </Link>
         ),
       },
       status: {
-        renderCell: (dataNode: DataNode) => <DataNodeStatusCell dataNode={dataNode} />,
-        staticWidth: 100,
+        renderCell: (_status: DataNodeStatus, dataNode: DataNode) => <DataNodeStatusCell dataNode={dataNode} />,
+      },
+      cert_valid_until: {
+        renderCell: (_cert_valid_until: string, dataNode: DataNode) => <RelativeTime dateTime={dataNode.cert_valid_until} />,
       },
     },
   };
@@ -108,12 +119,12 @@ const DataNodeList = () => {
     <PaginatedList pageSize={layoutConfig.pageSize}
                    showPageSizeSelect={false}
                    totalItems={total}>
-      <div style={{ marginBottom: 5 }}>
+      <SearchContainer>
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
                     query={query}
                     queryHelpComponent={<QueryHelper entityName="datanode" />} />
-      </div>
+      </SearchContainer>
       <div>
         {elements?.length === 0 ? (
           <NoSearchResult>No Data Nodes have been found</NoSearchResult>
