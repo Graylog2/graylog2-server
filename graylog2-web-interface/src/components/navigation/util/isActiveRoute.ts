@@ -14,26 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AppConfig from '../AppConfig';
 
-type MenuItem = {
-  path: string,
-};
+import { appPrefixed } from 'util/URLUtils';
 
-const filterMenuItems = <T extends MenuItem>(
-  menuItems: Array<T>,
-  toExclude: Array<string>,
-): Array<T> => menuItems.filter((item) => !toExclude.includes(item.path));
+const isActiveRoute = (requestPath: string, path: string, end: string = undefined) => (
+  end ? requestPath === appPrefixed(path) : requestPath.indexOf(appPrefixed(path)) === 0
+);
 
-export const filterCloudMenuItems = <T extends MenuItem>(
-  menuItems: Array<T>,
-  toExclude: Array<string>,
-): Array<T> => {
-  if (!AppConfig.isCloud()) {
-    return menuItems;
-  }
-
-  return filterMenuItems(menuItems, toExclude);
-};
-
-export default filterMenuItems;
+export default isActiveRoute;

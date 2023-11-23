@@ -54,7 +54,7 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $si
       box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
       z-index: 5; /* to render over Sidebar ContentColumn */
     }
-  `}
+`}
 `);
 
 const ContentGrid = styled.div(({ theme }) => css`
