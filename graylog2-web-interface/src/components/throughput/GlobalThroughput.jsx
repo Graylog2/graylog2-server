@@ -89,7 +89,7 @@ const ThroughputData = styled.span(({ $dataIn, theme }) => css`
       background-color: ${theme.colors.variant.light.default};
       display: block;
       grid-area: 2 / 1 / 3 / 3;
-    `}
+`}
   }
 `);
 
