@@ -80,7 +80,7 @@ const Switcher = () => {
       <Menu shadow="md" withinPortal>
         <ActivePerspectiveBrand>
           <Menu.Target>
-            <DropdownTrigger type="button">
+            <DropdownTrigger type="button" title="Change UI perspective">
               <DropdownIcon name="caret-down" />
             </DropdownTrigger>
           </Menu.Target>
