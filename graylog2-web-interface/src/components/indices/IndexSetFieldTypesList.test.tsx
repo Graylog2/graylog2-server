@@ -216,10 +216,10 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field');
 
-      const editButton = await within(tableRow).findByText('Edit');
       await within(tableRow).findByTitle('Field has reserved field type');
+      const editButton = await within(tableRow).findByRole('button', { name: /Edit/i });
 
-      expect(editButton.hasAttribute('disabled')).toBe(true);
+      expect(editButton).toBeDisabled();
     });
   });
 
