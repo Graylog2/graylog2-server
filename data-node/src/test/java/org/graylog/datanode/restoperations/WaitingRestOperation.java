@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode;
+package org.graylog.datanode.restoperations;
 
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
@@ -25,74 +25,36 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.NoHttpResponseException;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLHandshakeException;
 import java.net.SocketException;
-import java.security.KeyStore;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-public class DatanodeRestApiWait {
+public abstract class WaitingRestOperation extends RestOperation {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeRestApiWait.class);
-    private static final int ATTEMPTS_COUNT = 160;
-
-    private final int datanodePort;
-    private KeyStore truststore;
-    private String restApiUsername;
-    private String restApiPassword;
     private String lastRecordedResponse;
 
-    private DatanodeRestApiWait(int opensearchPort) {
-        this.datanodePort = opensearchPort;
+    protected WaitingRestOperation(RestOperationParameters parameters) {
+        super(parameters);
     }
-
-    public static DatanodeRestApiWait onPort(int datanodePort) {
-        return new DatanodeRestApiWait(datanodePort);
-    }
-
-    public DatanodeRestApiWait withTruststore(KeyStore truststore) {
-        this.truststore = truststore;
-        return this;
-    }
-
-    public DatanodeRestApiWait withBasicAuth(String username, String password) {
-        this.restApiUsername = username;
-        this.restApiPassword = password;
-        return this;
-    }
-
-    public ValidatableResponse waitForAvailableStatus() throws ExecutionException, RetryException {
-        return waitForDatanode(
-                input -> !input.extract().body().path("opensearch.node.state").equals("AVAILABLE")
-        );
-    }
-
 
     @SafeVarargs
-    private ValidatableResponse waitForDatanode(Predicate<ValidatableResponse>... predicates) throws ExecutionException, RetryException {
+    final ValidatableResponse waitForResponse(String url, Predicate<ValidatableResponse>... predicates) throws ExecutionException, RetryException {
 
-        if(LOG.isInfoEnabled()) {
-            LOG.info("cURL request: " + formatCurlConnectionInfo());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("cURL request: " + formatCurlConnectionInfo(parameters.port(), url));
         }
 
         //noinspection UnstableApiUsage
         final RetryerBuilder<ValidatableResponse> builder = RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(ATTEMPTS_COUNT))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(parameters.attempts_count()))
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
                 .retryIfException(input -> input instanceof SSLHandshakeException) // may happen before SSL is configured properly
@@ -119,42 +81,19 @@ public class DatanodeRestApiWait {
                 final RequestSpecification req = RestAssured.given()
                         .accept(ContentType.JSON);
 
-                Optional.ofNullable(truststore).ifPresent(ts -> req.trustStore(truststore));
+                Optional.ofNullable(parameters.truststore()).ifPresent(ts -> req.trustStore(parameters.truststore()));
 
-                if (restApiUsername != null && restApiPassword != null) {
-                    req.auth().basic(restApiUsername, restApiPassword);
-                }
+                parameters.addAuthorizationHeaders(req);
 
-                return req.get(formatDatanodeRestUrl())
+                return req.get(formatUrl(parameters.port(), url))
                         .then();
             });
         } catch (Exception e) {
             if (lastRecordedResponse != null) {
-                LOG.warn("Last recorded opensearch response, waiting for {}: {}", formatDatanodeRestUrl(), lastRecordedResponse);
+                LOG.warn("Last recorded opensearch response, waiting for {}: {}", formatUrl(parameters.port(), url), lastRecordedResponse);
             }
             throw e;
         }
     }
 
-    private String formatCurlConnectionInfo() {
-        List<String> builder = new LinkedList<>();
-        builder.add("curl -k"); // trust self-signed certs
-        if(restApiUsername != null && restApiPassword != null) {
-            builder.add("-u \"" + restApiUsername + ":" + restApiPassword + "\"");
-        }
-        builder.add(formatDatanodeRestUrl());
-        return String.join(" ", builder);
-    }
-
-    @NotNull
-    private String formatDatanodeRestUrl() {
-        return "https://localhost:" + datanodePort;
-    }
-
-    private String serializeResponse(ExtractableResponse<Response> extract) {
-        final String body = extract.body().asString();
-        final String contentType = extract.contentType();
-        final String headers = extract.headers().toString();
-        return String.format(Locale.ROOT, "\nContent-type: %s\nheaders: %s\nbody: %s", contentType, headers, body);
-    }
 }

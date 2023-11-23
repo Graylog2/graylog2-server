@@ -114,7 +114,7 @@ const UserConfig = () => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal && formConfig}
+          <Modal show={showModal && !!formConfig}
                  onHide={resetConfig}
                  aria-modal="true"
                  aria-labelledby="dialog_label">

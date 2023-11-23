@@ -1,0 +1,19 @@
+type = "changed"
+message = "Changed Content Packs handling to allow import/export of entites that reference Streams by title."
+
+pulls = ["16743"]
+
+details.user = """
+Previously it was not possible to create a Content Pack with Stream scoped entities without also exporting the referenced Stream,
+and potentially duplicating the Stream.
+
+For example, if a user had a Dashboard with a widget that was scoped to "stream_xyz" that they wished to create a
+Content Pack with to use on another system, there were two options:
+- Remove the Stream from the Dashboard widget before export, then re-associate the Stream with the Dashboard after uploading.
+- Export the Stream along with the Dashboard, in which case a new "stream_xyz" would be created on the uploading system
+    (whether it already existed or not).
+
+This change allows users to create a Content Pack with a "stream_xyz" scoped Dashboard, referencing the Stream by title only.
+When uploaded and installed, the Content Pack will resolve the existing stream with title "stream_xyz",
+and associate it to the new Dashboard.
+"""

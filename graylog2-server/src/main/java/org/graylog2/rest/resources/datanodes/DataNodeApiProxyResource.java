@@ -54,6 +54,7 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 @RequiresPermissions("*")
 public class DataNodeApiProxyResource extends RestResource {
     private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
+            request -> request.path().startsWith("_cluster"),
             request -> request.path().startsWith("_cat"),
             request -> request.path().startsWith("_mapping") && request.method().equals("GET")
     );

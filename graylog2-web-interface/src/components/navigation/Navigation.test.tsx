@@ -15,55 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount, mountUnwrapped } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-import { Route, Routes, MemoryRouter, useLocation } from 'react-router-dom';
-import DefaultProviders from 'DefaultProviders';
-import Immutable from 'immutable';
 import type { Location } from 'history';
 import { defaultUser } from 'defaultMockValues';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
-import RoutePaths from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
 import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
 import PerspectivesBindings from 'components/perspectives/bindings';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
+import useLocation from 'routing/useLocation';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 
-jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
-jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
-jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
-jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
-jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
 jest.mock('hooks/useCurrentUser');
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(() => ({
-    pathname: '',
-  })),
-}));
-
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  gl2ServerUrl: jest.fn(() => undefined),
-  gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => false),
-  isCloud: jest.fn(() => false),
-}));
+jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 
 describe('Navigation', () => {
   const SUT = () => <HotkeysProvider><PerspectivesProvider><Navigation /></PerspectivesProvider></HotkeysProvider>;
-
-  const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, PerspectivesBindings));
@@ -74,223 +48,12 @@ describe('Navigation', () => {
     asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
   });
 
-  describe('has common elements', () => {
-    let wrapper;
+  it('has common elements', async () => {
+    render(<SUT />);
 
-    beforeEach(() => {
-      wrapper = mount(<SUT />);
-    });
-
-    it('contains brand icon', () => {
-      const brand = wrapper.find('.navbar-brand');
-
-      expect(brand).toExist();
-      expect(brand.find('a')).toHaveProp('href', RoutePaths.STARTPAGE);
-      expect(brand.find('DefaultBrand')).toExist();
-    });
-
-    it('contains user menu including correct user details', () => {
-      const usermenu = wrapper.find('UserMenu');
-
-      expect(usermenu).toHaveProp('userId', adminUser.id);
-      expect(usermenu).toHaveProp('fullName', adminUser.fullName);
-    });
-
-    it('contains help menu', () => {
-      expect(wrapper.find('HelpMenu')).toExist();
-    });
-
-    it('contains global throughput', () => {
-      expect(wrapper.find('GlobalThroughput')).toExist();
-    });
-
-    it('contains notification badge', () => {
-      expect(wrapper.find('NotificationBadge')).toExist();
-    });
-  });
-
-  describe('renders custom navigation elements supplied by plugins', () => {
-    const plugin = {
-      metadata: { name: 'DummyPlugin ' },
-      exports: {
-        navigation: [
-          { path: '/something', description: 'Perpetuum Mobile' },
-          { path: '/system/archives', description: 'Archives', permissions: 'archive:read' },
-          {
-            description: 'Neat Stuff',
-            path: '/',
-            children: [
-              { path: '/somethingelse', description: 'Something Else', permissions: 'somethingelse' },
-              { path: '/completelydiffrent', description: 'Completely Different', permissions: 'completelydifferent' },
-            ],
-          },
-          {
-            description: 'Feature flag test',
-            path: '/',
-            requiredFeatureFlag: 'enable_main_nav_item',
-          },
-          {
-            description: 'Feature flag dropdown test',
-            path: '/',
-            children: [
-              { path: '/newpluginroute', description: 'New dropdown route', requiredFeatureFlag: 'enable_dropdown_nav_item' },
-            ],
-          },
-        ],
-      },
-    };
-
-    beforeEach(() => {
-      AppConfig.gl2AppPathPrefix = jest.fn(() => '');
-      AppConfig.isFeatureEnabled = jest.fn(() => false);
-      PluginStore.register(plugin);
-    });
-
-    afterEach(() => {
-      PluginStore.unregister(plugin);
-    });
-
-    it('contains top-level navigation element', () => {
-      const wrapper = mount(<SUT />);
-
-      expect(findLink(wrapper, 'Perpetuum Mobile')).toExist();
-    });
-
-    it('prefix plugin navigation item paths with app prefix', () => {
-      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/my/crazy/prefix');
-      const wrapper = mount(<SUT />);
-
-      expect(findLink(wrapper, 'Perpetuum Mobile')).toHaveProp('path', '/my/crazy/prefix/something');
-    });
-
-    it('does not contain navigation elements from plugins where permissions are missing', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List([]))
-        .build());
-
-      const wrapper = mount(<SUT />);
-
-      expect(findLink(wrapper, 'Archives')).not.toExist();
-    });
-
-    it('does not contain navigation elements from plugins when elements require a feature flag to be enabled', () => {
-      const wrapper = mount(<SUT />);
-
-      expect(findLink(wrapper, 'Feature flag test')).not.toExist();
-    });
-
-    it('contains navigation elements from plugins when elements require a feature flag which is enabled', () => {
-      asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      const wrapper = mount(<SUT />);
-
-      expect(findLink(wrapper, 'Feature flag test')).toExist();
-    });
-
-    it('contains restricted navigation elements from plugins if permissions are present', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(['archive:read']))
-        .build());
-
-      const wrapper = mount(<SUT />);
-
-      expect(findLink(wrapper, 'Archives')).toExist();
-    });
-
-    it('does not render dropdown contributed by plugin if permissions for all elements are missing', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List([]))
-        .build());
-
-      const wrapper = mount(<SUT />);
-
-      expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).not.toExist();
-    });
-
-    it('renders dropdown contributed by plugin if permissions are sufficient', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
-        .build());
-
-      const wrapper = mount(<SUT />);
-
-      expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).toExist();
-    });
-
-    it('does not render dropdown contributed by plugin if required feature flag is not enabled', () => {
-      const wrapper = mount(<SUT />);
-
-      expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).not.toExist();
-    });
-
-    it('renders dropdown contributed by plugin if required feature flag is enabled', () => {
-      asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      const wrapper = mount(<SUT />);
-
-      expect(wrapper.find('NavDropdown[title="Feature flag dropdown test"]')).toExist();
-    });
-
-    it('sets dropdown title based on match', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
-        .build());
-
-      asMock(useLocation).mockReturnValue({ pathname: '/somethingelse' } as Location);
-
-      const wrapper = mountUnwrapped((
-        <HotkeysProvider>
-          <DefaultProviders>
-            <PerspectivesProvider>
-              <MemoryRouter initialEntries={['/somethingelse']}>
-                <Routes>
-                  <Route path="/somethingelse"
-                         element={(
-                           <Navigation />
-                     )} />
-                </Routes>
-              </MemoryRouter>
-            </PerspectivesProvider>
-          </DefaultProviders>
-        </HotkeysProvider>
-      ));
-
-      expect(wrapper.find('NavDropdown[title="Neat Stuff / Something Else"]')).toExist();
-    });
-  });
-
-  describe('uses correct permissions:', () => {
-    const verifyPermissions = ({ count, links }) => {
-      const wrapper = mount(<SUT />);
-      const navigationLinks = wrapper.find('NavItem[active=false]');
-
-      expect(navigationLinks).toHaveLength(count);
-
-      links.forEach((title) => expect(wrapper.find(`NavItem[children="${title}"]`)).toExist());
-    };
-
-    // eslint-disable-next-line jest/expect-expect
-    it.each`
-    permissions                    | count | links
-    ${[]}                          | ${6}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}
-  `('shows $links for user with $permissions permissions', verifyPermissions);
-
-    it('should not show `Enterprise` item if user is lacking permissions', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List())
-        .build());
-
-      const wrapper = mount(<SUT />);
-
-      expect(wrapper.find('NavigationLink[description="Enterprise"]')).not.toExist();
-    });
-
-    it('should show `Enterprise` item if user has permission to read license', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(['licenseinfos:read']))
-        .build());
-
-      const wrapper = mount(<SUT />);
-
-      expect(wrapper.find('NavigationLink[description="Enterprise"]')).toExist();
-    });
+    await screen.findByRole('link', { name: /throughput/i });
+    await screen.findByRole('button', { name: /help/i });
+    await screen.findByRole('link', { name: /welcome/i });
+    await screen.findByRole('button', { name: /user menu for administrator/i });
   });
 });

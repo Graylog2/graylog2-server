@@ -20,8 +20,9 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.DatanodeRestApiWait;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
+import org.graylog.datanode.restoperations.DatanodeRestApiWait;
+import org.graylog.datanode.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
@@ -125,9 +126,13 @@ public class DatanodeSecuritySetupIT {
     private ValidatableResponse waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore, String authUsername, String authPassword) throws ExecutionException, RetryException {
 
         try {
-            return DatanodeRestApiWait.onPort(datanodeRestPort)
-                    .withTruststore(trustStore)
-                    .withBasicAuth(authUsername, authPassword)
+            return new DatanodeRestApiWait(
+                    RestOperationParameters.builder()
+                            .port(datanodeRestPort)
+                            .truststore(trustStore)
+                            .username(authUsername)
+                            .password(authPassword)
+                            .build())
                     .waitForAvailableStatus();
         } catch (Exception ex) {
             LOG.error("Error starting the DataNode, showing logs:\n" + backend.getLogs());

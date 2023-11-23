@@ -20,6 +20,7 @@ import find from 'lodash/find';
 import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/bootstrap';
+import type { SelectCallback } from 'components/bootstrap/types';
 
 import Icon from './Icon';
 
@@ -295,7 +296,7 @@ class Wizard extends React.Component<Props, State> {
         <Nav stacked
              bsStyle="pills"
              activeKey={selectedStep}
-             onSelect={this._wizardChanged}
+             onSelect={this._wizardChanged as SelectCallback}
              justified={justified}>
           {steps.map((navItem) => (
             <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
@@ -352,7 +353,7 @@ class Wizard extends React.Component<Props, State> {
         )}
         <StyledNav bsStyle="pills"
                    activeKey={selectedStep}
-                   onSelect={this._wizardChanged}
+                   onSelect={this._wizardChanged as SelectCallback}
                    justified={justified}>
           {steps.map((navItem) => (
             <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>))}

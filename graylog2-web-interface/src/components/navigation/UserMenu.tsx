@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -24,22 +23,18 @@ import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import useHistory from 'routing/useHistory';
+import useCurrentUser from 'hooks/useCurrentUser';
 import Menu from 'components/bootstrap/Menu';
 
 import ThemeModeToggle from './ThemeModeToggle';
-
-type Props = {
-  fullName: string,
-  userId: string,
-  readOnly: boolean,
-};
 
 const FullName = styled.span`
   text-transform: uppercase;
   font-weight: 700;
 `;
 
-const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
+const UserMenu = () => {
+  const { fullName, readOnly, id: userId } = useCurrentUser();
   const history = useHistory();
   const route = readOnly
     ? Routes.SYSTEM.USERS.show(userId)
@@ -59,7 +54,7 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
 
   return (
     <NavDropdown title={<Icon name="user" size="lg" />}
-                 aria-label={`User Menu for ${fullName}`}
+                 hoverTitle={`User Menu for ${fullName}`}
                  noCaret>
       <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
       <Menu.Divider />
@@ -70,14 +65,9 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
       <LinkContainer to={route}>
         <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <Menu.Item onSelect={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
+      <Menu.Item onClick={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
     </NavDropdown>
   );
-};
-
-UserMenu.propTypes = {
-  userId: PropTypes.string.isRequired,
-  fullName: PropTypes.string.isRequired,
 };
 
 export default UserMenu;
