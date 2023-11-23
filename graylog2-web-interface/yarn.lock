@@ -3165,10 +3165,10 @@
     expect "^29.0.0"
     pretty-format "^29.0.0"
 
-"@types/jquery@3.5.27":
-  version "3.5.27"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.27.tgz#d9d67a003d0292a36fe35868a618c82f8fd12b19"
-  integrity sha512-TR28Y8ezIGgfyA02UOh9x+Fy16/1qWYAnvtRd2gTBJuccX/vmddyti0MezLkTv7f+OLofVc2T961VPyKv1tXJQ==
+"@types/jquery@3.5.29":
+  version "3.5.29"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.29.tgz#3c06a1f519cd5fc3a7a108971436c00685b5dcea"
+  integrity sha512-oXQQC9X9MOPRrMhPHHOsXqeQDnWeCDT3PelUIg/Oy8FAbzSZtFHRjc7IpbfFVmpLtJ+UOoywpRsuO5Jxjybyeg==
   dependencies:
     "@types/sizzle" "*"
 
@@ -7099,7 +7099,7 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-jsx-a11y "6.8.0"
     eslint-plugin-react "7.33.2"
     eslint-plugin-react-hooks "4.6.0"
-    eslint-plugin-testing-library "6.1.2"
+    eslint-plugin-testing-library "6.2.0"
 
 eslint-import-resolver-node@^0.3.6:
   version "0.3.6"
@@ -7239,10 +7239,10 @@ eslint-plugin-react@7.33.2:
     semver "^6.3.1"
     string.prototype.matchall "^4.0.8"
 
-eslint-plugin-testing-library@6.1.2:
-  version "6.1.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-6.1.2.tgz#3e71e5cd5b09f5c443b7136cec97a6fb13ecbf66"
-  integrity sha512-Ra16FeBlonfbScOIdZEta9o+OxtwDqiUt+4UCpIM42TuatyLdtfU/SbwnIzPcAszrbl58PGwyZ9YGU9dwIo/tA==
+eslint-plugin-testing-library@6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-6.2.0.tgz#af3340b783c881eb19ec5ac6b3a4bfe8ab4a1f74"
+  integrity sha512-+LCYJU81WF2yQ+Xu4A135CgK8IszcFcyMF4sWkbiu6Oj+Nel0TrkZq/HvDw0/1WuO3dhDQsZA/OpEMGd0NfcUw==
   dependencies:
     "@typescript-eslint/utils" "^5.58.0"
 
@@ -8534,7 +8534,7 @@ graphemer@^1.4.0:
     "@graylog/sawmill" "2.0.7"
     "@tanstack/react-query" "4.36.1"
     "@types/create-react-class" "15.6.6"
-    "@types/jquery" "3.5.27"
+    "@types/jquery" "3.5.29"
     "@types/react" "18.2.20"
     babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
@@ -12355,9 +12355,9 @@ postcss@^8.4.21, postcss@^8.4.28, postcss@^8.4.31:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.92.1"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.92.1.tgz#2f3c370c649411cd04b90d085435a8f4bd190264"
-  integrity sha512-xtuTfM/acfDauiEfIdKF6d911KUZQ7RLii2COAYEoPWr3cVUFoNUoRQz9QJvgDlV2j22Zwl+mnXacUeua+Yi1A==
+  version "1.93.0"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.93.0.tgz#de6358ddfeb0a61a44c4620720db67e39051d47a"
+  integrity sha512-DKpn+AP8V8GuK0gcaCWbqN4jgs8bXe0LIyT4Jgjh6n486rJfVgzReV0cw6pyfVNWR6LZ+CvAMoqqYgJ0nH0z3g==
   dependencies:
     fflate "^0.4.1"
 
