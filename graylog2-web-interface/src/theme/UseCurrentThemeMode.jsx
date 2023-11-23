@@ -29,6 +29,12 @@ import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { PreferencesStore } = CombinedProvider.get('Preferences');
 
+const storeThemePreference = () => {
+  const preference = Store.get(PREFERENCES_THEME_MODE);
+
+  return preference === THEME_MODE_LIGHT || preference === THEME_MODE_DARK ? preference : null;
+};
+
 const useCurrentThemeMode = () => {
   const browserThemePreference = usePrefersColorScheme();
 
@@ -39,7 +45,7 @@ const useCurrentThemeMode = () => {
   }));
 
   const userPreferences = useContext(UserPreferencesContext);
-  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
+  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? storeThemePreference();
   const initialThemeMode = userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
   const [currentThemeMode, setCurrentThemeMode] = useState<string>(initialThemeMode);
 
