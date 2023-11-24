@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Streams;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import org.graylog.shaded.elasticsearch7.org.apache.http.ContentTooLongException;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
@@ -120,6 +121,9 @@ public class ElasticsearchClient {
         try {
             return fn.apply(client, requestOptions());
         } catch (IOException e) {
+            if (e.getCause() instanceof ContentTooLongException) {
+                throw new BatchSizeTooLargeException(e.getMessage());
+            }
             throw e;
         } catch (Exception e) {
             throw exceptionFrom(e, errorMessage);
@@ -154,6 +158,8 @@ public class ElasticsearchClient {
             if (isBatchSizeTooLargeException(elasticsearchException)) {
                 throw new BatchSizeTooLargeException(elasticsearchException.getMessage());
             }
+        } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
+            throw new BatchSizeTooLargeException(e.getMessage());
         }
         return new ElasticsearchException(errorMessage, e);
     }
