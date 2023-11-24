@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.datatiering.DeleteSnapshotEvent;
+import org.graylog2.datatiering.SearchableSnapshotInfo;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
@@ -106,8 +108,11 @@ public class Indices {
     }
 
     public void delete(String indexName) {
+        Optional<SearchableSnapshotInfo> snapshotInfoOptional = indicesAdapter.getSearchableSnapshotInfo(indexName);
         indicesAdapter.delete(indexName);
+
         eventBus.post(IndicesDeletedEvent.create(indexName));
+        snapshotInfoOptional.ifPresent(snapshotInfo -> eventBus.post(new DeleteSnapshotEvent(snapshotInfo)));
     }
 
     public void close(String indexName) {

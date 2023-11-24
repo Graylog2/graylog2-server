@@ -46,6 +46,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMap
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.collect.ImmutableOpenMap;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
@@ -62,6 +64,7 @@ import org.graylog.storage.elasticsearch7.blocks.BlockSettingsParser;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
+import org.graylog2.datatiering.SearchableSnapshotInfo;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
@@ -73,6 +76,7 @@ import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.Message;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -582,5 +586,24 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + index);
         return response.getSetting(index, "index.uuid");
+    }
+
+    @Override
+    public Optional<SearchableSnapshotInfo> getSearchableSnapshotInfo(String index) {
+        final GetSettingsResponse settingsResponse = client.execute((c, options) ->
+                c.indices().getSettings(new GetSettingsRequest().indices(index), options));
+        ImmutableOpenMap<String, Settings> indexToSettings = settingsResponse.getIndexToSettings();
+
+        return Optional.ofNullable(indexToSettings.get(index))
+                .filter(settings -> "remote_snapshot".equals(settings.get("index.store.type")))
+                .map(settings -> mapIndexSettingsToSearchableSnapshot(index, settings));
+    }
+
+    private SearchableSnapshotInfo mapIndexSettingsToSearchableSnapshot(String index, Settings settings) {
+        String initialIndexName = settings.get("index.provided_name");
+        Settings searchableSnapshotSettings = settings.getAsSettings("index.searchable_snapshot");
+        String repository = searchableSnapshotSettings.get("repository");
+        String snapshotName = searchableSnapshotSettings.get("snapshot_id.name");
+        return new SearchableSnapshotInfo(index, initialIndexName, repository, snapshotName);
     }
 }
