@@ -29,8 +29,8 @@ import java.nio.charset.Charset;
 /**
  * Check required system parameters
  */
-public class SysCheck implements PreflightCheck {
-    private static final Logger LOG = LoggerFactory.getLogger(SysCheck.class);
+public class OpenSearchPreconditionsCheck implements PreflightCheck {
+    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchPreconditionsCheck.class);
     private static final long MAX_MAP_COUNT_MIN = 262144L;
 
     @Override
