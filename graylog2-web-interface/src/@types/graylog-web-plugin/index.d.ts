@@ -53,12 +53,6 @@ interface PluginNavigationItems {
   key: string;
   component: React.ComponentType<{ smallScreen?: boolean }>;
 }
-interface SystemNavigationItem {
-  description: string;
-  path: string;
-  permissions: string | Array<string>;
-  perspective?: string,
-}
 interface GlobalNotification {
   key: string;
   component: React.ComponentType;
@@ -135,7 +129,6 @@ declare module 'graylog-web-plugin/plugin' {
     navigation?: Array<PluginNavigation>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    systemnavigation?: Array<SystemNavigationItem>;
     globalNotifications?: Array<GlobalNotification>
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
