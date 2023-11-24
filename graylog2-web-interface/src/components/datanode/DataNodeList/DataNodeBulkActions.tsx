@@ -30,6 +30,7 @@ type Props = {
 
 const DataNodeBulkActions = ({ selectedDataNodeIds, setSelectedDataNodeIds }: Props) => (
   <BulkActionsDropdown selectedEntities={selectedDataNodeIds} setSelectedEntities={setSelectedDataNodeIds}>
+    <MenuItem onSelect={() => { }}>Renew certificate</MenuItem>
     <MenuItem onSelect={() => { }}>Restart</MenuItem>
     <MenuItem onSelect={() => { }}>Remove</MenuItem>
   </BulkActionsDropdown>

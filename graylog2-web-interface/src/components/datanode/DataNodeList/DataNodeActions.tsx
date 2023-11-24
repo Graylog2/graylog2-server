@@ -16,19 +16,28 @@
  */
 import * as React from 'react';
 
+import type { DataNode } from 'preflight/types';
 import { MenuItem } from 'components/bootstrap';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import Routes from 'routing/Routes';
 
-const DataNodeActions = () => (
+import { rejoinDataNode, removeDataNode } from '../hooks/useDataNodes';
+
+type Props = {
+  dataNode: DataNode,
+};
+
+const DataNodeActions = ({ dataNode }: Props) => (
   <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
                          bsSize="xsmall"
                          buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                          disabled={false}
                          dropdownZIndex={1000}>
-    <MenuItem onSelect={() => {}}>Edit</MenuItem>
-    <MenuItem onSelect={() => {}}>Restart</MenuItem>
-    <MenuItem onSelect={() => {}}>Remove</MenuItem>
+    <MenuItem onSelect={() => Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>Edit</MenuItem>
+    <MenuItem onSelect={() => {}}>Renew certificate</MenuItem>
+    <MenuItem onSelect={() => rejoinDataNode(dataNode.node_id)}>Restart</MenuItem>
+    <MenuItem onSelect={() => removeDataNode(dataNode.node_id)}>Remove</MenuItem>
   </OverlayDropdownButton>
 );
 

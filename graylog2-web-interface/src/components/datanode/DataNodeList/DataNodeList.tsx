@@ -57,7 +57,7 @@ const columnRenderers: ColumnRenderers<DataNode> = {
   attributes: {
     hostname: {
       renderCell: (_hostname: string, dataNode: DataNode) => (
-        <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(dataNode.id)}>
+        <Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>
           {dataNode.hostname}
         </Link>
       ),
@@ -113,8 +113,8 @@ const DataNodeList = () => {
                          setSelectedDataNodeIds={setSelectedDataNodeIds}
                          dataNodes={elements} />
   );
-  const entityActions = () => (
-    <DataNodeActions />
+  const entityActions = (dataNode: DataNode) => (
+    <DataNodeActions dataNode={dataNode} />
   );
 
   if (isLoadingLayoutPreferences || isInitialLoadingDataNodes) {

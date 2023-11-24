@@ -17,18 +17,15 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import PaginationURL from 'util/PaginationURL';
 import type { DataNode } from 'preflight/types';
+import UserNotification from 'preflight/util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, PaginatedListJSON, SearchParams } from 'stores/PaginationTypes';
-import PaginationURL from 'util/PaginationURL';
 
 export const removeDataNode = async (datanodeId: string) => {
   try {
-    await fetch(
-      'DELETE',
-      qualifyUrl(`/datanode/${datanodeId}`),
-    );
+    await fetch('DELETE', qualifyUrl(`/datanode/${datanodeId}`));
 
     UserNotification.success(`Datanode "${datanodeId}" removed successfully`);
   } catch (errorThrown) {
@@ -38,10 +35,7 @@ export const removeDataNode = async (datanodeId: string) => {
 
 export const rejoinDataNode = async (datanodeId: string) => {
   try {
-    await fetch(
-      'POST',
-      qualifyUrl(`/datanode/${datanodeId}/reset`),
-    );
+    await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/reset`));
 
     UserNotification.success(`Datanode "${datanodeId}" rejoined successfully`);
   } catch (errorThrown) {
