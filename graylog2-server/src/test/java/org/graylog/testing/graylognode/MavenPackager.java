@@ -29,8 +29,6 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static org.graylog.testing.graylognode.ExecutableFileUtil.makeSureExecutableIsFound;
-
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
     private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true ";
@@ -49,14 +47,13 @@ public class MavenPackager {
             LOG.info("Assuming jars are current.");
         } else {
             LOG.info("Running from outside Maven. Packaging server jar now...");
-            makeSureExecutableIsFound("mvn");
             packageJar(mavenProjectDirProvider);
         }
     }
 
     public static boolean isRunFromMaven() {
         // surefire-related properties should only be present when the tests are started from surefire, i.e. maven
-        return System.getProperty("surefire.test.class.path") != null;
+        return System.getProperty("XXXXsurefire.test.class.path") != null;
     }
 
     public static void packageJar(final MavenProjectDirProvider mavenProjectDirProvider) {
