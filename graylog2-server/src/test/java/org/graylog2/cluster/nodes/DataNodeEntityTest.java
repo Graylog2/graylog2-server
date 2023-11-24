@@ -32,15 +32,15 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ServerNodeEntityTest {
-
+class DataNodeEntityTest {
     private final ObjectMapper mapper = new ObjectMapperProvider().get();
 
     @Test
     void serialize() throws Exception {
         final ZonedDateTime lastSeen = Instant.ofEpochSecond(1).atZone(ZoneOffset.UTC);
         final String nodeId = "2d4cff7a-b9c4-440c-9c62-89ba1fb06211";
-        final String transportAddress = "http://127.0.0.1:9000/api/";
+        final String transportAddress = "http://127.0.0.1:9200";
+        final String clusterAddress = "http://127.0.0.1:9300";
         final String hostname = "graylog.local";
         final Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", (int) lastSeen.toEpochSecond());
@@ -48,13 +48,15 @@ class ServerNodeEntityTest {
         fields.put("is_leader", true);
         fields.put("transport_address", transportAddress);
         fields.put("hostname", hostname);
+        fields.put("datanode_status", DataNodeStatus.AVAILABLE);
+        fields.put("cluster_address", clusterAddress);
 
         final String id = "61b9c2861448530c3e061283";
-        final ServerNodeEntity node = new ServerNodeEntity(new ObjectId(id), fields);
+        final DataNodeEntity node = new DataNodeEntity(new ObjectId(id), fields);
 
         final JsonNode jsonNode = mapper.readTree(mapper.writeValueAsString(node));
 
-        assertThat(jsonNode.size()).isEqualTo(8);
+        assertThat(jsonNode.size()).isEqualTo(10);
 
         assertThat(ZonedDateTime.parse(jsonNode.path("last_seen").asText())).isEqualTo(lastSeen);
         assertThat(jsonNode.path("node_id").asText()).isEqualTo(nodeId);
@@ -65,13 +67,16 @@ class ServerNodeEntityTest {
         assertThat(jsonNode.path("id").asText()).isEqualTo(id);
         assertThat(jsonNode.path("is_master").asBoolean()).isEqualTo(true);
         assertThat(jsonNode.path("short_node_id").asText()).isEqualTo("2d4cff7a");
+        assertThat(jsonNode.path("data_node_status").asText()).isEqualTo(DataNodeStatus.AVAILABLE.name());
 
-        assertThat(node.toDto()).isEqualTo(ServerNodeDto.Builder.builder()
+        assertThat(node.toDto()).isEqualTo(DataNodeDto.Builder.builder()
                 .setLastSeen(new DateTime(lastSeen.toEpochSecond() * 1000, DateTimeZone.UTC))
                 .setId(nodeId)
                 .setLeader(true)
                 .setTransportAddress(transportAddress)
                 .setHostname(hostname)
+                .setDataNodeStatus(DataNodeStatus.AVAILABLE)
+                .setClusterAddress(clusterAddress)
                 .setObjectId(id)
                 .build());
     }
