@@ -42,6 +42,8 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import MenuItem from 'components/bootstrap/MenuItem';
+import type { EditingField } from 'pages/IndexSetFieldTypesPage';
+
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -71,20 +73,26 @@ const FilterValueRenderers = {
   ),
 };
 
-const IndexSetFieldTypesList = () => {
-  const { indexSetId } = useParams();
-  const [editingField, setEditingField] = useState<IndexSetFieldType | null>(null);
-  const [deletingFieldTypes, setDeletingFieldTypes] = useState<Array<string> | null>(null);
+type Props = {
+  editingField: EditingField,
+  setEditingField: React.Dispatch<React.SetStateAction<EditingField | null>>,
+}
 
+const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
+  const { indexSetId } = useParams();
+  const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const handleOnClose = useCallback(() => {
     setEditingField(null);
-  }, []);
-
+  }, [setEditingField]);
+  const [deletingFieldTypes, setDeletingFieldTypes] = useState<Array<string> | null>(null);
   const handleOnOpen = useCallback((fieldType: IndexSetFieldType) => {
-    setEditingField(fieldType);
-  }, []);
+    setEditingField({
+      fieldName: fieldType.fieldName,
+      type: fieldType.type,
+      showFiledInput: false,
+    });
+  }, [setEditingField]);
 
-  const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
@@ -195,6 +203,9 @@ const IndexSetFieldTypesList = () => {
       </BulkActionsDropdown>
     );
   }, []);
+  const onFieldChange = useCallback(({ fieldName, type }: { fieldName: string, type: string }) => {
+    setEditingField({ fieldName, type, showFiledInput: true });
+  }, [setEditingField]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -250,7 +261,9 @@ const IndexSetFieldTypesList = () => {
                                 fieldTypes={fieldTypes}
                                 isOptionsLoading={isOptionsLoading}
                                 onSubmitCallback={refetch}
-                                initialFieldType={editingField.type} />
+                                initialFieldType={editingField.type}
+                                onFieldChange={onFieldChange}
+                                showFiledInput={editingField.showFiledInput} />
         ) : null
       }
       {

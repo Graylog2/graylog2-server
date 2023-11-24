@@ -24,7 +24,7 @@ import { NavItem } from 'components/bootstrap';
 // We render a NavItem if topLevel is set to avoid errors when the NavigationLink is place in the navigation
 // bar instead of a navigation drop-down menu.
 type Props = {
-  description: string,
+  description: React.ReactNode,
   path: string,
   topLevel?: boolean,
 }

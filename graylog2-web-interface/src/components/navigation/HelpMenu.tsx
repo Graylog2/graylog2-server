@@ -35,7 +35,7 @@ const HelpMenu = () => {
 
   return (
     <NavDropdown title={<Icon name="question-circle" size="lg" />}
-                 aria-label="Help"
+                 hoverTitle="Help"
                  noCaret>
 
       <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>
