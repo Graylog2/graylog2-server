@@ -122,9 +122,9 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
 
-  /* useEffect(() => {
+  useEffect(() => {
     refreshSearch();
-  }, [refreshSearch]); */
+  }, [refreshSearch]);
 
   useEffect(() => {
     SearchConfigActions.refresh();

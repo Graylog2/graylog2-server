@@ -27,6 +27,7 @@ import type { QuerySet } from 'views/logic/search/Search';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { RootState } from 'views/types';
+import useSearchExecutors from 'views/components/contexts/useSearchExecutors';
 
 type Props = {
   initialQuery: QueryId,
@@ -73,7 +74,8 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
   const reducers = usePluginEntities('views.reducers');
   const activeQuery = useActiveQuery(initialQuery, view);
   const initialState = useInitialState(undoRedoState, view, isNew, activeQuery, executionState, result);
-  const store = useMemo(() => createStore(reducers, initialState), [initialState, reducers]);
+  const searchExecutors = useSearchExecutors();
+  const store = useMemo(() => createStore(reducers, initialState, searchExecutors), [initialState, reducers, searchExecutors]);
 
   return (
     <Provider store={store}>
