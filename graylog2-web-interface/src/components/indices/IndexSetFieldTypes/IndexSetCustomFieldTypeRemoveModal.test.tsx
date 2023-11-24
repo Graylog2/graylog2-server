@@ -42,7 +42,7 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
   })]),
 }));
 
-jest.mock('hooks/useRemoveCustomFieldTypeMutation', () => jest.fn());
+jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation', () => jest.fn());
 
 describe('IndexSetFieldTypesList', () => {
   const mockedRemoveCustomFieldTypeMutation = jest.fn(() => Promise.resolve());

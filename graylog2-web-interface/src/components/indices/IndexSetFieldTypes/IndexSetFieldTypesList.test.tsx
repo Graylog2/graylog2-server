@@ -63,7 +63,7 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
 
 jest.mock('routing/useParams', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
-jest.mock('hooks/useIndexSetFieldType', () => jest.fn());
+jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
@@ -200,7 +200,7 @@ describe('IndexSetFieldTypesList', () => {
     const tableRow = await screen.findByTestId('table-row-field');
     const resetButton = await within(tableRow).findByText('Reset');
     fireEvent.click(resetButton);
-    await screen.findByText(/remove custom field type/i);
+    await screen.findByLabelText(/remove custom field type/i);
     const modal = await screen.findByTestId('modal-form');
     await within(modal).findByText('Rotate affected indices after change');
 

@@ -39,6 +39,9 @@ jest.mock('util/UserNotification', () => ({
 }));
 
 describe('useRemoveCustomFieldTypeMutation', () => {
+  const mockOnSuccessHandler = jest.fn();
+  const mockOnErrorHandler = jest.fn();
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -55,7 +58,10 @@ describe('useRemoveCustomFieldTypeMutation', () => {
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
-      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation({
+        onSuccessHandler: mockOnSuccessHandler,
+        onErrorHandler: mockOnErrorHandler,
+      }), { queryClientOptions: { logger } });
 
       act(() => {
         result.current.removeCustomFieldTypeMutation(requestBody);
@@ -69,7 +75,10 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation(), { queryClientOptions: { logger } });
+      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation({
+        onSuccessHandler: mockOnSuccessHandler,
+        onErrorHandler: mockOnErrorHandler,
+      }), { queryClientOptions: { logger } });
 
       act(() => {
         result.current.removeCustomFieldTypeMutation(requestBody).catch(() => {});
