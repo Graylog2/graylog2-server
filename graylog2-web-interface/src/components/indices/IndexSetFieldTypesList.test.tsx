@@ -27,44 +27,11 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import type { Attributes } from 'stores/PaginationTypes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
 import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import { customFiled, defaultFiled, reservedFiled, secondCustomFiled, attributes } from 'fixtures/indexSetFieldTypes';
 
-const attributes: Attributes = [
-  {
-    id: 'field_name',
-    title: 'Field Name',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'is_custom',
-    title: 'Custom',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'is_reserved',
-    title: 'Reserved',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'type',
-    title: 'Type',
-    type: 'STRING',
-    sortable: true,
-  },
-];
-
-const getData = (list = [{
-  id: 'field',
-  fieldName: 'field',
-  type: 'bool',
-  isCustom: false,
-  isReserved: false,
-}]) => (
+const getData = (list = [defaultFiled]) => (
   {
     list,
     pagination: {
@@ -73,10 +40,12 @@ const getData = (list = [{
     attributes,
   }
 );
+
+const mockedSetEditingField = jest.fn();
 const renderIndexSetFieldTypesList = () => render(
   <QueryParamProvider adapter={ReactRouter6Adapter}>
     <TestStoreProvider>
-      <IndexSetFieldTypesList />
+      <IndexSetFieldTypesList editingField={undefined} setEditingField={mockedSetEditingField} />
     </TestStoreProvider>,
   </QueryParamProvider>,
 );
@@ -160,13 +129,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: false,
-        }]),
+        data: getData([customFiled]),
       });
 
       renderIndexSetFieldTypesList();
@@ -182,13 +145,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: false,
-        }]),
+        data: getData([customFiled]),
       });
 
       renderIndexSetFieldTypesList();
@@ -204,13 +161,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: true,
-        }]),
+        data: getData([reservedFiled]),
       });
 
       renderIndexSetFieldTypesList();
@@ -223,41 +174,26 @@ describe('IndexSetFieldTypesList', () => {
     });
   });
 
-  it('Shows modal on edit action click', async () => {
+  it('Runs setEditingField with correct params', async () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([{
-        id: 'field',
-        fieldName: 'field',
-        type: 'bool',
-        isCustom: true,
-        isReserved: false,
-      }]),
+      data: getData([customFiled, secondCustomFiled]),
     });
 
     renderIndexSetFieldTypesList();
     const tableRow = await screen.findByTestId('table-row-field');
     const editButton = await within(tableRow).findByText('Edit');
     fireEvent.click(editButton);
-    await screen.findByText(/change field field type/i);
-    const modal = await screen.findByTestId('modal-form');
-    await within(modal).findByText('Boolean');
 
-    expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
+    expect(mockedSetEditingField).toHaveBeenCalledWith({ fieldName: 'field', type: 'bool', showFiledInput: false });
   });
 
   it('Shows modal on reset action click', async () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([{
-        id: 'field',
-        fieldName: 'field',
-        type: 'bool',
-        isCustom: true,
-        isReserved: false,
-      }]),
+      data: getData([customFiled]),
     });
 
     renderIndexSetFieldTypesList();
