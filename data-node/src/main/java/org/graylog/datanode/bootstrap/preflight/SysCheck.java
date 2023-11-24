@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import org.apache.commons.exec.OS;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
@@ -36,9 +35,8 @@ public class SysCheck implements PreflightCheck {
 
     @Override
     public void runCheck() throws PreflightCheckException {
-        String fqPath = OS.isFamilyMac() ? "/usr/sbin/sysctl" : "/sbin/sysctl";
         ProcessBuilder builder = new ProcessBuilder().redirectErrorStream(true);
-        builder.command(fqPath, "-n", "vm.max_map_count");
+        builder.command("/sbin/sysctl", "-n", "vm.max_map_count");
         try {
             final Process process = builder.start();
             final BufferedReader reader = new BufferedReader(
