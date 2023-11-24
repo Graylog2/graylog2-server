@@ -71,11 +71,6 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public boolean isOnlyLeader(NodeId nodeIde) {
-        return delegate.isOnlyLeader(nodeIde);
-    }
-
-    @Override
     public boolean isAnyLeaderPresent() {
         return delegate.isAnyLeaderPresent();
     }

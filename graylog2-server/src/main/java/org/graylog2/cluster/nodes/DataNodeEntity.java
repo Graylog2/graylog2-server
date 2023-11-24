@@ -48,9 +48,10 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
     @Override
     public DataNodeDto toDto() {
         return DataNodeDto.Builder.builder()
+                .setObjectId(this.getObjectId().toHexString())
                 .setId(this.getNodeId())
                 .setTransportAddress(this.getTransportAddress())
-//                .setLastSeen(this.getLastSeen())
+                .setLastSeen(this.getLastSeen())
                 .setHostname(this.getHostname())
                 .setLeader(this.isLeader())
                 .setClusterAddress(this.getClusterAddress())

@@ -68,21 +68,6 @@ public class TestNodeService implements NodeService {
         return nodes.stream().anyMatch(Node::isLeader);
     }
 
-    @Override
-    public boolean isOnlyLeader(NodeId nodeId) {
-        return nodes.stream().filter(n -> !Objects.equals(n.getNodeId(), nodeId.getNodeId())).noneMatch(Node::isLeader);
-    }
-
-    @Override
-    public void dropOutdated() {
-        throw new UnsupportedOperationException("Unsupported operation");
-    }
-
-    @Override
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress, DataNodeStatus dataNodeStatus) throws NodeNotFoundException {
-        throw new UnsupportedOperationException("Unsupported operation");
-    }
-
     record NodeRecord(String nodeId, boolean isLeader, String transportAddress,
                       String hostname, DateTime lastSeen) implements Node {
 

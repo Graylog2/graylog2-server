@@ -37,9 +37,10 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
     @Override
     public ServerNodeDto toDto() {
         return ServerNodeDto.Builder.builder()
+                .setObjectId(this.getObjectId().toHexString())
                 .setId(this.getNodeId())
                 .setTransportAddress(this.getTransportAddress())
-//                .setLastSeen(this.getLastSeen())
+                .setLastSeen(this.getLastSeen())
                 .setHostname(this.getHostname())
                 .setLeader(this.isLeader())
                 .build();

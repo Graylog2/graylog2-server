@@ -17,7 +17,6 @@
 package org.graylog2.cluster;
 
 
-import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
@@ -45,8 +44,6 @@ public interface NodeService {
 
     Map<String, Node> allActive();
 
-
-    boolean isOnlyLeader(NodeId nodeIde);
-
     boolean isAnyLeaderPresent();
+
 }

@@ -28,6 +28,10 @@ import java.util.Map;
 
 public abstract class NodeDto implements Node {
 
+    @JsonProperty("object_id")
+    @Nullable
+    public abstract String getObjectId();
+
     @JsonProperty("id")
     public abstract String getId();
 
@@ -57,6 +61,7 @@ public abstract class NodeDto implements Node {
 
     public Map<String, Object> toEntityParameters() {
         HashMap<String, Object> params = new HashMap<>();
+        params.put("node_id", getNodeId());
         params.put("transport_address", getTransportAddress());
         params.put("is_leader", isLeader());
         params.put("hostname", getHostname());
@@ -64,6 +69,9 @@ public abstract class NodeDto implements Node {
     }
 
     public abstract static class Builder<B extends Builder<B>> {
+        @JsonProperty("_id")
+        public abstract B setObjectId(String id);
+
         @JsonProperty("node_id")
         public abstract B setId(String id);
 
