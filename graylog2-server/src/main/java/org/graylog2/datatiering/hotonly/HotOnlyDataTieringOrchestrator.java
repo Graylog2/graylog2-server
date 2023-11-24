@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.datatiering.DataTieringState;
 import org.graylog2.datatiering.fallback.FallbackDataTieringConfig;
 import org.graylog2.datatiering.retention.DataTierDeleteRetention;
 import org.graylog2.datatiering.rotation.DataTierRotation;
@@ -33,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Optional;
 
 public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
@@ -42,7 +40,6 @@ public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
 
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final DataTierRotation.Factory dataTierRotationFactory;
-
     private final DataTierDeleteRetention dataTierDeleteRetention;
 
     @Inject
@@ -58,14 +55,6 @@ public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
         return IndexLifetimeConfig.builder()
                 .indexLifetimeMin(config.indexLifetimeMin())
                 .indexLifetimeMax(config.indexLifetimeMax())
-                .build();
-    }
-
-    @Override
-    public DataTieringState getState() {
-        return DataTieringState.builder()
-                .type(HotOnlyDataTieringConfig.TYPE)
-                .warmTierRequirements(List.of("graylog_enterprise"))
                 .build();
     }
 

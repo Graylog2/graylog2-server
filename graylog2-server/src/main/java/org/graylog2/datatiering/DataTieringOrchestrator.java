@@ -24,8 +24,6 @@ import java.util.Optional;
 
 public interface DataTieringOrchestrator {
 
-    DataTieringState getState();
-
     void rotate(IndexSet indexSet);
 
     void retain(IndexSet indexSet);

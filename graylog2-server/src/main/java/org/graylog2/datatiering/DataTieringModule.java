@@ -20,7 +20,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringOrchestrator;
-import org.graylog2.datatiering.rest.DataTieringResource;
 import org.graylog2.datatiering.rotation.DataTierRotation;
 import org.graylog2.plugin.inject.Graylog2Module;
 
@@ -31,7 +30,6 @@ public class DataTieringModule extends Graylog2Module {
         install(new FactoryModuleBuilder().build(DataTierRotation.Factory.class));
         OptionalBinder.newOptionalBinder(binder(), DataTieringOrchestrator.class).setDefault().to(HotOnlyDataTieringOrchestrator.class);
         registerJacksonSubtype(HotOnlyDataTieringConfig.class, HotOnlyDataTieringConfig.TYPE);
-        addSystemRestResource(DataTieringResource.class);
     }
 
 }
