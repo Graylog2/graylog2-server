@@ -114,13 +114,12 @@ ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
 type Props = {
   InfoBarSlot?: React.ComponentType,
-  SearchAreaContainer?: React.ComponentType,
 }
 
-const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
+const Search = ({ InfoBarSlot }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-  const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
+  const { sidebar: { isShown: showSidebar }, components } = useSearchPageLayout();
 
   useEffect(() => {
     refreshSearch();
@@ -164,7 +163,7 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
                                 </ConnectedSidebar>
                                 )}
                               </IfInteractive>
-                              <SearchArea as={SearchAreaContainer}>
+                              <SearchArea as={components?.SearchAreaContainer}>
                                 <IfInteractive>
                                   <HeaderElements />
                                   {InfoBarSlot && <InfoBarSlot />}

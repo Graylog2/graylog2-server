@@ -58,6 +58,9 @@ export const BLANK: ViewActions = {
 export type LayoutState = {
   sidebar: { isShown: boolean }
   viewActions: ViewActions
+  components?: {
+    SearchAreaContainer: React.ComponentType
+  }
 }
 
 export const DEFAULT_STATE: LayoutState = {
