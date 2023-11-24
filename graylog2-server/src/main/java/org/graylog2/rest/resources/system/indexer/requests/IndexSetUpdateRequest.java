@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERS;
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
@@ -55,7 +55,7 @@ public abstract class IndexSetUpdateRequest {
                                                @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                                @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                                @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
-                                               @JsonProperty(FIELD_DATA_TIERS) @Nullable DataTieringConfig dataTiers) {
+                                               @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiers) {
         return new AutoValue_IndexSetUpdateRequest(title, description, isWritable, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy,
                 indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
@@ -76,7 +76,7 @@ public abstract class IndexSetUpdateRequest {
                 indexSet.indexOptimizationMaxNumSegments(),
                 indexSet.indexOptimizationDisabled(),
                 indexSet.fieldTypeRefreshInterval(),
-                indexSet.dataTiers());
+                indexSet.dataTiering());
 
     }
 
@@ -126,8 +126,8 @@ public abstract class IndexSetUpdateRequest {
     public abstract Duration fieldTypeRefreshInterval();
 
     @Nullable
-    @JsonProperty(FIELD_DATA_TIERS)
-    public abstract DataTieringConfig dataTiers();
+    @JsonProperty(FIELD_DATA_TIERING)
+    public abstract DataTieringConfig dataTiering();
 
     public IndexSetConfig toIndexSetConfig(String id, IndexSetConfig oldConfig) {
         return IndexSetConfig.builder()
@@ -152,7 +152,7 @@ public abstract class IndexSetUpdateRequest {
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
-                .dataTiers(dataTiers())
+                .dataTiering(dataTiering())
                 .build();
     }
 }

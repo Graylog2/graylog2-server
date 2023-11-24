@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatiering.open;
+package org.graylog2.datatiering.hotonly;
 
 import com.google.common.base.Preconditions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
@@ -33,7 +33,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
-public class OpenDataTieringOrchestrator implements DataTieringOrchestrator {
+public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
 
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final DataTierRotation.Factory dataTierRotationFactory;
@@ -41,9 +41,9 @@ public class OpenDataTieringOrchestrator implements DataTieringOrchestrator {
     private final DataTierDeleteRetention dataTierDeleteRetention;
 
     @Inject
-    public OpenDataTieringOrchestrator(ElasticsearchConfiguration elasticsearchConfiguration,
-                                       DataTierRotation.Factory dataTierRotationFactory,
-                                       DataTierDeleteRetention dataTierDeleteRetention) {
+    public HotOnlyDataTieringOrchestrator(ElasticsearchConfiguration elasticsearchConfiguration,
+                                          DataTierRotation.Factory dataTierRotationFactory,
+                                          DataTierDeleteRetention dataTierDeleteRetention) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.dataTierRotationFactory = dataTierRotationFactory;
         this.dataTierDeleteRetention = dataTierDeleteRetention;
@@ -59,14 +59,14 @@ public class OpenDataTieringOrchestrator implements DataTieringOrchestrator {
     @Override
     public DataTieringState getState() {
         return DataTieringState.builder()
-                .type(OpenDataTieringConfig.TYPE_OPEN)
+                .type(HotOnlyDataTieringConfig.TYPE)
                 .warmTierRequirements(List.of("graylog_enterprise"))
                 .build();
     }
 
     @Override
     public void rotate(IndexSet indexSet) {
-        DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiers();
+        DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiering();
         Preconditions.checkNotNull(dataTieringConfig);
         DataTierRotation dataTierRotation = dataTierRotationFactory.create(toIndexLifetimeConfig(dataTieringConfig));
         dataTierRotation.rotate(indexSet);
@@ -74,7 +74,7 @@ public class OpenDataTieringOrchestrator implements DataTieringOrchestrator {
 
     @Override
     public void retain(IndexSet indexSet) {
-        DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiers();
+        DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiering();
         Preconditions.checkNotNull(dataTieringConfig);
         dataTierDeleteRetention.retain(indexSet, toIndexLifetimeConfig(dataTieringConfig));
     }

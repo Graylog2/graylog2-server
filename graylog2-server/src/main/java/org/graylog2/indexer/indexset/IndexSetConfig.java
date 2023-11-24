@@ -58,7 +58,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_ROTATION_STRATEGY = "rotation_strategy";
     public static final String FIELD_RETENTION_STRATEGY_CLASS = "retention_strategy_class";
     public static final String FIELD_RETENTION_STRATEGY = "retention_strategy";
-    public static final String FIELD_DATA_TIERS = "data_tiers";
+    public static final String FIELD_DATA_TIERING = "data_tiering";
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
@@ -88,7 +88,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
                                         @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
-                                        @JsonProperty(FIELD_DATA_TIERS) @Nullable DataTieringConfig dataTiers
+                                        @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;
@@ -122,7 +122,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .indexOptimizationDisabled(indexOptimizationDisabled != null && indexOptimizationDisabled)
                 .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
                 .customFieldMappings(customFieldMappings == null ? new CustomFieldMappings() : customFieldMappings)
-                .dataTiers(dataTiers)
+                .dataTiering(dataTiering)
                 .build();
     }
 
@@ -279,8 +279,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public abstract CustomFieldMappings customFieldMappings();
 
     @Nullable
-    @JsonProperty(FIELD_DATA_TIERS)
-    public abstract DataTieringConfig dataTiers();
+    @JsonProperty(FIELD_DATA_TIERING)
+    public abstract DataTieringConfig dataTiering();
 
     @JsonIgnore
     public boolean isRegularIndex() {
@@ -346,7 +346,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder customFieldMappings(CustomFieldMappings customFieldMappings);
 
-        public abstract Builder dataTiers(@Nullable DataTieringConfig dataTiers);
+        public abstract Builder dataTiering(@Nullable DataTieringConfig dataTiering);
 
         public abstract IndexSetConfig build();
     }

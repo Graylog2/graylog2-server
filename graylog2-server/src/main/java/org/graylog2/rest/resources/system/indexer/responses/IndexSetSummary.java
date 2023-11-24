@@ -37,6 +37,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
@@ -66,7 +67,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                          @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
                                          @JsonProperty("index_template_type") @Nullable String templateType,
-                                         @JsonProperty("data_tiers") @Nullable DataTieringConfig dataTiers) {
+                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering) {
         if (Objects.isNull(creationDate)) {
             creationDate = ZonedDateTime.now();
         }
@@ -74,7 +75,7 @@ public abstract class IndexSetSummary {
                 isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                Optional.ofNullable(templateType), dataTiers);
+                Optional.ofNullable(templateType), dataTiering);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
@@ -98,7 +99,7 @@ public abstract class IndexSetSummary {
                 indexSet.indexOptimizationDisabled(),
                 indexSet.fieldTypeRefreshInterval(),
                 indexSet.indexTemplateType().orElse(null),
-                indexSet.dataTiers());
+                indexSet.dataTiering());
 
     }
 
@@ -174,8 +175,8 @@ public abstract class IndexSetSummary {
     public abstract Optional<String> templateType();
 
     @Nullable
-    @JsonProperty("data_tiers")
-    public abstract DataTieringConfig dataTiers();
+    @JsonProperty(FIELD_DATA_TIERING)
+    public abstract DataTieringConfig dataTiering();
 
     public IndexSetConfig toIndexSetConfig(boolean isRegular) {
         final IndexSetConfig.Builder builder = IndexSetConfig.builder()
@@ -197,7 +198,7 @@ public abstract class IndexSetSummary {
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
-                .dataTiers(dataTiers());
+                .dataTiering(dataTiering());
 
         final IndexSetConfig.Builder builderWithTemplateType = templateType().map(builder::indexTemplateType).orElse(builder);
         return builderWithTemplateType.build();

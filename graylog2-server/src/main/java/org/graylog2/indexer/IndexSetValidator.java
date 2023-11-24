@@ -79,11 +79,11 @@ public class IndexSetValidator {
             return Optional.of(refreshIntervalViolation);
         }
 
-        if (newConfig.dataTiers() != null) {
+        if (newConfig.dataTiering() != null) {
             if (isCloud) {
                 return Optional.of(Violation.create("data tiering is not supported in cloud"));
             }
-            final Violation dataTiersViolation = validateDataTiers(newConfig.dataTiers());
+            final Violation dataTiersViolation = validateDataTiers(newConfig.dataTiering());
             if (dataTiersViolation != null) {
                 return Optional.of(dataTiersViolation);
             }

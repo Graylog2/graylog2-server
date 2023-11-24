@@ -111,7 +111,7 @@ public class IndexRotationThread extends Periodical {
 
     protected void checkForRotation(IndexSet indexSet) {
         final IndexSetConfig config = indexSet.getConfig();
-        if (indexSet.getConfig().dataTiers() != null) {
+        if (indexSet.getConfig().dataTiering() != null) {
             dataTieringOrchestrator.rotate(indexSet);
         } else {
             final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategyClass());

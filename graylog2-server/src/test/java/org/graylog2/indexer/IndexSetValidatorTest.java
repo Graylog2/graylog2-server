@@ -222,7 +222,7 @@ public class IndexSetValidatorTest {
 
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, true);
 
-        assertThat(validator.validate(testIndexSetConfig().toBuilder().dataTiers(mock(DataTieringConfig.class)).build())).hasValueSatisfying(v ->
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().dataTiering(mock(DataTieringConfig.class)).build())).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("cloud"));
     }
 

@@ -18,8 +18,8 @@ package org.graylog2.datatiering;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog2.datatiering.open.OpenDataTieringOrchestrator;
-import org.graylog2.datatiering.open.OpenDataTieringConfig;
+import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
+import org.graylog2.datatiering.hotonly.HotOnlyDataTieringOrchestrator;
 import org.graylog2.datatiering.rest.DataTieringResource;
 import org.graylog2.datatiering.rotation.DataTierRotation;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -29,8 +29,8 @@ public class DataTieringModule extends Graylog2Module {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder().build(DataTierRotation.Factory.class));
-        OptionalBinder.newOptionalBinder(binder(), DataTieringOrchestrator.class).setDefault().to(OpenDataTieringOrchestrator.class);
-        registerJacksonSubtype(OpenDataTieringConfig.class, OpenDataTieringConfig.TYPE_OPEN);
+        OptionalBinder.newOptionalBinder(binder(), DataTieringOrchestrator.class).setDefault().to(HotOnlyDataTieringOrchestrator.class);
+        registerJacksonSubtype(HotOnlyDataTieringConfig.class, HotOnlyDataTieringConfig.TYPE);
         addSystemRestResource(DataTieringResource.class);
     }
 

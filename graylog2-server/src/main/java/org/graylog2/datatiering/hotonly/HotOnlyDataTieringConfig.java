@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatiering.open;
+package org.graylog2.datatiering.hotonly;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,10 +30,10 @@ import javax.validation.constraints.NotNull;
 
 @AutoValue
 @WithBeanGetter
-@JsonDeserialize(builder = OpenDataTieringConfig.Builder.class)
-public abstract class OpenDataTieringConfig implements DataTieringConfig {
+@JsonDeserialize(builder = HotOnlyDataTieringConfig.Builder.class)
+public abstract class HotOnlyDataTieringConfig implements DataTieringConfig {
 
-    public final static String TYPE_OPEN = "data_tiering_open";
+    public final static String TYPE = "hot_only";
 
     public static Builder builder() {
         return Builder.create();
@@ -44,8 +44,8 @@ public abstract class OpenDataTieringConfig implements DataTieringConfig {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_OpenDataTieringConfig.Builder()
-                    .type(TYPE_OPEN);
+            return new AutoValue_HotOnlyDataTieringConfig.Builder()
+                    .type(TYPE);
         }
 
         @JsonProperty(FIELD_TYPE)
@@ -58,6 +58,6 @@ public abstract class OpenDataTieringConfig implements DataTieringConfig {
         public abstract Builder indexLifetimeMax(Period indexLifetimeMax);
 
 
-        public abstract OpenDataTieringConfig build();
+        public abstract HotOnlyDataTieringConfig build();
     }
 }
