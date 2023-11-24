@@ -21,12 +21,15 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.datatiering.DataTieringState;
+import org.graylog2.datatiering.fallback.FallbackDataTieringConfig;
 import org.graylog2.datatiering.retention.DataTierDeleteRetention;
 import org.graylog2.datatiering.rotation.DataTierRotation;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -34,6 +37,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(HotOnlyDataTieringOrchestrator.class);
 
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final DataTierRotation.Factory dataTierRotationFactory;
@@ -76,6 +81,10 @@ public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
     public void retain(IndexSet indexSet) {
         DataTieringConfig dataTieringConfig = indexSet.getConfig().dataTiering();
         Preconditions.checkNotNull(dataTieringConfig);
+        if (dataTieringConfig instanceof FallbackDataTieringConfig) {
+            LOG.warn("An enterprise data tier configuration is used for index '{}', enterprise properties are ignored! " +
+                    "Please update the configuration for this index set.", indexSet.getConfig().title());
+        }
         dataTierDeleteRetention.retain(indexSet, toIndexLifetimeConfig(dataTieringConfig));
     }
 

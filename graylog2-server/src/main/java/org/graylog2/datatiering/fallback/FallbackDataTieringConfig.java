@@ -14,11 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatiering;
+package org.graylog2.datatiering.fallback;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.graylog2.datatiering.fallback.FallbackDataTieringConfig;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.joda.time.Period;
 
 import javax.validation.constraints.NotNull;
@@ -26,26 +30,17 @@ import javax.validation.constraints.NotNull;
 import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MAX;
 import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MIN;
 
+@AutoValue
+@WithBeanGetter
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect
+public abstract class FallbackDataTieringConfig implements DataTieringConfig {
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
-              include = JsonTypeInfo.As.EXISTING_PROPERTY,
-              property = DataTieringConfig.FIELD_TYPE,
-              visible = true,
-              defaultImpl = FallbackDataTieringConfig.class)
-public interface DataTieringConfig {
+    public static final String TYPE = "fallback";
 
-    String FIELD_TYPE = "type";
-
-    @NotNull
-    @JsonProperty(FIELD_TYPE)
-    String type();
-
-    @NotNull
-    @JsonProperty(FIELD_INDEX_LIFETIME_MIN)
-    Period indexLifetimeMin();
-
-    @NotNull
-    @JsonProperty(FIELD_INDEX_LIFETIME_MAX)
-    Period indexLifetimeMax();
-
+    @JsonCreator
+    public static FallbackDataTieringConfig create(@JsonProperty(FIELD_INDEX_LIFETIME_MIN) @NotNull Period indexLifetimeMin,
+                                                   @JsonProperty(FIELD_INDEX_LIFETIME_MAX) @NotNull Period indexLifetimeMax) {
+        return new AutoValue_FallbackDataTieringConfig(TYPE, indexLifetimeMin, indexLifetimeMax);
+    }
 }

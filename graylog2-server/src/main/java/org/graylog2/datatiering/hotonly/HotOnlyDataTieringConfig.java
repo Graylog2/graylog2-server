@@ -22,10 +22,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.datatiering.DataTieringConfig;
-import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.joda.time.Period;
 
 import javax.validation.constraints.NotNull;
+
+import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MAX;
+import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MIN;
 
 
 @AutoValue
@@ -51,10 +53,10 @@ public abstract class HotOnlyDataTieringConfig implements DataTieringConfig {
         @JsonProperty(FIELD_TYPE)
         public abstract Builder type(@NotNull String type);
 
-        @JsonProperty(IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MIN)
+        @JsonProperty(FIELD_INDEX_LIFETIME_MIN)
         public abstract Builder indexLifetimeMin(Period indexLifetimeMin);
 
-        @JsonProperty(IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MAX)
+        @JsonProperty(FIELD_INDEX_LIFETIME_MAX)
         public abstract Builder indexLifetimeMax(Period indexLifetimeMax);
 
 
