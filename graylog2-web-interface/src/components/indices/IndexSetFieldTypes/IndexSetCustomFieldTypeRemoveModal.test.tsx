@@ -21,8 +21,8 @@ import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetCustomFieldTypeRemoveModal';
-import useRemoveCustomFieldTypeMutation from 'hooks/useRemoveCustomFieldTypeMutation';
+import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
+import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 
 const mockOnClosed = jest.fn();
 const renderIndexSetCustomFieldTypeRemoveModal = () => render(

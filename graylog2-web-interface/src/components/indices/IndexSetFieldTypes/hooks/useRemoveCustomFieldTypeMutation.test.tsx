@@ -20,7 +20,7 @@ import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
-import useRemoveCustomFieldTypeMutation from 'hooks/useRemoveCustomFieldTypeMutation';
+import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 
 const urlPrefix = '/system/indices/mappings/remove_mapping';
 

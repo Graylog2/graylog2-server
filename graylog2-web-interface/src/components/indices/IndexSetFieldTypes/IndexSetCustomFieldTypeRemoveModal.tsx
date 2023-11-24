@@ -26,7 +26,11 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Spinner } from 'components/common';
 import { Alert, BootstrapModalForm, Input, Badge } from 'components/bootstrap';
-import useRemoveCustomFieldTypeMutation from 'hooks/useRemoveCustomFieldTypeMutation';
+import type {
+  RemovalResponse,
+} from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
+import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
+import IndexSetsRemovalErrorAlert from 'components/indices/IndexSetFieldTypes/IndexSetsRemovalErrorAlert';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -85,13 +89,19 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, r
 
 const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds }: Props) => {
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
+  const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
-  const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation();
+  const onErrorHandler = useCallback((response: RemovalResponse) => {
+    setRemovalResponse(response);
+  }, []);
+  const onSuccessHandler = useCallback(onClose, [onClose]);
+  const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation({ onErrorHandler, onSuccessHandler });
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
+    setRemovalResponse(null);
 
     removeCustomFieldTypeMutation({ fields, indexSets: indexSetIds, rotated })
       .then(() => {
@@ -103,9 +113,8 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
                           rotated,
                         },
         });
-      })
-      .then(onClose);
-  }, [fields, indexSetIds, onClose, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
+      });
+  }, [fields, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_CLOSED, { app_pathname: telemetryPathName, app_action_value: 'removed-custom-field-type-closed' });
@@ -132,6 +141,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
                                                 fields={fields}
                                                 indexSets={indexSets} />
         )}
+      {removalResponse && <IndexSetsRemovalErrorAlert removalResponse={removalResponse} indexSets={indexSets} />}
     </BootstrapModalForm>
   );
 };

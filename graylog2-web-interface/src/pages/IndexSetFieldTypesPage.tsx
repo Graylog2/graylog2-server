@@ -25,7 +25,7 @@ import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
+import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexSetFieldTypesList';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 export type EditingField = {

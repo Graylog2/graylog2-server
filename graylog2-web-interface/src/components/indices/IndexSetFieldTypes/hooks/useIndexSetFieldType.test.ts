@@ -20,7 +20,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
-import useIndexSetFieldType from 'hooks/useIndexSetFieldType';
+import useIndexSetFieldType from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultFiled } from 'fixtures/indexSetFieldTypes';

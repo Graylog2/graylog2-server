@@ -18,9 +18,9 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
-import type { IndexSetFieldType } from 'hooks/useIndexSetFieldType';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import { Button } from 'components/bootstrap';
-import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
+import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
 import {
   HoverForHelp,
@@ -34,7 +34,7 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
-import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetCustomFieldTypeRemoveModal';
+import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
@@ -57,7 +57,7 @@ const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }
   color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
   margin-right: 5px;
 `);
-const isEntitySelectable = (field: IndexSetFieldType) => !field.isReserved;
+const isEntitySelectable = (field: IndexSetFieldType) => field.isCustom;
 const FilterValueRenderers = {
   is_custom: (value: 'true' | 'false', title: string) => (
     <>
