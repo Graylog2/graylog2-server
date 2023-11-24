@@ -42,6 +42,8 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.hierarchical.ContainerMatrixHierarchicalTestEngine;
 import org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutorService;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -61,6 +63,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEngine<JupiterEngineExecutionContext> {
     private static final String ENGINE_ID = "graylog-container-matrix-tests";
+    private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
 
     private static final Set<Class<?>> annotatedClasses;
 
@@ -107,7 +110,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
      */
     public static Optional<SearchVersion> getSearchVersionOverride() {
         final var property = System.getProperty("graylog.matrix.tests.search.version.override");
-        if(property == null) {
+        if (property == null) {
             return Optional.empty();
         }
         return Optional.of(SearchVersion.decode(property));
@@ -129,7 +132,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
 
     private Stream<SearchVersion> filterForCompatibleVersionOrDrop(SearchServer[] versions) {
         final var optional = getSearchVersionOverride();
-        if(optional.isPresent()) {
+        if (optional.isPresent()) {
             final var override = optional.get();
             return Stream.of(versions).anyMatch(version -> isCompatible(override, version)) ? Stream.of(override) : Stream.empty();
         } else {
@@ -140,8 +143,10 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     private Set<SearchVersion> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.searchVersions().length == 0) {
+                LOG.info("using defaultOrOverride");
                 return defaultOrOverride();
             } else {
+                LOG.info("using annotation");
                 return filterForCompatibleVersionOrDrop(annotation.searchVersions());
             }
         });
@@ -240,31 +245,31 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
             getMavenProjectDirProvider(annotatedClasses)
                     .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotatedClasses)
                             .forEach(pluginJarsProvider -> {
-                                MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
-                                PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
-                                // now add all grouped tests for Lifecycle.VM
-                                getSearchServerVersions(annotatedClasses)
-                                        .forEach(searchVersion -> getMongoVersions(annotatedClasses)
-                                                .forEach(mongoVersion -> {
-                                                    ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
-                                                            Lifecycle.VM,
-                                                            mavenProjectDirProvider,
-                                                            mpdp.getUniqueId(),
-                                                            pluginJarsProvider,
-                                                            pjp.getUniqueId(),
-                                                            searchVersion,
-                                                            mongoVersion,
-                                                            extraPorts,
-                                                            mongoDBFixtures,
-                                                            getEnabledFeatureFlags(Lifecycle.VM, annotatedClasses),
-                                                            withMailServerEnabled);
-                                                    new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
-                                                    engineDescriptor.addChild(testsDescriptor);
-                                                })
-                                        );
-                                // add separate test classes (Lifecycle.CLASS)
-                                getSearchServerVersions(annotatedClasses)
-                                        .forEach(esVersion -> getMongoVersions(annotatedClasses)
+                                        MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
+                                        PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
+                                        // now add all grouped tests for Lifecycle.VM
+                                        getSearchServerVersions(annotatedClasses)
+                                                .forEach(searchVersion -> getMongoVersions(annotatedClasses)
+                                                        .forEach(mongoVersion -> {
+                                                            ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
+                                                                    Lifecycle.VM,
+                                                                    mavenProjectDirProvider,
+                                                                    mpdp.getUniqueId(),
+                                                                    pluginJarsProvider,
+                                                                    pjp.getUniqueId(),
+                                                                    searchVersion,
+                                                                    mongoVersion,
+                                                                    extraPorts,
+                                                                    mongoDBFixtures,
+                                                                    getEnabledFeatureFlags(Lifecycle.VM, annotatedClasses),
+                                                                    withMailServerEnabled);
+                                                            new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
+                                                            engineDescriptor.addChild(testsDescriptor);
+                                                        })
+                                                );
+                                        // add separate test classes (Lifecycle.CLASS)
+                                        getSearchServerVersions(annotatedClasses)
+                                                .forEach(esVersion -> getMongoVersions(annotatedClasses)
                                                         .forEach(mongoVersion -> {
                                                             ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
                                                                     Lifecycle.CLASS,
@@ -290,7 +295,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     }
 
     private boolean isMailServerRequired(Set<Class<?>> annotatedClasses) {
-         return annotatedClasses
+        return annotatedClasses
                 .stream()
                 .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
                 .filter(Optional::isPresent)
