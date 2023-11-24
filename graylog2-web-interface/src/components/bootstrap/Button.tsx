@@ -101,6 +101,7 @@ Button.defaultProps = {
   bsStyle: 'default',
   bsSize: undefined,
   className: undefined,
+  'data-testid': undefined,
   disabled: false,
   form: undefined,
   href: undefined,
