@@ -16,8 +16,7 @@
  */
 package org.graylog2.cluster;
 
-import org.graylog2.cluster.nodes.DataNodeStatus;
-import org.graylog2.cluster.nodes.ServerNodeEntity;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
@@ -33,16 +32,22 @@ import java.util.stream.Collectors;
 @Deprecated(since = "6.0")
 public class NodeServiceImpl implements NodeService {
 
-    private final org.graylog2.cluster.nodes.NodeService<ServerNodeEntity> delegate;
+    private final org.graylog2.cluster.nodes.NodeService<ServerNodeDto> delegate;
 
     @Inject
-    public NodeServiceImpl(org.graylog2.cluster.nodes.NodeService<ServerNodeEntity> delegate) {
+    public NodeServiceImpl(org.graylog2.cluster.nodes.NodeService<ServerNodeDto> delegate) {
         this.delegate = delegate;
     }
 
     @Override
     public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
-        return delegate.registerServer(nodeId, isLeader, httpPublishUri, clusterUri, hostname);
+        ServerNodeDto dto = ServerNodeDto.Builder.builder()
+                .setId(nodeId)
+                .setLeader(isLeader)
+                .setTransportAddress(httpPublishUri.toString())
+                .setHostname(hostname)
+                .build();
+        return delegate.registerServer(dto);
     }
 
     @Override
@@ -66,16 +71,6 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void dropOutdated() {
-        delegate.dropOutdated();
-    }
-
-    @Override
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress, DataNodeStatus dataNodeStatus) throws NodeNotFoundException {
-        delegate.markAsAlive(node, isLeader, restTransportAddress, clusterAddress, dataNodeStatus);
-    }
-
-    @Override
     public boolean isOnlyLeader(NodeId nodeIde) {
         return delegate.isOnlyLeader(nodeIde);
     }
@@ -85,7 +80,7 @@ public class NodeServiceImpl implements NodeService {
         return delegate.isAnyLeaderPresent();
     }
 
-    private Map<String, Node> transformMap(Map<String, ServerNodeEntity> nodes) {
+    private Map<String, Node> transformMap(Map<String, ServerNodeDto> nodes) {
         return nodes.entrySet().stream()
                 .collect(
                         Collectors.toMap(

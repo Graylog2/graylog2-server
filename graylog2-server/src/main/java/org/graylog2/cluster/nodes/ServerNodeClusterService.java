@@ -17,11 +17,12 @@
 package org.graylog2.cluster.nodes;
 
 import org.graylog2.Configuration;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.database.MongoConnection;
 
 import javax.inject.Inject;
 
-public class ServerNodeClusterService extends AbstractNodeService<ServerNodeEntity> {
+public class ServerNodeClusterService extends AbstractNodeService<ServerNodeEntity, ServerNodeDto> {
 
     @Inject
     public ServerNodeClusterService(MongoConnection mongoConnection, Configuration configuration) {

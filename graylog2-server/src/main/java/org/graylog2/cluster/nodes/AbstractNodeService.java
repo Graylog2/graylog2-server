@@ -33,13 +33,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
@@ -47,7 +44,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class AbstractNodeService<T extends AbstractNode> extends PersistedServiceImpl implements NodeService<T> {
+public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeDto>, DTO extends NodeDto> extends PersistedServiceImpl implements NodeService<DTO> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNodeService.class);
 
@@ -75,25 +72,9 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
         this.nodeClass = nodeClass;
     }
 
-    private Map<String, Object> addDataNodeInfoToMap(final Map<String, Object> orig, final String clusterUri, DataNodeStatus dataNodeStatus) {
-        var newMap = new HashMap<>(orig);
-        if (Objects.nonNull(clusterUri)) {
-            newMap.put("cluster_address", clusterUri);
-        }
-        if (Objects.nonNull(dataNodeStatus)) {
-            newMap.put("datanode_status", dataNodeStatus);
-        }
-        return Map.copyOf(newMap);
-    }
-
     @Override
-    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
-        final var params = addDataNodeInfoToMap(Map.of(
-                "node_id", nodeId,
-                "is_leader", isLeader,
-                "transport_address", httpPublishUri.toString(),
-                "hostname", hostname
-        ), clusterUri, null);
+    public boolean registerServer(NodeDto dto) {
+        final var params = dto.toEntityParameters();
 
         final Map<String, Object> fields = Map.of(
                 "$set", params,
@@ -101,7 +82,7 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
         );
 
         final WriteResult result = this.collection(nodeClass).update(
-                new BasicDBObject("node_id", nodeId),
+                new BasicDBObject("node_id", dto.getId()),
                 new BasicDBObject(fields),
                 true,
                 false
@@ -109,8 +90,9 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
         return result.getN() == 1;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public T byNodeId(String nodeId) throws NodeNotFoundException {
+    public DTO byNodeId(String nodeId) throws NodeNotFoundException {
         DBObject query = new BasicDBObject("node_id", nodeId);
         DBObject o = findOne(nodeClass, query);
 
@@ -118,10 +100,9 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
             throw new NodeNotFoundException("Unable to find node " + nodeId);
         }
 
-        return construct((ObjectId) o.get("_id"), o.toMap());
+        return (DTO) construct((ObjectId) o.get("_id"), o.toMap()).toDto();
     }
 
-    @SuppressWarnings("rawtypes")
     protected T construct(ObjectId id, Map map) {
         try {
             return nodeClass
@@ -135,15 +116,16 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
     }
 
     @Override
-    public T byNodeId(NodeId nodeId) throws NodeNotFoundException {
+    public DTO byNodeId(NodeId nodeId) throws NodeNotFoundException {
         return byNodeId(nodeId.getNodeId());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Map<String, T> byNodeIds(Collection<String> nodeIds) {
+    public Map<String, DTO> byNodeIds(Collection<String> nodeIds) {
         return query(nodeClass, new BasicDBObject("node_id", new BasicDBObject("$in", nodeIds)))
                 .stream()
-                .map(o -> construct((ObjectId) o.get("_id"), o.toMap()))
+                .map(o -> (DTO) construct((ObjectId) o.get("_id"), o.toMap()).toDto())
                 .collect(Collectors.toMap(Node::getNodeId, Function.identity()));
     }
 
@@ -151,10 +133,11 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
         return cursorToStream(this.collection(nodeClass).aggregate(pipeline, AggregationOptions.builder().build()));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Map<String, T> allActive() {
+    public Map<String, DTO> allActive() {
         return aggregate(recentHeartbeat(List.of(Map.of())))
-                .collect(Collectors.toMap(obj -> (String) obj.get("node_id"), obj -> construct((ObjectId) obj.get("_id"), obj.toMap())));
+                .collect(Collectors.toMap(obj -> (String) obj.get("node_id"), obj -> (DTO) construct((ObjectId) obj.get("_id"), obj.toMap()).toDto()));
     }
 
     private List<? extends DBObject> recentHeartbeat(List<? extends Map<String, Object>> additionalMatches) {
@@ -192,12 +175,10 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      */
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress, DataNodeStatus dataNodeStatus) throws NodeNotFoundException {
-        BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
-        final var params = addDataNodeInfoToMap(Map.of(
-                "is_leader", isLeader,
-                "transport_address", restTransportAddress.toString()
-        ), clusterAddress, dataNodeStatus);
+    @Override
+    public void markAsAlive(NodeDto dto) throws NodeNotFoundException {
+        BasicDBObject query = new BasicDBObject("node_id", dto.getId());
+        final var params = dto.toEntityParameters();
 
         final BasicDBObject update = new BasicDBObject(Map.of(
                 "$set", params,
@@ -208,7 +189,7 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
 
         final int updatedDocumentsCount = result.getN();
         if (updatedDocumentsCount != 1) {
-            throw new NodeNotFoundException("Unable to find node " + node.getNodeId());
+            throw new NodeNotFoundException("Unable to find node " + dto.getId());
         }
     }
 
@@ -231,4 +212,19 @@ public abstract class AbstractNodeService<T extends AbstractNode> extends Persis
         ))).findAny().isPresent();
     }
 
+    @Override
+    public void ping(NodeDto dto) {
+        try {
+            markAsAlive(dto);
+        } catch (NodeNotFoundException e) {
+            LOG.warn("Did not find meta info of this node. Re-registering.");
+            registerServer(dto);
+        }
+        try {
+            // Remove old nodes that are no longer running. (Just some housekeeping)
+            dropOutdated();
+        } catch (Exception e) {
+            LOG.warn("Caught exception during node ping.", e);
+        }
+    }
 }

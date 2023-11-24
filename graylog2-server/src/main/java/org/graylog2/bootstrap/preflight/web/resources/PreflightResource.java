@@ -26,6 +26,7 @@ import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeEntity;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
@@ -58,14 +59,14 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 public class PreflightResource {
 
-    private final NodeService<DataNodeEntity> nodeService;
+    private final NodeService<DataNodeDto> nodeService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final CaService caService;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
 
     @Inject
-    public PreflightResource(final NodeService<DataNodeEntity> nodeService,
+    public PreflightResource(final NodeService<DataNodeDto> nodeService,
                              final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
                              final ClusterConfigService clusterConfigService,
@@ -83,7 +84,7 @@ public class PreflightResource {
     @GET
     @Path("/data_nodes")
     public List<DataNode> listDataNodes() {
-        final Map<String, DataNodeEntity> activeDataNodes = nodeService.allActive();
+        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         final var preflightDataNodes = dataNodeProvisioningService.streamAll().collect(Collectors.toMap(DataNodeProvisioningConfig::nodeId, Function.identity()));
 
         return activeDataNodes.values().stream().map(n -> {
@@ -144,7 +145,7 @@ public class PreflightResource {
     @Path("/generate")
     @NoAuditEvent("No Audit Event needed")
     public void generate() {
-        final Map<String, DataNodeEntity> activeDataNodes = nodeService.allActive();
+        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 

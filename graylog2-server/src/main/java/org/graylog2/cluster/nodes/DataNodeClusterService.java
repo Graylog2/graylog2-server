@@ -21,7 +21,7 @@ import org.graylog2.database.MongoConnection;
 
 import javax.inject.Inject;
 
-public class DataNodeClusterService extends AbstractNodeService<DataNodeEntity> {
+public class DataNodeClusterService extends AbstractNodeService<DataNodeEntity, DataNodeDto> {
 
     @Inject
     public DataNodeClusterService(MongoConnection mongoConnection, Configuration configuration) {

@@ -30,26 +30,32 @@ import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodePaginatedService;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,39 +119,37 @@ public class ClusterResource extends RestResource {
         return NodeSummaryList.create(nodeList);
     }
 
-//    @GET
-//    @Timed
-//    @Path("/datanodes")
-//    @ApiOperation(value = "Get a paginated list of all datanodes in this cluster")
-//    public PageListResponse<CertRenewalService.DataNode> dataNodes(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-//                                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-//                                                                   @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-//                                                                   @ApiParam(name = "sort",
-//                                                                             value = "The field to sort the result on",
-//                                                                             required = true,
-//                                                                             allowableValues = "title,description,type")
-//                                                                   @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-//                                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-//                                                                   @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order
-//
-//    ) {
-//        final SearchQuery searchQuery = searchQueryParser.parse(query);
-//        final PaginatedList<Node> result = dataNodePaginatedService.searchPaginatedDatanodes(searchQuery, sort, order, page, perPage);
-//
-//
-//        final List<Node> nodes = result.delegate();
-//        final List<CertRenewalService.DataNode> dataNodes = certRenewalService.addProvisioningInformation(nodes);
-//
-//        return PageListResponse.create(query, result.pagination(),
-//                result.grandTotal().orElse(0L), sort, order, dataNodes, attributes, settings);
-//    }
+    @GET
+    @Timed
+    @Path("/datanodes")
+    @ApiOperation(value = "Get a paginated list of all datanodes in this cluster")
+    public PageListResponse<DataNodeDto> dataNodes(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                   @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                   @ApiParam(name = "sort",
+                                                             value = "The field to sort the result on",
+                                                             required = true,
+                                                             allowableValues = "title,description,type")
+                                                   @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                   @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order
+
+    ) {
+        final SearchQuery searchQuery = searchQueryParser.parse(query);
+        final PaginatedList<DataNodeDto> result = dataNodePaginatedService.searchPaginated(searchQuery, sort, order, page, perPage);
+
+        final List<DataNodeDto> dataNodes = certRenewalService.addProvisioningInformation(result.delegate());
+
+        return PageListResponse.create(query, result.pagination(),
+                result.grandTotal().orElse(0L), sort, order, dataNodes, attributes, settings);
+    }
 
     @GET
     @Timed
     @Path("/node")
     @ApiOperation(value = "Information about this node.",
-            notes = "This is returning information of this node in context to its state in the cluster. " +
-                    "Use the system API of the node itself to get system information.")
+                  notes = "This is returning information of this node in context to its state in the cluster. " +
+                          "Use the system API of the node itself to get system information.")
     public NodeSummary node() throws NodeNotFoundException {
         return nodeSummary(nodeService.byNodeId(nodeId));
     }
@@ -154,8 +158,8 @@ public class ClusterResource extends RestResource {
     @Timed
     @Path("/nodes/{nodeId}")
     @ApiOperation(value = "Information about a node.",
-            notes = "This is returning information of a node in context to its state in the cluster. " +
-                    "Use the system API of the node itself to get system information.")
+                  notes = "This is returning information of a node in context to its state in the cluster. " +
+                          "Use the system API of the node itself to get system information.")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Node not found.")
     })

@@ -35,7 +35,8 @@ import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
-import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.MongoDbConfiguration;
@@ -129,13 +130,16 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected void startNodeRegistration(Injector injector) {
-        final NodeService<DataNodeEntity> nodeService = injector.getInstance(new Key<>() {});
+        final NodeService<DataNodeDto> nodeService = injector.getInstance(new Key<>() {});
         final NodeId nodeId = injector.getInstance(NodeId.class);
         // always set leader to "false" on startup and let the NodePingPeriodical take care of it later
-        nodeService.registerServer(nodeId.getNodeId(),
-                false,
-                configuration.getHttpPublishUri(),
-                Tools.getLocalCanonicalHostname());
+        nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(false)
+                .setTransportAddress(configuration.getHttpPublishUri().toString())
+                .setHostname(Tools.getLocalCanonicalHostname())
+                .setDataNodeStatus(DataNodeStatus.STARTING)
+                .build());
     }
 
     @Override

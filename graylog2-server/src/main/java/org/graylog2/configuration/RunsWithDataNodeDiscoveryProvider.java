@@ -20,7 +20,7 @@ import com.google.common.base.Suppliers;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +37,14 @@ public class RunsWithDataNodeDiscoveryProvider implements Provider<Boolean> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RunsWithDataNodeDiscoveryProvider.class);
     private final PreflightConfigService preflightConfigService;
-    private final NodeService<DataNodeEntity> nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     private final Supplier<Boolean> resultsCachingSupplier;
 
     @Inject
     public RunsWithDataNodeDiscoveryProvider(
             PreflightConfigService preflightConfigService,
-            NodeService<DataNodeEntity> nodeService) {
+            NodeService<DataNodeDto> nodeService) {
         this.preflightConfigService = preflightConfigService;
         this.nodeService = nodeService;
         this.resultsCachingSupplier = Suppliers.memoize(this::doGet);

@@ -20,7 +20,7 @@ import com.google.common.base.Suppliers;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
 
     private final List<URI> hosts;
     private final PreflightConfigService preflightConfigService;
-    private final NodeService<DataNodeEntity> nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     private final Supplier<List<URI>> resultsCachingSupplier;
 
@@ -51,7 +51,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     public IndexerDiscoveryProvider(
             @Named("elasticsearch_hosts") List<URI> hosts,
             PreflightConfigService preflightConfigService,
-            NodeService<DataNodeEntity> nodeService) {
+            NodeService<DataNodeDto> nodeService) {
         this.hosts = hosts;
         this.preflightConfigService = preflightConfigService;
         this.nodeService = nodeService;

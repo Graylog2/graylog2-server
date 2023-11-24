@@ -22,7 +22,7 @@ import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConfigServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
-import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.database.MongoConnection;
 
@@ -34,7 +34,7 @@ public class IndexerDiscoveryModule extends AbstractModule {
     protected void configure() {
         bind(new TypeLiteral<List<URI>>() {}).annotatedWith(IndexerHosts.class).toProvider(IndexerDiscoveryProvider.class).asEagerSingleton();
         bind(Boolean.class).annotatedWith(RunsWithDataNode.class).toProvider(RunsWithDataNodeDiscoveryProvider.class).asEagerSingleton();
-        bind(new TypeLiteral<NodeService<DataNodeEntity>>() {}).to(DataNodeClusterService.class);
+        bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
     }

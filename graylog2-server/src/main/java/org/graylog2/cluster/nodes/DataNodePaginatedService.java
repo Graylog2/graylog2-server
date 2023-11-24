@@ -17,7 +17,6 @@
 package org.graylog2.cluster.nodes;
 
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
@@ -27,20 +26,18 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class DataNodePaginatedService extends PaginatedDbService<DataNodeEntity> {
+public class DataNodePaginatedService extends PaginatedDbService<DataNodeDto> {
     private static final String NODE_COLLECTION_NAME = "datanodes";
 
     @Inject
     public DataNodePaginatedService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, DataNodeEntity.class, NODE_COLLECTION_NAME);
+        super(mongoConnection, mapper, DataNodeDto.class, NODE_COLLECTION_NAME);
     }
 
-    public PaginatedList<Node> searchPaginated(SearchQuery query,
-                                               String sortByField, String sortOrder, int page, int perPage) {
-        final PaginatedList<DataNodeEntity> results = findPaginatedWithQueryFilterAndSort(query.toDBQuery(), node -> true,
+    public PaginatedList<DataNodeDto> searchPaginated(SearchQuery query,
+                                                      String sortByField, String sortOrder, int page, int perPage) {
+        return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), node -> true,
                 getSortBuilder(sortOrder, sortByField), page, perPage);
-        return new PaginatedList<>(results.delegate().stream().map(n -> (Node) n).toList(),
-                results.pagination().total(), results.pagination().page(), results.pagination().perPage());
     }
 
 }

@@ -19,8 +19,8 @@ package org.graylog.datanode.periodicals;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessState;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 public class NodePingPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingPeriodical.class);
-    private final NodeService<DataNodeEntity> nodeService;
+    private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
     private final Supplier<URI> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
@@ -45,12 +45,12 @@ public class NodePingPeriodical extends Periodical {
 
 
     @Inject
-    public NodePingPeriodical(NodeService<DataNodeEntity> nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch) {
+    public NodePingPeriodical(NodeService<DataNodeDto> nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch) {
         this(nodeService, nodeId, configuration, managedOpenSearch::getOpensearchBaseUrl, managedOpenSearch::getOpensearchClusterUrl, managedOpenSearch::isLeaderNode, () -> managedOpenSearch.processInfo().state());
     }
 
     NodePingPeriodical(
-            NodeService<DataNodeEntity> nodeService,
+            NodeService<DataNodeDto> nodeService,
             NodeId nodeId,
             Configuration configuration,
             Supplier<URI> opensearchBaseUri,
@@ -110,20 +110,28 @@ public class NodePingPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        try {
-            nodeService.markAsAlive(nodeId, isLeader.get(), opensearchBaseUri.get(), opensearchClusterUri.get(), processState.get().getDataNodeStatus());
-        } catch (NodeNotFoundException e) {
-            LOG.warn("Did not find meta info of this node. Re-registering.");
-            registerServer();
-        }
+        final DataNodeDto dto = DataNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(isLeader.get())
+                .setTransportAddress(opensearchBaseUri.get().toString())
+                .setClusterAddress(opensearchClusterUri.get())
+                .setDataNodeStatus(processState.get().getDataNodeStatus())
+                .setHostname(configuration.getHostname())
+                .build();
+
+        nodeService.ping(dto);
+
     }
 
     private void registerServer() {
-        final boolean registrationSucceeded = nodeService.registerServer(nodeId.getNodeId(),
-                isLeader.get(),
-                opensearchBaseUri.get(),
-                opensearchClusterUri.get(),
-                configuration.getHostname());
+        final boolean registrationSucceeded = nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(isLeader.get())
+                .setTransportAddress(opensearchBaseUri.get().toString())
+                .setClusterAddress(opensearchClusterUri.get())
+                .setHostname(configuration.getHostname())
+                .setDataNodeStatus(DataNodeStatus.STARTING)
+                .build());
 
         if (!registrationSucceeded) {
             LOG.error("Failed to register node {} for heartbeats.", nodeId.getNodeId());

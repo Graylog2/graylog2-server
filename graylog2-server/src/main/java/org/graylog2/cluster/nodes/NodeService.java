@@ -16,21 +16,14 @@
  */
 package org.graylog2.cluster.nodes;
 
-import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.plugin.system.NodeId;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
-public interface NodeService<T extends Node> {
-    
-    boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname);
-
-    default boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
-        return registerServer(nodeId, isLeader, httpPublishUri, null, hostname);
-    }
+public interface NodeService<T extends NodeDto> {
+    boolean registerServer(NodeDto dto);
 
     T byNodeId(String nodeId) throws NodeNotFoundException;
 
@@ -42,13 +35,17 @@ public interface NodeService<T extends Node> {
 
     void dropOutdated();
 
-    void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress, DataNodeStatus dataNodeStatus) throws NodeNotFoundException;
-
-    default void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException {
-        markAsAlive(node, isLeader, restTransportAddress, null, null);
-    }
+    void markAsAlive(NodeDto dto) throws NodeNotFoundException;
 
     boolean isOnlyLeader(NodeId nodeIde);
 
     boolean isAnyLeaderPresent();
+
+    /**
+     * Sets the last seen date of the node, additionally updating the settings.
+     * If the node hasn't been registered yet, it will be registered.
+     *
+     * @param dto Dto of the node to be marked as alive
+     */
+    void ping(NodeDto dto);
 }

@@ -23,7 +23,7 @@ import org.graylog2.database.DbEntity;
 import java.util.Map;
 
 @DbEntity(collection = "nodes", titleField = "node_id")
-public class ServerNodeEntity extends AbstractNode {
+public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
 
     @JsonCreator
     public ServerNodeEntity(Map<String, Object> fields) {
@@ -32,6 +32,17 @@ public class ServerNodeEntity extends AbstractNode {
 
     public ServerNodeEntity(ObjectId id, Map<String, Object> fields) {
         super(id, fields);
+    }
+
+    @Override
+    public ServerNodeDto toDto() {
+        return ServerNodeDto.Builder.builder()
+                .setId(this.getNodeId())
+                .setTransportAddress(this.getTransportAddress())
+//                .setLastSeen(this.getLastSeen())
+                .setHostname(this.getHostname())
+                .setLeader(this.isLeader())
+                .build();
     }
 
 }

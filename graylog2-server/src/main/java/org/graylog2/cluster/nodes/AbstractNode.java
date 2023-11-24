@@ -30,7 +30,7 @@ import org.joda.time.DateTimeZone;
 import java.util.Collections;
 import java.util.Map;
 
-public abstract class AbstractNode extends PersistedImpl implements Node {
+public abstract class AbstractNode<DTO extends NodeDto> extends PersistedImpl implements Node {
 
     public AbstractNode(Map<String, Object> fields) {
         super(fields);
@@ -92,5 +92,7 @@ public abstract class AbstractNode extends PersistedImpl implements Node {
     public String toString() {
         return getTitle();
     }
+
+    public abstract DTO toDto();
 
 }

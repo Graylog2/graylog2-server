@@ -19,7 +19,7 @@ package org.graylog2.telemetry.rest;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.HashCode;
-import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
@@ -67,7 +67,7 @@ public class TelemetryService {
     private final boolean isTelemetryEnabled;
     private final TelemetryClusterService telemetryClusterService;
     private final String installationSource;
-    private final NodeService<DataNodeEntity> nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     @Inject
     public TelemetryService(
@@ -83,7 +83,7 @@ public class TelemetryService {
             EventBus eventBus,
             TelemetryClusterService telemetryClusterService,
             @Named("installation_source") String installationSource,
-            NodeService<DataNodeEntity> nodeService) {
+            NodeService<DataNodeDto> nodeService) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
         this.enterpriseDataProvider = enterpriseDataProvider;

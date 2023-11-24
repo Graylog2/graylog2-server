@@ -43,7 +43,7 @@ public interface Node {
 
     String getTransportAddress();
     DateTime getLastSeen();
-    
+
     String getHostname();
 
     default String getShortNodeId() {
@@ -54,4 +54,5 @@ public interface Node {
     default String getTitle() {
         return StringUtils.f("%s / %s", getShortNodeId(), getHostname());
     }
+    
 }

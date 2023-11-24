@@ -27,7 +27,7 @@ import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreCont
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
-import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
@@ -83,7 +83,7 @@ public class ServerBindings extends Graylog2Module {
     private void bindInterfaces() {
         bind(ActivityWriter.class).to(DataNodeActivityWriter.class);
         OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
-        bind(new TypeLiteral<NodeService<DataNodeEntity>>() {}).to(DataNodeClusterService.class);
+        bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
     }
 
     private void bindDynamicFeatures() {
