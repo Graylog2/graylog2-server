@@ -17,9 +17,7 @@
 package org.graylog.testing.containermatrix.discovery;
 
 import com.google.common.collect.Sets;
-import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestWithRunningESMongoTestsDescriptor;
@@ -37,8 +35,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.defaultOrOverride;
 import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.getSearchVersionOverride;
 import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.isCompatible;
 
@@ -86,8 +84,8 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
 
     private boolean isMatchingSearchServer(ContainerMatrixTestsConfiguration config) {
         final var optional = getSearchVersionOverride();
-        if(optional.isPresent()) {
-            if(config.searchVersions().length == 0) {
+        if (optional.isPresent()) {
+            if (config.searchVersions().length == 0) {
                 return true;
             } else {
                 final var override = optional.get();
@@ -99,7 +97,8 @@ public class IsContainerMatrixTestClass extends IsTestClassWithTests {
     }
 
     private Set<SearchVersion> getSearchServers(ContainerMatrixTestsConfiguration config) {
-        return Stream.of(config.searchVersions()).map(SearchServer::getSearchVersion).collect(Collectors.toSet());
+        return defaultOrOverride().collect(Collectors.toSet());
+        //return Stream.of(config.searchVersions()).map(SearchServer::getSearchVersion).collect(Collectors.toSet());
     }
 
     @Override

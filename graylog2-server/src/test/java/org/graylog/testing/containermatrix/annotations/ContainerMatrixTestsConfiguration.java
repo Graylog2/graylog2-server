@@ -58,9 +58,9 @@ public @interface ContainerMatrixTestsConfiguration {
 
     /**
      * matrix rule
-     * If no version is explicitly specified, then {@link SearchServer#DEFAULT_VERSION will be used by the tests}
+     * If no version is explicitly specified, a build context dependent default will be used by the tests}
      */
-    SearchServer[] searchVersions() default {SearchServer.DATANODE_DEV, SearchServer.OS2_LATEST};
+    SearchServer[] searchVersions() default {};
 
     /**
      * matrix rule
@@ -87,6 +87,7 @@ public @interface ContainerMatrixTestsConfiguration {
      * Disabling only works with Lifecycle.CLASS because a new container is spun up.
      */
     boolean defaultImportLicenses = true;
+
     boolean importLicenses() default defaultImportLicenses;
 
     boolean withMailServerEnabled() default false;

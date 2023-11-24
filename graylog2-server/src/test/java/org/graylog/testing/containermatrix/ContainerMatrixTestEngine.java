@@ -116,8 +116,15 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return Optional.of(SearchVersion.decode(property));
     }
 
-    private Stream<SearchVersion> defaultOrOverride() {
-        return Stream.of(getSearchVersionOverride().orElse(SearchServer.DEFAULT_VERSION.getSearchVersion()));
+    public static Stream<SearchVersion> defaultOrOverride() {
+        if (getSearchVersionOverride().isPresent()) {
+            return Stream.of(getSearchVersionOverride().get());
+        }
+        // To reduce test time and CI costs, only use one SearchServer by default for PR builds.
+        if (Boolean.parseBoolean(System.getenv("CI_IS_PULL_REQUEST_BUILD")) || true) {
+            return Stream.of(SearchServer.DEFAULT_VERSION.getSearchVersion());
+        }
+        return Stream.of(SearchServer.DEFAULT_VERSION.getSearchVersion(), SearchServer.OS2_LATEST.getSearchVersion());
     }
 
     /**
@@ -143,10 +150,8 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     private Set<SearchVersion> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
             if (annotation.searchVersions().length == 0) {
-                LOG.info("using defaultOrOverride");
                 return defaultOrOverride();
             } else {
-                LOG.info("using annotation");
                 return filterForCompatibleVersionOrDrop(annotation.searchVersions());
             }
         });
