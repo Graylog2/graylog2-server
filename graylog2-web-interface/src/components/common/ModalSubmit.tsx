@@ -61,7 +61,7 @@ type Props = {
   isSubmitting?: boolean,
   leftCol?: React.ReactNode,
   onSubmit?: (event?: SyntheticEvent) => void,
-  submitButtonText: string,
+  submitButtonText: React.ReactNode,
   submitButtonType?: 'submit' | 'button',
   submitIcon?: IconName,
 } & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
@@ -81,6 +81,8 @@ const ModalSubmit = (props: Props) => {
     submitIcon,
   } = props;
 
+  const title = typeof submitButtonText === 'string' ? submitButtonText : undefined;
+
   return (
     <StyledButtonToolbar className={className}>
       {leftCol}
@@ -98,8 +100,8 @@ const ModalSubmit = (props: Props) => {
               bsSize={bsSize}
               disabled={disabledSubmit || (isAsyncSubmit && props.isSubmitting)}
               form={formId}
-              title={submitButtonText}
-              aria-label={submitButtonText}
+              title={title}
+              aria-label={title}
               type={submitButtonType}
               onClick={onSubmit}>
         {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <><Icon name={submitIcon} /> </>}
