@@ -37,7 +37,7 @@ export type StyleProps = ColorVariant | 'link';
 
 const styleProps = (style: StyleProps) => {
   switch (style) {
-    case 'default': return { color: 'gray.6' };
+    case 'default': return { color: 'gray' };
     case 'link': return { variant: 'subtle' };
     default: return { color: style };
   }
