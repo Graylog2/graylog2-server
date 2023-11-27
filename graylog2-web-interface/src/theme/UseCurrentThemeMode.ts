@@ -22,7 +22,7 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 
 import type { ThemeMode } from './constants';
-import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
+import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE, THEME_MODE_DARK, THEME_MODE_LIGHT } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
 import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
@@ -34,12 +34,18 @@ type CurrentUser = {
   };
 };
 
+const storeThemePreference = () => {
+  const preference = Store.get(PREFERENCES_THEME_MODE);
+
+  return preference === THEME_MODE_LIGHT || preference === THEME_MODE_DARK ? preference : null;
+};
+
 const _getInitialThemeMode = (userPreferences, browserThemePreference, initialThemeModeOverride) => {
   if (initialThemeModeOverride) {
     return initialThemeModeOverride;
   }
 
-  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? Store.get(PREFERENCES_THEME_MODE);
+  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? storeThemePreference();
 
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
