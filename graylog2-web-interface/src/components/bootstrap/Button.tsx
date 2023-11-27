@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { Button as MantineButton } from '@mantine/core';
 import type { ColorVariant } from '@graylog/sawmill';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -43,11 +43,32 @@ const styleProps = (style: StyleProps) => {
   }
 };
 
-const StyledButton = styled(MantineButton)`
-  height: auto;
-  padding: 6px 12px;
+const stylesForSize = (size: Size) => {
+  switch (size) {
+    case 'xs':
+      return `
+        height: 21.4141px; 
+        padding: 1px 5px;
+      `;
+    case 'sm':
+      return `
+        height: 29.4141px;
+        padding: 5px 10px;
+      `;
+    default:
+      return `
+        height: 34px;
+        padding: 6px 12px;
+      `;
+  }
+};
+
+type Size = 'xs' | 'sm' | 'md' | 'lg';
+
+const StyledButton = styled(MantineButton)<{ size: Size }>(({ size }) => css`
+  ${stylesForSize(size)}
   font-weight: 400;
-`;
+`);
 
 type Props = React.PropsWithChildren<{
   active?: boolean,
@@ -68,6 +89,12 @@ type Props = React.PropsWithChildren<{
   type?: 'button' | 'reset' | 'submit',
 }>;
 
+const styles = {
+  inner: {
+    height: '16px',
+  },
+};
+
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
     'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
@@ -86,6 +113,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
                     onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
                     role={role}
                     size={sizeForMantine(bsSize)}
+                    styles={styles}
                     tabIndex={tabIndex}
                     title={title}
                     type={type}>{children}
