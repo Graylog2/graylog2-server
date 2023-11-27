@@ -55,6 +55,12 @@ const stylesForSize = (size: Size) => {
         height: 29.4141px;
         padding: 5px 10px;
       `;
+    case 'lg':
+      return `
+        height: 43.1641px;
+        padding: 10px 16px;
+      `;
+    case 'md':
     default:
       return `
         height: 34px;
