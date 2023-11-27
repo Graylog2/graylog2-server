@@ -17,13 +17,14 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -40,31 +41,24 @@ import static org.mockito.Mockito.when;
 public class MessageCountRotationStrategyTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private IndexSet indexSet;
-
     @Mock
     private IndexSetConfig indexSetConfig;
-
     @Mock
     private Indices indices;
-
-    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-
     @Mock
     private AuditEventSender auditEventSender;
 
-    private ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
-
     @Test
-    public void testRotate() throws Exception {
+    public void testRotate() {
         when(indices.numberOfMessages("name")).thenReturn(10L);
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender, configuration);
+        final MessageCountRotationStrategy strategy = createStrategy();
 
         strategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
@@ -72,13 +66,13 @@ public class MessageCountRotationStrategyTest {
     }
 
     @Test
-    public void testDontRotate() throws Exception {
+    public void testDontRotate() {
         when(indices.numberOfMessages("name")).thenReturn(1L);
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender, configuration);
+        final MessageCountRotationStrategy strategy = createStrategy();
 
         strategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
@@ -87,16 +81,21 @@ public class MessageCountRotationStrategyTest {
 
 
     @Test
-    public void testIndexUnavailable() throws Exception {
+    public void testIndexUnavailable() {
         doThrow(IndexNotFoundException.class).when(indices).numberOfMessages("name");
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, nodeId, auditEventSender, configuration);
+        final MessageCountRotationStrategy strategy = createStrategy();
 
         strategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
         reset(indexSet);
+    }
+
+    @NotNull
+    private MessageCountRotationStrategy createStrategy() {
+        return new MessageCountRotationStrategy(indices, new IndexRotator(indices, auditEventSender, nodeId));
     }
 }

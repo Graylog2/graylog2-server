@@ -24,8 +24,6 @@ import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
-import com.github.joschi.jadconfig.validators.DirectoryPathWritableValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
@@ -93,7 +91,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchConfigLocation = Path.of("datanode/config");
 
-    @Parameter(value = "config_location", validators = DirectoryPathReadableValidator.class)
+    @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
     private Path configLocation = null;
 
     @Parameter(value = "process_logs_buffer_size")

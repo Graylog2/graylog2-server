@@ -22,6 +22,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -62,18 +63,13 @@ public class TimeBasedRotationStrategyTest {
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private IndexSet indexSet;
-
     @Mock
     private IndexSetConfig indexSetConfig;
-
     @Mock
     private Indices indices;
-
-    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-
     @Mock
     private AuditEventSender auditEventSender;
 
@@ -87,7 +83,7 @@ public class TimeBasedRotationStrategyTest {
         when(indices.getIndices(eq(indexSet))).thenReturn(Collections.singleton(IGNORED));
         when(indices.numberOfMessages(eq(IGNORED))).thenReturn(20L);
         when(indices.isOpen(anyString())).thenReturn(true);
-        rotationStrategy = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender, configuration);
+        rotationStrategy = new TimeBasedRotationStrategy(indices, configuration, new IndexRotator(indices, auditEventSender, nodeId));
     }
 
     @After
@@ -161,7 +157,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateHourly() throws Exception {
+    public void shouldRotateHourly() {
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 59, 59, 0, DateTimeZone.UTC);
         final Period period = hours(1);
 
@@ -200,7 +196,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateNonIntegralPeriod() throws Exception {
+    public void shouldRotateNonIntegralPeriod() {
         // start 5 minutes before full hour
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 55, 0, 0, DateTimeZone.UTC);
         final Period period = minutes(10);
@@ -288,7 +284,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateThrowsISEIfIndexIsEmpty() throws Exception {
+    public void shouldRotateThrowsISEIfIndexIsEmpty() {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSet.getNewestIndex()).thenReturn("");
 
@@ -299,7 +295,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateThrowsISEIfIndexSetIdIsNull() throws Exception {
+    public void shouldRotateThrowsISEIfIndexSetIdIsNull() {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.id()).thenReturn(null);
         when(indexSet.getNewestIndex()).thenReturn(IGNORED);
@@ -311,7 +307,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateThrowsISEIfIndexSetIdIsEmpty() throws Exception {
+    public void shouldRotateThrowsISEIfIndexSetIdIsEmpty() {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.id()).thenReturn("");
         when(indexSet.getNewestIndex()).thenReturn(IGNORED);
@@ -323,7 +319,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateThrowsISEIfRotationStrategyHasIncorrectType() throws Exception {
+    public void shouldRotateThrowsISEIfRotationStrategyHasIncorrectType() {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSet.getNewestIndex()).thenReturn(IGNORED);
         when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.createDefault());
@@ -335,7 +331,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateConcurrently() throws Exception {
+    public void shouldRotateConcurrently() {
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 59, 59, 0, DateTimeZone.UTC);
         final Period period = hours(1);
 
@@ -414,7 +410,7 @@ public class TimeBasedRotationStrategyTest {
     // does with previous state. This is not ideal and this test demonstrates the behaviour by also acting as a test for
     // the #reset method. The ultimate goal would be to remove state, the #reset method and this test altogether.
     @Test
-    public void testResetWithMixedPeriod() throws Exception {
+    public void testResetWithMixedPeriod() {
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 0, 0, 0, DateTimeZone.UTC);
         final Period period = hours(1).plusMinutes(30);
 
@@ -459,7 +455,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldSkipRotationOnEmptyIndexSet() throws Exception {
+    public void shouldSkipRotationOnEmptyIndexSet() {
         final DateTime initialTime = new DateTime(2022, 7, 21, 13, 00, 00, 0, DateTimeZone.UTC);
         final Period period = hours(1);
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
@@ -489,7 +485,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void testRotationOnEmptyIndexSetWhenEnabled() throws Exception {
+    public void testRotationOnEmptyIndexSetWhenEnabled() {
         final DateTime initialTime = new DateTime(2022, 7, 21, 13, 00, 00, 0, DateTimeZone.UTC);
         final Period period = hours(1);
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);

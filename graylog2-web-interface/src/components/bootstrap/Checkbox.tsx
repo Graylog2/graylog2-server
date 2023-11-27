@@ -14,28 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { forwardRef } from 'react';
-import styled, { css } from 'styled-components';
+import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { Badge as BootstrapBadge } from 'react-bootstrap';
+import { Checkbox as BootstrapCheckbox } from 'react-bootstrap';
 
-const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
-  if (!bsStyle) {
-    return undefined;
-  }
+type BootstrapCheckboxProps = React.ComponentProps<typeof BootstrapCheckbox>;
 
-  const backgroundColor = theme.colors.variant[bsStyle];
-  const textColor = theme.utils.readableColor(backgroundColor);
-
-  return css`
-    background-color: ${backgroundColor};
-    color: ${textColor};
-`;
-});
-
-const Badge = forwardRef(({ ...props }, ref) => (
-  <StyledBadge ref={ref} {...props} />
-));
-
-export default Badge;
-export { StyledBadge };
+type Props = Omit<BootstrapCheckboxProps, 'onChange'> & {
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+}
+const Checkbox = ({ onChange, ...props }: Props) => <BootstrapCheckbox onChange={onChange as unknown as BootstrapCheckboxProps['onChange']} {...props} />;
+export default Checkbox;

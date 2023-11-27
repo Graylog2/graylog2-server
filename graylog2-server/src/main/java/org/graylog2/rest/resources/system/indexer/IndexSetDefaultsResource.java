@@ -61,6 +61,10 @@ public class IndexSetDefaultsResource extends RestResource {
         this.validator = validator;
     }
 
+    private static String buildFieldError(String field, String message) {
+        return f("Invalid value for field [%s]: %s", field, message);
+    }
+
     /**
      * Save new {@link IndexSetsDefaultConfiguration} cluster configuration object. This method exists to allow additional validation
      * before saving with the {@link ClusterConfigService}.
@@ -101,9 +105,5 @@ public class IndexSetDefaultsResource extends RestResource {
 
         clusterConfigService.write(config);
         return Response.ok(config).build();
-    }
-
-    private static String buildFieldError(String field, String message) {
-        return f("Invalid value for field [%s]: %s", field, message);
     }
 }

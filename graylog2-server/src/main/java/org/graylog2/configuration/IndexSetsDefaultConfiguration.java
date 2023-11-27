@@ -53,6 +53,10 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
     public static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
 
+    public static Builder builder() {
+        return new AutoValue_IndexSetsDefaultConfiguration.Builder();
+    }
+
     @NotBlank
     @JsonProperty(INDEX_ANALYZER)
     public abstract String indexAnalyzer();
@@ -111,10 +115,6 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     // alias for RETENTION_STRATEGY_CONFIG
     public RetentionStrategyConfig retentionStrategy() {
         return retentionStrategyConfig();
-    }
-
-    public static Builder builder() {
-        return new AutoValue_IndexSetsDefaultConfiguration.Builder();
     }
 
     public abstract Builder toBuilder();

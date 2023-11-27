@@ -18,6 +18,7 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.inmemory.InMemoryFilterExpressionParser;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
 import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
@@ -45,21 +47,27 @@ public class IndexFieldTypesListService {
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
 
+    private final InMemoryFilterExpressionParser inMemoryFilterExpressionParser;
+
     private FieldTypeDTOsMerger fieldTypeDTOsMerger;
 
     @Inject
     public IndexFieldTypesListService(final IndexFieldTypesService indexFieldTypesService,
                                       final IndexSetService indexSetService,
                                       final MongoIndexSet.Factory indexSetFactory,
-                                      final FieldTypeDTOsMerger fieldTypeDTOsMerger) {
+                                      final FieldTypeDTOsMerger fieldTypeDTOsMerger,
+                                      final InMemoryFilterExpressionParser inMemoryFilterExpressionParser) {
         this.indexFieldTypesService = indexFieldTypesService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
         this.fieldTypeDTOsMerger = fieldTypeDTOsMerger;
+        this.inMemoryFilterExpressionParser = inMemoryFilterExpressionParser;
     }
 
     public PageListResponse<IndexSetFieldType> getIndexSetFieldTypesList(
             final String indexSetId,
+            final String fieldNameQuery,
+            final List<String> filters,
             final int page,
             final int perPage,
             final String sort,
@@ -83,7 +91,7 @@ public class IndexFieldTypesListService {
                 .orElse(ImmutableSet.of());
 
         final Collection<FieldTypeDTO> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos, previousFieldDtos, customFieldMappings);
-        final List<IndexSetFieldType> retrievedPage = allFields
+        final List<IndexSetFieldType> filteredFields = allFields
                 .stream()
                 .map(fieldTypeDTO -> new IndexSetFieldType(
                                 fieldTypeDTO.fieldName(),
@@ -92,12 +100,16 @@ public class IndexFieldTypesListService {
                                 FieldTypeMappingsService.BLACKLISTED_FIELDS.contains(fieldTypeDTO.fieldName())
                         )
                 )
+                .filter(indexSetFieldType -> indexSetFieldType.fieldName().contains(fieldNameQuery))
+                .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parse(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
+                .collect(Collectors.toList());
+        final List<IndexSetFieldType> retrievedPage = filteredFields.stream()
                 .sorted(IndexSetFieldType.getComparator(sort, order))
                 .skip((long) Math.max(0, page - 1) * perPage)
                 .limit(perPage)
                 .toList();
 
-        final int total = allFields.size();
+        final int total = filteredFields.size();
 
         return PageListResponse.create("",
                 PaginatedList.PaginationInfo.create(

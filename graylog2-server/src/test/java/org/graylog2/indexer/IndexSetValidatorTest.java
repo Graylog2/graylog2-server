@@ -17,14 +17,14 @@
 package org.graylog2.indexer;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
-import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.Duration;
@@ -58,35 +58,30 @@ public class IndexSetValidatorTest {
     @Mock
     private ElasticsearchConfiguration elasticsearchConfiguration;
 
+    @Mock
+    private DataTieringOrchestrator dataTieringOrchestrator;
+
     private IndexSetValidator validator;
 
     @Before
     public void setUp() throws Exception {
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, false);
     }
 
     @Test
     public void validate() throws Exception {
-        final String prefix = "graylog_index";
-        final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);
-        final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
-        final RetentionStrategyConfig retentionStrategyConfig = mock(RetentionStrategyConfig.class);
-
-        when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
-        when(newConfig.indexPrefix()).thenReturn(prefix);
-        when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
-        when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
-        when(retentionStrategyConfig.validate(elasticsearchConfiguration)).thenReturn(new ValidationResult());
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+        IndexSetConfig validConfig = testIndexSetConfig();
 
-        final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
+        final Optional<IndexSetValidator.Violation> violation = validator.validate(validConfig);
 
         assertThat(violation).isNotPresent();
     }
 
     @Test
-    public void validateWhenAlreadyManaged() throws Exception {
+    public void validateWhenAlreadyManaged() {
         final String prefix = "graylog_index";
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
@@ -102,7 +97,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithConflict() throws Exception {
+    public void validateWithConflict() {
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
 
@@ -118,7 +113,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithConflict2() throws Exception {
+    public void validateWithConflict2() {
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
 
@@ -134,7 +129,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithInvalidFieldTypeRefreshInterval() throws Exception {
+    public void validateWithInvalidFieldTypeRefreshInterval() {
         final Duration fieldTypeRefreshInterval = Duration.millis(999);
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
@@ -175,75 +170,6 @@ public class IndexSetValidatorTest {
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
                 .build();
         assertThat(validator.validate(modifiedConfig)).isNotPresent();
-
-        // TimeBasedSizeOptimizingRotation validation
-        final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeMin(Period.days(2))
-                        .indexLifetimeMax(Period.days(30))
-                        .build()
-                )
-                .build();
-        assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
-                assertThat(v.message()).contains(
-                        "Lifetime setting index_lifetime_max <P30D> exceeds the configured maximum of max_index_retention_period=P9D")
-        );
-    }
-
-    @Test
-    public void timeBasedSizeOptimizingOnlyWithMultipleOfDays() {
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-
-        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
-        final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeMin(Period.days(2).withHours(2))
-                        .indexLifetimeMax(Period.days(30))
-                        .build()
-                )
-                .build();
-
-        assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
-                assertThat(v.message()).contains(
-                        "Lifetime setting index_lifetime_min <P2DT2H> can only be a multiple of days")
-        );
-
-        assertThat(validator.periodOtherThanDays(Period.days(5))).isFalse();
-        assertThat(validator.periodOtherThanDays(Period.weeks(5))).isTrue();
-        assertThat(validator.periodOtherThanDays(Period.days(5).withHours(3))).isTrue();
-    }
-
-    @Test
-    public void timeBasedSizeOptimizingHonorsFixedLeeWay() {
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(10));
-
-        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
-        final IndexSetConfig failingConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeMin(Period.days(10))
-                        .indexLifetimeMax(Period.days(19))
-                        .build()
-                )
-                .build();
-
-        assertThat(validator.validate(failingConfig)).hasValueSatisfying(v -> assertThat(v.message())
-                .contains("The duration between index_lifetime_max and index_lifetime_min <P9D> " +
-                        "cannot be shorter than time_size_optimizing_retention_fixed_leeway <P10D>"));
-
-        final IndexSetConfig successfullConfig = testIndexSetConfig().toBuilder()
-                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeMin(Period.days(10))
-                        .indexLifetimeMax(Period.days(20))
-                        .build()
-                )
-                .build();
-
-        assertThat(validator.validate(successfullConfig)).isEmpty();
     }
 
     @Test
@@ -265,6 +191,39 @@ public class IndexSetValidatorTest {
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
         assertThat(violation).isPresent();
+    }
+
+    @Test
+    public void testStrategiesPresentIfDataTiersIsNull() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+
+
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().retentionStrategy(null).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("retention_strategy cannot be null")
+        );
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().retentionStrategyClass(null).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("retention_strategy_class cannot be null")
+        );
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().rotationStrategy(null).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("rotation_strategy cannot be null")
+        );
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().rotationStrategyClass(null).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("rotation_strategy_class cannot be null")
+        );
+    }
+
+    @Test
+    public void testDataTieringNotSupportedInCloud() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, true);
+
+        assertThat(validator.validate(testIndexSetConfig().toBuilder().dataTiering(mock(DataTieringConfig.class)).build())).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("cloud"));
     }
 
     private IndexSetConfig testIndexSetConfig() {
