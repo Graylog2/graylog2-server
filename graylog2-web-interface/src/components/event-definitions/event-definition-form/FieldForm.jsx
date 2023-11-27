@@ -309,7 +309,7 @@ class FieldForm extends React.Component {
 
         <Col md={12}>
           <ButtonToolbar>
-            <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
+            <Button bsStyle="success" onClick={this.handleSubmit}>Add custom field</Button>
             <Button onClick={this.handleCancel}>Cancel</Button>
           </ButtonToolbar>
         </Col>

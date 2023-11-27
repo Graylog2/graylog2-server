@@ -40,6 +40,7 @@ import {
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { SelectCallback } from 'components/bootstrap/types';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -187,7 +188,7 @@ const TimeRangeTabs = ({
     <StyledTabs id="dateTimeTypes"
                 defaultActiveKey={availableTimeRangeTypes[0].type}
                 activeKey={activeTab ?? -1}
-                onSelect={onSelect}
+                onSelect={onSelect as SelectCallback}
                 animation={false}>
       {tabs}
       {!activeTab && (<TabDisabledTimeRange />)}

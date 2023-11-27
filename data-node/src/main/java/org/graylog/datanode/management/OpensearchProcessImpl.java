@@ -204,6 +204,19 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     @Override
+    public void onRemove() {
+        LOG.info("Starting removal of OpenSearch node");
+        if (this.commandLineProcess != null) {
+            onEvent(ProcessEvent.PROCESS_REMOVE);
+        }
+    }
+
+    @Override
+    public void onReset() {
+        onEvent(ProcessEvent.RESET);
+    }
+
+    @Override
     public void onStart() {
         onEvent(ProcessEvent.PROCESS_STARTED);
     }

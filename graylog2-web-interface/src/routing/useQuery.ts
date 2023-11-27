@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import qs from 'qs';
+
+import useLocation from 'routing/useLocation';
 
 const useQuery = () => {
   const { search } = useLocation();
