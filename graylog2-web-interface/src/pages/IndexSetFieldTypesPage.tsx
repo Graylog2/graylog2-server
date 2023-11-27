@@ -72,7 +72,7 @@ const IndexSetFieldTypesPage = () => {
                       <Button bsStyle="success" onClick={onAddCustomFieldClick}>Change field type</Button>
                     )}>
           <span>
-            Modify the current field types configuration for this index set.
+            The data represents field types from 2 last indices and the fields with custom field type. You can modify the current field types configuration for this index set.
           </span>
         </PageHeader>
 
