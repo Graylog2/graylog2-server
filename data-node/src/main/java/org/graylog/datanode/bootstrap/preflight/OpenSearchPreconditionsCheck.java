@@ -36,7 +36,7 @@ public class OpenSearchPreconditionsCheck implements PreflightCheck {
     @Override
     public void runCheck() throws PreflightCheckException {
         ProcessBuilder builder = new ProcessBuilder().redirectErrorStream(true);
-        builder.command("/sbin/sysctl", "-n", "vm.max_map_count");
+        builder.command("/usr/sbin/sysctl", "-n", "vm.max_map_count");
         try {
             final Process process = builder.start();
             final BufferedReader reader = new BufferedReader(

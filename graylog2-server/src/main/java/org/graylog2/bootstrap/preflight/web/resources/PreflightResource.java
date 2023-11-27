@@ -26,10 +26,12 @@ import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
+import org.graylog2.bootstrap.preflight.web.resources.model.RemoteReindexRequest;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
@@ -63,21 +65,25 @@ public class PreflightResource {
     private final CaService caService;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
+//    private final RemoteReindexingMigrationAdapter migrationService;
 
     @Inject
     public PreflightResource(final NodeService nodeService,
                              final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
                              final ClusterConfigService clusterConfigService,
+                             //                           final RemoteReindexingMigrationAdapter migrationService,
                              final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
         this.clusterConfigService = clusterConfigService;
+//        this.migrationService = migrationService;
         this.passwordSecret = passwordSecret;
     }
 
-    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg, String hostname, String shortNodeId) {}
+    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status,
+                    String errorMsg, String hostname, String shortNodeId) {}
 
     @GET
     @Path("/data_nodes")
@@ -159,5 +165,12 @@ public class PreflightResource {
         builder.altNames(params.altNames()).validFor(params.validFor());
         dataNodeProvisioningService.save(builder.build());
 
+    }
+
+    @POST
+    @Path("/remoteReindex")
+    @NoAuditEvent("No Audit Event needed")
+    public void migrate(@NotNull @Valid RemoteReindexRequest request) {
+        //       migrationService.start(request.hostname(), request.user(), request.password(), request.whitelist());
     }
 }
