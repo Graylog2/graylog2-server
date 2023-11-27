@@ -1,6 +1,6 @@
 package org.graylog.storage.opensearch2;
 
-import com.amazonaws.services.ec2.model.IpamAssociatedResourceDiscoveryStatus;
+import com.google.common.eventbus.EventBus;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -10,6 +10,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
+import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 
 import javax.inject.Inject;
@@ -26,20 +27,33 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigrationAdapter {
     private final OpenSearchClient client;
     private final OkHttpClient httpClient;
+    private final EventBus eventBus;
 
     @Inject
-    public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client, final OkHttpClient httpClient) {
+    public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
+                                               final OkHttpClient httpClient,
+                                               final EventBus eventBus) {
         this.client = client;
         this.httpClient = httpClient;
+        this.eventBus = eventBus;
     }
 
     @Override
     public void start(final String host, final String username, final String password, final List<String> indices) {
         var toReindex = isAllIndices(indices) ? getAllIndicesFrom(host, username, password) : indices;
 
-        allowReindexingFrom(host, username, password);
+        allowReindexingFrom(host);
+        // TODO: wait for cluster to come back up before
         reindex(host, username, password, toReindex);
-        removeAllowlist();
+        removeAllowlist(host);
+    }
+
+    private void removeAllowlist(final String host) {
+        eventBus.post(new RemoteReindexAllowlistEvent(host, RemoteReindexAllowlistEvent.ACTION.REMOVE));
+    }
+
+    private void allowReindexingFrom(final String host) {
+        eventBus.post(new RemoteReindexAllowlistEvent(host, RemoteReindexAllowlistEvent.ACTION.ADD));
     }
 
     private List<String> getAllIndicesFrom(final String host, final String username, final String password) {

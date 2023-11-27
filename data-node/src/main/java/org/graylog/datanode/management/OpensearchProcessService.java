@@ -25,6 +25,7 @@ import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -34,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -76,6 +79,15 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Subscribe
     @SuppressWarnings("unused")
+    public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
+        switch (event.action()) {
+            case ADD -> startWithConfig(Map.of("reindex.remote.whitelist", event.host()));
+            case REMOVE -> startWithConfig();
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
             case STORED -> startWithConfig();
@@ -99,19 +111,24 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     }
 
     private void startWithConfig() {
+        this.startWithConfig(Map.of());
+    }
+
+    private void startWithConfig(Map<String, String> additionalConfig) {
         final OpensearchConfiguration config = configurationProvider.get();
+        config.additionalConfiguration().putAll(additionalConfig);
         if (config.securityConfigured()) {
             this.process.startWithConfig(config);
         } else {
 
             String noConfigMessage = """
-                \n
-                ========================================================================================================
-                It seems you are starting Data node for the first time. The current configuration is not sufficient to
-                start the indexer process because a security configuration is missing. You have to either provide http
-                and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
-                ========================================================================================================
-                """;
+                    \n
+                    ========================================================================================================
+                    It seems you are starting Data node for the first time. The current configuration is not sufficient to
+                    start the indexer process because a security configuration is missing. You have to either provide http
+                    and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
+                    ========================================================================================================
+                    """;
             LOG.info(noConfigMessage);
         }
         eventBus.post(new OpensearchConfigurationChangeEvent(config));
