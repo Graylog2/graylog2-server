@@ -34,7 +34,7 @@ type Props = {
 
 const DataNodeStatusCell = ({ dataNode }: Props) => {
   const disableChange = dataNode.is_leader || dataNode.is_master;
-  const datanodeDisabled = dataNode.status !== 'CONNECTED';
+  const datanodeDisabled = dataNode.data_node_status !== 'AVAILABLE';
 
   const toggleStreamStatus = useCallback(async () => {
     if (datanodeDisabled) {
@@ -50,10 +50,10 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
   return (
     <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
                  onClick={disableChange ? undefined : toggleStreamStatus}
-                 title={dataNode.status}
-                 aria-label={dataNode.status}
+                 title={dataNode.data_node_status}
+                 aria-label={dataNode.data_node_status}
                  role="button">
-      {dataNode.status}
+      {dataNode.data_node_status}
     </StatusLabel>
   );
 };
