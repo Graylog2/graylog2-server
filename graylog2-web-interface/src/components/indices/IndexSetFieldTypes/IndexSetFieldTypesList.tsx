@@ -44,7 +44,6 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import MenuItem from 'components/bootstrap/MenuItem';
 import type { EditingField } from 'pages/IndexSetFieldTypesPage';
 
-
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
@@ -81,6 +80,7 @@ type Props = {
 const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
   const { indexSetId } = useParams();
   const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
+  const [initialFieldSelection, setInitialFieldSelection] = useState([]);
   const handleOnClose = useCallback(() => {
     setEditingField(null);
   }, [setEditingField]);
@@ -195,7 +195,9 @@ const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
     selectedFields: Array<string>,
     setSelectedEntities: (fieldName: Array<string>) => void,
   ) => {
-    const onRemove = () => setDeletingFieldTypes(selectedFields);
+    const onRemove = () => {
+      setDeletingFieldTypes(selectedFields);
+    };
 
     return (
       <BulkActionsDropdown selectedEntities={selectedFields} setSelectedEntities={setSelectedEntities}>
@@ -248,6 +250,7 @@ const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
                                               bulkSelection={{
                                                 actions: renderBulkActions,
                                                 isEntitySelectable,
+                                                initialSelection: initialFieldSelection,
                                               }} />
         )}
       </PaginatedList>
@@ -268,7 +271,7 @@ const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
       }
       {
         deletingFieldTypes ? (
-          <IndexSetCustomFieldTypeRemoveModal show={!!deletingFieldTypes} fields={deletingFieldTypes} onClose={onCloseDeleting} indexSetIds={indexSetsDeleting} />
+          <IndexSetCustomFieldTypeRemoveModal show={!!deletingFieldTypes} fields={deletingFieldTypes} onClose={onCloseDeleting} indexSetIds={indexSetsDeleting} updateSelectedEntities={setInitialFieldSelection} />
         ) : null
       }
     </>

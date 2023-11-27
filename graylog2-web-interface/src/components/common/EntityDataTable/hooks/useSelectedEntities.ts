@@ -16,11 +16,15 @@
  */
 
 import type { SetStateAction } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import isFunction from 'lodash/isFunction';
 
 const useSelectedEntities = <T>(initialSelection: Array<T>, onChangeSelection: (selectedEntities: Array<T>) => void): [Array<T>, (setSelectedEntitiesArgument: SetStateAction<Array<T>>) => void] => {
   const [selectedEntities, setSelectedEntities] = useState<Array<T>>(initialSelection || []);
+
+  useEffect(() => {
+    setSelectedEntities(initialSelection);
+  }, [initialSelection]);
 
   const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<T>>) => {
     const newState = isFunction(setSelectedEntitiesArgument) ? setSelectedEntitiesArgument(selectedEntities) : setSelectedEntitiesArgument;

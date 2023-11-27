@@ -25,9 +25,10 @@ import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetField
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 
 const mockOnClosed = jest.fn();
+const mockUpdateSelectedEntities = jest.fn();
 const renderIndexSetCustomFieldTypeRemoveModal = () => render(
   <TestStoreProvider>
-    <IndexSetCustomFieldTypeRemoveModal fields={['field']} indexSetIds={['111']} show onClose={mockOnClosed} />
+    <IndexSetCustomFieldTypeRemoveModal updateSelectedEntities={mockUpdateSelectedEntities} fields={['field']} indexSetIds={['111']} show onClose={mockOnClosed} />
   </TestStoreProvider>,
 );
 

@@ -69,6 +69,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
+      await waitFor(() => expect(mockOnSuccessHandler).toHaveBeenCalledWith());
       await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Custom field type removed successfully', 'Success!'));
     });
 
@@ -87,6 +88,32 @@ describe('useRemoveCustomFieldTypeMutation', () => {
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
         'Removing custom field type failed with status: Error: Error',
         'Could not remove custom field type'));
+    });
+
+    it('should run onErrorHandler when response has failures', async () => {
+      asMock(fetch).mockImplementation(() => Promise.resolve({
+        '001': {
+          successfully_performed: 0,
+          failures: [{ entity_id: 'field', failure_explanation: 'field has error' }],
+          errors: ['Some error'],
+        },
+      }));
+
+      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation({
+        onSuccessHandler: mockOnSuccessHandler,
+        onErrorHandler: mockOnErrorHandler,
+      }), { queryClientOptions: { logger } });
+
+      act(() => {
+        result.current.removeCustomFieldTypeMutation(requestBody);
+      });
+
+      await waitFor(() => expect(mockOnErrorHandler).toHaveBeenCalledWith([{
+        indexSetId: '001',
+        failures: [{ entityId: 'field', failureExplanation: 'field has error' }],
+        errors: ['Some error'],
+        successfullyPerformed: 0,
+      }]));
     });
   });
 });
