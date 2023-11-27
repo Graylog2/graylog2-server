@@ -71,6 +71,7 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
           'Could not load datanodes');
       },
       notifyOnChangeProps: ['data', 'error'],
+      refetchInterval: 5000,
       enabled,
     },
   );
