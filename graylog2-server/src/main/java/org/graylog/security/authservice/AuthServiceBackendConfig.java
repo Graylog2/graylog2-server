@@ -17,6 +17,7 @@
 package org.graylog.security.authservice;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -57,6 +58,7 @@ public interface AuthServiceBackendConfig {
         SELF type(String type);
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     class FallbackConfig implements AuthServiceBackendConfig {
         @Override
         public String type() {
@@ -65,7 +67,7 @@ public interface AuthServiceBackendConfig {
 
         @Override
         public Optional<List<String>> externalHTTPHosts() {
-            throw new UnsupportedOperationException();
+            return Optional.empty();
         }
     }
 }
