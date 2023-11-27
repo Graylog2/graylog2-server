@@ -40,7 +40,7 @@ const AttributeSelect = ({
   <>
     <MenuItem header>Create Filter</MenuItem>
     {attributes.map(({ id, title, type }) => {
-      const hasActiveFilter = !!activeFilters?.[id]?.length;
+      const hasActiveFilter = !!activeFilters?.get(id)?.length;
       const disabled = type === 'BOOLEAN' ? hasActiveFilter : false;
 
       return (

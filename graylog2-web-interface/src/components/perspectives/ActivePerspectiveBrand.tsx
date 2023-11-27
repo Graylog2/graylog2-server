@@ -21,7 +21,6 @@ import styled from 'styled-components';
 import { Link } from 'components/common/router';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import Routes from 'routing/Routes';
 import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 
 const BrandContainer = styled.div`
@@ -47,7 +46,7 @@ const ActivePerspectiveBrand = ({ children, className }: PropsWithChildren<{ cla
 
   return (
     <BrandContainer className={className}>
-      <BrandLink to={Routes.STARTPAGE}>
+      <BrandLink to={activePerspective.brandLink}>
         <ActiveBrandComponent />
       </BrandLink>
       {children}

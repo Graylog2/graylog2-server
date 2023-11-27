@@ -85,8 +85,19 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 };
 
 describe('AppRouter', () => {
+  const defaultPlugins = {
+    perspectives: [
+      {
+        id: 'default',
+        title: 'Default Perspective',
+        brandComponent: () => <div />,
+        brandLink: '',
+      },
+    ],
+  };
+
   beforeEach(() => {
-    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(usePluginEntities).mockImplementation((entityKey) => (defaultPlugins[entityKey] ?? []));
     AppConfig.isFeatureEnabled = jest.fn(() => false);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });
@@ -153,7 +164,7 @@ describe('AppRouter', () => {
         return <span>Current context value is {contextValue}</span>;
       };
 
-      asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: TestComponent, path: '/test' }]);
+      mockRoutes([{ parentComponent: null, component: TestComponent, path: '/test' }]);
 
       setInitialPath('/test');
       const { findByText } = render(<AppRouterWithContext />);

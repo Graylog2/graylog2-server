@@ -1,0 +1,5 @@
+type = "c"
+message = "Check vm.max_map_count in preflight"
+
+issues = ["17430"]
+pulls = ["17436"]
