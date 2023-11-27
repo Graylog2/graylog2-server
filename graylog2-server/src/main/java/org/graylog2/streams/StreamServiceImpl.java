@@ -176,6 +176,11 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
+    public List<Stream> loadAllByTitle(String title) {
+        return loadAll(QueryBuilder.start(StreamImpl.FIELD_TITLE).is(title).get());
+    }
+
+    @Override
     public List<Stream> loadAll() {
         return loadAll(Collections.emptyMap());
     }

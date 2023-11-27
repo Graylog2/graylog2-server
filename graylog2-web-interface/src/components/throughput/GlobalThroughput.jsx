@@ -83,13 +83,13 @@ const ThroughputData = styled.span(({ $dataIn, theme }) => css`
   }
 
   &::after {
-    ${$dataIn && `
+    ${$dataIn && css`
       content: ' ';
       min-height: 1px;
       background-color: ${theme.colors.variant.light.default};
       display: block;
       grid-area: 2 / 1 / 3 / 3;
-    `}
+`}
   }
 `);
 
@@ -102,7 +102,7 @@ const GlobalThroughput = (props) => {
     const outputNumeral = NumberUtils.formatNumber(throughput.output);
 
     output = (
-      <ContentWrap aria-label={`In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
+      <ContentWrap aria-label={`Throughput: In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
         <ThroughputData $dataIn>
           <span>{inputNumeral}</span> <i>in</i>
         </ThroughputData>

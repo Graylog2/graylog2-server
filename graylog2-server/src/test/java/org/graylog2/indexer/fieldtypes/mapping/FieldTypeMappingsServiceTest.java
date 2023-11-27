@@ -24,6 +24,7 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,10 +34,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.ZonedDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -61,7 +66,7 @@ class FieldTypeMappingsServiceTest {
     @Mock
     private MongoIndexSet existingMongoIndexSet;
 
-    private final IndexSetConfig existingIndexSet = buildSampleIndexSetConfig();
+    private final IndexSetConfig existingIndexSet = buildSampleIndexSetConfig("existing_index_set");
 
     @BeforeEach
     void setUp() {
@@ -113,9 +118,56 @@ class FieldTypeMappingsServiceTest {
         verifyNoMoreInteractions(mongoIndexSetService);
     }
 
-    private IndexSetConfig buildSampleIndexSetConfig() {
+    @Test
+    void testMappingsRemoval() {
+        final Map<String, BulkOperationResponse> response = toTest.removeCustomMappingForFields(
+                List.of("existing_field", "unexisting_field"),
+                Set.of("existing_index_set", "unexisting_index_set"),
+                false);
+
+        assertThat(response).isNotNull().hasSize(2);
+        assertThat(response).containsOnlyKeys("existing_index_set", "unexisting_index_set");
+
+        final BulkOperationResponse existingIndexSetResponse = response.get("existing_index_set");
+        assertThat(existingIndexSetResponse.successfullyPerformed()).isEqualTo(1);
+        assertThat(existingIndexSetResponse.errors()).isEmpty();
+        assertThat(existingIndexSetResponse.failures()).hasSize(1);
+
+        final BulkOperationResponse unexistingIndexSetResponse = response.get("unexisting_index_set");
+        assertThat(unexistingIndexSetResponse.successfullyPerformed()).isEqualTo(0);
+        assertThat(unexistingIndexSetResponse.errors()).hasSize(1);
+        assertThat(unexistingIndexSetResponse.failures()).isEmpty();
+    }
+
+    @Test
+    void testRemovesMappingsForIndexSetEvenIfRemovalForAnotherIndexSetThrowsException() {
+        final IndexSetConfig brokenIndexSet = buildSampleIndexSetConfig("broken_index_set");
+        lenient().when(mongoIndexSetService.save(argThat(indexSetConfig -> Objects.equals(brokenIndexSet.id(), indexSetConfig.id()))))
+                .thenThrow(new RuntimeException("Broken!"));
+        
+        final Map<String, BulkOperationResponse> response = toTest.removeCustomMappingForFields(
+                List.of("existing_field", "unexisting_field"),
+                Set.of("existing_index_set", "broken_index_set"),
+                false);
+
+        assertThat(response).isNotNull().hasSize(2);
+        assertThat(response).containsOnlyKeys("existing_index_set", "broken_index_set");
+
+        final BulkOperationResponse existingIndexSetResponse = response.get("existing_index_set");
+        assertThat(existingIndexSetResponse.successfullyPerformed()).isEqualTo(1);
+        assertThat(existingIndexSetResponse.errors()).isEmpty();
+        assertThat(existingIndexSetResponse.failures()).hasSize(1);
+
+        final BulkOperationResponse brokenIndexSetResponse = response.get("broken_index_set");
+        assertThat(brokenIndexSetResponse.successfullyPerformed()).isEqualTo(0);
+        assertThat(brokenIndexSetResponse.errors()).hasSize(1);
+        assertThat(brokenIndexSetResponse.failures()).isEmpty();
+
+    }
+
+    private IndexSetConfig buildSampleIndexSetConfig(final String id) {
         return IndexSetConfig.builder()
-                .id("existing_index_set")
+                .id(id)
                 .title("title")
                 .indexWildcard("ex*")
                 .shards(1)

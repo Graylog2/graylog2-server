@@ -154,7 +154,7 @@ export type StepKey = number | string;
 
 export type Step = {
   key: StepKey,
-  title: React.ReactElement,
+  title: React.ReactNode,
   component: React.ReactElement,
   disabled?: boolean,
 };
@@ -337,12 +337,14 @@ class Wizard extends React.Component<Props, State> {
           <div className="pull-right">
             <HorizontalButtonToolbar>
               <Button onClick={this._onPrevious}
+                      aria-label="Previous"
                       bsSize="xsmall"
                       bsStyle="info"
                       disabled={this._disableButton('previous')}>
                 <Icon name="caret-left" />
               </Button>
               <Button onClick={this._onNext}
+                      aria-label="Next"
                       bsSize="xsmall"
                       bsStyle="info"
                       disabled={this._disableButton('next')}>

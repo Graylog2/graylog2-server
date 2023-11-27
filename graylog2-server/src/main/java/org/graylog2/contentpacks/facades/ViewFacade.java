@@ -58,6 +58,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
+
 public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, ViewSummaryDTO> {
     private static final Logger LOG = LoggerFactory.getLogger(ViewFacade.class);
 
@@ -188,7 +190,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                 orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
         final Search search = searchDbService.get(viewSummaryDTO.searchId()).
                 orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewSummaryDTO.searchId()));
-        search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
+        search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_REF_V1))
                 .forEach(streamDescriptor -> mutableGraph.putEdge(entityDescriptor, streamDescriptor));
         return ImmutableGraph.copyOf(mutableGraph);
     }
@@ -216,8 +218,13 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
         viewEntity.search().usedStreamIds().stream()
-                .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
-                .map(entities::get)
+                .map(id -> resolveStreamEntity(id, entities))
+                .filter(Objects::nonNull)
+                .forEach(stream -> mutableGraph.putEdge(entity, stream));
+        viewEntity.state().values().stream()
+                .flatMap(s -> s.widgets().stream())
+                .flatMap(w -> w.streams().stream())
+                .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> mutableGraph.putEdge(entity, stream));
         return ImmutableGraph.copyOf(mutableGraph);
