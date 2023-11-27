@@ -18,6 +18,7 @@ package org.graylog2.datanode;
 
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
@@ -30,10 +31,10 @@ public class DataNodeServiceImpl implements DataNodeService {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeServiceImpl.class);
 
     private final ClusterEventBus clusterEventBus;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     @Inject
-    public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService nodeService) {
+    public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService) {
         this.clusterEventBus = clusterEventBus;
         this.nodeService = nodeService;
     }

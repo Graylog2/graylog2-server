@@ -17,7 +17,7 @@
 package org.graylog2.datanode;
 
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.nodes.NodeDto;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.events.ClusterEventBus;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public class DataNodeServiceImplTest {
     @Mock
     private ClusterEventBus clusterEventBus;
     @Mock
-    private NodeService<NodeDto> nodeService;
+    private NodeService<DataNodeDto> nodeService;
 
     private DataNodeServiceImpl classUnderTest;
 
@@ -47,7 +47,7 @@ public class DataNodeServiceImplTest {
 
     @Test
     public void removeNodePublishesClusterEvent() throws NodeNotFoundException {
-        NodeDto node = mock(NodeDto.class);
+        DataNodeDto node = mock(DataNodeDto.class);
         when(node.getNodeId()).thenReturn("returnedid"); // would be the same in real life
         when(nodeService.byNodeId("nodeid")).thenReturn(node);
         classUnderTest.removeNode("nodeid");
@@ -56,7 +56,7 @@ public class DataNodeServiceImplTest {
 
     @Test
     public void resetNodePublishesClusterEvent() throws NodeNotFoundException {
-        NodeDto node = mock(NodeDto.class);
+        DataNodeDto node = mock(DataNodeDto.class);
         when(node.getNodeId()).thenReturn("returnedid"); // would be the same in real life
         when(nodeService.byNodeId("nodeid")).thenReturn(node);
         classUnderTest.resetNode("nodeid");
