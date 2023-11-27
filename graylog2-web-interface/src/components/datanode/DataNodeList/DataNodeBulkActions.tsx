@@ -16,23 +16,17 @@
  */
 import * as React from 'react';
 
-import type { DataNode } from 'preflight/types';
 import MenuItem from 'components/bootstrap/MenuItem';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 
 type Props = {
-  // eslint-disable-next-line react/no-unused-prop-types
   selectedDataNodeIds: Array<string>,
   setSelectedDataNodeIds: (datanodeIds: Array<string>) => void,
-  // eslint-disable-next-line react/no-unused-prop-types
-  dataNodes: Array<DataNode>
 }
 
 const DataNodeBulkActions = ({ selectedDataNodeIds, setSelectedDataNodeIds }: Props) => (
   <BulkActionsDropdown selectedEntities={selectedDataNodeIds} setSelectedEntities={setSelectedDataNodeIds}>
-    <MenuItem onSelect={() => { }}>Renew certificate</MenuItem>
-    <MenuItem onSelect={() => { }}>Restart</MenuItem>
-    <MenuItem onSelect={() => { }}>Remove</MenuItem>
+    <MenuItem onSelect={() => {}}>Renew certificate</MenuItem>
   </BulkActionsDropdown>
 );
 

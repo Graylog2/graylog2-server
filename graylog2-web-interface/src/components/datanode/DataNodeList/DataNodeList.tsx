@@ -71,6 +71,15 @@ const columnRenderers: ColumnRenderers<DataNode> = {
   },
 };
 
+const bulkActions = (selectedDataNodeIds: string[], setSelectedDataNodeIds: (ids: string[]) => void) => (
+  <DataNodeBulkActions selectedDataNodeIds={selectedDataNodeIds}
+                       setSelectedDataNodeIds={setSelectedDataNodeIds} />
+);
+
+const entityActions = (dataNode: DataNode) => (
+  <DataNodeActions dataNode={dataNode} />
+);
+
 const SearchContainer = styled.div`
   margin-bottom: 5px;
 `;
@@ -107,15 +116,6 @@ const DataNodeList = () => {
     updateTableLayout,
     setQuery,
   });
-
-  const bulkActions = (selectedDataNodeIds: string[], setSelectedDataNodeIds: (ids: string[]) => void) => (
-    <DataNodeBulkActions selectedDataNodeIds={selectedDataNodeIds}
-                         setSelectedDataNodeIds={setSelectedDataNodeIds}
-                         dataNodes={elements} />
-  );
-  const entityActions = (dataNode: DataNode) => (
-    <DataNodeActions dataNode={dataNode} />
-  );
 
   if (isLoadingLayoutPreferences || isInitialLoadingDataNodes) {
     return <Spinner />;

@@ -36,7 +36,8 @@ const DataNodeActions = ({ dataNode }: Props) => (
                          dropdownZIndex={1000}>
     <MenuItem onSelect={() => Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>Edit</MenuItem>
     <MenuItem onSelect={() => {}}>Renew certificate</MenuItem>
-    <MenuItem onSelect={() => rejoinDataNode(dataNode.node_id)}>Restart</MenuItem>
+    <MenuItem onSelect={() => {}}>Restart</MenuItem>
+    <MenuItem onSelect={() => rejoinDataNode(dataNode.node_id)}>Rejoin</MenuItem>
     <MenuItem onSelect={() => removeDataNode(dataNode.node_id)}>Remove</MenuItem>
   </OverlayDropdownButton>
 );
