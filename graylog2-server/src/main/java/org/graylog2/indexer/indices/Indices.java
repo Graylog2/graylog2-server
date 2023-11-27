@@ -116,6 +116,10 @@ public class Indices {
     }
 
     public void close(String indexName) {
+        indicesAdapter.getSearchableSnapshotInfo(indexName).ifPresent(snapshotInfo -> {
+            throw new UnsupportedOperationException("Close operation not available for warm index: " + snapshotInfo.currentIndexName());
+        });
+
         if (isReopened(indexName)) {
             indicesAdapter.removeAlias(indexName, indexName + REOPENED_ALIAS_SUFFIX);
         }
