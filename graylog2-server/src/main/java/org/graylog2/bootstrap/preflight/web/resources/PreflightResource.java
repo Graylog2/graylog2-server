@@ -65,20 +65,20 @@ public class PreflightResource {
     private final CaService caService;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
-//    private final RemoteReindexingMigrationAdapter migrationService;
+    private final RemoteReindexingMigrationAdapter migrationService;
 
     @Inject
     public PreflightResource(final NodeService nodeService,
                              final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
                              final ClusterConfigService clusterConfigService,
-                             //                           final RemoteReindexingMigrationAdapter migrationService,
+                             final RemoteReindexingMigrationAdapter migrationService,
                              final @Named("password_secret") String passwordSecret) {
         this.nodeService = nodeService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
         this.clusterConfigService = clusterConfigService;
-//        this.migrationService = migrationService;
+        this.migrationService = migrationService;
         this.passwordSecret = passwordSecret;
     }
 
@@ -171,6 +171,6 @@ public class PreflightResource {
     @Path("/remoteReindex")
     @NoAuditEvent("No Audit Event needed")
     public void migrate(@NotNull @Valid RemoteReindexRequest request) {
-        //       migrationService.start(request.hostname(), request.user(), request.password(), request.whitelist());
+        migrationService.start(request.hostname(), request.user(), request.password(), request.indices());
     }
 }
