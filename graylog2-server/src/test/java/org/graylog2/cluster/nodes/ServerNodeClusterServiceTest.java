@@ -14,14 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog2.cluster.nodes;
 
 import com.mongodb.DBCollection;
+import org.assertj.core.api.Assertions;
+import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.nodes.ServerNodeClusterService;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Before;
@@ -33,10 +37,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class NodeServiceImplTest {
+public class ServerNodeClusterServiceTest {
     public static final int STALE_LEADER_TIMEOUT_MS = 2000;
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -52,23 +57,28 @@ public class NodeServiceImplTest {
     private Configuration configuration;
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
-    private NodeService nodeService;
+    private ServerNodeClusterService nodeService;
 
     @Before
     public void setUp() throws Exception {
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
-        this.nodeService = new NodeServiceImpl(
-                new ServerNodeClusterService(mongodb.mongoConnection(), configuration));
+        this.nodeService =
+                new ServerNodeClusterService(mongodb.mongoConnection(), configuration);
     }
 
     @Test
-    @MongoDBFixtures("NodeServiceImplTest-empty.json")
+    @MongoDBFixtures("ServerNodeClusterTest-empty.json")
     public void testRegisterServer() throws Exception {
         assertThat(nodeService.allActive())
                 .describedAs("The collection should be empty")
                 .isEmpty();
 
-        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
+        nodeService.registerServer(ServerNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(true)
+                .setTransportAddress(TRANSPORT_URI.toString())
+                .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .build());
 
         final Node node = nodeService.byNodeId(nodeId);
 
@@ -79,7 +89,7 @@ public class NodeServiceImplTest {
     }
 
     @Test
-    @MongoDBFixtures("NodeServiceImplTest-one-node.json")
+    @MongoDBFixtures("ServerNodeClusterTest-one-node.json")
     public void testRegisterServerWithExistingNode() throws Exception {
         final Node node1 = nodeService.byNodeId(nodeId);
 
@@ -87,7 +97,12 @@ public class NodeServiceImplTest {
                 .describedAs("There should be one existing node")
                 .isEqualTo(NODE_ID);
 
-        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
+        nodeService.registerServer(ServerNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(true)
+                .setTransportAddress(TRANSPORT_URI.toString())
+                .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .build());
 
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongodb.mongoConnection().getDatabase().getCollection("nodes");
@@ -107,9 +122,49 @@ public class NodeServiceImplTest {
     @Test
     public void testAllActive() throws NodeNotFoundException {
         assertThat(nodeService.allActive().keySet()).isEmpty();
-        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
+        nodeService.registerServer(ServerNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(true)
+                .setTransportAddress(TRANSPORT_URI.toString())
+                .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .build());
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
 
     }
-    
+
+    @Test
+    public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
+        nodeService.registerServer(ServerNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(true)
+                .setTransportAddress(TRANSPORT_URI.toString())
+                .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .build());
+
+        final ServerNodeDto node = nodeService.byNodeId(nodeId);
+
+        final long lastSeenMs = System.currentTimeMillis() - 2 * STALE_LEADER_TIMEOUT_MS;
+
+        final Map<String, Object> fields = node.toEntityParameters();
+        fields.put("last_seen", (int) (lastSeenMs / 1000));
+        ServerNodeEntity nodeEntity = new ServerNodeEntity(new ObjectId(node.getObjectId()), fields);
+
+        nodeService.save(nodeEntity);
+
+        final Node nodeAfterUpdate = nodeService.byNodeId(nodeId);
+        final long lastSeenFromDb = nodeAfterUpdate.getLastSeen().toInstant().getMillis();
+        Assertions.assertThat(lastSeenMs - lastSeenFromDb).isLessThan(1000); // make sure that our lastSeen from int is the same valid date
+
+        final Map<String, ServerNodeDto> activeNodes = nodeService.allActive();
+
+        // the node is stale, should not be present here
+        Assertions.assertThat(activeNodes).isEmpty();
+
+        // this should drop the node with the int timestamp, as it's at least 2xstale_delay outdated.
+        nodeService.dropOutdated();
+
+        Assertions.assertThatThrownBy(() -> nodeService.byNodeId(nodeId))
+                .isInstanceOf(NodeNotFoundException.class);
+    }
+
 }
