@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
@@ -34,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
@@ -81,6 +83,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
     private static final String FIELD_TIME_ZONE = "time_zone";
+    private static final String FIELD_LOOKUP_EMAILS = "lookup_emails";
+    private static final String FIELD_LOOKUP_TABLE_NAME = "lookup_table_name";
+    private static final String FIELD_LOOKUP_TABLE_KEY = "lookup_table_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
@@ -107,6 +112,17 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @JsonProperty(FIELD_TIME_ZONE)
     public abstract DateTimeZone timeZone();
 
+    @JsonProperty(FIELD_LOOKUP_EMAILS)
+    public abstract boolean lookupEmails();
+
+    @JsonProperty(FIELD_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String lookupTableName();
+
+    @JsonProperty(FIELD_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String lookupTableKey();
+
     @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -128,8 +144,16 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         if (bodyTemplate().isEmpty() && htmlBodyTemplate().isEmpty()) {
             validation.addError("body", "One of Email Notification body template or Email Notification HTML body must not be empty.");
         }
-        if (emailRecipients().isEmpty() && userRecipients().isEmpty()) {
+        if (!lookupEmails() && emailRecipients().isEmpty() && userRecipients().isEmpty()) {
             validation.addError("recipients", "Email Notification must have email recipients or user recipients.");
+        }
+        if (lookupEmails()) {
+            if (Strings.isNullOrEmpty(lookupTableName())) {
+                validation.addError(FIELD_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(lookupTableKey())) {
+                validation.addError(FIELD_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
         }
 
         return validation;
@@ -148,7 +172,8 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .userRecipients(ImmutableSet.of())
                     .bodyTemplate(DEFAULT_BODY_TEMPLATE)
                     .timeZone(DateTimeZone.UTC)
-                    .htmlBodyTemplate("");
+                    .htmlBodyTemplate("")
+                    .lookupEmails(false);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -175,6 +200,15 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_TIME_ZONE)
         public abstract Builder timeZone(DateTimeZone timeZone);
 
+        @JsonProperty(FIELD_LOOKUP_EMAILS)
+        public abstract Builder lookupEmails(boolean lookupEmails);
+
+        @JsonProperty(FIELD_LOOKUP_TABLE_NAME)
+        public abstract Builder lookupTableName(String lookupTableName);
+
+        @JsonProperty(FIELD_LOOKUP_TABLE_KEY)
+        public abstract Builder lookupTableKey(String lookupTableKey);
+
         public abstract EmailEventNotificationConfig build();
     }
 
@@ -189,6 +223,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
                 .timeZone(ValueReference.of(timeZone().getID()))
+                .lookupEmails(ValueReference.of(lookupEmails()))
+                .lookupTableName(ValueReference.ofNullable(lookupTableName()))
+                .lookupTableKey(ValueReference.ofNullable(lookupTableKey()))
             .build();
     }
 }

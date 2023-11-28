@@ -44,6 +44,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
     private static final String FIELD_TIME_ZONE = "time_zone";
+    private static final String FIELD_LOOKUP_EMAILS = "lookup_emails";
+    private static final String FIELD_LOOKUP_TABLE_NAME = "lookup_table_name";
+    private static final String FIELD_LOOKUP_TABLE_KEY = "lookup_table_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract ValueReference sender();
@@ -69,6 +72,15 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     @JsonProperty(FIELD_TIME_ZONE)
     public abstract ValueReference timeZone();
 
+    @JsonProperty(FIELD_LOOKUP_EMAILS)
+    public abstract ValueReference lookupEmails();
+
+    @JsonProperty(FIELD_LOOKUP_TABLE_NAME)
+    public abstract ValueReference lookupTableName();
+
+    @JsonProperty(FIELD_LOOKUP_TABLE_KEY)
+    public abstract ValueReference lookupTableKey();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -84,7 +96,8 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                     .type(TYPE_NAME)
                     .htmlBodyTemplate(ValueReference.of(""))
                     .timeZone(ValueReference.of("UTC"))
-                    .replyTo(ValueReference.of(""));
+                    .replyTo(ValueReference.of(""))
+                    .lookupEmails(ValueReference.of(false));
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -111,6 +124,15 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonProperty(FIELD_TIME_ZONE)
         public abstract Builder timeZone(ValueReference timeZone);
 
+        @JsonProperty(FIELD_LOOKUP_EMAILS)
+        public abstract Builder lookupEmails(ValueReference lookupEmails);
+
+        @JsonProperty(FIELD_LOOKUP_TABLE_NAME)
+        public abstract Builder lookupTableName(ValueReference lookupTableName);
+
+        @JsonProperty(FIELD_LOOKUP_TABLE_KEY)
+        public abstract Builder lookupTableKey(ValueReference lookupTableKey);
+
         public abstract EmailEventNotificationConfigEntity build();
     }
 
@@ -125,6 +147,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
                 .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
+                .lookupEmails(lookupEmails().asBoolean(parameters))
+                .lookupTableName(lookupTableName().asString(parameters))
+                .lookupTableKey(lookupTableKey().asString(parameters))
                 .build();
     }
 }

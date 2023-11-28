@@ -38,15 +38,33 @@ const EmailNotificationSummary = ({ notification, ...otherProps }) => (
         <td>{notification.config.reply_to}</td>
       </tr>
       <tr>
-        <td>User recipients</td>
+        <td>User Recipients</td>
         <td>{notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}</td>
       </tr>
       <tr>
-        <td>Email recipients</td>
-        <td>
-          {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
-        </td>
+        <td>Use Lookup Table for Email Recipients</td>
+        <td>{notification.config.lookup_emails ? 'Yes' : 'No'}</td>
       </tr>
+      {notification.config.lookup_emails ? (
+        <>
+          <tr>
+            <td>Lookup Table Name</td>
+            <td>{notification.config.lookup_table_name}</td>
+          </tr>
+          <tr>
+            <td>Lookup Table Key</td>
+            <td>{notification.config.lookup_table_key}</td>
+          </tr>
+        </>
+      )
+        : (
+          <tr>
+            <td>Email Recipients</td>
+            <td>
+              {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
+            </td>
+          </tr>
+        )}
       <tr>
         <td>Email Body</td>
         <td>
