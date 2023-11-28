@@ -25,16 +25,19 @@ jest.mock('hooks/usePluginEntities', () => () => ([
     id: 'default',
     title: 'Default Perspective',
     brandComponent: () => {},
+    brandLink: '',
   },
   {
     id: 'example-perspective',
     title: 'Example Perspective',
     brandComponent: () => {},
+    brandLink: '',
   },
   {
     id: 'unavailable-perspective',
     title: 'Unavailable Perspective',
     brandComponent: () => {},
+    brandLink: '',
     useCondition: () => false,
   },
 ]));

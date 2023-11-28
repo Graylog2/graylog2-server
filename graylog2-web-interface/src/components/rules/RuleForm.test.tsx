@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { renderWithDataRouter } from 'wrappedTestingLibrary';
+import { useState } from 'react';
+import { renderWithDataRouter, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import RuleForm from './RuleForm';
@@ -77,30 +78,51 @@ describe('RuleForm', () => {
       end`,
     };
 
-    const setRawMessageToSimulate = jest.fn();
+    const _setRawMessage = jest.fn();
     const ruleInput = 'new_test';
 
-    const { getByRole, getByTitle } = renderWithDataRouter(
-      <PipelineRulesContext.Provider value={{
-        ruleSource: ruleToUpdate.source,
-        ruleSourceRef: {},
-        usedInPipelines: [],
-        rawMessageToSimulate: '',
-        setRawMessageToSimulate,
-        setRuleSimulationResult: () => {},
-      }}>
+    const PipelineRulesContextProvider = ({ children, setRawMessage }: React.PropsWithChildren<{ setRawMessage: (message: string) => void }>) => {
+      const [rawMessageToSimulate, _setRawMessageToSimulate] = useState('');
+
+      const setRawMessageToSimulate = (message: string) => {
+        setRawMessage(message);
+        _setRawMessageToSimulate(message);
+      };
+
+      return (
+        <PipelineRulesContext.Provider value={{
+          ruleSource: ruleToUpdate.source,
+          ruleSourceRef: {},
+          usedInPipelines: [],
+          rawMessageToSimulate,
+          setRawMessageToSimulate,
+          setRuleSimulationResult: () => {},
+          simulateRule: () => {},
+        }}>
+          {children}
+        </PipelineRulesContext.Provider>
+      );
+    };
+
+    renderWithDataRouter(
+      <PipelineRulesContextProvider setRawMessage={_setRawMessage}>
         <RuleForm create={false} />
-      </PipelineRulesContext.Provider>,
+      </PipelineRulesContextProvider>,
     );
 
-    const rawMessageInput = getByTitle('Message string or JSON');
+    const rawMessageInput = await screen.findByTitle('Message string or JSON');
 
     expect(rawMessageInput).toHaveValue('');
 
     userEvent.paste(rawMessageInput, ruleInput);
-    const runSimulationButton = getByRole('button', { name: 'Run rule simulation' });
+    const runSimulationButton = await screen.findByRole('button', { name: 'Run rule simulation' });
+
+    await waitFor(() => {
+      expect(runSimulationButton).not.toBeDisabled();
+    });
+
     userEvent.click(runSimulationButton);
 
-    expect(setRawMessageToSimulate).toHaveBeenCalledWith(ruleInput);
+    expect(_setRawMessage).toHaveBeenCalledWith(ruleInput);
   });
 });

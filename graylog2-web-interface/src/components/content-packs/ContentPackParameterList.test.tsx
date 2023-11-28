@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
@@ -24,18 +24,25 @@ import ContentPackParameterList from 'components/content-packs/ContentPackParame
 
 import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
 
-jest.useFakeTimers();
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
 describe('<ContentPackParameterList />', () => {
-  it('should render with empty parameters with readOnly', () => {
-    const contentPack = ContentPack.builder().build();
-    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} readOnly />);
-
-    expect(wrapper).toExist();
+  beforeAll(() => {
+    jest.useFakeTimers();
   });
 
-  it('should render with parameters with readOnly', () => {
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
+  it('should render with empty parameters with readOnly', async () => {
+    const contentPack = ContentPack.builder().build();
+    render(<ContentPackParameterList contentPack={contentPack} readOnly />);
+
+    await screen.findByText('Parameters list');
+  });
+
+  it('should render with parameters with readOnly', async () => {
     const parameters = [{
       name: 'PARAM',
       title: 'A parameter title',
@@ -46,19 +53,19 @@ describe('<ContentPackParameterList />', () => {
     const contentPack = ContentPack.builder()
       .parameters(parameters)
       .build();
-    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} readOnly />);
+    render(<ContentPackParameterList contentPack={contentPack} readOnly />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Parameters list');
   });
 
-  it('should render with empty parameters without readOnly', () => {
+  it('should render with empty parameters without readOnly', async () => {
     const contentPack = ContentPack.builder().build();
-    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
+    render(<ContentPackParameterList contentPack={contentPack} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Parameters list');
   });
 
-  it('should render with parameters without readOnly', () => {
+  it('should render with parameters without readOnly', async () => {
     const parameters = [{
       name: 'PARAM',
       title: 'A parameter title',
@@ -69,44 +76,42 @@ describe('<ContentPackParameterList />', () => {
     const contentPack = ContentPack.builder()
       .parameters(parameters)
       .build();
-    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
+    render(<ContentPackParameterList contentPack={contentPack} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Parameters list');
   });
 
-  it('should delete a parameter', () => {
-    const deleteFn = jest.fn((parameter) => {
-      expect(parameter.name).toEqual('PARAM');
+  it('should delete a parameter', async () => {
+    const deleteFn = jest.fn();
+    const parameters = [{
+      name: 'PARAM',
+      title: 'A parameter title',
+      description: 'A parameter descriptions',
+      type: 'string',
+      default_value: 'test',
+    }];
+    const contentPack = ContentPack.builder()
+      .parameters(parameters)
+      .build();
+
+    render(<ContentPackParameterList contentPack={contentPack}
+                                     onDeleteParameter={deleteFn} />);
+
+    (await screen.findByRole('button', { name: 'Delete Parameter' })).click();
+
+    await waitFor(() => {
+      expect(deleteFn).toHaveBeenCalledWith(expect.objectContaining({ name: 'PARAM' }));
     });
-    const parameters = [{
-      name: 'PARAM',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }];
-    const contentPack = ContentPack.builder()
-      .parameters(parameters)
-      .build();
-
-    const wrapper = mount(<ContentPackParameterList contentPack={contentPack}
-                                                    onDeleteParameter={deleteFn} />);
-
-    wrapper.find('button[children="Delete"]').simulate('click');
-
-    expect(deleteFn.mock.calls.length).toBe(1);
   });
 
-  it('should not delete a used parameter', () => {
+  it('should not delete a used parameter', async () => {
     const entity = Entity.builder()
       .v(1)
       .type('input')
       .id('dead-beef')
       .data({ title: { '@type': 'parameter', '@value': 'PARAM' } })
       .build();
-    const deleteFn = jest.fn((parameter) => {
-      expect(parameter.name).toEqual('PARAM');
-    });
+    const deleteFn = jest.fn();
     const parameters = [{
       name: 'PARAM',
       title: 'A parameter title',
@@ -122,16 +127,20 @@ describe('<ContentPackParameterList />', () => {
       .entities([entity])
       .build();
 
-    const wrapper = mount(<ContentPackParameterList contentPack={contentPack}
-                                                    onDeleteParameter={deleteFn}
-                                                    appliedParameter={appliedParameter} />);
+    render(<ContentPackParameterList contentPack={contentPack}
+                                     onDeleteParameter={deleteFn}
+                                     appliedParameter={appliedParameter} />);
 
-    wrapper.find('button[children="Delete"]').simulate('click');
+    const deleteButton = await screen.findByRole('button', { name: 'Still in use' });
 
-    expect(deleteFn.mock.calls.length).toBe(0);
+    expect(deleteButton).toBeDisabled();
+
+    deleteButton.click();
+
+    expect(deleteFn).not.toHaveBeenCalled();
   });
 
-  it('should filter parameters', () => {
+  it('should filter parameters', async () => {
     const parameters = [{
       name: 'PARAM',
       title: 'A parameter title',
@@ -148,18 +157,21 @@ describe('<ContentPackParameterList />', () => {
     const contentPack = ContentPack.builder()
       .parameters(parameters)
       .build();
-    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
+    render(<ContentPackParameterList contentPack={contentPack} />);
 
-    expect(wrapper.find('td[children=\'PARAM\']').exists()).toBe(true);
+    await screen.findByText('PARAM');
 
-    wrapper.find('input').simulate('change', { target: { value: 'Bad' } });
+    const input = await screen.findByPlaceholderText('Enter search query...');
+    userEvent.type(input, 'Bad');
+
     jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
-    wrapper.update();
 
-    expect(wrapper.find('td[children=\'PARAM\']').exists()).toBe(false);
+    await waitFor(() => {
+      expect(screen.queryByText('PARAM')).not.toBeInTheDocument();
+    });
 
-    wrapper.find('button[title=\'Reset search\']').simulate('click');
+    (await screen.findByRole('button', { name: 'Reset search' })).click();
 
-    expect(wrapper.find('td[children=\'PARAM\']').exists()).toBe(true);
+    await screen.findByText('PARAM');
   });
 });

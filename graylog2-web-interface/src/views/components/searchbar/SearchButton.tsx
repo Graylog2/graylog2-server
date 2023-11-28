@@ -46,7 +46,7 @@ const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => 
       border-radius: 50%;
       background-color: ${theme.colors.variant.warning};
     }
-  ` : ''}
+` : ''}
 `);
 
 type Props = {

@@ -33,7 +33,7 @@ enum JobStatus {
   Running = 'running',
 }
 
-const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
+const StatusBadge = styled(StyledBadge)<{ status: string }>(({ status, theme }) => {
   const {
     primary,
     success,

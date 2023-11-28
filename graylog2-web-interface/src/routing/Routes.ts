@@ -188,6 +188,7 @@ const Routes = {
     VIEWID: (id: string) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
+  KEYBOARD_SHORTCUTS: '/keyboard-shortcuts',
   search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[]) => {
     const route = new URI(Routes.SEARCH);
     const queryParams: SearchQueryParams = {
