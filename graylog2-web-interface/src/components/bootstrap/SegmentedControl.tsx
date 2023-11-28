@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { SegmentedControl as MantineSegmentedControl, useMantineTheme } from '@mantine/core';
 import type { SegmentedControlItem } from '@mantine/core';
 
@@ -22,7 +23,7 @@ type Props = {
   data: Array<string> | Array<SegmentedControlItem>,
   defaultValue?: string,
   disabled?: boolean,
-  handleChange?: (value: string) => void,
+  handleChange?: (value: string) => void | Dispatch<SetStateAction<string>>,
   value?: string,
 }
 

@@ -17,15 +17,17 @@
 import React, { useState } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import AppConfig from 'util/AppConfig';
 import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, Input } from 'components/bootstrap';
+import { Col, Row, Input, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
+import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig } from 'components/indices/data-tiering';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import withHistory from 'routing/withHistory';
 import type { HistoryFunction } from 'routing/useHistory';
@@ -55,6 +57,15 @@ type Unit = 'seconds' | 'minutes';
 const StyledFormSubmit = styled(FormSubmit)`
   margin-left: 0;
 `;
+
+const ConfigSegmentsTitle = styled.h2(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
+`);
+
+const ConfigSegment = styled.div(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
+  margin-top: ${theme.spacings.sm};
+`);
 
 const _validateIndexPrefix = (value: string) => {
   let error;
@@ -94,9 +105,14 @@ const IndexSetConfigurationForm = ({
   submitButtonText,
   submitLoadingText,
 } : Props) => {
+  const retentionConfigSegments = [
+    { value: 'data_tiering', label: 'Data Tiering' },
+    { value: 'legacy', label: 'Legacy (Deprecated)' },
+  ];
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
+  const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<string>('data_tiering');
 
-  const saveConfiguration = (values: IndexSet) => onUpdate(values);
+  const saveConfiguration = (values: IndexSet) => onUpdate(prepareDataTieringConfig(values));
 
   const onFieldTypeRefreshIntervalChange = (
     intervalValue: number,
@@ -163,12 +179,14 @@ const IndexSetConfigurationForm = ({
 
   const onCancel = () => history.push(cancelLink);
 
+  const isCloud = AppConfig.isCloud();
+
   return (
     <Row>
       <Col md={8}>
         <Formik onSubmit={saveConfiguration}
                 initialValues={indexSet}>
-          {({ isValid, setFieldValue, isSubmitting }) => (
+          {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
 
               <Form>
@@ -254,8 +272,37 @@ const IndexSetConfigurationForm = ({
                     </HideOnCloud>
                   </Col>
                 </Row>
-                {indexSet.writable && rotationConfig()}
-                {indexSet.writable && retentionConfig()}
+                {isCloud ? (
+                  <>
+                    {indexSet.writable && rotationConfig()}
+                    {indexSet.writable && retentionConfig()}
+                  </>
+                ) : (
+                  <>
+                    <ConfigSegmentsTitle>Rotation and Retention</ConfigSegmentsTitle>
+                    <SegmentedControl data={retentionConfigSegments}
+                                      value={selectedRetentionSegment}
+                                      handleChange={setSelectedRetentionSegment} />
+
+                    {selectedRetentionSegment === 'data_tiering' ? (
+                      <ConfigSegment>
+                        <h3>Data Tiering Configuration</h3>
+                        <DataTieringVisualisation minDays={values.data_tiering?.index_lifetime_min}
+                                                  maxDays={values.data_tiering?.index_lifetime_max}
+                                                  minDaysInHot={values.data_tiering?.index_hot_lifetime_min} />
+                        <DataTieringConfiguration />
+                      </ConfigSegment>
+                    )
+                      : (
+                        <ConfigSegment>
+                          {indexSet.writable && rotationConfig()}
+                          {indexSet.writable && retentionConfig()}
+                        </ConfigSegment>
+                      )}
+
+                  </>
+                )}
+
                 <Row>
                   <Col md={9} mdOffset={3}>
                     <StyledFormSubmit disabledSubmit={!isValid}
