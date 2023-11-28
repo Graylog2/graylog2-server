@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
@@ -63,8 +64,9 @@ import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
@@ -240,14 +242,17 @@ public class Server extends ServerBootstrap {
     @Override
     protected void startNodeRegistration(Injector injector) {
         // Register this node.
-        final NodeService nodeService = injector.getInstance(NodeService.class);
+        final NodeService<ServerNodeDto> nodeService = injector.getInstance(new Key<>() {});
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         final LeaderElectionService leaderElectionService = injector.getInstance(LeaderElectionService.class);
-        nodeService.registerServer(serverStatus.getNodeId().toString(),
-                leaderElectionService.isLeader(),
-                httpConfiguration.getHttpPublishUri(),
-                Tools.getLocalCanonicalHostname());
+        nodeService.registerServer(
+                ServerNodeDto.Builder.builder()
+                        .setId(serverStatus.getNodeId().toString())
+                        .setLeader(leaderElectionService.isLeader())
+                        .setTransportAddress(httpConfiguration.getHttpPublishUri().toString())
+                        .setHostname(Tools.getLocalCanonicalHostname())
+                        .build());
         serverStatus.setLocalMode(isLocal());
         if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {
             LOG.warn("Detected another leader in the cluster. Retrying in {} seconds to make sure it is not "

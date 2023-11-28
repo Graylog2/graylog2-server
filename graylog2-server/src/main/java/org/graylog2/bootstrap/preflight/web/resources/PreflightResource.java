@@ -27,8 +27,9 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.bootstrap.preflight.web.resources.model.RemoteReindexRequest;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
@@ -60,7 +61,7 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 public class PreflightResource {
 
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final CaService caService;
     private final ClusterConfigService clusterConfigService;
@@ -68,7 +69,7 @@ public class PreflightResource {
     private final RemoteReindexingMigrationAdapter migrationService;
 
     @Inject
-    public PreflightResource(final NodeService nodeService,
+    public PreflightResource(final NodeService<DataNodeDto> nodeService,
                              final DataNodeProvisioningService dataNodeProvisioningService,
                              final CaService caService,
                              final ClusterConfigService clusterConfigService,
@@ -82,19 +83,19 @@ public class PreflightResource {
         this.passwordSecret = passwordSecret;
     }
 
-    record DataNode(String nodeId, Node.Type type, String transportAddress, DataNodeProvisioningConfig.State status,
-                    String errorMsg, String hostname, String shortNodeId) {}
+    record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status,
+                    String errorMsg,
+                    String hostname, String shortNodeId) {}
 
     @GET
     @Path("/data_nodes")
     public List<DataNode> listDataNodes() {
-        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         final var preflightDataNodes = dataNodeProvisioningService.streamAll().collect(Collectors.toMap(DataNodeProvisioningConfig::nodeId, Function.identity()));
 
         return activeDataNodes.values().stream().map(n -> {
             final var preflight = preflightDataNodes.get(n.getNodeId());
             return new DataNode(n.getNodeId(),
-                    n.getType(),
                     n.getTransportAddress(),
                     preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null,
                     n.getHostname(),
@@ -150,7 +151,7 @@ public class PreflightResource {
     @Path("/generate")
     @NoAuditEvent("No Audit Event needed")
     public void generate() {
-        final Map<String, Node> activeDataNodes = nodeService.allActive(Node.Type.DATANODE);
+        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 

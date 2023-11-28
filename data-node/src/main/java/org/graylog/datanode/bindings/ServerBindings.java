@@ -17,24 +17,24 @@
 package org.graylog.datanode.bindings;
 
 import com.google.common.eventbus.EventBus;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.cluster.DataNodeServiceImpl;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeClusterService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
 import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
-import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.system.activities.ActivityWriter;
 
@@ -83,7 +83,7 @@ public class ServerBindings extends Graylog2Module {
     private void bindInterfaces() {
         bind(ActivityWriter.class).to(DataNodeActivityWriter.class);
         OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
-        bind(NodeService.class).to(DataNodeServiceImpl.class);
+        bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
     }
 
     private void bindDynamicFeatures() {

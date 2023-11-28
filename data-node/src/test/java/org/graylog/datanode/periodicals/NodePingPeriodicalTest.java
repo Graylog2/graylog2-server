@@ -17,8 +17,10 @@
 package org.graylog.datanode.periodicals;
 
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.process.ProcessState;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -33,7 +35,8 @@ class NodePingPeriodicalTest {
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
         final String cluster = "localhost:9300";
-        final NodeService nodeService = Mockito.mock(NodeService.class);
+        @SuppressWarnings("unchecked")
+        final NodeService<DataNodeDto> nodeService = (NodeService<DataNodeDto>) Mockito.mock(NodeService.class);
 
         Configuration configuration = Mockito.mock(Configuration.class);
         Mockito.when(configuration.getHostname()).thenReturn("localhost");
@@ -44,50 +47,21 @@ class NodePingPeriodicalTest {
                 configuration,
                 () -> uri,
                 () -> cluster,
-                () -> true
+                () -> true,
+                () -> ProcessState.AVAILABLE
         );
 
         task.doRun();
 
-        Mockito.verify(nodeService).markAsAlive(
-                Mockito.eq(nodeID),
-                Mockito.eq(true),
-                Mockito.eq(uri),
-                Mockito.eq(cluster));
+        Mockito.verify(nodeService).ping(Mockito.eq(DataNodeDto.Builder.builder()
+                .setId(nodeID.getNodeId())
+                .setLeader(true)
+                .setTransportAddress(uri.toString())
+                .setClusterAddress(cluster)
+                .setDataNodeStatus(ProcessState.AVAILABLE.getDataNodeStatus())
+                .setHostname("localhost")
+                .build()
+        ));
     }
-
-
-    @Test
-    void doRunWithRegister() throws NodeNotFoundException {
-
-        final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-        final URI uri = URI.create("http://localhost:9200");
-        final String cluster = "localhost:9300";
-
-        final NodeService nodeService = Mockito.mock(NodeService.class);
-
-        Mockito.doThrow(new NodeNotFoundException("Node not found")).when(nodeService).markAsAlive(nodeID, true, uri, cluster);
-
-        Configuration configuration = Mockito.mock(Configuration.class);
-        Mockito.when(configuration.getHostname()).thenReturn("hostname.setting.from.config");
-
-        final NodePingPeriodical task = new NodePingPeriodical(
-                nodeService,
-                nodeID,
-                configuration,
-                () -> uri,
-                () -> cluster,
-                () -> true
-        );
-
-        task.doRun();
-
-        Mockito.verify(nodeService).registerServer(
-                Mockito.eq(nodeID.getNodeId()),
-                Mockito.eq(true),
-                Mockito.eq(uri),
-                Mockito.eq(cluster),
-                Mockito.eq("hostname.setting.from.config")
-        );
-    }
+    
 }
