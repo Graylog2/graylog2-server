@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
@@ -36,9 +36,9 @@ import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
-import MenuItem from 'components/bootstrap/MenuItem';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
+
+import BulkActions from './BulkActions';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -70,8 +70,6 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
-  const [initialFieldSelection, setInitialFieldSelection] = useState([]);
-
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { data: { fieldTypes } } = useFiledTypes();
@@ -130,10 +128,10 @@ const IndexSetFieldTypesList = () => {
     },
   }), [fieldTypes]);
 
-  const renderActions = useCallback((fieldType: IndexSetFieldType) => (
+  const renderActions = useCallback((fieldType: IndexSetFieldType, setSelectedFields: React.Dispatch<React.SetStateAction<Array<string>>>) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
-                      updateSelectedEntities={() => {}}
+                      setSelectedFields={setSelectedFields}
                       refetchFieldTypes={refetchFieldTypes} />
   ), [indexSetId, refetchFieldTypes]);
 
@@ -149,19 +147,12 @@ const IndexSetFieldTypesList = () => {
 
   const renderBulkActions = useCallback((
     selectedFields: Array<string>,
-    setSelectedEntities: (fieldName: Array<string>) => void,
-  ) => {
-    const onRemove = () => {
-      // setDeletingFieldTypes(selectedFields);
-    };
-
-    return (
-      <BulkActionsDropdown selectedEntities={selectedFields} setSelectedEntities={setSelectedEntities}>
-        <MenuItem onSelect={onRemove}>Remove</MenuItem>
-      </BulkActionsDropdown>
-    );
-  },
-  []);
+    setSelectedFields: (fieldName: Array<string>) => void,
+  ) => (
+    <BulkActions selectedFields={selectedFields}
+                 setSelectedFields={setSelectedFields}
+                 indexSetId={indexSetId} />
+  ), [indexSetId]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -183,9 +174,9 @@ const IndexSetFieldTypesList = () => {
         </SearchForm>
       </div>
       {pagination?.total === 0 && (
-      <NoEntitiesExist>
-        No fields have been found.
-      </NoEntitiesExist>
+        <NoEntitiesExist>
+          No fields have been found.
+        </NoEntitiesExist>
       )}
       {!!list?.length && (
         <EntityDataTable<IndexSetFieldType> data={list}
@@ -203,7 +194,6 @@ const IndexSetFieldTypesList = () => {
                                             bulkSelection={{
                                               actions: renderBulkActions,
                                               isEntitySelectable,
-                                              initialSelection: initialFieldSelection,
                                             }} />
       )}
     </PaginatedList>

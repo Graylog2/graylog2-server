@@ -16,7 +16,6 @@
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import flatten from 'lodash/flatten';
 
 import { useStore } from 'stores/connect';
 import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
@@ -49,7 +48,7 @@ type Props = {
   fields: Array<string>,
   onClose: () => void,
   indexSetIds: Array<string>,
-  updateSelectedEntities: (fields: Array<string>) => void
+  setSelectedFields: (fields: Array<string>) => void
 }
 
 type ContentProps = {
@@ -89,19 +88,19 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, r
   );
 };
 
-const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds, updateSelectedEntities }: Props) => {
+const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds, setSelectedFields }: Props) => {
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
   const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
   const onErrorHandler = useCallback((response: RemovalResponse) => {
-    const failedFields = flatten(response.map(((indexSet) => indexSet.failures.map(({ entityId }) => entityId))));
-    updateSelectedEntities(failedFields);
+    const failedFields = response.flatMap(((indexSet) => indexSet.failures.map(({ entityId }) => entityId)));
+    setSelectedFields(failedFields);
     setRemovalResponse(response);
-  }, [updateSelectedEntities]);
+  }, [setSelectedFields]);
   const onSuccessHandler = useCallback(() => {
     onClose();
-    updateSelectedEntities([]);
-  }, [onClose, updateSelectedEntities]);
+    setSelectedFields([]);
+  }, [onClose, setSelectedFields]);
   const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation({ onErrorHandler, onSuccessHandler });
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();

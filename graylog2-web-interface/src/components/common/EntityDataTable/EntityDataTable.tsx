@@ -188,7 +188,7 @@ type Props<Entity extends EntityBase> = {
   /** Active page size */
   pageSize?: number
   /** Actions for each row. */
-  rowActions?: (entity: Entity) => React.ReactNode,
+  rowActions?: (entity: Entity, setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>) => React.ReactNode,
   /** Which columns should be displayed. */
   visibleColumns: Array<string>,
 };
@@ -311,6 +311,7 @@ const EntityDataTable = <Entity extends EntityBase>({
                         displaySelect={displayBulkSelectCol}
                         isEntitySelectable={_isEntitySelectable}
                         displayActions={displayActionsCol}
+                        setSelectedEntities={setSelectedEntities}
                         columns={columns} />
               <ExpandedSections key={`expanded-sections-${entity.id}`}
                                 expandedSectionsRenderer={expandedSectionsRenderer}

@@ -27,11 +27,11 @@ import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/Chang
 type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
-  updateSelectedEntities: (fields: Array<string>) => void
+  setSelectedFields: React.Dispatch<React.SetStateAction<Array<string>>>
   refetchFieldTypes: () => void,
 }
 
-const FieldTypeActions = ({ fieldType, indexSetId, updateSelectedEntities, refetchFieldTypes }: Props) => {
+const FieldTypeActions = ({ fieldType, indexSetId, setSelectedFields, refetchFieldTypes }: Props) => {
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
@@ -68,7 +68,7 @@ const FieldTypeActions = ({ fieldType, indexSetId, updateSelectedEntities, refet
                                             fields={[fieldType.fieldName]}
                                             onClose={toggleResetModal}
                                             indexSetIds={[indexSetId]}
-                                            updateSelectedEntities={updateSelectedEntities} />
+                                            setSelectedFields={setSelectedFields} />
       )}
       {showEditModal && (
         <ChangeFieldTypeModal initialSelectedIndexSets={[indexSetId]}
@@ -80,7 +80,7 @@ const FieldTypeActions = ({ fieldType, indexSetId, updateSelectedEntities, refet
                               show
                               showSelectionTable={false}
                               onSubmitCallback={refetchFieldTypes}
-                              showFiledInput={false} />
+                              showFieldSelect={false} />
       )}
     </>
   );
