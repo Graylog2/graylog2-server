@@ -1,0 +1,4 @@
+type = "added"
+message = "Added support for looking up email notification recipients in lookup tables."
+
+pulls = ["17498"]
