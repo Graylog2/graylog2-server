@@ -83,7 +83,11 @@ const Label = styled.div<LabelProps>(({ value }) => css`
 const DataTieringVisualisation = ({ minDays, maxDays, minDaysInHot }: Props) => {
   const theme = useTheme();
 
-  const percentageFor = (days: number) => ((days / maxDays) * 100);
+  const percentageFor = (days: number) => {
+    if (days <= 0) return 0;
+
+    return ((days / maxDays) * 100);
+  };
 
   return (
     <BarWrapper>

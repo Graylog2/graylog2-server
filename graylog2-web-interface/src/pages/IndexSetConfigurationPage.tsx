@@ -71,6 +71,7 @@ const IndexSetConfigurationPage = () => {
   }
 
   const saveConfiguration = (newIndexSet: IndexSet) => {
+    console.log('===on update', newIndexSet);
     _saveConfiguration(history, newIndexSet);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_UPDATED, {
