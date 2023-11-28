@@ -129,6 +129,22 @@ class EmailNotificationForm extends React.Component {
     this.propagateChange('time_zone', nextValue);
   };
 
+  handleUseLookupChange = (nextValue) => {
+    const { config, onChange } = this.props;
+    const nextConfig = cloneDeep(config);
+
+    nextConfig.lookup_emails = nextValue;
+
+    if (nextValue) {
+      nextConfig.email_recipients = [];
+    } else {
+      nextConfig.lookup_table_name = null;
+      nextConfig.lookup_table_key = null;
+    }
+
+    onChange(nextConfig);
+  };
+
   handleBodyTemplateChange = (nextValue) => {
     this.propagateChange('body_template', nextValue);
   };
@@ -143,19 +159,19 @@ class EmailNotificationForm extends React.Component {
     const { config, validation } = this.props;
 
     return (
-        <FormGroup controlId="notification-email-recipients"
-                   validationState={validation.errors.recipients ? 'error' : null}><ControlLabel>Email recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
-          <MultiSelect id="notification-email-recipients"
-                       value={Array.isArray(config.email_recipients) ? config.email_recipients.join(',') : ''}
-                       addLabelText={'Add email "{label}"?'}
-                       placeholder="Type email address"
-                       options={[]}
-                       onChange={this.handleRecipientsChange('email_recipients')}
-                       allowCreate />
-          <HelpBlock>
-            {get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
-          </HelpBlock>
-        </FormGroup>
+      <FormGroup controlId="notification-email-recipients"
+                 validationState={validation.errors.recipients ? 'error' : null}><ControlLabel>Email recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
+        <MultiSelect id="notification-email-recipients"
+                     value={Array.isArray(config.email_recipients) ? config.email_recipients.join(',') : ''}
+                     addLabelText={'Add email "{label}"?'}
+                     placeholder="Type email address"
+                     options={[]}
+                     onChange={this.handleRecipientsChange('email_recipients')}
+                     allowCreate />
+        <HelpBlock>
+          {get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
+        </HelpBlock>
+      </FormGroup>
     );
   };
 
@@ -235,14 +251,14 @@ class EmailNotificationForm extends React.Component {
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
-          {config.lookup_emails ? this.emailLookupFormGroup() : this.emailRecipientsFormGroup()}
+        {config.lookup_emails ? this.emailLookupFormGroup() : this.emailRecipientsFormGroup()}
         <FormGroup>
-        <Input type="checkbox"
-                   id="lookup_emails"
-                   name="lookup_emails"
-                   label="Use lookup table for Email Recipients"
-                   onChange={this.handleChange}
-                   checked={config.lookup_emails} />
+          <Input type="checkbox"
+                 id="lookup_emails"
+                 name="lookup_emails"
+                 label="Use lookup table for Email Recipients"
+                 onChange={this.handleUseLookupChange}
+                 checked={config.lookup_emails} />
         </FormGroup>
         <Input id="notification-time-zone"
                help="Time zone used for timestamps in the email body."
