@@ -38,12 +38,12 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
 
   const toggleStreamStatus = useCallback(async () => {
     if (datanodeDisabled) {
-      // enable
+      // TODO enable
     }
 
     // eslint-disable-next-line no-alert
     if (!datanodeDisabled && window.confirm(`Do you really want to pause datanode '${dataNode.hostname}'?`)) {
-      // disable
+      // TODO disable
     }
   }, [dataNode.hostname, datanodeDisabled]);
 
