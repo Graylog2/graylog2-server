@@ -29,6 +29,7 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
   display: flex;
   justify-content: flex-end;
   align-items: end;
+  gap: 0.25em;
 `;
 
 type WithCancelProps = {
