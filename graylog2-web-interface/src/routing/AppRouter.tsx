@@ -111,6 +111,7 @@ import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import DataNodePage from "pages/DataNodePage";
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -249,6 +250,7 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.MIGRATION, element: <DataNodesMigrationPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
