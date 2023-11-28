@@ -106,6 +106,7 @@ const disabledStyles = (style: ColorVariant, other: Other) => {
     ':disabled': {
       color: colors.color,
       backgroundColor: colors.background,
+      opacity: '0.65',
     },
   };
 };
