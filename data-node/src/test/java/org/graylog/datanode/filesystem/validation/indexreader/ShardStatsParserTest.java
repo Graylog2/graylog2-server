@@ -29,7 +29,7 @@ class ShardStatsParserTest {
     @Test
     void testOpensearch2() throws URISyntaxException {
         final ShardStatsParser shardStatsParser = new ShardStatsParserImpl();
-        final URI shard = getClass().getResource("/indices/opensearch/nodes/0/indices/7z16oEKPTjivI0qd4tv36Q/0").toURI();
+        final URI shard = getClass().getResource("/indices/opensearch2/nodes/0/indices/7z16oEKPTjivI0qd4tv36Q/0").toURI();
         final Optional<ShardStats> stats = shardStatsParser.read(Path.of(shard));
         Assertions.assertThat(stats).map(ShardStats::documentsCount).hasValue(1);
         Assertions.assertThat(stats).map(ShardStats::minSegmentLuceneVersion).map(Version::toString).hasValue("9.7.0");
@@ -38,7 +38,7 @@ class ShardStatsParserTest {
     @Test
     void testElasticsearch7() throws URISyntaxException {
         final ShardStatsParser shardStatsParser = new ShardStatsParserImpl();
-        final URI shard = getClass().getResource("/indices/elasticsearch/nodes/0/indices/JwZYQzvUQG6JxLBgMsFfTA/0").toURI();
+        final URI shard = getClass().getResource("/indices/elasticsearch7/nodes/0/indices/JwZYQzvUQG6JxLBgMsFfTA/0").toURI();
         final Optional<ShardStats> stats = shardStatsParser.read(Path.of(shard));
         Assertions.assertThat(stats).map(ShardStats::documentsCount).hasValue(1);
         Assertions.assertThat(stats).map(ShardStats::minSegmentLuceneVersion).map(Version::toString).hasValue("8.7.0");

@@ -478,7 +478,7 @@
             </testResource>
             <testResource>
                 <directory>src/test/resources/indices</directory>
-                <targetPath>${project.build.outputDirectory}/indices</targetPath>
+                <targetPath>${project.build.testOutputDirectory}/indices</targetPath>
                 <filtering>false</filtering>
             </testResource>
         </testResources>
