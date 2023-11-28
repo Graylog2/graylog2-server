@@ -34,11 +34,13 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
+import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetCustomFieldTypeRemoveModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import type { EditingField } from 'pages/IndexSetFieldTypesPage';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -68,19 +70,26 @@ const FilterValueRenderers = {
   ),
 };
 
-const IndexSetFieldTypesList = () => {
-  const { indexSetId } = useParams();
-  const [editingField, setEditingField] = useState<IndexSetFieldType | null>(null);
+type Props = {
+  editingField: EditingField,
+  setEditingField: React.Dispatch<React.SetStateAction<EditingField | null>>,
+}
 
+const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
+  const { indexSetId } = useParams();
+  const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const handleOnClose = useCallback(() => {
     setEditingField(null);
-  }, []);
-
+  }, [setEditingField]);
+  const [deletingFieldTypes, setDeletingFieldTypes] = useState<Array<string> | null>(null);
   const handleOnOpen = useCallback((fieldType: IndexSetFieldType) => {
-    setEditingField(fieldType);
-  }, []);
+    setEditingField({
+      fieldName: fieldType.fieldName,
+      type: fieldType.type,
+      showFiledInput: false,
+    });
+  }, [setEditingField]);
 
-  const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
@@ -135,22 +144,39 @@ const IndexSetFieldTypesList = () => {
     handleOnOpen(fieldType);
   }, [handleOnOpen]);
 
+  const openDeletingModal = useCallback((fields: Array<string>) => {
+    setDeletingFieldTypes(fields);
+  }, []);
+  const onCloseDeleting = useCallback(() => setDeletingFieldTypes(null), []);
+
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
-    <Button onClick={() => openEditModal(fieldType)}
-            role="button"
-            bsSize="xsmall"
-            disabled={fieldType.isReserved}
-            title={`Edit field type for ${fieldType.fieldName}`}
-            tabIndex={0}>
-      Edit {
-          fieldType.isReserved && (
-          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-            We use reserved fields internally and expect a certain structure from them. Changing the field type for reserved fields might impact the stability of Graylog
-          </HoverForHelp>
-          )
-      }
-    </Button>
-  ), [openEditModal]);
+    <>
+      <Button onClick={() => openEditModal(fieldType)}
+              role="button"
+              bsSize="xsmall"
+              disabled={fieldType.isReserved}
+              title={`Edit field type for ${fieldType.fieldName}`}
+              tabIndex={0}>
+        Edit {
+            fieldType.isReserved && (
+            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+              We use reserved fields internally and expect a certain structure from them. Changing the field type for reserved fields might impact the stability of Graylog
+            </HoverForHelp>
+            )
+        }
+      </Button>
+      {fieldType.isCustom && (
+        <Button onClick={() => openDeletingModal([fieldType.fieldName])}
+                role="button"
+                bsSize="xsmall"
+                title="Reset custom type"
+                tabIndex={0}>
+          Reset
+        </Button>
+      )}
+    </>
+  ), [openDeletingModal, openEditModal]);
+  const indexSetsDeleting = useMemo(() => [indexSetId], [indexSetId]);
 
   const onSearch = useCallback((val: string) => {
     paginationQueryParameter.resetPage();
@@ -161,6 +187,10 @@ const IndexSetFieldTypesList = () => {
     paginationQueryParameter.resetPage();
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
+
+  const onFieldChange = useCallback(({ fieldName, type }: { fieldName: string, type: string }) => {
+    setEditingField({ fieldName, type, showFiledInput: true });
+  }, [setEditingField]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -212,7 +242,14 @@ const IndexSetFieldTypesList = () => {
                                 fieldTypes={fieldTypes}
                                 isOptionsLoading={isOptionsLoading}
                                 onSubmitCallback={refetch}
-                                initialFieldType={editingField.type} />
+                                initialFieldType={editingField.type}
+                                onFieldChange={onFieldChange}
+                                showFiledInput={editingField.showFiledInput} />
+        ) : null
+      }
+      {
+        deletingFieldTypes ? (
+          <IndexSetCustomFieldTypeRemoveModal show={!!deletingFieldTypes} fields={deletingFieldTypes} onClose={onCloseDeleting} indexSetIds={indexSetsDeleting} />
         ) : null
       }
     </>

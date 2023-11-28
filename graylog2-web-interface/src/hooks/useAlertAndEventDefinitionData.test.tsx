@@ -17,9 +17,10 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import type { Location } from 'react-router-dom';
 
+import useLocation from 'routing/useLocation';
 import {
   mockedMappedAggregation,
   mockEventData,
@@ -29,12 +30,10 @@ import asMock from 'helpers/mocking/AsMock';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '/' })));
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(() => ({
-    pathname: '/',
-  })),
   useParams: jest.fn(() => ({})),
 }));
 

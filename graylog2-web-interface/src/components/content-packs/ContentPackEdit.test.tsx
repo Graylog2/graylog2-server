@@ -15,16 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
-
-jest.mock('react-overlays', () => ({
-  // eslint-disable-next-line
-  AutoAffix: ({ children }) => <div>{children}</div>,
-}));
 
 describe('<ContentPackEdit />', () => {
   const emptyContentPack = ContentPack.builder()
@@ -63,35 +57,36 @@ describe('<ContentPackEdit />', () => {
     .parameters([parameter])
     .build();
 
-  it('should render spinner with no content pack', () => {
-    const wrapper = mount(<ContentPackEdit />);
+  it('should render spinner with no content pack', async () => {
+    render(<ContentPackEdit />);
 
-    expect(wrapper.find('Spinner')).toExist();
+    await screen.findByText(/loading/i);
   });
 
-  it('should render empty content pack for create', () => {
-    const wrapper = mount(<ContentPackEdit contentPack={emptyContentPack}
-                                           selectedEntities={{}}
-                                           appliedParameter={{}}
-                                           entityIndex={{}} />);
+  it('should render empty content pack for create', async () => {
+    render(<ContentPackEdit contentPack={emptyContentPack}
+                            selectedEntities={{}}
+                            appliedParameter={{}}
+                            entityIndex={{}} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Content Selection');
   });
 
-  it('should render with content pack for edit', () => {
-    const wrapper = mount(
+  it('should render with content pack for edit', async () => {
+    render(
       <ContentPackEdit contentPack={filledContentPack}
                        appliedParameter={appliedParameter}
                        entityIndex={serverEntities}
                        selectedEntities={selectedEntities} />,
     );
 
-    expect(wrapper).toExist();
+    await screen.findByText('Content Selection');
   });
 
-  it('should create a new content pack', () => {
+  it('should create a new content pack', async () => {
     const saveFn = jest.fn();
-    const wrapper = mount(
+
+    render(
       <ContentPackEdit contentPack={filledContentPack}
                        appliedParameter={appliedParameter}
                        entityIndex={serverEntities}
@@ -99,16 +94,16 @@ describe('<ContentPackEdit />', () => {
                        selectedEntities={selectedEntities} />,
     );
 
-    wrapper.find('button[children="Next"]').simulate('click');
+    (await screen.findByRole('button', { name: 'Next' })).click();
 
-    expect(wrapper.find('h2[children="Parameters list"]').exists()).toBe(true);
+    await screen.findByText(/Parameters list/i);
 
-    wrapper.find('button[children="Next"]').simulate('click');
+    (await screen.findByRole('button', { name: 'Next' })).click();
 
-    expect(wrapper.find('button[children="Create"]').exists()).toBe(true);
+    (await screen.findByRole('button', { name: 'Create' })).click();
 
-    wrapper.find('button[children="Create"]').simulate('click');
-
-    expect(saveFn.mock.calls.length).toBe(1);
+    await waitFor(() => {
+      expect(saveFn).toHaveBeenCalled();
+    });
   });
 });

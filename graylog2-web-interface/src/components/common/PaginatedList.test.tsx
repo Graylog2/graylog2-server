@@ -16,20 +16,15 @@
  */
 import React from 'react';
 import { render, fireEvent, screen } from 'wrappedTestingLibrary';
-import { useLocation } from 'react-router-dom';
 import type { Location } from 'history';
 
+import useLocation from 'routing/useLocation';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { asMock } from 'helpers/mocking';
 
 import PaginatedList from './PaginatedList';
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(() => ({
-    search: '',
-  })),
-}));
+jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
 
 describe('PaginatedList', () => {
   it('should display Pagination', () => {

@@ -265,32 +265,32 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                        name="index_optimization_disabled"
                                        help="Disable Elasticsearch index optimization (force merge) after rotation." />
                         </Input>
-                      </HideOnCloud>
-                      <Field name="field_type_refresh_interval">
-                        {({ field: { name, value, onChange } }) => {
-                          const _onFieldTypeRefreshIntervalChange = (intervalValue: number, unit: Unit) => {
-                            onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
-                            setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
-                            this.setState({ fieldTypeRefreshIntervalUnit: unit });
-                          };
+                        <Field name="field_type_refresh_interval">
+                          {({ field: { name, value, onChange } }) => {
+                            const _onFieldTypeRefreshIntervalChange = (intervalValue: number, unit: Unit) => {
+                              onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
+                              setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
+                              this.setState({ fieldTypeRefreshIntervalUnit: unit });
+                            };
 
-                          return (
-                            <Input id="roles-selector-input"
-                                   labelClassName="col-sm-3"
-                                   wrapperClassName="col-sm-9"
-                                   label="Field type refresh interval">
-                              <TimeUnitInput id="field-type-refresh-interval"
-                                             type="number"
-                                             help="How often the field type information for the active write index will be updated."
-                                             value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                                             unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
-                                             units={['SECONDS', 'MINUTES']}
-                                             required
-                                             update={_onFieldTypeRefreshIntervalChange} />
-                            </Input>
-                          );
-                        }}
-                      </Field>
+                            return (
+                              <Input id="roles-selector-input"
+                                     labelClassName="col-sm-3"
+                                     wrapperClassName="col-sm-9"
+                                     label="Field type refresh interval">
+                                <TimeUnitInput id="field-type-refresh-interval"
+                                               type="number"
+                                               help="How often the field type information for the active write index will be updated."
+                                               value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                                               unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                                               units={['SECONDS', 'MINUTES']}
+                                               required
+                                               update={_onFieldTypeRefreshIntervalChange} />
+                              </Input>
+                            );
+                          }}
+                        </Field>
+                      </HideOnCloud>
                     </Col>
                   </Row>
                   {indexSet.writable && rotationConfig}

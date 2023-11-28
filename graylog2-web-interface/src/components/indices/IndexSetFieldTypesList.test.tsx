@@ -19,50 +19,19 @@ import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
 import { useQueryParam, QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
+import { MockStore } from 'helpers/mocking';
+import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
 import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import type { Attributes } from 'stores/PaginationTypes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
-import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import { customFiled, defaultFiled, reservedFiled, secondCustomFiled, attributes } from 'fixtures/indexSetFieldTypes';
 
-const attributes: Attributes = [
-  {
-    id: 'field_name',
-    title: 'Field Name',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'is_custom',
-    title: 'Custom',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'is_reserved',
-    title: 'Reserved',
-    type: 'STRING',
-    sortable: true,
-  },
-  {
-    id: 'type',
-    title: 'Type',
-    type: 'STRING',
-    sortable: true,
-  },
-];
-
-const getData = (list = [{
-  id: 'field',
-  fieldName: 'field',
-  type: 'bool',
-  isCustom: false,
-  isReserved: false,
-}]) => (
+const getData = (list = [defaultFiled]) => (
   {
     list,
     pagination: {
@@ -71,14 +40,28 @@ const getData = (list = [{
     attributes,
   }
 );
+
+const mockedSetEditingField = jest.fn();
 const renderIndexSetFieldTypesList = () => render(
   <QueryParamProvider adapter={ReactRouter6Adapter}>
     <TestStoreProvider>
-      <IndexSetFieldTypesList />
+      <IndexSetFieldTypesList editingField={undefined} setEditingField={mockedSetEditingField} />
     </TestStoreProvider>,
   </QueryParamProvider>,
 );
 
+jest.mock('stores/indices/IndexSetsStore', () => ({
+  IndexSetsActions: {
+    list: jest.fn(),
+  },
+  IndexSetsStore: MockStore(['getInitialState', () => ({
+    indexSets: [
+      { id: '111', title: 'index set title' },
+    ],
+  })]),
+}));
+
+jest.mock('routing/useParams', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
 jest.mock('hooks/useIndexSetFieldType', () => jest.fn());
 
@@ -95,6 +78,10 @@ describe('IndexSetFieldTypesList', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
+    asMock(useParams).mockImplementation(() => ({
+      indexSetId: '111',
+    }));
+
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
@@ -106,7 +93,7 @@ describe('IndexSetFieldTypesList', () => {
       isInitialLoading: false,
     });
 
-    asMock(useFiledTypes).mockReturnValue({
+    asMock(useFieldTypes).mockReturnValue({
       data: {
         fieldTypes: {
           string: 'String type',
@@ -142,13 +129,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: false,
-        }]),
+        data: getData([customFiled]),
       });
 
       renderIndexSetFieldTypesList();
@@ -164,13 +145,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: false,
-        }]),
+        data: getData([customFiled]),
       });
 
       renderIndexSetFieldTypesList();
@@ -186,46 +161,49 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([{
-          id: 'field',
-          fieldName: 'field',
-          type: 'bool',
-          isCustom: true,
-          isReserved: true,
-        }]),
+        data: getData([reservedFiled]),
       });
 
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field');
 
-      const editButton = await within(tableRow).findByText('Edit');
       await within(tableRow).findByTitle('Field has reserved field type');
+      const editButton = await within(tableRow).findByRole('button', { name: /Edit/i });
 
-      expect(editButton.hasAttribute('disabled')).toBe(true);
+      expect(editButton).toBeDisabled();
     });
   });
 
-  it('Shows modal on action click', async () => {
+  it('Runs setEditingField with correct params', async () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([{
-        id: 'field',
-        fieldName: 'field',
-        type: 'bool',
-        isCustom: true,
-        isReserved: false,
-      }]),
+      data: getData([customFiled, secondCustomFiled]),
     });
 
     renderIndexSetFieldTypesList();
     const tableRow = await screen.findByTestId('table-row-field');
     const editButton = await within(tableRow).findByText('Edit');
     fireEvent.click(editButton);
-    await screen.findByText(/change field field type/i);
-    const modal = await screen.findByTestId('modal-form');
-    await within(modal).findByText('Boolean');
 
-    expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
+    expect(mockedSetEditingField).toHaveBeenCalledWith({ fieldName: 'field', type: 'bool', showFiledInput: false });
+  });
+
+  it('Shows modal on reset action click', async () => {
+    asMock(useIndexSetFieldTypes).mockReturnValue({
+      isLoading: false,
+      refetch: () => {},
+      data: getData([customFiled]),
+    });
+
+    renderIndexSetFieldTypesList();
+    const tableRow = await screen.findByTestId('table-row-field');
+    const resetButton = await within(tableRow).findByText('Reset');
+    fireEvent.click(resetButton);
+    await screen.findByText(/remove custom field type/i);
+    const modal = await screen.findByTestId('modal-form');
+    await within(modal).findByText('Rotate affected indices after change');
+
+    expect(modal).toHaveTextContent('After removing the custom field type for field in index set title the settings of your search engine will be used');
   });
 });

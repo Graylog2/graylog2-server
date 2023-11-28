@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
-import { useLocation } from 'react-router-dom';
 
+import useLocation from 'routing/useLocation';
 import { asMock } from 'helpers/mocking';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import type { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
