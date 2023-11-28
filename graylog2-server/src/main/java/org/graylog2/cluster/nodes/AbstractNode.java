@@ -14,31 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog2.cluster.nodes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.undercouch.bson4jackson.types.Timestamp;
 import org.bson.types.BSONTimestamp;
 import org.bson.types.ObjectId;
-import org.graylog2.database.DbEntity;
+import org.graylog2.cluster.Node;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
-import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Map;
 
-@DbEntity(collection = "nodes", titleField = "node_id")
-public class NodeImpl extends PersistedImpl implements Node {
+public abstract class AbstractNode<DTO extends NodeDto> extends PersistedImpl implements Node {
 
-    public NodeImpl(Map<String, Object> fields) {
+    public AbstractNode(Map<String, Object> fields) {
         super(fields);
     }
 
-    public NodeImpl(ObjectId id, Map<String, Object> fields) {
+    public AbstractNode(ObjectId id, Map<String, Object> fields) {
         super(id, fields);
     }
 
@@ -59,11 +57,6 @@ public class NodeImpl extends PersistedImpl implements Node {
     }
 
     @Override
-    public String getClusterAddress() {
-        return (String) fields.get("cluster_address");
-    }
-
-    @Override
     public DateTime getLastSeen() {
         final Object rawLastSeen = fields.get("last_seen");
         if (rawLastSeen == null) {
@@ -72,22 +65,15 @@ public class NodeImpl extends PersistedImpl implements Node {
         if (rawLastSeen instanceof BSONTimestamp) {
             return new DateTime(((BSONTimestamp) rawLastSeen).getTime() * 1000L, DateTimeZone.UTC);
         }
-        return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
-    }
-
-
-    @Override
-    public Type getType() {
-        if (!fields.containsKey("type")) {
-            return Type.SERVER;
+        if (rawLastSeen instanceof Timestamp ts) {
+            return new DateTime(ts.getTime() * 1000L, DateTimeZone.UTC);
         }
-
-        return Type.valueOf(fields.get("type").toString().toUpperCase(Locale.ENGLISH));
+        return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
     }
 
     @Override
     public String getHostname() {
-        return (String)fields.get("hostname");
+        return (String) fields.get("hostname");
     }
 
     @Override
@@ -106,4 +92,7 @@ public class NodeImpl extends PersistedImpl implements Node {
     public String toString() {
         return getTitle();
     }
+
+    public abstract DTO toDto();
+
 }

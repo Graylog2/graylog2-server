@@ -88,7 +88,7 @@
 
         <!-- Dependencies -->
         <opensearch.shaded.version>2.11.0-1</opensearch.shaded.version>
-        <airline.version>2.9.0</airline.version>
+        <airline.version>3.0.0</airline.version>
         <amqp-client.version>5.20.0</amqp-client.version>
         <antlr.version>4.13.1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
@@ -167,7 +167,7 @@
         <shiro.version>1.13.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.4.7</oshi.version>
+        <oshi.version>6.4.8</oshi.version>
         <siv-mode.version>1.5.0</siv-mode.version>
         <slf4j.version>2.0.9</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
@@ -391,7 +391,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.24.0</version>
+                <version>1.25.0</version>
             </dependency>
 
             <dependency>
