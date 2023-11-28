@@ -227,7 +227,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   const _isEntitySelectable = useCallback((entity: Entity) => {
     if (!displayBulkSelectCol) return false;
 
-    if (isEntitySelectable) return isEntitySelectable(entity);
+    if (typeof isEntitySelectable === 'function') return isEntitySelectable(entity);
 
     return true;
   }, [displayBulkSelectCol, isEntitySelectable]);
