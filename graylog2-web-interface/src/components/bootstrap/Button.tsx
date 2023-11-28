@@ -91,7 +91,7 @@ const stylesForSize = (size: BsSize) => {
     case 'medium':
     default:
       return {
-        height: '34px',
+        height: '33.84px',
         padding: '6px 12px',
       };
   }
