@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Button as MantineButton } from '@mantine/core';
+import { useMemo } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import styled, { css } from 'styled-components';
+import type { MantineTheme } from '@graylog/sawmill/mantine';
+import { Button as MantineButton, useMantineTheme } from '@mantine/core';
+import styled from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -43,38 +45,9 @@ const styleProps = (style: StyleProps) => {
   }
 };
 
-const stylesForSize = (size: Size) => {
-  switch (size) {
-    case 'xs':
-      return `
-        height: 21.4141px; 
-        padding: 1px 5px;
-      `;
-    case 'sm':
-      return `
-        height: 29.4141px;
-        padding: 5px 10px;
-      `;
-    case 'lg':
-      return `
-        height: 43.1641px;
-        padding: 10px 16px;
-      `;
-    case 'md':
-    default:
-      return `
-        height: 34px;
-        padding: 6px 12px;
-      `;
-  }
-};
-
-type Size = 'xs' | 'sm' | 'md' | 'lg';
-
-const StyledButton = styled(MantineButton)<{ size: Size }>(({ size }) => css`
-  ${stylesForSize(size)}
+const StyledButton = styled(MantineButton)`
   font-weight: 400;
-`);
+`;
 
 type Props = React.PropsWithChildren<{
   active?: boolean,
@@ -95,10 +68,59 @@ type Props = React.PropsWithChildren<{
   type?: 'button' | 'reset' | 'submit',
 }>;
 
-const styles = {
-  inner: {
-    height: '16px',
-  },
+const stylesForSize = (size: BsSize) => {
+  switch (size) {
+    case 'xs':
+    case 'xsmall':
+      return {
+        height: '21.4141px',
+        padding: '1px 5px',
+      };
+    case 'sm':
+    case 'small':
+      return {
+        height: '29.4141px',
+        padding: '5px 10px',
+      };
+    case 'lg':
+    case 'large':
+      return {
+        height: '43.1641px',
+        padding: '10px 16px',
+      };
+    case 'medium':
+    default:
+      return {
+        height: '34px',
+        padding: '6px 12px',
+      };
+  }
+};
+
+const disabledStyles = (style: ColorVariant, theme: MantineTheme) => {
+  const colors = theme.other.colors.disabled[style];
+
+  return {
+    ':disabled': {
+      color: colors.color,
+      backgroundColor: colors.background,
+    },
+  };
+};
+
+const generateStyles = (theme: MantineTheme, bsStyle: StyleProps, bsSize: BsSize, disabled: boolean) => {
+  const sizeStyles = stylesForSize(bsSize);
+  const disableStyles = (disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, theme) : {});
+
+  return {
+    root: {
+      ...sizeStyles,
+      ':disabled': disableStyles,
+    },
+    label: {
+      gap: '0.25em',
+    },
+  };
 };
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(
@@ -106,6 +128,8 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
     'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
     title, form, type, role, name, tabIndex, children,
   }, ref) => {
+    const theme = useMantineTheme();
+    const styles = useMemo(() => generateStyles(theme, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
     const button = (
       <StyledButton ref={ref}
                     id={id}
