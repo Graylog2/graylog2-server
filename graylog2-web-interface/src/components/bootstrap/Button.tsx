@@ -97,8 +97,10 @@ const stylesForSize = (size: BsSize) => {
   }
 };
 
-const disabledStyles = (style: ColorVariant, theme: MantineTheme) => {
-  const colors = theme.other.colors.disabled[style];
+type Other = MantineTheme['other'];
+
+const disabledStyles = (style: ColorVariant, other: Other) => {
+  const colors = other.colors.disabled[style];
 
   return {
     ':disabled': {
@@ -108,9 +110,9 @@ const disabledStyles = (style: ColorVariant, theme: MantineTheme) => {
   };
 };
 
-const generateStyles = (theme: MantineTheme, bsStyle: StyleProps, bsSize: BsSize, disabled: boolean) => {
+const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disabled: boolean) => {
   const sizeStyles = stylesForSize(bsSize);
-  const disableStyles = (disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, theme) : {});
+  const disableStyles = (disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, other) : {});
 
   return {
     root: {
@@ -129,7 +131,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
     title, form, type, role, name, tabIndex, children,
   }, ref) => {
     const theme = useMantineTheme();
-    const styles = useMemo(() => generateStyles(theme, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
+    const styles = useMemo(() => generateStyles(theme.other, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
     const button = (
       <StyledButton ref={ref}
                     id={id}
