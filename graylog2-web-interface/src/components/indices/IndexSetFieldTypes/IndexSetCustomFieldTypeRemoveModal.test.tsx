@@ -28,7 +28,7 @@ const mockOnClosed = jest.fn();
 const mockUpdateSelectedEntities = jest.fn();
 const renderIndexSetCustomFieldTypeRemoveModal = () => render(
   <TestStoreProvider>
-    <IndexSetCustomFieldTypeRemoveModal updateSelectedEntities={mockUpdateSelectedEntities} fields={['field']} indexSetIds={['111']} show onClose={mockOnClosed} />
+    <IndexSetCustomFieldTypeRemoveModal setSelectedFields={mockUpdateSelectedEntities} fields={['field']} indexSetIds={['111']} show onClose={mockOnClosed} />
   </TestStoreProvider>,
 );
 

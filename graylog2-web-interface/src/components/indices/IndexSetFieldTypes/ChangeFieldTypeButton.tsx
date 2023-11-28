@@ -36,7 +36,8 @@ const ChangeFieldTypeButton = ({ indexSetId }: Props) => {
         <ChangeFieldTypeModal initialSelectedIndexSets={[indexSetId]}
                               onClose={toggleModal}
                               showFieldSelect
-                              show />
+                              show
+                              showSelectionTable={false} />
       )}
     </>
   );

@@ -112,7 +112,6 @@ describe('IndexSetFieldTypesList', () => {
       isLoading: false,
       refetch: () => {},
       data: getData([customFiled]),
-
     });
 
     renderIndexSetFieldTypesPage();

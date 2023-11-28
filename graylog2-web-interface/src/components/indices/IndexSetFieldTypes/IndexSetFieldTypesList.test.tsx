@@ -29,7 +29,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexSetFieldTypesList';
 import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
-import { customFiled, defaultFiled, reservedFiled, secondCustomFiled, attributes } from 'fixtures/indexSetFieldTypes';
+import { customFiled, defaultFiled, reservedFiled, attributes } from 'fixtures/indexSetFieldTypes';
 
 const getData = (list = [defaultFiled]) => (
   {
@@ -41,11 +41,10 @@ const getData = (list = [defaultFiled]) => (
   }
 );
 
-const mockedSetEditingField = jest.fn();
 const renderIndexSetFieldTypesList = () => render(
   <QueryParamProvider adapter={ReactRouter6Adapter}>
     <TestStoreProvider>
-      <IndexSetFieldTypesList editingField={undefined} setEditingField={mockedSetEditingField} />
+      <IndexSetFieldTypesList />
     </TestStoreProvider>,
   </QueryParamProvider>,
 );
@@ -172,21 +171,6 @@ describe('IndexSetFieldTypesList', () => {
 
       expect(editButton).toBeDisabled();
     });
-  });
-
-  it('Runs setEditingField with correct params', async () => {
-    asMock(useIndexSetFieldTypes).mockReturnValue({
-      isLoading: false,
-      refetch: () => {},
-      data: getData([customFiled, secondCustomFiled]),
-    });
-
-    renderIndexSetFieldTypesList();
-    const tableRow = await screen.findByTestId('table-row-field');
-    const editButton = await within(tableRow).findByText('Edit');
-    fireEvent.click(editButton);
-
-    expect(mockedSetEditingField).toHaveBeenCalledWith({ fieldName: 'field', type: 'bool', showFiledInput: false });
   });
 
   it('Shows modal on reset action click', async () => {

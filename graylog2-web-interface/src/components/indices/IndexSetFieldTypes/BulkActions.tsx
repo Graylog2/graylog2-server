@@ -35,7 +35,7 @@ const BulkActions = ({ selectedFields, setSelectedFields, indexSetId }: Props) =
 
   return (
     <BulkActionsDropdown selectedEntities={selectedFields} setSelectedEntities={setSelectedFields}>
-      <MenuItem onSelect={toggleResetModal}>Remove</MenuItem>
+      <MenuItem onSelect={toggleResetModal}>Reset</MenuItem>
       {showResetModal && (
         <IndexSetCustomFieldTypeRemoveModal show
                                             fields={selectedFields}
