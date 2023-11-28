@@ -19,11 +19,9 @@ import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
-import { Button } from 'components/bootstrap';
 import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
 import {
-  HoverForHelp,
   Icon,
   NoEntitiesExist,
   PaginatedList, SearchForm,
@@ -33,8 +31,6 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
-import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
@@ -42,7 +38,7 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import MenuItem from 'components/bootstrap/MenuItem';
-import type { EditingField } from 'pages/IndexSetFieldTypesPage';
+import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
 
 export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
@@ -72,30 +68,13 @@ const FilterValueRenderers = {
   ),
 };
 
-type Props = {
-  editingField: EditingField,
-  setEditingField: React.Dispatch<React.SetStateAction<EditingField | null>>,
-}
-
-const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
+const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
-  const initialSelection = useMemo(() => [indexSetId], [indexSetId]);
   const [initialFieldSelection, setInitialFieldSelection] = useState([]);
-  const handleOnClose = useCallback(() => {
-    setEditingField(null);
-  }, [setEditingField]);
-  const [deletingFieldTypes, setDeletingFieldTypes] = useState<Array<string> | null>(null);
-  const handleOnOpen = useCallback((fieldType: IndexSetFieldType) => {
-    setEditingField({
-      fieldName: fieldType.fieldName,
-      type: fieldType.type,
-      showFiledInput: false,
-    });
-  }, [setEditingField]);
 
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
-  const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFiledTypes();
+  const { data: { fieldTypes } } = useFiledTypes();
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -125,7 +104,15 @@ const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });
   }, [updateTableLayout]);
-  const { isLoading, data: { list, pagination, attributes }, refetch } = useIndexSetFieldTypes(indexSetId, searchParams, { enabled: !isLoadingLayoutPreferences });
+  const {
+    isLoading,
+    data: { list, pagination, attributes },
+    refetch: refetchFieldTypes,
+  } = useIndexSetFieldTypes(
+    indexSetId,
+    searchParams,
+    { enabled: !isLoadingLayoutPreferences },
+  );
 
   const customColumnRenderers = useMemo(() => ({
     attributes: {
@@ -143,43 +130,12 @@ const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
     },
   }), [fieldTypes]);
 
-  const openEditModal = useCallback((fieldType: IndexSetFieldType) => {
-    handleOnOpen(fieldType);
-  }, [handleOnOpen]);
-
-  const openDeletingModal = useCallback((fields: Array<string>) => {
-    setDeletingFieldTypes(fields);
-  }, []);
-  const onCloseDeleting = useCallback(() => setDeletingFieldTypes(null), []);
-
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
-    <>
-      <Button onClick={() => openEditModal(fieldType)}
-              role="button"
-              bsSize="xsmall"
-              disabled={fieldType.isReserved}
-              title={`Edit field type for ${fieldType.fieldName}`}
-              tabIndex={0}>
-        Edit {
-            fieldType.isReserved && (
-            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-              We use reserved fields internally and expect a certain structure from them. Changing the field type for reserved fields might impact the stability of Graylog
-            </HoverForHelp>
-            )
-        }
-      </Button>
-      {fieldType.isCustom && (
-        <Button onClick={() => openDeletingModal([fieldType.fieldName])}
-                role="button"
-                bsSize="xsmall"
-                title="Reset custom type"
-                tabIndex={0}>
-          Reset
-        </Button>
-      )}
-    </>
-  ), [openDeletingModal, openEditModal]);
-  const indexSetsDeleting = useMemo(() => [indexSetId], [indexSetId]);
+    <FieldTypeActions fieldType={fieldType}
+                      indexSetId={indexSetId}
+                      updateSelectedEntities={() => {}}
+                      refetchFieldTypes={refetchFieldTypes} />
+  ), [indexSetId, refetchFieldTypes]);
 
   const onSearch = useCallback((val: string) => {
     paginationQueryParameter.resetPage();
@@ -196,7 +152,7 @@ const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
     setSelectedEntities: (fieldName: Array<string>) => void,
   ) => {
     const onRemove = () => {
-      setDeletingFieldTypes(selectedFields);
+      // setDeletingFieldTypes(selectedFields);
     };
 
     return (
@@ -204,77 +160,53 @@ const IndexSetFieldTypesList = ({ editingField, setEditingField }: Props) => {
         <MenuItem onSelect={onRemove}>Remove</MenuItem>
       </BulkActionsDropdown>
     );
-  }, []);
-  const onFieldChange = useCallback(({ fieldName, type }: { fieldName: string, type: string }) => {
-    setEditingField({ fieldName, type, showFiledInput: true });
-  }, [setEditingField]);
+  },
+  []);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
 
   return (
-    <>
-      <PaginatedList totalItems={pagination?.total}
-                     pageSize={layoutConfig.pageSize}
-                     showPageSizeSelect={false}>
-        <div style={{ marginBottom: 5 }}>
-          <SearchForm onSearch={onSearch}
-                      onReset={onSearchReset}
-                      query={query}
-                      placeholder="Enter search query for the filed name...">
-            <EntityFilters attributes={attributes}
-                           urlQueryFilters={urlQueryFilters}
-                           setUrlQueryFilters={onChangeFilters}
-                           filterValueRenderers={FilterValueRenderers} />
-          </SearchForm>
-        </div>
-        {pagination?.total === 0 && (
-          <NoEntitiesExist>
-            No fields have been found.
-          </NoEntitiesExist>
-        )}
-        {!!list?.length && (
-          <EntityDataTable<IndexSetFieldType> data={list}
-                                              visibleColumns={layoutConfig.displayedAttributes}
-                                              columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                              onColumnsChange={onColumnsChange}
-                                              onSortChange={onSortChange}
-                                              activeSort={layoutConfig.sort}
-                                              pageSize={searchParams.pageSize}
-                                              onPageSizeChange={onPageSizeChange}
-                                              actionsCellWidth={120}
-                                              columnRenderers={customColumnRenderers}
-                                              columnDefinitions={attributes}
-                                              rowActions={renderActions}
-                                              bulkSelection={{
-                                                actions: renderBulkActions,
-                                                isEntitySelectable,
-                                                initialSelection: initialFieldSelection,
-                                              }} />
-        )}
-      </PaginatedList>
-      {
-        editingField ? (
-          <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
-                                field={editingField.fieldName}
-                                onClose={handleOnClose}
-                                show={!!editingField}
-                                showSelectionTable={false}
-                                fieldTypes={fieldTypes}
-                                isOptionsLoading={isOptionsLoading}
-                                onSubmitCallback={refetch}
-                                initialFieldType={editingField.type}
-                                onFieldChange={onFieldChange}
-                                showFiledInput={editingField.showFiledInput} />
-        ) : null
-      }
-      {
-        deletingFieldTypes ? (
-          <IndexSetCustomFieldTypeRemoveModal show={!!deletingFieldTypes} fields={deletingFieldTypes} onClose={onCloseDeleting} indexSetIds={indexSetsDeleting} updateSelectedEntities={setInitialFieldSelection} />
-        ) : null
-      }
-    </>
+    <PaginatedList totalItems={pagination?.total}
+                   pageSize={layoutConfig.pageSize}
+                   showPageSizeSelect={false}>
+      <div style={{ marginBottom: 5 }}>
+        <SearchForm onSearch={onSearch}
+                    onReset={onSearchReset}
+                    query={query}
+                    placeholder="Enter search query for the filed name...">
+          <EntityFilters attributes={attributes}
+                         urlQueryFilters={urlQueryFilters}
+                         setUrlQueryFilters={onChangeFilters}
+                         filterValueRenderers={FilterValueRenderers} />
+        </SearchForm>
+      </div>
+      {pagination?.total === 0 && (
+      <NoEntitiesExist>
+        No fields have been found.
+      </NoEntitiesExist>
+      )}
+      {!!list?.length && (
+        <EntityDataTable<IndexSetFieldType> data={list}
+                                            visibleColumns={layoutConfig.displayedAttributes}
+                                            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+                                            onColumnsChange={onColumnsChange}
+                                            onSortChange={onSortChange}
+                                            activeSort={layoutConfig.sort}
+                                            pageSize={searchParams.pageSize}
+                                            onPageSizeChange={onPageSizeChange}
+                                            actionsCellWidth={120}
+                                            columnRenderers={customColumnRenderers}
+                                            columnDefinitions={attributes}
+                                            rowActions={renderActions}
+                                            bulkSelection={{
+                                              actions: renderBulkActions,
+                                              isEntitySelectable,
+                                              initialSelection: initialFieldSelection,
+                                            }} />
+      )}
+    </PaginatedList>
   );
 };
 

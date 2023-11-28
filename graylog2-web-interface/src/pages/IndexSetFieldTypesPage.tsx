@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -27,19 +27,13 @@ import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexSetFieldTypesList';
 import useCurrentUser from 'hooks/useCurrentUser';
-
-export type EditingField = {
-  type: string,
-  fieldName: string,
-  showFiledInput: boolean,
-}
+import ChangeFieldTypeButton from 'components/indices/IndexSetFieldTypes/ChangeFieldTypeButton';
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
   const navigate = useNavigate();
   const { indexSet } = useStore(IndexSetsStore);
   const currentUser = useCurrentUser();
-  const [editingField, setEditingField] = useState<EditingField | null>(null);
 
   useEffect(() => {
     const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
@@ -50,10 +44,6 @@ const IndexSetFieldTypesPage = () => {
       IndexSetsActions.get(indexSetId);
     }
   }, [currentUser.permissions, indexSetId, navigate]);
-
-  const onAddCustomFieldClick = useCallback(() => {
-    setEditingField({ fieldName: undefined, showFiledInput: true, type: undefined });
-  }, []);
 
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
@@ -68,9 +58,7 @@ const IndexSetFieldTypesPage = () => {
                         <Button bsStyle="info">Index set overview</Button>
                       </LinkContainer>
                     )}
-                    actions={(
-                      <Button bsStyle="success" onClick={onAddCustomFieldClick}>Change field type</Button>
-                    )}>
+                    actions={<ChangeFieldTypeButton indexSetId={indexSetId} />}>
           <span>
             The data represents field types from 2 last indices and the fields with custom field type. You can modify the current field types configuration for this index set.
           </span>
@@ -78,7 +66,7 @@ const IndexSetFieldTypesPage = () => {
 
         <Row className="content">
           <Col md={12}>
-            <IndexSetFieldTypesList editingField={editingField} setEditingField={setEditingField} />
+            <IndexSetFieldTypesList />
           </Col>
         </Row>
       </div>
