@@ -19,7 +19,7 @@ package org.graylog.datanode.filesystem.validation.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.datanode.filesystem.validation.statefile.StateFile;
+import org.graylog.datanode.filesystem.index.statefile.StateFile;
 import org.graylog.shaded.opensearch2.org.apache.lucene.util.Version;
 
 import java.util.Optional;
