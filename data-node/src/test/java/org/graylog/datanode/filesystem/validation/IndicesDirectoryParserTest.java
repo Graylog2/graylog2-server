@@ -40,16 +40,16 @@ class IndicesDirectoryParserTest {
 
     @Test
     void testOpensearch2() throws URISyntaxException {
-        final URI uri = getClass().getResource("/indices/opensearch").toURI();
+        final URI uri = getClass().getResource("/indices/opensearch2").toURI();
         final IndexerInformation result = parser.parse(Path.of(uri));
         Assertions.assertThat(result.nodes())
                 .hasSize(1)
                 .allSatisfy(node -> {
-                   Assertions.assertThat(node.nodeVersion()).isEqualTo("2.10.0");
-                   Assertions.assertThat(node.indices())
-                           .hasSize(6)
-                           .extracting(IndexInformation::indexName)
-                           .contains(".opensearch-sap-log-types-config", ".plugins-ml-config", "graylog_0", ".opensearch-observability", ".opendistro_security", "security-auditlog-2023.11.24");
+                    Assertions.assertThat(node.nodeVersion()).isEqualTo("2.10.0");
+                    Assertions.assertThat(node.indices())
+                            .hasSize(6)
+                            .extracting(IndexInformation::indexName)
+                            .contains(".opensearch-sap-log-types-config", ".plugins-ml-config", "graylog_0", ".opensearch-observability", ".opendistro_security", "security-auditlog-2023.11.24");
 
                     final IndexInformation graylog_0 = node.indices().stream().filter(i -> i.indexName().equals("graylog_0")).findFirst().orElseThrow(() -> new RuntimeException("Failed to detect graylog_0 index"));
 
@@ -66,10 +66,38 @@ class IndicesDirectoryParserTest {
                 });
     }
 
+    @Test
+    void testOpensearch1() throws URISyntaxException {
+        final URI uri = getClass().getResource("/indices/opensearch1").toURI();
+        final IndexerInformation result = parser.parse(Path.of(uri));
+        Assertions.assertThat(result.nodes())
+                .hasSize(1)
+                .allSatisfy(node -> {
+                    Assertions.assertThat(node.nodeVersion()).isEqualTo("1.3.0");
+                    Assertions.assertThat(node.indices())
+                            .hasSize(1)
+                            .extracting(IndexInformation::indexName)
+                            .contains("graylog_0");
+
+                    final IndexInformation graylog_0 = node.indices().stream().filter(i -> i.indexName().equals("graylog_0")).findFirst().orElseThrow(() -> new RuntimeException("Failed to detect graylog_0 index"));
+
+                    Assertions.assertThat(graylog_0.indexVersionCreated()).isEqualTo("1.3.0");
+
+                    Assertions.assertThat(graylog_0.shards())
+                            .hasSize(1)
+                            .allSatisfy(shard -> {
+                                Assertions.assertThat(shard.documentsCount()).isEqualTo(1);
+                                Assertions.assertThat(shard.name()).isEqualTo("S0");
+                                Assertions.assertThat(shard.primary()).isEqualTo(true);
+                                Assertions.assertThat(shard.minLuceneVersion()).isEqualTo("8.10.1");
+                            });
+                });
+    }
+
 
     @Test
     void testElasticsearch7() throws URISyntaxException {
-        final URI uri = getClass().getResource("/indices/elasticsearch").toURI();
+        final URI uri = getClass().getResource("/indices/elasticsearch7").toURI();
         final IndexerInformation result = parser.parse(Path.of(uri));
         Assertions.assertThat(result.nodes())
                 .hasSize(1)
@@ -92,6 +120,23 @@ class IndicesDirectoryParserTest {
                                 Assertions.assertThat(shard.primary()).isEqualTo(true);
                                 Assertions.assertThat(shard.minLuceneVersion()).isEqualTo("8.7.0");
                             });
+                });
+    }
+
+    @Test
+    void testElasticsearch6() throws URISyntaxException {
+        final URI uri = getClass().getResource("/indices/elasticsearch6").toURI();
+        final IndexerInformation result = parser.parse(Path.of(uri));
+        Assertions.assertThat(result.nodes())
+                .hasSize(1)
+                .allSatisfy(node -> {
+                    Assertions.assertThat(node.nodeVersion()).isEqualTo("6.8.0");
+                    Assertions.assertThat(node.indices())
+                            .hasSize(1)
+                            .extracting(IndexInformation::indexName)
+                            .contains("graylog_0");
+                    final IndexInformation graylog_0 = node.indices().stream().filter(i -> i.indexName().equals("graylog_0")).findFirst().orElseThrow(() -> new RuntimeException("Failed to detect graylog_0 index"));
+                    Assertions.assertThat(graylog_0.indexVersionCreated()).isEqualTo("6.8.0");
                 });
     }
 }

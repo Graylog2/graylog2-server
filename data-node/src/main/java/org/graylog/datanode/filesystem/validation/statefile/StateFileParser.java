@@ -21,5 +21,5 @@ import org.graylog.datanode.filesystem.validation.IndexerInformationParserExcept
 import java.nio.file.Path;
 
 public interface StateFileParser {
-    public StateFile parse(Path file) throws IndexerInformationParserException;
+    StateFile parse(Path file) throws IndexerInformationParserException;
 }

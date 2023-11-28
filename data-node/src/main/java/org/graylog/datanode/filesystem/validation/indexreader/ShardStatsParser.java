@@ -17,7 +17,8 @@
 package org.graylog.datanode.filesystem.validation.indexreader;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public interface ShardStatsParser {
-    ShardStats read(Path path);
+    Optional<ShardStats> read(Path path);
 }

@@ -26,18 +26,20 @@ import org.graylog.shaded.opensearch2.org.apache.lucene.util.Version;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 @Singleton
 public class ShardStatsParserImpl implements ShardStatsParser {
     @Override
-    public ShardStats read(Path shardPath) {
+    public Optional<ShardStats> read(Path shardPath) {
         try (Directory directory = FSDirectory.open(shardPath.resolve("index"))) {
             final StandardDirectoryReader reader = (StandardDirectoryReader) DirectoryReader.open(directory);
             final int documentsCount = getDocumentsCount(reader);
             final Version minSegmentLuceneVersion = reader.getSegmentInfos().getMinSegmentLuceneVersion();
-            return new ShardStats(shardPath, documentsCount, minSegmentLuceneVersion);
+            return Optional.of(new ShardStats(shardPath, documentsCount, minSegmentLuceneVersion));
         } catch (IOException e) {
-            throw new IndexerInformationParserException("Failed to open index for read", e);
+            //throw new IndexerInformationParserException("Failed to open index for read", e);
+            return Optional.empty();
         }
     }
 

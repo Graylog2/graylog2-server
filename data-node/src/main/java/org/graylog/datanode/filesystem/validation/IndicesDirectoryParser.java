@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,9 +102,9 @@ public class IndicesDirectoryParser {
     }
 
     private ShardInformation getShardInformation(Path path) {
-        final ShardStats shardStats = shardReader.read(path);
+        final Optional<ShardStats> shardStats = shardReader.read(path);
         final StateFile state = getState(path, "state");
-        return new ShardInformation(path, shardStats.documentsCount(), state, shardStats.minSegmentLuceneVersion());
+        return new ShardInformation(path, shardStats.map(ShardStats::documentsCount).orElse(-1), state, shardStats.map(ShardStats::minSegmentLuceneVersion).orElse(null));
     }
 
     private Path findStateFile(Path stateDir, String stateFilePrefix) {

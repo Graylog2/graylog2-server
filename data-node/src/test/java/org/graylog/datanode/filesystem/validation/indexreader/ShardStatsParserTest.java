@@ -17,28 +17,30 @@
 package org.graylog.datanode.filesystem.validation.indexreader;
 
 import org.assertj.core.api.Assertions;
+import org.graylog.shaded.opensearch2.org.apache.lucene.util.Version;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 class ShardStatsParserTest {
     @Test
     void testOpensearch2() throws URISyntaxException {
         final ShardStatsParser shardStatsParser = new ShardStatsParserImpl();
         final URI shard = getClass().getResource("/indices/opensearch/nodes/0/indices/7z16oEKPTjivI0qd4tv36Q/0").toURI();
-        final ShardStats stats = shardStatsParser.read(Path.of(shard));
-        Assertions.assertThat(stats.documentsCount()).isEqualTo(1);
-        Assertions.assertThat(stats.minSegmentLuceneVersion().toString()).isEqualTo("9.7.0");
+        final Optional<ShardStats> stats = shardStatsParser.read(Path.of(shard));
+        Assertions.assertThat(stats).map(ShardStats::documentsCount).hasValue(1);
+        Assertions.assertThat(stats).map(ShardStats::minSegmentLuceneVersion).map(Version::toString).hasValue("9.7.0");
     }
 
     @Test
     void testElasticsearch7() throws URISyntaxException {
         final ShardStatsParser shardStatsParser = new ShardStatsParserImpl();
         final URI shard = getClass().getResource("/indices/elasticsearch/nodes/0/indices/JwZYQzvUQG6JxLBgMsFfTA/0").toURI();
-        final ShardStats stats = shardStatsParser.read(Path.of(shard));
-        Assertions.assertThat(stats.documentsCount()).isEqualTo(1);
-        Assertions.assertThat(stats.minSegmentLuceneVersion().toString()).isEqualTo("8.7.0");
+        final Optional<ShardStats> stats = shardStatsParser.read(Path.of(shard));
+        Assertions.assertThat(stats).map(ShardStats::documentsCount).hasValue(1);
+        Assertions.assertThat(stats).map(ShardStats::minSegmentLuceneVersion).map(Version::toString).hasValue("8.7.0");
     }
 }

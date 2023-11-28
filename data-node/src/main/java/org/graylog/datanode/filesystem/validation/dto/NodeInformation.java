@@ -22,12 +22,19 @@ import org.graylog.datanode.filesystem.validation.statefile.StateFile;
 import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import java.util.List;
+import java.util.Optional;
 
 public record NodeInformation(@JsonIgnore java.nio.file.Path nodePath, List<IndexInformation> indices,
                               @JsonIgnore StateFile stateFile) {
     @JsonProperty
     public String nodeVersion() {
-        final Integer versionValue = (Integer) stateFile.document().get("node_version");
-        return Version.fromId(versionValue).toString();
+        return Optional.ofNullable((Integer)stateFile.document().get("node_version"))
+                .map(Version::fromId)
+                .map(Version::toString)
+                .orElseGet(this::parseFromIndices);
+    }
+
+    private String parseFromIndices() {
+        return indices.stream().map(IndexInformation::indexVersionCreated).distinct().findFirst().orElse(null);
     }
 }
