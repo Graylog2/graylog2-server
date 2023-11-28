@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook, act } from 'wrappedTestingLibrary/hooks';
-import { useLocation } from 'react-router-dom';
 import { stringify } from 'qs';
 
+import useLocation from 'routing/useLocation';
 import { asMock } from 'helpers/mocking';
 
 import useLocationSearchPagination from './useLocationSearchPagination';
@@ -27,11 +27,9 @@ const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  useLocation: jest.fn(() => ({
-    pathname: '',
-    search: '',
-  })),
 }));
+
+jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
 
 describe('useLocationSearchPagination custom hook', () => {
   const DEFAULT_PAGINATION = { page: 999, perPage: 999, query: 'foobar' };

@@ -30,8 +30,8 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,11 +70,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final Queue<String> stdout;
     private final Queue<String> stderr;
     private final CustomCAX509TrustManager trustManager;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
     private final Configuration configuration;
 
 
-    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService nodeService) {
+    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService<DataNodeDto> nodeService) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = ProcessStateMachine.createNew();
         tracerAggregator = new StateMachineTracerAggregator();
@@ -156,7 +156,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private void writeSeedHostsList() {
         try {
             final Path hostsfile = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(UNICAST_HOSTS_FILE);
-            final Set<String> current = nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
+            final Set<String> current = nodeService.allActive().values().stream().map(DataNodeDto::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
             Files.write(hostsfile, current, Charset.defaultCharset(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } catch (IOException iox) {
             LOG.error("Could not write to file: {} - {}", UNICAST_HOSTS_FILE, iox.getMessage());

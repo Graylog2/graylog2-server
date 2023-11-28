@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import URI from 'urijs';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 
+import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 
 export const DEFAULT_PAGE = 1;

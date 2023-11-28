@@ -120,7 +120,7 @@ const EventDefinitionEntry = ({
       {showActions() && (
         <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
           <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-            <Button data-testid="edit-button">
+            <Button>
               <Icon name="edit" /> Edit
             </Button>
           </LinkContainer>

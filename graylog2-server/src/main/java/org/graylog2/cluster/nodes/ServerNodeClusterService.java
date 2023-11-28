@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.cluster;
+package org.graylog2.cluster.nodes;
 
-import org.graylog.datanode.Configuration;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeServiceImpl;
+import org.graylog2.Configuration;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.database.MongoConnection;
 
 import javax.inject.Inject;
 
-public class DataNodeServiceImpl extends NodeServiceImpl {
+public class ServerNodeClusterService extends AbstractNodeService<ServerNodeEntity, ServerNodeDto> {
+
     @Inject
-    public DataNodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
-        super(mongoConnection, configuration.getStaleLeaderTimeout());
+    public ServerNodeClusterService(MongoConnection mongoConnection, Configuration configuration) {
+        super(mongoConnection, configuration, ServerNodeEntity.class);
     }
 
-    @Override
-    public Node.Type type() {
-        return Node.Type.DATANODE;
-    }
 }
