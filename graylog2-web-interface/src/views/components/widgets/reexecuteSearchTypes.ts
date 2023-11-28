@@ -18,7 +18,7 @@ import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { AppDispatch } from 'stores/useAppDispatch';
-import type { RootState, SearchExecutionResult } from 'views/types';
+import type { RootState, SearchExecutionResult, ExtraArguments } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import {
@@ -30,8 +30,8 @@ import { executeWithExecutionState } from 'views/logic/slices/searchExecutionSli
 
 const reexecuteSearchTypes = (
   searchTypes: SearchTypeOptions,
-  effectiveTimerange?: TimeRange,
-) => (dispatch: AppDispatch, getState: () => RootState) => {
+  effectiveTimerange: TimeRange,
+) => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
   const state = getState();
   const globalOverride = selectGlobalOverride(state);
   const globalQuery = globalOverride?.query;
@@ -56,7 +56,7 @@ const reexecuteSearchTypes = (
     return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping };
   };
 
-  return dispatch(executeWithExecutionState(view, [], executionState, handleSearchResult));
+  return dispatch(executeWithExecutionState(view, [], executionState, { ...searchExecutors, resultMapper: handleSearchResult }));
 };
 
 export default reexecuteSearchTypes;

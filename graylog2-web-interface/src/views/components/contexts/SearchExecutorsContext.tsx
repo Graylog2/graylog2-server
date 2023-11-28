@@ -14,26 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { configureStore } from '@reduxjs/toolkit';
-import type { PluggableReducer } from 'graylog-web-plugin';
+import * as React from 'react';
 
-import type { RootState } from 'views/types';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import executeSearch from 'views/logic/slices/executeSearch';
+import parseSearch from 'views/logic/slices/parseSearch';
 
-const createStore = (reducers: PluggableReducer[], initialState: Partial<RootState>, searchExecutors: SearchExecutors) => {
-  const reducer = Object.fromEntries(reducers.map((r) => [r.key, r.reducer]));
-
-  return configureStore({
-    reducer,
-    preloadedState: initialState,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-      serializableCheck: false,
-      immutableCheck: false,
-      thunk: {
-        extraArgument: { searchExecutors },
-      },
-    }),
-  });
+const defaultSearchExecutors: SearchExecutors = {
+  resultMapper: (r) => r,
+  execute: executeSearch,
+  parse: parseSearch,
 };
-
-export default createStore;
+const SearchExecutorsContext = React.createContext<SearchExecutors>(defaultSearchExecutors);
+export default SearchExecutorsContext;
