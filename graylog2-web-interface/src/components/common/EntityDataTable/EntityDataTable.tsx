@@ -261,6 +261,8 @@ const EntityDataTable = <Entity extends EntityBase>({
     }));
   }, [setSelectedEntities]);
 
+  const selectableData = useMemo(() => data.filter(_isEntitySelectable), [data, _isEntitySelectable]);
+
   return (
     <ExpandedSectionsProvider>
       <ActionsRow>
@@ -291,13 +293,12 @@ const EntityDataTable = <Entity extends EntityBase>({
                      columnsWidths={columnsWidths}
                      selectedEntities={selectedEntities}
                      setSelectedEntities={setSelectedEntities}
-                     data={data}
+                     data={selectableData}
                      columnRenderersByAttribute={columnRenderersByAttribute}
                      onSortChange={onSortChange}
                      displayBulkSelectCol={displayBulkSelectCol}
                      activeSort={activeSort}
-                     displayActionsCol={displayActionsCol}
-                     isEntitySelectable={_isEntitySelectable} />
+                     displayActionsCol={displayActionsCol} />
           {data.map((entity, index) => (
             <tbody key={`table-row-${entity.id}`} data-testid={`table-row-${entity.id}`}>
               <TableRow entity={entity}
