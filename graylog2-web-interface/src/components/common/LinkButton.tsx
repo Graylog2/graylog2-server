@@ -27,6 +27,7 @@ type Props = ButtonProps & {
   target?: '_blank' | '_self' | '_parent' | '_top' | 'framename',
 }
 
+// eslint-disable-next-line react/prop-types
 const LinkButton = ({ to, target, onClick, ...restButtonProps }: Props) => {
   const navigate = useNavigate();
   const handleOnClick = useCallback((e) => {
