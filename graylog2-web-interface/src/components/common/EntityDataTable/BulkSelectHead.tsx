@@ -59,22 +59,22 @@ const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entit
 };
 
 type Props<Entity extends EntityBase> = {
-  selectableData: Readonly<Array<Entity>>,
+  data: Readonly<Array<Entity>>,
   selectedEntities: Array<string>,
   setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>,
 }
 
 const BulkSelectHead = <Entity extends EntityBase>({
-  selectableData,
+  data,
   setSelectedEntities,
   selectedEntities,
 }: Props<Entity>) => {
-  const { checkboxRef, checkboxStatus } = useCheckboxStatus(selectableData, selectedEntities);
+  const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
   const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
 
   const onBulkSelect = () => {
     setSelectedEntities((cur) => {
-      const entityIds = selectableData.map(({ id }) => id);
+      const entityIds = data.map(({ id }) => id);
 
       if (checkboxStatus === 'CHECKED') {
         return cur.filter((itemId) => !entityIds.includes(itemId));
@@ -90,7 +90,7 @@ const BulkSelectHead = <Entity extends EntityBase>({
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
                    title={title}
-                   disabled={!selectableData?.length} />
+                   disabled={!data?.length} />
     </td>
   );
 };

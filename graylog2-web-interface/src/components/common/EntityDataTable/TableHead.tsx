@@ -89,7 +89,7 @@ const TableHead = <Entity extends EntityBase>({
   displayBulkSelectCol: boolean,
   onSortChange: (newSort: Sort) => void,
   selectedEntities: Array<string>,
-  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>,
+  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
 }) => {
   const sortedColumns = useMemo(
     () => columns.sort((col1, col2) => columnsOrder.indexOf(col1.id) - columnsOrder.indexOf(col2.id)),
@@ -100,7 +100,7 @@ const TableHead = <Entity extends EntityBase>({
     <thead>
       <tr>
         {displayBulkSelectCol && (
-          <BulkSelectHead selectableData={data}
+          <BulkSelectHead data={data}
                           selectedEntities={selectedEntities}
                           setSelectedEntities={setSelectedEntities} />
         )}
