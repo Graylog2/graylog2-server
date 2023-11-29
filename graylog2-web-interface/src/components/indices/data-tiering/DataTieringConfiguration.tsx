@@ -22,6 +22,23 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { FormikFormGroup } from 'components/common';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
+const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
+
+export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSet => {
+  if (!values.data_tiering) return values;
+
+  let { data_tiering } = values;
+
+  dayFields.forEach((field) => {
+    if (data_tiering[field]) {
+      const numberValue = parseInt(data_tiering[field].substring(1, data_tiering[field].length() - 1), 10);
+      data_tiering = { ...data_tiering, [field]: numberValue };
+    }
+  });
+
+  return { ...values, data_tiering };
+};
+
 export const prepareDataTieringConfig = (values: IndexSet) : IndexSet => {
   if (!values.data_tiering) return values;
 
@@ -30,8 +47,6 @@ export const prepareDataTieringConfig = (values: IndexSet) : IndexSet => {
   const dataTieringType = dataTieringPlugin?.type ?? defaultType;
 
   let { data_tiering } = values;
-
-  const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
 
   dayFields.forEach((field) => {
     if (data_tiering[field]) {

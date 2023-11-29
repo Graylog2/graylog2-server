@@ -27,7 +27,7 @@ import { Col, Row, Input, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
-import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig } from 'components/indices/data-tiering';
+import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import withHistory from 'routing/withHistory';
 import type { HistoryFunction } from 'routing/useHistory';
@@ -185,7 +185,7 @@ const IndexSetConfigurationForm = ({
     <Row>
       <Col md={8}>
         <Formik onSubmit={saveConfiguration}
-                initialValues={indexSet}>
+                initialValues={prepareDataTieringInitialValues(indexSet)}>
           {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
 
