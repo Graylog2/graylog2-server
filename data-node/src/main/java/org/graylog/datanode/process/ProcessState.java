@@ -16,41 +16,54 @@
  */
 package org.graylog.datanode.process;
 
+import org.graylog2.cluster.nodes.DataNodeStatus;
+
 public enum ProcessState {
     /**
      * Fresh created process, not started yet
      */
-    WAITING_FOR_CONFIGURATION,
+    WAITING_FOR_CONFIGURATION(DataNodeStatus.UNCONFIGURED),
     /**
      * The process is running on the underlying OS and has a process ID. It's not responding to the REST API yet
      */
-    STARTING,
+    STARTING(DataNodeStatus.STARTING),
     /**
      * Opensearch is now available on the default port with GREEN cluster status, all good
      */
-    AVAILABLE,
+    AVAILABLE(DataNodeStatus.AVAILABLE),
     /**
      * There are problems in the REST communication with the opensearch. We'll retry several times before
      * we go to the FAILED state, giving up.
      */
-    NOT_RESPONDING,
+    NOT_RESPONDING(DataNodeStatus.UNAVAILABLE),
 
     /**
      * Failed to reach the opensearch REST API, but the underlying process is still alive
      */
-    FAILED,
+    FAILED(DataNodeStatus.UNAVAILABLE),
 
     /**
      * Removal of node from Opensearch cluster requested
      */
-    REMOVING,
+    REMOVING(DataNodeStatus.REMOVING),
     /**
      * Removal of node from Opensearch cluster completed
      */
-    REMOVED,
-    
+    REMOVED(DataNodeStatus.REMOVED),
+
     /**
      * The OS process is not running anymore on the underlying system, it has been terminated
      */
-    TERMINATED
+    TERMINATED(DataNodeStatus.UNAVAILABLE);
+
+
+    private final DataNodeStatus dataNodeStatus;
+
+    ProcessState(DataNodeStatus dataNodeStatus) {
+        this.dataNodeStatus = dataNodeStatus;
+    }
+
+    public DataNodeStatus getDataNodeStatus() {
+        return dataNodeStatus;
+    }
 }
