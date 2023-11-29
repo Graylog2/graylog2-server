@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react'
+import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import useParams from "routing/useParams";
-import useDataNodes from "components/datanode/hooks/useDataNodes";
-import DataNodesPageNavigation from "components/datanode/DataNodePageNavigation";
-import DocsHelper from "util/DocsHelper";
-import {Row, Col, Label} from 'components/bootstrap';
-import {DocumentTitle, PageHeader, Spinner} from 'components/common';
-import {SearchParams} from "stores/PaginationTypes";
+import useParams from 'routing/useParams';
+import useDataNodes from 'components/datanode/hooks/useDataNodes';
+import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
+import DocsHelper from 'util/DocsHelper';
+import { Row, Col, Label } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import type { SearchParams } from 'stores/PaginationTypes';
 
-const StyledHorizontalDl = styled.dl(({ theme  }) => css`
+const StyledHorizontalDl = styled.dl(({ theme }) => css`
   margin: ${theme.spacings.md} 0;
   > dt {
     clear: left;
@@ -46,6 +46,7 @@ const StatusLabel = styled(Label)`
   justify-content: center;
   gap: 4px;
 `;
+
 const DataNodePage = () => {
   const { dataNodeId } = useParams();
   const { data: { elements }, isInitialLoading } = useDataNodes({
@@ -55,10 +56,10 @@ const DataNodePage = () => {
   } as SearchParams);
 
   if (isInitialLoading) {
-    return <Spinner />
+    return <Spinner />;
   }
-  console.log(elements);
-  const datanode = elements.find((datanode) => datanode.node_id === dataNodeId);
+
+  const datanode = elements.find((node) => node.node_id === dataNodeId);
   const datanodeDisabled = datanode.data_node_status !== 'AVAILABLE';
 
   return (
@@ -68,32 +69,31 @@ const DataNodePage = () => {
                   documentationLink={{
                     title: 'Data Nodes documentation',
                     path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-                  }}>
-      </PageHeader>
+                  }} />
       <Row className="content">
         <Col md={12}>
-            <Col md={5}>
-                <h2>Details:</h2>
-                <StyledHorizontalDl>
-                    <dt>Hostname:</dt>
-                    <dd>{datanode.hostname}</dd>
-                    <dt>Transport address:</dt>
-                    <dd>{datanode.transport_address || '-'}</dd>
-                    <dt>Status:</dt>
-                    <dd>
-                      <StatusLabel
-                          bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                          title={datanode.data_node_status}
-                          aria-label={datanode.data_node_status}
-                          role="button">
-                          {datanode.status || 'N/A'}
-                      </StatusLabel>
-                    </dd>
-                </StyledHorizontalDl>
-            </Col>
+          <Col md={5}>
+            <h2>Details:</h2>
+            <StyledHorizontalDl>
+              <dt>Hostname:</dt>
+              <dd>{datanode.hostname}</dd>
+              <dt>Transport address:</dt>
+              <dd>{datanode.transport_address || '-'}</dd>
+              <dt>Status:</dt>
+              <dd>
+                <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
+                             title={datanode.data_node_status}
+                             aria-label={datanode.data_node_status}
+                             role="button">
+                  {datanode.status || 'N/A'}
+                </StatusLabel>
+              </dd>
+            </StyledHorizontalDl>
+          </Col>
         </Col>
       </Row>
     </DocumentTitle>
-  )
-}
-export default DataNodePage
+  );
+};
+
+export default DataNodePage;
