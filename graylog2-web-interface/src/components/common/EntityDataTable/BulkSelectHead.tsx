@@ -85,12 +85,13 @@ const BulkSelectHead = <Entity extends EntityBase>({
   };
 
   return (
-    <td style={{ width: `${BULK_SELECT_COLUMN_WIDTH}px` }} aria-label="Select header">
+    <td style={{ width: `${BULK_SELECT_COLUMN_WIDTH}px` }}>
       <RowCheckbox inputRef={(ref) => { checkboxRef.current = ref; }}
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
                    title={title}
-                   disabled={!data?.length} />
+                   disabled={!data?.length}
+                   aria-label={title} />
     </td>
   );
 };

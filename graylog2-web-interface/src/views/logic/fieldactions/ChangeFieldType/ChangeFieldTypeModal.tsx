@@ -159,7 +159,7 @@ const ChangeFieldTypeModal = ({
                         onChange={onChangeFieldType}
                         placeholder="Select field type"
                         disabled={isLoadingFieldTypes}
-                        inputProps={{ 'aria-label': `Select Field Type For ${fieldName || 'Field'}` }}
+                        inputProps={{ 'aria-label': 'Select Field Type For Field' }}
                         required />
         </Input>
         {

@@ -76,14 +76,17 @@ const TableRow = <Entity extends EntityBase>({
 
   const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
 
+  const title = `${isSelected ? 'Deselect' : 'Select'} entity`;
+
   return (
     <tr>
       {displaySelect && (
         <td aria-label="Select cell">
           <RowCheckbox onChange={toggleRowSelect}
-                       title={`${isSelected ? 'Deselect' : 'Select'} entity`}
+                       title={title}
                        checked={isSelected}
-                       disabled={isSelectDisabled} />
+                       disabled={isSelectDisabled}
+                       aria-label={title} />
         </td>
       )}
       {columns.map((column) => {
