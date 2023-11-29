@@ -43,6 +43,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExecutionContext> implements TestEngine {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
