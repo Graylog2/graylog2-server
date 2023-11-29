@@ -49,7 +49,22 @@ const putFieldType = async ({
   return fetch('PUT', url, body);
 };
 
-const useRemoveCustomFieldTypeMutation = () => {
+type IndexSetResponseJSON = {
+  successfully_performed: number,
+  failures: Array<{ entity_id: string, failure_explanation: string }>,
+  errors: Array<string>,
+}
+type RemovalResponseJSON = Record<string, IndexSetResponseJSON>
+
+export type IndexSetResponse = {
+  indexSetId: string,
+  successfullyPerformed: number,
+  failures: Array<{ entityId: string, failureExplanation: string }>,
+  errors: Array<string>,
+}
+export type RemovalResponse = Array<IndexSetResponse>
+
+const useRemoveCustomFieldTypeMutation = (params: { onErrorHandler: (response: RemovalResponse) => void, onSuccessHandler: () => void }) => {
   const queryClient = useQueryClient();
 
   const put = useMutation(putFieldType, {
@@ -57,9 +72,30 @@ const useRemoveCustomFieldTypeMutation = () => {
       UserNotification.error(`Removing custom field type failed with status: ${errorThrown}`,
         'Could not remove custom field type');
     },
-    onSuccess: () => {
-      UserNotification.success('Custom field type removed successfully', 'Success!');
+    onSuccess: (response: RemovalResponseJSON) => {
+      let errorsQuantity: number = 0;
+      const mappedResponse: RemovalResponse = Object.entries(response).map(([id, { successfully_performed, errors, failures: failuresJSON }]) => {
+        const failures = failuresJSON.map(({ entity_id, failure_explanation }) => ({ entityId: entity_id, failureExplanation: failure_explanation }));
+        errorsQuantity = errorsQuantity + failures.length + errors.length;
+
+        return ({
+          indexSetId: id,
+          successfullyPerformed: successfully_performed,
+          errors,
+          failures,
+        });
+      },
+      );
+
       queryClient.refetchQueries({ queryKey: ['indexSetFieldTypes'], type: 'active' });
+
+      if (errorsQuantity === 0) {
+        UserNotification.success('Custom field type removed successfully', 'Success!');
+
+        return params.onSuccessHandler();
+      }
+
+      return params.onErrorHandler(mappedResponse);
     },
   });
 
