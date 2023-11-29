@@ -289,7 +289,8 @@ const IndexSetConfigurationForm = ({
                         <h3>Data Tiering Configuration</h3>
                         <DataTieringVisualisation minDays={values.data_tiering?.index_lifetime_min}
                                                   maxDays={values.data_tiering?.index_lifetime_max}
-                                                  minDaysInHot={values.data_tiering?.index_hot_lifetime_min} />
+                                                  minDaysInHot={values.data_tiering?.index_hot_lifetime_min}
+                                                  warmTierEnabled={values.data_tiering?.warm_tier_enabled} />
                         <DataTieringConfiguration />
                       </ConfigSegment>
                     )

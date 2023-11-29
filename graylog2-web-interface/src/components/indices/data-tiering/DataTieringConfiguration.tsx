@@ -83,7 +83,7 @@ const DataTieringConfiguration = () => {
       errors.push('Min. days in storage needs to be smaller than max. days in storage.');
     }
 
-    if (value < values?.data_tiering?.index_hot_lifetime_min) {
+    if (values?.data_tiering?.warm_tier_enabled && value < values?.data_tiering?.index_hot_lifetime_min) {
       errors.push('Min. days in storage needs to be bigger than min. days in hot tier.');
     }
 

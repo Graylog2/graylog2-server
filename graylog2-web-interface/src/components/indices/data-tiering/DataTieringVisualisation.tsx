@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
+
+import { Tooltip } from 'components/bootstrap';
 
 type Props = {
   minDays?: number,
   maxDays?: number,
-  minDaysInHot?: number
+  minDaysInHot?: number,
+  warmTierEnabled?: boolean,
 }
 
 type BarProps = {
@@ -33,10 +36,15 @@ type LabelProps = {
 }
 
 const BarWrapper = styled.div`
-overflow: hidden;
+  overflow: hidden;
 `;
 
 const LabelBar = styled.div`
+  position: relative;
+  height: 50px;
+`;
+
+const TooltipBar = styled.div`
   position: relative;
   height: 50px;
 `;
@@ -59,7 +67,7 @@ const Bar = styled.div<BarProps>(({ theme, value, color }) => css`
     left: 0;
     width: ${value}%;
     max-width: 100%;
-    
+    cursor: pointer;
 
     &::after {
       border-right: 1px solid ${theme.colors.variant.darkest.info};
@@ -80,7 +88,30 @@ const Label = styled.div<LabelProps>(({ value }) => css`
     : 'left: 0;'}
 `);
 
-const DataTieringVisualisation = ({ minDays, maxDays, minDaysInHot }: Props) => {
+const StyledTooltip = styled(Tooltip)(({ value }) => css`
+  position: absolute;
+  top: 0;
+  
+  ${value > 12
+    ? `
+  right: ${100 - value}%;
+
+    &.bottom > .tooltip-arrow {
+      margin-left: -20px;
+    }
+  `
+    : `
+  left: 0;
+  margin-left: 3px;
+  `
+}
+    
+
+`);
+
+const DataTieringVisualisation = ({ minDays, maxDays, minDaysInHot, warmTierEnabled }: Props) => {
+  const [showMinDaysTooltip, setShowMinDaysTooltip] = useState<boolean>(false);
+  const [showMinDaysInHotTooltip, setShowMinDaysInHotTooltip] = useState<boolean>(false);
   const theme = useTheme();
 
   const percentageFor = (days: number) => {
@@ -89,17 +120,47 @@ const DataTieringVisualisation = ({ minDays, maxDays, minDaysInHot }: Props) => 
     return ((days / maxDays) * 100);
   };
 
+  const minDaysPercentage = percentageFor(minDays);
+  const minDaysInHotPercentage = percentageFor(minDaysInHot);
+
+  const showHotTier = warmTierEnabled && minDaysInHotPercentage > 0;
+
   return (
     <BarWrapper>
       <LabelBar>
-        {percentageFor(minDays) > 0 && (<Label value={percentageFor(minDays)}>{minDays} days</Label>)}
-        {percentageFor(minDaysInHot) > 0 && (<Label value={percentageFor(minDaysInHot)}>{minDaysInHot} days</Label>)}
-        <Label value={100}>{maxDays} days</Label>
+        {minDaysPercentage > 0 && (<Label value={minDaysPercentage}>{minDays} days</Label>)}
+        {showHotTier && (<Label value={minDaysInHotPercentage}>{minDaysInHot} days</Label>)}
+        <Label value={100}>{maxDays} days in storage</Label>
       </LabelBar>
+
       <LifeCycleBar>
-        <Bar value={percentageFor(minDays)} color={theme.colors.variant.info} />
-        <Bar value={percentageFor(minDaysInHot)} color={theme.colors.variant.darkest.info} />
+        <Bar value={minDaysPercentage}
+             color={theme.colors.variant.info}
+             onMouseEnter={() => setShowMinDaysTooltip(true)}
+             onMouseLeave={() => setShowMinDaysTooltip(false)} />
+        {showHotTier && (
+        <Bar value={minDaysInHotPercentage}
+             color={theme.colors.variant.darkest.info}
+             onMouseEnter={() => setShowMinDaysInHotTooltip(true)}
+             onMouseLeave={() => setShowMinDaysInHotTooltip(false)} />
+        )}
       </LifeCycleBar>
+      <TooltipBar>
+        {showHotTier && showMinDaysInHotTooltip && (
+          <StyledTooltip placement="bottom"
+                         arrowOffsetLeft={minDaysInHotPercentage <= 12 ? '10px' : '100%'}
+                         value={minDaysInHotPercentage}>
+            Min. # of days in Hot Tier
+          </StyledTooltip>
+        )}
+        {minDaysPercentage > 0 && showMinDaysTooltip && (
+          <StyledTooltip placement="bottom"
+                         arrowOffsetLeft={minDaysPercentage <= 12 ? '10px' : '100%'}
+                         value={minDaysPercentage}>
+            Min. # of days in storage
+          </StyledTooltip>
+        )}
+      </TooltipBar>
     </BarWrapper>
   );
 };
@@ -110,4 +171,5 @@ DataTieringVisualisation.defaultProps = {
   minDays: 0,
   maxDays: 0,
   minDaysInHot: 0,
+  warmTierEnabled: false,
 };
