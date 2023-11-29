@@ -456,17 +456,3 @@ declare module 'graylog-web-plugin/plugin' {
     widgetCreators?: Array<WidgetCreator>;
   }
 }
-export interface ViewActions {
-  save: {
-    isShown: boolean,
-  };
-  saveAs: {
-    isShown: boolean,
-  };
-  share: {
-    isShown: boolean,
-  }
-  actionsDropdown: {
-    isShown: boolean,
-  }
-}

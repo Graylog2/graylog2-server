@@ -19,36 +19,14 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-export interface ViewActions {
-  save: {
-    isShown: boolean,
-  };
-  saveAs: {
-    isShown: boolean,
-  };
-  share: {
-    isShown: boolean,
-  }
-  actionsDropdown: {
-    isShown: boolean,
-  }
-}
-
-export const FULL_MENU: ViewActions = {
-  save: { isShown: true },
-  saveAs: { isShown: true },
-  share: { isShown: true },
-  actionsDropdown: { isShown: true },
-};
-
-export const SAVE_COPY: ViewActions = {
+export const SAVE_COPY = {
   save: { isShown: false },
   saveAs: { isShown: true },
   share: { isShown: false },
   actionsDropdown: { isShown: false },
 };
 
-export const BLANK: ViewActions = {
+export const BLANK = {
   save: { isShown: false },
   saveAs: { isShown: false },
   share: { isShown: false },
@@ -56,13 +34,25 @@ export const BLANK: ViewActions = {
 };
 
 export type LayoutState = {
-  sidebar: { isShown: boolean }
-  viewActions: ViewActions
+  sidebar: { isShown: boolean },
+  viewActions: {
+    save: { isShown: boolean },
+    saveAs: { isShown: boolean },
+    share: { isShown: boolean },
+    actionsDropdown: { isShown: boolean },
+  },
+  searchAreaContainer?: { component: React.ComponentType }
+  infoBar?: { component: React.ComponentType }
 }
 
 export const DEFAULT_STATE: LayoutState = {
   sidebar: { isShown: true },
-  viewActions: FULL_MENU,
+  viewActions: {
+    save: { isShown: true },
+    saveAs: { isShown: true },
+    share: { isShown: true },
+    actionsDropdown: { isShown: true },
+  },
 };
 
 const SearchPageLayoutContext = React.createContext<LayoutState>(DEFAULT_STATE);
