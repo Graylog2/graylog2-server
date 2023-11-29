@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import org.apache.commons.exec.OS;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
@@ -35,6 +36,10 @@ public class OpenSearchPreconditionsCheck implements PreflightCheck {
 
     @Override
     public void runCheck() throws PreflightCheckException {
+        if (OS.isFamilyMac()) {
+            return; // don't throw an exception on Mac dev machines
+        }
+
         ProcessBuilder builder = new ProcessBuilder().redirectErrorStream(true);
         builder.command("/sbin/sysctl", "-n", "vm.max_map_count");
         try {
