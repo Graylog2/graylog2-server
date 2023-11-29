@@ -132,7 +132,7 @@ public class ElasticsearchInstanceES7 extends TestableSearchServerInstance {
     public GenericContainer<?> buildContainer(String image, Network network) {
         return new ElasticsearchContainer(DockerImageName.parse(image).asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch"))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("ES_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")

@@ -34,7 +34,6 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -53,6 +52,7 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
 
 @AutoValue
 @JsonAutoDetect
@@ -149,8 +149,7 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                           .map(filter -> {
                               if (filter.type().matches(StreamFilter.NAME)) {
                                   final StreamFilter streamFilter = (StreamFilter) filter;
-                                  final Stream stream = (Stream) nativeEntities.get(
-                                          EntityDescriptor.create(streamFilter.streamId(), ModelTypes.STREAM_V1));
+                                  final Stream stream = (Stream) resolveStreamEntityObject(streamFilter.streamId(), nativeEntities);
                                   if (Objects.isNull(stream)) {
                                       throw new ContentPackException("Could not find matching stream id: " +
                                               streamFilter.streamId());

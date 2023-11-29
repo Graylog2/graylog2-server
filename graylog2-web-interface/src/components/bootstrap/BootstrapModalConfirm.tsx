@@ -28,7 +28,7 @@ type Props = {
   confirmButtonText: string,
   cancelButtonDisabled: boolean,
   confirmButtonDisabled: boolean,
-  onConfirm: () => void,
+  onConfirm: (e: React.BaseSyntheticEvent) => void,
   onCancel: () => void,
   children: React.ReactNode,
 };

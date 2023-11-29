@@ -91,25 +91,12 @@ module.exports = {
         {
           name: 'Common',
           components: 'src/components/common/**/[A-Z]*.{jsx,tsx}',
-          ignore: [
-            ...defaultComponentIgnore,
-            'src/components/common/URLWhiteListFormModal.tsx',
-            'src/components/common/FlatContentRow.tsx',
-            'src/components/common/Wizard.tsx',
-            'src/components/common/PublicNotifications.tsx',
-            'src/components/common/KeyCapture.tsx',
-            'src/components/common/MessageDetailsDefinitionList.jsx',
-            'src/components/common/Button.jsx',
-            'src/components/common/Accordion.tsx',
-          ],
+          ignore: defaultComponentIgnore,
         },
         {
           name: 'Configuration Forms',
           components: 'src/components/configurationforms/[A-Z]*.{jsx,tsx}',
-          ignore: [
-            ...defaultComponentIgnore,
-            'src/components/configurationforms/ListField.tsx',
-          ],
+          ignore: defaultComponentIgnore,
         },
       ],
     },

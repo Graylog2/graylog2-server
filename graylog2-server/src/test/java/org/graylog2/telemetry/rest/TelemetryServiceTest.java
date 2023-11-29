@@ -17,6 +17,7 @@
 package org.graylog2.telemetry.rest;
 
 import com.google.common.eventbus.EventBus;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;
@@ -45,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.CLUSTER;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.CURRENT_USER;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.DATA_NODES;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.LICENSE;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.PLUGIN;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.SEARCH_CLUSTER;
@@ -76,6 +78,9 @@ public class TelemetryServiceTest {
     EventBus eventBus;
     @Mock
     User user;
+
+    @Mock
+    NodeService nodeService;
 
     @Test
     void test_telemetry_is_disabled_globally() {
@@ -177,7 +182,7 @@ public class TelemetryServiceTest {
     }
 
     private void assertThatAllTelemetryDataIsPresent(Map<String, Object> response) {
-        assertThat(response).containsOnlyKeys(USER_TELEMETRY_SETTINGS, CURRENT_USER, CLUSTER, LICENSE, PLUGIN, SEARCH_CLUSTER);
+        assertThat(response).containsOnlyKeys(USER_TELEMETRY_SETTINGS, CURRENT_USER, CLUSTER, LICENSE, PLUGIN, SEARCH_CLUSTER, DATA_NODES);
     }
 
     private TelemetryService createTelemetryService(boolean isTelemetryEnabled) {
@@ -193,7 +198,8 @@ public class TelemetryServiceTest {
                 dbTelemetryUserSettingsService,
                 eventBus,
                 telemetryClusterService,
-                "unknown");
+                "unknown",
+                nodeService);
     }
 
     private void mockUserTelemetryEnabled(boolean isTelemetryEnabled) {

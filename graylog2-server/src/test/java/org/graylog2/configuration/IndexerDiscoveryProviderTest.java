@@ -16,25 +16,25 @@
  */
 package org.graylog2.configuration;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.TestNodeService;
-import org.graylog2.plugin.database.ValidationException;
-import org.jetbrains.annotations.NotNull;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.cluster.nodes.NodeService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static org.mockito.Mockito.when;
 
 class IndexerDiscoveryProviderTest {
 
@@ -94,11 +94,23 @@ class IndexerDiscoveryProviderTest {
                 .hasMessageStartingWith("No Datanode available");
     }
 
-    private NodeService nodes(String... transportAddress) {
-        final NodeService service = new TestNodeService(Node.Type.DATANODE);
-        Arrays.stream(transportAddress)
-                .map(URI::create)
-                .forEach(address -> service.registerServer(UUID.randomUUID().toString(), false, address, "localhost"));
+    private NodeService<DataNodeDto> nodes(String... transportAddress) {
+
+        final NodeService<DataNodeDto> service = Mockito.mock(NodeService.class);
+        final Map<String, DataNodeDto> map = Arrays.stream(transportAddress)
+                .map(address -> DataNodeDto.Builder.builder()
+                        .setId(UUID.randomUUID().toString())
+                        .setLeader(false)
+                        .setTransportAddress(address)
+                        .setHostname("localhost")
+                        .setDataNodeStatus(DataNodeStatus.AVAILABLE)
+                        .build())
+                .collect(Collectors.toMap(
+                        DataNodeDto::getId,
+                        obj -> obj
+                ));
+
+        when(service.allActive()).thenReturn(map);
         return service;
     }
 

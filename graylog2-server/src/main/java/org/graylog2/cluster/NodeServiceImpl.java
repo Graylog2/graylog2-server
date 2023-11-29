@@ -16,219 +16,71 @@
  */
 package org.graylog2.cluster;
 
-import com.google.common.collect.ImmutableList;
-import com.mongodb.AggregationOptions;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
-import org.bson.types.ObjectId;
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.plugin.system.NodeId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-public class NodeServiceImpl extends PersistedServiceImpl implements NodeService {
+/**
+ * @deprecated This is left for compatibility reasons,
+ * delegating calls to org.graylog2.cluster.nodes.NodeService&lt;ServerNodeEntity&gt;
+ */
+@Deprecated(since = "6.0")
+public class NodeServiceImpl implements NodeService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NodeServiceImpl.class);
-
-    public static final String LAST_SEEN_FIELD = "$last_seen";
-    private final long pingTimeout;
-    private final static Map<String, Object> lastSeenFieldDefinition = Map.of("last_seen", Map.of("$type", "timestamp"));
-    private final static DBObject addLastSeenFieldAsDate = new BasicDBObject("$addFields", Map.of("last_seen_date", Map.of("$cond",
-            Map.of(
-                    "if", Map.of("$isNumber", LAST_SEEN_FIELD),
-                    "then", Map.of("$toDate", Map.of("$toLong", LAST_SEEN_FIELD)),
-                    "else", Map.of("$toDate", Map.of("$dateToString", Map.of("date", LAST_SEEN_FIELD)))
-            )
-    )));
+    private final org.graylog2.cluster.nodes.NodeService<ServerNodeDto> delegate;
 
     @Inject
-    public NodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
-        this(mongoConnection, configuration.getStaleLeaderTimeout());
-    }
-
-    public NodeServiceImpl(final MongoConnection mongoConnection, final int staleLeaderTimeout) {
-        super(mongoConnection);
-        this.pingTimeout = staleLeaderTimeout;
-    }
-
-    public Node.Type type() {
-        return Node.Type.SERVER;
-    }
-
-    private Map<String, Object> addClusterUriToMap(final Map<String, Object> orig, final String clusterUri) {
-        if(clusterUri == null) {
-            return orig;
-        }
-        var newMap = new HashMap<>(orig);
-        newMap.put("cluster_address", clusterUri);
-        return Map.copyOf(newMap);
+    public NodeServiceImpl(org.graylog2.cluster.nodes.NodeService<ServerNodeDto> delegate) {
+        this.delegate = delegate;
     }
 
     @Override
     public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
-        final var params = addClusterUriToMap(Map.of(
-                "node_id", nodeId,
-                "type", type().toString(),
-                "is_leader", isLeader,
-                "transport_address", httpPublishUri.toString(),
-                "hostname", hostname
-        ), clusterUri);
-
-        final Map<String, Object> fields = Map.of(
-                "$set", params,
-                "$currentDate", lastSeenFieldDefinition
-        );
-
-        final WriteResult result = this.collection(NodeImpl.class).update(
-                new BasicDBObject("node_id", nodeId),
-                new BasicDBObject(fields),
-                true,
-                false
-        );
-        return result.getN() == 1;
+        ServerNodeDto dto = ServerNodeDto.Builder.builder()
+                .setId(nodeId)
+                .setLeader(isLeader)
+                .setTransportAddress(httpPublishUri.toString())
+                .setHostname(hostname)
+                .build();
+        return delegate.registerServer(dto);
     }
 
     @Override
     public Node byNodeId(String nodeId) throws NodeNotFoundException {
-        DBObject query = new BasicDBObject("node_id", nodeId);
-        DBObject o = findOne(NodeImpl.class, query);
-
-        if (o == null || !o.containsField("node_id")) {
-            throw new NodeNotFoundException("Unable to find node " + nodeId);
-        }
-
-        return new NodeImpl((ObjectId) o.get("_id"), o.toMap());
+        return delegate.byNodeId(nodeId);
     }
 
     @Override
     public Node byNodeId(NodeId nodeId) throws NodeNotFoundException {
-        return byNodeId(nodeId.getNodeId());
+        return delegate.byNodeId(nodeId);
     }
 
     @Override
     public Map<String, Node> byNodeIds(Collection<String> nodeIds) {
-        return query(NodeImpl.class, new BasicDBObject("node_id", new BasicDBObject("$in", nodeIds)))
-                .stream()
-                .map(o -> new NodeImpl((ObjectId) o.get("_id"), o.toMap()))
-                .collect(Collectors.toMap(NodeImpl::getNodeId, Function.identity()));
+        return transformMap(delegate.byNodeIds(nodeIds));
     }
 
-    private Stream<DBObject> aggregate(List<? extends DBObject> pipeline) {
-        return cursorToStream(this.collection(NodeImpl.class).aggregate(pipeline, AggregationOptions.builder().build()));
-    }
-
-    @Override
-    public Map<String, Node> allActive(Node.Type type) {
-        return aggregate(recentHeartbeat(List.of(Map.of("type", type.toString()))))
-                .collect(Collectors.toMap(obj -> (String) obj.get("node_id"), obj -> new NodeImpl((ObjectId) obj.get("_id"), obj.toMap())));
-    }
-
-    @Deprecated
     @Override
     public Map<String, Node> allActive() {
-        return allActive(type());
-    }
-
-    private List<? extends DBObject> recentHeartbeat(List<? extends Map<String, Object>> additionalMatches) {
-        var match = ImmutableList.builder()
-                .add(Map.of("$expr", Map.of("$gte", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout))))))
-                .addAll(additionalMatches)
-                .build();
-        return List.of(
-                addLastSeenFieldAsDate,
-                new BasicDBObject("$match", Map.of("$and", match)),
-                new BasicDBObject("$unset", "last_seen_date")
-        );
-    }
-
-    @Override
-    public void dropOutdated() {
-        var outdatedIds = aggregate(List.of(
-                addLastSeenFieldAsDate,
-                new BasicDBObject("$match", Map.of("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout)))))),
-                new BasicDBObject("$project", Map.of("_id", "$_id"))
-        ))
-                .map(obj -> obj.get("_id"))
-                .toList();
-
-        if (!outdatedIds.isEmpty()) {
-            final BasicDBObject query = new BasicDBObject("_id", Map.of("$in", outdatedIds));
-            destroyAll(NodeImpl.class, query);
-        }
-    }
-
-    private Stream<DBObject> cursorToStream(Iterator<DBObject> cursor) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(cursor, Spliterator.ORDERED), false);
-    }
-
-    /**
-     * Mark this node as alive and probably update some settings that may have changed since last server boot.
-     */
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress) throws NodeNotFoundException {
-        BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
-        final var params = addClusterUriToMap(Map.of(
-                "is_leader", isLeader,
-                "transport_address", restTransportAddress.toString()
-        ), clusterAddress);
-
-        final BasicDBObject update = new BasicDBObject(Map.of(
-                "$set", params,
-                "$currentDate", lastSeenFieldDefinition
-        ));
-
-        final WriteResult result = super.collection(NodeImpl.class).update(query, update);
-
-        final int updatedDocumentsCount = result.getN();
-        if (updatedDocumentsCount != 1) {
-            throw new NodeNotFoundException("Unable to find node " + node.getNodeId());
-        }
-    }
-
-    @Override
-    public boolean isOnlyLeader(NodeId nodeId) {
-
-        if(type() != Node.Type.SERVER) {
-            LOG.warn("Caution, isOnlyLeader called in the {} context, but returning only results of type {}", type(), Node.Type.SERVER);
-        }
-
-        return aggregate(recentHeartbeat(List.of(
-                Map.of(
-                        "type", Node.Type.SERVER.toString(),
-                        "node_id", new BasicDBObject("$ne", nodeId.getNodeId()),
-                        "is_leader", true
-                )
-        ))).findAny().isEmpty();
+        return transformMap(delegate.allActive());
     }
 
     @Override
     public boolean isAnyLeaderPresent() {
+        return delegate.isAnyLeaderPresent();
+    }
 
-        if(type() != Node.Type.SERVER) {
-            LOG.warn("Caution, isOnlyLeader called in the {} context, but returning only results of type {}", type(), Node.Type.SERVER);
-        }
-
-        return aggregate(recentHeartbeat(List.of(
-                Map.of(
-                        "type", Node.Type.SERVER.toString(),
-                        "is_leader", true
-                )
-        ))).findAny().isPresent();
+    private Map<String, Node> transformMap(Map<String, ServerNodeDto> nodes) {
+        return nodes.entrySet().stream()
+                .collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                        ));
     }
 }

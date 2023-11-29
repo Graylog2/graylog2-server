@@ -40,6 +40,7 @@ class HttpNotificationForm extends React.Component {
 
   static defaultConfig = {
     url: '',
+    api_key_as_header: false,
     api_key: '',
     api_secret: { keep_value: true },
     basic_auth: { keep_value: true },
@@ -201,6 +202,12 @@ class HttpNotificationForm extends React.Component {
                        </Button>
                      ) : undefined} />
             )}
+            <Checkbox id="api_key_as_header"
+                      name="api_key_as_header"
+                      onChange={this.handleChange}
+                      checked={config.api_key_as_header}>
+              Send API Key/Secret as Header
+            </Checkbox>
           </Col>
         </Row>
       </>

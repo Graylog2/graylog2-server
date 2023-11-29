@@ -27,7 +27,7 @@ const NodeId = styled(Badge)`
   margin-right: 3px;
 `;
 
-const SecureIcon = styled(Icon)`
+const SecureIcon: React.ComponentType<{ name: 'lock' | 'unlock' }> = styled(Icon)`
   margin-right: 3px;
 `;
 

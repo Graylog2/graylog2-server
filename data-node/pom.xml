@@ -69,6 +69,16 @@
             <artifactId>airline</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog.autovalue</groupId>
+            <artifactId>auto-value-javabean</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
@@ -476,12 +486,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.4</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -498,7 +508,7 @@
 
         <plugins>
             <plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <groupId>org.graylog.repackaged</groupId>
                 <artifactId>download-maven-plugin</artifactId>
                 <version>${download-maven-plugin.version}</version>
                 <executions>
@@ -694,9 +704,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <useLastCommittedRevision>true</useLastCommittedRevision>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>

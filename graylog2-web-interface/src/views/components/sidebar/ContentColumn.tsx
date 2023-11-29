@@ -54,16 +54,13 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $si
       box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
       z-index: 5; /* to render over Sidebar ContentColumn */
     }
-  `}
+`}
 `);
 
 const ContentGrid = styled.div(({ theme }) => css`
   display: grid;
-  display: -ms-grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto minmax(1px, 1fr);
-  -ms-grid-columns: 1fr;
-  -ms-grid-rows: auto 1fr;
   height: 100%;
   overflow-y: auto;
 
@@ -74,26 +71,20 @@ const ContentGrid = styled.div(({ theme }) => css`
 
 const Header = styled.div`
   grid-column: 1;
-  -ms-grid-column: 1;
   grid-row: 1;
-  -ms-grid-row: 1;
 `;
 
 const SearchTitle = styled.div`
   height: 35px;
   display: grid;
-  display: -ms-grid;
   grid-template-columns: 1fr auto;
-  -ms-grid-columns: 1fr auto;
 
   > *:nth-child(1) {
     grid-column: 1;
-    -ms-grid-column: 1;
   }
 
   > *:nth-child(2) {
     grid-column: 2;
-    -ms-grid-column: 2;
   }
 `;
 
@@ -122,15 +113,12 @@ const SectionTitle = styled.h2`
 
 const CenterVertical = styled.div`
   display: inline-grid;
-  display: -ms-inline-grid;
   align-content: center;
 `;
 
 const SectionContent = styled.div`
   grid-column: 1;
-  -ms-grid-column: 1;
   grid-row: 2;
-  -ms-grid-row: 2;
 
   /* Fixes padding problem with padding-bottom from container */
   > *:last-child {

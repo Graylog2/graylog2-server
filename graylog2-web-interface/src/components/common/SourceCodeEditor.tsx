@@ -108,6 +108,7 @@ type Props = {
   resizable?: boolean,
   toolbar?: boolean,
   value?: string,
+  wrapEnabled?: boolean,
 }
 
 type State = {
@@ -155,6 +156,8 @@ class SourceCodeEditor extends React.Component<Props, State> {
     value: PropTypes.string,
     /** Editor width in pixels. Use `Infinity` to indicate the editor should use 100% of its container's width. */
     width: PropTypes.number,
+    /** Specifies if the editor should wrap text or use horizontal scrolling. */
+    wrapEnabled: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -172,11 +175,12 @@ class SourceCodeEditor extends React.Component<Props, State> {
     toolbar: true,
     value: undefined,
     width: Infinity,
+    wrapEnabled: false,
   };
 
   private reactAce: AceEditor;
 
-  private readonly overlayContainerRef: React.RefObject<React.ReactElement>;
+  private readonly overlayContainerRef: React.RefObject<any>;
 
   constructor(props) {
     super(props);
@@ -281,6 +285,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
       onBlur,
       readOnly,
       value,
+      wrapEnabled,
     } = this.props;
     const validCssWidth = isFinite(width) ? width : '100%';
     const overlay = <StyledTooltip id="paste-button-tooltip" className="in">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</StyledTooltip>;
@@ -350,7 +355,8 @@ class SourceCodeEditor extends React.Component<Props, State> {
                        onSelectionChange={this.handleSelectionChange}
                        readOnly={readOnly}
                        value={value}
-                       width="100%" />
+                       width="100%"
+                       wrapEnabled={wrapEnabled} />
           </SourceCodeContainer>
         </Resizable>
       </div>

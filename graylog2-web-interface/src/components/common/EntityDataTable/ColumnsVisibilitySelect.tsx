@@ -48,7 +48,7 @@ const ColumnCheckbox = styled(Checkbox)`
   }
 `;
 
-const ListItem = styled(MenuItem)`
+const ListItem: React.ComponentType<Pick<React.ComponentProps<typeof MenuItem>, 'children' | 'title' | 'onSelect'>> = styled(MenuItem)`
   padding: 3px 0;
   cursor: pointer;
   display: flex;
