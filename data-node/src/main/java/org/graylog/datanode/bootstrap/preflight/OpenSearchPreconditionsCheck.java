@@ -37,7 +37,7 @@ public class OpenSearchPreconditionsCheck implements PreflightCheck {
     @Override
     public void runCheck() throws PreflightCheckException {
         if (OS.isFamilyMac()) {
-            return;
+            return; // don't throw an exception on Mac dev machines
         }
 
         ProcessBuilder builder = new ProcessBuilder().redirectErrorStream(true);

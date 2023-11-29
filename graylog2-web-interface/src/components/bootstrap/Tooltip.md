@@ -3,7 +3,7 @@
 ```js
 const styles = { position: 'relative', display: 'inline-block' };
 
-<div style={{display: "grid", "grid-template-columns": "1fr 1fr 1fr 1fr"}}>
+<div style={{display: "grid", "gridTemplateColumns": "1fr 1fr 1fr 1fr"}}>
   <div style={{height: "24px"}}>
     <Tooltip placement="right" className="in" id="tooltip-right" style={styles}>
       Tooltip right
