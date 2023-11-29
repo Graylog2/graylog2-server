@@ -17,7 +17,11 @@
 package org.graylog.datanode.filesystem.index.dto;
 
 import java.nio.file.Path;
+ import java.util.Collections;
 import java.util.List;
 
 public record IndexerDirectoryInformation(Path path, List<NodeInformation> nodes) {
+    public static IndexerDirectoryInformation empty(Path path) {
+        return new IndexerDirectoryInformation(path, Collections.emptyList());
+    }
 }

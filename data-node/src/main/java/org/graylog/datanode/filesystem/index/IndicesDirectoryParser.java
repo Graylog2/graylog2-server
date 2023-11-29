@@ -16,14 +16,14 @@
  */
 package org.graylog.datanode.filesystem.index;
 
-import org.graylog.datanode.filesystem.index.indexreader.ShardStats;
-import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
-import org.graylog.datanode.filesystem.index.statefile.StateFile;
-import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
 import org.graylog.datanode.filesystem.index.dto.IndexInformation;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
 import org.graylog.datanode.filesystem.index.dto.ShardInformation;
+import org.graylog.datanode.filesystem.index.indexreader.ShardStats;
+import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
+import org.graylog.datanode.filesystem.index.statefile.StateFile;
+import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -58,7 +58,13 @@ public class IndicesDirectoryParser {
             throw new IndexerInformationParserException("Path " + path + " is not readable");
         }
 
-        try (final Stream<Path> nodes = Files.list(path.resolve("nodes"))) {
+        final Path nodesPath = path.resolve("nodes");
+
+        if(!Files.exists(nodesPath)) {
+            return IndexerDirectoryInformation.empty(path);
+        }
+
+        try (final Stream<Path> nodes = Files.list(nodesPath)) {
             final List<NodeInformation> nodeInformation = nodes.filter(Files::isDirectory)
                     .filter(p -> p.getFileName().toString().matches("\\d+"))
                     .map(this::parseNode)

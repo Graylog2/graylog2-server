@@ -23,6 +23,7 @@ import org.graylog.datanode.filesystem.index.dto.IndexInformation;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -128,6 +129,14 @@ class IndicesDirectoryParserTest {
         final URI uri = getClass().getResource("/indices/elasticsearch6").toURI();
        Assertions.assertThatThrownBy(()->parser.parse(Path.of(uri)))
                .isInstanceOf(IncompatibleIndexVersionException.class);
+
+    }
+
+    @Test
+    void testEmptyDataDir(@TempDir Path tempDir) {
+        final IndexerDirectoryInformation result = parser.parse(tempDir);
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.nodes()).isEmpty();
 
     }
 }
