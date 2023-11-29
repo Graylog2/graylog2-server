@@ -72,13 +72,14 @@ module.exports = {
   ],
   extends: [
     'eslint:recommended',
-    'airbnb',
+    'airbnb/react',
     'plugin:compat/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/react',
     'plugin:jest-formatting/strict',
     'plugin:graylog/recommended',
+    'prettier',
   ],
   plugins: [
     'import',
