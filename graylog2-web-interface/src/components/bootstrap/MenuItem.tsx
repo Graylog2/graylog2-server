@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-// eslint-disable-next-line no-restricted-imports
-import { MenuItem as BootstrapMenuItem } from 'react-bootstrap';
+import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 
 import Icon from 'components/common/Icon';
+
+import Menu from './Menu';
 
 const IconWrapper = styled.div`
   display: inline-flex;
@@ -30,29 +30,58 @@ const IconWrapper = styled.div`
   align-items: center;
 `;
 
-type Props = React.ComponentProps<typeof BootstrapMenuItem> & {
+type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void
+
+type Props<T = undefined> = React.PropsWithChildren<{
+  className?: string,
+  disabled?: boolean,
+  divider?: boolean,
+  eventKey?: T,
+  header?: boolean,
+  href?: string,
   icon?: React.ComponentProps<typeof Icon>['name'],
-}
+  id?: string,
+  onClick?: Callback<T>,
+  onSelect?: Callback<T>,
+  rel?: 'noopener noreferrer',
+  target?: '_blank',
+  title?: string,
+}>;
 
-const CustomMenuItem = ({ className, children, icon, ...props } : Props) => (
-  <BootstrapMenuItem bsClass={className} {...props}>
-    {children && (
-      <>
-        {icon && <IconWrapper><Icon name={icon} /></IconWrapper>}
-        {children}
-      </>
-    )}
-  </BootstrapMenuItem>
-);
+const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title }: Props<T>) => {
+  const callback = onClick ?? onSelect;
+  const _onClick = useCallback(() => callback(eventKey), [callback, eventKey]);
 
-CustomMenuItem.propTypes = {
-  className: PropTypes.string,
-  icon: PropTypes.string,
+  if (divider) {
+    return <Menu.Divider className={className} id={id} />;
+  }
+
+  if (header) {
+    return <Menu.Label className={className} id={id}>{children}</Menu.Label>;
+  }
+
+  return (
+    <Menu.Item className={className} disabled={disabled} id={id} onClick={_onClick} title={title}>
+      {icon && <IconWrapper><Icon name={icon} /></IconWrapper>}
+      {href ? <a href={href} target={target} rel={rel}>{children}</a> : children}
+    </Menu.Item>
+  );
 };
 
 CustomMenuItem.defaultProps = {
   className: undefined,
+  disabled: false,
+  divider: false,
+  eventKey: undefined,
+  header: false,
+  href: undefined,
   icon: undefined,
+  id: undefined,
+  onClick: undefined,
+  onSelect: undefined,
+  rel: undefined,
+  target: undefined,
+  title: undefined,
 };
 
 /** @component */

@@ -20,14 +20,15 @@ import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
 type Props = PropsWithChildren<{
+  onChange?: (isOpen: boolean) => void,
+  opened?: boolean,
   position?: MenuProps['position'],
   shadow?: MenuProps['shadow'],
   width?: number,
   withinPortal?: boolean,
-  opened?: boolean,
 }>
 
-const Menu = ({ children, shadow, width, withinPortal, position, opened }: Props) => {
+const Menu = ({ children, shadow, width, withinPortal, position, opened, onChange }: Props) => {
   const theme = useTheme();
 
   const styles = () => ({
@@ -42,6 +43,7 @@ const Menu = ({ children, shadow, width, withinPortal, position, opened }: Props
   return (
     <MantineMenu shadow={shadow}
                  opened={opened}
+                 onChange={onChange}
                  width={width}
                  position={position}
                  withinPortal={withinPortal}
@@ -79,6 +81,7 @@ Menu.defaultProps = {
   width: undefined,
   withinPortal: false,
   opened: undefined,
+  onChange: undefined,
 };
 
 export default Menu;
