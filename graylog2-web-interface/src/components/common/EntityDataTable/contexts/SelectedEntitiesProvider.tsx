@@ -38,12 +38,24 @@ const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initial
     if (onChangeSelection) onChangeSelection(newState);
   }, [onChangeSelection, selectedEntities]);
 
+  const deselectEntity = useCallback((targetEntityId: EntityBase['id']) => (
+    _setSelectedEntities((cur) => cur.filter((entityId) => entityId !== targetEntityId))
+  ), [_setSelectedEntities]);
+
+  const selectEntity = useCallback((targetEntityId: EntityBase['id']) => (
+    _setSelectedEntities((cur) => [...cur, targetEntityId])
+  ), [_setSelectedEntities]);
+
   const contextValue = useMemo(() => ({
     setSelectedEntities: _setSelectedEntities,
     selectedEntities,
+    deselectEntity,
+    selectEntity,
   }), [
     _setSelectedEntities,
     selectedEntities,
+    deselectEntity,
+    selectEntity,
   ]);
 
   return (

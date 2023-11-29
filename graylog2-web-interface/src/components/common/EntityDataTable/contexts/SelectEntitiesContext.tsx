@@ -23,7 +23,9 @@ import type { EntityBase } from '../types';
 
 type ContextValue = {
   selectedEntities: Array<EntityBase['id']>,
-  setSelectedEntities: (setSelectedEntitiesArgument: SetStateAction<EntityBase['id'][]>) => void
+  setSelectedEntities: (setSelectedEntitiesArgument: SetStateAction<EntityBase['id'][]>) => void,
+  selectEntity: (entityId: EntityBase['id']) => void,
+  deselectEntity: (entityId: EntityBase['id']) => void,
 } | undefined
 
 const SelectEntitiesContext = React.createContext<ContextValue>(undefined);
