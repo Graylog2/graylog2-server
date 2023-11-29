@@ -27,16 +27,17 @@ type FormValues = {
   host: string,
   username: string,
   password: string,
-  whitelist: string,
 }
 
-const DataMigration = ({ setShouldMigrateData } : Props) => {
-  const onSubmit = (formValues: FormValues) => { console.log('===submitting', formValues); };
+const DataMigration = ({ setShouldMigrateData }: Props) => {
+  const onSubmit = (formValues: FormValues) => {
+    console.log('===submitting', formValues);
+  };
+
   const initialValues = {
     host: '',
     username: '',
     password: '',
-    whitelist: '',
   };
 
   return (
@@ -59,10 +60,6 @@ const DataMigration = ({ setShouldMigrateData } : Props) => {
             <FormikInput placeholder="Password"
                          name="password"
                          label="Password"
-                         required />
-            <FormikInput placeholder="Hosts to add to the whitelist"
-                         name="whitelist"
-                         label="Reindex from Remote Whitelist"
                          required />
             <Space h="md" />
             <Group>
