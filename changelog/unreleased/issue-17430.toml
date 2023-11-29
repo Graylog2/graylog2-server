@@ -2,4 +2,4 @@ type = "c"
 message = "Add Data Node pre-flight check to validate the `vm.max_map_count` sysctl value."
 
 issues = ["17430"]
-pulls = ["17436","17512"]
+pulls = ["17497","17512"]
