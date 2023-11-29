@@ -14,19 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { RootState } from 'views/types';
+import type { RootState, ExtraArguments, SearchExecutionResult } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { asMock } from 'helpers/mocking';
 import { createSearch } from 'fixtures/searches';
 import type View from 'views/logic/views/View';
+import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import SearchMetadata from 'views/logic/search/SearchMetadata';
 
 const defaultState = { view: { view: createSearch(), activeQuery: 'query-id-1' } } as RootState;
+const mockSearchExecutors: SearchExecutors = {
+  resultMapper: (r) => r,
+  parse: async () => SearchMetadata.empty(),
+  execute: async () => ({}) as SearchExecutionResult,
+};
 
 const mockDispatch = (state: RootState = defaultState) => {
   const dispatch: AppDispatch = jest.fn();
 
-  asMock(dispatch).mockImplementation((fn: (d: AppDispatch, getState: () => RootState) => unknown) => (typeof fn === 'function'
-    ? fn(dispatch, () => state)
+  asMock(dispatch).mockImplementation((fn: (d: AppDispatch, getState: () => RootState, extraArgs: ExtraArguments) => unknown) => (typeof fn === 'function'
+    ? fn(dispatch, () => state, { searchExecutors: mockSearchExecutors })
     : fn));
 
   return dispatch;

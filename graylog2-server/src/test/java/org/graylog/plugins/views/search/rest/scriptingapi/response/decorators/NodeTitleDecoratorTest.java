@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.rest.scriptingapi.response.decorators;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
-import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.TestNodeService;
 import org.graylog2.plugin.Message;
@@ -34,7 +33,7 @@ class NodeTitleDecoratorTest {
 
     @BeforeEach
     void setUp() {
-        final NodeService nodeService = new TestNodeService(Node.Type.SERVER);
+        final NodeService nodeService = new TestNodeService();
         nodeService.registerServer("5ca1ab1e-0000-4000-a000-000000000000", false, URI.create("http://my-host.example.com"), "my-host.example.com");
 
         decorator = new NodeTitleDecorator(nodeService);
