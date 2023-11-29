@@ -20,4 +20,8 @@ public class IncompatibleIndexVersionException extends RuntimeException {
     public IncompatibleIndexVersionException(Throwable cause) {
         super(cause);
     }
+
+    public IncompatibleIndexVersionException(String message) {
+        super(message);
+    }
 }

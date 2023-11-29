@@ -19,8 +19,8 @@ package org.graylog.datanode.filesystem.index;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
-import org.graylog.datanode.filesystem.validation.dto.IndexInformation;
-import org.graylog.datanode.filesystem.validation.dto.IndexerInformation;
+import org.graylog.datanode.filesystem.index.dto.IndexInformation;
+import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +41,7 @@ class IndicesDirectoryParserTest {
     @Test
     void testOpensearch2() throws URISyntaxException {
         final URI uri = getClass().getResource("/indices/opensearch2").toURI();
-        final IndexerInformation result = parser.parse(Path.of(uri));
+        final IndexerDirectoryInformation result = parser.parse(Path.of(uri));
         Assertions.assertThat(result.nodes())
                 .hasSize(1)
                 .allSatisfy(node -> {
@@ -69,7 +69,7 @@ class IndicesDirectoryParserTest {
     @Test
     void testOpensearch1() throws URISyntaxException {
         final URI uri = getClass().getResource("/indices/opensearch1").toURI();
-        final IndexerInformation result = parser.parse(Path.of(uri));
+        final IndexerDirectoryInformation result = parser.parse(Path.of(uri));
         Assertions.assertThat(result.nodes())
                 .hasSize(1)
                 .allSatisfy(node -> {
@@ -98,7 +98,7 @@ class IndicesDirectoryParserTest {
     @Test
     void testElasticsearch7() throws URISyntaxException {
         final URI uri = getClass().getResource("/indices/elasticsearch7").toURI();
-        final IndexerInformation result = parser.parse(Path.of(uri));
+        final IndexerDirectoryInformation result = parser.parse(Path.of(uri));
         Assertions.assertThat(result.nodes())
                 .hasSize(1)
                 .allSatisfy(node -> {

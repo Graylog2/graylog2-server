@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.filesystem.validation.dto;
+package org.graylog.datanode.filesystem.index.dto;
 
 import java.nio.file.Path;
 import java.util.List;
 
-public record IndexerInformation(Path path, List<NodeInformation> nodes) {
+public record IndexerDirectoryInformation(Path path, List<NodeInformation> nodes) {
 }

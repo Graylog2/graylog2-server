@@ -20,12 +20,13 @@ import org.graylog.datanode.filesystem.index.indexreader.ShardStats;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
-import org.graylog.datanode.filesystem.validation.dto.IndexInformation;
-import org.graylog.datanode.filesystem.validation.dto.IndexerInformation;
-import org.graylog.datanode.filesystem.validation.dto.NodeInformation;
-import org.graylog.datanode.filesystem.validation.dto.ShardInformation;
+import org.graylog.datanode.filesystem.index.dto.IndexInformation;
+import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
+import org.graylog.datanode.filesystem.index.dto.NodeInformation;
+import org.graylog.datanode.filesystem.index.dto.ShardInformation;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Singleton
 public class IndicesDirectoryParser {
 
     public static final String STATE_DIR_NAME = "_state";
@@ -47,7 +49,7 @@ public class IndicesDirectoryParser {
         this.shardReader = shardReader;
     }
 
-    public IndexerInformation parse(Path path) {
+    public IndexerDirectoryInformation parse(Path path) {
         if (!Files.exists(path)) {
             throw new IndexerInformationParserException("Path " + path + " is not a directory");
         }
@@ -61,7 +63,7 @@ public class IndicesDirectoryParser {
                     .filter(p -> p.getFileName().toString().matches("\\d+"))
                     .map(this::parseNode)
                     .toList();
-            return new IndexerInformation(path, nodeInformation);
+            return new IndexerDirectoryInformation(path, nodeInformation);
         } catch (IOException e) {
             throw new IndexerInformationParserException("Failed to list nodes", e);
         }
