@@ -196,6 +196,20 @@ public class Indices {
         }
     }
 
+    // TODO: replace/remove this method. This is supposed to be an intermediate solution to not blow up the remote reindex migration PR
+    public boolean createSimpleIndexForMigration(final String indexName, final int shards, final int replicas) {
+        try {
+            indicesAdapter.create(indexName, IndexSettings.create(shards, replicas));
+        } catch (Exception e) {
+            LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);
+            auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
+            return false;
+        }
+
+        auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
+        return true;
+    }
+
     public boolean create(String indexName, IndexSet indexSet) {
         final IndexSettings indexSettings = IndexSettings.create(
                 indexSet.getConfig().shards(),
@@ -293,8 +307,8 @@ public class Indices {
 
     public Set<String> getReopenedIndices(final Collection<String> indices) {
         return indices.stream()
-            .filter(this::isReopened)
-            .collect(Collectors.toSet());
+                .filter(this::isReopened)
+                .collect(Collectors.toSet());
     }
 
     public Set<String> getReopenedIndices(final IndexSet indexSet) {
@@ -358,7 +372,7 @@ public class Indices {
     }
 
     public Optional<DateTime> indexClosingDate(String index) {
-       return indicesAdapter.indexClosingDate(index);
+        return indicesAdapter.indexClosingDate(index);
     }
 
     public IndexRangeStats indexRangeStatsOfIndex(String index) {

@@ -27,7 +27,6 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -36,10 +35,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-
+import java.util.HashMap;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
@@ -56,7 +53,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
                                     final Provider<OpensearchConfiguration> configurationProvider,
                                     final EventBus eventBus,
-                                    final ClusterEventBus clusterEventBus,
                                     final CustomCAX509TrustManager trustManager,
                                     final NodeService<DataNodeDto> nodeService,
                                     final Configuration configuration,
@@ -66,7 +62,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.nodeId = nodeId;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
         eventBus.register(this);
-        checkNotNull(clusterEventBus).registerClusterEventSubscriber(this);
     }
 
     private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService nodeService) {
@@ -82,7 +77,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
-            case ADD -> startWithConfig(Map.of("reindex.remote.whitelist", event.host()));
+            case ADD ->
+                    startWithConfig(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
             case REMOVE -> startWithConfig();
         }
     }
@@ -116,8 +112,26 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     }
 
     private void startWithConfig(Map<String, String> additionalConfig) {
-        final OpensearchConfiguration config = configurationProvider.get();
-        config.additionalConfiguration().putAll(additionalConfig);
+        final OpensearchConfiguration original = configurationProvider.get();
+
+        final var finalAdditionalConfig = new HashMap<String, String>();
+        finalAdditionalConfig.putAll(original.additionalConfiguration());
+        finalAdditionalConfig.putAll(additionalConfig);
+
+        final var config = new OpensearchConfiguration(
+                original.opensearchDistribution(),
+                original.datanodeDirectories(),
+                original.bindAddress(),
+                original.hostname(),
+                original.httpPort(),
+                original.transportPort(),
+                original.clusterName(),
+                original.nodeName(),
+                original.nodeRoles(),
+                original.discoverySeedHosts(),
+                original.opensearchSecurityConfiguration(),
+                finalAdditionalConfig);
+
         if (config.securityConfigured()) {
             this.process.startWithConfig(config);
         } else {
