@@ -20,6 +20,7 @@ import { useCallback } from 'react';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
+import useSelectedEntities from './hooks/useSelectedEntities';
 import TableCell from './TableCell';
 import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
@@ -44,8 +45,6 @@ type Props<Entity extends EntityBase> = {
   displayActions: boolean,
   entity: Entity,
   index: number,
-  isSelected: boolean,
-  onToggleEntitySelect: (entityId: string) => void,
   rowActions?: (entity: Entity) => React.ReactNode,
   entityAttributesAreCamelCase: boolean,
 };
@@ -56,17 +55,22 @@ const TableRow = <Entity extends EntityBase>({
   displaySelect,
   displayActions,
   entity,
-  isSelected,
-  onToggleEntitySelect,
   rowActions,
   index,
   actionsRef,
   entityAttributesAreCamelCase,
 }: Props<Entity>) => {
-  const toggleRowSelect = useCallback(
-    () => onToggleEntitySelect(entity.id),
-    [entity.id, onToggleEntitySelect],
-  );
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const isSelected = !!selectedEntities?.includes(entity.id);
+  const toggleRowSelect = useCallback(() => {
+    setSelectedEntities(((cur) => {
+      if (cur.includes(entity.id)) {
+        return cur.filter((id) => id !== entity.id);
+      }
+
+      return [...cur, entity.id];
+    }));
+  }, [entity.id, setSelectedEntities]);
 
   const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
 

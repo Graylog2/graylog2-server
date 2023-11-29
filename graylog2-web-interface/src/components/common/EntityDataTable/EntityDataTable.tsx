@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useMemo, useCallback, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
 
@@ -31,7 +31,7 @@ import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
 
 import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
@@ -160,7 +160,7 @@ type Props<Entity extends EntityBase> = {
   entityAttributesAreCamelCase?: boolean,
   bulkSelection?: {
     /** Supported bulk actions */
-    actions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
+    actions?: React.ReactNode,
     /** Callback which runs on selection change */
     onChangeSelection?: (selectedEntities: Array<Entity['id']>) => void,
     /** Initial selected items */
@@ -218,10 +218,9 @@ const EntityDataTable = <Entity extends EntityBase>({
   visibleColumns,
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
-  const [selectedEntities, setSelectedEntities] = useSelectedEntities<Entity['id']>(initialSelection, onChangeSelection);
   const displayActionsCol = typeof rowActions === 'function';
-  const displayBulkAction = typeof actions === 'function';
-  const displayBulkSelectCol = typeof onChangeSelection === 'function' || typeof actions === 'function';
+  const displayBulkAction = !!actions;
+  const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
 
   const accessibleColumns = useMemo(
@@ -243,73 +242,57 @@ const EntityDataTable = <Entity extends EntityBase>({
     fixedActionsCellWidth,
   });
 
-  const onToggleEntitySelect = useCallback((itemId: string) => {
-    setSelectedEntities(((cur) => {
-      if (cur.includes(itemId)) {
-        return cur.filter((id) => id !== itemId);
-      }
-
-      return [...cur, itemId];
-    }));
-  }, [setSelectedEntities]);
-
   return (
-    <ExpandedSectionsProvider>
-      <ActionsRow>
-        <div>
-          {displayBulkAction && (
-            <BulkActionsRow bulkActions={actions}
-                            selectedEntities={selectedEntities}
-                            setSelectedEntities={setSelectedEntities} />
-          )}
-        </div>
-        <LayoutConfigRow>
-          Show
-          <ButtonGroup>
-            {displayPageSizeSelect && (
-              <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
-            )}
-            <ColumnsVisibilitySelect allColumns={accessibleColumns}
-                                     selectedColumns={visibleColumns}
-                                     onChange={onColumnsChange} />
-          </ButtonGroup>
-        </LayoutConfigRow>
-      </ActionsRow>
-      <ScrollContainer id="scroll-container" ref={tableRef}>
-        <StyledTable striped condensed hover>
-          <TableHead columns={columns}
-                     columnsOrder={columnsOrder}
-                     actionsColWidth={actionsColWidth}
-                     columnsWidths={columnsWidths}
-                     selectedEntities={selectedEntities}
-                     setSelectedEntities={setSelectedEntities}
-                     data={data}
-                     columnRenderersByAttribute={columnRenderersByAttribute}
-                     onSortChange={onSortChange}
-                     displayBulkSelectCol={displayBulkSelectCol}
-                     activeSort={activeSort}
-                     displayActionsCol={displayActionsCol} />
-          {data.map((entity, index) => (
-            <tbody key={`table-row-${entity.id}`} data-testid={`table-row-${entity.id}`}>
-              <TableRow entity={entity}
-                        index={index}
-                        entityAttributesAreCamelCase={entityAttributesAreCamelCase}
-                        actionsRef={actionsRef}
-                        onToggleEntitySelect={onToggleEntitySelect}
-                        columnRenderersByAttribute={columnRenderersByAttribute}
-                        isSelected={!!selectedEntities?.includes(entity.id)}
-                        rowActions={rowActions}
-                        displaySelect={displayBulkSelectCol}
-                        displayActions={displayActionsCol}
-                        columns={columns} />
-              <ExpandedSections key={`expanded-sections-${entity.id}`}
-                                expandedSectionsRenderer={expandedSectionsRenderer}
-                                entity={entity} />
-            </tbody>
-          ))}
-        </StyledTable>
-      </ScrollContainer>
-    </ExpandedSectionsProvider>
+    <SelectedEntitiesProvider<Entity> initialSelection={initialSelection} onChangeSelection={onChangeSelection}>
+      <ExpandedSectionsProvider>
+        <ActionsRow>
+          <div>
+            {displayBulkAction && <BulkActionsRow bulkActions={actions} />}
+          </div>
+          <LayoutConfigRow>
+            Show
+            <ButtonGroup>
+              {displayPageSizeSelect && (
+                <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+              )}
+              <ColumnsVisibilitySelect allColumns={accessibleColumns}
+                                       selectedColumns={visibleColumns}
+                                       onChange={onColumnsChange} />
+            </ButtonGroup>
+          </LayoutConfigRow>
+        </ActionsRow>
+        <ScrollContainer id="scroll-container" ref={tableRef}>
+          <StyledTable striped condensed hover>
+            <TableHead columns={columns}
+                       columnsOrder={columnsOrder}
+                       actionsColWidth={actionsColWidth}
+                       columnsWidths={columnsWidths}
+                       data={data}
+                       columnRenderersByAttribute={columnRenderersByAttribute}
+                       onSortChange={onSortChange}
+                       displayBulkSelectCol={displayBulkSelectCol}
+                       activeSort={activeSort}
+                       displayActionsCol={displayActionsCol} />
+            {data.map((entity, index) => (
+              <tbody key={`table-row-${entity.id}`} data-testid={`table-row-${entity.id}`}>
+                <TableRow entity={entity}
+                          index={index}
+                          entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+                          actionsRef={actionsRef}
+                          columnRenderersByAttribute={columnRenderersByAttribute}
+                          rowActions={rowActions}
+                          displaySelect={displayBulkSelectCol}
+                          displayActions={displayActionsCol}
+                          columns={columns} />
+                <ExpandedSections key={`expanded-sections-${entity.id}`}
+                                  expandedSectionsRenderer={expandedSectionsRenderer}
+                                  entity={entity} />
+              </tbody>
+            ))}
+          </StyledTable>
+        </ScrollContainer>
+      </ExpandedSectionsProvider>
+    </SelectedEntitiesProvider>
   );
 };
 
