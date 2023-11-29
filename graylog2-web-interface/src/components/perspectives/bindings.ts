@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import Routes from 'routing/Routes';
+
 import DefaultBrand from './DefaultBrand';
 
 const perspectivesBindings = {
@@ -22,6 +24,7 @@ const perspectivesBindings = {
     {
       id: 'default',
       title: 'Classic Graylog UI',
+      brandLink: Routes.WELCOME,
       brandComponent: DefaultBrand,
     },
   ],

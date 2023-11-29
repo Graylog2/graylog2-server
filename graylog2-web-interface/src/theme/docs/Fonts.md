@@ -1,4 +1,4 @@
-Font settings are accesible from within `theme.fonts` object.
+Font settings are accessible from within `theme.fonts` object.
 
 ### Family - _`theme.fonts.family`_
 
@@ -12,13 +12,11 @@ const { fonts } = useTheme();
 
 const FontFamilies = () => (
   <ul>
-    {Object.entries(fonts.family).map(([fontId, fontNames]) => {
-      return (
-        <li style={{ fontFamily: fontNames }}>
-          <b>{fontId}</b>: {fontNames}
-        </li>
-      )
-    })}
+    {Object.entries(fonts.family).map(([fontId, fontNames]) => (
+      <li style={{ fontFamily: fontNames }} key={fontId}>
+        <b>{fontId}</b>: {fontNames}
+      </li>
+    ))}
   </ul>
 );
 
@@ -38,14 +36,12 @@ const { fonts } = useTheme();
 
 const FontSizes = () => (
   <ul>
-    {Object.entries(fonts.size).map(([sizeId, sizeValue]) => {
-      return (
-        <li style={{ fontSize: sizeValue }}>
-          <b>{sizeId}</b>: {sizeValue}
-          {sizeId !== 'root' && <i> ({sizeValue.replace(/rem|em/i, '') * ROOT_FONT_SIZE}px)</i>}
-        </li>
-      )
-    })}
+    {Object.entries(fonts.size).map(([sizeId, sizeValue]) => (
+      <li style={{ fontSize: sizeValue }} key={sizeId}>
+        <b>{sizeId}</b>: {sizeValue}
+        {sizeId !== 'root' && <i> ({sizeValue.replace(/rem|em/i, '') * ROOT_FONT_SIZE}px)</i>}
+      </li>
+    ))}
   </ul>
 );
 
@@ -70,9 +66,9 @@ const { fonts } = useTheme();
 
 const FontLineHeights = () => (
   <ul>
-    {Object.entries(fonts.lineHeight).map(([lineHeightId, lineHeightValue]) => {
-      return <li><b>{lineHeightId}</b>: {lineHeightValue}</li>
-    })}
+    {Object.entries(fonts.lineHeight).map(([lineHeightId, lineHeightValue]) => (
+      <li key={lineHeightId}><b>{lineHeightId}</b>: {lineHeightValue}</li>
+    ))}
   </ul>
 );
 

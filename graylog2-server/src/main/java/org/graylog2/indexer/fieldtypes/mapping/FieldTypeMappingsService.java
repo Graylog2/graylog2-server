@@ -22,13 +22,20 @@ import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.rest.bulk.model.BulkOperationFailure;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.Message.RESERVED_SETTABLE_FIELDS;
 
@@ -72,37 +79,57 @@ public class FieldTypeMappingsService {
         }
     }
 
-    public void removeCustomMappingForFields(final List<String> fieldNames,
-                                             final Set<String> indexSetsIds,
-                                             final boolean rotateImmediately) {
+    public Map<String, BulkOperationResponse> removeCustomMappingForFields(final List<String> fieldNames,
+                                                                           final Set<String> indexSetsIds,
+                                                                           final boolean rotateImmediately) {
+        Map<String, BulkOperationResponse> result = new HashMap<>();
         for (String indexSetId : indexSetsIds) {
             try {
-                indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
-                    var updatedIndexSetConfig = removeMappings(fieldNames, indexSetConfig);
-                    if (rotateImmediately) {
-                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
-                    }
-                });
-                LOG.debug("Removed custom mappings for fields " + fieldNames.toString() + " in index set : " + indexSetId);
+                indexSetService.get(indexSetId).ifPresentOrElse(
+                        indexSetConfig -> result.put(indexSetId, removeMappings(fieldNames, indexSetConfig, rotateImmediately)),
+                        () -> result.put(indexSetId, new BulkOperationResponse(List.of("Index set with following ID not present in the database: " + indexSetId)))
+                );
             } catch (Exception ex) {
                 LOG.error("Failed to remove custom mappings for fields " + fieldNames.toString() + " in index set : " + indexSetId, ex);
-                throw ex;
+                result.put(indexSetId, new BulkOperationResponse(List.of("Exception while removing custom field mappings for index set : " + indexSetId + ": " + ex.getMessage())));
             }
         }
+        return result;
     }
 
-    private Optional<IndexSetConfig> removeMappings(final List<String> fieldNames, final IndexSetConfig indexSetConfig) {
+    private BulkOperationResponse removeMappings(final List<String> fieldNames,
+                                                 final IndexSetConfig indexSetConfig,
+                                                 final boolean rotateImmediately) {
         final CustomFieldMappings previousCustomFieldMappings = indexSetConfig.customFieldMappings();
+        final Set<String> fieldsWithoutCustomMappings = fieldNames.stream()
+                .filter(fieldName -> !previousCustomFieldMappings.containsCustomMappingForField(fieldName))
+                .collect(Collectors.toSet());
         final boolean removedSmth = previousCustomFieldMappings.removeIf(customFieldMapping -> fieldNames.stream().anyMatch(fieldName -> customFieldMapping.fieldName().equals(fieldName)));
+        final int fieldsRemoved = fieldNames.size() - fieldsWithoutCustomMappings.size();
+        final List<BulkOperationFailure> failures = fieldsWithoutCustomMappings.stream()
+                .map(f -> new BulkOperationFailure(f, "Field not present in custom mappings"))
+                .collect(Collectors.toCollection(ArrayList::new));
+        final List<String> errors = new LinkedList<>();
         if (removedSmth) {
-            return Optional.of(mongoIndexSetService.save(
+            var updatedIndexSetConfig = Optional.of(mongoIndexSetService.save(
                     indexSetConfig.toBuilder()
                             .customFieldMappings(previousCustomFieldMappings)
                             .build()
             ));
-        } else {
-            return Optional.empty();
+
+            if (rotateImmediately) {
+                try {
+                    updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                } catch (Exception ex) {
+                    errors.add("Failed to rotate index set after successful custom mapping removal: " + ex.getMessage());
+                    LOG.error("Failed to rotate index set after successful custom mapping removal for fields " + fieldNames.toString() + " in index set : " + indexSetConfig.id(), ex);
+                }
+            }
+
         }
+        return new BulkOperationResponse(fieldsRemoved,
+                failures,
+                errors);
     }
 
     private Optional<IndexSetConfig> storeMapping(final CustomFieldMapping customMapping,

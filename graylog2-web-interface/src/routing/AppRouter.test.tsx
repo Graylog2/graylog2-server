@@ -91,6 +91,7 @@ describe('AppRouter', () => {
         id: 'default',
         title: 'Default Perspective',
         brandComponent: () => <div />,
+        brandLink: '',
       },
     ],
   };

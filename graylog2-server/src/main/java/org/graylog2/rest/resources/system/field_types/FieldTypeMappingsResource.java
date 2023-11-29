@@ -27,6 +27,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -104,13 +105,12 @@ public class FieldTypeMappingsResource extends RestResource {
             @ApiResponse(code = 403, message = "Unauthorized")
     })
     @AuditEvent(type = FIELD_TYPE_MAPPING_DELETE)
-    public Response removeCustomMapping(@ApiParam(name = "request")
+    public Map<String, BulkOperationResponse> removeCustomMapping(@ApiParam(name = "request")
                                         @Valid
                                         @NotNull(message = "Request body is mandatory") final CustomFieldMappingRemovalRequest request) {
         checkPermissionsForCreation(request.indexSetsIds());
 
-        fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
-        return Response.ok().build();
+        return fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
     }
 
     private void checkFieldIsAllowedToBeChanged(String fieldName) {

@@ -14,23 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.cluster;
+import { useContext } from 'react';
 
-import org.graylog.datanode.Configuration;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeServiceImpl;
-import org.graylog2.database.MongoConnection;
+import SearchExecutorsContext from 'views/components/contexts/SearchExecutorsContext';
 
-import javax.inject.Inject;
+const useSearchExecutors = () => useContext(SearchExecutorsContext);
 
-public class DataNodeServiceImpl extends NodeServiceImpl {
-    @Inject
-    public DataNodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
-        super(mongoConnection, configuration.getStaleLeaderTimeout());
-    }
-
-    @Override
-    public Node.Type type() {
-        return Node.Type.DATANODE;
-    }
-}
+export default useSearchExecutors;

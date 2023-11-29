@@ -22,7 +22,8 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.events.ClusterEventBus;
@@ -54,7 +55,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final EventBus eventBus,
                                     final ClusterEventBus clusterEventBus,
                                     final CustomCAX509TrustManager trustManager,
-                                    final NodeService nodeService,
+                                    final NodeService<DataNodeDto> nodeService,
                                     final Configuration configuration,
                                     final NodeId nodeId) {
         this.configurationProvider = configurationProvider;

@@ -23,6 +23,7 @@ import suppressConsole from 'helpers/suppressConsole';
 import useIndexSetFieldType from 'hooks/useIndexSetFieldType';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultFiled } from 'fixtures/indexSetFieldTypes';
 
 const mockData = {
   attributes: [],
@@ -52,13 +53,7 @@ const mockData = {
 
 const expectedState = {
   attributes: [],
-  list: [{
-    id: 'field',
-    fieldName: 'field',
-    type: 'bool',
-    isCustom: false,
-    isReserved: false,
-  }],
+  list: [defaultFiled],
   pagination: {
     total: 1,
   },
