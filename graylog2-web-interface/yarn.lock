@@ -6454,22 +6454,22 @@ elementary-circuits-directed-graph@^1.0.4:
     strongly-connected-components "^1.0.1"
 
 embla-carousel-react@^8.0.0-rc11:
-  version "8.0.0-rc14"
-  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-8.0.0-rc14.tgz#ed5d9e641134fdc7e060a9188b0ccf13f7677da1"
-  integrity sha512-2b9vXACEcn0qja4QyaFMfCgFbFhumV3krOCGr9+jlQiuXt5z/EyfiYYziDsm70DhTtxtg/uKEGflIqZSfWRYKg==
+  version "8.0.0-rc15"
+  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-8.0.0-rc15.tgz#1f5528256896f5b9a8a49c743d56a522519d47e7"
+  integrity sha512-PePOkyPMWsUDNJKYRhUmGScYhex9mfpEiYiKT8OgwP/4K60plW0qk8cAXWvS9N61A/3RkUq7uz+hQsmhAtYMcA==
   dependencies:
-    embla-carousel "8.0.0-rc14"
-    embla-carousel-reactive-utils "8.0.0-rc14"
+    embla-carousel "8.0.0-rc15"
+    embla-carousel-reactive-utils "8.0.0-rc15"
 
-embla-carousel-reactive-utils@8.0.0-rc14:
-  version "8.0.0-rc14"
-  resolved "https://registry.yarnpkg.com/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.0.0-rc14.tgz#a8844b3930fb3b1423e07544b3efb125525c454a"
-  integrity sha512-r153bynAo9eTBuWWggPWLYnE9xqVOYmkkeMbAuGX8pkUisJN8aTLMW9b7CYOzjURRB7z85EmYRbeBg+axQzc9g==
+embla-carousel-reactive-utils@8.0.0-rc15:
+  version "8.0.0-rc15"
+  resolved "https://registry.yarnpkg.com/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.0.0-rc15.tgz#29309e19657944bc3fb6a908a2da5675c7d2a325"
+  integrity sha512-17Pr+N2vULFS8Lxzi2jaebwVloiFJLpdJMJLKJKQ26NzEmX8pVtHSu3uuTWc8HPwye5HFugqCPJ2QoWWhKs6Kg==
 
-embla-carousel@8.0.0-rc14:
-  version "8.0.0-rc14"
-  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-8.0.0-rc14.tgz#039372f97b57e95c9b839c6e27b8ff2f63b23053"
-  integrity sha512-/NLkMFZ7xKryRVYeUjmhbfV63Vr07saPBDwAX2TPMbcaiWwfQfU5Xsc2AiCMZANtwmzsjRK6gSBa7hOy/VXu6g==
+embla-carousel@8.0.0-rc15:
+  version "8.0.0-rc15"
+  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-8.0.0-rc15.tgz#68e269bb1ead1422aa3078401947f0d85c6e1671"
+  integrity sha512-s7VPexK2h8VEYjEVQFnJAPcRnY5YqJYicFxKVVyWXP3Hk9FFDkT0kqVxMM1PcL187qHOUgmGVHOrfC8xWy3OKQ==
 
 emittery@^0.13.1:
   version "0.13.1"
