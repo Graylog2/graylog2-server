@@ -62,8 +62,10 @@ type Props = React.PropsWithChildren<{
   id?: string,
   name?: string,
   onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void),
+  rel?: 'noopener noreferrer',
   role?: string,
   tabIndex?: number,
+  target?: '_blank',
   title?: string,
   type?: 'button' | 'reset' | 'submit',
 }>;
@@ -129,7 +131,7 @@ const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disab
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
     'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
-    title, form, type, role, name, tabIndex, children,
+    title, form, target, type, rel, role, name, tabIndex, children,
   }, ref) => {
     const theme = useMantineTheme();
     const styles = useMemo(() => generateStyles(theme.other, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
@@ -153,6 +155,8 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
       return (
         <StyledButton<'a'> component="a"
                            href={href}
+                           target={target}
+                           rel={rel}
                            onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
                            {...sharedProps}>
           {children}
@@ -184,8 +188,10 @@ Button.defaultProps = {
   id: undefined,
   name: undefined,
   onClick: undefined,
+  rel: undefined,
   role: undefined,
   tabIndex: undefined,
+  target: undefined,
   title: undefined,
   type: undefined,
 };

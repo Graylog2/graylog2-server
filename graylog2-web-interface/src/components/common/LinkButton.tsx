@@ -22,7 +22,7 @@ import { Button } from 'components/bootstrap';
 
 type ButtonProps = React.ComponentProps<typeof Button>;
 
-type Props = ButtonProps & {
+type Props = Omit<ButtonProps, 'target'> & {
   to: string,
   target?: '_blank' | '_self' | '_parent' | '_top' | 'framename',
 }
