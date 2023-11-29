@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Show correct throughput metric when messages are routed via pipeline rules."
+
+issues = ["Graylog2/graylog-plugin-enterprise#6138"]
+pulls = ["17456"]
