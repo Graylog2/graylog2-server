@@ -14,6 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import { Button as MantineButton } from '@mantine/core';
 
-export default MantineButton.Group;
+const ButtonGroup = (props: React.ComponentProps<typeof MantineButton.Group>) => (
+  <MantineButton.Group role="toolbar" {...props} />
+);
+export default ButtonGroup;
