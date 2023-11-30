@@ -74,7 +74,7 @@ const searchMetadata = SearchMetadata.empty();
 
 type Props = {
   searchJson: Partial<SearchJson>,
-  viewJson: Partial<ViewJson>,
+  viewJson: any,
   searchJobResult: Partial<SearchJobResult>,
   hotspots: Array<HotspotMeta>,
 }
