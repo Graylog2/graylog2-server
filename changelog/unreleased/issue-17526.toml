@@ -1,5 +1,5 @@
-type = "c"
-message = "Add Data Node pre-flight check to validate the `vm.max_map_count` sysctl value."
+type = "f"
+message = "Fix filebeat path configuration for sidecar"
 
-issues = ["17430"]
-pulls = ["17436"]
+issues = ["17526"]
+pulls = ["17000"]
