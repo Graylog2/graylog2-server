@@ -106,7 +106,7 @@ const MessageActions = ({
   ), [id, index, pluggableMenuActions]);
 
   if (disabled) {
-    return <ButtonGroup bsSize="small" />;
+    return <ButtonGroup />;
   }
 
   const messageUrl = index ? Routes.message_show(index, id) : '#';
@@ -124,9 +124,9 @@ const MessageActions = ({
     && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
 
   return (
-    <ButtonGroup bsSize="small">
+    <ButtonGroup>
       {showChanges}
-      <Button href={messageUrl}>Permalink</Button>
+      <Button bsSize="small" href={messageUrl}>Permalink</Button>
       {menuActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />

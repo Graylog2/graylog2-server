@@ -43,7 +43,7 @@ const EditTokensAction = ({
   wrapperComponent: WrapperComponent,
 }: {
   user: UserOverview,
-  wrapperComponent: Button,
+  wrapperComponent: React.ComponentType<any>,
 }) => (
   <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
     <WrapperComponent id={`edit-tokens-${id}`}
