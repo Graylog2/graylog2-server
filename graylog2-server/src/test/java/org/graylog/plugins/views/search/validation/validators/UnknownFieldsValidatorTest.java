@@ -22,8 +22,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.plugin.Message.RESERVED_SETTABLE_FIELDS;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -50,6 +52,15 @@ class UnknownFieldsValidatorTest {
         final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
                 Set.of("some_normal_field"),
                 List.of(ParsedTerm.create("_id", "buba"))
+        );
+        assertTrue(unknownFields.isEmpty());
+    }
+
+    @Test
+    void testDoesNotIdentifyGraylogReservedFieldsAsUnknown() {
+        final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
+                Set.of("some_normal_field"),
+                RESERVED_SETTABLE_FIELDS.stream().map(f -> ParsedTerm.create(f, "buba")).collect(Collectors.toList())
         );
         assertTrue(unknownFields.isEmpty());
     }
