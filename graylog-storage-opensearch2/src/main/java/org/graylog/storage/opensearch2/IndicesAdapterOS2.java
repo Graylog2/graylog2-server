@@ -62,7 +62,7 @@ import org.graylog.storage.opensearch2.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch2.stats.StatsApi;
-import org.graylog2.datatiering.SearchableSnapshotInfo;
+import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
@@ -81,7 +81,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -586,7 +585,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public Optional<SearchableSnapshotInfo> getSearchableSnapshotInfo(String index) {
+    public Optional<WarmIndexInfo> getSearchableSnapshotInfo(String index) {
         final GetSettingsResponse settingsResponse = client.execute((c, options) ->
                 c.indices().getSettings(new GetSettingsRequest().indices(index), options));
         Map<String, Settings> indexToSettings = settingsResponse.getIndexToSettings();
@@ -596,12 +595,12 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
                 .map(settings -> mapIndexSettingsToSearchableSnapshot(index, settings));
     }
 
-    private SearchableSnapshotInfo mapIndexSettingsToSearchableSnapshot(String index, Settings settings) {
+    private WarmIndexInfo mapIndexSettingsToSearchableSnapshot(String index, Settings settings) {
         String initialIndexName = settings.get("index.provided_name");
         Settings searchableSnapshotSettings = settings.getAsSettings("index.searchable_snapshot");
         String repository = searchableSnapshotSettings.get("repository");
         String snapshotName = searchableSnapshotSettings.get("snapshot_id.name");
 
-        return new SearchableSnapshotInfo(index, initialIndexName, repository, snapshotName);
+        return new WarmIndexInfo(index, initialIndexName, repository, snapshotName);
     }
 }

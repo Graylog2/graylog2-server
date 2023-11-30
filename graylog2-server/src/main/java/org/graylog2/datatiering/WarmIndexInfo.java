@@ -16,4 +16,4 @@
  */
 package org.graylog2.datatiering;
 
-public record SearchableSnapshotInfo(String currentIndexName, String initialIndexName, String repository, String snapshotName) {}
+public record WarmIndexInfo(String currentIndexName, String initialIndexName, String repository, String snapshotName) {}

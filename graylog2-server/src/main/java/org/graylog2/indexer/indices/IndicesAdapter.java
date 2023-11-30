@@ -18,7 +18,7 @@ package org.graylog2.indexer.indices;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
-import org.graylog2.datatiering.SearchableSnapshotInfo;
+import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
@@ -126,5 +126,5 @@ public interface IndicesAdapter {
 
     void refresh(String... indices);
 
-    Optional<SearchableSnapshotInfo> getSearchableSnapshotInfo(String indexOrAlias);
+    Optional<WarmIndexInfo> getSearchableSnapshotInfo(String indexOrAlias);
 }

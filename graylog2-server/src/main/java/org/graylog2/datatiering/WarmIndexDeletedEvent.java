@@ -16,5 +16,5 @@
  */
 package org.graylog2.datatiering;
 
-public record DeleteSnapshotEvent(SearchableSnapshotInfo searchableSnapshotInfo) {
+public record WarmIndexDeletedEvent(WarmIndexInfo warmIndexInfo) {
 }
