@@ -164,7 +164,8 @@ type Props<Entity extends EntityBase> = {
     /** Callback which runs on selection change */
     onChangeSelection?: (selectedEntities: Array<Entity['id']>) => void,
     /** Initial selected items */
-    initialSelection?: Array<Entity['id']>
+    initialSelection?: Array<Entity['id']>,
+    isEntitySelectable?: (entity: Entity) => boolean
   },
   /** List of all available columns. Column ids need to be snake case. */
   columnDefinitions: Array<Column>,
@@ -187,10 +188,9 @@ type Props<Entity extends EntityBase> = {
   /** Active page size */
   pageSize?: number
   /** Actions for each row. */
-  rowActions?: (entity: Entity) => React.ReactNode,
+  rowActions?: (entity: Entity, setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>) => React.ReactNode,
   /** Which columns should be displayed. */
   visibleColumns: Array<string>,
-
 };
 
 /**
@@ -204,6 +204,7 @@ const EntityDataTable = <Entity extends EntityBase>({
     actions,
     onChangeSelection,
     initialSelection,
+    isEntitySelectable,
   },
   columnDefinitions,
   columnRenderers: customColumnRenderers,
@@ -223,6 +224,13 @@ const EntityDataTable = <Entity extends EntityBase>({
   const displayBulkAction = typeof actions === 'function';
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || typeof actions === 'function';
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
+  const _isEntitySelectable = useCallback((entity: Entity) => {
+    if (!displayBulkSelectCol) return false;
+
+    if (typeof isEntitySelectable === 'function') return isEntitySelectable(entity);
+
+    return true;
+  }, [displayBulkSelectCol, isEntitySelectable]);
 
   const accessibleColumns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
@@ -252,6 +260,8 @@ const EntityDataTable = <Entity extends EntityBase>({
       return [...cur, itemId];
     }));
   }, [setSelectedEntities]);
+
+  const selectableData = useMemo(() => data.filter(_isEntitySelectable), [data, _isEntitySelectable]);
 
   return (
     <ExpandedSectionsProvider>
@@ -283,7 +293,7 @@ const EntityDataTable = <Entity extends EntityBase>({
                      columnsWidths={columnsWidths}
                      selectedEntities={selectedEntities}
                      setSelectedEntities={setSelectedEntities}
-                     data={data}
+                     data={selectableData}
                      columnRenderersByAttribute={columnRenderersByAttribute}
                      onSortChange={onSortChange}
                      displayBulkSelectCol={displayBulkSelectCol}
@@ -300,7 +310,9 @@ const EntityDataTable = <Entity extends EntityBase>({
                         isSelected={!!selectedEntities?.includes(entity.id)}
                         rowActions={rowActions}
                         displaySelect={displayBulkSelectCol}
+                        isEntitySelectable={_isEntitySelectable}
                         displayActions={displayActionsCol}
+                        setSelectedEntities={setSelectedEntities}
                         columns={columns} />
               <ExpandedSections key={`expanded-sections-${entity.id}`}
                                 expandedSectionsRenderer={expandedSectionsRenderer}
