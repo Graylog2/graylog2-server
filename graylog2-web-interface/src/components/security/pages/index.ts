@@ -14,3 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import loadAsync from 'routing/loadAsync';
+
+const SecurityOverview = loadAsync(() => import('./SecurityOverview'));
+const SecurityUserActivity = loadAsync(() => import('./SecurityUserActivity'));
+const SecurityHostActivity = loadAsync(() => import('./SecurityHostActivity'));
+const SecurityNetworkActivity = loadAsync(() => import('./SecurityNetworkActivity'));
+const SecurityAnomalies = loadAsync(() => import('./SecurityAnomalies'));
+
+export {
+  SecurityOverview,
+  SecurityUserActivity,
+  SecurityHostActivity,
+  SecurityNetworkActivity,
+  SecurityAnomalies,
+};
