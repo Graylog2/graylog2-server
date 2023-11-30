@@ -20,7 +20,7 @@ import { useQueryParam, QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import asMock from 'helpers/mocking/AsMock';
-import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
+import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -48,7 +48,7 @@ const renderIndexSetFieldTypesPage = () => render(
 );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
-jest.mock('hooks/useIndexSetFieldType', () => jest.fn());
+jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
@@ -112,7 +112,6 @@ describe('IndexSetFieldTypesList', () => {
       isLoading: false,
       refetch: () => {},
       data: getData([customFiled]),
-
     });
 
     renderIndexSetFieldTypesPage();

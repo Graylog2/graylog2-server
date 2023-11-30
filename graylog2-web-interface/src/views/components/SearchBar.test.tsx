@@ -123,7 +123,8 @@ describe('SearchBar', () => {
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).toContain('disabled'));
-    await waitFor(() => expect(timeRangePickerButton.firstChild).toHaveClass('fa-exclamation-triangle'));
+    const exclamationIcon = timeRangePickerButton.querySelector('svg');
+    await waitFor(() => expect(exclamationIcon).toHaveClass('fa-exclamation-triangle'));
   });
 
   it('should hide the save load controls if editing the widget', async () => {

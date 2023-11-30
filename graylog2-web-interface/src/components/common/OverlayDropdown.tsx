@@ -63,7 +63,7 @@ type Props = {
   menuContainer?: HTMLElement,
   onToggle: () => void,
   placement?: Placement,
-  renderToggle?: (payload: { onToggle: () => void, toggleTarget: React.Ref<HTMLElement> }) => React.ReactNode,
+  renderToggle?: (payload: { onToggle: () => void, toggleTarget: React.Ref<HTMLButtonElement> }) => React.ReactNode,
   show: boolean,
   toggleChild?: React.ReactNode,
 }
@@ -81,7 +81,7 @@ const OverlayDropdown = ({
   toggleChild,
 }: Props) => {
   const [currentPlacement, setCurrentPlacement] = useState<Placement>(placement);
-  const toggleTarget = useRef<HTMLElement>();
+  const toggleTarget = useRef<HTMLButtonElement>();
 
   const handleOverlayEntering = (dropdownElem) => {
     const dropdownOffsetLeft = dropdownElem.offsetLeft;
