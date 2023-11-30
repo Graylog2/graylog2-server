@@ -59,12 +59,12 @@ const StyledFormSubmit = styled(FormSubmit)`
 `;
 
 const ConfigSegmentsTitle = styled.h2(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
+  margin-bottom: ${theme.spacings.sm};
 `);
 
 const ConfigSegment = styled.div(({ theme }) => css`
   margin-bottom: ${theme.spacings.xs};
-  margin-top: ${theme.spacings.sm};
+  margin-top: ${theme.spacings.md};
 `);
 
 const _validateIndexPrefix = (value: string) => {
@@ -307,7 +307,8 @@ const IndexSetConfigurationForm = ({
                         <DataTieringVisualisation minDays={values.data_tiering?.index_lifetime_min}
                                                   maxDays={values.data_tiering?.index_lifetime_max}
                                                   minDaysInHot={values.data_tiering?.index_hot_lifetime_min}
-                                                  warmTierEnabled={values.data_tiering?.warm_tier_enabled} />
+                                                  warmTierEnabled={values.data_tiering?.warm_tier_enabled}
+                                                  archiveData={values.data_tiering?.archive_before_deletion} />
                         <DataTieringConfiguration />
                       </ConfigSegment>
                     )

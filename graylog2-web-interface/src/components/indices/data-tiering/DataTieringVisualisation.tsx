@@ -24,6 +24,7 @@ type Props = {
   maxDays?: number,
   minDaysInHot?: number,
   warmTierEnabled?: boolean,
+  archiveData?: boolean,
 }
 
 type BarProps = {
@@ -35,23 +36,31 @@ type LabelProps = {
   value: number,
 }
 
+const VisualisationWrapper = styled.div(({ theme }) => css`
+  padding-left: ${theme.spacings.md};
+  padding-right: ${theme.spacings.md};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`);
+
 const BarWrapper = styled.div`
   overflow: hidden;
+  width: 100%;
 `;
 
-const LabelBar = styled.div`
-  position: relative;
-  height: 50px;
-`;
+const MaxDaysLabel = styled.p(({ theme }) => css`
+  margin-left: ${theme.spacings.sm};
+  margin-bottom: 0;
+`);
 
-const TooltipBar = styled.div`
+const AnnotationBar = styled.div`
   position: relative;
-  height: 50px;
+  height: 60px;
 `;
 
 const LifeCycleBar = styled.div(({ theme }) => css`
   height: 40px;
-  margin-bottom: 20px;
   background: ${theme.colors.variant.lighter.info};
   position: relative;
 `);
@@ -82,7 +91,7 @@ const Bar = styled.div<BarProps>(({ theme, value, color }) => css`
 
 const Label = styled.div<LabelProps>(({ value }) => css`
   position: absolute;
-  top: 0;
+  bottom: 25px;
   ${value > 3
     ? `right: ${100 - value}%;`
     : 'left: 0;'}
@@ -103,13 +112,10 @@ const StyledTooltip = styled(Tooltip)(({ value }) => css`
     : `
   left: 0;
   margin-left: 3px;
-  `
-}
-    
-
+  `}    
 `);
 
-const DataTieringVisualisation = ({ minDays, maxDays, minDaysInHot, warmTierEnabled }: Props) => {
+const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot, warmTierEnabled }: Props) => {
   const [showMinDaysTooltip, setShowMinDaysTooltip] = useState<boolean>(false);
   const [showMinDaysInHotTooltip, setShowMinDaysInHotTooltip] = useState<boolean>(false);
   const theme = useTheme();
@@ -126,42 +132,54 @@ const DataTieringVisualisation = ({ minDays, maxDays, minDaysInHot, warmTierEnab
   const showHotTier = warmTierEnabled && minDaysInHotPercentage > 0;
 
   return (
-    <BarWrapper>
-      <LabelBar>
-        {minDaysPercentage > 0 && (<Label value={minDaysPercentage}>{minDays} days</Label>)}
-        {showHotTier && (<Label value={minDaysInHotPercentage}>{minDaysInHot} days</Label>)}
-        <Label value={100}>{maxDays} days in storage</Label>
-      </LabelBar>
+    <VisualisationWrapper>
+      <BarWrapper>
+        <AnnotationBar>
+          {minDaysPercentage > 0 && (<Label value={minDaysPercentage}>{minDays} days</Label>)}
+          {showHotTier && (minDaysInHotPercentage !== minDaysPercentage) && (
+            <Label value={minDaysInHotPercentage}>{minDaysInHot} days</Label>
+          )}
+        </AnnotationBar>
 
-      <LifeCycleBar>
-        <Bar value={minDaysPercentage}
-             color={theme.colors.variant.info}
-             onMouseEnter={() => setShowMinDaysTooltip(true)}
-             onMouseLeave={() => setShowMinDaysTooltip(false)} />
-        {showHotTier && (
-        <Bar value={minDaysInHotPercentage}
-             color={theme.colors.variant.darkest.info}
-             onMouseEnter={() => setShowMinDaysInHotTooltip(true)}
-             onMouseLeave={() => setShowMinDaysInHotTooltip(false)} />
-        )}
-      </LifeCycleBar>
-      <TooltipBar>
-        {showHotTier && showMinDaysInHotTooltip && (
-          <StyledTooltip placement="bottom"
-                         arrowOffsetLeft={minDaysInHotPercentage <= 12 ? '10px' : '100%'}
-                         value={minDaysInHotPercentage}>
-            Min. # of days in Hot Tier
-          </StyledTooltip>
-        )}
-        {minDaysPercentage > 0 && showMinDaysTooltip && (
-          <StyledTooltip placement="bottom"
-                         arrowOffsetLeft={minDaysPercentage <= 12 ? '10px' : '100%'}
-                         value={minDaysPercentage}>
-            Min. # of days in storage
-          </StyledTooltip>
-        )}
-      </TooltipBar>
-    </BarWrapper>
+        <LifeCycleBar>
+          <Bar value={minDaysPercentage}
+               color={theme.colors.variant.info}
+               onMouseEnter={() => setShowMinDaysTooltip(true)}
+               onMouseLeave={() => setShowMinDaysTooltip(false)} />
+          {showHotTier && (
+            <Bar value={minDaysInHotPercentage}
+                 color={theme.colors.variant.darkest.info}
+                 onMouseEnter={() => setShowMinDaysInHotTooltip(true)}
+                 onMouseLeave={() => setShowMinDaysInHotTooltip(false)} />
+          )}
+        </LifeCycleBar>
+        <AnnotationBar>
+          {showHotTier && showMinDaysInHotTooltip && (
+            minDaysInHotPercentage === minDaysPercentage ? (
+              <StyledTooltip placement="bottom"
+                             arrowOffsetLeft={minDaysInHotPercentage <= 12 ? '10px' : '100%'}
+                             value={minDaysInHotPercentage}>
+                Min. # of days in Hot Tier and storage
+              </StyledTooltip>
+            ) : (
+              <StyledTooltip placement="bottom"
+                             arrowOffsetLeft={minDaysInHotPercentage <= 12 ? '10px' : '100%'}
+                             value={minDaysInHotPercentage}>
+                Min. # of days in Hot Tier
+              </StyledTooltip>
+            )
+          )}
+          {minDaysPercentage > 0 && showMinDaysTooltip && (
+            <StyledTooltip placement="bottom"
+                           arrowOffsetLeft={minDaysPercentage <= 12 ? '10px' : '100%'}
+                           value={minDaysPercentage}>
+              Min. # of days in storage
+            </StyledTooltip>
+          )}
+        </AnnotationBar>
+      </BarWrapper>
+      <MaxDaysLabel>{archiveData ? 'Archived and deleted' : 'Deleted'} after <strong>{maxDays} days</strong></MaxDaysLabel>
+    </VisualisationWrapper>
   );
 };
 
@@ -172,4 +190,5 @@ DataTieringVisualisation.defaultProps = {
   maxDays: 0,
   minDaysInHot: 0,
   warmTierEnabled: false,
+  archiveData: false,
 };
