@@ -19,7 +19,6 @@ import styled from 'styled-components';
 import OriginalButtonGroup from './ButtonGroup';
 
 const ButtonToolbar = styled(OriginalButtonGroup)`
-  float: right;
   gap: 0.25em;
 `;
 
