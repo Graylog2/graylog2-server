@@ -134,24 +134,39 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
     const theme = useMantineTheme();
     const styles = useMemo(() => generateStyles(theme.other, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
 
+    const sharedProps = {
+      id,
+      'aria-label': ariaLabel,
+      className,
+      ...styleProps(bsStyle),
+      'data-testid': dataTestId,
+      disabled,
+      role,
+      size: sizeForMantine(bsSize),
+      styles,
+      tabIndex,
+      title,
+      type,
+    } as const;
+
+    if (href) {
+      return (
+        <StyledButton<'a'> component="a"
+                           href={href}
+                           onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+                           {...sharedProps}>
+          {children}
+        </StyledButton>
+      );
+    }
+
     return (
       <StyledButton ref={ref}
-                    component={href ? 'a' : undefined}
-                    id={id}
-                    aria-label={ariaLabel}
-                    className={className}
-                    {...styleProps(bsStyle)}
-                    data-testid={dataTestId}
-                    disabled={disabled}
                     form={form}
-                    name={name}
                     onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-                    role={role}
-                    size={sizeForMantine(bsSize)}
-                    styles={styles}
-                    tabIndex={tabIndex}
-                    title={title}
-                    type={type}>{children}
+                    name={name}
+                    {...sharedProps}>
+        {children}
       </StyledButton>
     );
   });
