@@ -68,7 +68,7 @@ const validate = ({ description }: FormValues) => {
 type Props = {
   addTimerange: (title: string) => void,
   toggleModal: () => void,
-  target: Button | undefined | null,
+  target: typeof Button | undefined | null,
 };
 
 const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target }: Props) => {
