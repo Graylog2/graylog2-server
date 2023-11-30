@@ -25,28 +25,28 @@ import resultJson from 'components/security/teaser/sample-dashboards/user_activi
 
 const hotspots = [
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '67%',
+    positionY: '260px',
     description: 'Quickly see if you have concerning trends in failed logons.',
   },
   {
-    positionX: '250px',
-    positionY: '25%',
+    positionX: '40%',
+    positionY: '500px',
     description: 'Logon successes and failures by user can help you spot problem accounts and unusual activity.',
   },
   {
-    positionX: '600px',
-    positionY: '80%',
+    positionX: '70%',
+    positionY: '500px',
     description: 'These are the top 15 user accounts generating high alerts!',
   },
   {
-    positionX: '600px',
-    positionY: '80%',
+    positionX: '40%',
+    positionY: '940px',
     description: 'What are the most common identity and access control changes made in your environment?',
   },
   {
-    positionX: '600px',
-    positionY: '80%',
+    positionX: '50%',
+    positionY: '1300px',
     description: 'Know the target of the most frequent access control changes.',
   },
 ];

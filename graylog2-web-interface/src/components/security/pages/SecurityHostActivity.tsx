@@ -25,28 +25,28 @@ import resultJson from 'components/security/teaser/sample-dashboards/host_activi
 
 const hotspots = [
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '50%',
+    positionY: '120px',
     description: 'Get a top-level view of your high, medium, and low alert counts with trending information to know if this is a normal day at the office . . . or not.',
   },
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '40%',
+    positionY: '480px',
     description: 'Immediately identify which hosts are generating the high alerts, to shrink MTTR.',
   },
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '65%',
+    positionY: '950px',
     description: 'See which tech is generating the most log-ons.',
   },
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '40%',
+    positionY: '1350px',
     description: 'Initiate an investigation when identity and access control changes come from unexpected machines.',
   },
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '80%',
+    positionY: '1730px',
     description: 'Message counts by event source give you a daily view of regular patterns in data, spikes outside the norm will trigger investigations as to why.',
   },
 ];

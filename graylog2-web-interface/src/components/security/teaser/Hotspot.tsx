@@ -66,8 +66,8 @@ const HotspotTrigger = styled.button(({ theme }) => css`
 
 const HotspotContainer = styled.div<{ $positionX: string, $positionY: string }>(({ $positionX, $positionY }) => css`
   position: absolute;
-  top: ${$positionX};
-  left: calc(${$positionY} - ${HOTSPOT_HEIGHT / 2}px);
+  top: ${$positionY};
+  left: calc(${$positionX} - ${HOTSPOT_HEIGHT / 2}px);
 `);
 
 type TooltipProps = React.PropsWithChildren<{

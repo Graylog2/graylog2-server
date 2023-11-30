@@ -25,19 +25,19 @@ import resultJson from 'components/security/teaser/sample-dashboards/overview_re
 
 const hotspots = [
   {
-    positionX: '50px',
-    positionY: '50%',
-    description: 'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
+    positionX: '15%',
+    positionY: '50px',
+    description: 'Quickly find your most critical security info in the Overview tab.',
   },
   {
-    positionX: '250px',
-    positionY: '25%',
-    description: 'Confidence intervals tell you how far off the normal the behavior is.',
+    positionX: '50%',
+    positionY: '350px',
+    description: 'Find high alerts, top event sources, and more that give you insight into your security posture.',
   },
   {
-    positionX: '600px',
-    positionY: '80%',
-    description: 'There are detectors for different types of anomalies – quickly see which ones are generating alerts.',
+    positionX: '75%',
+    positionY: '580px',
+    description: 'Hover these tool tips throughout this page to learn more about features of Graylog Security',
   },
 ];
 const SecurityOverview = () => (
