@@ -19,31 +19,41 @@ import * as React from 'react';
 
 import { DocumentTitle } from 'components/common';
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
-// import viewJson from 'components/security/teaser/sample-dashboards/overview_view.json';
-// import searchJson from 'components/security/teaser/sample-dashboards/overview_search.json';
-// import resultJson from 'components/security/teaser/sample-dashboards/overview_results.json';
+// import viewJson from 'components/security/teaser/sample-dashboards/user_activity_view.json';
+// import searchJson from 'components/security/teaser/sample-dashboards/user_activity_search.json';
+// import resultJson from 'components/security/teaser/sample-dashboards/user_activity_results.json';
 
 const hotspots = [
   {
     positionX: '50px',
     positionY: '50%',
-    description: 'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
+    description: 'Quickly see if you have concerning trends in failed logons.',
   },
   {
     positionX: '250px',
     positionY: '25%',
-    description: 'Confidence intervals tell you how far off the normal the behavior is.',
+    description: 'Logon successes and failures by user can help you spot problem accounts and unusual activity.',
   },
   {
     positionX: '600px',
     positionY: '80%',
-    description: 'There are detectors for different types of anomalies – quickly see which ones are generating alerts.',
+    description: 'These are the top 15 user accounts generating high alerts!',
+  },
+  {
+    positionX: '600px',
+    positionY: '80%',
+    description: 'What are the most common identity and access control changes made in your environment?',
+  },
+  {
+    positionX: '600px',
+    positionY: '80%',
+    description: 'Know the target of the most frequent access control changes.',
   },
 ];
-const SecurityOverview = () => (
-  <DocumentTitle title="Overview">
+const SecurityUserActivity = () => (
+  <DocumentTitle title="User activity">
     <TeaserSearch viewJson={{}} searchJson={{}} searchJobResult={{}} hotspots={hotspots} />
   </DocumentTitle>
 );
 
-export default SecurityOverview;
+export default SecurityUserActivity;

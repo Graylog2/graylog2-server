@@ -24,7 +24,7 @@ import Routes from 'routing/Routes';
 const securityRoutes = [
   {
     id: 'security-main',
-    path: '/security',
+    path: Routes.SECURITY.OVERVIEW,
     pathName: 'SECURITY',
     iconName: 'poll',
     end: true,
@@ -32,7 +32,7 @@ const securityRoutes = [
   },
   {
     id: 'security-user-activity',
-    path: '/security/user-activity',
+    path: Routes.SECURITY.USER_ACTIVITY,
     pathName: 'SECURITY_USER-ACTIVITY',
     iconName: 'user',
     end: false,
@@ -40,7 +40,7 @@ const securityRoutes = [
   },
   {
     id: 'security-host-activity',
-    path: '/security/host-activity',
+    path: Routes.SECURITY.HOST_ACTIVITY,
     pathName: 'SECURITY_HOST-ACTIVITY',
     iconName: 'tv',
     end: false,
@@ -48,7 +48,7 @@ const securityRoutes = [
   },
   {
     id: 'security-network-activity',
-    path: '/security/network-activity',
+    path: Routes.SECURITY.NETWORK_ACTIVITY,
     pathName: 'SECURITY_NETWORK-ACTIVITY',
     iconName: 'wifi',
     end: false,
@@ -56,7 +56,7 @@ const securityRoutes = [
   },
   {
     id: 'security-anomalies',
-    path: '/security/anomalies',
+    path: Routes.SECURITY.ANOMALIES,
     pathName: 'SECURITY_ANOMALIES',
     iconName: 'search-plus',
     end: false,

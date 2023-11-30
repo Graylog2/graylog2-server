@@ -19,31 +19,17 @@ import * as React from 'react';
 
 import { DocumentTitle } from 'components/common';
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
-// import viewJson from 'components/security/teaser/sample-dashboards/overview_view.json';
-// import searchJson from 'components/security/teaser/sample-dashboards/overview_search.json';
-// import resultJson from 'components/security/teaser/sample-dashboards/overview_results.json';
+// import viewJson from 'components/security/teaser/sample-dashboards/anomalies_view.json';
+// import searchJson from 'components/security/teaser/sample-dashboards/anomalies_search.json';
+// import resultJson from 'components/security/teaser/sample-dashboards/anomalies_results.json';
 
 const hotspots = [
-  {
-    positionX: '50px',
-    positionY: '50%',
-    description: 'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
-  },
-  {
-    positionX: '250px',
-    positionY: '25%',
-    description: 'Confidence intervals tell you how far off the normal the behavior is.',
-  },
-  {
-    positionX: '600px',
-    positionY: '80%',
-    description: 'There are detectors for different types of anomalies – quickly see which ones are generating alerts.',
-  },
+
 ];
-const SecurityOverview = () => (
-  <DocumentTitle title="Overview">
+const SecurityAnomalies = () => (
+  <DocumentTitle title="Anomalies">
     <TeaserSearch viewJson={{}} searchJson={{}} searchJobResult={{}} hotspots={hotspots} />
   </DocumentTitle>
 );
 
-export default SecurityOverview;
+export default SecurityAnomalies;
