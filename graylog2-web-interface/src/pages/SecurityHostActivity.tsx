@@ -19,9 +19,9 @@ import * as React from 'react';
 
 import { DocumentTitle } from 'components/common';
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
-// import viewJson from 'components/security/teaser/sample-dashboards/host_activity_view.json';
-// import searchJson from 'components/security/teaser/sample-dashboards/host_activity_search.json';
-// import resultJson from 'components/security/teaser/sample-dashboards/host_activity_results.json';
+import viewJson from 'components/security/teaser/sample-dashboards/host_activity_view.json';
+import searchJson from 'components/security/teaser/sample-dashboards/host_activity_search.json';
+import resultJson from 'components/security/teaser/sample-dashboards/host_activity_results.json';
 
 const hotspots = [
   {
@@ -53,7 +53,7 @@ const hotspots = [
 
 const SecurityHostActivity = () => (
   <DocumentTitle title="Host activity">
-    <TeaserSearch viewJson={{}} searchJson={{}} searchJobResult={{}} hotspots={hotspots} />
+    <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
   </DocumentTitle>
 );
 
