@@ -20,10 +20,12 @@ const SecurityOverview = loadAsync(() => import('./SecurityOverview'));
 const SecurityUserActivity = loadAsync(() => import('./SecurityUserActivity'));
 const SecurityHostActivity = loadAsync(() => import('./SecurityHostActivity'));
 const SecurityNetworkActivity = loadAsync(() => import('./SecurityNetworkActivity'));
+const SecurityAnomalies = loadAsync(() => import('./SecurityAnomalies'));
 
 export {
   SecurityOverview,
   SecurityUserActivity,
   SecurityHostActivity,
   SecurityNetworkActivity,
+  SecurityAnomalies,
 };

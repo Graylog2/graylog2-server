@@ -22,6 +22,7 @@ import {
   SecurityUserActivity,
   SecurityHostActivity,
   SecurityNetworkActivity,
+  SecurityAnomalies,
 } from 'components/security/pages';
 import TeaserPageLayout from 'components/security/teaser/TeaserPageLayout';
 
@@ -30,6 +31,7 @@ const routes = [
   { path: Routes.SECURITY.USER_ACTIVITY, component: SecurityUserActivity, parentComponent: TeaserPageLayout },
   { path: Routes.SECURITY.HOST_ACTIVITY, component: SecurityHostActivity, parentComponent: TeaserPageLayout },
   { path: Routes.SECURITY.NETWORK_ACTIVITY, component: SecurityNetworkActivity, parentComponent: TeaserPageLayout },
+  { path: Routes.SECURITY.ANOMALIES, component: SecurityAnomalies, parentComponent: TeaserPageLayout },
 ];
 
 export const navigation = {
