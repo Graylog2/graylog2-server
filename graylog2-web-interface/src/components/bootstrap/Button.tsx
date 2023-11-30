@@ -133,8 +133,10 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
   }, ref) => {
     const theme = useMantineTheme();
     const styles = useMemo(() => generateStyles(theme.other, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
-    const button = (
+
+    return (
       <StyledButton ref={ref}
+                    component={href ? 'a' : undefined}
                     id={id}
                     aria-label={ariaLabel}
                     className={className}
@@ -152,8 +154,6 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
                     type={type}>{children}
       </StyledButton>
     );
-
-    return href ? <a href={href}>{button}</a> : button;
   });
 
 Button.defaultProps = {
