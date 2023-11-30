@@ -112,7 +112,24 @@ const IndexSetConfigurationForm = ({
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<string>('data_tiering');
 
-  const saveConfiguration = (values: IndexSet) => onUpdate(prepareDataTieringConfig(values));
+  const prepareRetentionConfig = (values: IndexSet) : IndexSet => {
+    if (selectedRetentionSegment === 'legacy') {
+      return { ...values, data_tiering: undefined };
+    }
+
+    const configWithDataTiering = prepareDataTieringConfig(values, PluginStore);
+
+    const legacyDefaultConfig = {
+      retention_strategy: null,
+      retention_strategy_class: null,
+      rotation_strategy: null,
+      rotation_strategy_class: null,
+    };
+
+    return { ...configWithDataTiering, ...legacyDefaultConfig };
+  };
+
+  const saveConfiguration = (values: IndexSet) => onUpdate(prepareRetentionConfig(values));
 
   const onFieldTypeRefreshIntervalChange = (
     intervalValue: number,

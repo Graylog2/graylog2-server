@@ -39,11 +39,11 @@ export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSet => 
   return { ...values, data_tiering };
 };
 
-export const prepareDataTieringConfig = (values: IndexSet) : IndexSet => {
+export const prepareDataTieringConfig = (values: IndexSet, pluginStore) : IndexSet => {
   if (!values.data_tiering) return values;
 
   const defaultType = 'hot_only';
-  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+  const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
   const dataTieringType = dataTieringPlugin?.type ?? defaultType;
 
   let { data_tiering } = values;
