@@ -2,4 +2,4 @@ type = "f"
 message = "Fix filebeat path configuration for sidecar"
 
 issues = ["17526"]
-pulls = ["17000"]
+pulls = ["17532"]
