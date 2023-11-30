@@ -1,6 +1,6 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import Routes from 'routing/Routes';
+import Routes, { SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import SecurityOverview from 'pages/SecurityOverview';
 import TeaserPageLayout from 'components/security/teaser/TeaserPageLayout';
 import SecurityUserActivity from 'pages/SecurityUserActivity';
@@ -15,6 +15,17 @@ const routes = [
   { path: Routes.SECURITY.NETWORK_ACTIVITY, component: SecurityNetworkActivity, parentComponent: TeaserPageLayout },
   { path: Routes.SECURITY.ANOMALIES, component: SecurityAnomalies, parentComponent: TeaserPageLayout },
 ];
+
+export const navigation = {
+  description: SECURITY_ROUTE_DESCRIPTION,
+  children: [
+    { path: Routes.SECURITY.OVERVIEW, description: 'Overview' },
+    { path: Routes.SECURITY.USER_ACTIVITY, description: 'User Activity' },
+    { path: Routes.SECURITY.HOST_ACTIVITY, description: 'Host Activity' },
+    { path: Routes.SECURITY.NETWORK_ACTIVITY, description: 'Network Activity' },
+    { path: Routes.SECURITY.ANOMALIES, description: 'Anomalies' },
+  ],
+};
 
 const pluginExports: PluginExports = {
   routes,
