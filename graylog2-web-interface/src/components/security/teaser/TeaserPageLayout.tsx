@@ -54,14 +54,6 @@ const securityRoutes = [
     end: false,
     title: 'Network Activity',
   },
-  {
-    id: 'security-anomalies',
-    path: Routes.SECURITY.ANOMALIES,
-    pathName: 'SECURITY_ANOMALIES',
-    iconName: 'search-plus',
-    end: false,
-    title: 'Anomalies',
-  },
 ] as const;
 
 const TeaserPageLayout = ({ children }: PropsWithChildren) => {
