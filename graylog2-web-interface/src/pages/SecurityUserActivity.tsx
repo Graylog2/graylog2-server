@@ -50,6 +50,7 @@ const hotspots = [
     description: 'Know the target of the most frequent access control changes.',
   },
 ];
+
 const SecurityUserActivity = () => (
   <DocumentTitle title="User activity">
     <TeaserSearch viewJson={{}} searchJson={{}} searchJobResult={{}} hotspots={hotspots} />

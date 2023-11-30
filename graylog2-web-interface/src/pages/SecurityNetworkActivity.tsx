@@ -24,7 +24,31 @@ import TeaserSearch from 'components/security/teaser/TeaserSearch';
 // import resultJson from 'components/security/teaser/sample-dashboards/network_activity_results.json';
 
 const hotspots = [
-
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'Instantly see spikes in data flows across your network.',
+  },
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'Quickly see where the data is coming from and where it is going.',
+  },
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'Identify which users are sending the most amount of data across the network.',
+  },
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'Determine if there is an unusual pattern in DNS query results like a particular error code suddenly showing up in the Top 15 list. ',
+  },
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'The top 15 platforms generating DNS requests by event source.',
+  },
 ];
 
 const SecurityNetworkActivity = () => (

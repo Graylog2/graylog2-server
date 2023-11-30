@@ -24,7 +24,26 @@ import TeaserSearch from 'components/security/teaser/TeaserSearch';
 // import resultJson from 'components/security/teaser/sample-dashboards/anomalies_results.json';
 
 const hotspots = [
-
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
+  },
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'Confidence intervals tell you how far off the normal the behavior is.',
+  },
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'There are detectors for different types of anomalies – quickly see which ones are generating alerts.',
+  },
+  {
+    positionX: '50px',
+    positionY: '50%',
+    description: 'Identify user accounts that have unusual-for-them behaviors for logons or security events.',
+  },
 ];
 const SecurityAnomalies = () => (
   <DocumentTitle title="Anomalies">
