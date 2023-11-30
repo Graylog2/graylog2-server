@@ -126,5 +126,5 @@ public interface IndicesAdapter {
 
     void refresh(String... indices);
 
-    Optional<WarmIndexInfo> getSearchableSnapshotInfo(String indexOrAlias);
+    Optional<WarmIndexInfo> getWarmIndexInfo(String indexOrAlias);
 }

@@ -587,7 +587,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     //Snapshots not supported for ES
     @Override
-    public Optional<WarmIndexInfo> getSearchableSnapshotInfo(String index) {
+    public Optional<WarmIndexInfo> getWarmIndexInfo(String index) {
         return Optional.empty();
     }
 }

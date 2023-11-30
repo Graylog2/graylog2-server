@@ -585,7 +585,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public Optional<WarmIndexInfo> getSearchableSnapshotInfo(String index) {
+    public Optional<WarmIndexInfo> getWarmIndexInfo(String index) {
         final GetSettingsResponse settingsResponse = client.execute((c, options) ->
                 c.indices().getSettings(new GetSettingsRequest().indices(index), options));
         Map<String, Settings> indexToSettings = settingsResponse.getIndexToSettings();

@@ -108,7 +108,7 @@ public class Indices {
     }
 
     public void delete(String indexName) {
-        Optional<WarmIndexInfo> snapshotInfoOptional = indicesAdapter.getSearchableSnapshotInfo(indexName);
+        Optional<WarmIndexInfo> snapshotInfoOptional = indicesAdapter.getWarmIndexInfo(indexName);
         indicesAdapter.delete(indexName);
 
         eventBus.post(IndicesDeletedEvent.create(indexName));
@@ -116,7 +116,7 @@ public class Indices {
     }
 
     public void close(String indexName) {
-        indicesAdapter.getSearchableSnapshotInfo(indexName).ifPresent(snapshotInfo -> {
+        indicesAdapter.getWarmIndexInfo(indexName).ifPresent(snapshotInfo -> {
             throw new UnsupportedOperationException("Close operation not available for warm index: " + snapshotInfo.currentIndexName());
         });
 
