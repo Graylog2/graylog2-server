@@ -42,6 +42,7 @@ public class TransportsModule extends Graylog2Module {
         installTransport(mapBinder, "amqp", AmqpTransport.class);
         installTransport(mapBinder, "httppoll", HttpPollTransport.class);
         installTransport(mapBinder, "syslog-tcp", SyslogTcpTransport.class);
+        installTransport(mapBinder, "resurfacehttp", ResurfaceHttpTransport.class);
 
         bind(EventLoopGroupFactory.class).asEagerSingleton();
         bind(EventLoopGroup.class).toProvider(EventLoopGroupProvider.class).asEagerSingleton();
