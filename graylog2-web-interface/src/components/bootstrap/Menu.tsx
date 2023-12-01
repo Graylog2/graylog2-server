@@ -22,13 +22,14 @@ import styled, { css, useTheme } from 'styled-components';
 type Props = PropsWithChildren<{
   onChange?: (isOpen: boolean) => void,
   opened?: boolean,
+  keepMounted?: boolean,
   position?: MenuProps['position'],
   shadow?: MenuProps['shadow'],
   width?: number,
   withinPortal?: boolean,
 }>
 
-const Menu = ({ children, shadow, width, withinPortal, position, opened, onChange }: Props) => {
+const Menu = ({ children, shadow, width, withinPortal, position, opened, onChange, keepMounted }: Props) => {
   const theme = useTheme();
 
   const styles = () => ({
@@ -47,7 +48,8 @@ const Menu = ({ children, shadow, width, withinPortal, position, opened, onChang
                  width={width}
                  position={position}
                  withinPortal={withinPortal}
-                 styles={styles}>
+                 styles={styles}
+                 keepMounted={keepMounted}>
       {children}
     </MantineMenu>
   );
@@ -82,6 +84,7 @@ Menu.defaultProps = {
   withinPortal: false,
   opened: undefined,
   onChange: undefined,
+  keepMounted: undefined,
 };
 
 export default Menu;

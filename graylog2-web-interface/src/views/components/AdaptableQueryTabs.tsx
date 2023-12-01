@@ -23,7 +23,6 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { OrderedSet } from 'immutable';
 
 import UserNotification from 'util/UserNotification';
-import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 import { Nav, NavItem, MenuItem } from 'components/bootstrap';
@@ -46,6 +45,7 @@ import fetchSearch from 'views/logic/views/fetchSearch';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import DropdownButton from 'components/bootstrap/DropdownButton';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -133,8 +133,8 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
   const tabItems = dashboardTabs.querySelectorAll(':scope > li:not(.dropdown):not(.query-tabs-new)') as NodeListOf<HTMLElement>;
   const moreItems = dashboardTabs.querySelectorAll('li.dropdown .dropdown-menu li') as NodeListOf<HTMLElement>;
-  const moreBtn = dashboardTabs.querySelector('li.query-tabs-more') as HTMLElement;
-  const newBtn = dashboardTabs.querySelector('li.query-tabs-new') as HTMLElement;
+  const moreBtn = dashboardTabs.querySelector('.query-tabs-more') as HTMLElement;
+  const newBtn = dashboardTabs.querySelector('.query-tabs-new') as HTMLElement;
   const hiddenItems = [];
 
   let buttonsWidth = moreBtn.offsetWidth + newBtn.offsetWidth + NAV_PADDING;
@@ -234,7 +234,6 @@ const AdaptableQueryTabs = ({
   queryTitleEditModal,
   dashboardId,
 }: Props) => {
-  const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
@@ -325,18 +324,14 @@ const AdaptableQueryTabs = ({
       <StyledQueryNav bsStyle="tabs" activeKey={activeQueryId} id="dashboard-tabs">
         {currentTabs.navItems.toArray()}
 
-        <NavDropdown eventKey="more"
-                     title={<Icon name="ellipsis-h" />}
-                     className="query-tabs-more"
-                     id="query-tabs-more"
-                     aria-label="More Dashboard Pages"
-                     noCaret
-                     pullRight
-                     active={openedMore}
-                     open={openedMore}
-                     onToggle={(isOpened) => setOpenedMore(isOpened)}>
+        <DropdownButton title={<Icon name="ellipsis-h" />}
+                        className="query-tabs-more"
+                        id="query-tabs-more"
+                        aria-label="More Dashboard Pages"
+                        noCaret
+                        pullRight>
           {currentTabs.menuItems.toArray()}
-        </NavDropdown>
+        </DropdownButton>
 
         {currentTabs.lockedItems.toArray()}
 

@@ -72,7 +72,7 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Pro
   }, [descriptor, handleFailures, refetchStreams, selectedItemsAmount, selectedStreamIds]);
 
   return (
-    <BulkActionsDropdown selectedEntities={selectedStreamIds} setSelectedEntities={setSelectedStreamIds}>
+    <BulkActionsDropdown selectedEntities={selectedStreamIds} setSelectedEntities={setSelectedStreamIds} keepMounted>
       <AssignIndexSetAction indexSets={indexSets}
                             selectedStreamIds={selectedStreamIds}
                             setSelectedStreamIds={setSelectedStreamIds}

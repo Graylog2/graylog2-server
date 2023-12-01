@@ -25,16 +25,20 @@ type Props = {
   element: React.ReactNode,
 };
 
+const stopEvent = (e: React.BaseSyntheticEvent) => e.stopPropagation();
+
 const ActionDropdown = ({ children, element }: Props) => (
-  <Menu position="bottom" withinPortal>
-    <Menu.Target>
-      {element}
-    </Menu.Target>
-    <Menu.Dropdown>
-      <MenuItem header>Actions</MenuItem>
-      {children}
-    </Menu.Dropdown>
-  </Menu>
+  <span onClick={stopEvent}>
+    <Menu position="bottom" withinPortal>
+      <Menu.Target>
+        {element}
+      </Menu.Target>
+      <Menu.Dropdown>
+        <MenuItem header>Actions</MenuItem>
+        {children}
+      </Menu.Dropdown>
+    </Menu>
+  </span>
 );
 
 ActionDropdown.propTypes = {

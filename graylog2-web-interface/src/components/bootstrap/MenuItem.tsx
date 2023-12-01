@@ -50,10 +50,10 @@ type Props<T = undefined> = React.PropsWithChildren<{
 
 const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title }: Props<T>) => {
   const callback = onClick ?? onSelect;
-  const _onClick = useCallback(() => callback(eventKey), [callback, eventKey]);
+  const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
   if (divider) {
-    return <Menu.Divider className={className} id={id} />;
+    return <Menu.Divider role="separator" className={className} id={id} />;
   }
 
   if (header) {
