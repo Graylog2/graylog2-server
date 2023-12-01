@@ -15,8 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 
 import type { DataNode } from 'preflight/types';
+import {
+  ConfirmDialog,
+} from 'components/common';
 import { MenuItem } from 'components/bootstrap';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
@@ -27,19 +31,91 @@ import { rejoinDataNode, removeDataNode } from '../hooks/useDataNodes';
 type Props = {
   dataNode: DataNode,
 };
+const DIALOG_TYPES = {
+  REJOIN: 'rejoin',
+  REMOVE: 'remove',
+};
+const DIALOG_TEXT = {
+  [DIALOG_TYPES.REJOIN]: {
+    dialogTitle: 'Reset Datanode',
+    dialogBody: (datanode: string) => `Are you sure you want to reset datanode "${datanode}"?`,
+  },
+  [DIALOG_TYPES.REMOVE]: {
+    dialogTitle: 'Remove datanode',
+    dialogBody: (datanode: string) => `Are you sure you want to remove datanode "${datanode}"?`,
+  },
+};
 
-const DataNodeActions = ({ dataNode }: Props) => (
-  <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                         bsSize="xsmall"
-                         buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                         disabled={false}
-                         dropdownZIndex={1000}>
-    <MenuItem onSelect={() => Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>Edit</MenuItem>
-    <MenuItem onSelect={() => {}}>Renew certificate</MenuItem>
-    <MenuItem onSelect={() => {}}>Restart</MenuItem>
-    <MenuItem onSelect={() => rejoinDataNode(dataNode.node_id)}>Rejoin</MenuItem>
-    <MenuItem onSelect={() => removeDataNode(dataNode.node_id)}>Remove</MenuItem>
-  </OverlayDropdownButton>
-);
+const DataNodeActions = ({ dataNode }: Props) => {
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogType, setDialogType] = useState(null);
+
+  const updateState = ({ show, type }) => {
+    setShowDialog(show);
+    setDialogType(type);
+  };
+
+  const handleAction = (action) => {
+    switch (action) {
+      case DIALOG_TYPES.REJOIN:
+        updateState({ show: true, type: DIALOG_TYPES.REJOIN });
+
+        break;
+      case DIALOG_TYPES.REMOVE:
+        updateState({ show: true, type: DIALOG_TYPES.REMOVE });
+
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleClearState = () => {
+    updateState({ show: false, type: null });
+  };
+
+  const handleConfirm = () => {
+    switch (dialogType) {
+      case 'rejoin':
+        rejoinDataNode(dataNode.node_id).then(() => {
+          handleClearState();
+        });
+
+        break;
+      case 'remove':
+        removeDataNode(dataNode.node_id).then(() => {
+          handleClearState();
+        });
+
+        break;
+      default:
+        break;
+    }
+  };
+
+  return (
+    <>
+      <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
+                             bsSize="xsmall"
+                             buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+                             disabled={false}
+                             dropdownZIndex={1000}>
+        <MenuItem onSelect={() => Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>Edit</MenuItem>
+        <MenuItem onSelect={() => {}}>Renew certificate</MenuItem>
+        <MenuItem onSelect={() => {}}>Restart</MenuItem>
+        <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>
+        <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
+      </OverlayDropdownButton>
+      {showDialog && (
+        <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
+                       show
+                       onConfirm={handleConfirm}
+                       onCancel={handleClearState}>
+          {DIALOG_TEXT[dialogType].dialogBody(dataNode.hostname)}
+        </ConfirmDialog>
+      )}
+    </>
+  );
+};
 
 export default DataNodeActions;
