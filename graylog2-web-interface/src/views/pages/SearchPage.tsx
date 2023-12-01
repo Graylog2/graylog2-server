@@ -35,16 +35,12 @@ import useHistory from 'routing/useHistory';
 import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
 import type { SearchExecutionResult } from 'views/types';
 
-type SearchComponentSlots = { InfoBarSlot: React.ComponentType }
-
 type Props = React.PropsWithChildren<{
   isNew: boolean,
   view: Promise<View>,
   loadNewView?: (history: HistoryFunction) => unknown,
   loadView?: (history: HistoryFunction, viewId: string) => unknown,
   executionState?: SearchExecutionState,
-  SearchComponentSlots?: SearchComponentSlots,
-  SearchAreaContainer?: React.ComponentType,
   searchResult?: SearchExecutionResult,
 }>;
 
@@ -65,8 +61,6 @@ const SearchPage = ({
   loadNewView: _loadNewView = defaultLoadNewView,
   loadView: _loadView = defaultLoadView,
   executionState: initialExecutionState,
-  SearchComponentSlots,
-  SearchAreaContainer,
   searchResult,
 }: Props) => {
   const query = useQuery();
@@ -96,7 +90,7 @@ const SearchPage = ({
                 <AutoRefreshProvider>
                   {children}
                   <IfUserHasAccessToAnyStream>
-                    <Search InfoBarSlot={SearchComponentSlots.InfoBarSlot} SearchAreaContainer={SearchAreaContainer} />
+                    <Search />
                   </IfUserHasAccessToAnyStream>
                 </AutoRefreshProvider>
               </ViewLoaderContext.Provider>
@@ -112,8 +106,6 @@ SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
   executionState: SearchExecutionState.empty(),
-  SearchComponentSlots: {},
-  SearchAreaContainer: undefined,
   searchResult: undefined,
 };
 

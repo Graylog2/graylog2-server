@@ -15,17 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import { useMemo } from 'react';
+import merge from 'lodash/merge';
 
-import OriginalButtonGroup from './ButtonGroup';
+import type { LayoutState } from './SearchPageLayoutContext';
+import SearchPageLayoutContext, { DEFAULT_STATE } from './SearchPageLayoutContext';
 
-const StyledButtonToolbar = styled(OriginalButtonGroup)`
-  gap: 0.25em;
-`;
+type Props = {
+  children: React.ReactNode,
+  value: Partial<LayoutState>,
+};
 
-const ButtonToolbar = (props: React.ComponentProps<typeof StyledButtonToolbar>) => (
-  <StyledButtonToolbar role="toolbar" {...props} />
-);
+const SearchPageLayoutProvider = ({ children, value }: Props) => {
+  const contextValue = useMemo(() => merge({}, DEFAULT_STATE, value), [value]);
 
-/** @component */
-export default ButtonToolbar;
+  return (
+    <SearchPageLayoutContext.Provider value={contextValue}>
+      {children}
+    </SearchPageLayoutContext.Provider>
+  );
+};
+
+export default SearchPageLayoutProvider;

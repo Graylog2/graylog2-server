@@ -23,7 +23,7 @@ import { IfPermitted, ShareButton } from 'components/common';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 
-const onDelete = (e, savedSearch: View, deleteSavedSearch: (search: View) => Promise<View>, activeSavedSearchId: string, refetch: () => void) => {
+const onDelete = (e: React.MouseEvent<HTMLButtonElement>, savedSearch: View, deleteSavedSearch: (search: View) => Promise<View>, activeSavedSearchId: string, refetch: () => void) => {
   e.stopPropagation();
 
   // eslint-disable-next-line no-alert

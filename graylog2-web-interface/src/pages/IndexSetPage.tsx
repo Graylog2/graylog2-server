@@ -199,9 +199,7 @@ class IndexSetPage extends React.Component<Props, State> {
       indicesOverview = (
         <IndicesOverview indices={indexerOverview.indices}
                          indexDetails={indexDetailsIndices}
-                         indexSetId={indexSetId}
-                         closedIndices={indexDetailsClosedIndices}
-                         deflector={indexerOverview.deflector} />
+                         indexSetId={indexSetId} />
       );
     } else {
       indicesInfo = <Spinner />;

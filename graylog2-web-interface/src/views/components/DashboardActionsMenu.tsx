@@ -57,15 +57,10 @@ const DashboardActionsMenu = () => {
 
   const {
     viewActions: {
-      save: {
-        isShown: showSaveButton,
-      }, saveAs: {
-        isShown: showSaveNewButton,
-      }, share: {
-        isShown: showShareButton,
-      }, actionsDropdown: {
-        isShown: showDropDownButton,
-      },
+      save: { isShown: showSaveButton },
+      saveAs: { isShown: showSaveNewButton },
+      share: { isShown: showShareButton },
+      actionsDropdown: { isShown: showDropDownButton },
     },
   } = useSearchPageLayout();
   const pluggableSaveViewControls = useSaveViewFormControls();

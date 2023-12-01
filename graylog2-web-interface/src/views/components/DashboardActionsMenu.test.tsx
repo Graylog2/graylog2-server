@@ -24,7 +24,7 @@ import { adminUser } from 'fixtures/users';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
-import SearchPageLayoutContext, { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
+import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -32,6 +32,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 import DashboardActionsMenu from './DashboardActionsMenu';
 
@@ -68,12 +69,12 @@ describe('DashboardActionsMenu', () => {
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const SUT = ({ providerOverrides, view }: { providerOverrides?: LayoutState, view?: View }) => (
+  const SUT = ({ providerOverrides, view }: { providerOverrides?: Partial<LayoutState>, view?: View }) => (
     <TestStoreProvider view={view}>
       <HotkeysProvider>
-        <SearchPageLayoutContext.Provider value={providerOverrides}>
+        <SearchPageLayoutProvider value={providerOverrides}>
           <DashboardActionsMenu />
-        </SearchPageLayoutContext.Provider>
+        </SearchPageLayoutProvider>
       </HotkeysProvider>
     </TestStoreProvider>
   );
