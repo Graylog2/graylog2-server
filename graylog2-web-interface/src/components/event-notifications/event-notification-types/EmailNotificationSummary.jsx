@@ -43,17 +43,17 @@ const EmailNotificationSummary = ({ notification, ...otherProps }) => (
       </tr>
       <tr>
         <td>Use Lookup Table for Email Recipients</td>
-        <td>{notification.config.lookup_emails ? 'Yes' : 'No'}</td>
+        <td>{notification.config.lookup_recipient_emails ? 'Yes' : 'No'}</td>
       </tr>
-      {notification.config.lookup_emails ? (
+      {notification.config.lookup_recipient_emails ? (
         <>
           <tr>
             <td>Lookup Table Name</td>
-            <td>{notification.config.lookup_table_name}</td>
+            <td>{notification.config.recipients_lut_name}</td>
           </tr>
           <tr>
             <td>Lookup Table Key</td>
-            <td>{notification.config.lookup_table_key}</td>
+            <td>{notification.config.recipients_lut_key}</td>
           </tr>
         </>
       )

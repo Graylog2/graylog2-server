@@ -83,9 +83,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
     private static final String FIELD_TIME_ZONE = "time_zone";
-    private static final String FIELD_LOOKUP_EMAILS = "lookup_emails";
-    private static final String FIELD_LOOKUP_TABLE_NAME = "lookup_table_name";
-    private static final String FIELD_LOOKUP_TABLE_KEY = "lookup_table_key";
+    private static final String FIELD_LOOKUP_RECIPIENT_EMAILS = "lookup_recipient_emails";
+    private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_NAME = "recipients_lut_name";
+    private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_KEY = "recipients_lut_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
@@ -112,16 +112,16 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @JsonProperty(FIELD_TIME_ZONE)
     public abstract DateTimeZone timeZone();
 
-    @JsonProperty(FIELD_LOOKUP_EMAILS)
-    public abstract boolean lookupEmails();
+    @JsonProperty(FIELD_LOOKUP_RECIPIENT_EMAILS)
+    public abstract boolean lookupRecipientEmails();
 
-    @JsonProperty(FIELD_LOOKUP_TABLE_NAME)
+    @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_NAME)
     @Nullable
-    public abstract String lookupTableName();
+    public abstract String recipientsLUTName();
 
-    @JsonProperty(FIELD_LOOKUP_TABLE_KEY)
+    @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
     @Nullable
-    public abstract String lookupTableKey();
+    public abstract String recipientsLUTKey();
 
     @Override
     @JsonIgnore
@@ -144,15 +144,15 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         if (bodyTemplate().isEmpty() && htmlBodyTemplate().isEmpty()) {
             validation.addError("body", "One of Email Notification body template or Email Notification HTML body must not be empty.");
         }
-        if (!lookupEmails() && emailRecipients().isEmpty() && userRecipients().isEmpty()) {
+        if (!lookupRecipientEmails() && emailRecipients().isEmpty() && userRecipients().isEmpty()) {
             validation.addError("recipients", "Email Notification must have email recipients or user recipients.");
         }
-        if (lookupEmails()) {
-            if (Strings.isNullOrEmpty(lookupTableName())) {
-                validation.addError(FIELD_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+        if (lookupRecipientEmails()) {
+            if (Strings.isNullOrEmpty(recipientsLUTName())) {
+                validation.addError(FIELD_RECIPIENTS_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
             }
-            if (Strings.isNullOrEmpty(lookupTableKey())) {
-                validation.addError(FIELD_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            if (Strings.isNullOrEmpty(recipientsLUTKey())) {
+                validation.addError(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
             }
         }
 
@@ -173,7 +173,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .bodyTemplate(DEFAULT_BODY_TEMPLATE)
                     .timeZone(DateTimeZone.UTC)
                     .htmlBodyTemplate("")
-                    .lookupEmails(false);
+                    .lookupRecipientEmails(false);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -200,14 +200,14 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_TIME_ZONE)
         public abstract Builder timeZone(DateTimeZone timeZone);
 
-        @JsonProperty(FIELD_LOOKUP_EMAILS)
-        public abstract Builder lookupEmails(boolean lookupEmails);
+        @JsonProperty(FIELD_LOOKUP_RECIPIENT_EMAILS)
+        public abstract Builder lookupRecipientEmails(boolean lookupRecipientEmails);
 
-        @JsonProperty(FIELD_LOOKUP_TABLE_NAME)
-        public abstract Builder lookupTableName(String lookupTableName);
+        @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_NAME)
+        public abstract Builder recipientsLUTName(String recipientsLUTName);
 
-        @JsonProperty(FIELD_LOOKUP_TABLE_KEY)
-        public abstract Builder lookupTableKey(String lookupTableKey);
+        @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
+        public abstract Builder recipientsLUTKey(String recipientsLUTKey);
 
         public abstract EmailEventNotificationConfig build();
     }
@@ -223,9 +223,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
                 .timeZone(ValueReference.of(timeZone().getID()))
-                .lookupEmails(ValueReference.of(lookupEmails()))
-                .lookupTableName(ValueReference.ofNullable(lookupTableName()))
-                .lookupTableKey(ValueReference.ofNullable(lookupTableKey()))
+                .lookupRecipientEmails(ValueReference.of(lookupRecipientEmails()))
+                .recipientsLUTName(ValueReference.ofNullable(recipientsLUTName()))
+                .recipientsLUTKey(ValueReference.ofNullable(recipientsLUTKey()))
             .build();
     }
 }

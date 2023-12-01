@@ -200,21 +200,21 @@ public class EmailSender {
 
     private List<String> getEmails(EmailEventNotificationConfig notificationConfig, Map<String, Object> model) throws ConfigurationError {
         List<String> emails = new ArrayList<>(notificationConfig.emailRecipients());
-        if (notificationConfig.lookupEmails()) {
-            LookupTable lut = lookupTableService.getTable(notificationConfig.lookupTableName());
+        if (notificationConfig.lookupRecipientEmails()) {
+            LookupTable lut = lookupTableService.getTable(notificationConfig.recipientsLUTName());
             if (lut == null) {
-                throw new ConfigurationError(f("Unable to find lookup table with name [%s] to get recipient emails.", notificationConfig.lookupTableName()));
+                throw new ConfigurationError(f("Unable to find lookup table with name [%s] to get recipient emails.", notificationConfig.recipientsLUTName()));
             }
-            String key = templateEngine.transform(notificationConfig.lookupTableKey(), model);
+            String key = templateEngine.transform(notificationConfig.recipientsLUTKey(), model);
             LookupResult result = lut.lookup(requireNonNull(key));
             if (result != null) {
                 if (result.hasError()) {
                     LOG.warn("Lookup result in table [{}] with key [{}] returned with error. No recipients will be added from lookup table.",
-                            notificationConfig.lookupTableName(), notificationConfig.lookupTableKey());
+                            notificationConfig.recipientsLUTName(), notificationConfig.recipientsLUTKey());
                 } else {
                     if (result.isEmpty()) {
                         LOG.warn("Lookup result in table [{}] with key [{}] returned empty result. No recipients will be added from lookup table.",
-                                notificationConfig.lookupTableName(), notificationConfig.lookupTableKey());
+                                notificationConfig.recipientsLUTName(), notificationConfig.recipientsLUTKey());
                     } else {
                         if (result.stringListValue() != null && !result.stringListValue().isEmpty()) {
                             emails = result.stringListValue();

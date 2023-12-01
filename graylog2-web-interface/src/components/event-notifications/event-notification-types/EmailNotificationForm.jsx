@@ -26,6 +26,8 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Input, Row } from 'components/
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 
+import './lookup-table-provider';
+
 // TODO: Default body template should come from the server
 const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------
 Title:       \${event_definition_title}
@@ -106,9 +108,9 @@ class EmailNotificationForm extends React.Component {
     user_recipients: [],
     email_recipients: [],
     time_zone: 'UTC',
-    lookup_emails: false,
-    lookup_table_name: null,
-    lookup_table_key: null,
+    lookup_recipient_emails: false,
+    recipients_lut_name: null,
+    recipients_lut_key: null,
   };
 
   propagateChange = (key, value) => {
@@ -129,17 +131,17 @@ class EmailNotificationForm extends React.Component {
     this.propagateChange('time_zone', nextValue);
   };
 
-  handleUseLookupChange = (nextValue) => {
+  handleUseRecipientLookupChange = (event) => {
     const { config, onChange } = this.props;
     const nextConfig = cloneDeep(config);
-
-    nextConfig.lookup_emails = nextValue;
+    const nextValue = getValueFromInput(event.target);
+    nextConfig.lookup_recipient_emails = nextValue;
 
     if (nextValue) {
       nextConfig.email_recipients = [];
     } else {
-      nextConfig.lookup_table_name = null;
-      nextConfig.lookup_table_key = null;
+      nextConfig.recipients_lut_name = null;
+      nextConfig.recipients_lut_key = null;
     }
 
     onChange(nextConfig);
@@ -182,23 +184,23 @@ class EmailNotificationForm extends React.Component {
       <EmailLookupRow>
         <Col md={6}>
           <Input id="lookup-table-name"
-                 name="lookup_table_name"
+                 name="recipients_lut_name"
                  label="Lookup Table Name"
                  type="text"
-                 bsStyle={validation.errors.lookup_table_name ? 'error' : null}
-                 help={get(validation, 'errors.lookup_table_name[0]', 'The lookup table name to search for email recipients.')}
-                 value={config.lookup_table_name || ''}
+                 bsStyle={validation.errors.recipients_lut_name ? 'error' : null}
+                 help={get(validation, 'errors.recipients_lut_name[0]', 'The lookup table name to search for email recipients.')}
+                 value={config.recipients_lut_name || ''}
                  onChange={this.handleChange}
                  required />
         </Col>
         <Col md={6}>
           <Input id="lookup-table-key"
-                 name="lookup_table_key"
+                 name="recipients_lut_key"
                  label="Lookup Table Key"
                  type="text"
-                 bsStyle={validation.errors.lookup_table_key ? 'error' : null}
-                 help={get(validation, 'errors.lookup_table_key[0]', 'The lookup table key to use when looking up email recipients.')}
-                 value={config.lookup_table_key || ''}
+                 bsStyle={validation.errors.recipients_lut_key ? 'error' : null}
+                 help={get(validation, 'errors.recipients_lut_key[0]', 'The lookup table key to use when looking up email recipients.')}
+                 value={config.recipients_lut_key || ''}
                  onChange={this.handleChange}
                  required />
         </Col>
@@ -251,14 +253,14 @@ class EmailNotificationForm extends React.Component {
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
-        {config.lookup_emails ? this.emailLookupFormGroup() : this.emailRecipientsFormGroup()}
+        {config.lookup_recipient_emails ? this.emailLookupFormGroup() : this.emailRecipientsFormGroup()}
         <FormGroup>
           <Input type="checkbox"
-                 id="lookup_emails"
-                 name="lookup_emails"
+                 id="lookup_recipient_emails"
+                 name="lookup_recipient_emails"
                  label="Use lookup table for Email Recipients"
-                 onChange={this.handleUseLookupChange}
-                 checked={config.lookup_emails} />
+                 onChange={this.handleUseRecipientLookupChange}
+                 checked={config.lookup_recipient_emails} />
         </FormGroup>
         <Input id="notification-time-zone"
                help="Time zone used for timestamps in the email body."

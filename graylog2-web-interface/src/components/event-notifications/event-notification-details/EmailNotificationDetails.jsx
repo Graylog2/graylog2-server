@@ -27,10 +27,10 @@ const EmailNotificationDetails = ({ notification }) => {
     <ReadOnlyFormGroup label="Email Recipients"
                        value={notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'} />
   );
-  const lookupInfo = (
+  const recipientLookupInfo = (
     <>
-      <ReadOnlyFormGroup label="Lookup Table Name" value={notification.config.lookup_table_name} />
-      <ReadOnlyFormGroup label="Lookup Table Key" value={notification.config.lookup_table_key} />
+      <ReadOnlyFormGroup label="Lookup Table Name" value={notification.config.recipients_lut_name} />
+      <ReadOnlyFormGroup label="Lookup Table Key" value={notification.config.recipients_lut_key} />
     </>
   );
 
@@ -40,8 +40,8 @@ const EmailNotificationDetails = ({ notification }) => {
       <ReadOnlyFormGroup label="Subject" value={notification.config.subject} />
       <ReadOnlyFormGroup label="Reply-To" value={notification.config.reply_to} />
       <ReadOnlyFormGroup label="User Recipients" value={notification.config.user_recipients.join(', ') || 'No users will receive this notification.'} />
-      <ReadOnlyFormGroup label="Use Lookup Table for Email Recipients" value={notification.config.lookup_emails ? 'Yes' : 'No'} />
-      {notification.config.lookup_emails ? lookupInfo : recipients}
+      <ReadOnlyFormGroup label="Use Lookup Table for Email Recipients" value={notification.config.lookup_recipient_emails ? 'Yes' : 'No'} />
+      {notification.config.lookup_recipient_emails ? recipientLookupInfo : recipients}
       <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
       <ReadOnlyFormGroup label="Email Body"
                          value={(
