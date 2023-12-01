@@ -25,23 +25,23 @@ import resultJson from 'components/security/teaser/sample-dashboards/anomalies_r
 
 const hotspots = [
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '50%',
+    positionY: '110px',
     description: 'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
   },
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '60%',
+    positionY: '550px',
     description: 'Confidence intervals tell you how far off the normal the behavior is.',
   },
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '40%',
+    positionY: '910px',
     description: 'There are detectors for different types of anomalies – quickly see which ones are generating alerts.',
   },
   {
-    positionX: '50px',
-    positionY: '50%',
+    positionX: '70%',
+    positionY: '910px',
     description: 'Identify user accounts that have unusual-for-them behaviors for logons or security events.',
   },
 ];
