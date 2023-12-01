@@ -19,7 +19,6 @@ import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { IfPermitted, ShareButton } from 'components/common';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MenuItem } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
@@ -29,6 +28,7 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import DropdownButton from 'components/bootstrap/DropdownButton';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -74,7 +74,7 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                    entityId={dashboard.id}
                    entityType="dashboard"
                    onClick={() => setShowShareModal(true)} />
-      <OverlayDropdownButton bsSize="xsmall" title={MORE_ACTIONS_TITLE} buttonTitle={MORE_ACTIONS_HOVER_TITLE}>
+      <DropdownButton bsSize="xsmall" title={MORE_ACTIONS_TITLE} buttonTitle={MORE_ACTIONS_HOVER_TITLE}>
         {dashboardActions.length > 0 ? (
           <>
             {dashboardActions}
@@ -86,7 +86,7 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
             <DeleteItem role="button">Delete</DeleteItem>
           </MenuItem>
         </IfPermitted>
-      </OverlayDropdownButton>
+      </DropdownButton>
       {showShareModal && (
         <EntityShareModal entityId={dashboard.id}
                           entityType="dashboard"

@@ -17,15 +17,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { Icon } from 'components/common';
 import ActionDropdown from 'views/components/common/ActionDropdown';
+import IconButton from 'components/common/IconButton';
 
 type Props = {
   children: React.ReactElement | React.ReactElement[],
 };
 
 const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown element={<Icon name="chevron-down" data-testid="query-action-dropdown" title="Page Actions" />}>
+  <ActionDropdown element={<IconButton name="chevron-down" data-testid="query-action-dropdown" title="Page Actions" />}>
     {children}
   </ActionDropdown>
 );

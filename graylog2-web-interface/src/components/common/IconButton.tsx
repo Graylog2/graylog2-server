@@ -44,7 +44,7 @@ const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => cs
 
 type Props = {
   focusable?: boolean,
-  title: string,
+  title?: string,
   onClick?: () => void,
   className?: string,
   name: IconName,
@@ -57,17 +57,17 @@ const handleClick = (onClick) => {
   }
 };
 
-const IconButton = ({ title, onClick, focusable, className, disabled, ...rest }: Props) => (
-  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button" disabled={disabled}>
+const IconButton = React.forwardRef<HTMLButtonElement, Props>(({ title, onClick, focusable, className, disabled, ...rest }: Props, ref) => (
+  <Wrapper ref={ref} tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button" disabled={disabled}>
     <Icon {...rest} />
   </Wrapper>
-);
+));
 
 IconButton.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string,
   onClick: PropTypes.func,
-  name: PropTypes.string,
+  name: PropTypes.any,
 };
 
 IconButton.defaultProps = {

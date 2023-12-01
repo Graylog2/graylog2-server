@@ -26,6 +26,7 @@ import Button from './Button';
  */
 type ButtonProps = Omit<React.ComponentProps<typeof Button>, 'title' | 'children'>;
 type Props = React.PropsWithChildren<ButtonProps & {
+  buttonTitle?: string,
   dropup?: boolean,
   noCaret?: boolean,
   onMouseDown?: () => void,
@@ -41,9 +42,9 @@ const position = (pullRight: boolean, dropup: boolean): 'top' | 'bottom' | 'top-
   return `${orientation}${suffix}`;
 };
 
-const DropdownButton = ({ children, dropup, title, onMouseDown, onToggle, pullRight, noCaret, ...rest }: Props) => (
+const DropdownButton = ({ buttonTitle, children, dropup, title, onMouseDown, onToggle, pullRight, noCaret, ...rest }: Props) => (
   <Menu position={position(pullRight, dropup)} onChange={onToggle}>
-    <Menu.Target><Button onClick={onMouseDown} {...rest}>{title}{noCaret ? null : <>{' '}<Icon name="caret-down" /></>}</Button></Menu.Target>
+    <Menu.Target><Button onClick={onMouseDown} {...rest} title={buttonTitle}>{title}{noCaret ? null : <>{' '}<Icon name="caret-down" /></>}</Button></Menu.Target>
     <Menu.Dropdown>{children}</Menu.Dropdown>
   </Menu>
 );

@@ -62,15 +62,13 @@ const OverlayDropdownButton = ({
                      closeOnSelect={closeOnSelect}
                      dropdownZIndex={dropdownZIndex}
                      dropdownMinWidth={dropdownMinWidth}
-                     renderToggle={({ onToggle, toggleTarget }) => (
+                     toggleChild={(
                        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
                          <Button bsSize={bsSize}
                                  className="dropdown-toggle"
-                                 ref={toggleTarget}
                                  aria-label={buttonTitle}
                                  title={buttonTitle}
-                                 disabled={disabled}
-                                 onClick={onToggle}>
+                                 disabled={disabled}>
                            {title} <span className="caret" />
                          </Button>
                        </div>
