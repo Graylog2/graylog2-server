@@ -19,6 +19,7 @@ package org.graylog.datanode.bootstrap.preflight;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
+import org.graylog.datanode.filesystem.index.dto.IndexInformation;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
 import org.graylog.shaded.opensearch2.org.opensearch.Version;
@@ -31,8 +32,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchDataDirCompatibilityCheck.class);
 
     private final boolean isFreshInstallation;
     private final DatanodeConfiguration datanodeConfiguration;
@@ -58,6 +63,8 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         try {
             final IndexerDirectoryInformation info = indicesDirectoryParser.parse(opensearchDataDir);
             checkCompatibility(opensearchVersion, info);
+            final int indicesCount = info.nodes().stream().mapToInt(n -> n.indices().size()).sum();
+            LOG.info("Found {} indices and all of them are valid with current opensearch version {}", indicesCount, opensearchVersion);
         } catch (IncompatibleIndexVersionException e) {
             throw new PreflightCheckException("Index directory is not compatible with current version " + opensearchVersion + " of Opensearch, terminating.", e);
         }
