@@ -16,12 +16,25 @@
  */
 package org.graylog.datanode.filesystem.index.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.nio.file.Path;
  import java.util.Collections;
 import java.util.List;
 
-public record IndexerDirectoryInformation(Path path, List<NodeInformation> nodes) {
+public record IndexerDirectoryInformation(@JsonIgnore Path path, List<NodeInformation> nodes) {
     public static IndexerDirectoryInformation empty(Path path) {
         return new IndexerDirectoryInformation(path, Collections.emptyList());
+    }
+
+    /**
+     * The property name is matching the configuration property name, to minimize any confusion.
+     * Jackson is by default serializing paths with file:/ prefix, so we are doing the conversion to string
+     * here on our own to deliver only the real path value.
+     */
+    @JsonProperty("opensearch_data_location")
+    public String baseDir() {
+        return path.toString();
     }
 }

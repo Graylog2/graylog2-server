@@ -16,14 +16,9 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 
-public class RestBindings extends Graylog2Module {
-    @Override
-    protected void configure() {
-        addSystemRestResource(StatusController.class);
-        addSystemRestResource(LogsController.class);
-        addSystemRestResource(ManagementController.class);
-        addSystemRestResource(IndicesDirectoryController.class);
-    }
+public record CompatibilityResult(String opensearchVersion,
+                                  IndexerDirectoryInformation info,
+                                  java.util.List<String> compatibilityErrors) {
 }

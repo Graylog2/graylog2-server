@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -80,6 +81,7 @@ public class IndicesDirectoryParser {
             final StateFile state = getState(nodePath, "node");
             final List<IndexInformation> indices = indicesDirs
                     .map(this::parseIndex)
+                    .sorted(Comparator.comparing(IndexInformation::indexName))
                     .collect(Collectors.toList());
             return new NodeInformation(nodePath, indices, state);
         } catch (IOException e) {
@@ -101,6 +103,7 @@ public class IndicesDirectoryParser {
                     .filter(p -> p.getFileName().toString().matches("\\d+"))
                     .filter(p -> Files.exists(p.resolve("index")))
                     .map(this::getShardInformation)
+                    .sorted(Comparator.comparing(ShardInformation::name))
                     .collect(Collectors.toList());
             return new IndexInformation(path, indexID, state, shards);
         } catch (IOException e) {
