@@ -23,36 +23,31 @@ import Routes from 'routing/Routes';
 
 const navItems = [
   {
-    id: 'security-main',
-    path: Routes.SECURITY.overview(),
+    path: Routes.SECURITY.OVERVIEW,
     iconName: 'poll',
     end: true,
     title: 'Overview',
   },
   {
-    id: 'security-user-activity',
-    path: Routes.SECURITY.userActivity(),
+    path: Routes.SECURITY.USER_ACTIVITY,
     iconName: 'user',
     end: false,
     title: 'User Activity',
   },
   {
-    id: 'security-host-activity',
-    path: Routes.SECURITY.hostActivity(),
+    path: Routes.SECURITY.HOST_ACTIVITY,
     iconName: 'tv',
     end: false,
     title: 'Host Activity',
   },
   {
-    id: 'security-network-activity',
-    path: Routes.SECURITY.networkActivity(),
+    path: Routes.SECURITY.NETWORK_ACTIVITY,
     iconName: 'wifi',
     end: false,
     title: 'Network Activity',
   },
   {
-    id: 'security-anomalies',
-    path: Routes.SECURITY.anomalies(),
+    path: Routes.SECURITY.ANOMALIES,
     iconName: 'search-plus',
     end: false,
     title: 'Anomalies',

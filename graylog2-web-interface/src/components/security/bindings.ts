@@ -16,21 +16,21 @@
  */
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import Routes, { SECURITY_ROUTES_PREFIX, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
+import Routes, { SECURITY_PATH, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import SecurityPageEntry from 'components/security/SecurityPageEntry';
 
 const routes = [
-  { path: `${SECURITY_ROUTES_PREFIX}/*`, component: SecurityPageEntry, parentComponent: ({ children }) => children },
+  { path: `${SECURITY_PATH}/*`, component: SecurityPageEntry, parentComponent: ({ children }) => children },
 ];
 
 export const navigation = {
   description: SECURITY_ROUTE_DESCRIPTION,
   children: [
-    { path: Routes.SECURITY.overview(), description: 'Overview' },
-    { path: Routes.SECURITY.userActivity(), description: 'User Activity' },
-    { path: Routes.SECURITY.hostActivity(), description: 'Host Activity' },
-    { path: Routes.SECURITY.networkActivity(), description: 'Network Activity' },
-    { path: Routes.SECURITY.anomalies(), description: 'Anomalies' },
+    { path: Routes.SECURITY.OVERVIEW, description: 'Overview' },
+    { path: Routes.SECURITY.USER_ACTIVITY, description: 'User Activity' },
+    { path: Routes.SECURITY.HOST_ACTIVITY, description: 'Host Activity' },
+    { path: Routes.SECURITY.NETWORK_ACTIVITY, description: 'Network Activity' },
+    { path: Routes.SECURITY.ANOMALIES, description: 'Anomalies' },
   ],
 };
 

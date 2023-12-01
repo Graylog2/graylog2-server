@@ -19,7 +19,7 @@ import { Routes, Route } from 'react-router-dom';
 import React from 'react';
 
 import TeaserPageLayout from 'components/security/teaser/TeaserPageLayout';
-import AppRoutes from 'routing/Routes';
+import AppRoutes, { SECURITY_PATH } from 'routing/Routes';
 import {
   SecurityOverview,
   SecurityUserActivity,
@@ -28,18 +28,18 @@ import {
 } from 'components/security/pages';
 
 const subRoutes = [
-  { route: AppRoutes.SECURITY.overview(''), component: <SecurityOverview /> },
-  { route: AppRoutes.SECURITY.userActivity(''), component: <SecurityUserActivity /> },
-  { route: AppRoutes.SECURITY.hostActivity(''), component: <SecurityHostActivity /> },
-  { route: AppRoutes.SECURITY.networkActivity(''), component: <SecurityNetworkActivity /> },
-  { route: AppRoutes.SECURITY.anomalies(''), component: <SecurityAnomalies /> },
-];
+  { path: AppRoutes.SECURITY.OVERVIEW, element: <SecurityOverview /> },
+  { path: AppRoutes.SECURITY.USER_ACTIVITY, element: <SecurityUserActivity /> },
+  { path: AppRoutes.SECURITY.HOST_ACTIVITY, element: <SecurityHostActivity /> },
+  { path: AppRoutes.SECURITY.NETWORK_ACTIVITY, element: <SecurityNetworkActivity /> },
+  { path: AppRoutes.SECURITY.ANOMALIES, element: <SecurityAnomalies /> },
+].map((route) => ({ ...route, path: route.path.slice(SECURITY_PATH.length) }));
 
 const SecurityTeaserPage = () => (
   <TeaserPageLayout>
     <Routes>
-      {subRoutes.map(({ route, component }) => (
-        <Route key={route} path={route} element={component} />
+      {subRoutes.map(({ path, element }) => (
+        <Route key={path} path={path} element={element} />
       ))}
     </Routes>
   </TeaserPageLayout>
