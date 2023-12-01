@@ -200,7 +200,7 @@ export default class Query {
       query,
       timerange,
       filter,
-      filters: filters.toArray(),
+      filters: filters?.toArray(),
       search_types: searchTypes,
     };
   }
