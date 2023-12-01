@@ -20,7 +20,6 @@ import { useState } from 'react';
 
 import { SideNav, SideNavItem, ContentArea, Container } from 'components/security/page-layout';
 import Routes from 'routing/Routes';
-import 'wicg-inert';
 
 const navItems = [
   {

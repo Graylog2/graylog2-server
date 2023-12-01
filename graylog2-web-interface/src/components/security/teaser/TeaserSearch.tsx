@@ -18,20 +18,15 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useMemo } from 'react';
 
-import SearchExecutorsContext from 'views/components/contexts/SearchExecutorsContext';
 import { SAVE_COPY } from 'views/components/contexts/SearchPageLayoutContext';
-import SearchPage from 'views/pages/SearchPage';
-import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
-import type { ViewJson } from 'views/logic/views/View';
-import View from 'views/logic/views/View';
 import type { SearchJobResult } from 'views/logic/SearchResult';
-import SearchResult from 'views/logic/SearchResult';
 import type { SearchJson } from 'views/logic/search/Search';
-import Search from 'views/logic/search/Search';
-import SearchMetadata from 'views/logic/search/SearchMetadata';
 import Hotspot from 'components/security/teaser/Hotspot';
+
+import 'wicg-inert';
+import StaticSearch from 'views/components/StaticSearch';
 
 type HotspotMeta = {
   positionX: string,
@@ -71,8 +66,6 @@ const searchAreaContainer = (hotspots: Array<HotspotMeta>) => ({ children }: Rea
   </StyledPageContentLayout>
 );
 
-const searchMetadata = SearchMetadata.empty();
-
 type Props = {
   searchJson: Partial<SearchJson>,
   viewJson: any,
@@ -81,25 +74,6 @@ type Props = {
 }
 
 const TeaserSearch = ({ searchJson, viewJson, searchJobResult, hotspots }: Props) => {
-  const view = useMemo(() => {
-    const search = Search.fromJSON(searchJson as SearchJson);
-
-    return View.fromJSON(viewJson as ViewJson)
-      .toBuilder()
-      .search(search)
-      .build();
-  }, [searchJson, viewJson]);
-  const searchResult = useMemo(() => ({
-    result: new SearchResult(searchJobResult as SearchJobResult),
-    widgetMapping: view.widgetMapping,
-  }), [searchJobResult, view.widgetMapping]);
-
-  const searchExecutors: SearchExecutors = useMemo(() => ({
-    execute: async () => searchResult,
-    parse: async () => searchMetadata,
-    resultMapper: (result) => result,
-  }), [searchResult]);
-
   const searchPageLayout = useMemo(() => ({
     sidebar: { isShown: false },
     viewActions: SAVE_COPY,
@@ -108,9 +82,9 @@ const TeaserSearch = ({ searchJson, viewJson, searchJobResult, hotspots }: Props
 
   return (
     <SearchPageLayoutProvider value={searchPageLayout}>
-      <SearchExecutorsContext.Provider value={searchExecutors}>
-        <SearchPage view={Promise.resolve(view)} isNew={false} searchResult={searchResult} />
-      </SearchExecutorsContext.Provider>
+      <StaticSearch searchJson={searchJson}
+                    viewJson={viewJson}
+                    searchJobResult={searchJobResult} />
     </SearchPageLayoutProvider>
   );
 };
