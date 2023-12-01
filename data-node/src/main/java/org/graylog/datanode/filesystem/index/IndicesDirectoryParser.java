@@ -52,6 +52,10 @@ public class IndicesDirectoryParser {
 
     public IndexerDirectoryInformation parse(Path path) {
         if (!Files.exists(path)) {
+            throw new IndexerInformationParserException("Path " + path + " does not exist.");
+        }
+
+        if (!Files.isDirectory(path)) {
             throw new IndexerInformationParserException("Path " + path + " is not a directory");
         }
 
