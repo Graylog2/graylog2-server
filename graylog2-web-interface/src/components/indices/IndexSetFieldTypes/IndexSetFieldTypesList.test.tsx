@@ -29,9 +29,9 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexSetFieldTypesList';
 import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
-import { customFiled, defaultFiled, reservedFiled, attributes } from 'fixtures/indexSetFieldTypes';
+import { customField, defaultField, reservedField, attributes } from 'fixtures/indexSetFieldTypes';
 
-const getData = (list = [defaultFiled]) => (
+const getData = (list = [defaultField]) => (
   {
     list,
     pagination: {
@@ -128,7 +128,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([customFiled]),
+        data: getData([customField]),
       });
 
       renderIndexSetFieldTypesList();
@@ -144,7 +144,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([customFiled]),
+        data: getData([customField]),
       });
 
       renderIndexSetFieldTypesList();
@@ -160,7 +160,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
-        data: getData([reservedFiled]),
+        data: getData([reservedField]),
       });
 
       renderIndexSetFieldTypesList();
@@ -177,7 +177,7 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([customFiled]),
+      data: getData([customField]),
     });
 
     renderIndexSetFieldTypesList();

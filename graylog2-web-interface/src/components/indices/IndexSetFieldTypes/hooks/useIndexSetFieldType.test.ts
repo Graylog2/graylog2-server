@@ -23,7 +23,7 @@ import suppressConsole from 'helpers/suppressConsole';
 import useIndexSetFieldType from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import { defaultFiled } from 'fixtures/indexSetFieldTypes';
+import { defaultField } from 'fixtures/indexSetFieldTypes';
 
 const mockData = {
   attributes: [],
@@ -53,7 +53,7 @@ const mockData = {
 
 const expectedState = {
   attributes: [],
-  list: [defaultFiled],
+  list: [defaultField],
   pagination: {
     total: 1,
   },
