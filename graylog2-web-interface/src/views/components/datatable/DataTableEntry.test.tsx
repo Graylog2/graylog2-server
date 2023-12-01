@@ -109,12 +109,11 @@ describe('DataTableEntry', () => {
   });
 
   it('provides valuePath in context for each value', () => {
-    const wrapper = mount((
-      <SUT />
-    ));
+    const wrapper = mount(<SUT />);
 
     expect(wrapper.find('Provider')
-      .map((p) => p.props().value))
+      .map((p) => p.props().value as {})
+      .filter((value) => ('valuePath' in value)))
       .toMatchSnapshot();
   });
 

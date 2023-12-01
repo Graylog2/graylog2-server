@@ -67,6 +67,10 @@ const openActionDropdown = async () => {
   await screen.findByRole('heading', { name: 'Actions' });
 };
 
+const waitForDropdownToClose = () => waitFor(() => {
+  expect(screen.queryByRole('heading', { name: 'Actions' })).not.toBeInTheDocument();
+});
+
 describe('<WidgetActionsMenu />', () => {
   const widget = WidgetModel.builder().newId()
     .type('dummy')
@@ -211,6 +215,8 @@ describe('<WidgetActionsMenu />', () => {
     fireEvent.click(exportButton);
 
     expect(screen.getByText('Export message table search results')).not.toBeNull();
+
+    await waitForDropdownToClose();
   });
 
   describe('copy widget to dashboard', () => {
@@ -391,6 +397,8 @@ describe('<WidgetActionsMenu />', () => {
         expect(removeWidget).not.toHaveBeenCalledWith('widget-id');
 
         expect(deletingWidgetHook).toHaveBeenCalled();
+
+        await waitForDropdownToClose();
       });
 
       it('should skip custom deletion hook if it throws exception', async () => {

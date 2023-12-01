@@ -42,11 +42,9 @@ jest.mock('@graylog/server-api', () => ({
 }));
 
 describe('StreamsOverview BulkActionsRow', () => {
-  const openActionsDropdown = async () => {
-    await screen.findByRole('button', {
-      name: /bulk actions/i,
-    });
-  };
+  const openActionsDropdown = async () => userEvent.click(await screen.findByRole('button', {
+    name: /bulk actions/i,
+  }));
 
   const assignIndexSet = async () => {
     userEvent.click(await screen.findByRole('menuitem', { name: /assign index set/i }));
