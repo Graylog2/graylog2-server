@@ -17,18 +17,18 @@
 import React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import SecurityTeaserPage from 'components/security/teaser/SecurityTeaserPage';
+import SecurityPage from 'components/security/teaser/SecurityPage';
 
 const SecurityPageEntry = () => {
   const securityPagePlugins = usePluginEntities('securityPage');
 
   if (securityPagePlugins?.length) {
     // eslint-disable-next-line react/jsx-no-useless-fragment,react/no-array-index-key
-    return <>{securityPagePlugins.map((SecurityPage, index) => <SecurityPage key={index} />)}</>;
+    return <>{securityPagePlugins.map((Page, index) => <Page key={index} />)}</>;
   }
 
   return (
-    <SecurityTeaserPage />
+    <SecurityPage />
   );
 };
 

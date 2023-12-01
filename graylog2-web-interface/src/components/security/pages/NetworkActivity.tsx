@@ -51,10 +51,10 @@ const hotspots = [
   },
 ];
 
-const SecurityNetworkActivity = () => (
+const NetworkActivity = () => (
   <DocumentTitle title="Network activity">
     <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
   </DocumentTitle>
 );
 
-export default SecurityNetworkActivity;
+export default NetworkActivity;

@@ -21,21 +21,22 @@ import React from 'react';
 import TeaserPageLayout from 'components/security/teaser/TeaserPageLayout';
 import AppRoutes, { SECURITY_PATH } from 'routing/Routes';
 import {
-  SecurityOverview,
-  SecurityUserActivity,
-  SecurityHostActivity,
-  SecurityNetworkActivity, SecurityAnomalies,
+  Overview,
+  UserActivity,
+  HostActivity,
+  NetworkActivity,
+  Anomalies,
 } from 'components/security/pages';
 
 const subRoutes = [
-  { path: AppRoutes.SECURITY.OVERVIEW, element: <SecurityOverview /> },
-  { path: AppRoutes.SECURITY.USER_ACTIVITY, element: <SecurityUserActivity /> },
-  { path: AppRoutes.SECURITY.HOST_ACTIVITY, element: <SecurityHostActivity /> },
-  { path: AppRoutes.SECURITY.NETWORK_ACTIVITY, element: <SecurityNetworkActivity /> },
-  { path: AppRoutes.SECURITY.ANOMALIES, element: <SecurityAnomalies /> },
+  { path: AppRoutes.SECURITY.OVERVIEW, element: <Overview /> },
+  { path: AppRoutes.SECURITY.USER_ACTIVITY, element: <UserActivity /> },
+  { path: AppRoutes.SECURITY.HOST_ACTIVITY, element: <HostActivity /> },
+  { path: AppRoutes.SECURITY.NETWORK_ACTIVITY, element: <NetworkActivity /> },
+  { path: AppRoutes.SECURITY.ANOMALIES, element: <Anomalies /> },
 ].map((route) => ({ ...route, path: route.path.slice(SECURITY_PATH.length) }));
 
-const SecurityTeaserPage = () => (
+const SecurityPage = () => (
   <TeaserPageLayout>
     <Routes>
       {subRoutes.map(({ path, element }) => (
@@ -45,4 +46,4 @@ const SecurityTeaserPage = () => (
   </TeaserPageLayout>
 );
 
-export default SecurityTeaserPage;
+export default SecurityPage;

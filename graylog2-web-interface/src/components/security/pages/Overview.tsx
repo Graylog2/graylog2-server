@@ -40,10 +40,10 @@ const hotspots = [
     description: 'Hover these tool tips throughout this page to learn more about features of Graylog Security',
   },
 ];
-const SecurityOverview = () => (
+const Overview = () => (
   <DocumentTitle title="Overview">
     <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
   </DocumentTitle>
 );
 
-export default SecurityOverview;
+export default Overview;

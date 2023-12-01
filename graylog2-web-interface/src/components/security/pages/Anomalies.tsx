@@ -45,10 +45,10 @@ const hotspots = [
     description: 'Identify user accounts that have unusual-for-them behaviors for logons or security events.',
   },
 ];
-const SecurityAnomalies = () => (
+const Anomalies = () => (
   <DocumentTitle title="Anomalies">
     <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
   </DocumentTitle>
 );
 
-export default SecurityAnomalies;
+export default Anomalies;

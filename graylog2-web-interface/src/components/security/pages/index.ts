@@ -16,16 +16,16 @@
  */
 import loadAsync from 'routing/loadAsync';
 
-const SecurityOverview = loadAsync(() => import('./SecurityOverview'));
-const SecurityUserActivity = loadAsync(() => import('./SecurityUserActivity'));
-const SecurityHostActivity = loadAsync(() => import('./SecurityHostActivity'));
-const SecurityNetworkActivity = loadAsync(() => import('./SecurityNetworkActivity'));
-const SecurityAnomalies = loadAsync(() => import('./SecurityAnomalies'));
+const Overview = loadAsync(() => import('./Overview'));
+const UserActivity = loadAsync(() => import('./UserActivity'));
+const HostActivity = loadAsync(() => import('./HostActivity'));
+const NetworkActivity = loadAsync(() => import('./NetworkActivity'));
+const Anomalies = loadAsync(() => import('./Anomalies'));
 
 export {
-  SecurityOverview,
-  SecurityUserActivity,
-  SecurityHostActivity,
-  SecurityNetworkActivity,
-  SecurityAnomalies,
+  Overview,
+  UserActivity,
+  HostActivity,
+  NetworkActivity,
+  Anomalies,
 };

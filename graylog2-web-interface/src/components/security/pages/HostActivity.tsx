@@ -51,10 +51,10 @@ const hotspots = [
   },
 ];
 
-const SecurityHostActivity = () => (
+const HostActivity = () => (
   <DocumentTitle title="Host activity">
     <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
   </DocumentTitle>
 );
 
-export default SecurityHostActivity;
+export default HostActivity;
