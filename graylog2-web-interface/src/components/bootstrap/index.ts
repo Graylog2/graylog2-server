@@ -20,6 +20,7 @@ export { default as BootstrapModalConfirm } from './BootstrapModalConfirm';
 export { default as BootstrapModalForm } from './BootstrapModalForm';
 export { default as BootstrapModalWrapper } from './BootstrapModalWrapper';
 export { default as Button } from './Button';
+export { default as ButtonGroup } from './ButtonGroup';
 export { default as ButtonToolbar } from './ButtonToolbar';
 export { default as Checkbox } from './Checkbox';
 export { default as ControlLabel } from './ControlLabel';

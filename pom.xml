@@ -113,14 +113,14 @@
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-net.version>3.10.0</commons-net.version>
         <commons-validator.version>1.7</commons-validator.version>
-        <commons-io.version>2.15.0</commons-io.version>
+        <commons-io.version>2.15.1</commons-io.version>
         <disruptor.version>3.4.4</disruptor.version>
         <error-prone.version>2.23.0</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.1.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
-        <grpc.version>1.59.0</grpc.version>
+        <grpc.version>1.59.1</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>32.1.3-jre</guava.version>
         <guice.version>6.0.0</guice.version>
@@ -174,7 +174,7 @@
         <swagger.version>1.6.12</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>6.0.10</unboundid-ldap.version>
+        <unboundid-ldap.version>6.0.11</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zstd.version>1.5.5-6</zstd.version>
@@ -187,7 +187,7 @@
         <assertj-core.version>3.24.2</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <equalsverifier.version>3.15.3</equalsverifier.version>
+        <equalsverifier.version>3.15.4</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>

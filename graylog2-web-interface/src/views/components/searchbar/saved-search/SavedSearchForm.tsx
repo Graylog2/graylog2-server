@@ -31,7 +31,7 @@ type Props = {
   toggleModal: () => void,
   isCreateNew: boolean,
   value: string,
-  target: Button | undefined | null,
+  target: typeof Button | undefined | null,
 };
 
 const StyledForm = styled.form`
