@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import 'helpers/mocking/react-dom_mock';
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -41,33 +42,36 @@ describe('<ContentPackVersions />', () => {
 
   const contentPackRevision = new ContentPackRevisions(contentPack);
 
-  it('should render with content pack versions', () => {
-    const wrapper = mount(<ContentPackVersions contentPackRevisions={contentPackRevision} />);
+  it('should render with content pack versions', async () => {
+    render(<ContentPackVersions contentPackRevisions={contentPackRevision} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('Select');
   });
 
-  it('should fire on change when clicked on a version', () => {
-    const changeFn = jest.fn((version) => {
-      expect(version).toEqual('1');
+  it('should fire on change when clicked on a version', async () => {
+    const changeFn = jest.fn();
+    render(<ContentPackVersions onChange={changeFn} contentPackRevisions={contentPackRevision} />);
+
+    const inputs = await screen.findAllByRole('radio');
+    userEvent.click(inputs[0]);
+
+    await waitFor(() => {
+      expect(changeFn).toHaveBeenCalledWith('1');
     });
-    const wrapper = mount(<ContentPackVersions onChange={changeFn} contentPackRevisions={contentPackRevision} />);
-
-    wrapper.find('input[value=1]').simulate('change', { target: { checked: true, value: '1' } });
-
-    expect(changeFn.mock.calls.length).toBe(1);
   });
 
-  it('should fire on delete when clicked on delete a version', () => {
-    const deleteFn = jest.fn((version, revision) => {
-      expect(version).toEqual('1');
-      expect(revision).toEqual(1);
+  it('should fire on delete when clicked on delete a version', async () => {
+    const deleteFn = jest.fn();
+    render(<ContentPackVersions onDeletePack={deleteFn} contentPackRevisions={contentPackRevision} />);
+
+    const menuButton = await screen.findAllByRole('button', { name: /actions/i });
+    userEvent.click(menuButton[0]);
+
+    const deleteButton = await screen.findByRole('menuitem', { name: /delete/i });
+    userEvent.click(deleteButton);
+
+    await waitFor(() => {
+      expect(deleteFn).toHaveBeenCalledWith('1', 1);
     });
-    const wrapper = mount(<ContentPackVersions onDeletePack={deleteFn} contentPackRevisions={contentPackRevision} />);
-
-    const menuItem = wrapper.findWhere((node) => node.type() === 'a' && node.text() === 'Delete').at(0);
-    menuItem.simulate('click');
-
-    expect(deleteFn.mock.calls.length).toBe(1);
   });
 });

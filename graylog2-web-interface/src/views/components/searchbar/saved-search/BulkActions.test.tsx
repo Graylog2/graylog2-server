@@ -33,9 +33,9 @@ jest.mock('util/UserNotification', () => ({
 
 describe('SavedSearches BulkActionsRow', () => {
   const openActionsDropdown = async () => {
-    await screen.findByRole('button', {
+    await userEvent.click(await screen.findByRole('button', {
       name: /bulk actions/i,
-    });
+    }));
   };
 
   const deleteSavedSearch = async () => {
