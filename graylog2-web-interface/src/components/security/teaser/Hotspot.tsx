@@ -43,6 +43,7 @@ const HotspotTrigger = styled.button(({ theme }) => css`
     color: ${theme.utils.contrastingColor(theme.colors.variant.warning)};
     border: 0;
     font-size: ${theme.fonts.size.huge};
+
     &:hover {
       background: ${theme.colors.variant.warning};
       color: ${theme.utils.contrastingColor(theme.colors.variant.warning)};
@@ -80,10 +81,16 @@ const Hotspot = ({ children, positionX, positionY, index }: TooltipProps) => {
   const [show, setShow] = useState(false);
   const target = useRef();
   const container = useRef();
+  const showPopover = () => setShow(true);
+  const hidePopover = () => setShow(false);
 
   return (
     <HotspotContainer $positionX={positionX} $positionY={positionY} ref={container}>
-      <HotspotTrigger onMouseOver={() => setShow(true)} onMouseOut={() => setShow(false)} ref={target}>
+      <HotspotTrigger onMouseOver={showPopover}
+                      onMouseOut={hidePopover}
+                      onFocus={showPopover}
+                      onBlur={hidePopover}
+                      ref={target}>
         {index + 1}
       </HotspotTrigger>
 
