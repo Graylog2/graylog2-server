@@ -24,14 +24,14 @@ import {
 import { MenuItem } from 'components/bootstrap';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
-import Routes from 'routing/Routes';
 
-import { rejoinDataNode, removeDataNode, renewDatanodeCertificate } from '../hooks/useDataNodes';
+import { rejoinDataNode, removeDataNode, renewDatanodeCertificate, stopDataNode } from '../hooks/useDataNodes';
 
 type Props = {
   dataNode: DataNode,
 };
 const DIALOG_TYPES = {
+  STOP: 'stop',
   REJOIN: 'rejoin',
   REMOVE: 'remove',
   RENEW_CERT: 'renew',
@@ -44,6 +44,10 @@ const DIALOG_TEXT = {
   [DIALOG_TYPES.REMOVE]: {
     dialogTitle: 'Remove datanode',
     dialogBody: (datanode: string) => `Are you sure you want to remove datanode "${datanode}"?`,
+  },
+  [DIALOG_TYPES.STOP]: {
+    dialogTitle: 'Stop datanode',
+    dialogBody: (datanode: string) => `Are you sure you want to stop datanode "${datanode}"?`,
   },
 };
 
@@ -64,6 +68,10 @@ const DataNodeActions = ({ dataNode }: Props) => {
         break;
       case DIALOG_TYPES.REMOVE:
         updateState({ show: true, type: DIALOG_TYPES.REMOVE });
+
+        break;
+      case DIALOG_TYPES.STOP:
+        updateState({ show: true, type: DIALOG_TYPES.STOP });
 
         break;
       default:
@@ -89,6 +97,12 @@ const DataNodeActions = ({ dataNode }: Props) => {
         });
 
         break;
+      case 'stop':
+        stopDataNode(dataNode.node_id).then(() => {
+          handleClearState();
+        });
+
+        break;
       default:
         break;
     }
@@ -101,9 +115,9 @@ const DataNodeActions = ({ dataNode }: Props) => {
                              buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                              disabled={false}
                              dropdownZIndex={1000}>
-        <MenuItem onSelect={() => Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>Edit</MenuItem>
         <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
-        <MenuItem onSelect={() => {}}>Restart</MenuItem>
+        <MenuItem onSelect={() => stopDataNode(dataNode.node_id)}>Start</MenuItem>
+        <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
       </OverlayDropdownButton>

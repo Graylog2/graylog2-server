@@ -33,6 +33,26 @@ export const removeDataNode = async (datanodeId: string) => {
   }
 };
 
+export const startDataNode = async (datanodeId: string) => {
+  try {
+    await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/start`));
+
+    UserNotification.success(`Datanode "${datanodeId}" started successfully`);
+  } catch (errorThrown) {
+    UserNotification.error(`Starting Datanode failed with status: ${errorThrown}`, 'Could not start the Datanode.');
+  }
+};
+
+export const stopDataNode = async (datanodeId: string) => {
+  try {
+    await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/stop`));
+
+    UserNotification.success(`Datanode "${datanodeId}" stopped successfully`);
+  } catch (errorThrown) {
+    UserNotification.error(`Stopping Datanode failed with status: ${errorThrown}`, 'Could not Stop the Datanode.');
+  }
+};
+
 export const rejoinDataNode = async (datanodeId: string) => {
   try {
     await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/reset`));
