@@ -16,32 +16,22 @@
  */
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import Routes, { SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
-import {
-  SecurityOverview,
-  SecurityUserActivity,
-  SecurityHostActivity,
-  SecurityNetworkActivity,
-  SecurityAnomalies,
-} from 'components/security/pages';
+import Routes, { SECURITY_ROUTES_PREFIX, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import TeaserPageLayout from 'components/security/teaser/TeaserPageLayout';
+import SecurityRoutes from 'components/security/SecurityRoutes';
 
 const routes = [
-  { path: Routes.SECURITY.OVERVIEW, component: SecurityOverview, parentComponent: TeaserPageLayout },
-  { path: Routes.SECURITY.USER_ACTIVITY, component: SecurityUserActivity, parentComponent: TeaserPageLayout },
-  { path: Routes.SECURITY.HOST_ACTIVITY, component: SecurityHostActivity, parentComponent: TeaserPageLayout },
-  { path: Routes.SECURITY.NETWORK_ACTIVITY, component: SecurityNetworkActivity, parentComponent: TeaserPageLayout },
-  { path: Routes.SECURITY.ANOMALIES, component: SecurityAnomalies, parentComponent: TeaserPageLayout },
+  { path: `${SECURITY_ROUTES_PREFIX}/*`, component: SecurityRoutes, parentComponent: TeaserPageLayout },
 ];
 
 export const navigation = {
   description: SECURITY_ROUTE_DESCRIPTION,
   children: [
-    { path: Routes.SECURITY.OVERVIEW, description: 'Overview' },
-    { path: Routes.SECURITY.USER_ACTIVITY, description: 'User Activity' },
-    { path: Routes.SECURITY.HOST_ACTIVITY, description: 'Host Activity' },
-    { path: Routes.SECURITY.NETWORK_ACTIVITY, description: 'Network Activity' },
-    { path: Routes.SECURITY.ANOMALIES, description: 'Anomalies' },
+    { path: Routes.SECURITY.overview(), description: 'Overview' },
+    { path: Routes.SECURITY.userActivity(), description: 'User Activity' },
+    { path: Routes.SECURITY.hostActivity(), description: 'Host Activity' },
+    { path: Routes.SECURITY.networkActivity(), description: 'Network Activity' },
+    { path: Routes.SECURITY.anomalies(), description: 'Anomalies' },
   ],
 };
 

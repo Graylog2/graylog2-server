@@ -21,6 +21,8 @@ import AppConfig from 'util/AppConfig';
 import { extendedSearchPath, viewsPath } from 'views/Constants';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
+export const SECURITY_ROUTES_PREFIX = '/security';
+
 type RoutesRelativeTimeRange = {
   relative: number
 };
@@ -65,11 +67,11 @@ const Routes = {
     },
   },
   SECURITY: {
-    OVERVIEW: '/security-teaser',
-    USER_ACTIVITY: '/security-teaser/user-activity',
-    HOST_ACTIVITY: '/security-teaser/host-activity',
-    NETWORK_ACTIVITY: '/security-teaser/network-activity',
-    ANOMALIES: '/security-teaser/anomalies',
+    overview: (prefix = SECURITY_ROUTES_PREFIX) => prefix,
+    userActivity: (prefix = SECURITY_ROUTES_PREFIX) => `${prefix}/user-activity`,
+    hostActivity: (prefix = SECURITY_ROUTES_PREFIX) => `${prefix}/host-activity`,
+    networkActivity: (prefix = SECURITY_ROUTES_PREFIX) => `${prefix}/network-activity`,
+    anomalies: (prefix = SECURITY_ROUTES_PREFIX) => `${prefix}/anomalies`,
   },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',

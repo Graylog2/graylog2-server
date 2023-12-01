@@ -24,7 +24,7 @@ import Routes from 'routing/Routes';
 const securityRoutes = [
   {
     id: 'security-main',
-    path: Routes.SECURITY.OVERVIEW,
+    path: Routes.SECURITY.overview(),
     pathName: 'SECURITY',
     iconName: 'poll',
     end: true,
@@ -32,7 +32,7 @@ const securityRoutes = [
   },
   {
     id: 'security-user-activity',
-    path: Routes.SECURITY.USER_ACTIVITY,
+    path: Routes.SECURITY.userActivity(),
     pathName: 'SECURITY_USER-ACTIVITY',
     iconName: 'user',
     end: false,
@@ -40,7 +40,7 @@ const securityRoutes = [
   },
   {
     id: 'security-host-activity',
-    path: Routes.SECURITY.HOST_ACTIVITY,
+    path: Routes.SECURITY.hostActivity(),
     pathName: 'SECURITY_HOST-ACTIVITY',
     iconName: 'tv',
     end: false,
@@ -48,7 +48,7 @@ const securityRoutes = [
   },
   {
     id: 'security-network-activity',
-    path: Routes.SECURITY.NETWORK_ACTIVITY,
+    path: Routes.SECURITY.networkActivity(),
     pathName: 'SECURITY_NETWORK-ACTIVITY',
     iconName: 'wifi',
     end: false,
@@ -56,7 +56,7 @@ const securityRoutes = [
   },
   {
     id: 'security-anomalies',
-    path: Routes.SECURITY.ANOMALIES,
+    path: Routes.SECURITY.anomalies(),
     pathName: 'SECURITY_ANOMALIES',
     iconName: 'search-plus',
     end: false,
@@ -71,7 +71,8 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
     <Container>
       <SideNav isOpen={showSideBar} toggleIsOpen={() => setShowSideBar((cur) => !cur)}>
         {securityRoutes.map((route) => (
-          <SideNavItem iconName={route.iconName}
+          <SideNavItem key={route.title}
+                       iconName={route.iconName}
                        linkTarget={route.path}
                        linkEnd={route.end}>
             {route.title}
