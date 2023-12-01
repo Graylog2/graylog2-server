@@ -17,6 +17,7 @@
 package org.graylog.datanode.rest;
 
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
@@ -28,6 +29,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -48,14 +50,19 @@ public class IndicesDirectoryController {
     @GET
     @Path("compatibility")
     public CompatibilityResult status() {
-        final IndexerDirectoryInformation info = indicesDirectoryParser.parse(datanodeConfiguration.datanodeDirectories().getDataTargetDir());
+        final java.nio.file.Path dataTargetDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
         final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
-        final Version currentVersion = Version.fromString(opensearchVersion);
-        final List<String> compatibilityErrors = info.nodes().stream()
-                .filter(node -> !isNodeCompatible(node, currentVersion))
-                .map(node -> String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, node.nodeVersion()))
-                .toList();
-        return new CompatibilityResult(opensearchVersion, info, compatibilityErrors);
+        try {
+            final IndexerDirectoryInformation info = indicesDirectoryParser.parse(dataTargetDir);
+            final Version currentVersion = Version.fromString(opensearchVersion);
+            final List<String> compatibilityErrors = info.nodes().stream()
+                    .filter(node -> !isNodeCompatible(node, currentVersion))
+                    .map(node -> String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, node.nodeVersion()))
+                    .toList();
+            return new CompatibilityResult(opensearchVersion, info, compatibilityErrors);
+        } catch (IncompatibleIndexVersionException e) {
+            return new CompatibilityResult(opensearchVersion, new IndexerDirectoryInformation(dataTargetDir, Collections.emptyList()), Collections.singletonList(e.getMessage()));
+        }
     }
 
     private static boolean isNodeCompatible(NodeInformation node, Version currentVersion) {
