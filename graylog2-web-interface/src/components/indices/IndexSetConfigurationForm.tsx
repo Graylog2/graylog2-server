@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -53,6 +54,8 @@ type Props = {
 };
 
 type Unit = 'seconds' | 'minutes';
+
+type RetentionConfigSegment = 'data_tiering' | 'legacy'
 
 const StyledFormSubmit = styled(FormSubmit)`
   margin-left: 0;
@@ -105,12 +108,19 @@ const IndexSetConfigurationForm = ({
   submitButtonText,
   submitLoadingText,
 } : Props) => {
-  const retentionConfigSegments = [
+  const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
     { value: 'data_tiering', label: 'Data Tiering' },
     { value: 'legacy', label: 'Legacy (Deprecated)' },
   ];
+
+  const initialSegment = () : RetentionConfigSegment => {
+    if (indexSet.data_tiering) return 'data_tiering';
+
+    return 'legacy';
+  };
+
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
-  const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<string>('data_tiering');
+  const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
   const prepareRetentionConfig = (values: IndexSet) : IndexSet => {
     if (selectedRetentionSegment === 'legacy') {
@@ -299,7 +309,7 @@ const IndexSetConfigurationForm = ({
                     <ConfigSegmentsTitle>Rotation and Retention</ConfigSegmentsTitle>
                     <SegmentedControl data={retentionConfigSegments}
                                       value={selectedRetentionSegment}
-                                      handleChange={setSelectedRetentionSegment} />
+                                      handleChange={setSelectedRetentionSegment as Dispatch<SetStateAction<string>>} />
 
                     {selectedRetentionSegment === 'data_tiering' ? (
                       <ConfigSegment>

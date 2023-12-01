@@ -31,7 +31,7 @@ export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSet => 
 
   dayFields.forEach((field) => {
     if (data_tiering[field]) {
-      const numberValue = parseInt(data_tiering[field].substring(1, data_tiering[field].length() - 1), 10);
+      const numberValue = parseInt(data_tiering[field].substring(1, data_tiering[field].length - 1), 10);
       data_tiering = { ...data_tiering, [field]: numberValue };
     }
   });

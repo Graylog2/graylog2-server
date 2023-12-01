@@ -157,12 +157,14 @@ const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot,
           {showHotTier && showMinDaysInHotTooltip && (
             minDaysInHotPercentage === minDaysPercentage ? (
               <StyledTooltip placement="bottom"
+                             id="min-days-in-hot-and-storage"
                              arrowOffsetLeft={minDaysInHotPercentage <= 12 ? '10px' : '100%'}
                              value={minDaysInHotPercentage}>
                 Min. # of days in Hot Tier and storage
               </StyledTooltip>
             ) : (
               <StyledTooltip placement="bottom"
+                             id="min-days-in-hot"
                              arrowOffsetLeft={minDaysInHotPercentage <= 12 ? '10px' : '100%'}
                              value={minDaysInHotPercentage}>
                 Min. # of days in Hot Tier
@@ -171,6 +173,7 @@ const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot,
           )}
           {minDaysPercentage > 0 && showMinDaysTooltip && (
             <StyledTooltip placement="bottom"
+                           id="min-days-in-storage"
                            arrowOffsetLeft={minDaysPercentage <= 12 ? '10px' : '100%'}
                            value={minDaysPercentage}>
               Min. # of days in storage
