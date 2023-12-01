@@ -25,6 +25,7 @@ import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.th`
+  float: right;
   text-align: right;
 
   .btn-toolbar {
