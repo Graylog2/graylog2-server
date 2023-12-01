@@ -8,5 +8,5 @@ details.user = """
 Configuration setting `disabled_retention_strategies` disables the specified retention strategies.
 This is introduced in order to deprecate obsolete strategies in new installations. Strategies can be re-enabled
 simply by removing from this list.<br/>
-**Do not disable a strategy while an active index is configured to use it.**
+**Do not extend this list on existing installs!**
 """
