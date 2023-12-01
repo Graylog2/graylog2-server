@@ -23,7 +23,7 @@ const SecurityPageEntry = () => {
   const securityPagePlugins = usePluginEntities('securityPage');
 
   if (securityPagePlugins?.length) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
+    // eslint-disable-next-line react/jsx-no-useless-fragment,react/no-array-index-key
     return <>{securityPagePlugins.map((SecurityPage, index) => <SecurityPage key={index} />)}</>;
   }
 

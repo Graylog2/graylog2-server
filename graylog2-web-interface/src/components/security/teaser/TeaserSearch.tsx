@@ -17,15 +17,14 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useMemo } from 'react';
+import 'wicg-inert';
 
+import Hotspot from 'components/security/teaser/Hotspot';
 import { SAVE_COPY } from 'views/components/contexts/SearchPageLayoutContext';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import type { SearchJobResult } from 'views/logic/SearchResult';
 import type { SearchJson } from 'views/logic/search/Search';
-import Hotspot from 'components/security/teaser/Hotspot';
-
-import 'wicg-inert';
 import StaticSearch from 'views/components/StaticSearch';
 
 type HotspotMeta = {
