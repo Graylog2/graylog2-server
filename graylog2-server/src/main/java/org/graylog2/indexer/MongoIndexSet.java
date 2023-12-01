@@ -65,6 +65,7 @@ public class MongoIndexSet implements IndexSet {
     // TODO: Hardcoded archive suffix. See: https://github.com/Graylog2/graylog2-server/issues/2058
     // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
+    public static final String WARM_INDEX_INFIX = "warm_";
     public interface Factory {
         MongoIndexSet create(IndexSetConfig config);
     }
@@ -107,7 +108,7 @@ public class MongoIndexSet implements IndexSet {
                 ? Pattern.quote(config.indexPrefix())
                 : config.indexMatchPattern();
 
-        this.indexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+        this.indexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "(?:" + WARM_INDEX_INFIX + ")?" + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
         this.deflectorIndexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "\\d+");
 
         // The index wildcard can be configured in IndexSetConfig. If not set we use a default one based on the index
