@@ -714,30 +714,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-data-node-artifact</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <attach>true</attach>
-                    <appendAssemblyId>true</appendAssemblyId>
-                    <descriptors>
-                        <descriptor>src/main/assembly/datanode.xml</descriptor>
-                    </descriptors>
-                    <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
-                    <outputDirectory>${project.basedir}/../target/assembly</outputDirectory>
-                    <finalName>datanode-${project.version}-${maven.build.timestamp}</finalName>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
@@ -773,6 +749,41 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>generate-data-node-artifact</id>
+            <activation>
+                <property>
+                    <name>!skip.package.assembly</name>
+                </property>
+            </activation>
+            <build>
+               <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-data-node-artifact</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <attach>true</attach>
+                            <appendAssemblyId>true</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/datanode.xml</descriptor>
+                            </descriptors>
+                            <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
+                            <outputDirectory>${project.basedir}/../target/assembly</outputDirectory>
+                            <finalName>datanode-${project.version}-${maven.build.timestamp}</finalName>
+                        </configuration>
+                    </plugin>
+               </plugins>
+            </build>
+        </profile>
         <profile>
             <id>release</id>
             <build>
