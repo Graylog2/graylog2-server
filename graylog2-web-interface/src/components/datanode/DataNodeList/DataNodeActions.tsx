@@ -26,7 +26,7 @@ import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import Routes from 'routing/Routes';
 
-import { rejoinDataNode, removeDataNode } from '../hooks/useDataNodes';
+import { rejoinDataNode, removeDataNode, renewDatanodeCertificate } from '../hooks/useDataNodes';
 
 type Props = {
   dataNode: DataNode,
@@ -34,6 +34,7 @@ type Props = {
 const DIALOG_TYPES = {
   REJOIN: 'rejoin',
   REMOVE: 'remove',
+  RENEW_CERT: 'renew',
 };
 const DIALOG_TEXT = {
   [DIALOG_TYPES.REJOIN]: {
@@ -101,7 +102,7 @@ const DataNodeActions = ({ dataNode }: Props) => {
                              disabled={false}
                              dropdownZIndex={1000}>
         <MenuItem onSelect={() => Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>Edit</MenuItem>
-        <MenuItem onSelect={() => {}}>Renew certificate</MenuItem>
+        <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
         <MenuItem onSelect={() => {}}>Restart</MenuItem>
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>

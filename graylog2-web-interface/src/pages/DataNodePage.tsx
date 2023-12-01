@@ -27,6 +27,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 
 const StyledHorizontalDl = styled.dl(({ theme }) => css`
   margin: ${theme.spacings.md} 0;
+  
   > dt {
     clear: left;
     float: left;
@@ -36,6 +37,7 @@ const StyledHorizontalDl = styled.dl(({ theme }) => css`
     white-space: nowrap;
     width: 150px;
   }
+  
   > *:not(dt) {
     margin-bottom: ${theme.spacings.md};
     margin-left: 140px;
@@ -85,7 +87,7 @@ const DataNodePage = () => {
                              title={datanode.data_node_status}
                              aria-label={datanode.data_node_status}
                              role="button">
-                  {datanode.status || 'N/A'}
+                  {datanode.data_node_status || 'N/A'}
                 </StatusLabel>
               </dd>
             </StyledHorizontalDl>

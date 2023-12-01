@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import type { DataNode } from 'preflight/types';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, PaginatedListJSON, SearchParams } from 'stores/PaginationTypes';
 
@@ -46,6 +46,14 @@ export const rejoinDataNode = async (datanodeId: string) => {
 type Options = {
   enabled: boolean,
 }
+
+export const renewDatanodeCertificate = (nodeId: string) => fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
+  .then(() => {
+    UserNotification.success('Certificate renewed successfully');
+  })
+  .catch((error) => {
+    UserNotification.error(`Certificate renewal failed with error: ${error}`);
+  });
 
 const fetchDataNodes = async (params?: SearchParams) => {
   const url = PaginationURL('/system/cluster/datanodes', params?.page, params?.pageSize, params?.query, { sort: params?.sort?.attributeId, order: params?.sort?.direction });
