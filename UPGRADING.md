@@ -18,6 +18,12 @@ Now this can be achieved by registering a `navigation` plugin.
 The plugin entity needs the `description` `System` and `children` (array).
 Every child represents a dropdown option and needs a `path` and `description` attribute.
 
+## Configuration File Changes
+| Option                                         | Action    | Description                                                                                                                                                                                                                                                                          |
+|------------------------------------------------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `disabled_retention_strategies`  | **added** | Disables the specified retention strategies. This is introduced in order to deprecate obsolete strategies in new installations.<br/>Strategies can be re-enabled simply by removing from this list.<br/>**Do not disable a strategy while an active index is configured to use it.** |
+
+
 ## Asset Import Changes
 
 Graylog 5.2 introduced the Assets feature and the ability to import Assets from Active Directory.
@@ -32,9 +38,9 @@ Any existing Active Directory User Asset import configurations will be automatic
 
 The following Java Code API changes have been made.
 
-| File/method                   | Description              |
-|-------------------------------|--------------------------|
-| `ExampleClass#exampleFuntion` | TODO placeholder comment |
+| File/method                    | Description              |
+|--------------------------------|--------------------------|
+| `ExampleClass#exampleFunction` | TODO placeholder comment |
 
 ## REST API Endpoint Changes
 
