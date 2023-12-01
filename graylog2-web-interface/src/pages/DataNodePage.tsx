@@ -100,8 +100,6 @@ const DataNodePage = () => {
               </dd>
               <dt>Is leader:</dt>
               <dd><BooleanValue value={datanode.is_leader} /></dd>
-              <dt>Is master:</dt>
-              <dd><BooleanValue value={datanode.is_master} /></dd>
               <dt>Certificate valid until:</dt>
               <dd><RelativeTime dateTime={datanode.cert_valid_until} /> <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} /></dd>
             </StyledHorizontalDl>
