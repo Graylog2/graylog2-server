@@ -16,6 +16,7 @@
  */
 
 export { default as DataTieringConfiguration } from './DataTieringConfiguration';
+export { default as DataTieringSummary } from './DataTieringSummary';
 export { prepareDataTieringConfig } from './DataTieringConfiguration';
 export { prepareDataTieringInitialValues } from './DataTieringConfiguration';
 export { default as DataTieringVisualisation } from './DataTieringVisualisation';
