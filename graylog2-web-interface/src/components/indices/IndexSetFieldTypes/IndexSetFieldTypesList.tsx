@@ -166,7 +166,7 @@ const IndexSetFieldTypesList = () => {
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
                     query={query}
-                    placeholder="Enter search query for the filed name...">
+                    placeholder="Enter search query for the field name...">
           <EntityFilters attributes={attributes}
                          urlQueryFilters={urlQueryFilters}
                          setUrlQueryFilters={onChangeFilters}
