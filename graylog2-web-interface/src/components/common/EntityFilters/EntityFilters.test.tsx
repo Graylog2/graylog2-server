@@ -177,8 +177,11 @@ describe('<EntityFilters />', () => {
         name: /create filter/i,
       }));
 
-      // eslint-disable-next-line testing-library/no-node-access
-      expect(screen.getByRole('menuitem', { name: /status/i }).closest('li')).toHaveClass('disabled');
+      const statusElement = await screen.findByRole('menuitem', { name: /status/i });
+
+      await waitFor(() => {
+        expect(statusElement).toBeDisabled();
+      });
     });
   });
 

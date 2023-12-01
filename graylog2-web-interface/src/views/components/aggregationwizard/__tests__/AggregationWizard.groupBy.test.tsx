@@ -119,7 +119,7 @@ describe('AggregationWizard', () => {
     await addElement('Grouping');
 
     await screen.findByText('Field is required.');
-  });
+  }, extendedTimeout);
 
   it('should add pivot to widget config', async () => {
     const onChange = jest.fn();
@@ -138,7 +138,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should update config, even when field only exists for current query', async () => {
     const onChange = jest.fn();

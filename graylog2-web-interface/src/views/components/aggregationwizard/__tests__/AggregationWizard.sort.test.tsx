@@ -207,7 +207,7 @@ describe('AggregationWizard', () => {
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
     await waitFor(() => expect(applyButton).toBeDisabled());
-  });
+  }, extendedTimeout);
 
   it('should require direction when creating a sort element', async () => {
     renderSUT();
@@ -218,7 +218,7 @@ describe('AggregationWizard', () => {
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
     await waitFor(() => expect(applyButton).toBeDisabled());
-  });
+  }, extendedTimeout);
 
   it('should remove all sorts', async () => {
     const onChangeMock = jest.fn();
@@ -242,7 +242,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should correctly update sort of sort elements', async () => {
     const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);

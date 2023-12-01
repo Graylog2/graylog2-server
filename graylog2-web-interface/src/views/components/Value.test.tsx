@@ -35,7 +35,7 @@ const Value = (props: React.ComponentProps<typeof OriginalValue>) => (
 );
 
 describe('Value', () => {
-  const openActionsMenu = (value) => {
+  const openActionsMenu = (value: string | RegExp) => {
     userEvent.click(screen.getByText(value));
   };
 
@@ -52,8 +52,6 @@ describe('Value', () => {
   afterAll(unloadViewsPlugin);
 
   describe('actions menu title', () => {
-    const Component = (props) => <Value {...props} />;
-
     it('renders without type information but no children', async () => {
       render(<Value field="foo" value={42} type={FieldType.Unknown} />);
 
@@ -63,11 +61,10 @@ describe('Value', () => {
     });
 
     it('renders timestamps with a custom component', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value="2018-10-02T14:45:40Z"
-                        render={({ value }) => `The date ${value}`}
-                        type={new FieldType('date', [], [])} />);
+      render(<Value field="foo"
+                    value="2018-10-02T14:45:40Z"
+                    render={({ value }) => <>The date {value}</>}
+                    type={new FieldType('date', [], [])} />);
 
       openActionsMenu('The date 2018-10-02 16:45:40.000');
       const title = await screen.findByTestId('value-actions-title');
@@ -76,20 +73,18 @@ describe('Value', () => {
     });
 
     it('renders numeric timestamps with a custom component', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value={1571302317}
-                        render={({ value }) => `The number ${value}`}
-                        type={new FieldType('numeric', [], [])} />);
+      render(<Value field="foo"
+                    value={1571302317}
+                    render={({ value }) => <>The number {value}</>}
+                    type={new FieldType('numeric', [], [])} />);
 
       await screen.findByText('The number 1571302317');
     });
 
     it('renders booleans as strings', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value={false}
-                        type={new FieldType('boolean', [], [])} />);
+      render(<Value field="foo"
+                    value={false}
+                    type={new FieldType('boolean', [], [])} />);
 
       openActionsMenu('false');
 
@@ -97,7 +92,7 @@ describe('Value', () => {
     });
 
     it('renders booleans as strings even if field type is unknown', async () => {
-      render(<Component field="foo" queryId="someQueryId" value={false} type={FieldType.Unknown} />);
+      render(<Value field="foo" value={false} type={FieldType.Unknown} />);
 
       openActionsMenu('false');
 
@@ -105,10 +100,9 @@ describe('Value', () => {
     });
 
     it('renders arrays as strings', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value={[23, 'foo']}
-                        type={FieldType.Unknown} />);
+      render(<Value field="foo"
+                    value={[23, 'foo']}
+                    type={FieldType.Unknown} />);
 
       openActionsMenu('[23,"foo"]');
 
@@ -116,10 +110,9 @@ describe('Value', () => {
     });
 
     it('renders objects as strings', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value={{ foo: 23 }}
-                        type={FieldType.Unknown} />);
+      render(<Value field="foo"
+                    value={{ foo: 23 }}
+                    type={FieldType.Unknown} />);
 
       openActionsMenu('{"foo":23}');
 
@@ -127,10 +120,9 @@ describe('Value', () => {
     });
 
     it('truncates values longer than 30 characters', async () => {
-      render(<Component field="message"
-                        queryId="someQueryId"
-                        value="sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1"
-                        type={new FieldType('string', [], [])} />);
+      render(<Value field="message"
+                    value="sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1"
+                    type={new FieldType('string', [], [])} />);
 
       openActionsMenu('sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1');
 
@@ -166,7 +158,7 @@ describe('Value', () => {
   });
 
   describe('handles value action menu depending on interactive context', () => {
-    const component = (interactive) => (props) => (
+    const component = (interactive: boolean) => (props: React.ComponentProps<typeof Value>) => (
       <InteractiveContext.Provider value={interactive}>
         <Value {...props} />
       </InteractiveContext.Provider>
@@ -176,7 +168,6 @@ describe('Value', () => {
       const NoninteractiveComponent = component(false);
 
       render(<NoninteractiveComponent field="foo"
-                                      queryId="someQueryId"
                                       value={{ foo: 23 }}
                                       type={FieldType.Unknown} />);
 
@@ -189,7 +180,6 @@ describe('Value', () => {
       const InteractiveComponent = component(true);
 
       render(<InteractiveComponent field="foo"
-                                   queryId="someQueryId"
                                    value={{ foo: 23 }}
                                    type={FieldType.Unknown} />);
 
