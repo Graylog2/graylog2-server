@@ -22,8 +22,10 @@ import useDataNodes from 'components/datanode/hooks/useDataNodes';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import { Row, Col, Label } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, RelativeTime, Spinner } from 'components/common';
 import type { SearchParams } from 'stores/PaginationTypes';
+import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
+import Icon from 'components/common/Icon';
 
 const StyledHorizontalDl = styled.dl(({ theme }) => css`
   margin: ${theme.spacings.md} 0;
@@ -35,7 +37,7 @@ const StyledHorizontalDl = styled.dl(({ theme }) => css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 150px;
+    width: 160px;
   }
   
   > *:not(dt) {
@@ -48,6 +50,12 @@ const StatusLabel = styled(Label)`
   justify-content: center;
   gap: 4px;
 `;
+const BooleanIcon = styled(Icon)<{ value: boolean }>(({ theme, value }) => css`
+  color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
+`);
+const BooleanValue = ({ value }: { value: boolean }) => (
+  <><BooleanIcon name={value ? 'check-circle' : 'times-circle'} value={value} /> {value ? 'yes' : 'no'}</>
+);
 
 const DataNodePage = () => {
   const { dataNodeId } = useParams();
@@ -90,6 +98,12 @@ const DataNodePage = () => {
                   {datanode.data_node_status || 'N/A'}
                 </StatusLabel>
               </dd>
+              <dt>Is leader:</dt>
+              <dd><BooleanValue value={datanode.is_leader} /></dd>
+              <dt>Is master:</dt>
+              <dd><BooleanValue value={datanode.is_master} /></dd>
+              <dt>Certificate valid until:</dt>
+              <dd><RelativeTime dateTime={datanode.cert_valid_until} /> <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} /></dd>
             </StyledHorizontalDl>
           </Col>
         </Col>

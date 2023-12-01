@@ -41,14 +41,15 @@ const ENTITY_TABLE_ID = 'datanodes';
 const DEFAULT_LAYOUT = {
   pageSize: 10,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['hostname', 'transport_address', 'status', 'cert_valid_until'],
-  columnsOrder: ['hostname', 'transport_address', 'status', 'cert_valid_until'],
+  displayedColumns: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
+  columnsOrder: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
 };
 
 const columnDefinitions = [
   { id: 'hostname', title: 'Name', sortable: true, permissions: [] },
   { id: 'transport_address', title: 'Transport address' },
   { id: 'status', title: 'Status', sortable: true },
+  { id: 'is_leader', title: 'Is leader', sortable: true },
   { id: 'cert_valid_until', title: 'Certificate valid until', sortable: true },
 ];
 
@@ -63,6 +64,9 @@ const columnRenderers: ColumnRenderers<DataNode> = {
     },
     status: {
       renderCell: (_status: DataNodeStatus, dataNode: DataNode) => <DataNodeStatusCell dataNode={dataNode} />,
+    },
+    is_leader: {
+      renderCell: (_is_leader: string, dataNode: DataNode) => (dataNode.is_leader ? 'yes' : 'no'),
     },
     cert_valid_until: {
       renderCell: (_cert_valid_until: string, dataNode: DataNode) => <RelativeTime dateTime={dataNode.cert_valid_until} />,

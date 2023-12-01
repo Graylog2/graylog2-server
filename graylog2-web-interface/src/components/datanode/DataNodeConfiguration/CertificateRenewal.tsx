@@ -99,7 +99,7 @@ const provisioningWording = {
   buttonStyle: 'success',
 } as const;
 
-const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNode['status'] }) => {
+export const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNode['status'] }) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isRenewing, setIsRenewing] = useState(false);
