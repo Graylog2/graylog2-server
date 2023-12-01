@@ -32,7 +32,8 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoColl
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -45,8 +46,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.net.InetAddress;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.Collections;
 import java.util.Objects;
@@ -59,7 +60,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeConfigurationPeriodical.class);
 
     private final DataNodeProvisioningService dataNodeProvisioningService;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
     private final PrivateKeyEncryptedFileStorage privateKeyEncryptedStorage;
     private final CsrMongoStorage csrStorage;
@@ -71,7 +72,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
 
     @Inject
     public DataNodeConfigurationPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
-                                           final NodeService nodeService,
+                                           final NodeService<DataNodeDto> nodeService,
                                            final NodeId nodeId,
                                            final CsrMongoStorage csrStorage,
                                            final CsrGenerator csrGenerator,

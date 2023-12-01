@@ -18,7 +18,6 @@
 // eslint-disable-next-line no-restricted-imports
 export {
   /* 👇 no custom theme colors needed 👇 */
-  ButtonGroup,
   Clearfix,
   Col,
   Collapse,

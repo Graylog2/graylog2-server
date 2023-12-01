@@ -28,6 +28,7 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import type { Attributes } from 'stores/PaginationTypes';
 import suppressConsole from 'helpers/suppressConsole';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 
 const onCloseMock = jest.fn();
 const renderChangeFieldTypeModal = ({
@@ -36,22 +37,17 @@ const renderChangeFieldTypeModal = ({
   show = true,
   showSelectionTable = undefined,
   initialFieldType = undefined,
-  fieldTypes = {
-    string: 'String type',
-    int: 'Number(int)',
-    bool: 'Boolean',
-  },
   initialSelectedIndexSets = ['id-1', 'id-2'],
 }) => render(
   <TestStoreProvider>
     <ChangeFieldTypeModal onClose={onClose}
-                          field={field}
+                          initialData={{
+                            fieldName: field,
+                            type: initialFieldType,
+                          }}
                           show={show}
-                          isOptionsLoading={false}
-                          fieldTypes={fieldTypes}
                           initialSelectedIndexSets={initialSelectedIndexSets}
-                          showSelectionTable={showSelectionTable}
-                          initialFieldType={initialFieldType} />
+                          showSelectionTable={showSelectionTable} />
   </TestStoreProvider>,
 );
 const attributes: Attributes = [
@@ -115,6 +111,7 @@ const paginatedFieldUsage = ({
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
@@ -127,6 +124,17 @@ describe('ChangeFieldTypeModal', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
+    asMock(useFieldTypes).mockReturnValue({
+      isLoading: false,
+      data: {
+        fieldTypes: {
+          string: 'String type',
+          int: 'Number(int)',
+          bool: 'Boolean',
+        },
+      },
+    });
+
     asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFieldTypeMutation: putFieldTypeMutationMock });
     asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
 

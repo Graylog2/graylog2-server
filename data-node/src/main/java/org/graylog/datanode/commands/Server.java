@@ -21,6 +21,7 @@ import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
@@ -34,7 +35,9 @@ import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningBindings;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -127,13 +130,16 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected void startNodeRegistration(Injector injector) {
-        final NodeService nodeService = injector.getInstance(NodeService.class);
+        final NodeService<DataNodeDto> nodeService = injector.getInstance(new Key<>() {});
         final NodeId nodeId = injector.getInstance(NodeId.class);
         // always set leader to "false" on startup and let the NodePingPeriodical take care of it later
-        nodeService.registerServer(nodeId.getNodeId(),
-                false,
-                configuration.getHttpPublishUri(),
-                Tools.getLocalCanonicalHostname());
+        nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(false)
+                .setTransportAddress(configuration.getHttpPublishUri().toString())
+                .setHostname(Tools.getLocalCanonicalHostname())
+                .setDataNodeStatus(DataNodeStatus.STARTING)
+                .build());
     }
 
     @Override

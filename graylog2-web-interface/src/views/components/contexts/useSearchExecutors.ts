@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { Button as BootstrapButton } from 'react-bootstrap';
+import { useContext } from 'react';
 
-const Button = styled(BootstrapButton)(({ theme }) => css`
-  ${theme.components.button}
-`);
+import SearchExecutorsContext from 'views/components/contexts/SearchExecutorsContext';
 
-export default Button;
+const useSearchExecutors = () => useContext(SearchExecutorsContext);
+
+export default useSearchExecutors;

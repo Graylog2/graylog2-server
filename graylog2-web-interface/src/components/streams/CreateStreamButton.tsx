@@ -23,10 +23,12 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { BsSize } from 'components/bootstrap/types';
+import type { StyleProps } from 'components/bootstrap/Button';
 
 type Props = {
-  bsSize?: string
-  bsStyle?: string,
+  bsSize?: BsSize,
+  bsStyle?: StyleProps,
   buttonText?: string,
   className?: string,
   indexSets: Array<IndexSet>

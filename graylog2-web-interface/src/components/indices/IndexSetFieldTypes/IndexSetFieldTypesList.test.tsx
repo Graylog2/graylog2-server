@@ -22,14 +22,14 @@ import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { MockStore } from 'helpers/mocking';
 import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
-import useIndexSetFieldTypes from 'hooks/useIndexSetFieldType';
+import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
+import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexSetFieldTypesList';
 import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
-import { customFiled, defaultFiled, reservedFiled, secondCustomFiled, attributes } from 'fixtures/indexSetFieldTypes';
+import { customFiled, defaultFiled, reservedFiled, attributes } from 'fixtures/indexSetFieldTypes';
 
 const getData = (list = [defaultFiled]) => (
   {
@@ -41,11 +41,10 @@ const getData = (list = [defaultFiled]) => (
   }
 );
 
-const mockedSetEditingField = jest.fn();
 const renderIndexSetFieldTypesList = () => render(
   <QueryParamProvider adapter={ReactRouter6Adapter}>
     <TestStoreProvider>
-      <IndexSetFieldTypesList editingField={undefined} setEditingField={mockedSetEditingField} />
+      <IndexSetFieldTypesList />
     </TestStoreProvider>,
   </QueryParamProvider>,
 );
@@ -63,7 +62,7 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
 
 jest.mock('routing/useParams', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
-jest.mock('hooks/useIndexSetFieldType', () => jest.fn());
+jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
@@ -174,21 +173,6 @@ describe('IndexSetFieldTypesList', () => {
     });
   });
 
-  it('Runs setEditingField with correct params', async () => {
-    asMock(useIndexSetFieldTypes).mockReturnValue({
-      isLoading: false,
-      refetch: () => {},
-      data: getData([customFiled, secondCustomFiled]),
-    });
-
-    renderIndexSetFieldTypesList();
-    const tableRow = await screen.findByTestId('table-row-field');
-    const editButton = await within(tableRow).findByText('Edit');
-    fireEvent.click(editButton);
-
-    expect(mockedSetEditingField).toHaveBeenCalledWith({ fieldName: 'field', type: 'bool', showFiledInput: false });
-  });
-
   it('Shows modal on reset action click', async () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
@@ -200,7 +184,7 @@ describe('IndexSetFieldTypesList', () => {
     const tableRow = await screen.findByTestId('table-row-field');
     const resetButton = await within(tableRow).findByText('Reset');
     fireEvent.click(resetButton);
-    await screen.findByText(/remove custom field type/i);
+    await screen.findByLabelText(/remove custom field type/i);
     const modal = await screen.findByTestId('modal-form');
     await within(modal).findByText('Rotate affected indices after change');
 
