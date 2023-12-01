@@ -57,7 +57,7 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
   }
 
   if (header) {
-    return <Menu.Label className={className} id={id}>{children}</Menu.Label>;
+    return <Menu.Label role="heading" className={className} id={id}>{children}</Menu.Label>;
   }
 
   return (
