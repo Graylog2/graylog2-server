@@ -137,9 +137,9 @@ describe('EventDefinitionEntry', () => {
 
     render(renderSUT('DEFAULT'));
 
-    await waitFor(() => {
-      expect(screen.getAllByTestId('delete-button')[0]).toBeVisible();
-    });
+    (await screen.findAllByRole('button', { name: 'More' }))[0].click();
+
+    await screen.findByRole('menuitem', { name: /delete/i });
   });
 
   it('hides "delete" button for immutable definitions', async () => {

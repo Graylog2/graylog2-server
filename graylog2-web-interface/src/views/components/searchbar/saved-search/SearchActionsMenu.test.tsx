@@ -154,6 +154,7 @@ describe('SearchActionsMenu', () => {
       );
 
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
       userEvent.click(exportAsDashboardMenuItem);
       await waitFor(() => expect(history.pushWithState).toHaveBeenCalledTimes(1));
@@ -169,6 +170,7 @@ describe('SearchActionsMenu', () => {
       );
 
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       await screen.findByText('Export');
 
@@ -177,6 +179,7 @@ describe('SearchActionsMenu', () => {
 
     it('should open file export modal', async () => {
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const exportMenuItem = await screen.findByText('Export');
       userEvent.click(exportMenuItem);
@@ -193,6 +196,7 @@ describe('SearchActionsMenu', () => {
 
       asMock(useView).mockReturnValue(createView('some-id'));
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportMenuItem = await screen.findByText('Edit metadata');
       userEvent.click(exportMenuItem);
 
@@ -204,6 +208,7 @@ describe('SearchActionsMenu', () => {
       const loadNewView = jest.fn(() => Promise.resolve());
 
       render(<SimpleSearchActionsMenu loadNewView={loadNewView} />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const resetSearch = await screen.findByText('Reset search');
 

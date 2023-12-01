@@ -88,6 +88,8 @@ describe('DashboardActions', () => {
 
     userEvent.click(await screen.findByText('More'));
 
+    await screen.findByRole('menu');
+
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
   });
 

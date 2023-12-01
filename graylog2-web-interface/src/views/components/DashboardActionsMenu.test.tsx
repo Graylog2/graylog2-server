@@ -144,8 +144,9 @@ describe('DashboardActionsMenu', () => {
   });
 
   it('should open edit dashboard meta information modal', async () => {
-    const { getByText, findByText } = render(<SUT />);
-    const editMenuItem = getByText(/Edit metadata/i);
+    const { findByText } = render(<SUT />);
+    (await screen.findByRole('button', { name: /more actions/i })).click();
+    const editMenuItem = await screen.findByText(/Edit metadata/i);
 
     userEvent.click(editMenuItem);
 
@@ -167,7 +168,7 @@ describe('DashboardActionsMenu', () => {
     await findByTitle(/Save dashboard/);
     await findByTitle(/Save as new dashboard/);
     await findByTitle(/Share/);
-    await findByRole(/^menu$/);
+    await findByRole('button', { name: /more actions/i });
   });
 
   it('should only render "Save As" button in SAVE_COPY layout option', async () => {
