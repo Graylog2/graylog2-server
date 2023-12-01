@@ -20,6 +20,7 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
+import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import javax.inject.Inject;
@@ -43,6 +44,7 @@ public class IndicesDirectoryController {
         this.indicesDirectoryParser = indicesDirectoryParser;
     }
 
+    @OnlyInSecuredNode
     @GET
     @Path("compatibility")
     public CompatibilityResult status() {
