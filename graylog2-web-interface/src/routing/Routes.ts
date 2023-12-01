@@ -383,7 +383,7 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
 const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
 
 /**
- * Exported constants for using strings to check if a plugin is registered by it's description.
+ * Exported constants for using strings to check if a plugin is registered by its description.
  *
  */
 export const ENTERPRISE_ROUTE_DESCRIPTION = 'Enterprise';

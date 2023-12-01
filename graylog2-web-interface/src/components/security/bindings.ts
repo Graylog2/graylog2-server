@@ -17,11 +17,10 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes, { SECURITY_ROUTES_PREFIX, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
-import TeaserPageLayout from 'components/security/teaser/TeaserPageLayout';
-import SecurityRoutes from 'components/security/SecurityRoutes';
+import SecurityPageEntry from 'components/security/SecurityPageEntry';
 
 const routes = [
-  { path: `${SECURITY_ROUTES_PREFIX}/*`, component: SecurityRoutes, parentComponent: TeaserPageLayout },
+  { path: `${SECURITY_ROUTES_PREFIX}/*`, component: SecurityPageEntry, parentComponent: ({ children }) => children },
 ];
 
 export const navigation = {

@@ -21,11 +21,10 @@ import { useState } from 'react';
 import { SideNav, SideNavItem, ContentArea, Container } from 'components/security/page-layout';
 import Routes from 'routing/Routes';
 
-const securityRoutes = [
+const navItems = [
   {
     id: 'security-main',
     path: Routes.SECURITY.overview(),
-    pathName: 'SECURITY',
     iconName: 'poll',
     end: true,
     title: 'Overview',
@@ -33,7 +32,6 @@ const securityRoutes = [
   {
     id: 'security-user-activity',
     path: Routes.SECURITY.userActivity(),
-    pathName: 'SECURITY_USER-ACTIVITY',
     iconName: 'user',
     end: false,
     title: 'User Activity',
@@ -41,7 +39,6 @@ const securityRoutes = [
   {
     id: 'security-host-activity',
     path: Routes.SECURITY.hostActivity(),
-    pathName: 'SECURITY_HOST-ACTIVITY',
     iconName: 'tv',
     end: false,
     title: 'Host Activity',
@@ -49,7 +46,6 @@ const securityRoutes = [
   {
     id: 'security-network-activity',
     path: Routes.SECURITY.networkActivity(),
-    pathName: 'SECURITY_NETWORK-ACTIVITY',
     iconName: 'wifi',
     end: false,
     title: 'Network Activity',
@@ -57,7 +53,6 @@ const securityRoutes = [
   {
     id: 'security-anomalies',
     path: Routes.SECURITY.anomalies(),
-    pathName: 'SECURITY_ANOMALIES',
     iconName: 'search-plus',
     end: false,
     title: 'Anomalies',
@@ -70,7 +65,7 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
   return (
     <Container>
       <SideNav isOpen={showSideBar} toggleIsOpen={() => setShowSideBar((cur) => !cur)}>
-        {securityRoutes.map((route) => (
+        {navItems.map((route) => (
           <SideNavItem key={route.title}
                        iconName={route.iconName}
                        linkTarget={route.path}
