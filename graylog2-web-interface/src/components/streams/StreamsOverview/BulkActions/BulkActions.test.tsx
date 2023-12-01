@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import selectEvent from 'react-select-event';
 
@@ -25,7 +25,6 @@ import UserNotification from 'util/UserNotification';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions/BulkActions';
 import { indexSets } from 'fixtures/indexSets';
 import { asMock } from 'helpers/mocking';
-import suppressConsole from 'helpers/suppressConsole';
 import ApiRoutes from 'routing/ApiRoutes';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
@@ -67,9 +66,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
     await waitFor(() => expect(submitButton).toBeEnabled());
 
-    await suppressConsole(async () => {
-      await userEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
   };
 
   describe('assign index set', () => {
@@ -79,7 +76,10 @@ describe('StreamsOverview BulkActionsRow', () => {
                           indexSets={indexSets} />);
 
       await openActionsDropdown();
-      await assignIndexSet();
+
+      await act(async () => {
+        await assignIndexSet();
+      });
 
       await waitFor(() => expect(Streams.assignToIndexSet).toHaveBeenCalledWith('index-set-id-2', ['stream-id-1', 'stream-id-2']));
 
@@ -94,7 +94,10 @@ describe('StreamsOverview BulkActionsRow', () => {
                           indexSets={indexSets} />);
 
       await openActionsDropdown();
-      await assignIndexSet();
+
+      await act(async () => {
+        await assignIndexSet();
+      });
 
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Assigning index set failed with status: Error: Unexpected error!', 'Error'));
     });
@@ -106,7 +109,7 @@ describe('StreamsOverview BulkActionsRow', () => {
     });
 
     const deleteStreams = async () => {
-      userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
     };
 
     it('should delete selected streams', async () => {
@@ -145,6 +148,7 @@ describe('StreamsOverview BulkActionsRow', () => {
                           setSelectedStreamIds={setSelectedStreamIds}
                           indexSets={indexSets} />);
 
+      await openActionsDropdown();
       await deleteStreams();
 
       expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams? This action cannot be undone.');
@@ -199,6 +203,7 @@ describe('StreamsOverview BulkActionsRow', () => {
                           setSelectedStreamIds={setSelectedStreamIds}
                           indexSets={indexSets} />);
 
+      await openActionsDropdown();
       await startStreams();
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith(
@@ -251,6 +256,7 @@ describe('StreamsOverview BulkActionsRow', () => {
                           setSelectedStreamIds={setSelectedStreamIds}
                           indexSets={indexSets} />);
 
+      await openActionsDropdown();
       await stopStreams();
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith(
@@ -270,7 +276,8 @@ describe('StreamsOverview BulkActionsRow', () => {
                           setSelectedStreamIds={() => {}}
                           indexSets={indexSets} />);
 
-      const link = await screen.findByRole('menuitem', { name: /search in streams/i }) as HTMLAnchorElement;
+      await openActionsDropdown();
+      const link = await screen.findByRole('link', { name: /search in streams/i }) as HTMLAnchorElement;
 
       expect(link.href).toContain('/search?rangetype=relative&from=300&streams=stream-id-1%2Cstream-id-2');
     });
