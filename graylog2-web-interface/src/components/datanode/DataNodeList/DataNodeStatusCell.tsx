@@ -16,13 +16,11 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback } from 'react';
 
 import { Label } from 'components/bootstrap';
 import type { DataNode } from 'preflight/types';
 
 const StatusLabel = styled(Label)`
-  cursor: 'pointer';
   display: inline-flex;
   justify-content: center;
   gap: 4px;
@@ -33,26 +31,12 @@ type Props = {
 };
 
 const DataNodeStatusCell = ({ dataNode }: Props) => {
-  const disableChange = dataNode.is_leader || dataNode.is_master;
   const datanodeDisabled = dataNode.data_node_status !== 'AVAILABLE';
-
-  const toggleStreamStatus = useCallback(async () => {
-    if (datanodeDisabled) {
-      // TODO enable
-    }
-
-    // eslint-disable-next-line no-alert
-    if (!datanodeDisabled && window.confirm(`Do you really want to pause datanode '${dataNode.hostname}'?`)) {
-      // TODO disable
-    }
-  }, [dataNode.hostname, datanodeDisabled]);
 
   return (
     <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                 onClick={disableChange ? undefined : toggleStreamStatus}
                  title={dataNode.data_node_status}
-                 aria-label={dataNode.data_node_status}
-                 role="button">
+                 aria-label={dataNode.data_node_status}>
       {dataNode.data_node_status}
     </StatusLabel>
   );
