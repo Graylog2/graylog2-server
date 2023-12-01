@@ -92,7 +92,6 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 /* Fail hard if the containerized backend failed to start. */
                 LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
                 System.exit(1);
-//                        throw new JUnitException("Error executing tests for engine " + getId(), exception);
             }
         } else if (Lifecycle.CLASS.equals(descriptor.getLifecycle())) {
             for (TestDescriptor td : descriptor.getChildren()) {
@@ -108,7 +107,6 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                     /* Fail hard if the containerized backend failed to start. */
                     LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
                     System.exit(1);
-//                          throw new JUnitException("Error executing tests for engine " + getId(), exception);
                 }
             }
         } else {
