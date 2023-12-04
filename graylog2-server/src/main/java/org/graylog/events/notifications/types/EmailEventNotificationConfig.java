@@ -86,6 +86,12 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_LOOKUP_RECIPIENT_EMAILS = "lookup_recipient_emails";
     private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_NAME = "recipients_lut_name";
     private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_KEY = "recipients_lut_key";
+    private static final String FIELD_LOOKUP_SENDER_EMAIL = "lookup_sender_email";
+    private static final String FIELD_SENDER_LOOKUP_TABLE_NAME = "sender_lut_name";
+    private static final String FIELD_SENDER_LOOKUP_TABLE_KEY = "sender_lut_key";
+    private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
+    private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
+    private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
@@ -123,6 +129,28 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @Nullable
     public abstract String recipientsLUTKey();
 
+    @JsonProperty(FIELD_LOOKUP_SENDER_EMAIL)
+    public abstract boolean lookupSenderEmail();
+
+    @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String senderLUTName();
+
+    @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String senderLUTKey();
+
+    @JsonProperty(FIELD_LOOKUP_REPLY_TO_EMAIL)
+    public abstract boolean lookupReplyToEmail();
+
+    @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String replyToLUTName();
+
+    @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String replyToLUTKey();
+
     @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -155,6 +183,22 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 validation.addError(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
             }
         }
+        if (lookupSenderEmail()) {
+            if (Strings.isNullOrEmpty(senderLUTName())) {
+                validation.addError(FIELD_SENDER_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(senderLUTKey())) {
+                validation.addError(FIELD_SENDER_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
+        }
+        if (lookupReplyToEmail()) {
+            if (Strings.isNullOrEmpty(replyToLUTName())) {
+                validation.addError(FIELD_REPLY_TO_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(replyToLUTKey())) {
+                validation.addError(FIELD_REPLY_TO_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
+        }
 
         return validation;
     }
@@ -173,7 +217,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .bodyTemplate(DEFAULT_BODY_TEMPLATE)
                     .timeZone(DateTimeZone.UTC)
                     .htmlBodyTemplate("")
-                    .lookupRecipientEmails(false);
+                    .lookupRecipientEmails(false)
+                    .lookupSenderEmail(false)
+                    .lookupReplyToEmail(false);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -209,6 +255,24 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
         public abstract Builder recipientsLUTKey(String recipientsLUTKey);
 
+        @JsonProperty(FIELD_LOOKUP_SENDER_EMAIL)
+        public abstract Builder lookupSenderEmail(boolean lookupSenderEmail);
+
+        @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_NAME)
+        public abstract Builder senderLUTName(String senderLUTName);
+
+        @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_KEY)
+        public abstract Builder senderLUTKey(String senderLUTKey);
+
+        @JsonProperty(FIELD_LOOKUP_REPLY_TO_EMAIL)
+        public abstract Builder lookupReplyToEmail(boolean lookupReplyToEmail);
+
+        @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_NAME)
+        public abstract Builder replyToLUTName(String replyToLUTName);
+
+        @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
+        public abstract Builder replyToLUTKey(String replyToLUTKey);
+
         public abstract EmailEventNotificationConfig build();
     }
 
@@ -226,6 +290,12 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .lookupRecipientEmails(ValueReference.of(lookupRecipientEmails()))
                 .recipientsLUTName(ValueReference.ofNullable(recipientsLUTName()))
                 .recipientsLUTKey(ValueReference.ofNullable(recipientsLUTKey()))
+                .lookupSenderEmail(ValueReference.of(lookupSenderEmail()))
+                .senderLUTName(ValueReference.ofNullable(senderLUTName()))
+                .senderLUTKey(ValueReference.ofNullable(senderLUTKey()))
+                .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()))
+                .replyToLUTName(ValueReference.ofNullable(replyToLUTName()))
+                .replyToLUTKey(ValueReference.ofNullable(replyToLUTKey()))
             .build();
     }
 }

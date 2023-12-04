@@ -47,6 +47,12 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_LOOKUP_RECIPIENT_EMAILS = "lookup_recipient_emails";
     private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_NAME = "recipients_lut_name";
     private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_KEY = "recipients_lut_key";
+    private static final String FIELD_LOOKUP_SENDER_EMAIL = "lookup_sender_email";
+    private static final String FIELD_SENDER_LOOKUP_TABLE_NAME = "sender_lut_name";
+    private static final String FIELD_SENDER_LOOKUP_TABLE_KEY = "sender_lut_key";
+    private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
+    private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
+    private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract ValueReference sender();
@@ -81,6 +87,24 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
     public abstract ValueReference recipientsLUTKey();
 
+    @JsonProperty(FIELD_LOOKUP_SENDER_EMAIL)
+    public abstract ValueReference lookupSenderEmail();
+
+    @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_NAME)
+    public abstract ValueReference senderLUTName();
+
+    @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_KEY)
+    public abstract ValueReference senderLUTKey();
+
+    @JsonProperty(FIELD_LOOKUP_REPLY_TO_EMAIL)
+    public abstract ValueReference lookupReplyToEmail();
+
+    @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_NAME)
+    public abstract ValueReference replyToLUTName();
+
+    @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
+    public abstract ValueReference replyToLUTKey();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -97,7 +121,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                     .htmlBodyTemplate(ValueReference.of(""))
                     .timeZone(ValueReference.of("UTC"))
                     .replyTo(ValueReference.of(""))
-                    .lookupRecipientEmails(ValueReference.of(false));
+                    .lookupRecipientEmails(ValueReference.of(false))
+                    .lookupSenderEmail(ValueReference.of(false))
+                    .lookupReplyToEmail(ValueReference.of(false));
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -133,6 +159,24 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
         public abstract Builder recipientsLUTKey(ValueReference recipientsLUTKey);
 
+        @JsonProperty(FIELD_LOOKUP_SENDER_EMAIL)
+        public abstract Builder lookupSenderEmail(ValueReference lookupSenderEmail);
+
+        @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_NAME)
+        public abstract Builder senderLUTName(ValueReference senderLUTName);
+
+        @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_KEY)
+        public abstract Builder senderLUTKey(ValueReference senderLUTKey);
+
+        @JsonProperty(FIELD_LOOKUP_REPLY_TO_EMAIL)
+        public abstract Builder lookupReplyToEmail(ValueReference lookupReplyToEmail);
+
+        @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_NAME)
+        public abstract Builder replyToLUTName(ValueReference replyToLUTName);
+
+        @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
+        public abstract Builder replyToLUTKey(ValueReference replyToLUTKey);
+
         public abstract EmailEventNotificationConfigEntity build();
     }
 
@@ -150,6 +194,12 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .lookupRecipientEmails(lookupRecipientEmails().asBoolean(parameters))
                 .recipientsLUTName(recipientsLUTName().asString(parameters))
                 .recipientsLUTKey(recipientsLUTKey().asString(parameters))
+                .lookupSenderEmail(lookupSenderEmail().asBoolean(parameters))
+                .senderLUTName(senderLUTName().asString(parameters))
+                .senderLUTKey(senderLUTKey().asString(parameters))
+                .lookupReplyToEmail(lookupReplyToEmail().asBoolean(parameters))
+                .replyToLUTName(replyToLUTName().asString(parameters))
+                .replyToLUTKey(replyToLUTKey().asString(parameters))
                 .build();
     }
 }
