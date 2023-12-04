@@ -37,6 +37,8 @@ const sizeForMantine = (size: BsSize) => {
 
 export type StyleProps = ColorVariant | 'link';
 
+const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
+
 const styleProps = (style: StyleProps) => {
   switch (style) {
     case 'default': return { color: 'gray' };
@@ -119,6 +121,7 @@ const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disab
     root: {
       ...sizeStyles,
       ':disabled': disableStyles,
+      color: other.colors.contrast[bsStyle],
     },
     label: {
       gap: '0.25em',
@@ -132,28 +135,44 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
     title, form, type, role, name, tabIndex, children,
   }, ref) => {
     const theme = useMantineTheme();
-    const styles = useMemo(() => generateStyles(theme.other, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
-    const button = (
+    const style = mapStyle(bsStyle);
+    const styles = useMemo(() => generateStyles(theme.other, style, bsSize, disabled), [bsSize, disabled, style, theme.other]);
+
+    const sharedProps = {
+      id,
+      'aria-label': ariaLabel,
+      className,
+      ...styleProps(style),
+      'data-testid': dataTestId,
+      disabled,
+      role,
+      size: sizeForMantine(bsSize),
+      styles,
+      tabIndex,
+      title,
+      type,
+    } as const;
+
+    if (href) {
+      return (
+        <StyledButton<'a'> component="a"
+                           href={href}
+                           onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+                           {...sharedProps}>
+          {children}
+        </StyledButton>
+      );
+    }
+
+    return (
       <StyledButton ref={ref}
-                    id={id}
-                    aria-label={ariaLabel}
-                    className={className}
-                    {...styleProps(bsStyle)}
-                    data-testid={dataTestId}
-                    disabled={disabled}
                     form={form}
-                    name={name}
                     onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-                    role={role}
-                    size={sizeForMantine(bsSize)}
-                    styles={styles}
-                    tabIndex={tabIndex}
-                    title={title}
-                    type={type}>{children}
+                    name={name}
+                    {...sharedProps}>
+        {children}
       </StyledButton>
     );
-
-    return href ? <a href={href}>{button}</a> : button;
   });
 
 Button.defaultProps = {

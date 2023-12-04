@@ -14,14 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import styled from 'styled-components';
 
 import OriginalButtonGroup from './ButtonGroup';
 
-const ButtonToolbar = styled(OriginalButtonGroup)`
-  float: right;
+const StyledButtonToolbar = styled(OriginalButtonGroup)`
   gap: 0.25em;
 `;
+
+const ButtonToolbar = (props: React.ComponentProps<typeof StyledButtonToolbar>) => (
+  <StyledButtonToolbar role="toolbar" {...props} />
+);
 
 /** @component */
 export default ButtonToolbar;
