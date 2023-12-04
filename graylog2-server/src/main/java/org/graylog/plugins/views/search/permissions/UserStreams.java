@@ -41,7 +41,7 @@ public class UserStreams {
     }
 
     public ImmutableSet<String> loadAllMessageStreams() {
-        return permittedStreams.load(streamPermissions);
+        return permittedStreams.loadAllMessageStreams(streamPermissions);
     }
 
     public ImmutableSet<String> loadAllStreams() {

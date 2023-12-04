@@ -39,7 +39,7 @@ public class PermittedStreams {
         this(() -> streamService.loadAll().stream().map(org.graylog2.plugin.streams.Stream::getId));
     }
 
-    public ImmutableSet<String> load(StreamPermissions streamPermissions) {
+    public ImmutableSet<String> loadAllMessageStreams(final StreamPermissions streamPermissions) {
         return allStreamsProvider.get()
                 // Unless explicitly queried, exclude event and failure indices by default
                 // Having these indices in every search, makes sorting almost impossible
@@ -50,7 +50,7 @@ public class PermittedStreams {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    public ImmutableSet<String> loadAll(StreamPermissions streamPermissions) {
+    public ImmutableSet<String> loadAll(final StreamPermissions streamPermissions) {
         return allStreamsProvider.get()
                 .filter(streamPermissions::canReadStream)
                 .collect(ImmutableSet.toImmutableSet());
