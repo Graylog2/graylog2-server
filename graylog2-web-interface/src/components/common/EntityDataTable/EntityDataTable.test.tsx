@@ -259,10 +259,14 @@ describe('<EntityDataTable />', () => {
                             bulkSelection={{ actions: () => <div /> }}
                             columnDefinitions={columnDefinitions} />);
 
-    userEvent.click(screen.getByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(screen.getByRole('menuitem', { name: /show title/i }));
+    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /show title/i }));
 
     expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: /show title/i })).not.toBeInTheDocument();
+    });
   });
 
   it('should hande entities with camel case attributes', async () => {
