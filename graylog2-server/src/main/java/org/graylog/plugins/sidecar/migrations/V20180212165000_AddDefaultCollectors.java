@@ -97,7 +97,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         %s
                         output.logstash:
                           hosts: ["${user.graylog_host}:5044"]
-                        zpath:
+                        path:
                           data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
                           logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
                         filebeat.inputs:
