@@ -26,8 +26,6 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Input, Row } from 'components/
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 
-import './lookup-table-provider';
-
 // TODO: Default body template should come from the server
 const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------
 Title:       \${event_definition_title}
