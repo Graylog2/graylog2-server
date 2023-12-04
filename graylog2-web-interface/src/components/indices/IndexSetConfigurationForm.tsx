@@ -29,7 +29,7 @@ import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMai
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
 import withHistory from 'routing/withHistory';
 import type { HistoryFunction } from 'routing/useHistory';
 import type {
@@ -122,7 +122,7 @@ const IndexSetConfigurationForm = ({
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
-  const prepareRetentionConfig = (values: IndexSet) : IndexSet => {
+  const prepareRetentionConfig = (values: IndexSetFormValues) : IndexSet => {
     if (selectedRetentionSegment === 'legacy') {
       return { ...values, data_tiering: undefined };
     }
@@ -139,7 +139,7 @@ const IndexSetConfigurationForm = ({
     return { ...configWithDataTiering, ...legacyDefaultConfig };
   };
 
-  const saveConfiguration = (values: IndexSet) => onUpdate(prepareRetentionConfig(values));
+  const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfig(values));
 
   const onFieldTypeRefreshIntervalChange = (
     intervalValue: number,

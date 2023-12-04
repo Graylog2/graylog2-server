@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import { durationToRoundedDays } from 'components/indices/data-tiering';
 
 type Props = {
   config: DataTieringConfig
@@ -11,10 +12,10 @@ const DataTieringSummary = ({ config } : Props) => (
     <dl>
       <dt>Rotation strategy:</dt>
       <dd>Data Tiering</dd>
-      <dt>Max # days in storage:</dt>
-      <dd>{config.index_lifetime_max}</dd>
-      <dt>Min # days in storage:</dt>
-      <dd>{config.index_lifetime_min}</dd>
+      <dt>Max. in storage:</dt>
+      <dd>{durationToRoundedDays(config.index_lifetime_max)} days</dd>
+      <dt>Min. in storage:</dt>
+      <dd>{durationToRoundedDays(config.index_lifetime_min)} days</dd>
     </dl>
   </div>
 );

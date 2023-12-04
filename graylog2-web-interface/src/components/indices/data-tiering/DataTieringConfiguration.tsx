@@ -15,32 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import moment from 'moment';
 import { useFormikContext } from 'formik';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
 import { FormikFormGroup } from 'components/common';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
 
-export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSet => {
-  if (!values.data_tiering) return values;
+export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
+
+export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSetFormValues => {
+  if (!values.data_tiering) return values as unknown as IndexSetFormValues;
 
   let { data_tiering } = values;
 
   dayFields.forEach((field) => {
     if (data_tiering[field]) {
-      const numberValue = parseInt(data_tiering[field].substring(1, data_tiering[field].length - 1), 10);
+      const numberValue = durationToRoundedDays(data_tiering[field]);
       data_tiering = { ...data_tiering, [field]: numberValue };
     }
   });
 
-  return { ...values, data_tiering };
+  return { ...values, data_tiering } as unknown as IndexSetFormValues;
 };
 
-export const prepareDataTieringConfig = (values: IndexSet, pluginStore) : IndexSet => {
-  if (!values.data_tiering) return values;
+export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore) : IndexSet => {
+  if (!values.data_tiering) return values as unknown as IndexSet;
 
   const defaultType = 'hot_only';
   const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
@@ -56,13 +59,13 @@ export const prepareDataTieringConfig = (values: IndexSet, pluginStore) : IndexS
 
   data_tiering = { ...data_tiering, type: dataTieringType };
 
-  return { ...values, data_tiering };
+  return { ...values, data_tiering } as unknown as IndexSet;
 };
 
 const DataTieringConfiguration = () => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === 'hot_warm'));
 
-  const { values } = useFormikContext<IndexSet>();
+  const { values } = useFormikContext<IndexSetFormValues>();
 
   const validateMaxDaysInStorage = (value) => {
     if (value < 0) {
