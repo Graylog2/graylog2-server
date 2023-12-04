@@ -47,7 +47,7 @@ Changed fields:
 Removed fields:
 - `answers`
 - `api`
-- `class_name` (This field stored in  `vendor_subtype`)
+- `class_name` (now stored in the `vendor_subtype` field)
 - `cloud`
 - `compliance`
 - `confidence`
