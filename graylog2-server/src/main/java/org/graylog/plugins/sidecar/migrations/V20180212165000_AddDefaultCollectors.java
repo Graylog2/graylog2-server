@@ -97,7 +97,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         %s
                         output.logstash:
                           hosts: ["${user.graylog_host}:5044"]
-                        path:
+                        zpath:
                           data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
                           logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
                         filebeat.inputs:
@@ -153,7 +153,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                           - /var/log/httpd/error_log
                         """))
                 .toString()
-        ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-linux-default", collector));
+        ).ifPresent(collectorState -> ensureDefaultConfiguration("filebeat-linux-default", collectorState));
 
         ensureFilebeatCollector(OS_FREEBSD, "/usr/share/filebeat/bin/filebeat", filebeatConfigBuilder
                 .append(f(apacheConfigType, """
@@ -162,7 +162,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                           - /var/log/httpd-error.log
                         """))
                 .toString()
-        ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-freebsd-default", collector));
+        ).ifPresent(collectorState -> ensureDefaultConfiguration("filebeat-freebsd-default", collectorState));
 
         ensureFilebeatCollector(OS_DARWIN, "/usr/share/filebeat/bin/filebeat", filebeatConfigBuilder
                 .append(f(apacheConfigType, """
@@ -171,7 +171,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                           - /etc/httpd/log/error_log
                         """))
                 .toString()
-        ).ifPresent(collector -> ensureDefaultConfiguration("filebeat-darwin-default", collector));
+        ).ifPresent(collectorState -> ensureDefaultConfiguration("filebeat-darwin-default", collectorState));
     }
 
     private void ensureAuditbeatCollectorsAndConfig() {
@@ -257,7 +257,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                   hash_types: [sha256]
                                   recursive: false""",
                         BEATS_PREAMBEL)
-        ).ifPresent(collector -> ensureDefaultConfiguration("auditbeat-linux-default", collector));
+        ).ifPresent(collectorState -> ensureDefaultConfiguration("auditbeat-linux-default", collectorState));
     }
 
     private void ensureWinlogbeatCollectorsAndConfig() {
@@ -302,7 +302,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                      ignore_older: 96h""",
                         BEATS_PREAMBEL
                 )
-        ).ifPresent(collector -> ensureDefaultConfiguration("winlogbeat-default", collector));
+        ).ifPresent(collectorState -> ensureDefaultConfiguration("winlogbeat-default", collectorState));
     }
 
     private void ensureNxLogCollectors() {
@@ -463,7 +463,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
     }
 
 
-    private Optional<Collector> ensureFilebeatCollector(String operatingSystem, String executablePath, String config) {
+    private Optional<CollectorState> ensureFilebeatCollector(String operatingSystem, String executablePath, String config) {
         return ensureCollector(
                 "filebeat",
                 "exec",
@@ -489,13 +489,18 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         }
     }
 
-    private Optional<Collector> ensureCollector(String collectorName,
-                                                String serviceType,
-                                                String nodeOperatingSystem,
-                                                String executablePath,
-                                                String executeParameters,
-                                                String validationCommand,
-                                                String defaultTemplate) {
+    /**
+     * Create or update Collector
+     *
+     * @return current Collector and a flag, indicating whether default template was updated
+     */
+    private Optional<CollectorState> ensureCollector(String collectorName,
+                                                     String serviceType,
+                                                     String nodeOperatingSystem,
+                                                     String executablePath,
+                                                     String executeParameters,
+                                                     String validationCommand,
+                                                     String defaultTemplate) {
         Collector collector = null;
         try {
             collector = collectorService.findByNameAndOs(collectorName, nodeOperatingSystem);
@@ -504,18 +509,20 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 LOG.debug(msg, collectorName, nodeOperatingSystem);
                 throw new IllegalArgumentException();
             }
-            if (!collector.defaultTemplateUpdated()) {
+            if (collector.defaultTemplateUnchanged()) {
                 long newCRC = Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8));
                 if (collector.defaultTemplateCRC() == null      // known obsolete version of template
                         || newCRC != collector.defaultTemplateCRC() // new standard template
                 ) {
                     LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
                     try {
-                        return Optional.of(collectorService.save(
-                                collector.toBuilder()
-                                        .defaultTemplate(defaultTemplate)
-                                        .defaultTemplateCRC(newCRC)
-                                        .build()));
+                        return Optional.of(new CollectorState(
+                                collectorService.save(
+                                        collector.toBuilder()
+                                                .defaultTemplate(defaultTemplate)
+                                                .defaultTemplateCRC(newCRC)
+                                                .build()),
+                                true));
                     } catch (Exception e) {
                         LOG.error("Can't save collector '{}'!", collectorName, e);
                     }
@@ -524,17 +531,18 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         } catch (IllegalArgumentException ignored) {
             LOG.info("{} collector on {} is missing, adding it.", collectorName, nodeOperatingSystem);
             try {
-                return Optional.of(collectorService.save(Collector.create(
-                        null,
-                        collectorName,
-                        serviceType,
-                        nodeOperatingSystem,
-                        executablePath,
-                        executeParameters,
-                        validationCommand,
-                        defaultTemplate,
-                        Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8))
-                )));
+                return Optional.of(new CollectorState(
+                        collectorService.save(Collector.create(
+                                null,
+                                collectorName,
+                                serviceType,
+                                nodeOperatingSystem,
+                                executablePath,
+                                executeParameters,
+                                validationCommand,
+                                defaultTemplate,
+                                Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8)))),
+                        true));
             } catch (Exception e) {
                 LOG.error("Can't save collector '{}'!", collectorName, e);
             }
@@ -545,7 +553,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             return Optional.empty();
         }
 
-        return Optional.of(collector);
+        return Optional.of(new CollectorState(collector, false));
     }
 
     private void ensureConfigurationVariable(String name, String description, String content) {
@@ -570,22 +578,37 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         }
     }
 
-    private void ensureDefaultConfiguration(String name, Collector collector) {
+    private void ensureDefaultConfiguration(String name, CollectorState collectorState) {
         Configuration config = null;
         try {
             config = configurationService.findByName(name);
             if (config == null) {
                 LOG.debug("Couldn't find sidecar default configuration'{}' fixing it.", name);
                 throw new IllegalArgumentException();
+            } else {
+                if (collectorState.updatedTemplate && !config.template().equals(collectorState.collector.defaultTemplate())) {
+                    try {
+                        LOG.info("Updating sidecar default configuration template '{}'.", name);
+                        config = configurationService.save(Configuration.create(
+                                config.id(),
+                                config.collectorId(),
+                                config.name(),
+                                config.color(),
+                                collectorState.collector.defaultTemplate(),
+                                config.tags()));
+                    } catch (Exception e) {
+                        LOG.error("Can't update sidecar default configuration '{}'!", name, e);
+                    }
+                }
             }
         } catch (IllegalArgumentException ignored) {
             LOG.info("'{}' sidecar default configuration is missing, adding it.", name);
             try {
                 config = configurationService.save(Configuration.createWithoutId(
-                        collector.id(),
+                        collectorState.collector.id(),
                         name,
                         "#ffffff",
-                        collector.defaultTemplate(),
+                        collectorState.collector.defaultTemplate(),
                         Set.of("default")));
             } catch (Exception e) {
                 LOG.error("Can't save sidecar default configuration '{}'!", name, e);
@@ -594,6 +617,16 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
         if (config == null) {
             LOG.error("Unable to access '{}' sidecar default configuration!", name);
+        }
+    }
+
+    class CollectorState {
+        Collector collector;
+        boolean updatedTemplate;
+
+        CollectorState(Collector collector, boolean updatedTemplate) {
+            this.collector = collector;
+            this.updatedTemplate = updatedTemplate;
         }
     }
 }

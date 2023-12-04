@@ -106,21 +106,21 @@ public abstract class Collector {
     public abstract Long defaultTemplateCRC();
 
     @JsonIgnore
-    public boolean defaultTemplateUpdated() {
+    public boolean defaultTemplateUnchanged() {
         if (defaultTemplate() == null) {
-            return false;
+            return true;
         }
 
         long crc = checksum(defaultTemplate().getBytes(StandardCharsets.UTF_8));
         if (defaultTemplateCRC() == null) {
             if (INITIAL_CRC.contains(crc)) {
-                return false; // known old version
+                return true; // known old version
             } else {
                 LOG.info("{} collector default template on {} is an unrecognized version - not updating automatically.", name(), nodeOperatingSystem());
-                return true;  // changed or really old standard default template
+                return false;  // changed or really old standard default template
             }
         }
-        return (crc != defaultTemplateCRC());
+        return (crc == defaultTemplateCRC());
     }
 
     @JsonIgnore
