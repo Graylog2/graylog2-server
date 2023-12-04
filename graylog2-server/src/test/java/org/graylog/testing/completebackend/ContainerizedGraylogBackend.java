@@ -65,7 +65,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          Map<String, String> configParams) {
 
         LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
-        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, enabledFeatureFlags, configParams);
+        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, enabledFeatureFlags);
         LOG.debug("Done creating backend services");
 
         return new ContainerizedGraylogBackend().create(services, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
