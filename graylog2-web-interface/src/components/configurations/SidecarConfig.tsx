@@ -93,7 +93,7 @@ const SidecarConfig = () => {
     const inactiveMilliseconds = durationMilliseconds(formConfig.sidecar_inactive_threshold);
     const expirationMilliseconds = durationMilliseconds(formConfig.sidecar_expiration_threshold);
 
-    return milliseconds >= 1000 && milliseconds < inactiveMilliseconds && milliseconds < expirationMilliseconds;
+    return (milliseconds >= 1000) && (milliseconds < inactiveMilliseconds) && (milliseconds < expirationMilliseconds);
   };
 
   if (!loaded || !viewConfig) { return <Spinner />; }
