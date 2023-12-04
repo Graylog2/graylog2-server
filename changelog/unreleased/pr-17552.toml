@@ -1,5 +1,5 @@
 type = "f"
-message = "By default, `none` and `close` retention strategies are disabled for new installations."
+message = "By default, `none` and `close` index retention strategies are disabled for new installations."
 
 issues = ["graylog-plugin-enterprise#5888"]
 pulls = ["17552"]
