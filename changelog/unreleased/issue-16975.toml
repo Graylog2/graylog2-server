@@ -2,4 +2,4 @@ type = "f"
 message = "Fix broken validator for System Configuration / Sidecars / Update interval."
 
 issues = ["16975"]
-pulls = [""]
+pulls = ["17569"]
