@@ -33,7 +33,6 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import SourceViewModal from './SourceViewModal';
-import ImportsViewModal from './ImportsViewModal';
 import ConfigurationTagsSelect from './ConfigurationTagsSelect';
 
 import type { Collector, Configuration, ConfigurationSidecarsResponse } from '../types';
@@ -63,7 +62,6 @@ const ConfigurationForm = ({
   const [error, setError] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [showUploadsModal, setShowUploadsModal] = useState(false);
   const defaultTemplates = useRef({});
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
@@ -191,15 +189,6 @@ const ConfigurationForm = ({
     setFormData(nextFormData);
   };
 
-  const _onTemplateImport = (nextTemplate) => {
-    const nextFormData = cloneDeep(formData);
-
-    // eslint-disable-next-line no-alert
-    if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
-      _onTemplateChange(nextTemplate);
-    }
-  };
-
   const _onSubmit = (event) => {
     event.preventDefault();
     _save();
@@ -211,10 +200,6 @@ const ConfigurationForm = ({
 
   const _onShowSource = () => {
     setShowPreviewModal(true);
-  };
-
-  const _onShowImports = () => {
-    setShowUploadsModal(true);
   };
 
   const _formatCollector = (collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
@@ -339,12 +324,6 @@ const ConfigurationForm = ({
                         onClick={_onShowSource}>
                   Preview
                 </Button>
-                <Button className="pull-right"
-                        bsStyle="link"
-                        bsSize="sm"
-                        onClick={_onShowImports}>
-                  Migrate
-                </Button>
                 <HelpBlock>
                   {_formatValidationMessage('template', 'Required. Collector configuration, see quick reference for more information.')}
                 </HelpBlock>
@@ -362,9 +341,6 @@ const ConfigurationForm = ({
           <SourceViewModal showModal={showPreviewModal}
                            onHide={() => setShowPreviewModal(false)}
                            templateString={formData.template} />
-          <ImportsViewModal showModal={showUploadsModal}
-                            onHide={() => setShowUploadsModal(false)}
-                            onApply={_onTemplateImport} />
         </div>
       </Col>
       <Col md={6}>
