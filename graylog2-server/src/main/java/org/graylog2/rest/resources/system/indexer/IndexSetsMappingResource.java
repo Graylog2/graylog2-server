@@ -153,7 +153,7 @@ public class IndexSetsMappingResource extends RestResource {
 
     private Set<String> normalizeStreamIds(Set<String> streams, SearchUser searchUser) {
         return (streams == null || streams.isEmpty())
-                ? permittedStreams.load(searchUser)
+                ? permittedStreams.loadAllMessageStreams(searchUser)
                 : streams;
     }
 }
