@@ -284,8 +284,7 @@ const WidgetActionsMenu = ({
           <CopyToDashboard onSubmit={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
                            onCancel={() => setShowCopyToDashboard(false)}
                            submitLoadingText="Copying widget..."
-                           submitButtonText="Copy widget"
-                           onCopyToNewDashboard={onCreateNewDashboard} />
+                           submitButtonText="Copy widget" />
         )}
 
         {showExport && (
