@@ -109,7 +109,7 @@ public class MongoIndexSet implements IndexSet {
                 : config.indexMatchPattern();
 
         this.indexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "(?:" + WARM_INDEX_INFIX + ")?" + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
-        this.deflectorIndexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "\\d+");
+        this.deflectorIndexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "(?:" + WARM_INDEX_INFIX + ")?" + "\\d+");
 
         // The index wildcard can be configured in IndexSetConfig. If not set we use a default one based on the index
         // prefix.
