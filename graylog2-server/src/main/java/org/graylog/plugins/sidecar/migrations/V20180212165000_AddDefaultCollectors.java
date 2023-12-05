@@ -621,7 +621,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         }
     }
 
-    class CollectorState {
+    static class CollectorState {
         Collector collector;
         boolean updatedTemplate;
 
