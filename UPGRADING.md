@@ -43,6 +43,7 @@ The following Java Code API changes have been made.
 | `org.graylog2.plugin.Message#addStringFields` | Deprecated method removed |
 | `org.graylog2.plugin.Message#addLongFields` | Deprecated method removed |
 | `org.graylog2.plugin.Message#addDoubleFields` | Deprecated method removed |
+| `org.graylog2.plugin.Message#getValidationErrors` | Deprecated method removed |
 
 
 ## REST API Endpoint Changes
