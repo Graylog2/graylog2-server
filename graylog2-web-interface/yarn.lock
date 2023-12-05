@@ -1790,10 +1790,10 @@
   resolved "https://registry.yarnpkg.com/@eslint-community/regexpp/-/regexpp-4.6.2.tgz#1816b5f6948029c5eaacb0703b850ee0cb37d8f8"
   integrity sha512-pPTNuaAG3QMH+buKyBIGJs3g/S5y0caxw0ygM3YyE6yJFySwiGGSzA+mM3KJ8QQvzeLh3blwgSonkFjgQdxzMw==
 
-"@eslint/eslintrc@^2.1.3":
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-2.1.3.tgz#797470a75fe0fbd5a53350ee715e85e87baff22d"
-  integrity sha512-yZzuIG+jnVu6hNSzFEN07e8BxF3uAzYtQb6uDkaYZLo6oYZDCq454c5kB8zxnzfCYyP4MIuyBn10L0DqwujTmA==
+"@eslint/eslintrc@^2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-2.1.4.tgz#388a269f0f25c1b6adc317b5a2c55714894c70ad"
+  integrity sha512-269Z39MS6wVJtsoUl10L60WdkhJVdPG24Q4eZTH3nnF6lpvSShEK3wQjDX9JRWAUPvPh7COouPpU9IrqaZFvtQ==
   dependencies:
     ajv "^6.12.4"
     debug "^4.3.2"
@@ -1805,10 +1805,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@eslint/js@8.54.0":
-  version "8.54.0"
-  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.54.0.tgz#4fab9a2ff7860082c304f750e94acd644cf984cf"
-  integrity sha512-ut5V+D+fOoWPgGGNj83GGjnntO39xDy6DWxO0wb7Jp3DcMX0TfIqdzHF85VTQkerdyGmuuMD9AKAo5KiNlf/AQ==
+"@eslint/js@8.55.0":
+  version "8.55.0"
+  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.55.0.tgz#b721d52060f369aa259cf97392403cb9ce892ec6"
+  integrity sha512-qQfo2mxH5yVom1kacMtZZJFVdW+E70mqHMJvVg6WTLo+VBuQJ4TojZlfWBjK0ve5BdEeNAVxOsl/nvNMpJOaJA==
 
 "@floating-ui/core@^1.2.6":
   version "1.2.6"
@@ -1838,38 +1838,38 @@
     aria-hidden "^1.1.3"
     tabbable "^6.0.1"
 
-"@fortawesome/fontawesome-common-types@6.5.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.5.0.tgz#5d3912d28a2fb3e6c867320eb27a71f23e7bcb29"
-  integrity sha512-vYC8oN2l8meu05sRi1j3Iie/HNFAeIxpitYFhsUrBc11TxiMken9QdXnSQ0q16FYsOSt/6soxs5ghdk+VYGiog==
+"@fortawesome/fontawesome-common-types@6.5.1":
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.5.1.tgz#fdb1ec4952b689f5f7aa0bffe46180bb35490032"
+  integrity sha512-GkWzv+L6d2bI5f/Vk6ikJ9xtl7dfXtoRu3YGE6nq0p/FFqA1ebMOAWg3XgRyb0I6LYyYkiAo+3/KrwuBp8xG7A==
 
 "@fortawesome/fontawesome-svg-core@^6.4.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-6.5.0.tgz#4957e163bb890963442c110c5290703af21803d9"
-  integrity sha512-5DrR+oxQr+ruRQ3CEVV8DSCT/q8Atm56+FzAs0P6eW/epW47OmecSpSwc/YTlJ3u5BfPKUBSGyPR2qjZ+5eIgA==
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-6.5.1.tgz#9d56d46bddad78a7ebb2043a97957039fcebcf0a"
+  integrity sha512-MfRCYlQPXoLlpem+egxjfkEuP9UQswTrlCOsknus/NcMoblTH2g0jPrapbcIb04KGA7E2GZxbAccGZfWoYgsrQ==
   dependencies:
-    "@fortawesome/fontawesome-common-types" "6.5.0"
+    "@fortawesome/fontawesome-common-types" "6.5.1"
 
 "@fortawesome/free-brands-svg-icons@^6.4.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/free-brands-svg-icons/-/free-brands-svg-icons-6.5.0.tgz#00ff5b4a0122b3e4cdb5c901cd97e769c133e183"
-  integrity sha512-LwIl3b5cH0xjmBS7mcy8+SsSsl/7J4xi3aP+Tr4rDUf2Tab8r1c8NcqC8wP5c+bgphGstyG3QPx7l4b9WtcO5Q==
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@fortawesome/free-brands-svg-icons/-/free-brands-svg-icons-6.5.1.tgz#e948cc02404277cb8ad40fe3573ca75f2830e876"
+  integrity sha512-093l7DAkx0aEtBq66Sf19MgoZewv1zeY9/4C7vSKPO4qMwEsW/2VYTUTpBtLwfb9T2R73tXaRDPmE4UqLCYHfg==
   dependencies:
-    "@fortawesome/fontawesome-common-types" "6.5.0"
+    "@fortawesome/fontawesome-common-types" "6.5.1"
 
 "@fortawesome/free-regular-svg-icons@^6.4.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/free-regular-svg-icons/-/free-regular-svg-icons-6.5.0.tgz#c2c448695efc0b2a16d126ff8e3cb94e1544778b"
-  integrity sha512-RaBW/y0jKcCyEPM+NYuBs3bQXuLYZHnXABQPmg6qwuRxNb2EUmyCcVUECUH2dkFmMjggh/xvl6n6y62Pl19JkA==
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@fortawesome/free-regular-svg-icons/-/free-regular-svg-icons-6.5.1.tgz#c98a91d2c9137ed54a7aa2362a916f46503e0627"
+  integrity sha512-m6ShXn+wvqEU69wSP84coxLbNl7sGVZb+Ca+XZq6k30SzuP3X4TfPqtycgUh9ASwlNh5OfQCd8pDIWxl+O+LlQ==
   dependencies:
-    "@fortawesome/fontawesome-common-types" "6.5.0"
+    "@fortawesome/fontawesome-common-types" "6.5.1"
 
 "@fortawesome/free-solid-svg-icons@^6.4.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-6.5.0.tgz#bc50a291948fa43b1a9502548ac0b02e7b1f2433"
-  integrity sha512-6ZPq8mme67Q7O9Fbp2O+Z7mPZbcWTsRv555JLftLaTodiV0Wq+99YgMhyQ8O6mgNQfComqS9OEvqs7M8ySA92g==
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-6.5.1.tgz#737b8d787debe88b400ab7528f47be333031274a"
+  integrity sha512-S1PPfU3mIJa59biTtXJz1oI0+KAXW6bkAb31XKhxdxtuXDiUIFsih4JR1v5BbxY7hVHsD1RKq+jRkVRaf773NQ==
   dependencies:
-    "@fortawesome/fontawesome-common-types" "6.5.0"
+    "@fortawesome/fontawesome-common-types" "6.5.1"
 
 "@fortawesome/react-fontawesome@^0.2.0":
   version "0.2.0"
@@ -1878,10 +1878,10 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@graylog/sawmill@2.0.10":
-  version "2.0.10"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.10.tgz#ff9a4a2cab82987a82d59f8d695a994b816e755d"
-  integrity sha512-9IoPxvtNI/kqNPxxN3dAvcxH1tVekhORU5goatdI64StKYhgDj80FFK3IL0sBiYbi+DSMPYR6cduPhwdz3IfRw==
+"@graylog/sawmill@2.0.11":
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.11.tgz#3c850e9d2aa87ef5ffeeb53bf2146828d0d39e2a"
+  integrity sha512-H+oWLHdiymm5w/1LftgHIUNEKDNceIBpjLx/bl4AhJHoUjJTnn+DF16rf42s7sZyorq/fn24RzUfVas6VNvy3A==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
@@ -1913,10 +1913,10 @@
   resolved "https://registry.yarnpkg.com/@icons/material/-/material-0.2.4.tgz#e90c9f71768b3736e76d7dd6783fc6c2afa88bc8"
   integrity sha512-QPcGmICAPbGLGb6F/yNf/KzKqvFx8z5qx3D1yFqVAjoFmXK35EgyW+cJ57Te3CNsmzblwtzakLGFqHPqrfb4Tw==
 
-"@interactjs/types@1.10.23":
-  version "1.10.23"
-  resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.10.23.tgz#ed62f85cc9a821527552398b808bb3e77c83d674"
-  integrity sha512-8/s1gFVNW60SqFLiFQDsvJuuzICthzyOu52bu8MhLFsxFnhVfng1xzjxi2+UokQULsp0WgBsctIS9bF7se9nJQ==
+"@interactjs/types@1.10.25":
+  version "1.10.25"
+  resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.10.25.tgz#574ba6fbb9e46c5c33a470905a03c254b908444c"
+  integrity sha512-mGeUWFKVYDd3kiqST/bZNIMOZ33K7fqXfDcsqoVt5t2L3moICeNQr2LDsU6Yz6YPSM1xHlIKEfRGAAKkYYtxuw==
 
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
@@ -2797,10 +2797,10 @@
     lz-string "^1.4.4"
     pretty-format "^27.0.2"
 
-"@testing-library/jest-dom@6.1.4":
-  version "6.1.4"
-  resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-6.1.4.tgz#cf0835c33bc5ef00befb9e672b1e3e6a710e30e3"
-  integrity sha512-wpoYrCYwSZ5/AxcrjLxJmCU6I5QAJXslEeSiMQqaWmP2Kzpd1LvF/qxmAIW2qposULGWq2gw30GgVNFLSc2Jnw==
+"@testing-library/jest-dom@6.1.5":
+  version "6.1.5"
+  resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-6.1.5.tgz#0a635d0ad4a1a880089d967299d94e9cfc81fbe1"
+  integrity sha512-3y04JLW+EceVPy2Em3VwNr95dOKqA8DhR0RJHhHKDZNYXcVXnEK7WIrpj4eYU8SVt/qYZ2aRWt/WgQ+grNES8g==
   dependencies:
     "@adobe/css-tools" "^4.3.1"
     "@babel/runtime" "^7.9.2"
@@ -3034,10 +3034,18 @@
   dependencies:
     "@types/enzyme" "*"
 
-"@types/enzyme@*", "@types/enzyme@3.10.16":
+"@types/enzyme@*":
   version "3.10.16"
   resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.16.tgz#100c49093f694545fc903266b2eb410df08859a9"
   integrity sha512-17uMdJjSKjvdn/MhO/G2lRNPZGvJxFpvgONrsRoS1+khtJ6UcnCwC9v3gk2UqPyAkMZb6a1VYxScc/vOgkDl9w==
+  dependencies:
+    "@types/cheerio" "*"
+    "@types/react" "^16"
+
+"@types/enzyme@3.10.17":
+  version "3.10.17"
+  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.17.tgz#085f29fdb3a24f72cf3e0e14490b6f233254e596"
+  integrity sha512-4+CMYPx8cToXnF1WxUdjKCZFSrslJqkIW5N5D27stzJsnJmw4dWbOcmhPERJpe+CufV0LanV7BgTWuj63Z2/Vg==
   dependencies:
     "@types/cheerio" "*"
     "@types/react" "^16"
@@ -3373,9 +3381,9 @@
     react-select "*"
 
 "@types/react-slider@^1.3.1":
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/@types/react-slider/-/react-slider-1.3.5.tgz#d13142fd2f491661004f875de413e1c4d27aa532"
-  integrity sha512-Hhp+YTvc1bALrow07DkpahC4KqlCwKem2/5MsP6AXoPBHBzfRB6OIv+Kr4DFqeP1onmUfdrN04DbyI9/QU6X1A==
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/@types/react-slider/-/react-slider-1.3.6.tgz#6f5602be93ab1cb3d273428c87aa227ad2ff68ff"
+  integrity sha512-RS8XN5O159YQ6tu3tGZIQz1/9StMLTg/FCIPxwqh2gwVixJnlfIodtVx+fpXVMZHe7A58lAX1Q4XTgAGOQaCQg==
   dependencies:
     "@types/react" "*"
 
@@ -7106,7 +7114,7 @@ eslint-config-airbnb@19.0.4:
     "@tanstack/eslint-plugin-query" "4.36.1"
     "@typescript-eslint/eslint-plugin" "6.13.1"
     "@typescript-eslint/parser" "6.13.1"
-    eslint "8.54.0"
+    eslint "8.55.0"
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
@@ -7318,15 +7326,15 @@ eslint-visitor-keys@^3.4.3:
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-3.4.3.tgz#0cd72fe8550e3c2eae156a96a4dddcd1c8ac5800"
   integrity sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag==
 
-eslint@8.54.0:
-  version "8.54.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.54.0.tgz#588e0dd4388af91a2e8fa37ea64924074c783537"
-  integrity sha512-NY0DfAkM8BIZDVl6PgSa1ttZbx3xHgJzSNJKYcQglem6CppHyMhRIQkBVSSMaSRnLhig3jsDbEzOjwCVt4AmmA==
+eslint@8.55.0:
+  version "8.55.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.55.0.tgz#078cb7b847d66f2c254ea1794fa395bf8e7e03f8"
+  integrity sha512-iyUUAM0PCKj5QpwGfmCAG9XXbZCWsqP/eWAWrG/W0umvjuLRBECwSFdt+rCntju0xEH7teIABPwXpahftIaTdA==
   dependencies:
     "@eslint-community/eslint-utils" "^4.2.0"
     "@eslint-community/regexpp" "^4.6.1"
-    "@eslint/eslintrc" "^2.1.3"
-    "@eslint/js" "8.54.0"
+    "@eslint/eslintrc" "^2.1.4"
+    "@eslint/js" "8.55.0"
     "@humanwhocodes/config-array" "^0.11.13"
     "@humanwhocodes/module-importer" "^1.0.1"
     "@nodelib/fs.walk" "^1.2.8"
@@ -8550,7 +8558,7 @@ graphemer@^1.4.0:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "6.0.0-SNAPSHOT"
   dependencies:
-    "@graylog/sawmill" "2.0.10"
+    "@graylog/sawmill" "2.0.11"
     "@tanstack/react-query" "4.36.1"
     "@types/create-react-class" "15.6.6"
     "@types/jquery" "3.5.29"
@@ -9106,11 +9114,11 @@ ini@^1.3.5:
   integrity sha512-iKpRpXP+CrP2jyrxvg1kMUpXDyRUFDWurxbnVT1vQPx+Wz9uCYsMIqYuSBLV+PAaZG/d7kRLKRFc9oDMsH+mFQ==
 
 interactjs@^1.4.0-rc.13:
-  version "1.10.23"
-  resolved "https://registry.yarnpkg.com/interactjs/-/interactjs-1.10.23.tgz#13b20e08ec66b9e5d43761ea39fd67f34459bc17"
-  integrity sha512-ZnxfYh4QBnWnnCXVOVHEU4r2w01EQMTsLCd71n0mpsItFhV7S/jXycvzgsNvf5I99trBRRwP8RJXU8oy4hRFEw==
+  version "1.10.25"
+  resolved "https://registry.yarnpkg.com/interactjs/-/interactjs-1.10.25.tgz#8ee9bb39143d164451691e0db4de7c15a3bc8cd7"
+  integrity sha512-fmk+WI3JWQY1ebe/2PWILnLIIJ/DHGguLPzpemFpUVmSkcVgdyApDxQppUOYg1ofy9bJvPDaTPvyIXa7nl5d0w==
   dependencies:
-    "@interactjs/types" "1.10.23"
+    "@interactjs/types" "1.10.25"
 
 internal-slot@^1.0.3:
   version "1.0.3"
@@ -10147,11 +10155,11 @@ jest-pnp-resolver@^1.2.2:
   dependencies:
     "@jest/types" "29.6.1"
     "@testing-library/dom" "9.3.3"
-    "@testing-library/jest-dom" "6.1.4"
+    "@testing-library/jest-dom" "6.1.5"
     "@testing-library/react" "12.1.5"
     "@testing-library/react-hooks" "^8.0.0"
     "@testing-library/user-event" "^13.5.0"
-    "@types/enzyme" "3.10.16"
+    "@types/enzyme" "3.10.17"
     "@types/jest" "29.5.5"
     babel-jest "29.6.2"
     enzyme "3.11.0"
