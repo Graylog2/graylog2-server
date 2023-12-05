@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.shaded.opensearch2.org.apache.http.ContentTooLongException;
@@ -73,6 +74,11 @@ public class OpenSearchClient {
         this.indexerMaxConcurrentSearches = Optional.ofNullable(indexerMaxConcurrentSearches);
         this.indexerMaxConcurrentShardRequests = Optional.ofNullable(indexerMaxConcurrentShardRequests);
         this.objectMapper = objectMapper;
+    }
+
+    @VisibleForTesting
+    public OpenSearchClient(RestHighLevelClient client, ObjectMapper objectMapper) {
+        this(client, false, null, null, objectMapper);
     }
 
     public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
