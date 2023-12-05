@@ -133,7 +133,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         MessagesRequest request = requestFromClient != null ? requestFromClient : MessagesRequest.withDefaults();
 
         if (request.streams().isEmpty()) {
-            request = request.withStreams(searchUser.streams().loadStreamsForEmptyStreamsReplacement());
+            request = request.withStreams(searchUser.streams().loadMessageStreamsWithFallback());
         }
 
         if (!request.timeZone().isPresent()) {
@@ -242,7 +242,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         Search search = searchDomain.getForUser(searchId, searchUser)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
 
-        search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadStreamsForEmptyStreamsReplacement());
+        search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
 
         search = search.applyExecutionState(executionState);
 

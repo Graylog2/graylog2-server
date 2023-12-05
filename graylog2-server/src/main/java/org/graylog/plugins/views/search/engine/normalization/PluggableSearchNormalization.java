@@ -64,7 +64,7 @@ public class PluggableSearchNormalization implements SearchNormalization {
 
     @Override
     public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadStreamsForEmptyStreamsReplacement());
+        final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
         Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()));
 
         return normalize(normalizedSearch, pluggableNormalizers);
@@ -79,7 +79,7 @@ public class PluggableSearchNormalization implements SearchNormalization {
     public Query preValidation(final Query query, final ParameterProvider parameterProvider, SearchUser searchUser, ExecutionState executionState) {
         Query normalizedQuery = query;
         if (!query.hasStreams()) {
-            normalizedQuery = query.addStreamsToFilter(searchUser.streams().loadStreamsForEmptyStreamsReplacement());
+            normalizedQuery = query.addStreamsToFilter(searchUser.streams().loadMessageStreamsWithFallback());
         }
 
         if (!executionState.equals(ExecutionState.empty())) {

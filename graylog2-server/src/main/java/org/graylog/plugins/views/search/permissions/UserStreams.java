@@ -48,7 +48,7 @@ public class UserStreams {
         return permittedStreams.loadAll(streamPermissions);
     }
 
-    public ImmutableSet<String> loadStreamsForEmptyStreamsReplacement() {
+    public ImmutableSet<String> loadMessageStreamsWithFallback() {
         final ImmutableSet<String> messageStreams = loadAllMessageStreams();
         if (!messageStreams.isEmpty()) {
             return messageStreams;
@@ -67,7 +67,7 @@ public class UserStreams {
      */
     public ImmutableSet<String> readableOrAllIfEmpty(@Nullable final Set<String> requestedStreams) {
         if (requestedStreams == null || requestedStreams.isEmpty()) {
-            return loadStreamsForEmptyStreamsReplacement();
+            return loadMessageStreamsWithFallback();
         } else {
 
             final Set<String> notPermittedStreams = requestedStreams.stream()
