@@ -22,7 +22,7 @@ import type { TitleType } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
 import View from 'views/logic/views/View';
 
-const CopyWidgetToNewDashboard = (view: View, widgetId: string) => {
+const CreateViewWithOneWidget = (view: View, widgetId: string) => {
   const [newWidget, currentQueryId] = FindWidgetAndQueryIdInView(widgetId, view);
   const currentViewState = view.state.get(currentQueryId);
   const widgetMappings = Immutable.Map({ [newWidget.id]: currentViewState.widgetMapping.get(newWidget.id) });
@@ -47,4 +47,4 @@ const CopyWidgetToNewDashboard = (view: View, widgetId: string) => {
     .build();
 };
 
-export default CopyWidgetToNewDashboard;
+export default CreateViewWithOneWidget;

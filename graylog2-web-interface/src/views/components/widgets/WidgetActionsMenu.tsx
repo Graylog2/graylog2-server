@@ -48,7 +48,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import CopyWidgetToNewDashboard from 'views/logic/views/CopyWidgetToNewDashboard';
+import CreateViewWithOneWidget from 'views/logic/views/CreateViewWithOneWidget';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -95,8 +95,8 @@ const _onCopyToDashboard = async (
   setShowCopyToDashboard(false);
 };
 
-const _onCopyToNewDashboard = (view: View, widgetId: string, history: HistoryFunction) => {
-  const newView = CopyWidgetToNewDashboard(view, widgetId);
+const _onCreateNewDashboard = (view: View, widgetId: string, history: HistoryFunction) => {
+  const newView = CreateViewWithOneWidget(view, widgetId);
 
   loadAsDashboard(history, newView);
 };
@@ -184,14 +184,14 @@ const WidgetActionsMenu = ({
     return _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history);
   }, [history, pathname, sendTelemetry, view]);
 
-  const onCopyToNewDashboard = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_NEW_DASHBOARD, {
+  const onCreateNewDashboard = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CREATE_NEW_DASHBOARD, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
-      app_action_value: 'widget-copy-to-new-dashboard-button',
+      app_action_value: 'widget-create-new-dashboard-button',
     });
 
-    return _onCopyToNewDashboard(view, widget.id, history);
+    return _onCreateNewDashboard(view, widget.id, history);
   }, [sendTelemetry, pathname, view, widget.id, history]);
 
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => {
@@ -263,8 +263,8 @@ const WidgetActionsMenu = ({
             </MenuItem>
           </IfSearch>
           <IfSearch>
-            <MenuItem onSelect={onCopyToNewDashboard}>
-              Copy to new Dashboard
+            <MenuItem onSelect={onCreateNewDashboard}>
+              Create new dashboard
             </MenuItem>
           </IfSearch>
           {widget.isExportable && <MenuItem onSelect={() => setShowExport(true)}>Export</MenuItem>}
@@ -285,7 +285,7 @@ const WidgetActionsMenu = ({
                            onCancel={() => setShowCopyToDashboard(false)}
                            submitLoadingText="Copying widget..."
                            submitButtonText="Copy widget"
-                           onCopyToNewDashboard={onCopyToNewDashboard} />
+                           onCopyToNewDashboard={onCreateNewDashboard} />
         )}
 
         {showExport && (
