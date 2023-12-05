@@ -1913,10 +1913,10 @@
   resolved "https://registry.yarnpkg.com/@icons/material/-/material-0.2.4.tgz#e90c9f71768b3736e76d7dd6783fc6c2afa88bc8"
   integrity sha512-QPcGmICAPbGLGb6F/yNf/KzKqvFx8z5qx3D1yFqVAjoFmXK35EgyW+cJ57Te3CNsmzblwtzakLGFqHPqrfb4Tw==
 
-"@interactjs/types@1.10.23":
-  version "1.10.23"
-  resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.10.23.tgz#ed62f85cc9a821527552398b808bb3e77c83d674"
-  integrity sha512-8/s1gFVNW60SqFLiFQDsvJuuzICthzyOu52bu8MhLFsxFnhVfng1xzjxi2+UokQULsp0WgBsctIS9bF7se9nJQ==
+"@interactjs/types@1.10.25":
+  version "1.10.25"
+  resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.10.25.tgz#574ba6fbb9e46c5c33a470905a03c254b908444c"
+  integrity sha512-mGeUWFKVYDd3kiqST/bZNIMOZ33K7fqXfDcsqoVt5t2L3moICeNQr2LDsU6Yz6YPSM1xHlIKEfRGAAKkYYtxuw==
 
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
@@ -7118,7 +7118,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-c6a6ba22-7f2a-4c84-9ca7-c28381eb4056-1701691541748/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.6.0"
     eslint-plugin-jest-dom "5.1.0"
@@ -8563,13 +8563,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.6"
     "@types/jquery" "3.5.29"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-af8e076d-d42a-4531-956c-de7030f09cd0-1701691541626/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-af8e076d-d42a-4531-956c-de7030f09cd0-1701691541626/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-af8e076d-d42a-4531-956c-de7030f09cd0-1701691541626/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.29.4"
     moment-timezone "0.5.43"
@@ -9114,11 +9114,11 @@ ini@^1.3.5:
   integrity sha512-iKpRpXP+CrP2jyrxvg1kMUpXDyRUFDWurxbnVT1vQPx+Wz9uCYsMIqYuSBLV+PAaZG/d7kRLKRFc9oDMsH+mFQ==
 
 interactjs@^1.4.0-rc.13:
-  version "1.10.23"
-  resolved "https://registry.yarnpkg.com/interactjs/-/interactjs-1.10.23.tgz#13b20e08ec66b9e5d43761ea39fd67f34459bc17"
-  integrity sha512-ZnxfYh4QBnWnnCXVOVHEU4r2w01EQMTsLCd71n0mpsItFhV7S/jXycvzgsNvf5I99trBRRwP8RJXU8oy4hRFEw==
+  version "1.10.25"
+  resolved "https://registry.yarnpkg.com/interactjs/-/interactjs-1.10.25.tgz#8ee9bb39143d164451691e0db4de7c15a3bc8cd7"
+  integrity sha512-fmk+WI3JWQY1ebe/2PWILnLIIJ/DHGguLPzpemFpUVmSkcVgdyApDxQppUOYg1ofy9bJvPDaTPvyIXa7nl5d0w==
   dependencies:
-    "@interactjs/types" "1.10.23"
+    "@interactjs/types" "1.10.25"
 
 internal-slot@^1.0.3:
   version "1.0.3"
