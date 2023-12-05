@@ -21,7 +21,6 @@ import upperFirst from 'lodash/upperFirst';
 
 import { Link } from 'components/common/router';
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { isPermitted } from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
@@ -64,7 +63,7 @@ const renderQueryParameters = (queryParameters) => {
 
     return (
       <Alert bsStyle="danger">
-        <Icon name="exclamation-triangle" />&nbsp;There are undeclared query parameters: {undeclaredParameters}
+        There are undeclared query parameters: {undeclaredParameters}
       </Alert>
     );
   }
@@ -112,6 +111,7 @@ class FilterAggregationSummary extends React.Component {
       search_within_ms: searchWithinMs,
       execute_every_ms: executeEveryMs,
       _is_scheduled: isScheduled,
+      event_limit,
       group_by: groupBy,
       series,
       conditions,
@@ -122,8 +122,8 @@ class FilterAggregationSummary extends React.Component {
     const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
 
-    const effectiveStreamIds = streams.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
-    const streamIdsWithMissingPermission = streams.filter((s) => !effectiveStreamIds.includes(s));
+    const effectiveStreamIds = streams?.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
+    const streamIdsWithMissingPermission = streams?.filter((s) => !effectiveStreamIds.includes(s));
 
     const validationResults = validateExpression(conditions.expression, series);
 
@@ -142,6 +142,12 @@ class FilterAggregationSummary extends React.Component {
         <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
         <dt>Enable scheduling</dt>
         <dd>{isScheduled ? 'yes' : 'no'}</dd>
+        {conditionType === 'filter' && (
+          <>
+            <dt>Event limit</dt>
+            <dd>{event_limit}</dd>
+          </>
+        )}
         {conditionType === 'aggregation' && (
           <>
             <dt>Group by Field(s)</dt>
@@ -151,7 +157,7 @@ class FilterAggregationSummary extends React.Component {
               {validationResults.isValid
                 ? <AggregationConditionSummary series={series} conditions={conditions} />
                 : (
-                  <Alert bsSize="small" bsStyle="danger"><Icon name="exclamation-triangle" />&nbsp;
+                  <Alert bsSize="small" bsStyle="danger">
                     Condition is not valid: {validationResults.errors.join(', ')}
                   </Alert>
                 )}

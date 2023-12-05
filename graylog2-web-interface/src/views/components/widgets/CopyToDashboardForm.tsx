@@ -37,7 +37,9 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
   useEffect(() => {
     isMounted.current = true;
 
-    return () => { isMounted.current = false; };
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -76,9 +78,7 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
   };
 
   return (
-    <Modal show
-           data-app-section="dashboards"
-           data-event-element="CopyToDashboardForm">
+    <Modal show onHide={() => {}}>
       <Modal.Body>
         {isLoadingDashboards && <Spinner />}
         {!isLoadingDashboards && (

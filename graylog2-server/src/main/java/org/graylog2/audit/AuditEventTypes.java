@@ -38,6 +38,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String CLUSTER_CONFIGURATION_CREATE = PREFIX + "cluster_configuration:create";
     public static final String CLUSTER_CONFIGURATION_DELETE = PREFIX + "cluster_configuration:delete";
     public static final String CLUSTER_CONFIGURATION_UPDATE = PREFIX + "cluster_configuration:update";
+    public static final String CERTIFICATE_RENEWAL_MANUALLY_INITIATED = PREFIX + "certificate_renewal:manual";
     public static final String CONTENT_PACK_CREATE = PREFIX + "content_pack:create";
     public static final String CONTENT_PACK_DELETE = PREFIX + "content_pack:delete";
     public static final String CONTENT_PACK_DELETE_REV = PREFIX + "content_pack:delete_rev";
@@ -50,6 +51,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DASHBOARD_WIDGET_DELETE = PREFIX + "dashboard_widget:delete";
     public static final String DASHBOARD_WIDGET_POSITIONS_UPDATE = PREFIX + "dashboard_widget_positions:update";
     public static final String DASHBOARD_WIDGET_UPDATE = PREFIX + "dashboard_widget:update";
+    public static final String DATANODE_API_REQUEST = PREFIX + "data_node:api_request";
+    public static final String DATANODE_REMOVE = PREFIX + "data_node:remove";
+    public static final String DATANODE_RESET = PREFIX + "data_node:reset";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
@@ -68,6 +72,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_CREATE = PREFIX + "extractor:create";
     public static final String EXTRACTOR_DELETE = PREFIX + "extractor:delete";
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
+    public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
+    public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
     public static final String EXTRACTOR_UPDATE = PREFIX + "extractor:update";
     public static final String GETTING_STARTED_GUIDE_OPT_OUT_CREATE = PREFIX + "getting_started_guide_opt_out:create";
     public static final String GRANTS_UPDATE = PREFIX + "grants:update";
@@ -153,6 +159,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String USER_PREFERENCES_UPDATE = PREFIX + "user_preferences:update";
     public static final String USER_UPDATE = PREFIX + "user:update";
     public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
+    public static final String CONTENT_STREAM_USER_SETTINGS_UPDATE = PREFIX + "content_stream_user_settings:update";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
@@ -181,6 +188,10 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DASHBOARD_WIDGET_DELETE)
             .add(DASHBOARD_WIDGET_POSITIONS_UPDATE)
             .add(DASHBOARD_WIDGET_UPDATE)
+            .add(DATANODE_API_REQUEST)
+            .add(DATANODE_REMOVE)
+            .add(DATANODE_RESET)
+            .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)
@@ -200,6 +211,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_DELETE)
             .add(EXTRACTOR_ORDER_UPDATE)
             .add(EXTRACTOR_UPDATE)
+            .add(FIELD_TYPE_MAPPING_CREATE)
+            .add(FIELD_TYPE_MAPPING_DELETE)
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GRANTS_UPDATE)
             .add(GROK_PATTERN_CREATE)
@@ -283,6 +296,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(USER_PREFERENCES_UPDATE)
             .add(USER_UPDATE)
             .add(TELEMETRY_USER_SETTINGS_UPDATE)
+            .add(CONTENT_STREAM_USER_SETTINGS_UPDATE)
+            .add(CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
             .build();
 
     @Override

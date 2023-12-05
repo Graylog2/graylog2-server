@@ -27,6 +27,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,19 +71,23 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     protected final Duration writeTimeout;
     protected final URI httpProxyUri;
     protected final ProxyHostsPattern nonProxyHostsPattern;
+    private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
 
     @Inject
     public OkHttpClientProvider(@Named("http_connect_timeout") Duration connectTimeout,
                                 @Named("http_read_timeout") Duration readTimeout,
                                 @Named("http_write_timeout") Duration writeTimeout,
                                 @Named("http_proxy_uri") @Nullable URI httpProxyUri,
-                                @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern) {
+                                @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern,
+                                TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
         this.connectTimeout = requireNonNull(connectTimeout);
         this.readTimeout = requireNonNull(readTimeout);
         this.writeTimeout = requireNonNull(writeTimeout);
         this.httpProxyUri = httpProxyUri;
         this.nonProxyHostsPattern = nonProxyHostsPattern;
+        this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
     }
+
 
     @Override
     public OkHttpClient get() {
@@ -91,6 +96,11 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 .connectTimeout(connectTimeout.getQuantity(), connectTimeout.getUnit())
                 .writeTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit())
                 .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
+
+        if(trustManagerAndSocketFactoryProvider != null) {
+            // always set our own CA, might be overriden in later code
+            clientBuilder.sslSocketFactory(trustManagerAndSocketFactoryProvider.getSslSocketFactory(), trustManagerAndSocketFactoryProvider.getTrustManager());
+        }
 
         if (httpProxyUri != null) {
             final ProxySelector proxySelector = new ProxySelector() {

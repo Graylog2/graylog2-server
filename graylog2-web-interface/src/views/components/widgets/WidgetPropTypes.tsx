@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import Widget from 'views/logic/widgets/Widget';
+import SearchError from 'views/logic/SearchError';
 
 import CustomPropTypes from '../CustomPropTypes';
 
@@ -43,8 +44,6 @@ export const WidgetData = PropTypes.oneOfType([
 
 export const WidgetDataMap = PropTypes.objectOf(WidgetData);
 
-export const WidgetError = PropTypes.exact({
-  description: PropTypes.string,
-});
+export const WidgetError = PropTypes.instanceOf(SearchError);
 export const WidgetErrorsList = PropTypes.arrayOf(WidgetError);
 export const WidgetErrorsMap = PropTypes.objectOf(WidgetErrorsList);

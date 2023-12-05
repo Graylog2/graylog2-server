@@ -24,7 +24,7 @@ import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import useWidgetResults from 'views/components/useWidgetResults';
-import type SearchError from 'views/logic/SearchError';
+import SearchError from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { duplicateWidget, updateWidgetConfig, updateWidget } from 'views/logic/slices/widgetActions';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -42,7 +42,14 @@ import FieldTypesContext from '../contexts/FieldTypesContext';
 jest.mock('../searchbar/queryinput/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+
 jest.mock('views/components/useWidgetResults');
+
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
@@ -139,7 +146,18 @@ describe('<Widget />', () => {
   });
 
   it('should render error widget for widget with one error', async () => {
-    asMock(useWidgetResults).mockReturnValue({ error: [{ description: 'The widget has failed: the dungeon collapsed, you die!' } as SearchError], widgetData: undefined });
+    asMock(useWidgetResults).mockReturnValue({
+      error: [
+        new SearchError({
+          description: 'The widget has failed: the dungeon collapsed, you die!',
+          query_id: 'query-id-2',
+          search_type_id: 'search_type_id-2',
+          type: 'query',
+          backtrace: '',
+        })],
+      widgetData: undefined,
+    });
+
     render(<DummyWidget />);
 
     await screen.findByText('The widget has failed: the dungeon collapsed, you die!');
@@ -148,8 +166,20 @@ describe('<Widget />', () => {
   it('should render error widget including all error messages for widget with multiple errors', async () => {
     asMock(useWidgetResults).mockReturnValue({
       error: [
-        { description: 'Something is wrong' } as SearchError,
-        { description: 'Very wrong' } as SearchError,
+        new SearchError({
+          description: 'Something is wrong',
+          query_id: 'query-id-1',
+          search_type_id: 'search_type_id-1',
+          type: 'query',
+          backtrace: '',
+        }),
+        new SearchError({
+          description: 'Very wrong',
+          query_id: 'query-id-2',
+          search_type_id: 'search_type_id-2',
+          type: 'query',
+          backtrace: '',
+        }),
       ],
       widgetData: undefined,
     });

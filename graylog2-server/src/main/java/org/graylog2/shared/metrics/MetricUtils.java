@@ -187,6 +187,11 @@ public class MetricUtils {
         }
     }
 
+    public static <T extends Metric> T reRegister(MetricRegistry metricRegistry, String name, T metric) {
+        metricRegistry.remove(name);
+        return metricRegistry.register(name, metric);
+    }
+
     public static <T extends Metric> T getOrRegister(MetricRegistry metricRegistry, String name, T newMetric) {
         final Metric metric = metricRegistry.getMetrics().get(name);
         if (metric != null) {

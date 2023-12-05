@@ -265,4 +265,16 @@ describe('StreamsOverview BulkActionsRow', () => {
       expect(setSelectedStreamIds).toHaveBeenCalledWith(['stream-id-1']);
     });
   });
+
+  describe('search in streams action', () => {
+    it('should render link', async () => {
+      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
+                          setSelectedStreamIds={() => {}}
+                          indexSets={indexSets} />);
+
+      const link = await screen.findByRole('menuitem', { name: /search in streams/i }) as HTMLAnchorElement;
+
+      expect(link.href).toContain('/search?rangetype=relative&from=300&streams=stream-id-1%2Cstream-id-2');
+    });
+  });
 });

@@ -55,7 +55,7 @@ public class MigrationHelpers {
             previousRole = roleService.load(roleName);
             if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions())) {
                 final String msg = "Invalid role '" + roleName + "', fixing it.";
-                LOG.error(msg);
+                LOG.debug(msg);
                 throw new IllegalArgumentException(msg); // jump to fix code
             }
         } catch (NotFoundException | IllegalArgumentException | NoSuchElementException ignored) {
@@ -130,7 +130,7 @@ public class MigrationHelpers {
                     || !previousUser.getRoleIds().containsAll(expectedRoles)
                     || !Objects.equals(isServiceAccount, previousUser.isServiceAccount())) {
                 final String msg = "Invalid user '" + userName + "', fixing it.";
-                LOG.error(msg);
+                LOG.debug(msg);
                 throw new IllegalArgumentException(msg);
             }
         } catch (IllegalArgumentException ignored) {

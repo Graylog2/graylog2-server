@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { TextInput as MantineTextInput, Input as MantineInput } from '@mantine/core';
+import { Input as MantineInput } from '@mantine/core';
 
-const Input = (props: React.ComponentProps<typeof MantineTextInput>) => (
-  <MantineTextInput {...props} />
+const Input = (props: React.ComponentProps<typeof MantineInput>) => (
+  <MantineInput {...props} />
 );
 
 Input.Error = MantineInput.Error;

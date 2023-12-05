@@ -16,7 +16,7 @@
  */
 import type { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
 
-export type DataNodeStatus = typeof DATA_NODES_STATUS[keyof typeof DATA_NODES_STATUS]['key']
+export type DataNodeStatus = keyof typeof DATA_NODES_STATUS;
 
 export type DataNode = {
   hostname: string,
@@ -29,6 +29,8 @@ export type DataNode = {
   transport_address: string,
   type: string,
   status: DataNodeStatus
+  cert_valid_until: string | null,
+  error_msg?: string,
 }
 
 export type DataNodes = Array<DataNode>;

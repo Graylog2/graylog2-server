@@ -1,0 +1,5 @@
+type = "a"
+message = "Optional flag to invert condition of `remove_field` function."
+
+issues = ["8128"]
+pulls = ["16182"]

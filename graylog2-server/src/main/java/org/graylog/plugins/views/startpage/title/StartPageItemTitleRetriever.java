@@ -17,10 +17,17 @@
 package org.graylog.plugins.views.startpage.title;
 
 import org.graylog.grn.GRN;
+import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
+import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog2.lookup.Catalog;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -30,13 +37,28 @@ import java.util.Optional;
 public class StartPageItemTitleRetriever {
 
     private final Catalog catalog;
+    private final Map<String, ViewResolver> viewResolvers;
 
     @Inject
-    public StartPageItemTitleRetriever(final Catalog catalog) {
+    public StartPageItemTitleRetriever(final Catalog catalog,
+                                       final Map<String, ViewResolver> viewResolvers) {
         this.catalog = catalog;
+        this.viewResolvers = viewResolvers;
     }
 
-    public Optional<String> retrieveTitle(final GRN itemGrn) {
+    public Optional<String> retrieveTitle(final GRN itemGrn, final SearchUser searchUser) {
+        if (isSpecialView(itemGrn)) {
+            final ViewResolverDecoder decoder = new ViewResolverDecoder(itemGrn.entity());
+            if (decoder.isResolverViewId()) {
+                final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
+                if (viewResolver != null) {
+                    Optional<ViewDTO> view = viewResolver.get(decoder.getViewId());
+                    if (view.isPresent() && searchUser.canReadView(view.get())) {
+                        return Optional.ofNullable(view.get().title());
+                    }
+                }
+            }
+        }
         final Optional<Catalog.Entry> entry = catalog.getEntry(itemGrn);
         final Optional<String> title = entry.map(Catalog.Entry::title);
         if (title.isPresent()) {
@@ -44,5 +66,14 @@ public class StartPageItemTitleRetriever {
         } else {
             return entry.map(Catalog.Entry::id);
         }
+
+
+    }
+
+    private boolean isSpecialView(final GRN itemGrn) {
+        final GRNType grnType = itemGrn.grnType();
+        final String entity = itemGrn.entity();
+        return (grnType == GRNTypes.DASHBOARD || grnType == GRNTypes.SEARCH) && entity.contains(ViewResolverDecoder.SEPARATOR);
+
     }
 }

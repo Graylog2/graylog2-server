@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog2.decorators.Decorator;
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -117,6 +119,36 @@ class CommandFactoryTest {
         assertThat(command.timeRange()).isEqualTo(query.timerange());
         assertThat(command.queryString()).isEqualTo(query.query());
         assertThat(command.streams()).isEqualTo(query.usedStreamIds());
+    }
+
+    @Test
+    void buildsCommandWithSearchFilters() {
+        final InlineQueryStringSearchFilter sampleSearchFilter = InlineQueryStringSearchFilter.builder()
+                .queryString("smth")
+                .id("id")
+                .title("title")
+                .build();
+
+        MessageList ml = MessageList.builder().id("ml-id")
+                .streams(ImmutableSet.of("stream-1", "stream-2"))
+                .build();
+
+        Query query = validQueryBuilderWith(ml)
+                .filters(List.of(sampleSearchFilter))
+                .build();
+        Search s = searchWithQueries(query);
+
+        ResultFormat resultFormat = ResultFormat.builder()
+                .fieldsInOrder("field-1", "field-2")
+                .limit(100)
+                .build();
+
+        ExportMessagesCommand command = sut.buildWithSearchOnly(s, resultFormat);
+        assertThat(command.usedSearchFilters()).isEqualTo(List.of(sampleSearchFilter));
+
+
+        command = sut.buildWithMessageList(s, "ml-id", resultFormat);
+        assertThat(command.usedSearchFilters()).isEqualTo(List.of(sampleSearchFilter));
     }
 
     @Test

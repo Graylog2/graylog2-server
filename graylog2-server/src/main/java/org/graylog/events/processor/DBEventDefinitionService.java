@@ -81,6 +81,10 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
         return super.save(enrichedWithUpdateDate);
     }
 
+    public void updateMatchedAt(String id, DateTime timeStamp) {
+        db.updateById(new ObjectId(id), new DBUpdate.Builder().set(EventDefinitionDto.FIELD_MATCHED_AT, timeStamp));
+    }
+
     public void updateState(String id, EventDefinition.State state) {
         // Strictly enabling/disabling event definitions does not require a scope check
         db.updateById(new ObjectId(id), new DBUpdate.Builder().set(EventDefinitionDto.FIELD_STATE, state));

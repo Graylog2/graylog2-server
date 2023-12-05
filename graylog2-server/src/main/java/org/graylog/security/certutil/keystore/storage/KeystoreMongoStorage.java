@@ -74,5 +74,4 @@ public final class KeystoreMongoStorage implements KeystoreStorage<KeystoreMongo
         }
         return Optional.empty();
     }
-
 }

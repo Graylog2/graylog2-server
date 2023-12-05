@@ -28,6 +28,7 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePluginEntities from 'hooks/usePluginEntities';
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -73,7 +74,7 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                    entityId={dashboard.id}
                    entityType="dashboard"
                    onClick={() => setShowShareModal(true)} />
-      <OverlayDropdownButton bsSize="xsmall" title="More" buttonTitle="More actions">
+      <OverlayDropdownButton bsSize="xsmall" title={MORE_ACTIONS_TITLE} buttonTitle={MORE_ACTIONS_HOVER_TITLE}>
         {dashboardActions.length > 0 ? (
           <>
             {dashboardActions}

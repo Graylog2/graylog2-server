@@ -43,6 +43,10 @@ import {
 import { ModalSubmit } from 'components/common';
 import useAppDispatch from 'stores/useAppDispatch';
 import { addHighlightingRule, updateHighlightingRule } from 'views/logic/slices/highlightActions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 type Props = {
   onClose: () => void,
@@ -106,6 +110,8 @@ const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
 
 const HighlightForm = ({ onClose, rule }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
+  const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
   const fields = fieldTypes?.all
     ? fieldTypes.all
     : Immutable.List<FieldTypeMapping>();
@@ -117,12 +123,17 @@ const HighlightForm = ({ onClose, rule }: Props) => {
   const onSubmit = useCallback(({ field, value, color, condition }) => {
     const newColor = colorFromObject(color);
 
+    sendTelemetry(TELEMETRY_EVENT_TYPE[`SEARCH_SIDEBAR_HIGHLIGHT_${rule ? 'UPDATED' : 'CREATED'}`], {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_action_value: 'search-sidebar-highlight',
+    });
+
     if (rule) {
       return dispatch(updateHighlightingRule(rule, { field, value, condition, color: newColor })).then(onClose);
     }
 
     return dispatch(addHighlightingRule(HighlightingRule.create(field, value, condition, newColor))).then(onClose);
-  }, [dispatch, onClose, rule]);
+  }, [dispatch, location.pathname, onClose, rule, sendTelemetry]);
 
   const headerPrefix = rule ? 'Edit' : 'Create';
   const submitButtonPrefix = rule ? 'Update' : 'Create';
@@ -142,9 +153,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
 
         return (
           <BootstrapModalWrapper showModal
-                                 onHide={onClose}
-                                 data-app-section="sidebar_highlighting"
-                                 data-event-element={`${headerPrefix} Highlighting Rule`}>
+                                 onHide={onClose}>
             <Form className="form"
                   data-testid={`${headerPrefix}-highlighting-rule-dialog`}>
               <Modal.Header>
@@ -191,7 +200,9 @@ const HighlightForm = ({ onClose, rule }: Props) => {
                 <HighlightingColorForm field={selectedFieldType} />
               </Modal.Body>
               <Modal.Footer>
-                <ModalSubmit onCancel={onClose} disabledSubmit={!isValid} submitButtonText={`${submitButtonPrefix} rule`} />
+                <ModalSubmit onCancel={onClose}
+                             disabledSubmit={!isValid}
+                             submitButtonText={`${submitButtonPrefix} rule`} />
               </Modal.Footer>
             </Form>
           </BootstrapModalWrapper>

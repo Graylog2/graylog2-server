@@ -16,29 +16,18 @@
  */
 package org.graylog.datanode.configuration.variants;
 
-import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.Configuration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-
-import java.util.Map;
-
-import static org.graylog.datanode.configuration.variants.SecureConfiguration.SSL_PREFIX;
 
 public class InSecureConfiguration implements SecurityConfigurationVariant {
 
     @Override
-    public boolean checkPrerequisites(Configuration localConfiguration) {
-        //TODO: for backwards compability reasons it is true bye default
-        //TODO: add config property, than is required for insecure startup
-        return true;
+    public boolean isConfigured(final Configuration localConfiguration) {
+        return localConfiguration.isInsecureStartup();
     }
 
     @Override
-    public ImmutableMap<String, String> configure(Configuration localConfiguration) throws KeyStoreStorageException {
-        return ImmutableMap.<String, String>builder()
-                .putAll(commonConfig(localConfiguration))
-                .put("plugins.security.disabled", "true")
-                .put(SSL_PREFIX + "http.enabled", "false")
-                .build();
+    public OpensearchSecurityConfiguration build() throws KeyStoreStorageException {
+        return OpensearchSecurityConfiguration.disabled();
     }
 }

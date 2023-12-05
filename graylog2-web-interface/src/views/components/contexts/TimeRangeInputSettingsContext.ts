@@ -20,18 +20,14 @@ import { singleton } from 'logic/singleton';
 
 type TimeRangeInputSettings = {
   showDropdownButton: boolean,
-  showRelativePresetsButton: boolean,
-  showAbsolutePresetsButton: boolean,
-  showKeywordPresetsButton: boolean,
+  showPresetsButton: boolean,
   showAddToQuickListButton: boolean,
   ignoreLimitDurationInTimeRangeDropdown: boolean
 }
 
 const defaultValue = {
   showDropdownButton: true,
-  showRelativePresetsButton: true,
-  showAbsolutePresetsButton: true,
-  showKeywordPresetsButton: true,
+  showPresetsButton: true,
   showAddToQuickListButton: true,
   ignoreLimitDurationInTimeRangeDropdown: false,
 };

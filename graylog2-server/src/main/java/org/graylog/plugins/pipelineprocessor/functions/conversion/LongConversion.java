@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
@@ -39,7 +40,7 @@ public class LongConversion extends AbstractFunction<Long> {
     private final ParameterDescriptor<Long, Long> defaultParam;
 
     public LongConversion() {
-        valueParam = object(VALUE).description("Value to convert").primary().build();
+        valueParam = object(VALUE).ruleBuilderVariable().description("Value to convert").ruleBuilderVariable().build();
         defaultParam = integer(DEFAULT).optional().allowNegatives(true).description("Used when 'value' is null, defaults to 0").build();
     }
 
@@ -69,7 +70,9 @@ public class LongConversion extends AbstractFunction<Long> {
                 ))
                 .description("Converts a value to a long value using its string representation")
                 .ruleBuilderEnabled()
-                .ruleBuilderTitle("Convert value to number")
+                .ruleBuilderName("Convert to long")
+                .ruleBuilderTitle("Convert '${value}' to long integer")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 }

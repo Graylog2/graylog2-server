@@ -58,6 +58,7 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -700,6 +701,18 @@ public class PipelineRuleParserTest extends BaseParserTest {
         @Override
         protected ImmutableList<ParameterDescriptor> params() {
             return ImmutableList.of();
+        }
+
+        @NotNull
+        @Override
+        protected String getRuleBuilderName() {
+            return null;
+        }
+
+        @NotNull
+        @Override
+        protected String getRuleBuilderTitle() {
+            return null;
         }
     }
 }

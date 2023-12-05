@@ -1,0 +1,4 @@
+type = "s"
+message = "Update Scala to 2.13.12 to include fix of CVE-2022-36944."
+
+pulls = ["16456"]

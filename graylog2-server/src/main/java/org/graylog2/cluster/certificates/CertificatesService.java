@@ -127,4 +127,15 @@ public class CertificatesService {
         return Optional.empty();
     }
 
+    public boolean removeCert(final KeystoreMongoLocation keystoreMongoLocation) {
+        final KeystoreMongoCollection collection = keystoreMongoLocation.collection();
+        MongoCollection<Document> dbCollection = mongoDatabase.getCollection(collection.collectionName());
+        var result = dbCollection.deleteOne(
+                eq(
+                        collection.identifierField(),
+                        keystoreMongoLocation.nodeId()
+                )
+        );
+        return result.getDeletedCount() > 0;
+    }
 }

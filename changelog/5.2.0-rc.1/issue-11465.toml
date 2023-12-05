@@ -1,0 +1,6 @@
+type = "c"
+message = "Memorize state of time range tabs in time range picker while picker is open."
+
+issues = ["11465"]
+pulls = ["16107"]
+

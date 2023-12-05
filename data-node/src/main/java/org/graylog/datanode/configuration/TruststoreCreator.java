@@ -16,7 +16,10 @@
  */
 package org.graylog.datanode.configuration;
 
+import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.security.certutil.CertConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,23 +27,44 @@ import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TruststoreCreator {
 
-    public void createTruststore(final Map<String, X509Certificate> rootCerts,
-                                 final char[] truststorePassword,
-                                 final Path truststorePath) throws IOException, GeneralSecurityException {
+    private static final Logger LOG = LoggerFactory.getLogger(TruststoreCreator.class);
+
+    private final Map<String, X509Certificate> rootCertificates;
+    private final RootCertificateFinder rootCertificateFinder;
+
+    public TruststoreCreator(RootCertificateFinder rootCertificateFinder) {
+        this.rootCertificateFinder = rootCertificateFinder;
+        this.rootCertificates = new LinkedHashMap<>();
+    }
+
+    public static TruststoreCreator newTruststore() {
+        return new TruststoreCreator(new RootCertificateFinder());
+    }
+
+    public TruststoreCreator addRootCert(final String name, KeystoreInformation keystoreInformation,
+                                         final String alias) throws IOException, GeneralSecurityException {
+        final X509Certificate rootCert = rootCertificateFinder.findRootCert(keystoreInformation.location(), keystoreInformation.password(), alias);
+        rootCertificates.put(name, rootCert);
+        return this;
+    }
+
+    public KeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
         KeyStore trustStore = KeyStore.getInstance(CertConstants.PKCS12);
         trustStore.load(null, null);
 
-        for (Map.Entry<String, X509Certificate> cert : rootCerts.entrySet()) {
+        for (Map.Entry<String, X509Certificate> cert : rootCertificates.entrySet()) {
+            LOG.info("Adding certificate {} to the truststore", cert.getKey());
             trustStore.setCertificateEntry(cert.getKey(), cert.getValue());
         }
 
         try (final FileOutputStream fileOutputStream = new FileOutputStream(truststorePath.toFile())) {
             trustStore.store(fileOutputStream, truststorePassword);
         }
+        return new KeystoreInformation(truststorePath, truststorePassword);
     }
-
 }

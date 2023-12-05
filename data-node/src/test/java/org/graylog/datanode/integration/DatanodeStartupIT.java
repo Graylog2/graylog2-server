@@ -63,10 +63,19 @@ public class DatanodeStartupIT {
                     .assertThat()
                     .body("opensearch.node.node_name", Matchers.equalTo("node1"))
                     .body("opensearch.node.process.pid", Matchers.notNullValue());
+
+            assertInsecuredMethodSecurity(datanodeRestApiPort);
         } catch (RetryException retryException) {
             LOG.error("DataNode Container logs follow:\n" + backend.getLogs());
             throw retryException;
         }
+    }
+
+    private void assertInsecuredMethodSecurity(Integer mappedPort) {
+        RestAssured.given()
+                .delete("http://localhost:" + mappedPort + "/management")
+                .then()
+                .statusCode(401);
     }
 
     private ValidatableResponse getStatus(Integer mappedPort) {

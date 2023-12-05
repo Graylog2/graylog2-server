@@ -17,12 +17,17 @@
 
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import Welcome from 'components/welcome/Welcome';
 import { asMock } from 'helpers/mocking';
 import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { carol, sam } from 'fixtures/users';
+
+jest.mock('components/content-stream/ContentStreamSection', () => 'content-stream-section');
 
 jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
   data: {
@@ -83,9 +88,43 @@ jest.mock('routing/Routes', () => ({
   dashboard_show: (x) => `/route/DASHBOARDS_VIEWID/${x}`,
   getPluginRoute: (x) => () => x,
   SEARCH: '/search',
+  SYSTEM: {
+    USERS: {
+      edit: () => '/edit-profile-page',
+    },
+  },
 }));
 
+jest.mock('hooks/useCurrentUser');
+
 describe('Welcome', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
+
+  describe('Page header', () => {
+    it('Shows link to edit profile in case user is not readOnly and has no defined starting page', async () => {
+      render(<Welcome />);
+
+      await screen.findByText('This is your personal start page, allowing easy access to the content most relevant for you.');
+      const linkToEditProfile = await screen.findByText('edit profile');
+
+      expect(linkToEditProfile).toHaveAttribute('href', '/edit-profile-page');
+    });
+
+    it('Shows appropriate message without link for readOnly users', async () => {
+      asMock(useCurrentUser).mockReturnValue(sam);
+      render(<Welcome />);
+      await screen.findByText('This is your personal page, allowing easy access to the content most relevant for you.');
+    });
+
+    it('Shows appropriate message without link for users with defined starting page', async () => {
+      asMock(useCurrentUser).mockReturnValue(carol);
+      render(<Welcome />);
+      await screen.findByText('This is your personal page, allowing easy access to the content most relevant for you.');
+    });
+  });
+
   describe('Last opened list', () => {
     it('Show items', async () => {
       render(<Welcome />);
@@ -100,7 +139,11 @@ describe('Welcome', () => {
     });
 
     it('Show no items', async () => {
-      asMock(useLastOpened).mockImplementation(() => ({ data: { lastOpened: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
+      asMock(useLastOpened).mockImplementation(() => ({
+        data: { lastOpened: [], page: 1, count: 0, total: 0, per_page: 5 },
+        isFetching: false,
+      }));
+
       render(<Welcome />);
       await screen.findByText(/You do not have opened any searches\/dashboards yet/i);
     });
@@ -120,7 +163,17 @@ describe('Welcome', () => {
     });
 
     it('Show no items', async () => {
-      asMock(useFavoriteItems).mockImplementation(() => ({ data: { favorites: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
+      asMock(useFavoriteItems).mockImplementation(() => ({
+        data: {
+          favorites: [],
+          page: 1,
+          count: 0,
+          total: 0,
+          per_page: 5,
+        },
+        isFetching: false,
+      }));
+
       render(<Welcome />);
       await screen.findByText(/You do not have any favorite items yet./i);
     });
@@ -140,7 +193,17 @@ describe('Welcome', () => {
     });
 
     it('Show no items', async () => {
-      asMock(useRecentActivity).mockImplementation(() => ({ data: { recentActivity: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
+      asMock(useRecentActivity).mockImplementation(() => ({
+        data: {
+          recentActivity: [],
+          page: 1,
+          count: 0,
+          total: 0,
+          per_page: 5,
+        },
+        isFetching: false,
+      }));
+
       render(<Welcome />);
       await screen.findByText(/There is no recent activity/i);
     });

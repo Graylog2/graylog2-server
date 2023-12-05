@@ -22,7 +22,7 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.graylog.security.certutil.cert.CertificateChain;
-import org.graylog2.cluster.preflight.NodePreflightConfigService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 
 import javax.inject.Inject;
 import java.io.BufferedReader;
@@ -40,10 +40,10 @@ import java.util.Optional;
 
 public class CertChainMongoStorage implements CertChainStorage {
 
-    private NodePreflightConfigService mongoService;
+    private DataNodeProvisioningService mongoService;
 
     @Inject
-    public CertChainMongoStorage(final NodePreflightConfigService mongoService) {
+    public CertChainMongoStorage(final DataNodeProvisioningService mongoService) {
         this.mongoService = mongoService;
     }
 

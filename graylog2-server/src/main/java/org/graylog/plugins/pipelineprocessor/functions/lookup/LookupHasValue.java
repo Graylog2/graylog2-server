@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
 
@@ -69,6 +70,10 @@ public class LookupHasValue extends AbstractFunction<Object> {
                 .description("Checks if lookup table contains a given key.")
                 .params(lookupTableParam, keyParam)
                 .returnType(Boolean.class)
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Lookup value check")
+                .ruleBuilderTitle("Check if lookup table '${lookup_table}' contains '${value}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
 }

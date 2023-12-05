@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.primitives.Ints.saturatedCast;
 
@@ -35,7 +36,7 @@ public class Abbreviate extends AbstractFunction<String> {
     private final ParameterDescriptor<Long, Long> widthParam;
 
     public Abbreviate() {
-        valueParam = ParameterDescriptor.string(VALUE).description("The string to abbreviate").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("The string to abbreviate").build();
         widthParam = ParameterDescriptor.integer(WIDTH).description("The maximum number of characters including the '...' (at least 4)").build();
     }
 
@@ -64,6 +65,10 @@ public class Abbreviate extends AbstractFunction<String> {
                         widthParam
                 ))
                 .description("Abbreviates a string by appending '...' to fit into a maximum amount of characters")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Abbreviate string")
+                .ruleBuilderTitle("Abbreviate '${value}' to ${width} characters")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -49,7 +50,7 @@ public class RuleBuilderServiceTest {
     @Test
     public void generateRuleSourceSyntaxOk() {
         RuleBuilder ruleBuilder = RuleBuilder.builder().build();
-        when(conditionParser.generate(any())).thenReturn("  conditions");
+        when(conditionParser.generate(any(), any(), anyInt())).thenReturn("  conditions");
         when(actionParser.generate(any(), anyBoolean())).thenReturn("  actions");
         assertThat(ruleBuilderService.generateRuleSource("title", ruleBuilder, false))
                 .isEqualTo("""

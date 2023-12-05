@@ -1,0 +1,6 @@
+type = "added"
+message = "Secure datanode REST API with the same SSL certificate as the one used for Opensearch HTTP"
+
+issues = ["15990"]
+pulls = ["16058"]
+

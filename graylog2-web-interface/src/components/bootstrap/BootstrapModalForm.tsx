@@ -15,26 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import $ from 'jquery';
+import isString from 'lodash/isString';
 
 import ModalSubmit from 'components/common/ModalSubmit';
-import StringUtils from 'util/StringUtils';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  backdrop: boolean|'static'|undefined,
+  backdrop: boolean | 'static' | undefined,
   submitButtonDisabled: boolean,
   formProps: object,
-  bsSize: 'lg'|'large'|'sm'|'small',
+  bsSize: 'lg' | 'large' | 'sm' | 'small',
   show: boolean,
   submitButtonText: string,
   onSubmitForm: (event) => void,
   onCancel: () => void,
-  title: string|React.ReactNode,
+  title: string | React.ReactNode,
   children: React.ReactNode,
+  modalTitle?: string | undefined,
 };
 
 /**
@@ -52,6 +53,7 @@ const BootstrapModalForm = ({
   onCancel,
   title,
   children,
+  modalTitle,
   ...restProps
 }: Props) => {
   const form = useRef(null);
@@ -79,12 +81,14 @@ const BootstrapModalForm = ({
     </div>
   );
 
+  const _title = useMemo<string | undefined>(() => (isString(title) ? title : modalTitle), [modalTitle, title]);
+
   return (
     <BootstrapModalWrapper bsSize={bsSize}
                            showModal={show}
                            backdrop={backdrop}
                            onHide={onCancel}
-                           data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
+                           title={_title}
                            {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
@@ -133,6 +137,7 @@ BootstrapModalForm.defaultProps = {
   submitButtonDisabled: false,
   onSubmitForm: undefined,
   bsSize: undefined,
+  modalTitle: undefined,
 };
 
 export default BootstrapModalForm;

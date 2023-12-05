@@ -212,11 +212,15 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     public SearchJobDTO jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
         final SearchJob searchJob = searchJobService.load(jobId, searchUser.username()).orElseThrow(NotFoundException::new);
-        try {
-            // force a "conditional join", to catch fast responses without having to poll
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
-        } catch (ExecutionException | TimeoutException ignore) {
+        if (searchJob != null && searchJob.getResultFuture() != null) {
+            try {
+                // force a "conditional join", to catch fast responses without having to poll
+                Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
+            } catch (ExecutionException | TimeoutException ignore) {
+
+            }
         }
+
 
         return SearchJobDTO.fromSearchJob(searchJob);
     }

@@ -42,6 +42,7 @@ const UsersOverviewItem = ({
     username,
     roles,
     accountStatus,
+    authServiceEnabled,
   },
   isActive,
 }: Props) => (
@@ -57,7 +58,7 @@ const UsersOverviewItem = ({
     <td className="limited">{username}</td>
     <td className="limited">{email}</td>
     <td className="limited">{clientAddress}</td>
-    <StatusCell accountStatus={accountStatus} />
+    <StatusCell accountStatus={accountStatus} authServiceEnabled={authServiceEnabled} />
     <RolesCell roles={roles} />
     <ActionsCell user={user} />
   </tr>

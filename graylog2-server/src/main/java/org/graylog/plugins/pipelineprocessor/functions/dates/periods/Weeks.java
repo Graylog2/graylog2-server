@@ -41,4 +41,16 @@ public class Weeks extends AbstractPeriodComponentFunction {
     protected String getDescription() {
         return "Create a period with a specified number of weeks.";
     }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Create period (weeks)";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Create a time period of '${value}' weeks";
+    }
 }

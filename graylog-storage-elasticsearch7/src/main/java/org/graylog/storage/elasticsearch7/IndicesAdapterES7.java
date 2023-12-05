@@ -17,10 +17,10 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.apache.logging.log4j.util.Strings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -33,12 +33,10 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Requests;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
@@ -46,8 +44,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.Create
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplatesExistRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
@@ -72,6 +68,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
@@ -105,16 +102,20 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private final StatsApi statsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
+    private final IndexTemplateAdapter indexTemplateAdapter;
 
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
                              StatsApi statsApi,
                              CatApi catApi,
-                             ClusterStateApi clusterStateApi) {
+                             ClusterStateApi clusterStateApi,
+                             ObjectMapper objectMapper,
+                             IndexTemplateAdapter indexTemplateAdapter) {
         this.client = client;
         this.statsApi = statsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
+        this.indexTemplateAdapter = indexTemplateAdapter;
     }
 
     @Override
@@ -204,20 +205,18 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
-        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
-                .source(template);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
-                "Unable to create index template " + templateName);
-
-        return result.isAcknowledged();
+    public boolean ensureIndexTemplate(String templateName, Template template) {
+        return indexTemplateAdapter.ensureIndexTemplate(templateName, template);
     }
 
     @Override
     public boolean indexTemplateExists(String templateName) {
-        return client.execute((c, requestOptions) -> c.indices().existsTemplate(new IndexTemplatesExistRequest(templateName),
-                requestOptions), "Unable to verify index template existence " + templateName);
+        return indexTemplateAdapter.indexTemplateExists(templateName);
+    }
+
+    @Override
+    public boolean deleteIndexTemplate(String templateName) {
+        return indexTemplateAdapter.deleteIndexTemplate(templateName);
     }
 
     @Override
@@ -342,15 +341,6 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public boolean deleteIndexTemplate(String templateName) {
-        final DeleteIndexTemplateRequest request = new DeleteIndexTemplateRequest(templateName);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteTemplate(request, requestOptions),
-                "Unable to delete index template " + templateName);
-        return result.isAcknowledged();
-    }
-
-    @Override
     public Map<String, Set<String>> fieldsInIndices(String[] writeIndexWildcards) {
         final List<String> indexWildCards = Arrays.asList(writeIndexWildcards);
         return clusterStateApi.fields(indexWildCards);
@@ -401,7 +391,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(indices.toArray(new String[]{}))
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(Strings.EMPTY_ARRAY);
+                .names(new String[]{});
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);

@@ -18,15 +18,18 @@ import * as React from 'react';
 import { Field, useFormikContext, getIn } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
+import * as Immutable from 'immutable';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
+import type { Property } from 'views/logic/fieldtypes/FieldType';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import FieldSelect from '../FieldSelect';
 
@@ -37,6 +40,14 @@ type Props = {
 const Wrapper = styled.div``;
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
+
+const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
+  const fieldProperties = fieldType?.type?.properties ?? Immutable.Set();
+
+  return properties
+    .map((property) => fieldProperties.contains(property))
+    .find((result) => result === false) === undefined;
+};
 
 const Metric = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);
@@ -55,9 +66,14 @@ const Metric = ({ index }: Props) => {
   const isPercentile = currentFunction === 'percentile';
   const isPercentage = currentFunction === 'percentage';
   const requiresNumericField = (isPercentage && currentMetric.strategy === 'SUM') || !['card', 'count', 'latest', 'percentage'].includes(currentFunction);
-  const requiredProperties = requiresNumericField
-    ? [Properties.Numeric]
-    : [];
+
+  const isFieldQualified = useCallback((field: FieldTypeMapping) => {
+    if (!requiresNumericField) {
+      return true;
+    }
+
+    return hasProperty(field, [Properties.Numeric]);
+  }, [requiresNumericField]);
 
   const [functionIsSettled, setFunctionIsSettled] = useState<boolean>(false);
   const onFunctionChange = useCallback((newValue) => {
@@ -103,9 +119,10 @@ const Metric = ({ index }: Props) => {
                  wrapperClassName="col-sm-9">
             <FieldSelect id="metric-field-select"
                          selectRef={metricFieldSelectRef}
+                         menuPortalTarget={document.body}
                          onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
                          clearable={!isFieldRequired}
-                         properties={requiredProperties}
+                         isFieldQualified={isFieldQualified}
                          name={name}
                          value={value}
                          ariaLabel="Select a field" />
@@ -164,7 +181,7 @@ const Metric = ({ index }: Props) => {
                              selectRef={metricFieldSelectRef}
                              onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
                              clearable={!isFieldRequired}
-                             properties={requiredProperties}
+                             isFieldQualified={isFieldQualified}
                              name={name}
                              value={value}
                              menuPortalTarget={document.body}

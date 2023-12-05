@@ -18,13 +18,12 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, keyframes } from 'styled-components';
 import chroma from 'chroma-js';
-
-import type { ColorVariants } from 'theme/colors';
+import type { ColorVariant } from '@graylog/sawmill';
 
 type StyledBarProps = {
   $animated?: boolean,
   $striped?: boolean,
-  $bsStyle?: ColorVariants,
+  $bsStyle?: ColorVariant,
   value: number,
   label?: string,
 };
@@ -33,7 +32,7 @@ type ProgressBarProps = {
   bars: Array<{
     animated?: boolean,
     striped?: boolean,
-    bsStyle?: ColorVariants,
+    bsStyle?: ColorVariant,
     value: number,
     label?: string,
   }>,
@@ -108,10 +107,10 @@ const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) =
         transparent
       );
       background-size: 40px 40px;
-    `}
+`}
     ${$animated && css`
       animation: ${animatedStripes} 2s linear infinite;
-    `}
+`}
     ${progressBarVariants}
 `;
 });

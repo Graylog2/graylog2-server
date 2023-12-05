@@ -39,14 +39,15 @@ import useView from 'views/hooks/useView';
 import createSearch from 'views/logic/slices/createSearch';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
-import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { selectQuery, updateView } from 'views/logic/slices/viewSlice';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import useParameters from 'views/hooks/useParameters';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -110,10 +111,9 @@ const _onMoveWidgetToPage = async (
   if (newDashboard) {
     const searchResponse = await createSearch(newDashboard.search);
     const updatedDashboard = newDashboard.toBuilder().search(searchResponse).build();
-    await dispatch(loadView(updatedDashboard));
+    await dispatch(updateView(updatedDashboard, true));
     setShowMoveWidgetToTab(false);
     await dispatch(selectQuery(queryId));
-    await dispatch(execute());
   }
 };
 
@@ -156,9 +156,10 @@ const WidgetActionsMenu = ({
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const { parameters, parameterBindings } = useParameters();
 
   const onDuplicate = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-duplicate-button',
@@ -167,7 +168,7 @@ const WidgetActionsMenu = ({
     return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
   }, [sendTelemetry, pathname, dispatch, widget.id, unsetWidgetFocusing, title]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-copy-to-dashboard-button',
@@ -176,7 +177,7 @@ const WidgetActionsMenu = ({
     return _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history);
   }, [history, pathname, sendTelemetry, view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.MOVE, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-move-button',
@@ -185,7 +186,7 @@ const WidgetActionsMenu = ({
     return _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy);
   }, [dispatch, pathname, sendTelemetry, view]);
   const onDelete = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DELETED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-delete-button',
@@ -194,7 +195,7 @@ const WidgetActionsMenu = ({
     return dispatch(_onDelete(widget, view, title));
   }, [dispatch, pathname, sendTelemetry, title, view, widget]);
   const focusWidget = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.FOCUSED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-focus-button',
@@ -209,7 +210,9 @@ const WidgetActionsMenu = ({
         <IfDashboard>
           <ReplaySearchButton queryString={query.query_string}
                               timerange={timerange}
-                              streams={streams} />
+                              streams={streams}
+                              parameterBindings={parameterBindings}
+                              parameters={parameters} />
         </IfDashboard>
         {isFocused && (
           <IconButton name="compress-arrows-alt"
@@ -247,9 +250,7 @@ const WidgetActionsMenu = ({
               Move to Page
             </MenuItem>
           </IfDashboard>
-          <ExtraWidgetActions widget={widget}
-                              onSelect={() => {
-                              }} />
+          <ExtraWidgetActions widget={widget} />
           <MenuItem divider />
           <MenuItem onSelect={onDelete}>
             Delete

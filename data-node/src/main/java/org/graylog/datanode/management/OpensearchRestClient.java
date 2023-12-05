@@ -16,26 +16,45 @@
  */
 package org.graylog.datanode.management;
 
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
-import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpRequestInterceptor;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog2.security.CustomCAX509TrustManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class OpensearchRestClient {
-    public static RestHighLevelClient build(OpensearchConfiguration configuration) {
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchRestClient.class);
 
+    public static RestHighLevelClient build(final OpensearchConfiguration configuration, final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager tm) {
         final HttpHost host = configuration.getRestBaseUrl();
 
         org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder builder = org.graylog.shaded.opensearch2.org.opensearch.client.RestClient.builder(host);
         if ("https".equals(host.getSchemeName())) {
-            if (configuration.authUsername() != null && configuration.authPassword() != null) {
-                credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(configuration.authUsername(), configuration.authPassword()));
+
+            try {
+                final var sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
+
+                builder.setHttpClientConfigCallback(httpClientBuilder -> {
+                    httpClientBuilder.addInterceptorLast((HttpRequestInterceptor) (request, context) -> {
+                        final String jwtToken = datanodeConfiguration.indexerJwtAuthTokenProvider().get();
+                        request.addHeader("Authorization", jwtToken);
+                    });
+                    httpClientBuilder.setSSLContext(sslContext);
+                    return httpClientBuilder;
+                });
+            } catch (NoSuchAlgorithmException | KeyManagementException ex) {
+                LOG.error("Could not initialize SSL correctly: {}", ex.getMessage(), ex);
             }
-            builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
         }
         return new RestHighLevelClient(builder);
     }

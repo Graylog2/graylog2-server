@@ -37,7 +37,7 @@ const NewDashboardPage = () => {
 
   const viewPromise = useMemo(() => (searchView?.search
     ? Promise.resolve(viewTransformer(searchView))
-    : ViewGenerator(View.Type.Dashboard, undefined)),
+    : ViewGenerator({ type: View.Type.Dashboard })),
   // This should be run only once upon mount on purpose.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   []);

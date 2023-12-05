@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class UrlConversion extends AbstractFunction<URL> {
 
     public static final String NAME = "to_url";
 
-    private final ParameterDescriptor<Object, Object> urlParam = ParameterDescriptor.object("url").description("Value to convert").build();
+    private final ParameterDescriptor<Object, Object> urlParam = ParameterDescriptor.object("url").ruleBuilderVariable().description("Value to convert").build();
     private final ParameterDescriptor<String, String> defaultParam = ParameterDescriptor.string("default").optional().description("Used when 'url' is null or malformed").build();
 
     @Override
@@ -61,6 +62,10 @@ public class UrlConversion extends AbstractFunction<URL> {
                 .params(urlParam,
                         defaultParam)
                 .description("Converts a value to a valid URL using its string representation")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Convert to URL")
+                .ruleBuilderTitle("Convert '${url}' to URL")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 }

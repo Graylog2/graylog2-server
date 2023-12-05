@@ -15,57 +15,59 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { forwardRef, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { ColorPickerPopover, IconButton } from 'components/common';
+import { ColorPickerPopover, Icon, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slices/highlightActions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 import ColorPreview from './ColorPreview';
 
-export const HighlightingRuleGrid = styled.div`
-  display: grid;
-  display: -ms-grid;
-  grid-template-columns: max-content 1fr max-content;
-  -ms-grid-columns: max-content 1fr max-content;
-  margin-top: 10px;
+export const Container = styled.div<{ $displayBorder?: boolean }>(({ theme, $displayBorder = true }) => css`
+  display: flex;
+  padding-top: 5px;
+  padding-bottom: 5px;
   word-break: break-word;
 
-  > *:nth-child(1) {
-    grid-column: 1;
-    -ms-grid-column: 1;
+  &:not(:last-child) {
+    border-bottom: ${$displayBorder ? `1px solid ${theme.colors.global.background}` : 'none'};
   }
+`);
 
-  > *:nth-child(2) {
-    grid-column: 2;
-    -ms-grid-column: 2;
-  }
-
-  > *:nth-child(3) {
-    grid-column: 3;
-    -ms-grid-column: 3;
-  }
+const RightCol = styled.div`
+  flex: 1;
 `;
 
 const ButtonContainer = styled.div`
-  display: flex;
+  display: inline-flex;
+  float: right;
 `;
 
 export const RuleContainer = styled.div`
-  padding-top: 4px;
+  padding-top: 2px;
+  display: inline-block;
 `;
 
-type Props = {
-  rule: Rule,
-};
+const DragHandle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  width: 25px;
+`;
 
 const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () => void) => async (dispatch: AppDispatch) => dispatch(updateHighlightingRule(rule, { color: newColor })).then(hidePopover);
 
@@ -104,29 +106,68 @@ const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
   throw new Error(`Invalid highlighting color: ${color}`);
 };
 
-const HighlightingRule = ({ rule }: Props) => {
+type Props = {
+  rule: Rule,
+  className?: string,
+  draggableProps?: DraggableProvidedDraggableProps;
+  dragHandleProps?: DraggableProvidedDragHandleProps;
+};
+
+const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
+  rule,
+  className,
+  draggableProps,
+  dragHandleProps,
+}, ref) => {
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
   const dispatch = useAppDispatch();
+  const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
 
-  const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => dispatch(updateColor(rule, newColor, hidePopover)), [dispatch, rule]);
-  const _onDelete = useCallback(() => dispatch(onDelete(rule)), [dispatch, rule]);
+  const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_UPDATED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_action_value: 'search-sidebar-highlight-color-update',
+    });
+
+    return dispatch(updateColor(rule, newColor, hidePopover));
+  }, [dispatch, location.pathname, rule, sendTelemetry]);
+  const _onDelete = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_action_value: 'search-sidebar-highlight-delete',
+    });
+
+    return dispatch(onDelete(rule));
+  }, [dispatch, location.pathname, rule, sendTelemetry]);
 
   return (
-    <>
-      <HighlightingRuleGrid>
-        <RuleColorPreview color={color} onChange={_onChange} />
+    <Container className={className} ref={ref} {...(draggableProps ?? {})}>
+      <RuleColorPreview color={color} onChange={_onChange} />
+      <RightCol>
         <RuleContainer data-testid="highlighting-rule">
           <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
         </RuleContainer>
         <ButtonContainer>
           <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
           <IconButton title="Remove this Highlighting Rule" name="trash-alt" onClick={_onDelete} />
+          {dragHandleProps && (
+            <DragHandle {...dragHandleProps}>
+              <Icon name="bars" />
+            </DragHandle>
+          )}
         </ButtonContainer>
-      </HighlightingRuleGrid>
+      </RightCol>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}
-    </>
+    </Container>
   );
+});
+
+HighlightingRule.defaultProps = {
+  className: undefined,
+  draggableProps: undefined,
+  dragHandleProps: undefined,
 };
 
 HighlightingRule.propTypes = {

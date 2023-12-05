@@ -38,6 +38,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Locale;
 
 import static java.util.Objects.isNull;
@@ -46,26 +47,38 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearch13Instance.class);
 
     private static final int ES_PORT = 9200;
-    private static final String NETWORK_ALIAS = "elasticsearch";
 
-    private final RestHighLevelClient restHighLevelClient;
-    private final ElasticsearchClient elasticsearchClient;
-    private final Client client;
-    private final FixtureImporter fixtureImporter;
-    private final Adapters adapters;
+    private RestHighLevelClient restHighLevelClient;
+    private ElasticsearchClient elasticsearchClient;
+    private Client client;
+    private FixtureImporter fixtureImporter;
+    private Adapters adapters;
+    private List<String> featureFlags;
 
-    protected OpenSearch13Instance(String image, SearchVersion version, Network network) {
-        super(image, version, network, "2g");
+    public OpenSearch13Instance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        super(version, hostname, network, heapSize);
+        this.featureFlags = featureFlags;
+    }
+
+    public OpenSearch13Instance init() {
+        super.init();
         this.restHighLevelClient = buildRestClient();
         this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
-        this.client = new ClientES7(this.elasticsearchClient);
+        this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        return this;
     }
 
     @Override
     public SearchServer searchServer() {
         return SearchServer.OS1;
+    }
+
+    @Override
+    protected String imageName() {
+        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version().version());
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -87,18 +100,6 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
                 false,
                 new BasicCredentialsProvider())
                 .get();
-    }
-
-    public static OpenSearch13Instance create(SearchVersion searchVersion, Network network) {
-        final String image = imageNameFrom(searchVersion);
-
-        LOG.debug("Creating instance {}", image);
-
-        return new OpenSearch13Instance(image, searchVersion, network);
-    }
-
-    private static String imageNameFrom(SearchVersion version) {
-        return String.format(Locale.ROOT, "opensearchproject/opensearch:%s", version.version());
     }
 
     @Override
@@ -123,7 +124,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     public GenericContainer<?> buildContainer(String image, Network network) {
         return new OpenSearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", "-Xms2g -Xmx2g -Dlog4j2.formatMsgNoLookups=true")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
@@ -131,8 +132,9 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
                 .withEnv("plugins.security.disabled", "true")
                 .withEnv("action.auto_create_index", "false")
                 .withEnv("cluster.info.update.interval", "10s")
+                .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
+                .withNetworkAliases(hostname)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
     }
 

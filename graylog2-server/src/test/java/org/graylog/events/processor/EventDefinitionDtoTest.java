@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +39,7 @@ public class EventDefinitionDtoTest {
     public void setUp() throws Exception {
         final AggregationEventProcessorConfig configMock = mock(AggregationEventProcessorConfig.class);
         when(configMock.validate()).thenReturn(new ValidationResult());
+        when(configMock.validate(any(), any())).thenReturn(new ValidationResult());
 
         testSubject = EventDefinitionDto.builder()
             .title("foo")
@@ -55,7 +57,7 @@ public class EventDefinitionDtoTest {
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()
             .title("")
             .build();
-        final ValidationResult validationResult = invalidEventDefinition.validate();
+        final ValidationResult validationResult = validate(invalidEventDefinition);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("title");
     }
@@ -65,7 +67,7 @@ public class EventDefinitionDtoTest {
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()
             .config(new EventProcessorConfig.FallbackConfig())
             .build();
-        final ValidationResult validationResult = invalidEventDefinition.validate();
+        final ValidationResult validationResult = validate(invalidEventDefinition);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("config");
     }
@@ -76,11 +78,12 @@ public class EventDefinitionDtoTest {
         final ValidationResult mockedValidationResult = new ValidationResult();
         mockedValidationResult.addError("foo", "bar");
         when(configMock.validate()).thenReturn(mockedValidationResult);
+        when(configMock.validate(any(), any())).thenReturn(mockedValidationResult);
 
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()
             .config(configMock)
             .build();
-        final ValidationResult validationResult = invalidEventDefinition.validate();
+        final ValidationResult validationResult = validate(invalidEventDefinition);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("foo");
     }
@@ -91,7 +94,7 @@ public class EventDefinitionDtoTest {
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()
             .fieldSpec(ImmutableMap.of("foo\\bar", fieldSpecMock, "$yo&^a", fieldSpecMock))
             .build();
-        final ValidationResult validationResult = invalidEventDefinition.validate();
+        final ValidationResult validationResult = validate(invalidEventDefinition);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("field_spec");
         final List<String> fieldValidation = (List<String>) validationResult.getErrors().get("field_spec");
@@ -107,14 +110,14 @@ public class EventDefinitionDtoTest {
             .fieldSpec(ImmutableMap.of("bar", fieldSpecMock, "baz", fieldSpecMock))
             .keySpec(ImmutableList.of("foo"))
             .build();
-        final ValidationResult validationResult = invalidEventDefinition.validate();
+        final ValidationResult validationResult = validate(invalidEventDefinition);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsOnlyKeys("key_spec");
     }
 
     @Test
     public void testValidEventDefinition() {
-        final ValidationResult validationResult = testSubject.validate();
+        final ValidationResult validationResult = validate(testSubject);
         assertThat(validationResult.failed()).isFalse();
         assertThat(validationResult.getErrors().size()).isEqualTo(0);
     }
@@ -126,8 +129,12 @@ public class EventDefinitionDtoTest {
             .fieldSpec(ImmutableMap.of("foo", fieldSpecMock, "bar", fieldSpecMock))
             .keySpec(ImmutableList.of("foo", "bar"))
             .build();
-        final ValidationResult validationResult = invalidEventDefinition.validate();
+        final ValidationResult validationResult = validate(invalidEventDefinition);
         assertThat(validationResult.failed()).isFalse();
         assertThat(validationResult.getErrors().size()).isEqualTo(0);
+    }
+
+    private static ValidationResult validate(EventDefinitionDto eventDefinitionDto) {
+        return eventDefinitionDto.validate(null, new EventDefinitionConfiguration());
     }
 }

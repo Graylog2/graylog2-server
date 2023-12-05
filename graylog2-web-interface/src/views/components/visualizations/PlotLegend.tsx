@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useContext, useState, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 import chunk from 'lodash/chunk';
 
@@ -35,7 +35,7 @@ import type { ChartDefinition } from 'views/components/visualizations/ChartData'
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 
-const ColorHint = styled.div(({ color }) => `
+const ColorHint = styled.div(({ color }) => css`
   cursor: pointer;
   background-color: ${color} !important; /* Needed for report generation */
   -webkit-print-color-adjust: exact !important; /* Needed for report generation */
@@ -95,7 +95,10 @@ type ColorPickerConfig = {
   target: EventTarget,
 };
 
-const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) => data.map(({ name, originalName }) => originalName ?? name);
+const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) => data.map(({
+  name,
+  originalName,
+}) => originalName ?? name);
 
 const stringLenSort = (s1: string, s2: string) => {
   if (s1.length < s2.length) {
@@ -111,7 +114,14 @@ const stringLenSort = (s1: string, s2: string) => {
 
 const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
-const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMapper, labelFields = columnPivotsToFields, neverHide }: Props) => {
+const PlotLegend = ({
+  children,
+  config,
+  chartData,
+  labelMapper = defaultLabelMapper,
+  labelFields = columnPivotsToFields,
+  neverHide,
+}: Props) => {
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
@@ -150,12 +160,17 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     const val = labelsWithField.map(({ label, field, type }) => (field
       ? <Value key={`${field}:${label}`} type={type} value={label} field={field} />
       : label));
-    const humanLabel = Object.values(labelsWithField).map(({ label, field }) => mapKeys(label, field)).join(humanSeparator);
+    const humanLabel = Object.values(labelsWithField).map(({
+      label,
+      field,
+    }) => mapKeys(label, field)).join(humanSeparator);
 
     return (
       <LegendCell key={value}>
         <LegendEntry>
-          <ColorHint aria-label="Color Hint" onClick={_onOpenColorPicker(value, humanLabel)} color={colors.get(value, defaultColor)} />
+          <ColorHint aria-label="Color Hint"
+                     onClick={_onOpenColorPicker(value, humanLabel)}
+                     color={colors.get(value, defaultColor)} />
           <ValueContainer>
             {val}
           </ValueContainer>
@@ -184,8 +199,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
                    placement="top"
                    target={colorPickerConfig.target}>
             <Popover id="legend-config"
-                     title={`Configuration for ${colorPickerConfig.label}`}
-                     data-event-element="Plot Legend">
+                     title={`Configuration for ${colorPickerConfig.label}`}>
               <ColorPicker color={colors.get(colorPickerConfig.name)}
                            colors={defaultColors}
                            onChange={(newColor) => _onColorSelect(colorPickerConfig.name, newColor)} />

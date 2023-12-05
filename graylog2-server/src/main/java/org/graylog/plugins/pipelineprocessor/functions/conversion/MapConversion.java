@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Collections;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class MapConversion extends AbstractFunction<Map> {
 
 
     public MapConversion() {
-        this.valueParam = object(VALUE).description("Map-like value to convert").build();
+        this.valueParam = object(VALUE).ruleBuilderVariable().description("Map-like value to convert").build();
     }
 
     @Override
@@ -66,6 +67,10 @@ public class MapConversion extends AbstractFunction<Map> {
                 .returnType(Map.class)
                 .params(of(valueParam))
                 .description("Converts a map-like value into a map usable by set_fields()")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Convert to map")
+                .ruleBuilderTitle("Convert '${value}' to map")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 }

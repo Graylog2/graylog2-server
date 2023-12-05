@@ -59,6 +59,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     private static final String FIELD_STORAGE = "storage";
     private static final String FIELD_IS_SCHEDULED = "is_scheduled";
     private static final String UPDATED_AT = "updated_at";
+    private static final String MATCHED_AT = "matched_at";
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -69,6 +70,10 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     @Nullable
     @JsonProperty(UPDATED_AT)
     public abstract DateTime updatedAt();
+
+    @Nullable
+    @JsonProperty(MATCHED_AT)
+    public abstract DateTime matchedAt();
 
     @JsonProperty(FIELD_PRIORITY)
     public abstract ValueReference priority();
@@ -118,6 +123,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
 
         @JsonProperty(UPDATED_AT)
         public abstract Builder updatedAt(DateTime updatedAt);
+
+        @JsonProperty(MATCHED_AT)
+        public abstract Builder matchedAt(DateTime matchedAt);
 
         @JsonProperty(FIELD_PRIORITY)
         public abstract Builder priority(ValueReference priority);

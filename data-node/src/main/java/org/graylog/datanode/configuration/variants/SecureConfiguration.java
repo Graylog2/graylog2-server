@@ -16,82 +16,60 @@
  */
 package org.graylog.datanode.configuration.variants;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.collect.ImmutableMap;
-import org.graylog.datanode.Configuration;
-import org.graylog2.jackson.TypeReferences;
-import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
+import com.google.common.base.Suppliers;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.Objects;
+import java.util.function.Supplier;
 
 public sealed abstract class SecureConfiguration implements SecurityConfigurationVariant permits MongoCertSecureConfiguration, UploadedCertFilesSecureConfiguration {
 
-    public static final String SSL_PREFIX = "plugins.security.ssl.";
+    /**
+     * This filename is used only internally - we copy user-provided certificates to this location and
+     * we configure opensearch to read this file. It doesn't have to match naming provided by user.
+     * The target configuration is regenerated during each startup, so it could also be a random filename
+     * as long as we use the same name as a copy-target and opensearch config property.
+     */
+    private static final Path TARGET_DATANODE_HTTP_KEYSTORE_FILENAME = Path.of("http-keystore.p12");
+    /**
+     * This filename is used only internally - we copy user-provided certificates to this location and
+     * we configure opensearch to read this file. It doesn't have to match naming provided by user.
+     * The target configuration is regenerated during each startup, so it could also be a random filename
+     * as long as we use the same name as a copy-target and opensearch config property.
+     */
+    private static final Path TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME = Path.of("transport-keystore.p12");
 
-    final Path datanodeConfigDir;
-    final Path opensearchConfigDir;
+    private final Supplier<KeystoreFileLocation> httpKeystoreLocation;
+    private final Supplier<KeystoreFileLocation> transportKeystoreLocation;
 
-    public SecureConfiguration(final Configuration localConfiguration) {
-        this.opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
-        this.datanodeConfigDir = Path.of(localConfiguration.getConfigLocation());
+    public SecureConfiguration(final DatanodeConfiguration datanodeConfiguration) {
+        this.httpKeystoreLocation = Suppliers.memoize(() -> {
+            try {
+                final Path filePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME);
+                return new KeystoreFileLocation(filePath);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create http keystore file", e);
+            }
+        });
+
+        this.transportKeystoreLocation = Suppliers.memoize(() -> {
+            try {
+                final Path filePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME);
+                return new KeystoreFileLocation(filePath);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create transport keystore file", e);
+            }
+        });
     }
 
-    protected ImmutableMap<String, String> commonSecureConfig(final Configuration localConfiguration) {
-        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        config.putAll(commonConfig(localConfiguration));
-
-        config.put("plugins.security.disabled", "false");
-        //config.put(SSL_PREFIX + "http.enabled", "true");
-        config.put("plugins.security.allow_default_init_securityindex", "true");
-        //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
-
-        config.put("plugins.security.audit.type", "internal_opensearch");
-        config.put("plugins.security.enable_snapshot_restore_privilege", "true");
-        config.put("plugins.security.check_snapshot_restore_write_privileges", "true");
-        config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access");
-        config.put("plugins.security.system_indices.enabled", "true");
-        config.put("plugins.security.system_indices.indices", ".plugins-ml-model,.plugins-ml-task,.opendistro-alerting-config,.opendistro-alerting-alert*,.opendistro-anomaly-results*,.opendistro-anomaly-detector*,.opendistro-anomaly-checkpoints,.opendistro-anomaly-detection-state,.opendistro-reports-*,.opensearch-notifications-*,.opensearch-notebooks,.opensearch-observability,.opendistro-asynchronous-search-response*,.replication-metadata-store");
-        config.put("node.max_local_storage_nodes", "3");
-
-        return config.build();
-    }
-
-    protected void configureInitialAdmin(final Configuration localConfiguration,
-                                         final String adminUsername,
-                                         final String adminPassword) throws IOException {
-        final Path internalUsersFile = opensearchConfigDir.resolve("opensearch-security").resolve("internal_users.yml");
-
-        Objects.requireNonNull(localConfiguration.getRestApiUsername(),
-                "rest_api_username has to be configured the usage of secured Opensearch REST api"
-        );
-
-        Objects.requireNonNull(localConfiguration.getRestApiPassword(),
-                "rest_api_password has to be configured the usage of secured Opensearch REST api"
-        );
-
-        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), TypeReferences.MAP_STRING_OBJECT);
-        final Map<String, Object> adminUserConfig = (Map) map.get("admin");
-
-        map.remove("admin");
-        map.put(adminUsername, adminUserConfig);
-
-        final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(12);
-        final String hashWithPrefix = passwordAlgorithm.hash(adminPassword);
-
-        // remove the prefix and suffix, we need just the hash itself
-        final String hash = hashWithPrefix.substring("{bcrypt}".length(), hashWithPrefix.indexOf("{salt}"));
-        adminUserConfig.put("hash", hash);
-
-        final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
-        mapper.writeValue(fos, map);
+    KeystoreFileLocation getHttpKeystoreLocation() {
+        return httpKeystoreLocation.get();
     }
 
 
+    KeystoreFileLocation getTransportKeystoreLocation() {
+        return transportKeystoreLocation.get();
+    }
 }

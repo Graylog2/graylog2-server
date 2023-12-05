@@ -61,6 +61,4 @@ public final class SmartKeystoreStorage implements KeystoreStorage<KeystoreLocat
             return Optional.empty();
         }
     }
-
-
 }

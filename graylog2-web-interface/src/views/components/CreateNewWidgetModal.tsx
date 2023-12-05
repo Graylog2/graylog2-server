@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import kebabCase from 'lodash/kebabCase';
+import upperCase from 'lodash/upperCase';
 
 import { Modal, Button } from 'components/bootstrap';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -27,6 +27,9 @@ import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 const modalTitle = 'Create new widget';
 
@@ -66,14 +69,14 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
     const onClick = async () => {
-      sendTelemetry('click', {
-        app_pathname: 'search',
-        app_section: 'widget',
-        app_action_value: `widget-create-${kebabCase(title)}-button`,
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_section: 'search-widget',
       });
 
       const newId = generateId();
@@ -87,12 +90,11 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
         <HugeIcon><WidgetIcon /></HugeIcon>{title}
       </CreateWidgetButton>
     );
-  }), [creators, dispatch, position, sendTelemetry, view]);
+  }), [creators, dispatch, location.pathname, position, sendTelemetry, view]);
 
   return (
     <Modal onHide={onCancel}
-           show
-           data-event-element={modalTitle}>
+           show>
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>

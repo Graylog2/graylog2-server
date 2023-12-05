@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -77,6 +78,15 @@ public class ClusterMetricsResource extends ProxiedResource {
     public void multipleMetricsAllNodes(@ApiParam(name = "Requested metrics", required = true)
                                         @Valid @NotNull MetricsReadRequest request,
                                         @Suspended AsyncResponse asyncResponse) {
+
+        // Workaround to fail fast with a 401 if we can't extract an authentication token
+        try {
+            var ignored = getAuthenticationToken();
+        } catch (NotAuthorizedException e) {
+            processAsync(asyncResponse, e::getResponse);
+            return;
+        }
+
         processAsync(asyncResponse,
                 () -> stripCallResult(requestOnAllNodes(RemoteMetricsResource.class, r -> r.multipleMetrics(request), callTimeout))
         );

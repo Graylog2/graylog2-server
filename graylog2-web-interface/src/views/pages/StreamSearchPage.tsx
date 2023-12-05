@@ -35,7 +35,7 @@ const StreamSearchPage = () => {
   }
 
   const { timeRange, queryString } = useSearchURLQueryParams();
-  const viewPromise = useCreateSavedSearch(streamId, timeRange, queryString);
+  const viewPromise = useCreateSavedSearch({ streamId, timeRange, queryString });
   const view = useCreateSearch(viewPromise);
 
   const _loadNewView = useCallback(() => loadNewViewForStream(history, streamId), [history, streamId]);

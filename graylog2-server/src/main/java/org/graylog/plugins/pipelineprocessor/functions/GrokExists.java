@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.grok.GrokPatternRegistry;
 
 import javax.inject.Inject;
@@ -73,7 +74,11 @@ public class GrokExists extends AbstractFunction<Boolean> {
                .name(NAME)
                .returnType(Boolean.class)
                .params(of(patternParam, doLog))
-               .description("Checks if the given Grok pattern exists.")
+               .description("Checks if the given Grok pattern exists in Graylog.")
+               .ruleBuilderEnabled()
+               .ruleBuilderName("Check for grok pattern")
+               .ruleBuilderTitle("Check if grok pattern named '${pattern}' exists in Graylog")
+               .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.PATTERN)
                .build();
     }
 }

@@ -15,25 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import trim from 'lodash/trim';
 import isEqual from 'lodash/isEqual';
-import { Field, useField, useFormikContext } from 'formik';
+import { Field, useField } from 'formik';
 
 import { Col, FormControl, FormGroup, Panel, Row } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import ToolsStore from 'stores/tools/ToolsStore';
-import type { KeywordTimeRange, AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { KeywordTimeRange } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import { InputDescription } from 'components/common';
-
-import type { TimeRangePickerFormValues } from './TimeRangePicker';
-import TimeRangePresetRow from './TimeRangePresetRow';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -71,14 +66,13 @@ type Props = {
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
-  const { setFieldValue } = useFormikContext<TimeRangePickerFormValues & { nextTimeRange: AbsoluteTimeRange }>();
   const { formatTime, userTimezone } = useUserDateTime();
-  const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
+  const [nextRangeProps, , nextRangeHelpers] = useField('timeRangeTabs.keyword');
   const mounted = useRef(true);
   const keywordRef = useRef<string>();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
 
-  const _setSuccessfullPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
+  const _setSuccessfulPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
     setValidatingKeyword(false);
 
     return setKeywordPreview(_parseKeywordPreview(response, formatTime));
@@ -105,13 +99,13 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
         ? Promise.resolve('Keyword must not be empty!')
         : ToolsStore.testNaturalDate(keyword, userTimezone)
           .then((response) => {
-            if (mounted.current) _setSuccessfullPreview(response);
+            if (mounted.current) _setSuccessfulPreview(response);
           })
           .catch(_setFailedPreview);
     }
 
     return undefined;
-  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword, userTimezone]);
+  }, [_setFailedPreview, _setSuccessfulPreview, setValidatingKeyword, userTimezone]);
 
   useEffect(() => () => {
     mounted.current = false;
@@ -136,18 +130,11 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     }
   }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);
 
-  const { config } = useSearchConfiguration();
-  const { showKeywordPresetsButton } = useContext(TimeRangeInputSettingsContext);
-  const keywordOptions = useMemo(() => config?.quick_access_timerange_presets?.filter((option) => option?.timerange?.type === 'keyword'), [config?.quick_access_timerange_presets]);
-  const onSetPreset = useCallback((range) => {
-    setFieldValue('nextTimeRange', range);
-  }, [setFieldValue]);
-
   return (
     <Row className="no-bm">
       <Col sm={5}>
         <Headline>Time range:</Headline>
-        <Field name="nextTimeRange.keyword" validate={_validateKeyword}>
+        <Field name="timeRangeTabs.keyword.keyword" validate={_validateKeyword}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
@@ -168,7 +155,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
           )}
         </Field>
 
-        Preview
+        <b>Preview</b>
         <EffectiveTimeRangeTable>
           <tbody>
             <tr>
@@ -181,12 +168,6 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
             </tr>
           </tbody>
         </EffectiveTimeRangeTable>
-
-        {showKeywordPresetsButton && (
-          <TimeRangePresetRow disabled={disabled}
-                              onSetPreset={onSetPreset}
-                              availableOptions={keywordOptions} />
-        )}
       </Col>
 
       <Col sm={7}>

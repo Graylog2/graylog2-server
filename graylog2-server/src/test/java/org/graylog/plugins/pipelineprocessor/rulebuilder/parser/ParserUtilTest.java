@@ -121,6 +121,18 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void addFunctionParameterNull_WhenEmptyStringParameterValueIsSet() {
+        String parameterName = "foo";
+        var parameterValue = "";
+        RuleBuilderStep step = mock(RuleBuilderStep.class);
+        Map<String, Object> params = Map.of(parameterName, parameterValue);
+        when(step.parameters()).thenReturn(params);
+        ParameterDescriptor descriptor = mock(ParameterDescriptor.class);
+        when(descriptor.name()).thenReturn(parameterName);
+        assertThat(ParserUtil.addFunctionParameter(descriptor, step)).isNull();
+    }
+
+    @Test
     public void addFunctionParameterSyntaxOk_WhenStringParameterValueIsSet() {
         String parameterName = "foo";
         var parameterValue = "bar";
@@ -157,6 +169,19 @@ public class ParserUtilTest {
         when(descriptor.name()).thenReturn(parameterName);
         assertThat(ParserUtil.addFunctionParameter(descriptor, step))
                 .isEqualTo("    foo : bar");
+    }
+
+    @Test
+    public void addFunctionParameterSyntaxOk_WhenVariableParameterStringContainsBadChar() {
+        String parameterName = "foo";
+        String parameterValue = "bar\"123";
+        RuleBuilderStep step = mock(RuleBuilderStep.class);
+        Map<String, Object> params = Map.of(parameterName, parameterValue);
+        when(step.parameters()).thenReturn(params);
+        ParameterDescriptor descriptor = mock(ParameterDescriptor.class);
+        when(descriptor.name()).thenReturn(parameterName);
+        assertThat(ParserUtil.addFunctionParameter(descriptor, step))
+                .isEqualTo("    foo : \"bar\\\"123\"");
     }
 
     // Fragment Building

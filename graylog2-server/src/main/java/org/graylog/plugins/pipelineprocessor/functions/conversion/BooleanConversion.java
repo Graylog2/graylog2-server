@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
@@ -34,7 +35,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
 
 
     public BooleanConversion() {
-        valueParam = object("value").description("Value to convert").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to convert").build();
         defaultParam = bool("default").optional().description("Used when 'value' is null, defaults to false").build();
     }
 
@@ -54,6 +55,10 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
                 .returnType(Boolean.class)
                 .params(of(valueParam, defaultParam))
                 .description("Converts a value to a boolean value using its string representation")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Convert to boolean")
+                .ruleBuilderTitle("Convert '${value}' to boolean")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 }

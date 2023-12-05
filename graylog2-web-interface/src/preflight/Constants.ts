@@ -27,11 +27,10 @@ export const CONFIGURATION_STEPS = {
   CERTIFICATE_PROVISIONING: {
     key: 'CERTIFICATE_PROVISIONING',
     description: 'Provision certificates for your data nodes',
-
   },
   CONFIGURATION_FINISHED: {
     key: 'CONFIGURATION_FINISHED',
-    description: 'All data nodes are secured and reachable',
+    description: 'Configuration finished',
   },
 } as const;
 
@@ -43,22 +42,11 @@ export const CONFIGURATION_STEPS_ORDER = [
 ];
 
 export const DATA_NODES_STATUS = {
-  UNCONFIGURED: {
-    key: 'UNCONFIGURED',
-  },
-  CONFIGURED: {
-    key: 'UNCONFIGURED',
-  },
-  CSR: {
-    key: 'CSR',
-  },
-  SIGNED: {
-    key: 'SIGNED',
-  },
-  CONNECTED: {
-    key: 'CONNECTED',
-  },
-  ERROR: {
-    key: 'ERROR',
-  },
-};
+  UNCONFIGURED: 'UNCONFIGURED',
+  CONFIGURED: 'UNCONFIGURED',
+  CSR: 'CSR',
+  SIGNED: 'SIGNED',
+  CONNECTED: 'CONNECTED',
+  ERROR: 'ERROR',
+  CONNECTING: 'CONNECTING',
+} as const;

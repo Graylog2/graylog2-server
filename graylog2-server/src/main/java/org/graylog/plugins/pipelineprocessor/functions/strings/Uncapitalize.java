@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
 import java.util.Locale;
 
 public class Uncapitalize extends StringUtilsFunction {
@@ -42,5 +43,17 @@ public class Uncapitalize extends StringUtilsFunction {
     @Override
     protected String apply(String value, Locale unused) {
         return StringUtils.uncapitalize(value);
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Uncapitalize string";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Uncapitalize '${value}' by changing the first letter to lower case";
     }
 }

@@ -23,6 +23,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
+
 public class Now extends TimezoneAwareFunction {
 
     public static final String NAME = "now";
@@ -34,7 +36,7 @@ public class Now extends TimezoneAwareFunction {
 
     @Override
     protected String description() {
-        return "Returns the current time";
+        return "Returns the current date and time";
     }
 
     @Override
@@ -45,5 +47,17 @@ public class Now extends TimezoneAwareFunction {
     @Override
     protected ImmutableList<ParameterDescriptor> params() {
         return ImmutableList.of();
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Create timestamp";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Create current DateTime";
     }
 }

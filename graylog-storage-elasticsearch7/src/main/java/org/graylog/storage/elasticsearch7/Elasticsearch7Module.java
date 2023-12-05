@@ -31,6 +31,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
@@ -42,11 +43,12 @@ import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
 
 public class Elasticsearch7Module extends VersionAwareModule {
-
     private final SearchVersion supportedVersion;
+    private final boolean useComposableIndexTemplates;
 
-    public Elasticsearch7Module(final SearchVersion supportedVersion) {
+    public Elasticsearch7Module(final SearchVersion supportedVersion, boolean useComposableIndexTemplates) {
         this.supportedVersion = supportedVersion;
+        this.useComposableIndexTemplates = useComposableIndexTemplates;
     }
 
     @Override
@@ -55,6 +57,12 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES7.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
+        if (useComposableIndexTemplates) {
+            bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
+        } else {
+            bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
+        }
+
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES7.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterES7.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterES7.class);
@@ -68,6 +76,8 @@ public class Elasticsearch7Module extends VersionAwareModule {
                 .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsES7.class);
 
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsES7.class);
+        bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterES7.class);
+        
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);

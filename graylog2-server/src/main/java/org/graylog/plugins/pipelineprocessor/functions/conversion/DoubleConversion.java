@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
@@ -38,7 +39,7 @@ public class DoubleConversion extends AbstractFunction<Double> {
     private final ParameterDescriptor<Double, Double> defaultParam;
 
     public DoubleConversion() {
-        valueParam = object(VALUE).description("Value to convert").build();
+        valueParam = object(VALUE).ruleBuilderVariable().description("Value to convert").build();
         defaultParam = floating(DEFAULT).optional().allowNegatives(true).description("Used when 'value' is null, defaults to 0").build();
     }
 
@@ -67,6 +68,10 @@ public class DoubleConversion extends AbstractFunction<Double> {
                         defaultParam
                 ))
                 .description("Converts a value to a double value using its string representation")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Convert to double")
+                .ruleBuilderTitle("Convert '${value}' to double")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 }

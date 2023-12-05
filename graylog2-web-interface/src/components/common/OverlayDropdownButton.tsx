@@ -19,16 +19,17 @@ import { useState } from 'react';
 
 import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
+import type { BsSize } from 'components/bootstrap/types';
 
 type Props = {
-  bsSize?: string,
+  bsSize?: BsSize,
   buttonTitle?: string,
   children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
   closeOnSelect?: boolean,
   disabled?: boolean
   dropdownMinWidth?: number
   dropdownZIndex?: number,
-  onToggle?: () => void,
+  onToggle?: (isOpen: boolean) => void,
   title: React.ReactNode,
 };
 
@@ -50,7 +51,7 @@ const OverlayDropdownButton = ({
 
   const _onToggle = () => {
     if (typeof onToggleProp === 'function') {
-      onToggleProp();
+      onToggleProp(!show);
     }
 
     setShowDropdown((cur) => !cur);

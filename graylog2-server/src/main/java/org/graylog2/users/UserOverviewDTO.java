@@ -53,6 +53,7 @@ public abstract class UserOverviewDTO {
     private static final String FIELD_CLIENT_ADDRESS = "client_address";
     private static final String FIELD_ACCOUNT_STATUS = "account_status";
     private static final String FIELD_SERVICE_ACCOUNT = "service_account";
+    private static final String FIELD_AUTH_SERVICE_ENABLED = "auth_service_enabled";
 
     @Id
     @ObjectId
@@ -111,6 +112,9 @@ public abstract class UserOverviewDTO {
     @JsonProperty(FIELD_SERVICE_ACCOUNT)
     public abstract boolean serviceAccount();
 
+    @JsonProperty(FIELD_AUTH_SERVICE_ENABLED)
+    public abstract boolean authServiceEnabled();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -118,7 +122,7 @@ public abstract class UserOverviewDTO {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    @JsonIgnoreProperties({ "preferences", "permissions", "timezone", "session_timeout_ms", "startpage", "password" })
+    @JsonIgnoreProperties({"preferences", "permissions", "timezone", "session_timeout_ms", "startpage", "password"})
     public static abstract class Builder {
 
         @JsonCreator
@@ -126,7 +130,8 @@ public abstract class UserOverviewDTO {
             return new AutoValue_UserOverviewDTO.Builder()
                     .accountStatus(User.AccountStatus.ENABLED)
                     .roles(Collections.emptySet())
-                    .serviceAccount(false);
+                    .serviceAccount(false)
+                    .authServiceEnabled(true);
         }
 
         @Id
@@ -180,15 +185,18 @@ public abstract class UserOverviewDTO {
         @JsonProperty(FIELD_SERVICE_ACCOUNT)
         public abstract Builder serviceAccount(boolean isServiceAccount);
 
+        @JsonProperty(FIELD_AUTH_SERVICE_ENABLED)
+        public abstract Builder authServiceEnabled(boolean authServiceEnabled);
+
         @JsonIgnore
         public Builder fillSession(Optional<MongoDbSession> session) {
-           if (session.isPresent()) {
-               MongoDbSession lastSession = session.get();
-               return sessionActive(true)
-                       .lastActivity(lastSession.getLastAccessTime())
-                       .clientAddress(lastSession.getHost());
-           };
-           return this;
+            if (session.isPresent()) {
+                MongoDbSession lastSession = session.get();
+                return sessionActive(true)
+                        .lastActivity(lastSession.getLastAccessTime())
+                        .clientAddress(lastSession.getHost());
+            }
+            return this;
         }
 
         public abstract UserOverviewDTO build();

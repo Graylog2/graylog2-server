@@ -31,6 +31,8 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationSystemEventPublisher;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.jukito.JukitoRunner;
@@ -66,7 +68,14 @@ public class SidecarServiceTest {
     @Mock
     private CollectorService collectorService;
 
-    @Mock private ConfigurationService configurationService;
+    @Mock
+    private ConfigurationService configurationService;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private NotificationSystemEventPublisher publisher;
 
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -76,7 +85,7 @@ public class SidecarServiceTest {
     @Before
     public void setUp(MongoJackObjectMapperProvider mapperProvider,
                       Validator validator) throws Exception {
-        this.sidecarService = new SidecarService(collectorService, configurationService,  mongodb.mongoConnection(), mapperProvider, validator);
+        this.sidecarService = new SidecarService(collectorService, configurationService, mongodb.mongoConnection(), mapperProvider, notificationService, publisher, validator);
     }
 
     @Test
@@ -112,7 +121,7 @@ public class SidecarServiceTest {
                         null,
                         null),
                 version
-                );
+        );
 
         final Sidecar result = this.sidecarService.save(sidecar);
         MongoCollection<Document> collection = mongodb.mongoConnection().getMongoDatabase().getCollection(collectionName);
@@ -356,7 +365,7 @@ public class SidecarServiceTest {
 
     private static Collector getCollector() {
         return Collector.create("collector-id", "collector-name", "service", "linux",
-                "/path", "param", "valid param", "");
+                "/path", "param", "valid param", "", null);
     }
 
     private Sidecar getTestSidecar() {

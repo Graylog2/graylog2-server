@@ -65,14 +65,12 @@ class SystemOverviewDetails extends React.Component {
         <Col md={4}>
           <Alert bsStyle="info">
             <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" /></span>
-            <Icon name="exchange-alt" />&nbsp;
             Lifecycle state: <strong>{StringUtils.capitalizeFirstLetter(this.props.information.lifecycle)}</strong>
           </Alert>
         </Col>
         <Col md={4}>
           <Alert bsStyle={lbStatus === 'ALIVE' ? 'success' : 'danger'}>
             <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" /></span>
-            <Icon name="heart" />&nbsp;
             Marked as <strong>{lbStatus}</strong> for load balancers
           </Alert>
         </Col>

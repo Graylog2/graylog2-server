@@ -41,4 +41,16 @@ public class Months extends AbstractPeriodComponentFunction {
     protected String getDescription() {
         return "Create a period with a specified number of months.";
     }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Create period (months)";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Create a time period of '${value}' months";
+    }
 }

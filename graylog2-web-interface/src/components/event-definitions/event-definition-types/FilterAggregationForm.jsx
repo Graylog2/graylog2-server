@@ -18,8 +18,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
+import cloneDeep from 'lodash/cloneDeep';
 
-import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/bootstrap';
+import { Col, ControlLabel, FormGroup, Input, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 import FilterForm from './FilterForm';
@@ -37,6 +38,8 @@ const initialFilterConfig = {
   streams: [],
   search_within_ms: 5 * 60 * 1000,
   execute_every_ms: 5 * 60 * 1000,
+  _is_scheduled: true,
+  event_limit: 100,
 };
 
 const initialAggregationConfig = {
@@ -73,10 +76,15 @@ class FilterAggregationForm extends React.Component {
     };
   }
 
-  propagateChange = (key, value) => {
-    const { onChange } = this.props;
+  handleConfigChange = (event) => {
+    const config = cloneDeep(this.props.eventDefinition.config);
 
-    onChange(key, value);
+    config[event.target.name] = FormsUtils.getValueFromInput(event.target);
+    this.propagateConfigChange(config);
+  };
+
+  propagateConfigChange = (config) => {
+    this.props.onChange('config', config);
   };
 
   handleTypeChange = (event) => {
@@ -99,7 +107,7 @@ class FilterAggregationForm extends React.Component {
 
       const nextConfig = { ...eventDefinition.config, ...initialAggregationConfig };
 
-      this.propagateChange('config', nextConfig);
+      this.propagateConfigChange(nextConfig);
     } else {
       // Reset aggregation data from state if it exists
       const { existingAggregationConfig } = this.state;
@@ -108,7 +116,7 @@ class FilterAggregationForm extends React.Component {
         const { eventDefinition } = this.props;
         const nextConfig = { ...eventDefinition.config, ...existingAggregationConfig };
 
-        this.propagateChange('config', nextConfig);
+        this.propagateConfigChange(nextConfig);
         stateChange.existingAggregationConfig = undefined;
       }
     }
@@ -128,7 +136,7 @@ class FilterAggregationForm extends React.Component {
                         validation={validation}
                         streams={streams.filter((s) => s.is_editable)}
                         currentUser={currentUser}
-                        onChange={this.propagateChange} />
+                        onChange={this.props.onChange} />
 
             <FormGroup>
               <ControlLabel>Create Events for Definition if...</ControlLabel>
@@ -147,6 +155,22 @@ class FilterAggregationForm extends React.Component {
                 Aggregation of results reaches a threshold
               </Radio>
             </FormGroup>
+            {conditionType === conditionTypes.FILTER && (
+              <Row>
+                <Col md={12}>
+                  <Input id="event-limit"
+                         name="event_limit"
+                         label="Event Limit"
+                         type="number"
+                         bsStyle={validation.errors.event_limit ? 'error' : null}
+                         help={get(validation, 'errors.event_limit', 'Maximum number of events to be created.')}
+                         value={eventDefinition.config.event_limit}
+                         onChange={this.handleConfigChange}
+                         required />
+                </Col>
+              </Row>
+            )}
+
           </Col>
           <Col md={5} lgOffset={1}>
             <FilterPreviewContainer eventDefinition={eventDefinition} />
@@ -158,7 +182,7 @@ class FilterAggregationForm extends React.Component {
               <AggregationForm eventDefinition={eventDefinition}
                                validation={validation}
                                aggregationFunctions={entityTypes.aggregation_functions}
-                               onChange={this.propagateChange} />
+                               onChange={this.props.onChange} />
             </Col>
           </Row>
         )}

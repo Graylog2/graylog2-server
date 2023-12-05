@@ -17,11 +17,11 @@
 package org.graylog2.configuration;
 
 import com.google.common.base.Suppliers;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
 
     private final List<URI> hosts;
     private final PreflightConfigService preflightConfigService;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     private final Supplier<List<URI>> resultsCachingSupplier;
 
@@ -51,7 +51,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     public IndexerDiscoveryProvider(
             @Named("elasticsearch_hosts") List<URI> hosts,
             PreflightConfigService preflightConfigService,
-            NodeService nodeService) {
+            NodeService<DataNodeDto> nodeService) {
         this.hosts = hosts;
         this.preflightConfigService = preflightConfigService;
         this.nodeService = nodeService;
@@ -70,9 +70,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
             return hosts;
         }
 
-        final PreflightConfigResult preflightResult = preflightConfigService.getPersistedConfig()
-                .map(PreflightConfig::result)
-                .orElse(PreflightConfigResult.UNKNOWN);
+        final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
 
         // if preflight is finished, we assume that there will be some datanode registered via node-service.
         if (preflightResult == PreflightConfigResult.FINISHED) {
@@ -93,7 +91,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     }
 
     private List<URI> discover() {
-        return nodeService.allActive(Node.Type.DATANODE).values().stream()
+        return nodeService.allActive().values().stream()
                 .map(Node::getTransportAddress)
                 .map(URI::create)
                 .collect(Collectors.toList());

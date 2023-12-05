@@ -19,10 +19,13 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import withTelemetry from 'logic/telemetry/withTelemetry';
 import { FormSubmit, Select, Spinner } from 'components/common';
 import { Alert, Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 const getNotificationPlugin = (type) => {
   if (type === undefined) {
@@ -52,6 +55,7 @@ class EventNotificationForm extends React.Component {
     onSubmit: PropTypes.func.isRequired,
     onTest: PropTypes.func.isRequired,
     sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -72,13 +76,16 @@ class EventNotificationForm extends React.Component {
   };
 
   handleSubmit = (event) => {
-    const { notification, onSubmit, sendTelemetry } = this.props;
+    const { notification, onSubmit, sendTelemetry, action, location } = this.props;
 
-    sendTelemetry('form_submit', {
-      app_pathname: 'events',
-      app_section: 'event-notification',
-      app_action_value: 'save',
-    });
+    sendTelemetry(
+      action === 'create'
+        ? TELEMETRY_EVENT_TYPE.NOTIFICATIONS.CREATE_CLICKED
+        : TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EDIT_CLICKED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_section: 'event-notification',
+        app_action_value: `${action}-button`,
+      });
 
     event.preventDefault();
 
@@ -99,13 +106,13 @@ class EventNotificationForm extends React.Component {
   };
 
   handleTypeChange = (nextType) => {
-    const { sendTelemetry } = this.props;
+    const { sendTelemetry, location } = this.props;
 
-    sendTelemetry('input_value_change', {
-      app_pathname: 'events',
-      app_section: 'event-notification',
-      app_action_value: 'notification-type',
-      event_details: { notification_type: nextType },
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_TYPE_SELECTED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_section: 'event-definition-notifications',
+      app_action_value: 'notification-type-select',
+      notification_type: nextType,
     });
 
     const notificationPlugin = getNotificationPlugin(nextType);
@@ -115,12 +122,12 @@ class EventNotificationForm extends React.Component {
   };
 
   handleTestTrigger = () => {
-    const { notification, onTest, sendTelemetry } = this.props;
+    const { notification, onTest, sendTelemetry, location } = this.props;
 
-    sendTelemetry('input_value_change', {
-      app_pathname: 'events',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EXECUTE_TEST_CLICKED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'event-notification',
-      app_action_value: 'notification-test',
+      app_action_value: 'execute-test-button',
     });
 
     onTest(notification);
@@ -193,8 +200,7 @@ class EventNotificationForm extends React.Component {
                   </Button>
                 </FormControl.Static>
                 {testResult.message && (
-                  <Alert bsStyle={testResult.error ? 'danger' : 'success'}>
-                    <b>{testResult.error ? 'Error: ' : 'Success: '}</b>
+                  <Alert bsStyle={testResult.error ? 'danger' : 'success'} title={testResult.error ? 'Error: ' : 'Success: '}>
                     {testResult.message}
                   </Alert>
                 )}
@@ -216,4 +222,4 @@ class EventNotificationForm extends React.Component {
   }
 }
 
-export default withTelemetry(EventNotificationForm);
+export default withLocation(withTelemetry(EventNotificationForm));

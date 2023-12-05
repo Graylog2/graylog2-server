@@ -23,18 +23,15 @@ import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import { Modal } from 'components/bootstrap';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import type { RuleBlock, BlockType, BlockDict } from './types';
-import { ruleBlockPropType, blockDictPropType, RuleBuilderTypes } from './types';
+import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
+import { ruleBlockPropType, blockDictPropType, outputVariablesPropType } from './types';
 import { getDictForFunction } from './helpers';
 
-const BlockContainer = styled.div.attrs<{ $hasErrors: boolean }>(({ $hasErrors }) => ({
-  $hasErrors,
-}))(({ $hasErrors, theme }) => css`
-  border-radius: 4px;
-  border-color: ${$hasErrors ? theme.colors.variant.lighter.danger : theme.colors.variant.lighter.default};
-  padding: ${theme.spacings.md};
-  margin-bottom: ${theme.spacings.md};
+const BlockContainer = styled.div(({ theme }) => css`
+  padding-top: ${theme.spacings.xxs};
 `);
 
 type Props = {
@@ -42,8 +39,8 @@ type Props = {
   blockDict: Array<BlockDict>,
   block?: RuleBlock,
   order: number,
-  previousOutputPresent?: boolean,
-  addBlock: (type: string, block: RuleBlock) => void,
+  outputVariableList?: OutputVariables,
+  addBlock: (type: string, block: RuleBlock, orderIndex?: number) => void,
   updateBlock: (orderIndex: number, type: string, block: RuleBlock) => void,
   deleteBlock: (orderIndex: number, type: string) => void,
 };
@@ -53,20 +50,22 @@ const RuleBuilderBlock = ({
   blockDict,
   block,
   order,
-  previousOutputPresent,
+  outputVariableList,
   addBlock,
   updateBlock,
   deleteBlock,
 }: Props) => {
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [insertMode, setInsertMode] = useState<'above'|'below'|undefined>(undefined);
+  const [insertBlockDict, setInsertBlockDict] = useState<BlockDict>(undefined);
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     if (block) {
-      setCurrentBlockDict(blockDict.find(((b) => b.name === block.function)));
+      setCurrentBlockDict(getDictForFunction(blockDict, block.function));
     }
   },
   [block, blockDict]);
@@ -95,6 +94,8 @@ const RuleBuilderBlock = ({
   };
 
   const resetBlock = () => {
+    setEditMode(false);
+
     if (block) {
       setCurrentBlockDict(blockDict.find(((b) => b.name === block.function)));
     } else {
@@ -102,9 +103,14 @@ const RuleBuilderBlock = ({
     }
   };
 
+  const resetInsertBlock = () => {
+    setInsertMode(undefined);
+    setInsertBlockDict(undefined);
+  };
+
   const onCancel = () => {
-    setEditMode(false);
     resetBlock();
+    resetInsertBlock();
   };
 
   const onAdd = (paramsToAdd) => {
@@ -114,27 +120,33 @@ const RuleBuilderBlock = ({
   };
 
   const onDelete = () => {
-    sendTelemetry('click', {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
-      app_action_value: `delete-${type}-button`,
-    });
+    sendTelemetry(
+      type === 'condition'
+        ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.DELETE_CONDITION_CLICKED
+        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.DELETE_ACTION_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'pipeline-rule-builder',
+        app_action_value: `delete-${type}-button`,
+      });
 
     deleteBlock(order, type);
   };
 
   const onEdit = () => {
-    sendTelemetry('click', {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
-      app_action_value: `edit-${type}-button`,
-    });
+    sendTelemetry(
+      type === 'condition'
+        ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.EDIT_CONDITION_CLICKED
+        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.EDIT_ACTION_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'pipeline-rule-builder',
+        app_action_value: `edit-${type}-button`,
+      });
 
     setEditMode(true);
   };
 
   const onNegate = () => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEGATE_CONDITION_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-builder',
       app_action_value: `negate-${type}-button`,
@@ -143,25 +155,69 @@ const RuleBuilderBlock = ({
     updateBlock(order, type, buildBlockData({ toggleNegate: true }));
   };
 
+  const onDuplicate = async () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.DUPLICATE_ACTION_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `duplicate-${type}`,
+    });
+
+    const duplicatedBlock = { ...block, outputvariable: null };
+    addBlock(type, duplicatedBlock, order + 1);
+  };
+
+  const onInsert = (paramsToAdd) => {
+    if (insertMode) {
+      const newBlock: RuleBlock = { id: '', function: insertBlockDict.name, params: paramsToAdd, outputvariable: null };
+
+      addBlock(type, newBlock, insertMode === 'above' ? order : order + 1);
+    }
+
+    onCancel();
+  };
+
+  const onInsertAbove = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.INSERT_ABOVE_ACTION_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `insert-above-${type}`,
+    });
+
+    setInsertMode('above');
+  };
+
+  const onInsertBelow = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.INSERT_BELOW_ACTION_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'pipeline-rule-builder',
+      app_action_value: `insert-below-${type}`,
+    });
+
+    setInsertMode('below');
+  };
+
   const onUpdate = (params: { [key: string]: any }, functionName: string) => {
     updateBlock(order, type, buildBlockData({ newFunctionName: functionName, newParams: params }));
-    setEditMode(false);
+
+    onCancel();
   };
 
   const onSelect = (option: string) => {
     setCurrentBlockDict(blockDict.find(((b) => b.name === option)));
   };
 
-  const isBlockNegatable = (): boolean => (
-    getDictForFunction(blockDict, block.function)?.return_type === RuleBuilderTypes.Boolean
-  );
+  const onInsertSelect = (option: string) => {
+    setInsertBlockDict(blockDict.find(((b) => b.name === option)));
+  };
 
-  const options = blockDict.map(({ name }) => ({ label: name, value: name }));
+  const isBlockNegatable = (): boolean => type === 'condition';
+
+  const options = blockDict.map(({ name, description, rule_builder_name }) => ({ label: rule_builder_name, value: name, description: description }));
 
   const showForm = !block || editMode;
 
   return (
-    <BlockContainer className="content" $hasErrors={block?.errors?.length > 0}>
+    <BlockContainer>
       {showForm ? (
         <RuleBlockForm existingBlock={block}
                        onAdd={onAdd}
@@ -170,15 +226,44 @@ const RuleBuilderBlock = ({
                        onSelect={onSelect}
                        order={order}
                        options={options}
-                       previousOutputPresent={previousOutputPresent}
+                       outputVariableList={outputVariableList}
                        selectedBlockDict={currentBlockDict}
                        type={type} />
       ) : (
-        <RuleBlockDisplay block={block}
-                          onDelete={onDelete}
-                          onEdit={onEdit}
-                          onNegate={onNegate}
-                          negatable={isBlockNegatable()} />
+        <>
+          <RuleBlockDisplay block={block}
+                            onDelete={onDelete}
+                            onEdit={onEdit}
+                            onNegate={onNegate}
+                            onDuplicate={onDuplicate}
+                            onInsertAbove={onInsertAbove}
+                            onInsertBelow={onInsertBelow}
+                            returnType={currentBlockDict?.return_type}
+                            negatable={isBlockNegatable()}
+                            type={type} />
+          {Boolean(insertMode) && (
+            <Modal show
+                   title="insert rule action"
+                   bsSize="lg"
+                   enforceFocus
+                   onHide={resetInsertBlock}>
+              <Modal.Header closeButton>
+                <Modal.Title>Insert new action {insertMode} action N°{order + 1}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <RuleBlockForm onAdd={onInsert}
+                               onCancel={onCancel}
+                               onUpdate={onUpdate}
+                               onSelect={onInsertSelect}
+                               order={insertMode === 'above' ? order : order + 1}
+                               options={options}
+                               outputVariableList={outputVariableList}
+                               selectedBlockDict={insertBlockDict}
+                               type={type} />
+              </Modal.Body>
+            </Modal>
+          )}
+        </>
       )}
     </BlockContainer>
   );
@@ -189,7 +274,7 @@ RuleBuilderBlock.propTypes = {
   blockDict: PropTypes.arrayOf(blockDictPropType).isRequired,
   block: ruleBlockPropType,
   order: PropTypes.number.isRequired,
-  previousOutputPresent: PropTypes.bool,
+  outputVariableList: outputVariablesPropType,
   addBlock: PropTypes.func.isRequired,
   updateBlock: PropTypes.func.isRequired,
   deleteBlock: PropTypes.func.isRequired,
@@ -197,7 +282,7 @@ RuleBuilderBlock.propTypes = {
 
 RuleBuilderBlock.defaultProps = {
   block: undefined,
-  previousOutputPresent: false,
+  outputVariableList: undefined,
 };
 
 export default RuleBuilderBlock;

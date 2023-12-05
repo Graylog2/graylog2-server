@@ -87,7 +87,12 @@ describe('NewSearchPage', () => {
       asMock(useQuery).mockReturnValue({});
       render(<SimpleNewSearchPage />);
 
-      await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith([], undefined, undefined));
+      await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith({
+        parameters: undefined,
+        queryString: undefined,
+        streamId: [],
+        timeRange: undefined,
+      }));
     });
 
     it('should process hooks with provided location query', async () => {

@@ -21,64 +21,47 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { Button, Col, Row, Popover } from 'components/bootstrap';
-import { Icon, IfPermitted, KeyCapture, ModalSubmit } from 'components/common';
+import { Icon, KeyCapture, ModalSubmit } from 'components/common';
 import type {
   AbsoluteTimeRange,
   KeywordTimeRange,
   NoTimeRangeOverride,
-  TimeRange,
-  RelativeTimeRange,
 } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
-import { isTypeKeyword, isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
-import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
+import { isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
+import {
+  normalizeFromPickerForSearchBar,
+} from 'views/logic/queries/NormalizeTimeRange';
 import validateTimeRange from 'views/components/TimeRangeValidation';
-import type { DateTimeFormats, DateTime } from 'util/DateTime';
-import { toDateObject } from 'util/DateTime';
+import type { DateTime } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import TimeRangeAddToQuickListButton
-  from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangeAddToQuickListButton';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RelativeTimeRangeClassified } from './types';
-import migrateTimeRangeToNewType from './migrateTimeRangeToNewType';
 import {
   classifyRelativeTimeRange,
   normalizeIfClassifiedRelativeTimeRange,
-  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
 import TimeRangeTabs, { timeRangePickerTabs } from './TimeRangePickerTabs';
+import TimeRangePresetRow from './TimeRangePresetRow';
 
 export type TimeRangePickerFormValues = {
-  nextTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
+  timeRangeTabs: {
+    relative?: RelativeTimeRangeClassified | undefined,
+    absolute?: AbsoluteTimeRange | undefined,
+    keyword?: KeywordTimeRange | undefined,
+  }
+  activeTab: 'relative' | 'absolute' | 'keyword' | undefined
 };
 
+export type TimeRangePickerTimeRange = TimeRangePickerFormValues['timeRangeTabs'][keyof TimeRangePickerFormValues['timeRangeTabs']];
 export type SupportedTimeRangeType = keyof typeof timeRangePickerTabs;
 
 export const allTimeRangeTypes = Object.keys(timeRangePickerTabs) as Array<SupportedTimeRangeType>;
-
-const createDefaultRanges = (formatTime: (time: DateTime, format: DateTimeFormats) => string) => ({
-  absolute: {
-    type: 'absolute',
-    from: formatTime(toDateObject(new Date()).subtract(300, 'seconds'), 'complete'),
-    to: formatTime(toDateObject(new Date()), 'complete'),
-  },
-  relative: {
-    type: 'relative',
-    from: {
-      value: 5,
-      unit: 'minutes',
-      isAllTime: false,
-    },
-    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-  },
-  keyword: {
-    type: 'keyword',
-    keyword: 'Last five minutes',
-  },
-  disabled: undefined,
-});
 
 const StyledPopover = styled(Popover)(({ theme }) => css`
   min-width: 750px;
@@ -120,21 +103,33 @@ const LimitLabel = styled.span(({ theme }) => css`
   }
 `);
 
-const dateTimeValidate = (nextTimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
-  const timeRange = normalizeIfClassifiedRelativeTimeRange(nextTimeRange);
-  const timeRangeErrors = validateTimeRange(timeRange, limitDuration, formatTime);
+const dateTimeValidate = (activeTabTimeRange: TimeRangePickerTimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
+  if (!activeTabTimeRange) {
+    return {};
+  }
+
+  const normalizedTimeRange = normalizeIfClassifiedRelativeTimeRange(activeTabTimeRange);
+  const timeRangeErrors = validateTimeRange(normalizedTimeRange, limitDuration, formatTime);
 
   return Object.keys(timeRangeErrors).length !== 0
-    ? { nextTimeRange: timeRangeErrors }
+    ? { timeRangeTabs: { [activeTabTimeRange.type]: timeRangeErrors } }
     : {};
 };
 
-const onInitializingNextTimeRange = (currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => {
-  if (isTypeRelative(currentTimeRange)) {
-    return classifyRelativeTimeRange(currentTimeRange);
+const initialFormValues = (currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => {
+  if (isTimeRange(currentTimeRange)) {
+    return ({
+      timeRangeTabs: {
+        [currentTimeRange.type]: isTypeRelative(currentTimeRange) ? classifyRelativeTimeRange(currentTimeRange) : currentTimeRange,
+      },
+      activeTab: currentTimeRange.type,
+    });
   }
 
-  return currentTimeRange;
+  return ({
+    timeRangeTabs: {},
+    activeTab: undefined,
+  });
 };
 
 type Props = {
@@ -142,7 +137,7 @@ type Props = {
   limitDuration: number,
   noOverride?: boolean,
   position: 'bottom' | 'right',
-  setCurrentTimeRange: (nextTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
+  setCurrentTimeRange: (timeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
   validTypes?: Array<SupportedTimeRangeType>,
 };
@@ -161,9 +156,8 @@ const TimeRangePicker = ({
   const { formatTime, userTimezone } = useUserDateTime();
   const [validatingKeyword, setValidatingKeyword] = useState(false);
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
   const positionIsBottom = position === 'bottom';
-  const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
-  const { showAddToQuickListButton } = useContext(TimeRangeInputSettingsContext);
 
   const handleNoOverride = useCallback(() => {
     setCurrentTimeRange({});
@@ -173,44 +167,29 @@ const TimeRangePicker = ({
   const handleCancel = useCallback(() => {
     toggleDropdownShow();
 
-    sendTelemetry('click', {
-      app_pathname: 'search',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_CANCELED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-time-range-cancel-button',
     });
-  }, [sendTelemetry, toggleDropdownShow]);
+  }, [location.pathname, sendTelemetry, toggleDropdownShow]);
 
-  const normalizeIfKeywordTimerange = (timeRange: TimeRange | NoTimeRangeOverride) => {
-    if (isTypeKeyword(timeRange)) {
-      return {
-        type: timeRange.type,
-        timezone: timeRange.timezone,
-        keyword: timeRange.keyword,
-      };
-    }
-
-    return timeRange;
-  };
-
-  const handleSubmit = useCallback(({ nextTimeRange }: {
-    nextTimeRange: TimeRangePickerFormValues['nextTimeRange']
-  }) => {
-    const normalizedTimeRange = normalizeIfKeywordTimerange(
-      normalizeIfAllMessagesRange(
-        normalizeIfClassifiedRelativeTimeRange(nextTimeRange),
-      ),
-    );
+  const handleSubmit = useCallback(({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => {
+    const normalizedTimeRange = normalizeFromPickerForSearchBar(timeRangeTabs[activeTab]);
 
     setCurrentTimeRange(normalizedTimeRange);
 
     toggleDropdownShow();
 
-    sendTelemetry('click', {
-      app_pathname: 'search',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_UPDATED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-time-range-confirm-button',
+      event_details: {
+        timerange: normalizedTimeRange,
+      },
     });
-  }, [sendTelemetry, setCurrentTimeRange, toggleDropdownShow]);
+  }, [location.pathname, sendTelemetry, setCurrentTimeRange, toggleDropdownShow]);
 
   const title = (
     <PopoverTitle>
@@ -224,8 +203,11 @@ const TimeRangePicker = ({
     </PopoverTitle>
   );
 
-  const _validateTimeRange = useCallback(({ nextTimeRange }) => dateTimeValidate(nextTimeRange, limitDuration, formatTime), [formatTime, limitDuration]);
-  const initialTimeRange = useMemo(() => ({ nextTimeRange: onInitializingNextTimeRange(currentTimeRange) }), [currentTimeRange]);
+  const _validateTimeRange = useCallback(({
+    timeRangeTabs,
+    activeTab,
+  }: TimeRangePickerFormValues) => dateTimeValidate(timeRangeTabs[activeTab], limitDuration, formatTime), [formatTime, limitDuration]);
+  const initialValues = useMemo(() => initialFormValues(currentTimeRange), [currentTimeRange]);
 
   return (
     <StyledPopover id="timerange-type"
@@ -236,52 +218,39 @@ const TimeRangePicker = ({
                    arrowOffsetTop={positionIsBottom ? undefined : 25}
                    arrowOffsetLeft={positionIsBottom ? 34 : -11}
                    title={title}>
-      <Formik<TimeRangePickerFormValues> initialValues={initialTimeRange}
+      <Formik<TimeRangePickerFormValues> initialValues={initialValues}
                                          validate={_validateTimeRange}
                                          onSubmit={handleSubmit}
                                          validateOnMount>
-        {(({ values: { nextTimeRange }, isValid, setFieldValue, submitForm }) => {
-          const handleActiveTab = (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
-            if ('type' in nextTimeRange) {
-              setFieldValue('nextTimeRange', migrateTimeRangeToNewType(nextTimeRange as TimeRange, nextTab, formatTime));
-            } else {
-              setFieldValue('nextTimeRange', defaultRanges[nextTab]);
-            }
-          };
+        {(({ isValid, submitForm }) => (
+          <KeyCapture shortcuts={[
+            { actionKey: 'submit-form', callback: submitForm, scope: 'general', options: { displayInOverview: false } },
+            { actionKey: 'close-modal', callback: handleCancel, scope: 'general', options: { displayInOverview: false } },
+          ]}>
+            <Form>
+              <Row>
+                <Col md={12}>
+                  <TimeRangePresetRow />
+                  <TimeRangeTabs limitDuration={limitDuration}
+                                 validTypes={validTypes}
+                                 setValidatingKeyword={setValidatingKeyword} />
+                </Col>
+              </Row>
 
-          return (
-            <KeyCapture shortcuts={{ enter: submitForm, esc: handleCancel }}>
-              <Form>
-                <Row>
-                  <Col md={12}>
-                    {showAddToQuickListButton && isTimeRange(nextTimeRange) && (
-                      <IfPermitted permissions="clusterconfigentry:edit">
-                        <TimeRangeAddToQuickListButton />
-                      </IfPermitted>
-                    )}
-                    <TimeRangeTabs currentTimeRange={currentTimeRange}
-                                   handleActiveTab={handleActiveTab}
-                                   limitDuration={limitDuration}
-                                   validTypes={validTypes}
-                                   setValidatingKeyword={setValidatingKeyword} />
-                  </Col>
-                </Row>
-
-                <Row className="row-sm">
-                  <Col md={6}>
-                    <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
-                  </Col>
-                  <Col md={6}>
-                    <ModalSubmit leftCol={noOverride && <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>}
-                                 onCancel={handleCancel}
-                                 disabledSubmit={!isValid || validatingKeyword}
-                                 submitButtonText="Update time range" />
-                  </Col>
-                </Row>
-              </Form>
-            </KeyCapture>
-          );
-        })}
+              <Row className="row-sm">
+                <Col md={6}>
+                  <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
+                </Col>
+                <Col md={6}>
+                  <ModalSubmit leftCol={noOverride && <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>}
+                               onCancel={handleCancel}
+                               disabledSubmit={!isValid || validatingKeyword}
+                               submitButtonText="Update time range" />
+                </Col>
+              </Row>
+            </Form>
+          </KeyCapture>
+        ))}
       </Formik>
     </StyledPopover>
   );

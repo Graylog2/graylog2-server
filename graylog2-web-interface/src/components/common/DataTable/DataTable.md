@@ -1,4 +1,6 @@
 ```js
+import DataTable from './DataTable';
+
 const entities = [
     {
       id: '1',
@@ -46,6 +48,8 @@ const rowFormatter = (entity, idx) => {
 `DataTable` with `sortBy` function:
 
 ```js
+import DataTable from './DataTable';
+
 const entities = [
     {
       id: '1',

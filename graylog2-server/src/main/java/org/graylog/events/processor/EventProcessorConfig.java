@@ -26,6 +26,7 @@ import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.plugin.rest.ValidationResult;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -53,6 +54,19 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
     @JsonIgnore
     default Optional<EventProcessorSchedulerConfig> toJobSchedulerConfig(EventDefinition eventDefinition, JobSchedulerClock clock) {
         return Optional.empty();
+    }
+
+    /**
+     * Validates the event processor configuration.
+     *
+     * @param oldEventProcessorConfig      the old event config if exists
+     * @param eventDefinitionConfiguration the event definition configuration
+     * @return the validation result
+     */
+    @JsonIgnore
+    default ValidationResult validate(@Nullable EventProcessorConfig oldEventProcessorConfig,
+                                      EventDefinitionConfiguration eventDefinitionConfiguration) {
+        return new ValidationResult();
     }
 
     /**

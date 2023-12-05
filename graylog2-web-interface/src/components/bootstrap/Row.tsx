@@ -25,7 +25,8 @@ export const RowContentStyles = css(({ theme }) => css`
   border-radius: 4px;
 `);
 
-const Row = styled(BootstrapRow)`
+type RowProps = React.ComponentProps<typeof BootstrapRow>;
+const Row: React.ComponentType<RowProps> = styled(BootstrapRow)`
   &.content {
     ${RowContentStyles}
   }

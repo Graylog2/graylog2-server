@@ -21,10 +21,34 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 import styles from './FieldsList.css';
 
 const HEADERS = ['Field Name', 'Is Key?', 'Value Source', 'Data Type', 'Configuration', 'Actions'];
+
+const getFieldValueProviderPlugin = (type) => {
+  if (type === undefined) {
+    return {};
+  }
+
+  return PluginStore.exports('fieldValueProviders').find((p) => p.type === type) || {};
+};
+
+const providerFormatter = (config) => {
+  const configKeys = Object.keys(config).filter((key) => key !== 'type');
+
+  return (
+    <p>
+      {configKeys.map((key) => (
+        <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
+      ))}
+    </p>
+  );
+};
 
 class FieldsList extends React.Component {
   static propTypes = {
@@ -33,17 +57,17 @@ class FieldsList extends React.Component {
     onAddFieldClick: PropTypes.func.isRequired,
     onEditFieldClick: PropTypes.func.isRequired,
     onRemoveFieldClick: PropTypes.func.isRequired,
-  };
-
-  getFieldValueProviderPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-
-    return PluginStore.exports('fieldValueProviders').find((p) => p.type === type) || {};
+    sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   };
 
   handleAddFieldClick = () => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.ADD_CUSTOM_FIELD_CLICKED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-fields',
+      app_action_value: 'add-custom-field-button',
+    });
+
     const { onAddFieldClick } = this.props;
 
     onAddFieldClick();
@@ -61,24 +85,12 @@ class FieldsList extends React.Component {
     onRemoveFieldClick(fieldName);
   };
 
-  providerFormatter = (config) => {
-    const configKeys = Object.keys(config).filter((key) => key !== 'type');
-
-    return (
-      <p>
-        {configKeys.map((key) => (
-          <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
-        ))}
-      </p>
-    );
-  };
-
   fieldFormatter = (fieldName) => {
     const { fields, keys } = this.props;
     const config = fields[fieldName];
 
     const keyIndex = keys.indexOf(fieldName);
-    const fieldProviderPlugin = this.getFieldValueProviderPlugin(config.providers[0].type);
+    const fieldProviderPlugin = getFieldValueProviderPlugin(config.providers[0].type);
 
     return (
       <tr key={fieldName}>
@@ -86,7 +98,7 @@ class FieldsList extends React.Component {
         <td>{keyIndex < 0 ? 'No' : 'Yes'}</td>
         <td>{fieldProviderPlugin.displayName || config.providers[0].type}</td>
         <td>{config.data_type}</td>
-        <td>{this.providerFormatter(config.providers[0])}</td>
+        <td>{providerFormatter(config.providers[0])}</td>
         <td className={styles.actions}>
           <ButtonToolbar>
             <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
@@ -107,7 +119,7 @@ class FieldsList extends React.Component {
     const fieldNames = Object.keys(fields).sort(naturalSort);
     const addCustomFieldButton = (
       <Button bsStyle="success" onClick={this.handleAddFieldClick}>
-        Add Custom Field
+        Add custom field
       </Button>
     );
 
@@ -136,4 +148,4 @@ class FieldsList extends React.Component {
   }
 }
 
-export default FieldsList;
+export default withLocation(withTelemetry(FieldsList));

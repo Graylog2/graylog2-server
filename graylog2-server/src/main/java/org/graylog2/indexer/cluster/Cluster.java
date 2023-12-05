@@ -123,8 +123,17 @@ public class Cluster {
      */
     public boolean isHealthy() {
         return health()
-                .map(health -> !health.equals(HealthStatus.Red) && indexSetRegistry.isUp())
+                .map(health -> !health.equals(HealthStatus.Red) && indexSetRegistryIsUp())
                 .orElse(false);
+    }
+
+    /**
+     * Check if the index registry is up. For logging purposes.
+     *
+     * @return true, if it's up
+     */
+    public boolean indexSetRegistryIsUp() {
+        return indexSetRegistry.isUp();
     }
 
     /**
@@ -135,7 +144,7 @@ public class Cluster {
      */
     public boolean isDeflectorHealthy() {
         return deflectorHealth()
-                .map(health -> !health.equals(HealthStatus.Red) && indexSetRegistry.isUp())
+                .map(health -> !health.equals(HealthStatus.Red) &&indexSetRegistryIsUp())
                 .orElse(false);
     }
 

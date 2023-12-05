@@ -56,6 +56,7 @@ import type { WidgetMapping } from 'views/logic/views/types';
 import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
+import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -188,12 +189,14 @@ interface ExportFormat {
   fileExtension: string;
 }
 
+export interface SystemConfigurationComponentProps {
+  config: any,
+  updateConfig: (newConfig: any) => any,
+}
+
 export interface SystemConfiguration {
   configType: string;
-  component: React.ComponentType<{
-    config: any,
-    updateConfig: (newConfig: any) => any,
-  }>;
+  component: React.ComponentType<SystemConfigurationComponentProps>;
 }
 
 export type SearchTypeResult = {
@@ -263,6 +266,7 @@ type DashboardActionModalProps = {
 
 type AssetInformationComponentProps = {
   identifiers: unknown,
+  addToQuery: (id: string) => void;
 }
 
 type DashboardAction = {
@@ -377,6 +381,10 @@ export interface RootState {
   undoRedo: UndoRedoState
 }
 
+export interface ExtraArguments {
+  searchExecutors: SearchExecutors;
+}
+
 export type GetState = () => RootState;
 
 export type ViewsReducer = {
@@ -446,19 +454,5 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
-  }
-}
-export interface ViewActions {
-  save: {
-    isShown: boolean,
-  };
-  saveAs: {
-    isShown: boolean,
-  };
-  share: {
-    isShown: boolean,
-  }
-  actionsDropdown: {
-    isShown: boolean,
   }
 }

@@ -34,7 +34,10 @@ import debounceWithPromise from 'views/logic/debounceWithPromise';
 import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -161,7 +164,7 @@ const UserCreate = () => {
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
   const history = useHistory();
-
+  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
@@ -195,8 +198,8 @@ const UserCreate = () => {
   const onSubmit = (data) => {
     _onSubmit(history, data, user.roles, setSubmitError);
 
-    sendTelemetry('form_submit', {
-      app_pathname: 'users',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_CREATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'user-create-form',
     });
   };
@@ -259,7 +262,8 @@ const UserCreate = () => {
                                      key={role.id} />
                     ))}
                     {!hasValidRole && (
-                      <Alert bsStyle="danger">You need to select at least one of
+                      <Alert bsStyle="danger">
+                        You need to select at least one of
                         the <em>Reader</em> or <em>Admin</em> roles.
                       </Alert>
                     )}
@@ -273,8 +277,7 @@ const UserCreate = () => {
               {submitError && (
                 <Row>
                   <Col xs={9} xsOffset={3}>
-                    <Alert bsStyle="danger">
-                      <b>Failed to create user</b><br />
+                    <Alert bsStyle="danger" title="Failed to create user">
                       {showSubmitError(submitError)}
                     </Alert>
                   </Col>

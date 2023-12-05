@@ -31,7 +31,7 @@ type Props = {
   toggleModal: () => void,
   isCreateNew: boolean,
   value: string,
-  target: Button | undefined | null,
+  target: typeof Button | undefined | null,
 };
 
 const StyledForm = styled.form`
@@ -53,7 +53,7 @@ const SavedSearchForm = (props: Props) => {
     target,
   } = props;
   const [title, setTitle] = useState(value);
-  const onChangeTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value), []);
+  const onChangeTitle = useCallback((e: React.FormEvent<unknown>) => setTitle((e.target as HTMLInputElement).value), []);
 
   const trimmedTitle = (title ?? '').trim();
   const disableSaveAs = trimmedTitle === '' || (!isCreateNew && trimmedTitle === value);
@@ -67,9 +67,7 @@ const SavedSearchForm = (props: Props) => {
       <Position placement="left"
                 target={target}>
         <Popover title="Name of search"
-                 id="saved-search-popover"
-                 data-app-section="saved_search_form"
-                 data-event-element="Name of search">
+                 id="saved-search-popover">
           <StyledForm onSubmit={stopEvent}>
             <FormGroup>
               <ControlLabel htmlFor="title">Title</ControlLabel>
@@ -79,7 +77,8 @@ const SavedSearchForm = (props: Props) => {
                            placeholder="Enter title"
                            onChange={onChangeTitle} />
             </FormGroup>
-            {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component && <Component key={id} disabledViewCreation={disableSaveAs} />))}
+            {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component
+              && <Component key={id} disabledViewCreation={disableSaveAs} />))}
             <ButtonToolbar>
               {!isCreateNew && (
                 <Button bsStyle="primary"

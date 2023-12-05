@@ -52,6 +52,10 @@ public interface StreamService extends PersistedService {
 
     List<Stream> loadAllEnabled();
 
+    default List<Stream> loadAllByTitle(String title) {
+        return loadAll().stream().filter(s -> title.equals(s.getTitle())).toList();
+    }
+
     /**
      * @return the total number of streams
      */
@@ -70,6 +74,8 @@ public interface StreamService extends PersistedService {
     void removeOutputFromAllStreams(Output output);
 
     List<Stream> loadAllWithIndexSet(String indexSetId);
+
+    List<String> streamTitlesForIndexSet(String indexSetId);
 
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
 }

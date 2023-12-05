@@ -64,10 +64,6 @@ public class ConditionParserTest {
                         integer("optional").optional().build()
                 ), Boolean.class
         ));
-//        functions.put(FRAGMENT1_NAME, FunctionUtil.testCondition(
-//                FRAGMENT1_NAME, "hasField(\"{field}\")",
-//                ImmutableList.of(string("field").build())
-//        ));
 
         RuleFragmentService ruleFragmentService = mock(RuleFragmentService.class);
         when(ruleFragmentService.all()).thenReturn(new ArrayList<>());
@@ -86,28 +82,28 @@ public class ConditionParserTest {
 
     @Test
     public void generateTrueValue_WhenRuleConditionsEmpty() {
-        assertThat(conditionParser.generate(new ArrayList<>())).isEqualTo("  true" + NL);
+        assertThat(conditionParser.generate(new ArrayList<>(), RuleBuilderStep.Operator.AND, 1)).isEqualTo("  true");
     }
 
     @Test
     public void emptyString_WhenConditionNotInRuleBuilderConditions() {
         RuleBuilderStep step = RuleBuilderStep.builder().function("unknownFunction").build();
-        assertThat(conditionParser.generateCondition(step)).isEqualTo("");
+        assertThat(conditionParser.generateCondition(step, 1)).isEqualTo("");
     }
 
     @Test
     public void singleConditionWithoutParamsGeneration() {
         RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION2_NAME).build();
-        assertThat(conditionParser.generateCondition(step)).isEqualTo(
-                "  && function2()"
+        assertThat(conditionParser.generateCondition(step, 1)).isEqualTo(
+                "  function2()"
         );
     }
 
     @Test
     public void singleNegatedConditionWithoutParamsGeneration() {
         RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION2_NAME).negate().build();
-        assertThat(conditionParser.generateCondition(step)).isEqualTo(
-                "  && ! function2()"
+        assertThat(conditionParser.generateCondition(step, 1)).isEqualTo(
+                "  ! function2()"
         );
     }
 
@@ -115,8 +111,8 @@ public class ConditionParserTest {
     public void singleConditionWithSingleParamGeneration() {
         RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION1_NAME)
                 .parameters(Map.of("required", "val1")).build();
-        assertThat(conditionParser.generateCondition(step)).isEqualTo(
-                "  && function1(" + NL + "    required : \"val1\"" + NL + "  )"
+        assertThat(conditionParser.generateCondition(step, 1)).isEqualTo(
+                "  function1(" + NL + "    required : \"val1\"" + NL + "  )"
         );
     }
 
@@ -124,8 +120,8 @@ public class ConditionParserTest {
     public void singleConditionWithMultipleParamsGeneration() {
         RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION1_NAME)
                 .parameters(Map.of("required", "val1", "optional", 1)).build();
-        assertThat(conditionParser.generateCondition(step)).isEqualTo(
-                "  && function1(" + NL +
+        assertThat(conditionParser.generateCondition(step, 1)).isEqualTo(
+                "  function1(" + NL +
                         "    required : \"val1\"," + NL +
                         "    optional : 1" + NL +
                         "  )"
@@ -137,9 +133,8 @@ public class ConditionParserTest {
         List<RuleBuilderStep> steps = List.of(
                 RuleBuilderStep.builder().function(FUNCTION2_NAME).build()
         );
-        assertThat(conditionParser.generate(steps)).isEqualTo("""
-                  true
-                  && function2()
+        assertThat(conditionParser.generate(steps, RuleBuilderStep.Operator.AND, 1)).isEqualTo("""
+                  function2()
                 """.stripTrailing());
     }
 
@@ -151,18 +146,13 @@ public class ConditionParserTest {
                         .build(),
                 RuleBuilderStep.builder().function(FUNCTION2_NAME).negate().build()
         );
-        assertThat(conditionParser.generate(steps)).isEqualTo("""
-                  true
-                  && function1(
+        assertThat(conditionParser.generate(steps, RuleBuilderStep.Operator.AND, 1)).isEqualTo("""
+                  function1(
                     required : "val1"
                   )
-                  && ! function2()
+                  AND
+                  ! function2()
                 """.stripTrailing());
-    }
-
-    @Test
-    public void generate_WhenRuleConditionsContainsOneFragment() {
-
     }
 
 

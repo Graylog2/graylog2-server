@@ -22,7 +22,6 @@ import styled from 'styled-components';
 import { Button } from 'components/bootstrap';
 import { FlatContentRow, Icon } from 'components/common';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
-import useHighlightValuesForEventDefinition from 'hooks/useHighlightValuesForEventDefinition';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 
@@ -56,7 +55,6 @@ const Value = styled.div`
 `;
 
 const EventInfoBar = () => {
-  useHighlightValuesForEventDefinition();
   const { isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
   const [open, setOpen] = useState<boolean>(true);
 

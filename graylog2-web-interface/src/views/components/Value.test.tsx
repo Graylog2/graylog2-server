@@ -21,10 +21,13 @@ import userEvent from '@testing-library/user-event';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import asMock from 'helpers/mocking/AsMock';
 
 import OriginalValue from './Value';
 import InteractiveContext from './contexts/InteractiveContext';
 
+jest.mock('views/hooks/useExternalValueActions');
 const Value = (props: React.ComponentProps<typeof OriginalValue>) => (
   <TestStoreProvider>
     <OriginalValue {...props} />
@@ -35,6 +38,14 @@ describe('Value', () => {
   const openActionsMenu = (value) => {
     userEvent.click(screen.getByText(value));
   };
+
+  beforeEach(() => {
+    asMock(useExternalValueActions).mockReturnValue({
+      isLoading: false,
+      externalValueActions: [],
+      isError: false,
+    });
+  });
 
   beforeAll(loadViewsPlugin);
 

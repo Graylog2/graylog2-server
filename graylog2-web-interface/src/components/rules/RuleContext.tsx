@@ -21,7 +21,11 @@ import type { RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import { getSavedRuleSourceCode, removeSavedRuleSourceCode } from 'hooks/useRuleBuilder';
 
+import { jsonifyText } from './rule-builder/helpers';
+
 let VALIDATE_TIMEOUT;
+
+export const DEFAULT_SIMULATOR_JSON_MESSAGE = 'message: test\nsource: unknown\n';
 
 export const PipelineRulesContext = createContext(undefined);
 
@@ -48,8 +52,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);
   const [description, setDescription] = useState(rule?.description);
-  const [startRuleSimulation, setStartRuleSimulation] = useState(false);
-  const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
+  const [rawMessageToSimulate, setRawMessageToSimulate] = useState(DEFAULT_SIMULATOR_JSON_MESSAGE);
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   useEffect(() => {
@@ -57,6 +60,10 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     setRuleSource(savedSourceCode || rule?.source);
     setDescription(rule?.description);
     removeSavedRuleSourceCode();
+
+    if (rule?.simulator_message) {
+      setRawMessageToSimulate(rule?.simulator_message);
+    }
   }, [rule]);
 
   const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
@@ -69,15 +76,17 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     const nextRule = {
       ...rule,
       source: ruleSourceRef?.current?.editor?.getSession().getValue(),
+      simulator_message: rawMessageToSimulate,
       description,
     };
 
     RulesActions.parse(nextRule, callback);
-  }, [rule, description]);
+  }, [rule, description, rawMessageToSimulate]);
 
-  const simulateRule = useCallback((messageString: string, _rule: RuleType, callback: () => void) => {
-    RulesActions.simulate(messageString, _rule, callback);
-  }, []);
+  const simulateRule = useCallback((_rule: RuleType, messageString: string = rawMessageToSimulate, callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult) => {
+    const messageToSimulate = jsonifyText(messageString);
+    RulesActions.simulate(messageToSimulate, _rule, callback);
+  }, [rawMessageToSimulate, setRuleSimulationResult]);
 
   useEffect(() => {
     if (ruleSourceRef?.current) {
@@ -90,6 +99,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       const savedRule = {
         ...rule,
         source: ruleSourceRef?.current?.editor?.getSession().getValue(),
+        simulator_message: rawMessageToSimulate,
         description,
       };
 
@@ -122,6 +132,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
         ...rule,
         description,
         source: ruleSource,
+        simulator_message: rawMessageToSimulate,
       },
       description,
       handleDescription: setDescription,
@@ -136,8 +147,6 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       setRawMessageToSimulate,
       ruleSimulationResult,
       setRuleSimulationResult,
-      startRuleSimulation,
-      setStartRuleSimulation,
     });
   }, [
     description,
@@ -149,7 +158,6 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     simulateRule,
     rawMessageToSimulate,
     ruleSimulationResult,
-    startRuleSimulation,
   ]);
 
   return (
@@ -167,6 +175,7 @@ PipelineRulesProvider.propTypes = {
     title: PropTypes.string,
     description: PropTypes.string,
     source: PropTypes.string,
+    simulator_message: PropTypes.string,
   }),
 };
 
@@ -175,5 +184,6 @@ PipelineRulesProvider.defaultProps = {
   rule: {
     description: '',
     source: '',
+    simulator_message: DEFAULT_SIMULATOR_JSON_MESSAGE,
   },
 };

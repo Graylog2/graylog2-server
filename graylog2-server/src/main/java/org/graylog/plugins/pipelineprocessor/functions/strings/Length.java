@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -35,7 +36,7 @@ public class Length extends AbstractFunction<Long> {
     private final ParameterDescriptor<Boolean, Boolean> bytesParam;
 
     public Length() {
-        valueParam = ParameterDescriptor.string(VALUE).description("The input string").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("The input string").build();
         bytesParam = ParameterDescriptor.bool(BYTES)
                 .description("If true, count the bytes of the UTF-8 string instead of the characters")
                 .optional().build();
@@ -58,6 +59,10 @@ public class Length extends AbstractFunction<Long> {
                 .returnType(Long.class)
                 .params(ImmutableList.of(valueParam, bytesParam))
                 .description("Counts the characters or bytes in a string")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Length of string")
+                .ruleBuilderTitle("Count the characters of '${value}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class FlexParseDate extends TimezoneAwareFunction {
     private final ParameterDescriptor<DateTime, DateTime> defaultParam;
 
     public FlexParseDate() {
-        valueParam = ParameterDescriptor.string(VALUE).description("Date string to parse").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("Date string to parse").build();
         defaultParam = ParameterDescriptor.type(DEFAULT, DateTime.class).optional().description("Used when 'value' could not be parsed, 'null' otherwise").build();
     }
 
@@ -73,5 +74,17 @@ public class FlexParseDate extends TimezoneAwareFunction {
                 valueParam,
                 defaultParam
         );
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Parse date (flex)";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Flex parse '${value}' into a DateTime";
     }
 }

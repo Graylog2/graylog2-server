@@ -24,9 +24,11 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
 import java.util.Locale;
 
 public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
@@ -61,10 +63,14 @@ public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
                 .name(getName())
                 .returnType(DateTime.class)
                 .params(ImmutableList.<ParameterDescriptor>builder()
-                                .addAll(params())
-                                .add(timeZoneParam)
-                                .build())
+                        .addAll(params())
+                        .add(timeZoneParam)
+                        .build())
                 .description(description())
+                .ruleBuilderEnabled()
+                .ruleBuilderName(getRuleBuilderName())
+                .ruleBuilderTitle(getRuleBuilderTitle())
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)
                 .build();
     }
 
@@ -73,4 +79,10 @@ public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
     protected abstract String getName();
 
     protected abstract ImmutableList<ParameterDescriptor> params();
+
+    @Nonnull
+    protected abstract String getRuleBuilderName();
+
+    @Nonnull
+    protected abstract String getRuleBuilderTitle();
 }

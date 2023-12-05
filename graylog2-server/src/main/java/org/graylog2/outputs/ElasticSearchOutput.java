@@ -19,7 +19,8 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.IndexingResults;
+import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -35,8 +36,6 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -88,10 +87,10 @@ public class ElasticSearchOutput implements MessageOutput {
         throw new UnsupportedOperationException("Method not supported!");
     }
 
-    public Set<String> writeMessageEntries(List<Map.Entry<IndexSet, Message>> messageList) throws Exception {
+    public IndexingResults writeMessageEntries(List<MessageWithIndex> messageList) {
         if (LOG.isTraceEnabled()) {
             final String sortedIds = messageList.stream()
-                    .map(Map.Entry::getValue)
+                    .map(MessageWithIndex::message)
                     .map(Message::getId)
                     .sorted(Comparator.naturalOrder())
                     .collect(Collectors.joining(", "));
@@ -99,13 +98,13 @@ public class ElasticSearchOutput implements MessageOutput {
         }
 
         writes.mark(messageList.size());
-        final Set<String> failedMessageIds;
+        final IndexingResults indexingResults;
         try (final Timer.Context ignored = processTime.time()) {
-            failedMessageIds = messages.bulkIndex(messageList);
+            indexingResults = messages.bulkIndex(messageList);
         }
-        failures.mark(failedMessageIds.size());
+        failures.mark(indexingResults.errors().size());
 
-        return failedMessageIds;
+        return indexingResults;
     }
 
     @Override

@@ -28,9 +28,9 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-public class RootCertificateFinder {
+class RootCertificateFinder {
 
-    public X509Certificate findRootCert(Path keystorePath,
+    X509Certificate findRootCert(Path keystorePath,
                                         char[] password,
                                         final String alias) throws IOException, GeneralSecurityException {
         final KeyStore keystore = loadKeystore(keystorePath, password);

@@ -16,27 +16,39 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.conversion;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
 public class IsNumber extends AbstractFunction<Boolean> {
     public static final String NAME = "is_number";
 
     private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Boolean, Boolean> conversionParam;
 
     public IsNumber() {
-        valueParam = object("value").description("Value to check").build();
+        valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
+        conversionParam = bool("attemptConversion").optional().description("Try to convert value to long from its string representation (default: false)").build();
     }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         final Object value = valueParam.required(args, context);
-        return value instanceof Number;
+        final boolean convert = conversionParam.optional(args, context).orElse(false);
+        if (value instanceof Number) {
+            return true;
+        }
+        if (convert) {
+            return NumberUtils.isParsable(String.valueOf(value));
+        }
+        return false;
     }
 
     @Override
@@ -44,8 +56,12 @@ public class IsNumber extends AbstractFunction<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(valueParam)
+                .params(valueParam, conversionParam)
                 .description("Checks whether a value is a number")
+                .ruleBuilderEnabled(false)
+                .ruleBuilderName("Check if number")
+                .ruleBuilderTitle("Check if '${value}' is a number")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
                 .build();
     }
 }

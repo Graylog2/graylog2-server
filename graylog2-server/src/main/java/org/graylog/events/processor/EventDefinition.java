@@ -44,6 +44,9 @@ public interface EventDefinition {
     @Nullable
     DateTime updatedAt();
 
+    @Nullable
+    DateTime matchedAt();
+
     int priority();
 
     boolean alert();

@@ -25,17 +25,38 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootst
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
+  const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
+
+  const sendEvent = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_section: 'search-message-table',
+      app_action_value: 'seach-message-table-test-against-stream',
+    });
+  };
+
   const streamList = streams.map((stream) => {
     if (stream.is_default) {
-      return <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>;
+      return (
+        <MenuItem key={stream.id}
+                  onClick={() => sendEvent()}
+                  disabled
+                  title="Cannot test against the default stream">{stream.title}
+        </MenuItem>
+      );
     }
 
     return (
       <LinkContainer key={stream.id}
                      to={Routes.stream_edit_example(stream.id, index, id)}>
-        <MenuItem>{stream.title}</MenuItem>
+        <MenuItem onClick={() => sendEvent()}>{stream.title}</MenuItem>
       </LinkContainer>
     );
   });
@@ -45,7 +66,7 @@ const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string
                     bsSize="small"
                     title="Test against stream"
                     id="select-stream-dropdown">
-      {streamList || <MenuItem header>No streams available</MenuItem>}
+      {(streamList && !streamList.isEmpty()) ? streamList.toArray() : <MenuItem header>No streams available</MenuItem>}
     </DropdownButton>
   );
 };
@@ -85,7 +106,7 @@ const MessageActions = ({
   ), [id, index, pluggableMenuActions]);
 
   if (disabled) {
-    return <ButtonGroup bsSize="small" />;
+    return <ButtonGroup />;
   }
 
   const messageUrl = index ? Routes.message_show(index, id) : '#';
@@ -99,12 +120,13 @@ const MessageActions = ({
                              messageFields={remainingFields} />
   );
 
-  const showChanges = decorationStats && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
+  const showChanges = decorationStats
+    && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
 
   return (
-    <ButtonGroup bsSize="small">
+    <ButtonGroup>
       {showChanges}
-      <Button href={messageUrl}>Permalink</Button>
+      <Button bsSize="small" href={messageUrl}>Permalink</Button>
       {menuActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />

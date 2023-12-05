@@ -19,6 +19,7 @@ import * as Immutable from 'immutable';
 import isDeepEqual from 'stores/isDeepEqual';
 import generateId from 'logic/generateId';
 import type { FiltersType } from 'views/types';
+import type { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 
 import type { SearchType } from './SearchType';
 
@@ -121,7 +122,7 @@ export type KeywordTimeRange = {
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
-export type NoTimeRangeOverride = {};
+export type NoTimeRangeOverride = typeof NO_TIMERANGE_OVERRIDE;
 
 const isNullish = (o: any) => (o === null || o === undefined);
 

@@ -18,39 +18,48 @@
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState, ViewState } from 'views/types';
 import { selectRootUndoRedo, selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
-import { selectQuery, updateView } from 'views/logic/slices/viewSlice';
+import { isViewWidgetsEqualForSearch, selectQuery, updateView } from 'views/logic/slices/viewSlice';
 import { setCurrentRevision } from 'views/logic/slices/undoRedoSlice';
+import { selectRootView } from 'views/logic/slices/viewSelectors';
+import type View from 'views/logic/views/View';
+import isEqualForSearch from 'views/stores/isEqualForSearch';
+import type Search from 'views/logic/search/Search';
 
-const viewHandler = (state: ViewState, { hasToPushRevision, dispatch }: {
+const isViewSearchEqual = (first: Search, second: Search) => isEqualForSearch(first, second);
+const viewHandler = (state: ViewState, { hasToPushRevision, dispatch, currentView }: {
   hasToPushRevision: boolean,
-  dispatch: AppDispatch
-}): Promise<unknown> => dispatch(selectQuery(state.activeQuery)).then(() => dispatch(updateView(state.view, state.isDirty, { hasToPushRevision })));
+  dispatch: AppDispatch,
+  currentView: View,
+}): Promise<unknown> => dispatch(selectQuery(state.activeQuery)).then(() => {
+  const shouldRecreateSearch = !isViewWidgetsEqualForSearch(state.view, currentView) || !isViewSearchEqual(state.view.search, currentView.search);
+
+  return dispatch(updateView(state.view, shouldRecreateSearch, { hasToPushRevision }));
+});
 
 export const undo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const rootState = getState();
   const { revisions, currentRevision } = selectRootUndoRedo(rootState);
   const { isUndoAvailable } = selectUndoRedoAvailability(rootState);
-
+  const { view: currentView } = selectRootView(rootState);
   const hasToPushRevision = currentRevision === revisions.length;
 
   if (isUndoAvailable) {
     const newRevision = currentRevision - 1;
     const { state } = revisions[newRevision];
-
-    viewHandler(state, { hasToPushRevision, dispatch }).then(() => dispatch(setCurrentRevision(newRevision)));
+    viewHandler(state, { hasToPushRevision, dispatch, currentView }).then(() => dispatch(setCurrentRevision(newRevision)));
   }
 };
 
 export const redo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const rootState = getState();
   const { revisions, currentRevision } = selectRootUndoRedo(rootState);
+  const { view: currentView } = selectRootView(rootState);
   const { isRedoAvailable } = selectUndoRedoAvailability(rootState);
 
   if (isRedoAvailable) {
     const newRevision = currentRevision + 1;
 
     const { state } = revisions[newRevision];
-
-    viewHandler(state, { dispatch, hasToPushRevision: false }).then(() => dispatch(setCurrentRevision(newRevision)));
+    viewHandler(state, { dispatch, hasToPushRevision: false, currentView }).then(() => dispatch(setCurrentRevision(newRevision)));
   }
 };

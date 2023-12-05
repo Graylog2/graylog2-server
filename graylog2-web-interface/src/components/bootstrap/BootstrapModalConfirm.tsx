@@ -18,18 +18,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ModalSubmit from 'components/common/ModalSubmit';
-import StringUtils from 'util/StringUtils';
 
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
   showModal: boolean,
-  title: string|React.ReactNode,
+  title: string | React.ReactNode,
   confirmButtonText: string,
   cancelButtonDisabled: boolean,
   confirmButtonDisabled: boolean,
-  onConfirm: () => void,
+  onConfirm: (e: React.BaseSyntheticEvent) => void,
   onCancel: () => void,
   children: React.ReactNode,
 };
@@ -52,7 +51,6 @@ const BootstrapModalConfirm = ({
   <BootstrapModalWrapper showModal={showModal}
                          onHide={onCancel}
                          role="alertdialog"
-                         data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}
                          {...restProps}>
     <Modal.Header closeButton>
       <Modal.Title>{title}</Modal.Title>

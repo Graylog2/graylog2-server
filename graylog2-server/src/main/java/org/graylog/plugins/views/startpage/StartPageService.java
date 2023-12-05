@@ -69,7 +69,7 @@ public class StartPageService {
                 .stream()
                 .skip((long) (page - 1) * perPage)
                 .map(i -> startPageItemTitleRetriever
-                        .retrieveTitle(i.grn())
+                        .retrieveTitle(i.grn(), searchUser)
                         .map(title -> new LastOpened(i.grn(), title, i.timestamp()))
                 )
                 .flatMap(Optional::stream)
@@ -83,7 +83,7 @@ public class StartPageService {
         final var items = recentActivityService.findRecentActivitiesFor(searchUser, page, perPage);
         final var mapped = items.stream()
                 .map(i -> startPageItemTitleRetriever
-                        .retrieveTitle(i.itemGrn())
+                        .retrieveTitle(i.itemGrn(), searchUser)
                         .map(title -> new RecentActivity(i.id(),
                                 i.activityType(),
                                 i.itemGrn(),

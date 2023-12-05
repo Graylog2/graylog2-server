@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
 import java.util.Locale;
 
 public class Lowercase extends StringUtilsFunction {
@@ -42,5 +43,17 @@ public class Lowercase extends StringUtilsFunction {
     @Override
     protected String apply(String value, Locale locale) {
         return StringUtils.lowerCase(value, locale);
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Lowercase string";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Convert '${value}' to lower case";
     }
 }

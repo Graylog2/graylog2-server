@@ -27,6 +27,7 @@ import { saveRuleSourceCode } from 'hooks/useRuleBuilder';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RuleBuilderRule } from './types';
 
@@ -40,10 +41,11 @@ const SourceCodeContainer = styled.div`
 type Props = {
   show: boolean,
   onHide: () => void,
+  onNavigateAway: (rule: RuleBuilderRule) => void,
   rule: RuleBuilderRule,
 };
 
-const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
+const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props) => {
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -65,22 +67,23 @@ const ConvertToSourceCodeModal = ({ show, onHide, rule }: Props) => {
       <Modal.Footer>
         <Button type="button"
                 bsStyle="success"
-                onClick={() => {
-                  sendTelemetry('click', {
+                onClick={async () => {
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_NEW_RULE_FROM_CODE_CLICKED, {
                     app_pathname: getPathnameWithoutId(pathname),
                     app_section: 'convert-rule-builder-to-source-code-modal',
                     app_action_value: 'create-new-rule-from-code-button',
                   });
 
                   saveRuleSourceCode(rule.source || '');
-                  history.replace(Routes.SYSTEM.PIPELINES.RULE('new'));
+                  await onNavigateAway(rule);
+                  history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
                 }}>
           Create new Rule from Code
         </Button>
         <Button type="button"
                 bsStyle="info"
                 onClick={() => {
-                  sendTelemetry('click', {
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.COPY_CODE_AND_CLOSE_CLICKED, {
                     app_pathname: getPathnameWithoutId(pathname),
                     app_section: 'convert-rule-builder-to-source-code-modal',
                     app_action_value: 'copy-rule-code-and-close-button',

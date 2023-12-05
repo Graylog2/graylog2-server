@@ -186,7 +186,7 @@ class IndexSetPage extends React.Component<Props, State> {
       indicesInfo = (
         <span>
           <Alert bsStyle="success" style={{ marginTop: '10' }}>
-            <Icon name="th" /> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
+            {this._totalIndexCount()} indices with a total of{' '}
             {numeral(indexerOverview.counts.events).format('0,0')} messages under management,
             current write-active index is <i>{deflectorInfo.current_target}</i>.
           </Alert>
@@ -199,9 +199,7 @@ class IndexSetPage extends React.Component<Props, State> {
       indicesOverview = (
         <IndicesOverview indices={indexerOverview.indices}
                          indexDetails={indexDetailsIndices}
-                         indexSetId={indexSetId}
-                         closedIndices={indexDetailsClosedIndices}
-                         deflector={indexerOverview.deflector} />
+                         indexSetId={indexSetId} />
       );
     } else {
       indicesInfo = <Spinner />;

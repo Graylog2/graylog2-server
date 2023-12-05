@@ -19,16 +19,19 @@ package org.graylog.storage.opensearch2;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpRequestInterceptor;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog2.configuration.IndexerHosts;
-import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.Sniffer;
+import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
+import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -40,11 +43,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
+    private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
     private final Supplier<RestHighLevelClient> clientSupplier;
+    private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
 
     @SuppressWarnings("unused")
     @Inject
@@ -64,7 +68,13 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteOpenSearchDeprecationWarnings,
-            CredentialsProvider credentialsProvider) {
+            CredentialsProvider credentialsProvider,
+            TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
+            @RunsWithDataNode Boolean runsWithDataNode,
+            @Named("indexer_use_jwt_authentication") boolean indexerUseJwtAuthentication,
+            IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
+
+        this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
 
         clientSupplier = Suppliers.memoize(() -> {
             final RestHighLevelClient client = buildClient(hosts,
@@ -74,7 +84,9 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     maxTotalConnectionsPerRoute,
                     useExpectContinue,
                     muteOpenSearchDeprecationWarnings,
-                credentialsProvider);
+                credentialsProvider,
+                    runsWithDataNode || indexerUseJwtAuthentication,
+                    indexerJwtAuthTokenProvider);
 
             var sniffer = SnifferWrapper.create(
                     client.getLowLevelClient(),
@@ -117,24 +129,40 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             int maxTotalConnectionsPerRoute,
             boolean useExpectContinue,
             boolean muteElasticsearchDeprecationWarnings,
-            CredentialsProvider credentialsProvider) {
+            CredentialsProvider credentialsProvider,
+            boolean isJwtAuthentication,
+            final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
-
         final RestClientBuilder restClientBuilder = RestClient.builder(esHosts)
-                .setRequestConfigCallback(requestConfig -> requestConfig
-                        .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
-                        .setSocketTimeout(Math.toIntExact(socketTimeout.toMilliseconds()))
-                        .setExpectContinueEnabled(useExpectContinue)
-                        .setAuthenticationEnabled(true)
+                .setRequestConfigCallback(requestConfig -> {
+                            requestConfig
+                                    .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
+                                    .setSocketTimeout(Math.toIntExact(socketTimeout.toMilliseconds()))
+                                    .setExpectContinueEnabled(useExpectContinue);
+                            // manually handle Auth if we use JWT
+                            if (!isJwtAuthentication) {
+                                requestConfig.setAuthenticationEnabled(true);
+                            }
+                            return requestConfig;
+                        }
                 )
                 .setHttpClientConfigCallback(httpClientConfig -> {
                     httpClientConfig
                         .setMaxConnTotal(maxTotalConnections)
-                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute)
-                        .setDefaultCredentialsProvider(credentialsProvider);
+                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
+
+                    if(isJwtAuthentication) {
+                        httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", indexerJwtAuthTokenProvider.get()));
+                    } else {
+                        httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
+                    }
 
                     if(muteElasticsearchDeprecationWarnings) {
                         httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
+                    }
+
+                    if(hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
+                        httpClientConfig.setSSLContext(trustManagerAndSocketFactoryProvider.getSslContext());
                     }
 
                     return httpClientConfig;

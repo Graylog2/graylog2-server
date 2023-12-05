@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef, useMemo } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
@@ -47,9 +47,11 @@ import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
+import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
+import SaveViewButton from 'views/components/searchbar/SaveViewButton';
+import useHotkey from 'hooks/useHotkey';
 
 import SavedSearchForm from './SavedSearchForm';
-import SavedSearchesModal from './SavedSearchesModal';
 
 const Container = styled(ButtonGroup)`
   display: flex;
@@ -67,7 +69,6 @@ const _extractErrorMessage = (error: FetchError) => ((error
     && error.additional.body.message) ? error.additional.body.message : error);
 
 const SearchActionsMenu = () => {
-  const theme = useTheme();
   const dirty = useIsDirty();
   const view = useView();
   const isNew = useIsNew();
@@ -86,7 +87,6 @@ const SearchActionsMenu = () => {
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
 
   const loaded = isNew === false;
-  const savedSearchColor = dirty ? theme.colors.variant.dark.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
@@ -94,11 +94,12 @@ const SearchActionsMenu = () => {
   const history = useHistory();
 
   const toggleFormModal = useCallback(() => setShowForm((cur) => !cur), []);
+  const closeFormModal = useCallback(() => setShowForm(false), []);
+  const openFormModal = useCallback(() => setShowForm(true), []);
   const toggleListModal = useCallback(() => setShowList((cur) => !cur), []);
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
-
   const pluggableSearchActions = usePluginEntities('views.components.searchActions');
   const searchActions = useMemo(() => pluggableSearchActions.map(
     ({ component: PluggableSearchAction, key }) => (
@@ -117,9 +118,9 @@ const SearchActionsMenu = () => {
       .build();
 
     await dispatch(onSaveView(newView));
-    toggleFormModal();
+    closeFormModal();
     await dispatch(loadView(newView));
-  }, [dispatch, toggleFormModal, view]);
+  }, [closeFormModal, dispatch, view]);
 
   const saveAsSearch = useCallback(async (newTitle: string) => {
     if (!newTitle || newTitle === '') {
@@ -162,11 +163,24 @@ const SearchActionsMenu = () => {
     loadAsDashboard(history, view);
   }, [history, view]);
 
+  useHotkey({
+    actionKey: 'save',
+    callback: () => (loaded ? saveSearch(title) : openFormModal()),
+    scope: 'search',
+    dependencies: [loaded, saveSearch, title],
+  });
+
+  useHotkey({
+    actionKey: 'save-as',
+    callback: () => openFormModal(),
+    scope: 'search',
+  });
+
   return (
     <Container aria-label="Search Meta Buttons">
-      <Button title={title} ref={formTarget} onClick={toggleFormModal}>
-        <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="floppy-disk" type={loaded ? 'solid' : 'regular'} /> Save
-      </Button>
+      <SaveViewButton title={title}
+                      ref={formTarget}
+                      onClick={toggleFormModal} />
       {showForm && (
         <SavedSearchForm target={formTarget.current}
                          saveSearch={saveSearch}

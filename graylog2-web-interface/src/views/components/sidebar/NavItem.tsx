@@ -29,6 +29,7 @@ export type NavItemProps = {
   showTitleOnHover?: boolean,
   sidebarIsPinned: boolean,
   disabled?: boolean,
+  ariaLabel: string,
 };
 
 type ContainerProps = {
@@ -37,7 +38,7 @@ type ContainerProps = {
   $disabled: boolean,
 };
 
-const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSelected, $sidebarIsPinned, $disabled }) => css`
+const Container = styled.button<ContainerProps>(({ theme: { colors, fonts }, $isSelected, $sidebarIsPinned, $disabled }) => css`
   position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
@@ -47,6 +48,8 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSel
   font-size: ${fonts.size.h3};
   color: ${colors.variant.darkest.default};
   background: ${$isSelected ? colors.gray[90] : colors.global.contentBackground};
+  border: 0;
+  padding: 0;
 
   &:hover {
     color: ${$isSelected ? colors.variant.darkest.default : colors.variant.darker.default};
@@ -78,7 +81,7 @@ const Container = styled.div<ContainerProps>(({ theme: { colors, fonts }, $isSel
       transform: skewY(45deg);
       bottom: calc(50% - 12px);
     }
-  `}
+`}
   /* stylelint-enable selector-max-empty-lines, indentation */
 `);
 
@@ -128,7 +131,7 @@ const Title = styled.div(({ theme: { colors, fonts } }) => css`
   padding: 0 10px;
   left: 100%;
   top: calc(50% - 13px);
-  height: 25px;
+  height: 26px;
   background-color: ${colors.variant.lightest.info};
   border: 1px solid ${colors.variant.light.info};
   border-left: none;
@@ -145,8 +148,8 @@ const Title = styled.div(({ theme: { colors, fonts } }) => css`
   }
 `);
 
-const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned, disabled }: NavItemProps) => (
-  <Container aria-label={title}
+const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned, disabled, ariaLabel }: NavItemProps) => (
+  <Container aria-label={ariaLabel}
              $isSelected={isSelected}
              onClick={!disabled ? onClick : undefined}
              title={showTitleOnHover ? '' : title}

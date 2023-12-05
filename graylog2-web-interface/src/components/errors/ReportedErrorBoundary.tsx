@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 
+import useLocation from 'routing/useLocation';
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import type { ReportedError } from 'logic/errors/ReportedErrors';
@@ -29,7 +29,7 @@ import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
 
 const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => (
   <ErrorPage title="Something went wrong"
-             description={<p>An unkown error has occured. Please have a look at the following message and the graylog server log for more information.</p>}>
+             description={<p>An unknown error has occurred. Please have a look at the following message and the graylog server log for more information.</p>}>
     <pre>
       {JSON.stringify(reportedError)}
     </pre>
@@ -82,6 +82,7 @@ const ReportedErrorBoundary = ({ children }: Props) => {
     return <ReportedErrorPage reportedError={reportedError} />;
   }
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 };
 

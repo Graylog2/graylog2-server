@@ -61,7 +61,7 @@ public class ActionParserTest {
         functions.put(FUNCTION2_NAME, FunctionUtil.testFunction(
                 FUNCTION2_NAME, ImmutableList.of(
                         integer("optional").optional().build()
-                ), Boolean.class
+                ), Integer.class
         ));
         functions.put(FUNCTION3_NAME, FunctionUtil.testFunction(
                 FUNCTION3_NAME, ImmutableList.of(
@@ -95,13 +95,13 @@ public class ActionParserTest {
     @Test
     public void emptyString_WhenActionNotInRuleBuilderActions() {
         RuleBuilderStep step = RuleBuilderStep.builder().function("unknownFunction").build();
-        assertThat(actionParser.generateAction(step, false)).isEqualTo("");
+        assertThat(actionParser.generateAction(step, false, 0)).isEqualTo("");
     }
 
     @Test
     public void singleActionWithoutParamsGeneration() {
         RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION2_NAME).build();
-        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+        assertThat(actionParser.generateAction(step, false, 0)).isEqualTo(
                 "  function2();"
         );
     }
@@ -109,7 +109,7 @@ public class ActionParserTest {
     @Test
     public void singleNegatedActionWithoutParamsGeneration() {
         RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION2_NAME).negate().build();
-        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+        assertThat(actionParser.generateAction(step, false, 0)).isEqualTo(
                 "  ! function2();"
         );
     }
@@ -120,7 +120,7 @@ public class ActionParserTest {
                 .function(FUNCTION2_NAME)
                 .outputvariable("outvar")
                 .build();
-        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+        assertThat(actionParser.generateAction(step, false, 0)).isEqualTo(
                 "  let outvar = function2();"
         );
     }
@@ -129,7 +129,7 @@ public class ActionParserTest {
     public void singleActionWithSingleParamGeneration() {
         RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION1_NAME)
                 .parameters(Map.of("required", "val1")).build();
-        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+        assertThat(actionParser.generateAction(step, false, 0)).isEqualTo(
                 "  function1(" + NL + "    required : \"val1\"" + NL + "  );"
         );
     }
@@ -139,7 +139,7 @@ public class ActionParserTest {
         RuleBuilderStep step = RuleBuilderStep.builder().function(FUNCTION1_NAME)
                 .parameters(Map.of("required", "val1", "optional", 1))
                 .outputvariable("outvar").build();
-        assertThat(actionParser.generateAction(step, false)).isEqualTo(
+        assertThat(actionParser.generateAction(step, false, 0)).isEqualTo(
                 "  let outvar = function1(" + NL +
                         "    required : \"val1\"," + NL +
                         "    optional : 1" + NL +

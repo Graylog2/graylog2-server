@@ -17,27 +17,23 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type { SyntheticEvent } from 'react';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import defer from 'lodash/defer';
+import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from '@graylog/sawmill';
 
-import ThemePropTypes from 'preflight/theme/types';
 import { Icon } from 'preflight/components/common';
-import {
-  THEME_MODE_LIGHT,
-  THEME_MODE_DARK,
-} from 'theme/constants';
-
-type Props = {
-  theme: DefaultTheme,
-};
 
 const ThemeModeToggleWrap = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(({ theme, $currentMode }) => css`
+type ModeIconProps = {
+  $currentMode: boolean,
+  name: React.ComponentProps<typeof Icon>['name'],
+  spin: boolean
+};
+const ModeIcon: React.ComponentType<ModeIconProps> = styled(Icon)<{ $currentMode: boolean }>(({ theme, $currentMode }) => css`
   opacity: ${$currentMode ? '1' : '0.5'};
   color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
 `);
@@ -105,7 +101,8 @@ const Toggle = styled.label(({ theme }) => css`
   }
 `);
 
-const ThemeModeToggle = ({ theme }: Props) => {
+const ThemeModeToggle = () => {
+  const theme = useTheme();
   const currentMode = theme.mode;
   const [loadingTheme, setLoadingTheme] = useState(false);
 
@@ -119,35 +116,31 @@ const ThemeModeToggle = ({ theme }: Props) => {
     const { checked } = event.target as HTMLInputElement;
     event.persist();
     setLoadingTheme(true);
-    const newMode = checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
+    const newMode = checked ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
     defer(() => theme.changeMode(newMode));
   };
 
-  const loadingLightMode = currentMode === THEME_MODE_DARK && loadingTheme;
-  const loadingDarkMode = currentMode === THEME_MODE_LIGHT && loadingTheme;
+  const loadingLightMode = currentMode === COLOR_SCHEME_DARK && loadingTheme;
+  const loadingDarkMode = currentMode === COLOR_SCHEME_LIGHT && loadingTheme;
 
   return (
     <ThemeModeToggleWrap>
       <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'}
                 spin={loadingLightMode}
-                $currentMode={currentMode === THEME_MODE_LIGHT} />
+                $currentMode={currentMode === COLOR_SCHEME_LIGHT} />
       <Toggle>
-        <input value={THEME_MODE_DARK}
+        <input value={COLOR_SCHEME_DARK}
                type="checkbox"
                onChange={toggleThemeMode}
-               checked={currentMode === THEME_MODE_DARK}
+               checked={currentMode === COLOR_SCHEME_DARK}
                disabled={loadingLightMode || loadingDarkMode} />
         <span className="slider" />
       </Toggle>
       <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'}
                 spin={loadingDarkMode}
-                $currentMode={currentMode === THEME_MODE_DARK} />
+                $currentMode={currentMode === COLOR_SCHEME_DARK} />
     </ThemeModeToggleWrap>
   );
 };
 
-ThemeModeToggle.propTypes = {
-  theme: ThemePropTypes.isRequired,
-};
-
-export default withTheme(ThemeModeToggle);
+export default ThemeModeToggle;

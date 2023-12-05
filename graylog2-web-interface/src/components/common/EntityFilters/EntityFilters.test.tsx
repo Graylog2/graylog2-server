@@ -29,7 +29,6 @@ import EntityFilters from './EntityFilters';
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.useFakeTimers()
-  // @ts-expect-error
   .setSystemTime(mockedUnixTime);
 
 jest.mock('logic/generateId', () => jest.fn(() => 'filter-id'));
@@ -49,6 +48,23 @@ describe('<EntityFilters />', () => {
       filter_options: [
         { value: 'true', title: 'Paused' },
         { value: 'false', title: 'Running' },
+      ],
+    },
+    {
+      id: 'type',
+      title: 'Type',
+      type: 'STRING',
+      sortable: true,
+      filterable: true,
+      filter_options: [
+        {
+          value: 'string',
+          title: 'String (aggregatable)',
+        },
+        {
+          value: 'long',
+          title: 'Number',
+        },
       ],
     },
     {
@@ -140,6 +156,29 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ disabled: ['true'] })));
+    });
+
+    it('should prevent creating multiple filter for boolean value', async () => {
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ disabled: [{ title: 'Running', value: 'false' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(
+        <EntityFilters attributes={attributes}
+                       setUrlQueryFilters={() => {}}
+                       urlQueryFilters={OrderedMap({ disabled: ['false'] })} />,
+      );
+
+      await screen.findByTestId('disabled-filter-false');
+
+      userEvent.click(await screen.findByRole('button', {
+        name: /create filter/i,
+      }));
+
+      // eslint-disable-next-line testing-library/no-node-access
+      expect(screen.getByRole('menuitem', { name: /status/i }).closest('li')).toHaveClass('disabled');
     });
   });
 
@@ -309,6 +348,37 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['2019-12-31T23:55:00.001+00:00><'] })));
+    });
+  });
+
+  describe('string attribute', () => {
+    it('should prevent creating same filter multiple times', async () => {
+      const setUrlQueryFilters = jest.fn();
+
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ type: [{ title: 'String', value: 'string' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(
+        <EntityFilters attributes={attributes}
+                       setUrlQueryFilters={setUrlQueryFilters}
+                       urlQueryFilters={OrderedMap({ type: ['string'] })} />,
+      );
+
+      await screen.findByTestId('type-filter-string');
+
+      userEvent.click(await screen.findByRole('button', {
+        name: /create filter/i,
+      }));
+
+      userEvent.click(await screen.findByRole('menuitem', {
+        name: /type/i,
+      }));
+
+      // eslint-disable-next-line testing-library/no-node-access
+      expect(screen.getByRole('menuitem', { name: /string/i }).closest('li')).toHaveClass('disabled');
     });
   });
 

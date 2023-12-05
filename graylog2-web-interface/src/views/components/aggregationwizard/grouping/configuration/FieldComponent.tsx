@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import { useFormikContext } from 'formik';
 
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldsConfiguration from 'views/components/widgets/FieldsConfiguration';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
@@ -25,7 +26,7 @@ import Input from 'components/bootstrap/Input';
 import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import { DateType } from 'views/logic/aggregationbuilder/Pivot';
+import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 
 const placeholder = (grouping: GroupByFormValues) => {
   if (!grouping.fields?.length) {
@@ -61,6 +62,16 @@ const FieldComponent = ({ groupingIndex }: Props) => {
     });
   };
 
+  const isFieldQualified = useCallback((field: FieldTypeMapping) => {
+    if (!grouping.fields?.length) {
+      return true;
+    }
+
+    const fieldTypeCategory = field.type.type === 'date' ? DateType : ValuesType;
+
+    return grouping.type === fieldTypeCategory;
+  }, [grouping.fields?.length, grouping.type]);
+
   return (
     <Input id="group-by-field-select"
            label="Fields"
@@ -71,7 +82,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
                            selectedFields={grouping.fields}
                            menuPortalTarget={document.body}
                            createSelectPlaceholder={createSelectPlaceholder}
-                           qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
+                           isFieldQualified={isFieldQualified}
                            testPrefix={`grouping-${groupingIndex}`} />
     </Input>
   );

@@ -1,0 +1,4 @@
+type = "a"
+message = "Implement option to change order of search highlighting rules."
+
+pulls = ["16095"]

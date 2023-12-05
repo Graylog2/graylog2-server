@@ -177,7 +177,7 @@ public abstract class MessageListEntity implements SearchTypeEntity {
                 .decorators(decorators())
                 .timerange(timerange().orElse(null))
                 .filter(filter())
-                .filters(filters())
+                .filters(convertSearchFilters(filters()))
                 .name(name().orElse(null))
                 .type(type())
                 .query(query().orElse(null))

@@ -26,18 +26,18 @@ const { colors, utils } = useTheme();
 const { info, primary } = colors.variant;
 
 <>
-  <p>
+  <div style={{ marginBottom: '5px' }}>
     <ColorSwatch name='info -5' color={utils.colorLevel(info, -5)} />
     <ColorSwatch name='info' color={info} />
     <ColorSwatch name='info +5' color={utils.colorLevel(info, 5)} />
-  </p>
-  <p>
+  </div>
+  <div>
     <ColorSwatch name='primary -8' color={utils.colorLevel(primary, -8)} />
     <ColorSwatch name='primary -2' color={utils.colorLevel(primary, -2)} />
     <ColorSwatch name='primary' color={primary} />
     <ColorSwatch name='primary +2' color={utils.colorLevel(primary, 2)} />
     <ColorSwatch name='primary +8' color={utils.colorLevel(primary, 8)} />
-  </p>
+  </div>
 </>
 ```
 
@@ -60,23 +60,23 @@ const { info, primary } = colors.variant;
 const { textDefault } = colors.global;
 
 <>
-  <p>
+  <div style={{ marginBottom: '5px' }}>
     <ColorSwatch name='info AAA' color={utils.contrastingColor(info)} />
     <ColorSwatch name='info' color={info} />
     <ColorSwatch name='info AA' color={utils.contrastingColor(info, 'AA')} />
-  </p>
-  <p>
+  </div>
+  <div style={{ marginBottom: '5px' }}>
     <ColorSwatch name='textDefault AAALarge' color={utils.contrastingColor(textDefault, 'AAALarge')} />
     <ColorSwatch name='textDefault AAA' color={utils.contrastingColor(textDefault)} />
     <ColorSwatch name='textDefault' color={textDefault} />
     <ColorSwatch name='textDefault AALarge' color={utils.contrastingColor(textDefault, 'AALarge')} />
     <ColorSwatch name='textDefault AA' color={utils.contrastingColor(textDefault, 'AA')} />
-  </p>
-  <p>
+  </div>
+  <div>
     <ColorSwatch name='primary AAA' color={utils.contrastingColor(primary)} />
     <ColorSwatch name='primary' color={primary} />
     <ColorSwatch name='primary AA' color={utils.contrastingColor(primary, 'AA')} />
-  </p>
+  </div>
 </>
 ```
 
@@ -102,17 +102,17 @@ const { info, primary } = colors.variant;
 const { textDefault } = colors.global;
 
 <>
-  <p>
+  <div style={{ marginBottom: '5px' }}>
     <ColorSwatch name='info' color={info} />
     <ColorSwatch name='info readableColor' color={utils.readableColor(info)} />
-  </p>
-  <p>
+  </div>
+  <div style={{ marginBottom: '5px' }}>
     <ColorSwatch name='textDefault' color={textDefault} />
     <ColorSwatch name='textDefault readableColor' color={utils.readableColor(textDefault)} />
-  </p>
-  <p>
+  </div>
+  <div>
     <ColorSwatch name='primary' color={primary} />
     <ColorSwatch name='primary readableColor' color={utils.readableColor(primary)} />
-  </p>
+  </div>
 </>
 ```

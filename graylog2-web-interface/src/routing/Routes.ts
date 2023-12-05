@@ -71,6 +71,7 @@ const Routes = {
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
     CONFIGURATIONS: '/system/configurations',
+    configurationsSection: (section: string, pluginSection?: string) => `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
     CONTENTPACKS: {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
@@ -92,6 +93,7 @@ const Routes = {
         return `/system/index_sets/${indexSetId}/configuration`;
       },
       SHOW: (indexSetId: string) => `/system/index_sets/${indexSetId}`,
+      FIELD_TYPES: (indexSetId: string) => `/system/index_sets/${indexSetId}/field-types`,
       CREATE: '/system/index_sets/create',
     },
     INPUTS: '/system/inputs',
@@ -100,6 +102,9 @@ const Routes = {
     NODES: {
       LIST: '/system/nodes',
       SHOW: (nodeId: string) => `/system/nodes/${nodeId}`,
+    },
+    DATANODES: {
+      OVERVIEW: '/system/datanodes',
     },
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
@@ -183,6 +188,7 @@ const Routes = {
     VIEWID: (id: string) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
+  KEYBOARD_SHORTCUTS: '/keyboard-shortcuts',
   search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[]) => {
     const route = new URI(Routes.SEARCH);
     const queryParams: SearchQueryParams = {

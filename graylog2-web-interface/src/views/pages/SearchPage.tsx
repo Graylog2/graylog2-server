@@ -32,8 +32,8 @@ import useViewTitle from 'views/hooks/useViewTitle';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
-
-type SearchComponentSlots = { InfoBarSlot: React.ComponentType }
+import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
+import type { SearchExecutionResult } from 'views/types';
 
 type Props = React.PropsWithChildren<{
   isNew: boolean,
@@ -41,7 +41,7 @@ type Props = React.PropsWithChildren<{
   loadNewView?: (history: HistoryFunction) => unknown,
   loadView?: (history: HistoryFunction, viewId: string) => unknown,
   executionState?: SearchExecutionState,
-  SearchComponentSlots?: SearchComponentSlots
+  searchResult?: SearchExecutionResult,
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -54,7 +54,15 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewView = defaultLoadNewView, loadView: _loadView = defaultLoadView, executionState: initialExecutionState, SearchComponentSlots }: Props) => {
+const SearchPage = ({
+  children,
+  isNew,
+  view: viewPromise,
+  loadNewView: _loadNewView = defaultLoadNewView,
+  loadView: _loadView = defaultLoadView,
+  executionState: initialExecutionState,
+  searchResult,
+}: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
   const history = useHistory();
@@ -74,15 +82,17 @@ const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewV
 
   return view
     ? (
-      <PluggableStoreProvider view={view} executionState={executionState} isNew={isNew} initialQuery={initialQuery}>
+      <PluggableStoreProvider view={view} executionState={executionState} isNew={isNew} initialQuery={initialQuery} result={searchResult}>
         <SearchPageTitle>
           <DashboardPageContextProvider>
             <NewViewLoaderContext.Provider value={loadNewView}>
               <ViewLoaderContext.Provider value={loadView}>
-                {children}
-                <IfUserHasAccessToAnyStream>
-                  <Search InfoBarSlot={SearchComponentSlots.InfoBarSlot} />
-                </IfUserHasAccessToAnyStream>
+                <AutoRefreshProvider>
+                  {children}
+                  <IfUserHasAccessToAnyStream>
+                    <Search />
+                  </IfUserHasAccessToAnyStream>
+                </AutoRefreshProvider>
               </ViewLoaderContext.Provider>
             </NewViewLoaderContext.Provider>
           </DashboardPageContextProvider>
@@ -96,7 +106,7 @@ SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
   executionState: SearchExecutionState.empty(),
-  SearchComponentSlots: {},
+  searchResult: undefined,
 };
 
 export default React.memo(SearchPage);

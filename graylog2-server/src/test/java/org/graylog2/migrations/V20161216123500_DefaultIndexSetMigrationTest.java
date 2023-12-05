@@ -44,7 +44,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class V20161216123500_DefaultIndexSetMigrationTest {
@@ -167,6 +166,6 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
 
         verify(clusterConfigService).get(V20161216123500_Succeeded.class);
         verifyNoMoreInteractions(clusterConfigService);
-        verifyZeroInteractions(indexSetService);
+        verifyNoMoreInteractions(indexSetService);
     }
 }

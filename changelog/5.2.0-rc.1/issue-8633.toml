@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix wrong lookup cache metrics after reconfiguration."
+
+issues = ["8633"]
+pulls = [""]
+

@@ -33,7 +33,7 @@ enum JobStatus {
   Running = 'running',
 }
 
-const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
+const StatusBadge = styled(StyledBadge)<{ status: string }>(({ status, theme }) => {
   const {
     primary,
     success,
@@ -109,7 +109,9 @@ const SystemJob = ({ job }) => {
         <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
         - on <LinkToNode nodeId={job.node_id} />{' '}
         <RelativeTime dateTime={job.started_at} />{' '}
-        <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
+        <span data-toggle="tooltip" title={`runtime: ${job.execution_duration}`}>
+          <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
+        </span>
         {!jobIsOver && job.is_cancelable
           ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
           : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="x" /></AcknowledgeButton>)}
@@ -129,6 +131,7 @@ SystemJob.propTypes = {
     name: PropTypes.string,
     node_id: PropTypes.string,
     started_at: PropTypes.string,
+    execution_duration: PropTypes.string,
     job_status: PropTypes.oneOf(Object.values(JobStatus)),
   }).isRequired,
 };

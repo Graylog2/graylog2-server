@@ -28,27 +28,33 @@ import CustomizationProvider from 'contexts/CustomizationProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import AwsBindings from 'aws/bindings';
+import IntegrationsBindings from 'integrations/bindings';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import TelemetryInit from 'logic/telemetry/TelemetryInit';
 import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
+import PerspectivesBindings from 'components/perspectives/bindings';
+import NavigationBindings from 'components/navigation/bindings';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 PluginStore.register(new PluginManifest({}, ThreatIntelBindings));
 PluginStore.register(new PluginManifest({}, AwsBindings));
+PluginStore.register(new PluginManifest({}, IntegrationsBindings));
+PluginStore.register(new PluginManifest({}, PerspectivesBindings));
+PluginStore.register(new PluginManifest({}, NavigationBindings));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
     <CustomizationProvider>
       <TelemetryInit>
-        <GraylogThemeProvider>
-          <GlobalThemeStyles />
-          <LoginQueryClientProvider>
+        <LoginQueryClientProvider>
+          <GraylogThemeProvider>
+            <GlobalThemeStyles />
             <AppFacade />
-          </LoginQueryClientProvider>
-        </GraylogThemeProvider>
+          </GraylogThemeProvider>
+        </LoginQueryClientProvider>
       </TelemetryInit>
     </CustomizationProvider>,
     appContainer,

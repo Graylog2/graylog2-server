@@ -36,6 +36,12 @@ export const CatalogStore = singletonStore(
   () => Reflux.createStore({
     listenables: [CatalogActions],
 
+    getInitialState() {
+      return {
+        entityIndex: undefined,
+      };
+    },
+
     showEntityIndex() {
       const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.showEntityIndex().url);
       const promise = fetch('GET', url)

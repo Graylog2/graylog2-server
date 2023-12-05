@@ -47,6 +47,7 @@ export type UserJSON = {
   username: string;
   account_status: AccountStatus;
   service_account: boolean;
+  auth_service_enabled: boolean;
 };
 
 type InternalState = {
@@ -70,6 +71,7 @@ type InternalState = {
   lastActivity: string | null | undefined;
   accountStatus: AccountStatus;
   serviceAccount: boolean;
+  authServiceEnabled: boolean;
 };
 
 export default class User {
@@ -96,6 +98,7 @@ export default class User {
     accountStatus: $PropertyType<InternalState, 'accountStatus'>,
     serviceAccount: $PropertyType<InternalState, 'serviceAccount'>,
     grnPermissions: $PropertyType<InternalState, 'grnPermissions'>,
+    authServiceEnabled: $PropertyType<InternalState, 'authServiceEnabled'>,
   ) {
     this._value = {
       id,
@@ -118,6 +121,7 @@ export default class User {
       accountStatus,
       grnPermissions,
       serviceAccount,
+      authServiceEnabled,
     };
   }
 
@@ -241,6 +245,10 @@ export default class User {
     return this._value.lastActivity;
   }
 
+  get authServiceEnabled() {
+    return this._value.authServiceEnabled;
+  }
+
   toBuilder() {
     const {
       id,
@@ -263,6 +271,7 @@ export default class User {
       lastActivity,
       accountStatus,
       serviceAccount,
+      authServiceEnabled,
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -287,6 +296,7 @@ export default class User {
       lastActivity,
       accountStatus,
       serviceAccount,
+      authServiceEnabled,
     }));
   }
 
@@ -311,6 +321,7 @@ export default class User {
     accountStatus: $PropertyType<InternalState, 'accountStatus'>,
     serviceAccount: $PropertyType<InternalState, 'serviceAccount'>,
     grnPermissions: $PropertyType<InternalState, 'grnPermissions'>,
+    authServiceEnabled: $PropertyType<InternalState, 'authServiceEnabled'>,
   ) {
     return new User(
       id,
@@ -333,6 +344,7 @@ export default class User {
       accountStatus,
       serviceAccount,
       grnPermissions,
+      authServiceEnabled,
     );
   }
 
@@ -363,6 +375,7 @@ export default class User {
       lastActivity,
       accountStatus,
       serviceAccount,
+      authServiceEnabled,
     } = this._value;
 
     return {
@@ -386,6 +399,7 @@ export default class User {
       last_activity: lastActivity,
       account_status: accountStatus,
       service_account: serviceAccount,
+      auth_service_enabled: authServiceEnabled,
     };
   }
 
@@ -411,6 +425,7 @@ export default class User {
       last_activity,
       account_status,
       service_account,
+      auth_service_enabled,
     } = value;
 
     return User.create(
@@ -434,6 +449,7 @@ export default class User {
       account_status,
       service_account,
       Immutable.List(grn_permissions),
+      auth_service_enabled,
     );
   }
 
@@ -532,6 +548,10 @@ class Builder {
     return new Builder(this.value.set('serviceAccount', value));
   }
 
+  authServiceEnabled(value: $PropertyType<InternalState, 'authServiceEnabled'>) {
+    return new Builder(this.value.set('authServiceEnabled', value));
+  }
+
   build() {
     const {
       id,
@@ -554,6 +574,7 @@ class Builder {
       accountStatus,
       serviceAccount,
       grnPermissions,
+      authServiceEnabled,
     } = this.value.toObject();
 
     return new User(
@@ -577,6 +598,7 @@ class Builder {
       accountStatus,
       serviceAccount,
       grnPermissions,
+      authServiceEnabled,
     );
   }
 }

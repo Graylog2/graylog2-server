@@ -31,8 +31,12 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import withHistory from 'routing/withHistory';
 import type { HistoryFunction } from 'routing/useHistory';
 import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
-
-import type { RetentionStrategyContext } from './Types';
+import type {
+  RotationStrategyConfig,
+  RetentionStrategyConfig,
+  RetentionStrategyContext,
+} from 'components/indices/Types';
+import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 
 type Props = {
   cancelLink: string,
@@ -73,12 +77,12 @@ const _validateIndexPrefix = (value: string) => {
   return error;
 };
 
-const _getRotationConfigState = (strategy: string, data: string) => ({
+const _getRotationConfigState = (strategy: string, data: RotationStrategyConfig) => ({
   rotation_strategy_class: strategy,
   rotation_strategy: data,
 });
 
-const _getRetentionConfigState = (strategy: string, data: string) => ({
+const _getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig) => ({
   retention_strategy_class: strategy,
   retention_strategy: data,
 });
@@ -218,90 +222,94 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
           <Formik onSubmit={this._saveConfiguration}
                   initialValues={indexSet}>
             {({ isValid, setFieldValue, isSubmitting }) => (
-              <Form>
-                <Row>
-                  <Col md={12}>
-                    <FormikFormGroup type="text"
-                                     label="Title"
-                                     name="title"
-                                     help="Descriptive name of the index set."
-                                     required />
-                    <FormikFormGroup type="text"
-                                     label="Description"
-                                     name="description"
-                                     help="Add a description of this index set."
-                                     required />
-                    {readOnlyconfig}
-                    <HideOnCloud>
-                      <FormikFormGroup type="number"
-                                       label="Index shards"
-                                       name="shards"
-                                       help="Number of Elasticsearch shards used per index in this index set."
-                                       required />
-                      <FormikFormGroup type="number"
-                                       label="Index replicas"
-                                       name="replicas"
-                                       help="Number of Elasticsearch replicas used per index in this index set."
-                                       required />
-                      <FormikFormGroup type="number"
-                                       label="Max. number of segments"
-                                       name="index_optimization_max_num_segments"
-                                       minLength={1}
-                                       help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
-                                       required />
-                      <Input id="roles-selector-input"
-                             labelClassName="col-sm-3"
-                             wrapperClassName="col-sm-9"
-                             label="Index optimization after rotation">
-                        <FormikInput type="checkbox"
-                                     id="index_optimization_disabled"
-                                     label="Disable index optimization after rotation"
-                                     name="index_optimization_disabled"
-                                     help="Disable Elasticsearch index optimization (force merge) after rotation." />
-                      </Input>
-                    </HideOnCloud>
-                    <Field name="field_type_refresh_interval">
-                      {({ field: { name, value, onChange } }) => {
-                        const _onFieldTypeRefreshIntervalChange = (intervalValue: number, unit: Unit) => {
-                          onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
-                          setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
-                          this.setState({ fieldTypeRefreshIntervalUnit: unit });
-                        };
+              <IndexRetentionProvider>
 
-                        return (
-                          <Input id="roles-selector-input"
-                                 labelClassName="col-sm-3"
-                                 wrapperClassName="col-sm-9"
-                                 label="Field type refresh interval">
-                            <TimeUnitInput id="field-type-refresh-interval"
-                                           type="number"
-                                           help="How often the field type information for the active write index will be updated."
-                                           value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                                           unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
-                                           units={['SECONDS', 'MINUTES']}
-                                           required
-                                           update={_onFieldTypeRefreshIntervalChange} />
-                          </Input>
-                        );
-                      }}
-                    </Field>
-                  </Col>
-                </Row>
-                {indexSet.writable && rotationConfig}
-                {indexSet.writable && retentionConfig}
-                <Row>
-                  <Col md={9} mdOffset={3}>
-                    <StyledFormSubmit disabledSubmit={!isValid}
-                                      submitButtonText={submitButtonText}
-                                      submitLoadingText={submitLoadingText}
-                                      isSubmitting={isSubmitting}
-                                      isAsyncSubmit
-                                      displayCancel
-                                      onCancel={onCancel} />
-                  </Col>
-                </Row>
+                <Form>
+                  <Row>
+                    <Col md={12}>
+                      <FormikFormGroup type="text"
+                                       label="Title"
+                                       name="title"
+                                       help="Descriptive name of the index set."
+                                       required />
+                      <FormikFormGroup type="text"
+                                       label="Description"
+                                       name="description"
+                                       help="Add a description of this index set."
+                                       required />
+                      {readOnlyconfig}
+                      <HideOnCloud>
+                        <FormikFormGroup type="number"
+                                         label="Index shards"
+                                         name="shards"
+                                         help="Number of Elasticsearch shards used per index in this index set."
+                                         required />
+                        <FormikFormGroup type="number"
+                                         label="Index replicas"
+                                         name="replicas"
+                                         help="Number of Elasticsearch replicas used per index in this index set."
+                                         required />
+                        <FormikFormGroup type="number"
+                                         label="Max. number of segments"
+                                         name="index_optimization_max_num_segments"
+                                         minLength={1}
+                                         help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
+                                         required />
+                        <Input id="roles-selector-input"
+                               labelClassName="col-sm-3"
+                               wrapperClassName="col-sm-9"
+                               label="Index optimization after rotation">
+                          <FormikInput type="checkbox"
+                                       id="index_optimization_disabled"
+                                       label="Disable index optimization after rotation"
+                                       name="index_optimization_disabled"
+                                       help="Disable Elasticsearch index optimization (force merge) after rotation." />
+                        </Input>
+                        <Field name="field_type_refresh_interval">
+                          {({ field: { name, value, onChange } }) => {
+                            const _onFieldTypeRefreshIntervalChange = (intervalValue: number, unit: Unit) => {
+                              onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
+                              setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
+                              this.setState({ fieldTypeRefreshIntervalUnit: unit });
+                            };
 
-              </Form>
+                            return (
+                              <Input id="roles-selector-input"
+                                     labelClassName="col-sm-3"
+                                     wrapperClassName="col-sm-9"
+                                     label="Field type refresh interval">
+                                <TimeUnitInput id="field-type-refresh-interval"
+                                               type="number"
+                                               help="How often the field type information for the active write index will be updated."
+                                               value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                                               unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                                               units={['SECONDS', 'MINUTES']}
+                                               required
+                                               update={_onFieldTypeRefreshIntervalChange} />
+                              </Input>
+                            );
+                          }}
+                        </Field>
+                      </HideOnCloud>
+                    </Col>
+                  </Row>
+                  {indexSet.writable && rotationConfig}
+                  {indexSet.writable && retentionConfig}
+                  <Row>
+                    <Col md={9} mdOffset={3}>
+                      <StyledFormSubmit disabledSubmit={!isValid}
+                                        submitButtonText={submitButtonText}
+                                        submitLoadingText={submitLoadingText}
+                                        isSubmitting={isSubmitting}
+                                        isAsyncSubmit
+                                        displayCancel
+                                        onCancel={onCancel} />
+                    </Col>
+                  </Row>
+
+                </Form>
+              </IndexRetentionProvider>
+
             )}
           </Formik>
         </Col>

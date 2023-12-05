@@ -32,8 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserSummaryTest {
 
-    private GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
-    private ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private final UserSummary userSummary = UserSummary.create(
             "1234",
@@ -55,7 +55,8 @@ class UserSummaryTest {
             null,
             null,
             User.AccountStatus.ENABLED,
-            false
+            false,
+            true
     );
 
     @Test

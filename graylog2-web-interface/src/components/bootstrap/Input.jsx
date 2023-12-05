@@ -19,7 +19,8 @@ import React from 'react';
 
 import InputDescription from 'components/common/InputDescription';
 
-import { Checkbox, Radio } from './imports';
+import Checkbox from './Checkbox';
+import { Radio } from './imports';
 import ControlLabel from './ControlLabel';
 import FormControl from './FormControl';
 import FormGroup from './FormGroup';
@@ -161,13 +162,21 @@ class Input extends React.Component {
   };
 
   _renderCheckboxGroup = (controlProps) => {
-    const { id, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
+    const { id, buttonAfter, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
 
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
-          <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+          {buttonAfter ? (
+            <InputGroup>
+              <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+              {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
+            </InputGroup>
+          ) : (
+            <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+          )}
           <InputDescription error={error} help={help} className={inputDescClassName} />
+
         </InputWrapper>
       </FormGroup>
     );
@@ -190,17 +199,13 @@ class Input extends React.Component {
     const {
       id,
       type,
-      bsStyle,
-      formGroupClassName,
-      wrapperClassName,
-      label,
-      labelClassName, inputDescClassName,
-      name,
-      error,
-      help,
       children,
-      addonAfter,
-      buttonAfter,
+      label,
+      name,
+      // The following props need to be extracted even if they are not used
+      // so they are not passed as controll props to the input
+      bsStyle, formGroupClassName, wrapperClassName, labelClassName, inputDescClassName, // eslint-disable-line no-unused-vars
+      error, help, addonAfter, buttonAfter, // eslint-disable-line no-unused-vars
       ...controlProps
     } = this.props;
 

@@ -1,33 +1,51 @@
-Upgrading to Graylog 5.2.x
+Upgrading to Graylog 6.0.x
 ==========================
-
-## New Functionality
 
 ## Breaking Changes
 
-## Deprecation and Change in Functionality of GreyNoise Data Adapters
+### Prometheus metrics
 
-- GreyNoise Community IP Lookup Data Adapters have been marked as deprecated. Existing Data Adapters can no longer be
-  started or lookups performed.
-- GreyNoise Full IP Lookup [Enterprise] Data Adapter can no longer be used with a free GreyNoise Community API tokens.
-- GreyNoise Quick IP Lookup Data Adapter can no longer be used with a free GreyNoise Community API tokens.
+The name of the `jvm_classes_loaded` metric [has been changed](https://github.com/prometheus/client_java/pull/681).
 
-## Shutdown of Graylog on OutOfMemoryError
-Because of an error in HttpCore 4.4.12, which is required by Elasticsearch and older versions of Opensearch, OutOfMemoryError errors were not properly handled.
-The Reactor was stopped, which prevented proper Graylog operation and the reason (OutOfMemoryError) was not clearly visible.
-From now on, Graylog will shutdown on OutOfMemoryError, trying to log some basic information about the thread and memory consumption during this event.
+Prometheus queries referencing `jvm_classes_loaded` need to be adapted to
+the new name `jvm_classes_currently_loaded`.
+
+### Plugins
+
+Removal of `systemnavigation` web interface plugin. Previously it was possible to register options for the
+system dropdown in the navigation, by using the `systemnavigation` plugin.
+Now this can be achieved by registering a `navigation` plugin.
+The plugin entity needs the `description` `System` and `children` (array).
+Every child represents a dropdown option and needs a `path` and `description` attribute.
+
+## Configuration File Changes
+| Option                                         | Action    | Description                                                                                                                                                                                                                                             |
+|------------------------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `disabled_retention_strategies`  | **added** | Disables the specified retention strategies. By default, strategies `none` and `close` are now disabled in new installations.<br/>Strategies can be re-enabled simply by removing from this list.<br/>**Do not extend this list on existing installs!** |
+
+
+## Asset Import Changes
+
+Graylog 5.2 introduced the Assets feature and the ability to import Assets from Active Directory.
+Previously Graylog users could define any AD attribute to map to a Graylog Asset's User ID field.
+
+This functionality has been amended to only allow the Active Directory SID attribute for AD User Asset import mapping configurations,
+to better align with the GIM schema and allow for targeted handling of AD SIDs.
+
+Any existing Active Directory User Asset import configurations will be automatically updated to use the SID as the Unique ID attribute, potentially changing the behavior of subsequent imports by those configurations.
 
 ## Java API Changes
+
 The following Java Code API changes have been made.
 
-| File/method                   | Description                                                      |
-|-------------------------------|------------------------------------------------------------------|
-| `ExampleClass#exampleFuntion` | TODO placeholder comment                                         |
-
+| File/method                    | Description              |
+|--------------------------------|--------------------------|
+| `ExampleClass#exampleFunction` | TODO placeholder comment |
 
 ## REST API Endpoint Changes
+
 The following REST API changes have been made.
 
-| Endpoint                                              | Description                               |
-|-------------------------------------------------------|-------------------------------------------|
-| `PUT /example/placeholder`                            | TODO placeholder comment                  |
+| Endpoint                | Description              |
+|-------------------------|--------------------------|
+| `GET /example/resource` | TODO placeholder comment |

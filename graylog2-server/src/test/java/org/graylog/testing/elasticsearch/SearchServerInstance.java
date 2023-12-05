@@ -30,7 +30,7 @@ public interface SearchServerInstance extends Closeable {
 
     FixtureImporter fixtureImporter();
 
-    GenericContainer<?> createContainer(String image, SearchVersion version, Network network);
+    GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize);
 
     GenericContainer<?> buildContainer(String image, Network network);
 

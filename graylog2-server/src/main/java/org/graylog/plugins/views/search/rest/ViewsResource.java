@@ -204,6 +204,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             if (viewResolver != null) {
                 ViewDTO view = viewResolver.get(decoder.getViewId()).orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
                 if (searchUser.canReadView(view)) {
+                    startPageService.addLastOpenedFor(view, searchUser);
                     return view;
                 } else {
                     throw viewNotFoundException(id);
@@ -214,7 +215,6 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         } else {
             ViewDTO view =  loadViewIncludingFavorite(searchUser, id);
             if (searchUser.canReadView(view)) {
-                // Only register normal views in LastOpened, for ViewResolvers, a more global solution has to be found because of the catalog
                 startPageService.addLastOpenedFor(view, searchUser);
                 return view;
             } else {

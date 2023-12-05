@@ -21,5 +21,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record BulkOperationResponse(@JsonProperty("successfully_performed") int successfullyPerformed,
-                                    @JsonProperty("failures") List<BulkOperationFailure> failures) {
+                                    @JsonProperty("failures") List<BulkOperationFailure> failures,
+                                    @JsonProperty("errors") List<String> errors) {
+
+    public BulkOperationResponse(int successfullyPerformed, List<BulkOperationFailure> failures, List<String> errors) {
+        this.successfullyPerformed = successfullyPerformed;
+        this.failures = failures;
+        this.errors = errors;
+    }
+
+    public BulkOperationResponse(final int successfullyPerformed, final List<BulkOperationFailure> failures) {
+        this(successfullyPerformed, failures, List.of());
+    }
+
+    public BulkOperationResponse(final List<String> errors) {
+        this(0, List.of(), errors);
+    }
 }

@@ -15,17 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { GraylogTheme } from '@graylog/sawmill';
-import { withTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 
-import ThemePropTypes from 'preflight/theme/types';
-
-type Props = {
-  theme: GraylogTheme
-}
-
-const NavigationBrand = ({ theme }: Props) => {
-  const logoSecondColor = theme.mode === 'teint' ? theme.colors.brand.concrete : 'white';
+const NavigationBrand = () => {
+  const theme = useTheme();
+  const logoSecondColor = theme.mode === 'light' ? theme.colors.brand.concrete : 'white';
 
   return (
     <svg width="135" height="43" viewBox="0 0 287 92" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -41,8 +35,4 @@ const NavigationBrand = ({ theme }: Props) => {
   );
 };
 
-NavigationBrand.propTypes = {
-  theme: ThemePropTypes.isRequired,
-};
-
-export default withTheme(NavigationBrand);
+export default NavigationBrand;

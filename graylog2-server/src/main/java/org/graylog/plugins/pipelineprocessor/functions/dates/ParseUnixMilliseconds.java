@@ -23,6 +23,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
+
 public class ParseUnixMilliseconds extends TimezoneAwareFunction {
     public static final String NAME = "parse_unix_milliseconds";
 
@@ -31,7 +33,7 @@ public class ParseUnixMilliseconds extends TimezoneAwareFunction {
     private final ParameterDescriptor<Long, Long> valueParam;
 
     public ParseUnixMilliseconds() {
-        valueParam = ParameterDescriptor.integer(VALUE).description("UNIX millisecond timestamp to parse").build();
+        valueParam = ParameterDescriptor.integer(VALUE).ruleBuilderVariable().description("UNIX millisecond timestamp to parse").build();
     }
 
     @Override
@@ -53,5 +55,17 @@ public class ParseUnixMilliseconds extends TimezoneAwareFunction {
     @Override
     protected String description() {
         return "Converts a UNIX millisecond timestamp into a date";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Parse UNIX timestamp";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Parse '${value}' timestamp into a DateTime";
     }
 }

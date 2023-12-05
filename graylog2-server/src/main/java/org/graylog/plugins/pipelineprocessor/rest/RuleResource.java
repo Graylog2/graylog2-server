@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -100,7 +101,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
     private final PipelineServiceHelper pipelineServiceHelper;
-    private final StreamService streamService;
+    private final RuleBuilderService ruleBuilderService;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -110,7 +111,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
                         PaginatedRuleService paginatedRuleService,
                         FunctionRegistry functionRegistry,
                         PipelineServiceHelper pipelineServiceHelper,
-                        StreamService streamService) {
+                        StreamService streamService,
+                        RuleBuilderService ruleBuilderService) {
         this.ruleService = ruleService;
         this.ruleSimulator = ruleSimulator;
         this.pipelineService = pipelineService;
@@ -119,7 +121,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
         this.pipelineServiceHelper = pipelineServiceHelper;
-        this.streamService = streamService;
+        this.ruleBuilderService = ruleBuilderService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -135,10 +137,12 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
                 .description(ruleSource.description())
-                .source(ruleSource.source())
+                .source(ruleSource.source()
+                )
                 .createdAt(now)
                 .modifiedAt(now)
                 .ruleBuilder(ruleSource.ruleBuilder())
+                .simulatorMessage(ruleSource.simulatorMessage())
                 .build();
 
         final RuleDao save;
@@ -176,7 +180,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("only used to test a rule, no changes made in the system")
     public Message simulate(
             @ApiParam(name = "request", required = true) @NotNull SimulateRuleRequest request
-    ) throws NotFoundException {
+    ) {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(request.ruleSource().id(), request.ruleSource().source(), true);
         Message message = ruleSimulator.createMessage(request.message());
         return ruleSimulator.simulate(rule, message);
@@ -291,6 +295,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .ruleBuilder(update.ruleBuilder())
+                .simulatorMessage(update.simulatorMessage())
                 .build();
 
         final RuleDao savedRule;

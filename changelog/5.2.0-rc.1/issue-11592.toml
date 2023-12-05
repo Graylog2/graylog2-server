@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Validate in aggregation builder if metric name is unique."
+
+issues = ["11592"]
+pulls = ["16097"]
+

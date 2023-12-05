@@ -20,9 +20,9 @@ import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.cluster.preflight.NodePreflightConfig;
-import org.graylog2.cluster.preflight.NodePreflightConfigService;
-import org.graylog2.cluster.preflight.NodePreflightConfigServiceImpl;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningServiceImpl;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,12 +50,12 @@ public class CertChainMongoStorageTest {
     @Test
     public void testChainStorageSaveAndRetrieve() throws Exception {
         final String nodeId = "test-node-id";
-        final NodePreflightConfigService mongoService = new NodePreflightConfigServiceImpl(
+        final DataNodeProvisioningService mongoService = new DataNodeProvisioningServiceImpl(
                 new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
                 mongodb.mongoConnection()
         );
         CertChainMongoStorage toTest = new CertChainMongoStorage(mongoService);
-        mongoService.save(NodePreflightConfig.builder().nodeId(nodeId).state(NodePreflightConfig.State.UNCONFIGURED).build());
+        mongoService.save(DataNodeProvisioningConfig.builder().nodeId(nodeId).state(DataNodeProvisioningConfig.State.UNCONFIGURED).build());
 
         KeyStore testKeystore = KeyStore.getInstance(CertConstants.PKCS12);
         testKeystore.load(new FileInputStream("src/test/resources/org/graylog/security/certutil/keystore/storage/sample_certificate_keystore.p12"), "password".toCharArray());

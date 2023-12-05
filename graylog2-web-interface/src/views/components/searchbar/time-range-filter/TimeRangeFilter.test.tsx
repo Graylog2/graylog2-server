@@ -24,7 +24,7 @@ import MockAction from 'helpers/mocking/MockAction';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { adminUser, alice } from 'fixtures/users';
+import { alice } from 'fixtures/users';
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
@@ -145,21 +145,13 @@ describe('TimeRangeFilter', () => {
     expect(screen.queryByRole('button', { name: /open time range preset select/i })).not.toBeInTheDocument();
   });
 
-  it('has no button add time renge to quick access for non admin users', async () => {
+  it('has no button for non admin users to save current time range as preset', async () => {
     asMock(useCurrentUser).mockReturnValue(alice);
     render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
     fireEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByText(/search time range/i);
 
-    expect(screen.queryByTitle('Add time range to quick access time range list')).not.toBeInTheDocument();
-  });
-
-  it('has button add time renge to quick access for admin users', async () => {
-    asMock(useCurrentUser).mockReturnValue(adminUser);
-
-    render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
-    await fireEvent.click(await screen.findByText(/5 minutes ago/));
-    await screen.findByTitle('Add time range to quick access time range list');
+    expect(screen.queryByTitle('Save current time range as preset')).not.toBeInTheDocument();
   });
 });

@@ -19,6 +19,7 @@ package org.graylog2.bindings;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.scheduler.periodicals.ScheduleTriggerCleanUp;
+import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningPeriodical;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
@@ -30,6 +31,7 @@ import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.periodical.IndexRotationThread;
 import org.graylog2.periodical.IndexerClusterCheckerThread;
+import org.graylog2.periodical.LeaderPresenceCheckPeriodical;
 import org.graylog2.periodical.NodePingThread;
 import org.graylog2.periodical.ThrottleStateUpdaterThread;
 import org.graylog2.periodical.TrafficCounterCalculator;
@@ -49,6 +51,7 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(IndexRetentionThread.class);
         periodicalBinder.addBinding().to(IndexRotationThread.class);
         periodicalBinder.addBinding().to(NodePingThread.class);
+        periodicalBinder.addBinding().to(LeaderPresenceCheckPeriodical.class);
         periodicalBinder.addBinding().to(VersionCheckThread.class);
         periodicalBinder.addBinding().to(ThrottleStateUpdaterThread.class);
         periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
@@ -60,5 +63,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
         periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
         periodicalBinder.addBinding().to(TelemetryClusterInfoPeriodical.class);
+        periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
     }
 }

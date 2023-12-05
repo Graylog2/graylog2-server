@@ -27,6 +27,7 @@ import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEn
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
@@ -52,6 +53,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamEntityId;
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = AggregationEventProcessorConfig.Builder.class)
@@ -66,6 +70,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     private static final String FIELD_CONDITIONS = "conditions";
     private static final String FIELD_SEARCH_WITHIN_MS = "search_within_ms";
     private static final String FIELD_EXECUTE_EVERY_MS = "execute_every_ms";
+    private static final String FIELD_EVENT_LIMIT = "event_limit";
 
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
@@ -91,6 +96,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @JsonProperty(FIELD_EXECUTE_EVERY_MS)
     public abstract long executeEveryMs();
 
+    @JsonProperty(FIELD_EVENT_LIMIT)
+    public abstract int eventLimit();
+
+
     @Override
     public Set<String> requiredPermissions() {
         // When there are no streams the event processor will search in all streams so we need to require the
@@ -99,8 +108,8 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
             return Collections.singleton(RestPermissions.STREAMS_READ);
         }
         return streams().stream()
-            .map(streamId -> String.join(":", RestPermissions.STREAMS_READ, streamId))
-            .collect(Collectors.toSet());
+                .map(streamId -> String.join(":", RestPermissions.STREAMS_READ, streamId))
+                .collect(Collectors.toSet());
     }
 
     public static Builder builder() {
@@ -138,7 +147,8 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         public static Builder create() {
             return new AutoValue_AggregationEventProcessorConfig.Builder()
                     .queryParameters(ImmutableSet.of())
-                    .type(TYPE_NAME);
+                    .type(TYPE_NAME)
+                    .eventLimit(0);
         }
 
         @JsonProperty(FIELD_QUERY)
@@ -165,6 +175,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         @JsonProperty(FIELD_EXECUTE_EVERY_MS)
         public abstract Builder executeEveryMs(long executeEveryMs);
 
+        @JsonProperty(FIELD_EVENT_LIMIT)
+        public abstract Builder eventLimit(Integer eventLimit);
+
         public abstract AggregationEventProcessorConfig build();
     }
 
@@ -178,11 +191,11 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
         if (searchWithinMs() <= 0) {
             validationResult.addError(FIELD_SEARCH_WITHIN_MS,
-                "Filter & Aggregation search_within_ms must be greater than 0.");
+                    "Filter & Aggregation search_within_ms must be greater than 0.");
         }
         if (executeEveryMs() <= 0) {
             validationResult.addError(FIELD_EXECUTE_EVERY_MS,
-                "Filter & Aggregation execute_every_ms must be greater than 0.");
+                    "Filter & Aggregation execute_every_ms must be greater than 0.");
         }
         if (!groupBy().isEmpty() && (series().isEmpty() || isConditionsEmpty())) {
             validationResult.addError(FIELD_SERIES, "Aggregation with group_by must also contain series");
@@ -194,37 +207,72 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         if (!series().isEmpty() && isConditionsEmpty()) {
             validationResult.addError(FIELD_CONDITIONS, "Aggregation with series must also contain conditions");
         }
+        return validationResult;
+    }
+
+    @Override
+    public ValidationResult validate(@Nullable EventProcessorConfig oldEventProcessorConfig,
+                                     EventDefinitionConfiguration eventDefinitionConfiguration) {
+        final ValidationResult validationResult = new ValidationResult();
+        if (!series().isEmpty()) {
+            return validationResult;
+        }
+
+        if (oldEventProcessorConfig == null) {
+            // Enforce event limit on newly created event filter definition
+            checkEventLimitGreaterZero(validationResult);
+        } else if ( !(oldEventProcessorConfig instanceof final AggregationEventProcessorConfig oldConfig)) {
+            // Enforce event limit on event definition type change
+            checkEventLimitGreaterZero(validationResult);
+        } else if ( !oldConfig.series().isEmpty()) {
+            // Enforce event limit on aggregation to filter change
+            checkEventLimitGreaterZero(validationResult);
+        } else if (oldConfig.eventLimit() != 0) {
+            // Enforce event limit if event limit has already been changed
+            checkEventLimitGreaterZero(validationResult);
+        }
+
+        if (eventLimit() > eventDefinitionConfiguration.getMaxEventLimit()) {
+            validationResult.addError(FIELD_EVENT_LIMIT, f("Event limit must be less than %s.", eventDefinitionConfiguration.getMaxEventLimit()));
+        }
 
         return validationResult;
+    }
+
+    private void checkEventLimitGreaterZero(ValidationResult validationResult) {
+        if (eventLimit() <= 0) {
+            validationResult.addError(FIELD_EVENT_LIMIT, "Event limit must be greater than 0.");
+        }
     }
 
     @Override
     public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final ImmutableSet<String> streamRefs = ImmutableSet.copyOf(streams().stream()
-            .map(streamId -> entityDescriptorIds.get(streamId, ModelTypes.STREAM_V1))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(Collectors.toSet()));
+                .map(streamId -> getStreamEntityId(streamId, entityDescriptorIds))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet()));
         return AggregationEventProcessorConfigEntity.builder()
                 .type(type())
                 .query(ValueReference.of(query()))
                 .streams(streamRefs)
                 .groupBy(groupBy())
                 .series(series().stream().map(SeriesSpecEntity::fromNativeEntity).toList())
-            .conditions(conditions().orElse(null))
-            .executeEveryMs(executeEveryMs())
-            .searchWithinMs(searchWithinMs())
-            .build();
+                .conditions(conditions().orElse(null))
+                .executeEveryMs(executeEveryMs())
+                .searchWithinMs(searchWithinMs())
+                .eventLimit(eventLimit())
+                .build();
     }
 
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
         streams().forEach(streamId -> {
-                final EntityDescriptor depStream = EntityDescriptor.builder()
+            final EntityDescriptor depStream = EntityDescriptor.builder()
                     .id(ModelId.of(streamId))
-                    .type(ModelTypes.STREAM_V1)
+                    .type(ModelTypes.STREAM_REF_V1)
                     .build();
-                mutableGraph.putEdge(entityDescriptor, depStream);
-            });
+            mutableGraph.putEdge(entityDescriptor, depStream);
+        });
     }
 }

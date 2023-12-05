@@ -29,8 +29,9 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useHandlerContext from 'views/components/useHandlerContext';
+import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 
-import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
+import { onInitializingTimerange } from './TimerangeForForm';
 
 export type DashboardFormValues = {
   timerange: TimeRange | undefined | null | NoTimeRangeOverride,
@@ -57,7 +58,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
     setEnableReinitialize(false);
 
     return onSubmit({
-      timerange: isNoTimeRangeOverride(timerange) ? undefined : onSubmittingTimerange(timerange, userTimezone),
+      timerange: isNoTimeRangeOverride(timerange) ? undefined : normalizeFromSearchBarForBackend(timerange, userTimezone),
       ...rest,
     }).then(() => setEnableReinitialize(true));
   }, [onSubmit, userTimezone]);
