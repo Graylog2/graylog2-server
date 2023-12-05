@@ -32,4 +32,18 @@ public class DatanodeStatusChangeOperation extends RestOperation {
         );
     }
 
+    public void triggerNodeStop() {
+        validatedResponse("/management/stop", HttpMethod.POST, "",
+                "Could not trigger node stop",
+                r -> r.extract().statusCode() < 300
+        );
+    }
+
+    public void triggerNodeStart() {
+        validatedResponse("/management/start", HttpMethod.POST, "",
+                "Could not trigger node start",
+                r -> r.extract().statusCode() < 300
+        );
+    }
+
 }
