@@ -100,6 +100,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         path:
                           data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
                           logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
+                          
                         filebeat.inputs:
                         """,
                 BEATS_PREAMBEL));
