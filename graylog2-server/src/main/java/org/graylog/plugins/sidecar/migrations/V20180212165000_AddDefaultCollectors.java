@@ -100,7 +100,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         path:
                           data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
                           logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
-                          
+
                         filebeat.inputs:
                         """,
                 BEATS_PREAMBEL));
@@ -493,7 +493,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
     /**
      * Create or update Collector
      *
-     * @return current Collector and a flag, indicating whether default template was updated
+     * @return current Collector and information about update status
      */
     private Optional<CollectorState> ensureCollector(String collectorName,
                                                      String serviceType,
@@ -510,10 +510,12 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 LOG.debug(msg, collectorName, nodeOperatingSystem);
                 throw new IllegalArgumentException();
             }
+
             if (collector.defaultTemplateUnchanged()) {
+                long oldCRC = collector.defaultTemplateCRC();
                 long newCRC = Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8));
                 if (collector.defaultTemplateCRC() == null      // known obsolete version of template
-                        || newCRC != collector.defaultTemplateCRC() // new standard template
+                        || newCRC != oldCRC // new standard template
                 ) {
                     LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
                     try {
@@ -523,7 +525,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                                 .defaultTemplate(defaultTemplate)
                                                 .defaultTemplateCRC(newCRC)
                                                 .build()),
-                                true));
+                                oldCRC));
                     } catch (Exception e) {
                         LOG.error("Can't save collector '{}'!", collectorName, e);
                     }
@@ -532,6 +534,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         } catch (IllegalArgumentException ignored) {
             LOG.info("{} collector on {} is missing, adding it.", collectorName, nodeOperatingSystem);
             try {
+                long newCRC = Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8));
                 return Optional.of(new CollectorState(
                         collectorService.save(Collector.create(
                                 null,
@@ -542,8 +545,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                 executeParameters,
                                 validationCommand,
                                 defaultTemplate,
-                                Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8)))),
-                        true));
+                                newCRC)),
+                        null));
             } catch (Exception e) {
                 LOG.error("Can't save collector '{}'!", collectorName, e);
             }
@@ -554,7 +557,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             return Optional.empty();
         }
 
-        return Optional.of(new CollectorState(collector, false));
+        return Optional.of(new CollectorState(collector, collector.defaultTemplateCRC()));
     }
 
     private void ensureConfigurationVariable(String name, String description, String content) {
@@ -586,20 +589,21 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             if (config == null) {
                 LOG.debug("Couldn't find sidecar default configuration'{}' fixing it.", name);
                 throw new IllegalArgumentException();
-            } else {
-                if (collectorState.updatedTemplate && !config.template().equals(collectorState.collector.defaultTemplate())) {
-                    try {
-                        LOG.info("Updating sidecar default configuration template '{}'.", name);
-                        config = configurationService.save(Configuration.create(
-                                config.id(),
-                                config.collectorId(),
-                                config.name(),
-                                config.color(),
-                                collectorState.collector.defaultTemplate(),
-                                config.tags()));
-                    } catch (Exception e) {
-                        LOG.error("Can't update sidecar default configuration '{}'!", name, e);
-                    }
+            }
+
+            if (!config.template().equals(collectorState.collector.defaultTemplate())
+                    && config.templateUnchanged(collectorState.crc)) {
+                try {
+                    LOG.info("Updating sidecar default configuration template '{}'.", name);
+                    config = configurationService.save(Configuration.create(
+                            config.id(),
+                            config.collectorId(),
+                            config.name(),
+                            config.color(),
+                            collectorState.collector.defaultTemplate(),
+                            config.tags()));
+                } catch (Exception e) {
+                    LOG.error("Can't update sidecar default configuration '{}'!", name, e);
                 }
             }
         } catch (IllegalArgumentException ignored) {
@@ -623,11 +627,11 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     static class CollectorState {
         Collector collector;
-        boolean updatedTemplate;
+        Long crc;
 
-        CollectorState(Collector collector, boolean updatedTemplate) {
+        CollectorState(Collector collector, Long crc) {
             this.collector = collector;
-            this.updatedTemplate = updatedTemplate;
+            this.crc = crc;
         }
     }
 }

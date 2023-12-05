@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -25,7 +26,11 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Set;
+
+import static org.graylog.plugins.sidecar.rest.models.Collector.INITIAL_CRC;
 
 @AutoValue
 @WithBeanGetter
@@ -87,6 +92,15 @@ public abstract class Configuration {
                 color,
                 template,
                 tags);
+    }
+
+    @JsonIgnore
+    public boolean templateUnchanged(Long crc) {
+        long thisCrc = Collector.checksum(template().getBytes(StandardCharsets.UTF_8));
+        if (INITIAL_CRC.contains(thisCrc)) {
+            return true;
+        }
+        return Objects.equals(crc, thisCrc);
     }
 
     public static Builder builder() {

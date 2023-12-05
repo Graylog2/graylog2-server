@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -48,7 +49,7 @@ public abstract class Collector {
     public static final String FIELD_DEFAULT_TEMPLATE_CRC = "default_template_crc";
 
     // Set of prior version CRCs for back-compat
-    private static final Set<Long> INITIAL_CRC = java.util.Set.of(
+    public static final Set<Long> INITIAL_CRC = java.util.Set.of(
             3280545580L, // 5.2 filebeat linux
             3396210381L, // 5.2 filebeat darwin
             3013497446L, // 5.2 filebeat freebsd
@@ -116,11 +117,11 @@ public abstract class Collector {
             if (INITIAL_CRC.contains(crc)) {
                 return true; // known old version
             } else {
-                LOG.info("{} collector default template on {} is an unrecognized version - not updating automatically.", name(), nodeOperatingSystem());
+                LOG.info("{} collector default template on {} is an unrecognized version", name(), nodeOperatingSystem());
                 return false;  // changed or really old standard default template
             }
         }
-        return (crc == defaultTemplateCRC());
+        return Objects.equals(crc, defaultTemplateCRC());
     }
 
     @JsonIgnore
