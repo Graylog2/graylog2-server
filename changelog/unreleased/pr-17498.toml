@@ -1,4 +1,4 @@
 type = "added"
-message = "Added support for looking up email notification recipients in lookup tables."
+message = "Added support for looking up Email Notification sender, reply to, and recipient emails in lookup tables."
 
 pulls = ["17498"]
