@@ -16,7 +16,7 @@
  */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 
-import { Modal, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { Modal, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
 import { PaginatedList, SearchForm, ModalSubmit, Spinner } from 'components/common';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -27,9 +27,10 @@ type Props = {
   onSubmit: (selectedDashboardId: string | undefined | null) => Promise<void>,
   submitButtonText: string,
   submitLoadingText: string,
+  onCopyToNewDashboard: () => void,
 };
 
-const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadingText, activeDashboardId }: Props) => {
+const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadingText, activeDashboardId, onCopyToNewDashboard }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const isMounted = useRef<boolean>();
@@ -121,7 +122,8 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
                      disabledSubmit={!selectedDashboard}
                      submitButtonType="button"
                      onSubmit={handleSubmit}
-                     onCancel={onCancel} />
+                     onCancel={onCancel}
+                     leftCol={<Button bsStyle="link" onClick={onCopyToNewDashboard}>Copy to new Dashboard</Button>} />
       </Modal.Footer>
     </Modal>
   );

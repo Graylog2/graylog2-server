@@ -23,7 +23,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
-import { loadDashboard } from 'views/logic/views/Actions';
+import { loadAsDashboard, loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -48,6 +48,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import CopyWidgetToNewDashboard from 'views/logic/views/CopyWidgetToNewDashboard';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -92,6 +93,12 @@ const _onCopyToDashboard = async (
   }
 
   setShowCopyToDashboard(false);
+};
+
+const _onCopyToNewDashboard = (view: View, widgetId: string, history: HistoryFunction) => {
+  const newView = CopyWidgetToNewDashboard(view, widgetId);
+
+  loadAsDashboard(history, newView);
 };
 
 const _onMoveWidgetToPage = async (
@@ -176,6 +183,17 @@ const WidgetActionsMenu = ({
 
     return _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history);
   }, [history, pathname, sendTelemetry, view]);
+
+  const onCopyToNewDashboard = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_NEW_DASHBOARD, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'search-widget',
+      app_action_value: 'widget-copy-to-new-dashboard-button',
+    });
+
+    return _onCopyToNewDashboard(view, widget.id, history);
+  }, [sendTelemetry, pathname, view, widget.id, history]);
+
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.MOVE, {
       app_pathname: getPathnameWithoutId(pathname),
@@ -244,6 +262,11 @@ const WidgetActionsMenu = ({
               Copy to Dashboard
             </MenuItem>
           </IfSearch>
+          <IfSearch>
+            <MenuItem onSelect={onCopyToNewDashboard}>
+              Copy to new Dashboard
+            </MenuItem>
+          </IfSearch>
           {widget.isExportable && <MenuItem onSelect={() => setShowExport(true)}>Export</MenuItem>}
           <IfDashboard>
             <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>
@@ -261,7 +284,8 @@ const WidgetActionsMenu = ({
           <CopyToDashboard onSubmit={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
                            onCancel={() => setShowCopyToDashboard(false)}
                            submitLoadingText="Copying widget..."
-                           submitButtonText="Copy widget" />
+                           submitButtonText="Copy widget"
+                           onCopyToNewDashboard={onCopyToNewDashboard} />
         )}
 
         {showExport && (
