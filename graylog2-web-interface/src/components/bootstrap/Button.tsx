@@ -155,10 +155,10 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
     if (href) {
       return (
-        <StyledButton<'a'> component="a"
-                           href={href}
-                           onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-                           {...sharedProps}>
+        <StyledButton component="a"
+                      href={href}
+                      onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+                      {...sharedProps}>
           {children}
         </StyledButton>
       );

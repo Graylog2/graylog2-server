@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import upperCase from 'lodash/upperCase';
+import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
 
 import { Modal, Button } from 'components/bootstrap';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -37,24 +38,24 @@ const WidgetList = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
+  gap: 0.7rem;
 `;
 
-const CreateWidgetButton = styled(Button)`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 10px;
+const CreateWidgetButton = styled(Button)(({ theme }) => css`
+  background-color: transparent;
+  border-color: ${theme.colors.variant.gray};
+  border-radius: 4px;
+  height: 8rem;
   width: 8rem;
-  white-space: normal;
-
-  && {
-    background: transparent;
-    border-radius: 4px;
+  .mantine-Button-label {
+    display: flex;
+    flex-flow: column nowrap;
+    place-content: center center;
+    align-items: center;
+    word-wrap: break-word;
+    white-space: break-spaces;
   }
-`;
+`);
 
 const HugeIcon = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.huge};
@@ -86,8 +87,9 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
     };
 
     return (
-      <CreateWidgetButton type="button" title={`Create ${title} Widget`} onClick={onClick}>
-        <HugeIcon><WidgetIcon /></HugeIcon>{title}
+      <CreateWidgetButton key={title} type="button" title={`Create ${title} Widget`} onClick={onClick}>
+        <HugeIcon><WidgetIcon /></HugeIcon>
+        {title}
       </CreateWidgetButton>
     );
   }), [creators, dispatch, location.pathname, position, sendTelemetry, view]);
