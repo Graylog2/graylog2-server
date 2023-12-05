@@ -42,5 +42,7 @@ public interface CertRenewalService {
     void initiateRenewalForNode(String nodeId);
     List<DataNode> findNodes();
 
+    DataNodeDto addProvisioningInformation(DataNodeDto node);
+
     List<DataNodeDto> addProvisioningInformation(Collection<DataNodeDto> nodes);
 }
