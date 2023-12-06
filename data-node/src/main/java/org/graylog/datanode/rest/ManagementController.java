@@ -16,11 +16,15 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.rest.config.OnlyInSecuredNode;
+import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -29,17 +33,39 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class ManagementController {
 
-    private final OpensearchProcess openSearch;
+    private final ClusterEventBus clusterEventBus;
+    private final NodeId nodeId;
+
 
     @Inject
-    public ManagementController(OpensearchProcess openSearch) {
-        this.openSearch = openSearch;
+    public ManagementController(ClusterEventBus clusterEventBus, NodeId nodeId) {
+        this.clusterEventBus = clusterEventBus;
+        this.nodeId = nodeId;
     }
 
     @DELETE
     @OnlyInSecuredNode
     public void remove() {
-        openSearch.onRemove();
+        postEvent(DataNodeLifecycleTrigger.REMOVE);
+    }
+
+    @POST
+    @Path("/start")
+    @OnlyInSecuredNode
+    public void start() {
+        postEvent(DataNodeLifecycleTrigger.START);
+    }
+
+    @POST
+    @Path("/stop")
+    @OnlyInSecuredNode
+    public void stop() {
+        postEvent(DataNodeLifecycleTrigger.STOP);
+    }
+
+    private void postEvent(DataNodeLifecycleTrigger trigger) {
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(nodeId.getNodeId(), trigger);
+        clusterEventBus.post(e);
     }
 
 }

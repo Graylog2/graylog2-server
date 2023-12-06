@@ -12,11 +12,11 @@
   "dependencies": {
     "@jest/types": "29.6.1",
     "@testing-library/dom": "9.3.3",
-    "@testing-library/jest-dom": "6.1.4",
+    "@testing-library/jest-dom": "6.1.5",
     "@testing-library/react": "12.1.5",
     "@testing-library/react-hooks": "^8.0.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/enzyme": "3.10.16",
+    "@types/enzyme": "3.10.18",
     "@types/jest": "29.5.5",
     "babel-jest": "29.6.2",
     "enzyme": "3.11.0",
