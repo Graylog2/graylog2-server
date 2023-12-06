@@ -32,48 +32,17 @@ Any existing Active Directory User Asset import configurations will be automatic
 
 Several log parsing changes have been made to the AWS Security Lake input in preparation for Illuminate parsing content.
 
+Changed fields:
+- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
+- The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `time` value. The `event_created` field now contains the previous `time` value for backwards-compatibility.
+
 Added fields:
+`vendor_event_description`: Contains the value which was previously present in the `message` log field.
 `event_created`: Contains the `time` log value.
 `event_input_source`: Contains the static value `aws_security_lake`.
 `event_source_product`: Contains the `metadata.product.name` log value.
 `vendor_version`: Contains the `metadata.product.versoin` log value.
 `vendor_subtype`: Contains the `class_name` log value.
-
-
-Changed fields:
-- `message`: Now contains the full JSON content of the log message. 
-- The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `time` value. The `event_created` field now contains the previous `time` value.
-
-Removed fields:
-- `answers`
-- `api`
-- `class_name` (now stored in the `vendor_subtype` field)
-- `cloud`
-- `compliance`
-- `confidence`
-- `connection_info`
-- `destination_ip`
-- `destination_port`
-- `destination_subnet_id`
-- `destination_vpc_id`
-- `event_action,`
-- `event_end`
-- `event_log_name`
-- `event_severity`
-- `event_start`
-- `finding`
-- `http_request`
-- `identity`
-- `malware`
-- `process`
-- `query`
-- `rcode`
-- `source_ip`
-- `source_port`
-- `source_subnet_id`
-- `source_vpc_id`
-- `traffic`
-- `vulnerabilities`
 
 Note that additional AWS Security Lake message parsing is expected to be released in an upcoming release of Graylog Illuminate.
 
