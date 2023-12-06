@@ -1,0 +1,20 @@
+type = "a"
+message = "Added the string_entropy pipeline function."
+
+issues = ["graylog-plugin-enterprise#4839"]
+pulls = ["15682"]
+
+details.user = """
+The `string_entropy` pipeline function is now avaialble and can be used to compute Shannon Entropy for input strings.
+
+Example usage:
+
+```
+rule "string_entropy"
+when
+    true
+then
+    set_field("entropy_value", string_entropy(to_string($message.my_field)));
+end
+```
+"""
