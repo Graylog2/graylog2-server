@@ -93,7 +93,7 @@ public class MongoDBSessionServiceImpl extends PersistedServiceImpl implements M
     public <T extends Persisted> int destroy(T model) {
         int affectedDocs = super.destroy(model);
         if (affectedDocs != 0 && model instanceof MongoDbSession session) {
-            eventBus.post(new SessionDeletedEvent(session.getSessionId()));
+            // removed for benchmarking eventBus.post(new SessionDeletedEvent(session.getSessionId()));
         }
         return affectedDocs;
     }
