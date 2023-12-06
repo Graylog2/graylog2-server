@@ -249,13 +249,13 @@ class EmailNotificationForm extends React.Component {
 
     return (
       <Input id="notification-sender"
-           name="sender"
-           label={<ControlLabel>Sender <small className="text-muted">(Optional)</small></ControlLabel>}
-           type="text"
-           bsStyle={validation.errors.sender ? 'error' : null}
-           help={get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
-           value={config.sender || ''}
-           onChange={this.handleChange} />
+             name="sender"
+             label={<ControlLabel>Sender <small className="text-muted">(Optional)</small></ControlLabel>}
+             type="text"
+             bsStyle={validation.errors.sender ? 'error' : null}
+             help={get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
+             value={config.sender || ''}
+             onChange={this.handleChange} />
     );
   };
 
@@ -289,7 +289,7 @@ class EmailNotificationForm extends React.Component {
       </EmailLookupRow>
     );
   };
-  
+
   replyToInput = () => {
     const { config, validation } = this.props;
 
