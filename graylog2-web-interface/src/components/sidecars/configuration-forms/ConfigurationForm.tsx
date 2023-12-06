@@ -212,10 +212,6 @@ const ConfigurationForm = ({
     setShowPreviewModal(true);
   };
 
-  const _onShowImports = () => {
-    setShowUploadsModal(true);
-  };
-
   const _formatCollector = (collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
 
   const _formatCollectorOptions = () => {
