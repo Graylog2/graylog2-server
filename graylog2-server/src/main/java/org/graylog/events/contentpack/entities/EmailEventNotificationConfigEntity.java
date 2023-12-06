@@ -122,8 +122,14 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                     .timeZone(ValueReference.of("UTC"))
                     .replyTo(ValueReference.of(""))
                     .lookupRecipientEmails(ValueReference.of(false))
+                    .recipientsLUTName(ValueReference.of(""))
+                    .recipientsLUTKey(ValueReference.of(""))
                     .lookupSenderEmail(ValueReference.of(false))
-                    .lookupReplyToEmail(ValueReference.of(false));
+                    .senderLUTName(ValueReference.of(""))
+                    .senderLUTKey(ValueReference.of(""))
+                    .lookupReplyToEmail(ValueReference.of(false))
+                    .replyToLUTName(ValueReference.of(""))
+                    .replyToLUTKey(ValueReference.of(""));
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -182,7 +188,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
 
     @Override
     public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
-        return EmailEventNotificationConfig.builder()
+        EmailEventNotificationConfig.Builder builder = EmailEventNotificationConfig.builder()
                 .sender(sender().asString(parameters))
                 .replyTo(replyTo().asString())
                 .subject(subject().asString(parameters))
@@ -190,16 +196,25 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .htmlBodyTemplate(htmlBodyTemplate().asString())
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
-                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
-                .lookupRecipientEmails(lookupRecipientEmails().asBoolean(parameters))
-                .recipientsLUTName(recipientsLUTName().asString(parameters))
-                .recipientsLUTKey(recipientsLUTKey().asString(parameters))
-                .lookupSenderEmail(lookupSenderEmail().asBoolean(parameters))
-                .senderLUTName(senderLUTName().asString(parameters))
-                .senderLUTKey(senderLUTKey().asString(parameters))
-                .lookupReplyToEmail(lookupReplyToEmail().asBoolean(parameters))
-                .replyToLUTName(replyToLUTName().asString(parameters))
-                .replyToLUTKey(replyToLUTKey().asString(parameters))
-                .build();
+                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)));
+        final boolean lookupRecipientEmails = lookupRecipientEmails().asBoolean(parameters);
+        builder.lookupRecipientEmails(lookupRecipientEmails);
+        if (lookupRecipientEmails) {
+            builder.recipientsLUTName(recipientsLUTName().asString(parameters))
+                    .recipientsLUTKey(recipientsLUTKey().asString(parameters));
+        }
+        final boolean lookupSenderEmail = lookupSenderEmail().asBoolean(parameters);
+        builder.lookupSenderEmail(lookupSenderEmail);
+        if (lookupSenderEmail) {
+            builder.senderLUTName(senderLUTName().asString(parameters))
+                    .senderLUTKey(senderLUTKey().asString(parameters));
+        }
+        final boolean lookupReplyToEmail = lookupReplyToEmail().asBoolean(parameters);
+        builder.lookupReplyToEmail(lookupReplyToEmail);
+        if (lookupReplyToEmail) {
+            builder.replyToLUTName(replyToLUTName().asString(parameters))
+                    .replyToLUTKey(replyToLUTKey().asString(parameters));
+        }
+        return builder.build();
     }
 }

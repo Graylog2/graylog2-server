@@ -278,7 +278,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
 
     @Override
     public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        return EmailEventNotificationConfigEntity.builder()
+        EmailEventNotificationConfigEntity.Builder builder = EmailEventNotificationConfigEntity.builder()
                 .sender(ValueReference.of(sender()))
                 .replyTo(ValueReference.of(replyTo()))
                 .subject(ValueReference.of(subject()))
@@ -288,14 +288,30 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .userRecipients(userRecipients())
                 .timeZone(ValueReference.of(timeZone().getID()))
                 .lookupRecipientEmails(ValueReference.of(lookupRecipientEmails()))
-                .recipientsLUTName(ValueReference.ofNullable(recipientsLUTName()))
-                .recipientsLUTKey(ValueReference.ofNullable(recipientsLUTKey()))
                 .lookupSenderEmail(ValueReference.of(lookupSenderEmail()))
-                .senderLUTName(ValueReference.ofNullable(senderLUTName()))
-                .senderLUTKey(ValueReference.ofNullable(senderLUTKey()))
-                .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()))
-                .replyToLUTName(ValueReference.ofNullable(replyToLUTName()))
-                .replyToLUTKey(ValueReference.ofNullable(replyToLUTKey()))
-            .build();
+                .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()));
+        if (lookupRecipientEmails()) {
+            builder.recipientsLUTName(ValueReference.ofNullable(recipientsLUTName()))
+                    .recipientsLUTKey(ValueReference.ofNullable(recipientsLUTKey()));
+        } else {
+            builder.recipientsLUTName(ValueReference.of(""))
+                    .recipientsLUTKey(ValueReference.of(""));
+        }
+        if (lookupSenderEmail()) {
+            builder.senderLUTName(ValueReference.ofNullable(senderLUTName()))
+                    .senderLUTKey(ValueReference.ofNullable(senderLUTKey()));
+        } else {
+            builder.senderLUTName(ValueReference.of(""))
+                    .senderLUTKey(ValueReference.of(""));
+        }
+        if (lookupReplyToEmail()) {
+            builder.replyToLUTName(ValueReference.ofNullable(replyToLUTName()))
+                    .replyToLUTKey(ValueReference.ofNullable(replyToLUTKey()));
+        } else {
+            builder.replyToLUTName(ValueReference.of(""))
+                    .replyToLUTKey(ValueReference.of(""));
+        }
+
+        return builder.build();
     }
 }
