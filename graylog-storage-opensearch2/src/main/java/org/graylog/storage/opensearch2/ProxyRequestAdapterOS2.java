@@ -16,6 +16,8 @@
  */
 package org.graylog.storage.opensearch2;
 
+import org.graylog.shaded.opensearch2.org.apache.http.entity.ContentType;
+import org.graylog.shaded.opensearch2.org.apache.http.entity.InputStreamEntity;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
@@ -35,6 +37,8 @@ public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
         final var osRequest = new Request(request.method(), request.path());
+        osRequest.setEntity(new InputStreamEntity(request.body(), ContentType.APPLICATION_JSON));
+
         try {
             final var osResponse = client.execute((c, requestOptions) -> {
                 osRequest.setOptions(requestOptions);
