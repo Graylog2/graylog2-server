@@ -553,9 +553,10 @@ public class Message implements Messages, Indexable {
 
         // Don't accept protected keys. (some are allowed though lol)
         if ((RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey)) || !validKey(trimmedKey)) {
-            RATE_LIMITED_LOG.info("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
+            } else {
+                RATE_LIMITED_LOG.info("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             }
             return;
         }
