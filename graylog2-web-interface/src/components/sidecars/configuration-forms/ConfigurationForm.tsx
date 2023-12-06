@@ -338,12 +338,6 @@ const ConfigurationForm = ({
                         onClick={_onShowSource}>
                   Preview
                 </Button>
-                <Button className="pull-right"
-                        bsStyle="link"
-                        bsSize="sm"
-                        onClick={_onShowImports}>
-                  Migrate
-                </Button>
                 <HelpBlock>
                   {_formatValidationMessage('template', 'Required. Collector configuration, see quick reference for more information.')}
                 </HelpBlock>
