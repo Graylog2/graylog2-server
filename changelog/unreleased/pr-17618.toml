@@ -1,0 +1,7 @@
+type = "r"
+message = "Removed unused classes: org.graylog2.plugin.SingletonMessages and org.graylog.plugins.views.search.engine.LuceneQueryParsingException"
+
+issues = [""]
+pulls = ["17618"]
+
+
