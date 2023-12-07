@@ -55,3 +55,4 @@ jobs:
           committer: Dr. Lint-a-lot <garybot2@graylog.com>
           commit-message: Running lint --fix
           delete-branch: true
+          token: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}

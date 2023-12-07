@@ -27,3 +27,4 @@ jobs:
           committer: Gary Bot <garybot2@graylog.com>
           commit-message: Updating yarn lockfile
           delete-branch: true
+          token: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
