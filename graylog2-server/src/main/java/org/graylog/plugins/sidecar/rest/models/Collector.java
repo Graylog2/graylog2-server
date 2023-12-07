@@ -30,7 +30,6 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @JsonIgnoreProperties({"default_template_crc"})
 public abstract class Collector {
-
     public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_SERVICE_TYPE = "service_type";

@@ -122,8 +122,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         output.logstash:
                            hosts: ["${user.graylog_host}:5044"]
                         paths:
-                            data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
-                            logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
+                           data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
+                           logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
 
                         filebeat.inputs:
                         """,
@@ -600,6 +600,11 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             if (config == null) {
                 LOG.debug("Couldn't find sidecar default configuration'{}' fixing it.", name);
                 throw new IllegalArgumentException();
+            }
+            if (!config.template().equals(collector.defaultTemplate()) &&
+                    migrationState.isKnownDefaultTemplate(config.template())) {
+                LOG.info("Sidecar configuration '{}' still matches a known default. Updating.", name);
+                configurationService.save(config.toBuilder().template(collector.defaultTemplate()).build());
             }
         } catch (IllegalArgumentException ignored) {
             LOG.info("'{}' sidecar default configuration is missing, adding it.", name);
