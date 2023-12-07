@@ -33,16 +33,14 @@ Any existing Active Directory User Asset import configurations will be automatic
 Several log parsing changes have been made to the AWS Security Lake input in preparation for Illuminate parsing content.
 
 Changed fields:
-- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
+- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. The full message can still also optionally be stored in the `full_message` field if the `Store full message` option is enabled.
 - The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `time` value. The `event_created` field now contains the previous `time` value for backwards-compatibility.
 
 Added fields:
 `vendor_event_description`: Contains the value which was previously present in the `message` log field.
 `event_created`: Contains the `time` log value.
-`event_input_source`: Contains the static value `aws_security_lake`.
-`event_source_product`: Contains the `metadata.product.name` log value.
+`event_source_input`: Contains the static value `aws_security_lake`.
 `vendor_version`: Contains the `metadata.product.versoin` log value.
-`vendor_subtype`: Contains the `class_name` log value.
 
 Note that additional AWS Security Lake message parsing is expected to be released in an upcoming release of Graylog Illuminate.
 
