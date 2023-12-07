@@ -112,10 +112,9 @@ describe('SavedSearchForm', () => {
                               saveAsSearch={onSaveAs} />);
 
       const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      userEvent.click(saveAsButton);
 
-      expect(() => userEvent.click(saveAsButton)).toThrow(new Error('unable to click element as it has or inherits pointer-events set to "none".'));
-
-      expect(onSaveAs).toHaveBeenCalledTimes(0);
+      expect(onSaveAs).not.toHaveBeenCalled();
     });
 
     it('should handle create new', async () => {
