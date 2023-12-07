@@ -18,6 +18,12 @@ Now this can be achieved by registering a `navigation` plugin.
 The plugin entity needs the `description` `System` and `children` (array).
 Every child represents a dropdown option and needs a `path` and `description` attribute.
 
+## Configuration File Changes
+| Option                                         | Action    | Description                                                                                                                                                                                                                                             |
+|------------------------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `disabled_retention_strategies`  | **added** | Disables the specified retention strategies. By default, strategies `none` and `close` are now disabled in new installations.<br/>Strategies can be re-enabled simply by removing from this list.<br/>**Do not extend this list on existing installs!** |
+
+
 ## Asset Import Changes
 
 Graylog 5.2 introduced the Assets feature and the ability to import Assets from Active Directory.
@@ -98,9 +104,15 @@ Note that additional F5 BIG-IP message parsing is expected to be released in an 
 
 The following Java Code API changes have been made.
 
-| File/method                   | Description              |
-|-------------------------------|--------------------------|
-| `ExampleClass#exampleFuntion` | TODO placeholder comment |
+| File/method                                       | Description                    |
+|---------------------------------------------------|--------------------------------|
+| `org.graylog2.plugin.Message#addStringFields`     | Deprecated method removed      |
+| `org.graylog2.plugin.Message#addLongFields`       | Deprecated method removed      |
+| `org.graylog2.plugin.Message#addDoubleFields`     | Deprecated method removed      |
+| `org.graylog2.plugin.Message#getValidationErrors` | Deprecated method removed      |
+| `org.graylog2.plugin.SingletonMessages` | Unused class removed     |
+| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException`        | Unused exception class removed |
+
 
 ## REST API Endpoint Changes
 
