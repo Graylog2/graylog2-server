@@ -23,7 +23,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 
 import static io.restassured.RestAssured.given;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true, additionalConfigurationParameters = {
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, additionalConfigurationParameters = {
         @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_LEADER_ELECTION_MODE", value = "automatic")
 })
 class AutomaticLeaderElectionStartupIT {
