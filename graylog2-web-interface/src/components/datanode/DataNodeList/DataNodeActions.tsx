@@ -18,14 +18,18 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import type { DataNode } from 'preflight/types';
-import {
-  ConfirmDialog,
-} from 'components/common';
+import { ConfirmDialog } from 'components/common';
 import { MenuItem } from 'components/bootstrap';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 
-import { rejoinDataNode, removeDataNode, renewDatanodeCertificate, stopDataNode } from '../hooks/useDataNodes';
+import {
+  rejoinDataNode,
+  removeDataNode,
+  renewDatanodeCertificate,
+  stopDataNode,
+  startDataNode,
+} from '../hooks/useDataNodes';
 
 type Props = {
   dataNode: DataNode,
@@ -116,7 +120,7 @@ const DataNodeActions = ({ dataNode }: Props) => {
                              disabled={false}
                              dropdownZIndex={1000}>
         <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
-        <MenuItem onSelect={() => stopDataNode(dataNode.node_id)}>Start</MenuItem>
+        <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
