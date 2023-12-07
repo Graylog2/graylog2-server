@@ -40,7 +40,7 @@ Added fields:
 `vendor_event_description`: Contains the value which was previously present in the `message` log field.
 `event_created`: Contains the `time` log value.
 `event_source_input`: Contains the static value `aws_security_lake`.
-`vendor_version`: Contains the `metadata.product.versoin` log value.
+`vendor_version`: Contains the `metadata.product.version` log value.
 
 Note that additional AWS Security Lake message parsing is expected to be released in an upcoming release of Graylog Illuminate.
 
@@ -49,7 +49,7 @@ Note that additional AWS Security Lake message parsing is expected to be release
 Several log parsing changes have been made to the Office 365 input in preparation for Illuminate parsing content.
 
 Changed fields:
-- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
+- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. The full message can still also optionally be stored in the `full_message` field if the `Store full message` option is enabled.
 - The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `CreationTime` value. The `event_created` field now contains the previous `CreationTime` value for backwards-compatibility.
 - `vendor_event_description`: Now contains the value which was previously present in the `message` log field.
 
@@ -66,7 +66,7 @@ Note that additional Office 365 message parsing is expected to be released in an
 Several log parsing changes have been made to the Okta Log Events input in preparation for Illuminate parsing content.
 
 Changed fields:
-- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
+- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. The full message can still also optionally be stored in the `full_message` field if the `Store full message` option is enabled.
 - The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `published` value. The `event_created` field now contains the previous `published` value for backwards-compatibility.
 - `vendor_event_description`: Now contains the value which was previously present in the `message` log field.
 
@@ -80,7 +80,7 @@ Note that additional Okta Log Events message parsing is expected to be released 
 
 ## F5 BIG-IP input log parsing changes
 
-Several log parsing changes have been made to the F5 BIG-IP input in preparation for Illuminate parsing content.
+Several log parsing changes have been made to the F5 BIG-IP input in preparation for Illuminate parsing content. The full message can still also optionally be stored in the `full_message` field if the `Store full message` option is enabled.
 
 Changed fields:
 - `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
