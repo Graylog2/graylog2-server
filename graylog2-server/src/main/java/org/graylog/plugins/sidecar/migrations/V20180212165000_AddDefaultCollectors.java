@@ -631,6 +631,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
     public static abstract class MigrationState {
 
         // Set of prior version CRCs
+        // !!! Extending this list does not work. It is persisted after the first migration run.
         private static final Set<Long> OLD_CHECKSUMS = java.util.Set.of(
                 3280545580L, // 5.2 filebeat linux
                 3396210381L, // 5.2 filebeat darwin
