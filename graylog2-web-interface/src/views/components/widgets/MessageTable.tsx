@@ -157,7 +157,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
           <TableHead>
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => (
-                <th key={selectedFieldName}>
+                <th key={selectedFieldName} className={`message-table-header-${selectedFieldName}`}>
                   <Field type={_fieldTypeFor(selectedFieldName, fields)}
                          name={selectedFieldName}
                          queryId={activeQueryId}>

@@ -165,7 +165,9 @@ const MessageTableEntry = ({
             const type = fieldType(selectedFieldName, message, fields);
 
             return (
-              <td key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
+              <td key={selectedFieldName}
+                  data-testid={`message-summary-field-${selectedFieldName}`}
+                  className={`message-table-cell-${selectedFieldName}`}>
                 {_renderStrong(
                   <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
                     <TypeSpecificValue value={message.fields[selectedFieldName]}
@@ -189,6 +191,7 @@ const MessageTableEntry = ({
 
         {expanded && (
           <MessageDetailRow>
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td colSpan={colSpanFixup}>
               <MessageDetail message={message}
                              fields={fields}

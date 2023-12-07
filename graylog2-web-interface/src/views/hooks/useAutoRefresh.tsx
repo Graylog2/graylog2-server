@@ -22,7 +22,13 @@ const useAutoRefresh = () => {
   const autoRefresh = useContext(AutoRefreshContext);
 
   if (!autoRefresh) {
-    throw new Error('useAutoRefresh hook needs to be used inside AutoRefreshContext.Provider');
+    return ({
+      refreshConfig: ({
+        enabled: false,
+      }),
+      startAutoRefresh: () => {},
+      stopAutoRefresh: () => {},
+    });
   }
 
   return autoRefresh;
