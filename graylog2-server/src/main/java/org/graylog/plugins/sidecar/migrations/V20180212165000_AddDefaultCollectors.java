@@ -16,11 +16,17 @@
  */
 package org.graylog.plugins.sidecar.migrations;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
@@ -30,15 +36,20 @@ import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
@@ -62,17 +73,23 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
     private final URI httpExternalUri;
     private final ConfigurationService configurationService;
 
+    private final ClusterConfigService clusterConfigService;
+    private MigrationState migrationState;
+    private MigrationState updatedMigrationState;
+
     @Inject
     public V20180212165000_AddDefaultCollectors(HttpConfiguration httpConfiguration,
                                                 CollectorService collectorService,
                                                 ConfigurationVariableService configurationVariableService,
                                                 ConfigurationService configurationService,
-                                                MongoConnection mongoConnection) {
+                                                MongoConnection mongoConnection,
+                                                ClusterConfigService clusterConfigService) {
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.collectorService = collectorService;
         this.configurationVariableService = configurationVariableService;
         this.configurationService = configurationService;
         this.collection = mongoConnection.getMongoDatabase().getCollection(CollectorService.COLLECTION_NAME);
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -82,6 +99,9 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     @Override
     public void upgrade() {
+        migrationState = clusterConfigService.getOrDefault(MigrationState.class, MigrationState.createEmpty());
+        updatedMigrationState = migrationState;
+
         removeConfigPath();
         ensureConfigurationVariable("graylog_host", "Graylog Host.", httpExternalUri.getHost());
 
@@ -89,6 +109,10 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         ensureAuditbeatCollectorsAndConfig();
         ensureWinlogbeatCollectorsAndConfig();
         ensureNxLogCollectors();
+
+        if (!updatedMigrationState.equals(migrationState)) {
+            clusterConfigService.write(updatedMigrationState);
+        }
     }
 
     private void ensureFilebeatCollectorsAndConfig() {
@@ -97,8 +121,10 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         %s
                         output.logstash:
                            hosts: ["${user.graylog_host}:5044"]
-                        data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
-                        logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
+                        paths:
+                            data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
+                            logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
+
                         filebeat.inputs:
                         """,
                 BEATS_PREAMBEL));
@@ -495,6 +521,9 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                                 String executeParameters,
                                                 String validationCommand,
                                                 String defaultTemplate) {
+
+        this.updatedMigrationState = updatedMigrationState.withNewDefaultTemplate(defaultTemplate);
+
         Collector collector = null;
         try {
             collector = collectorService.findByNameAndOs(collectorName, nodeOperatingSystem);
@@ -503,21 +532,16 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 LOG.debug(msg, collectorName, nodeOperatingSystem);
                 throw new IllegalArgumentException();
             }
-            if (!collector.defaultTemplateUpdated()) {
-                long newCRC = Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8));
-                if (collector.defaultTemplateCRC() == null      // known obsolete version of template
-                        || newCRC != collector.defaultTemplateCRC() // new standard template
-                ) {
-                    LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
-                    try {
-                        return Optional.of(collectorService.save(
-                                collector.toBuilder()
-                                        .defaultTemplate(defaultTemplate)
-                                        .defaultTemplateCRC(newCRC)
-                                        .build()));
-                    } catch (Exception e) {
-                        LOG.error("Can't save collector '{}'!", collectorName, e);
-                    }
+            if (!defaultTemplate.equals(collector.defaultTemplate()) &&
+                    migrationState.isKnownDefaultTemplate(collector.defaultTemplate())) {
+                LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
+                try {
+                    return Optional.of(collectorService.save(
+                            collector.toBuilder()
+                                    .defaultTemplate(defaultTemplate)
+                                    .build()));
+                } catch (Exception e) {
+                    LOG.error("Can't save collector '{}'!", collectorName, e);
                 }
             }
         } catch (IllegalArgumentException ignored) {
@@ -531,8 +555,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         executablePath,
                         executeParameters,
                         validationCommand,
-                        defaultTemplate,
-                        Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8))
+                        defaultTemplate
                 )));
             } catch (Exception e) {
                 LOG.error("Can't save collector '{}'!", collectorName, e);
@@ -543,6 +566,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             LOG.error("Unable to access fixed '{}' collector!", collectorName);
             return Optional.empty();
         }
+
 
         return Optional.of(collector);
     }
@@ -593,6 +617,72 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
         if (config == null) {
             LOG.error("Unable to access '{}' sidecar default configuration!", name);
+        }
+    }
+
+    @JsonAutoDetect
+    @AutoValue
+    @WithBeanGetter
+    public static abstract class MigrationState {
+
+        // Set of prior version CRCs
+        private static final Set<Long> OLD_CHECKSUMS = java.util.Set.of(
+                3280545580L, // 5.2 filebeat linux
+                3396210381L, // 5.2 filebeat darwin
+                3013497446L, // 5.2 filebeat freebsd
+                4009863009L, // 5.2 winlogbeat windows
+                2023247173L, // 5.2 nxlog linux
+                2491201449L, // 5.2 nxlog windows
+                2487909285L, // 5.2 auditbeat windows
+
+                4049210961L, // 5.1 and 5.0 filebeat linux/darwin/freebsd
+                2306685777L, // 5.1 and 5.0 winlogbeat windows
+                639836274L,  // 5.1 and 5.0 nxlog linux
+                2157898695L, // 5.1 and 5.0 nxlog windows
+                1490581247L, // 5.1 and 5.0 filebeat windows
+
+                1256873081L, // 4.3 filebeat linux
+                3852098581L, // 4.3 winlogbeat windows
+                3676599312L, // 4.3 nxlog linux
+                4293222217L, // 4.3 nxlog windows
+                2559816928L  // 4.3 filebeat windows
+        );
+        @JsonProperty("knownChecksums")
+        public abstract Set<Long> knownChecksums();
+
+        public static MigrationState createEmpty() {
+            return create(Set.of());
+        }
+
+        public MigrationState withNewDefaultTemplate(String template) {
+            var merged = knownChecksums();
+            merged.add(checksum(template));
+            return create(merged);
+        }
+        @JsonCreator
+        public static MigrationState create(@JsonProperty("knownChecksums") Set<Long> knownChecksums) {
+            var merged = new HashSet<>(knownChecksums);
+            merged.addAll(OLD_CHECKSUMS);
+
+            return new AutoValue_V20180212165000_AddDefaultCollectors_MigrationState(merged);
+        }
+
+        @JsonIgnore
+        public boolean isKnownDefaultTemplate(@Nullable String template) {
+            if (template == null) {
+                return false;
+            }
+
+            long crc = checksum(template);
+            return knownChecksums().contains(crc);
+        }
+
+        @JsonIgnore
+        public static long checksum(String template) {
+            var bytes = template.getBytes(StandardCharsets.UTF_8);
+            Checksum crc32 = new CRC32();
+            crc32.update(bytes, 0, bytes.length);
+            return crc32.getValue();
         }
     }
 }
