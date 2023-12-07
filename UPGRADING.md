@@ -38,12 +38,14 @@ Any existing Active Directory User Asset import configurations will be automatic
 
 The following Java Code API changes have been made.
 
-| File/method                    | Description               |
-|--------------------------------|---------------------------|
-| `org.graylog2.plugin.Message#addStringFields` | Deprecated method removed |
-| `org.graylog2.plugin.Message#addLongFields` | Deprecated method removed |
-| `org.graylog2.plugin.Message#addDoubleFields` | Deprecated method removed |
-| `org.graylog2.plugin.Message#getValidationErrors` | Deprecated method removed |
+| File/method                                       | Description                    |
+|---------------------------------------------------|--------------------------------|
+| `org.graylog2.plugin.Message#addStringFields`     | Deprecated method removed      |
+| `org.graylog2.plugin.Message#addLongFields`       | Deprecated method removed      |
+| `org.graylog2.plugin.Message#addDoubleFields`     | Deprecated method removed      |
+| `org.graylog2.plugin.Message#getValidationErrors` | Deprecated method removed      |
+| `org.graylog2.plugin.SingletonMessages` | Unused class removed     |
+| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException`        | Unused exception class removed |
 
 
 ## REST API Endpoint Changes
