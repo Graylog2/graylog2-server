@@ -100,4 +100,20 @@ public class TimeSizeOptimizingValidatorTest {
         assertThat(periodOtherThanDays(Period.weeks(5))).isTrue();
         assertThat(periodOtherThanDays(Period.days(5).withHours(3))).isTrue();
     }
+
+    @Test
+    void testAllowFlexiblePeriodFlag() {
+        when(elasticConfig.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.minutes(1));
+        when(elasticConfig.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.minutes(1));
+        IndexLifetimeConfig config = IndexLifetimeConfig.builder()
+                .indexLifetimeMin(Period.minutes(3))
+                .indexLifetimeMax(Period.minutes(5))
+                .build();
+
+        assertThat(validate(elasticConfig, config)).hasValueSatisfying(v -> assertThat(v.message())
+                .contains("can only be a multiple of days"));
+
+        when(elasticConfig.allowFlexibleRetentionPeriod()).thenReturn(true);
+        assertThat(validate(elasticConfig, config)).isEmpty();
+    }
 }

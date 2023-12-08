@@ -58,6 +58,7 @@ public class ElasticsearchConfiguration {
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE = "time_size_optimizing_rotation_min_shard_size";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE = "time_size_optimizing_rotation_max_shard_size";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_PERIOD = "time_size_optimizing_rotation_period";
+    public static final String ALLOW_FLEXIBLE_RETENTION_PERIOD = "allow_flexible_retention_period";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String defaultIndexPrefix = "graylog";
@@ -136,6 +137,9 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY)
     private Period timeSizeOptimizingRetentionFixedLeeway;
+
+    @Parameter(value = ALLOW_FLEXIBLE_RETENTION_PERIOD)
+    private boolean allowFlexibleRetentionPeriod = false;
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -297,6 +301,8 @@ public class ElasticsearchConfiguration {
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
     }
+
+    public boolean allowFlexibleRetentionPeriod() { return allowFlexibleRetentionPeriod; }
 
     @ValidatorMethod
     @SuppressWarnings("unused")
