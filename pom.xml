@@ -99,7 +99,7 @@
         <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.20.153</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.21.40</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.1</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
@@ -112,7 +112,7 @@
         <commons-email.version>1.5</commons-email.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-net.version>3.10.0</commons-net.version>
-        <commons-validator.version>1.7</commons-validator.version>
+        <commons-validator.version>1.8.0</commons-validator.version>
         <commons-io.version>2.15.1</commons-io.version>
         <disruptor.version>3.4.4</disruptor.version>
         <error-prone.version>2.23.0</error-prone.version>
