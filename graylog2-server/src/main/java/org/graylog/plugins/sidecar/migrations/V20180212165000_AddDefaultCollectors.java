@@ -515,7 +515,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 Long oldCRC = collector.defaultTemplateCRC();
                 long newCRC = Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8));
                 if (collector.defaultTemplateCRC() == null      // known obsolete version of template
-                        || newCRC != oldCRC // new standard template
+                        || !Objects.equals(newCRC, oldCRC) // new standard template
                 ) {
                     LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
                     try {
