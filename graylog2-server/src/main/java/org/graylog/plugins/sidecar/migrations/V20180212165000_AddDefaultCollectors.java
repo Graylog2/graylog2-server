@@ -512,7 +512,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             }
 
             if (collector.defaultTemplateUnchanged()) {
-                long oldCRC = collector.defaultTemplateCRC();
+                Long oldCRC = collector.defaultTemplateCRC();
                 long newCRC = Collector.checksum(defaultTemplate.getBytes(StandardCharsets.UTF_8));
                 if (collector.defaultTemplateCRC() == null      // known obsolete version of template
                         || newCRC != oldCRC // new standard template
