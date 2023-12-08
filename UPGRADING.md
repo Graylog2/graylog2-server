@@ -34,9 +34,12 @@ to better align with the GIM schema and allow for targeted handling of AD SIDs.
 
 Any existing Active Directory User Asset import configurations will be automatically updated to use the SID as the Unique ID attribute, potentially changing the behavior of subsequent imports by those configurations.
 
-## AWS Security Lake input log parsing changes
+## Input log parsing changes
 
-Several log parsing changes have been made to the AWS Security Lake input in preparation for Illuminate parsing content.
+Log parsing changes have been made several inputs in preparation for Illuminate parsing content. Note that additional 
+message parsing for these inputs is expected to be released in an upcoming release of Graylog Illuminate.
+
+### AWS Security Lake input
 
 Changed fields:
 - `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. 
@@ -48,11 +51,7 @@ Added fields:
 `vendor_event_description`: Contains the value which was previously present in the `message` log field.
 `vendor_version`: Contains the `metadata.product.version` log value.
 
-Note that additional AWS Security Lake message parsing is expected to be released in an upcoming release of Graylog Illuminate.
-
-## Office 365 input log parsing changes
-
-Several log parsing changes have been made to the Office 365 input in preparation for Illuminate parsing content.
+### Office 365 input
 
 Changed fields:
 - `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. 
@@ -65,9 +64,7 @@ Added fields:
 - `vendor_subtype`: Contains the `Workload` log value.
 - `vendor_version`: Contains the `Version` log value.
 
-Note that additional Office 365 message parsing is expected to be released in an upcoming release of Graylog Illuminate.
-
-## Okta Log Events input log parsing changes
+### Okta Log Events input
 
 Several log parsing changes have been made to the Okta Log Events input in preparation for Illuminate parsing content.
 
@@ -82,11 +79,7 @@ Added fields:
 - `vendor_subtype`: Contains the `eventType` log value.
 - `vendor_version`: Contains the `version` log value.
 
-Note that additional Okta Log Events message parsing is expected to be released in an upcoming release of Graylog Illuminate.
-
-## F5 BIG-IP input log parsing changes
-
-Several log parsing changes have been made to the F5 BIG-IP input in preparation for Illuminate parsing content. 
+### F5 BIG-IP input
 
 Changed fields:
 - `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
@@ -97,8 +90,6 @@ Changed fields:
 Added fields:
 - `event_created`: Contains the `vendorTimestamp`, `eventCreated`, or `timestamp` log value.
 - `event_source_product`: Contains the static value `f5_big-ip`.
-
-Note that additional F5 BIG-IP message parsing is expected to be released in an upcoming release of Graylog Illuminate.
 
 ## Java API Changes
 
