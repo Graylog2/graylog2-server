@@ -16,7 +16,10 @@
  */
 package org.graylog2.rest.resources.datanodes;
 
+import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeService;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,10 +42,14 @@ public class DataNodeManagementResourceTest {
 
     @Mock
     private DataNodeService dataNodeService;
+    @Mock
+    private NodeService<DataNodeDto> nodeService;
+    @Mock
+    private CertRenewalService certRenewalService;
 
     @Before
     public void setUp() {
-        classUnderTest = new DataNodeManagementResource(dataNodeService);
+        classUnderTest = new DataNodeManagementResource(dataNodeService, nodeService, certRenewalService);
     }
 
     @Test
