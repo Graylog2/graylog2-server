@@ -82,7 +82,7 @@ Added fields:
 ### F5 BIG-IP input
 
 Changed fields:
-- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
+- `message`: Now contains the full text content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
 - The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `vendorTimestamp`, `eventCreated`, or `timestamp` values. The `event_created` field now contains the previous `vendorTimestamp`, `eventCreated`, or `timestamp` value for backwards-compatibility.
 - `source`: Now contains the `host` log value if present, or the static value `F5 BIG-IP` used previously if not.
 - `vendor_event_description`: Now contains the value which was previously present in the `message` log field.
