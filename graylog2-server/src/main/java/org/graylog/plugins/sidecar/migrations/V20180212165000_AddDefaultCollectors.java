@@ -66,6 +66,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
     public static final String OS_FREEBSD = "freebsd";
     public static final String OS_LINUX = "linux";
     public static final String OS_DARWIN = "darwin";
+    public static final String OS_WINDOWS = "windows";
     private static final Logger LOG = LoggerFactory.getLogger(V20180212165000_AddDefaultCollectors.class);
     private final CollectorService collectorService;
     private final ConfigurationVariableService configurationVariableService;
@@ -289,7 +290,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         ensureCollector(
                 "winlogbeat",
                 "svc",
-                "windows",
+                OS_WINDOWS,
                 "C:\\Program Files\\Graylog\\sidecar\\winlogbeat.exe",
                 "-c \"%s\"",
                 "test config -c \"%s\"",
@@ -405,7 +406,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         ensureCollector(
                 "nxlog",
                 "svc",
-                "windows",
+                OS_WINDOWS,
                 "C:\\Program Files (x86)\\nxlog\\nxlog.exe",
                 "-c \"%s\"",
                 "-v -f -c \"%s\"",
@@ -522,7 +523,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                                 String validationCommand,
                                                 String defaultTemplate) {
 
-        this.updatedMigrationState = updatedMigrationState.withNewDefaultTemplate(defaultTemplate);
+        this.updatedMigrationState = updatedMigrationState.withNewDefaultTemplate(collectorName, nodeOperatingSystem, defaultTemplate);
 
         Collector collector = null;
         try {
@@ -533,7 +534,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 throw new IllegalArgumentException();
             }
             if (!defaultTemplate.equals(collector.defaultTemplate()) &&
-                    migrationState.isKnownDefaultTemplate(collector.defaultTemplate())) {
+                    migrationState.isKnownDefaultTemplate(collectorName, nodeOperatingSystem, collector.defaultTemplate())) {
                 LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
                 try {
                     return Optional.of(collectorService.save(
@@ -602,7 +603,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 throw new IllegalArgumentException();
             }
             if (!config.template().equals(collector.defaultTemplate()) &&
-                    migrationState.isKnownDefaultTemplate(config.template())) {
+                    migrationState.isKnownDefaultTemplate(collector.name(), collector.nodeOperatingSystem(), config.template())) {
                 LOG.info("Sidecar configuration '{}' still matches a known default. Updating.", name);
                 configurationService.save(config.toBuilder().template(collector.defaultTemplate()).build());
             }
@@ -631,42 +632,47 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
     public static abstract class MigrationState {
 
         // Set of prior version CRCs
-        // !!! Extending this list does not work. It is persisted after the first migration run.
-        private static final Set<Long> OLD_CHECKSUMS = java.util.Set.of(
-                3280545580L, // 5.2 filebeat linux
-                3396210381L, // 5.2 filebeat darwin
-                3013497446L, // 5.2 filebeat freebsd
-                4009863009L, // 5.2 winlogbeat windows
-                2023247173L, // 5.2 nxlog linux
-                2491201449L, // 5.2 nxlog windows
-                2487909285L, // 5.2 auditbeat windows
+        // !!! Extending this list does not work. It was persisted after the first migration run.
+        private static final Set<CollectorChecksum> OLD_CHECKSUMS = java.util.Set.of(
+                // 5.2
+                new CollectorChecksum("filebeat", OS_LINUX, 3280545580L),
+                new CollectorChecksum("filebeat", OS_DARWIN, 3396210381L),
+                new CollectorChecksum("filebeat", OS_FREEBSD, 3013497446L),
+                new CollectorChecksum("winlogbeat", OS_WINDOWS, 4009863009L),
+                new CollectorChecksum("nxlog", OS_LINUX, 2023247173L),
+                new CollectorChecksum("nxlog", OS_WINDOWS, 2491201449L),
+                new CollectorChecksum("auditbeat", OS_WINDOWS, 2487909285L),
 
-                4049210961L, // 5.1 and 5.0 filebeat linux/darwin/freebsd
-                2306685777L, // 5.1 and 5.0 winlogbeat windows
-                639836274L,  // 5.1 and 5.0 nxlog linux
-                2157898695L, // 5.1 and 5.0 nxlog windows
-                1490581247L, // 5.1 and 5.0 filebeat windows
+                // 5.1 & 5.0
+                new CollectorChecksum("filebeat", OS_LINUX, 4049210961L),
+                new CollectorChecksum("filebeat", OS_DARWIN, 4049210961L),
+                new CollectorChecksum("filebeat", OS_FREEBSD, 4049210961L),
+                new CollectorChecksum("winlogbeat", OS_WINDOWS, 2306685777L),
+                new CollectorChecksum("nxlog", OS_LINUX, 639836274L),
+                new CollectorChecksum("nxlog", OS_WINDOWS, 2157898695L),
 
-                1256873081L, // 4.3 filebeat linux
-                3852098581L, // 4.3 winlogbeat windows
-                3676599312L, // 4.3 nxlog linux
-                4293222217L, // 4.3 nxlog windows
-                2559816928L  // 4.3 filebeat windows
+                // 4.3
+                new CollectorChecksum("filebeat", OS_LINUX, 1256873081L),
+                new CollectorChecksum("winlogbeat", OS_WINDOWS, 3852098581L),
+                new CollectorChecksum("nxlog", OS_LINUX, 3676599312L),
+                new CollectorChecksum("nxlog", OS_WINDOWS, 4293222217L)
+                // !!! Extending this list does not work. It was persisted after the first migration run.
         );
+
         @JsonProperty("knownChecksums")
-        public abstract Set<Long> knownChecksums();
+        public abstract Set<CollectorChecksum> knownChecksums();
 
         public static MigrationState createEmpty() {
             return create(Set.of());
         }
 
-        public MigrationState withNewDefaultTemplate(String template) {
+        public MigrationState withNewDefaultTemplate(String collectorName, String platform, String template) {
             var merged = knownChecksums();
-            merged.add(checksum(template));
+            merged.add(checksum(collectorName, platform, template));
             return create(merged);
         }
         @JsonCreator
-        public static MigrationState create(@JsonProperty("knownChecksums") Set<Long> knownChecksums) {
+        public static MigrationState create(@JsonProperty("knownChecksums") Set<CollectorChecksum> knownChecksums) {
             var merged = new HashSet<>(knownChecksums);
             merged.addAll(OLD_CHECKSUMS);
 
@@ -674,21 +680,25 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         }
 
         @JsonIgnore
-        public boolean isKnownDefaultTemplate(@Nullable String template) {
+        public boolean isKnownDefaultTemplate(String collectorName, String os, @Nullable String template) {
             if (template == null) {
                 return false;
             }
 
-            long crc = checksum(template);
-            return knownChecksums().contains(crc);
+            var collectorChecksum = checksum(collectorName, os, template);
+            return knownChecksums().contains(collectorChecksum);
         }
 
         @JsonIgnore
-        public static long checksum(String template) {
+        public static CollectorChecksum checksum(String name, String platform, String template) {
             var bytes = template.getBytes(StandardCharsets.UTF_8);
             Checksum crc32 = new CRC32();
             crc32.update(bytes, 0, bytes.length);
-            return crc32.getValue();
+            return new CollectorChecksum(name, platform, crc32.getValue());
         }
     }
+
+    public record CollectorChecksum(@JsonProperty("name") String name,
+                                    @JsonProperty("platform") String platform,
+                                    @JsonProperty("crc") Long crc) {}
 }
