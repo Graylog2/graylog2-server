@@ -196,6 +196,7 @@ export interface SystemConfigurationComponentProps {
 
 export interface SystemConfiguration {
   configType: string;
+  displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
 }
 
