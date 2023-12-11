@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import upperCase from 'lodash/upperCase';
-import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
 
 import { Modal, Button } from 'components/bootstrap';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -47,15 +46,17 @@ const CreateWidgetButton = styled(Button)(({ theme }) => css`
   border-radius: 4px;
   height: 8rem;
   width: 8rem;
-  .mantine-Button-label {
-    display: flex;
-    flex-flow: column nowrap;
-    place-content: center center;
-    align-items: center;
-    word-wrap: break-word;
-    white-space: break-spaces;
-  }
 `);
+
+const ButtonInner = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  word-wrap: break-word;
+  white-space: break-spaces;
+  text-align: center;
+  gap: 0.3rem;
+`;
 
 const HugeIcon = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.huge};
@@ -88,8 +89,10 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
 
     return (
       <CreateWidgetButton key={title} type="button" title={`Create ${title} Widget`} onClick={onClick}>
-        <HugeIcon><WidgetIcon /></HugeIcon>
-        {title}
+        <ButtonInner>
+          <HugeIcon><WidgetIcon /></HugeIcon>
+          {title}
+        </ButtonInner>
       </CreateWidgetButton>
     );
   }), [creators, dispatch, location.pathname, position, sendTelemetry, view]);
