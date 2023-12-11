@@ -70,7 +70,6 @@ import {
   RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
-  SecurityPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,
@@ -289,7 +288,6 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },
             { path: RoutePaths.SYSTEM.ENTERPRISE, element: <EnterprisePage /> },
-            { path: RoutePaths.SECURITY, element: <SecurityPage /> },
 
             { path: RoutePaths.SYSTEM.SIDECARS.OVERVIEW, element: <SidecarsPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.STATUS(':sidecarId'), element: <SidecarStatusPage /> },

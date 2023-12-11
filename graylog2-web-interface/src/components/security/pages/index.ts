@@ -14,23 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+import loadAsync from 'routing/loadAsync';
 
-import com.google.common.collect.Iterators;
+const Overview = loadAsync(() => import('./Overview'));
+const UserActivity = loadAsync(() => import('./UserActivity'));
+const HostActivity = loadAsync(() => import('./HostActivity'));
+const NetworkActivity = loadAsync(() => import('./NetworkActivity'));
+const Anomalies = loadAsync(() => import('./Anomalies'));
 
-import java.util.Iterator;
-
-public class SingletonMessages implements Messages {
-
-    private final Message message;
-
-    public SingletonMessages(Message message) {
-        this.message = message;
-    }
-
-    @Override
-    public Iterator<Message> iterator() {
-        return Iterators.singletonIterator(message);
-    }
-
-}
+export {
+  Overview,
+  UserActivity,
+  HostActivity,
+  NetworkActivity,
+  Anomalies,
+};
