@@ -54,6 +54,7 @@ const Table = styled.table(({ theme }) => css`
       font-size: inherit !important;
       white-space: break-spaces !important;
       word-break: break-all !important;
+      min-width: 0 !important;
     }
 
     th,
@@ -62,7 +63,6 @@ const Table = styled.table(({ theme }) => css`
       left: 0;
       padding: 5px !important;
       position: static;
-      min-width: 0 !important;
     }
   }
 `);
