@@ -48,7 +48,6 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSort
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -63,6 +62,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetEntity.Builder.class)
@@ -155,8 +156,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 .filters(convertSearchFilters(this.filters()))
                 .id(this.id())
                 .streams(this.streams().stream()
-                        .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
-                        .map(nativeEntities::get)
+                        .map(id -> resolveStreamEntityObject(id, nativeEntities))
                         .map(object -> {
                             if (object == null) {
                                 throw new ContentPackException("Missing Stream for widget entity");
