@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix reporting erroneous distribution of table column width"
+
+issues = ["Graylog2/graylog-plugin-enterprise#6158"]
+pulls = ["17642"]
