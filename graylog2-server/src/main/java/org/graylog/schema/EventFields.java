@@ -23,7 +23,6 @@ public class EventFields {
     public static final String EVENT_END = "event_end";
     public static final String EVENT_ERROR_CODE = "event_error_code";
     public static final String EVENT_ERROR_DESCRIPTION = "event_error_description";
-    public static final String EVENT_INPUT_SOURCE = "event_input_source";
     public static final String EVENT_LOG_NAME = "event_log_name";
     public static final String EVENT_OBSERVER_HOSTNAME = "event_observer_hostname";
     public static final String EVENT_OBSERVER_ID = "event_observer_id";
@@ -34,6 +33,7 @@ public class EventFields {
     public static final String EVENT_REPORTER = "event_reporter";
     public static final String EVENT_SOURCE = "event_source";
     public static final String EVENT_SOURCE_API_VERSION = "event_source_api_version";
+    public static final String EVENT_SOURCE_INPUT = "event_source_input";
     public static final String EVENT_SOURCE_PRODUCT = "event_source_product";
     public static final String EVENT_START = "event_start";
     public static final String EVENT_UID = "event_uid";
