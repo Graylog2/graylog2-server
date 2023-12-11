@@ -33,4 +33,10 @@ public class DatanodeRestApiWait extends WaitingRestOperation {
         );
     }
 
+    public ValidatableResponse waitForStoppedStatus() throws ExecutionException, RetryException {
+        return waitForResponse("/",
+                input -> !input.extract().body().path("opensearch.node.state").equals("TERMINATED")
+        );
+    }
+
 }

@@ -355,7 +355,7 @@ public class EventDefinitionFacadeTest {
         EntityDescriptor eventDescriptor = EntityDescriptor
                 .create("5d4032513d2746703d1467f6", ModelTypes.EVENT_DEFINITION_V1);
         EntityDescriptor streamDescriptor = EntityDescriptor
-                .create("5cdab2293d27467fbe9e8a72", ModelTypes.STREAM_V1);
+                .create("5cdab2293d27467fbe9e8a72", ModelTypes.STREAM_REF_V1);
         Set<EntityDescriptor> expectedNodes = ImmutableSet.of(eventDescriptor, streamDescriptor);
         Graph<EntityDescriptor> graph = facade.resolveNativeEntity(eventDescriptor);
         assertThat(graph).isNotNull();

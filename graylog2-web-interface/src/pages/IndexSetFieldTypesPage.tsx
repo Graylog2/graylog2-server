@@ -25,8 +25,9 @@ import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypesList';
+import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexSetFieldTypesList';
 import useCurrentUser from 'hooks/useCurrentUser';
+import ChangeFieldTypeButton from 'components/indices/IndexSetFieldTypes/ChangeFieldTypeButton';
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
@@ -56,9 +57,10 @@ const IndexSetFieldTypesPage = () => {
                       <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}>
                         <Button bsStyle="info">Index set overview</Button>
                       </LinkContainer>
-                    )}>
+                    )}
+                    actions={<ChangeFieldTypeButton indexSetId={indexSetId} />}>
           <span>
-            Modify the current field types configuration for this index set.
+            The data represents field types from 2 last indices and the fields with custom field type. You can modify the current field types configuration for this index set.
           </span>
         </PageHeader>
 

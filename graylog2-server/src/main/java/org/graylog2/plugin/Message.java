@@ -375,21 +375,6 @@ public class Message implements Messages, Indexable {
         return true;
     }
 
-    @Deprecated
-    public String getValidationErrors() {
-        final StringBuilder sb = new StringBuilder();
-
-        for (String key : REQUIRED_FIELDS) {
-            final Object field = getField(key);
-            if (field == null) {
-                sb.append(key).append(" is missing, ");
-            } else if (field instanceof String && ((String) field).isEmpty()) {
-                sb.append(key).append(" is empty, ");
-            }
-        }
-        return sb.toString();
-    }
-
     @Override
     public String getId() {
         return getFieldAs(String.class, FIELD_ID);
@@ -652,39 +637,6 @@ public class Message implements Messages, Indexable {
         }
 
         for (Map.Entry<String, Object> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
-    @Deprecated
-    public void addStringFields(final Map<String, String> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, String> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
-    @Deprecated
-    public void addLongFields(final Map<String, Long> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, Long> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
-    @Deprecated
-    public void addDoubleFields(final Map<String, Double> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, Double> field : fields.entrySet()) {
             addField(field.getKey(), field.getValue());
         }
     }

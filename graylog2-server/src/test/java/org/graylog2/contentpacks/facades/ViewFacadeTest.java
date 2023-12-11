@@ -278,7 +278,7 @@ public class ViewFacadeTest {
     @Test
     @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldResolveDependencyForCreation() {
-        final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_V1);
+        final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_REF_V1);
         final EntityDescriptor viewEntityDescriptor = EntityDescriptor.create(viewId, ModelTypes.SEARCH_V1);
         Graph graph = facade.resolveNativeEntity(viewEntityDescriptor);
 

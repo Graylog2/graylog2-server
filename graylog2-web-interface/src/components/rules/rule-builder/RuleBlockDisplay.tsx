@@ -59,7 +59,8 @@ const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => cs
   border-left: solid 1px ${theme.colors.gray[80]};
 `);
 
-const NegationButton = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
+type NegationButtonProps = React.ComponentProps<typeof Button> & { $negate: boolean };
+const NegationButton: React.ComponentType<NegationButtonProps> = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
   opacity: ${$negate ? '1' : '0.3'};
   margin-right: ${theme.spacings.sm};
 `);
@@ -135,7 +136,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
           <Col xs={10} md={9}>
             <BlockTitle title={block?.step_title}>
               {negatable
-              && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
+              && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
               {highlightedOutput ? (
                 highlightedRuleTitle(highlightedOutput, block?.step_title)
               ) : block?.step_title}

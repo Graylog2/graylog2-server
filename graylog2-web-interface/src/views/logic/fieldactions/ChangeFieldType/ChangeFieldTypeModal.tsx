@@ -30,7 +30,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
+import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -52,20 +53,30 @@ const failureStreamId = '000000000000000000000004';
 
 type Props = {
   show: boolean,
-  field: string,
   onClose: () => void,
   onSubmitCallback?: () => void,
   initialSelectedIndexSets: Array<string>,
   showSelectionTable?: boolean,
-  fieldTypes: FieldTypes,
-  isOptionsLoading: boolean,
-  initialFieldType?: string,
+  showFieldSelect?: boolean,
+  initialData?: {
+    type?: string,
+    fieldName?: string
+  }
 }
 
-const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoading, initialSelectedIndexSets, onClose, field, showSelectionTable, initialFieldType }: Props) => {
+const ChangeFieldTypeModal = ({
+  show,
+  onSubmitCallback,
+  initialSelectedIndexSets,
+  onClose,
+  showSelectionTable,
+  showFieldSelect,
+  initialData,
+}: Props) => {
+  const [{ fieldName, type }, setModalData] = useState<{ fieldName?: string, type?: string }>(initialData);
+  const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypes();
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
-  const [newFieldType, setNewFieldType] = useState(null);
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
     .sort(([, label1], [, label2]) => defaultCompare(label1, label2))
     .map(([value, label]) => ({
@@ -76,7 +87,7 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
-  const { putFieldTypeMutation } = usePutFieldTypeMutation();
+  const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLading } = usePutFieldTypeMutation();
 
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
@@ -85,9 +96,9 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
 
     putFieldTypeMutation({
       indexSetSelection,
-      newFieldType,
+      newFieldType: type,
       rotated,
-      field,
+      field: fieldName,
     }).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CHANGED, {
         app_pathname: telemetryPathName,
@@ -101,10 +112,10 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
 
       onClose();
     }).then(() => onSubmitCallback && onSubmitCallback());
-  }, [field, indexSetSelection, initialSelectedIndexSets.length, newFieldType, onClose, onSubmitCallback, putFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
+  }, [fieldName, indexSetSelection, initialSelectedIndexSets.length, onClose, onSubmitCallback, putFieldTypeMutation, rotated, sendTelemetry, telemetryPathName, type]);
 
   const onChangeFieldType = useCallback((value: string) => {
-    setNewFieldType(value);
+    setModalData((cur) => ({ ...cur, type: value }));
   }, []);
 
   useEffect(() => {
@@ -120,33 +131,35 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
     setIndexSetSelection(initialSelectedIndexSets);
   }, [initialSelectedIndexSets, setIndexSetSelection]);
 
-  useEffect(() => {
-    if (initialFieldType) setNewFieldType(initialFieldType);
-  }, [initialFieldType]);
-
   return (
-    <BootstrapModalForm title={<span>Change {field} Field Type <BetaBadge /></span>}
-                        submitButtonText="Change field type"
+    <BootstrapModalForm title={<span>Change {fieldName} Field Type <BetaBadge /></span>}
+                        submitButtonText={fieldTypeMutationIsLading ? 'Changing field type...' : 'Change field type'}
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}
                         show={show}
-                        bsSize="large">
+                        bsSize="large"
+                        submitButtonDisabled={fieldTypeMutationIsLading}>
       <div>
+        {showFieldSelect && (
+          <FieldSelect indexSetId={initialSelectedIndexSets[0]}
+                       onFieldChange={setModalData}
+                       field={fieldName} />
+        )}
         <Alert bsStyle="warning">
-          Changing the type of the field <b>{field}</b> can have a significant impact on the ingestion of future log messages.
+          Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
         </Alert>
-        <StyledLabel>{`Select Field Type For ${field}`}</StyledLabel>
+        <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
         <Input id="field_type">
           <StyledSelect inputId="field_type"
                         options={fieldTypeOptions}
-                        value={newFieldType}
+                        value={type}
                         onChange={onChangeFieldType}
                         placeholder="Select field type"
-                        disabled={isOptionsLoading}
-                        inputProps={{ 'aria-label': `Select Field Type For ${field}` }}
+                        disabled={isLoadingFieldTypes}
+                        inputProps={{ 'aria-label': 'Select Field Type For Field' }}
                         required />
         </Input>
         {
@@ -154,15 +167,15 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
           <>
             <StyledLabel>Select Targeted Index Sets</StyledLabel>
             <p>
-              By default the {newFieldType ? <b>{newFieldType}</b> : 'selected'} field type will be set for the <b>{field}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
+              By default the {type ? <b>{type}</b> : 'selected'} field type will be set for the <b>{fieldName}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
             </p>
-            <IndexSetsTable field={field} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelectedIndexSets} />
+            <IndexSetsTable field={fieldName} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelectedIndexSets} />
           </>
           )
         }
         <StyledLabel>Select Rotation Strategy</StyledLabel>
         <p>
-          To see and use the {newFieldType ? <b>{newFieldType}</b> : 'selected field type'} as a field type for <b>{field}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+          To see and use the {type ? <b>{type}</b> : 'selected field type'} as a field type{fieldName ? <> for <b>{fieldName}</b></> : ''}, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
         </p>
         <Input type="checkbox"
                id="rotate"
@@ -178,7 +191,8 @@ const ChangeFieldTypeModal = ({ show, onSubmitCallback, fieldTypes, isOptionsLoa
 ChangeFieldTypeModal.defaultProps = {
   showSelectionTable: true,
   onSubmitCallback: undefined,
-  initialFieldType: null,
+  showFieldSelect: false,
+  initialData: { fieldName: undefined, type: undefined },
 };
 
 export default ChangeFieldTypeModal;

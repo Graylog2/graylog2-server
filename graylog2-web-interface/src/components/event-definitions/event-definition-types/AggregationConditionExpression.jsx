@@ -27,7 +27,7 @@ import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';
 import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpression';
 import BooleanOperatorSelector from './AggregationConditionExpressions/BooleanOperatorSelector';
-/* eslint-disable import/no-cycle */
+/* eslint-disable import/no-cycle, import/order */
 // We render the expression tree recursively, so complex expressions need to refer back to this component
 import BooleanExpression from './AggregationConditionExpressions/BooleanExpression';
 import ComparisonExpression from './AggregationConditionExpressions/ComparisonExpression';
@@ -56,9 +56,13 @@ class AggregationConditionExpression extends React.Component {
     validation: {},
   };
 
-  state = {
-    globalGroupOperator: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      globalGroupOperator: undefined,
+    };
+  }
 
   getEffectiveGlobalGroupOperator = () => {
     const { globalGroupOperator } = this.state;
@@ -72,6 +76,7 @@ class AggregationConditionExpression extends React.Component {
     return (expression.expr === '&&' || expression.expr === '||' ? expression.expr : '&&');
   };
 
+  // eslint-disable-next-line class-methods-use-this
   getBooleanOperator = (expression, defaultOperator) => {
     if (!expression) {
       return defaultOperator;
@@ -188,8 +193,8 @@ class AggregationConditionExpression extends React.Component {
               <FormGroup>
                 <div className={renderLabel ? styles.formControlNoLabel : undefined}>
                   <ButtonToolbar>
-                    <Button bsSize="sm" onClick={this.handleDeleteExpression}><Icon name="minus" fixedWidth /></Button>
-                    <Button bsSize="sm" onClick={this.handleAddExpression}><Icon name="plus" fixedWidth /></Button>
+                    <Button bsSize="sm" onClick={this.handleDeleteExpression} title="Delete Expression"><Icon name="minus" fixedWidth /></Button>
+                    <Button bsSize="sm" onClick={this.handleAddExpression} title="Add Expression"><Icon name="plus" fixedWidth /></Button>
                     <Button bsSize="sm" onClick={this.handleAddGroup}>Add Group</Button>
                   </ButtonToolbar>
                 </div>

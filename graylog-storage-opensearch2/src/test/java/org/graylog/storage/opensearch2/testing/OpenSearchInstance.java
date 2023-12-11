@@ -77,12 +77,12 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     public OpenSearchInstance init() {
         super.init();
         RestHighLevelClient restHighLevelClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
-        if(isFirstContainerStart) {
+        if (isFirstContainerStart) {
             afterContainerCreated();
         }
         return this;
@@ -187,7 +187,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     public GenericContainer<?> buildContainer(String image, Network network) {
         var container = new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
@@ -199,7 +199,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
         // disabling the performance plugin in 2.0.1 consistently created errors during CI runs, but keeping it running
         // in later versions sometimes created errors on CI, too.
-        if(version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.7.0")) {
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.7.0")) {
             return container.withCommand("sh", "-c", "opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
         } else {
             return container;

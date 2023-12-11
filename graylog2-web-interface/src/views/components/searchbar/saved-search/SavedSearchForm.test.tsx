@@ -35,7 +35,7 @@ describe('SavedSearchForm', () => {
     disableCreateNew: false,
     toggleModal: () => {},
     isCreateNew: false,
-    target: () => {},
+    target: undefined,
     saveSearch: () => {},
   };
   const findByHeadline = () => screen.findByRole('heading', { name: /name of search/i });
@@ -114,7 +114,7 @@ describe('SavedSearchForm', () => {
       const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
       userEvent.click(saveAsButton);
 
-      expect(onSaveAs).toHaveBeenCalledTimes(0);
+      expect(onSaveAs).not.toHaveBeenCalled();
     });
 
     it('should handle create new', async () => {

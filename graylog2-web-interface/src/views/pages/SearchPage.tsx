@@ -33,8 +33,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
-
-type SearchComponentSlots = { InfoBarSlot: React.ComponentType }
+import type { SearchExecutionResult } from 'views/types';
 
 type Props = React.PropsWithChildren<{
   isNew: boolean,
@@ -42,8 +41,7 @@ type Props = React.PropsWithChildren<{
   loadNewView?: (history: HistoryFunction) => unknown,
   loadView?: (history: HistoryFunction, viewId: string) => unknown,
   executionState?: SearchExecutionState,
-  SearchComponentSlots?: SearchComponentSlots,
-  SearchAreaContainer?: React.ComponentType,
+  searchResult?: SearchExecutionResult,
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -56,7 +54,15 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewView = defaultLoadNewView, loadView: _loadView = defaultLoadView, executionState: initialExecutionState, SearchComponentSlots, SearchAreaContainer }: Props) => {
+const SearchPage = ({
+  children,
+  isNew,
+  view: viewPromise,
+  loadNewView: _loadNewView = defaultLoadNewView,
+  loadView: _loadView = defaultLoadView,
+  executionState: initialExecutionState,
+  searchResult,
+}: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
   const history = useHistory();
@@ -76,7 +82,7 @@ const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewV
 
   return view
     ? (
-      <PluggableStoreProvider view={view} executionState={executionState} isNew={isNew} initialQuery={initialQuery}>
+      <PluggableStoreProvider view={view} executionState={executionState} isNew={isNew} initialQuery={initialQuery} result={searchResult}>
         <SearchPageTitle>
           <DashboardPageContextProvider>
             <NewViewLoaderContext.Provider value={loadNewView}>
@@ -84,7 +90,7 @@ const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewV
                 <AutoRefreshProvider>
                   {children}
                   <IfUserHasAccessToAnyStream>
-                    <Search InfoBarSlot={SearchComponentSlots.InfoBarSlot} SearchAreaContainer={SearchAreaContainer} />
+                    <Search />
                   </IfUserHasAccessToAnyStream>
                 </AutoRefreshProvider>
               </ViewLoaderContext.Provider>
@@ -100,8 +106,7 @@ SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
   executionState: SearchExecutionState.empty(),
-  SearchComponentSlots: {},
-  SearchAreaContainer: undefined,
+  searchResult: undefined,
 };
 
 export default React.memo(SearchPage);

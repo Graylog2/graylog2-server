@@ -16,9 +16,10 @@
  */
 package org.graylog2.datanode;
 
-import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,26 +31,59 @@ public class DataNodeServiceImpl implements DataNodeService {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeServiceImpl.class);
 
     private final ClusterEventBus clusterEventBus;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     @Inject
-    public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService nodeService) {
+    public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService) {
         this.clusterEventBus = clusterEventBus;
         this.nodeService = nodeService;
     }
 
     @Override
-    public void removeNode(String nodeId) throws NodeNotFoundException {
-        final Node node = nodeService.byNodeId(nodeId);
+    public DataNodeDto removeNode(String nodeId) throws NodeNotFoundException {
+        final DataNodeDto node = nodeService.byNodeId(nodeId);
+        if (nodeService.allActive().size() <= 1) {
+            throw new IllegalArgumentException("Cannot remove last data node in the cluster.");
+        }
+        if (nodeService.allActive().values().stream().anyMatch(n -> n.getDataNodeStatus() == DataNodeStatus.REMOVING)) {
+            throw new IllegalArgumentException("Only one data node can be removed at a time.");
+        }
         DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE);
         clusterEventBus.post(e);
+        return node;
     }
 
     @Override
-    public void resetNode(String nodeId) throws NodeNotFoundException {
-        final Node node = nodeService.byNodeId(nodeId);
+    public DataNodeDto resetNode(String nodeId) throws NodeNotFoundException {
+        final DataNodeDto node = nodeService.byNodeId(nodeId);
+        if (node.getDataNodeStatus() != DataNodeStatus.REMOVED) {
+            throw new IllegalArgumentException("Only previously removed data nodes can rejoin the cluster.");
+        }
         DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.RESET);
         clusterEventBus.post(e);
+        return node;
+    }
+
+    @Override
+    public DataNodeDto stopNode(String nodeId) throws NodeNotFoundException {
+        final DataNodeDto node = nodeService.byNodeId(nodeId);
+        if (node.getDataNodeStatus() != DataNodeStatus.AVAILABLE) {
+            throw new IllegalArgumentException("Only running data nodes can be stopped.");
+        }
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.STOP);
+        clusterEventBus.post(e);
+        return node;
+    }
+
+    @Override
+    public DataNodeDto startNode(String nodeId) throws NodeNotFoundException {
+        final DataNodeDto node = nodeService.byNodeId(nodeId);
+        if (node.getDataNodeStatus() != DataNodeStatus.UNAVAILABLE) {
+            throw new IllegalArgumentException("Only stopped data nodes can be started.");
+        }
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.START);
+        clusterEventBus.post(e);
+        return node;
     }
 
 }

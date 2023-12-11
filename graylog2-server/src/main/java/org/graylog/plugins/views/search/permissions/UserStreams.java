@@ -40,8 +40,22 @@ public class UserStreams {
         this.permittedStreams = permittedStreams;
     }
 
-    public ImmutableSet<String> loadAll() {
-        return permittedStreams.load(streamPermissions);
+    public ImmutableSet<String> loadAllMessageStreams() {
+        return permittedStreams.loadAllMessageStreams(streamPermissions);
+    }
+
+    public ImmutableSet<String> loadAllStreams() {
+        return permittedStreams.loadAll(streamPermissions);
+    }
+
+    public ImmutableSet<String> loadMessageStreamsWithFallback() {
+        final ImmutableSet<String> messageStreams = loadAllMessageStreams();
+        if (!messageStreams.isEmpty()) {
+            return messageStreams;
+        } else {
+            //if a user cannot access any message streams, load others (non-message) as default
+            return loadAllStreams();
+        }
     }
 
     /**
@@ -53,7 +67,7 @@ public class UserStreams {
      */
     public ImmutableSet<String> readableOrAllIfEmpty(@Nullable final Set<String> requestedStreams) {
         if (requestedStreams == null || requestedStreams.isEmpty()) {
-            return loadAll();
+            return loadMessageStreamsWithFallback();
         } else {
 
             final Set<String> notPermittedStreams = requestedStreams.stream()

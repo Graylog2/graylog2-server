@@ -19,7 +19,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { ShardRouting } from 'components/indices';
+import ShardRouting from 'components/indices/ShardRouting';
 
 const ShardRoutingWrap = styled.div(({ theme }) => css`
   .shards {

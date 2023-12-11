@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
@@ -25,6 +25,7 @@ import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.th`
+  float: right;
   text-align: right;
 
   .btn-toolbar {
@@ -46,8 +47,10 @@ type Props<Entity extends EntityBase> = {
   index: number,
   isSelected: boolean,
   onToggleEntitySelect: (entityId: string) => void,
-  rowActions?: (entity: Entity) => React.ReactNode,
+  rowActions?: (entity: Entity, setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>) => React.ReactNode,
   entityAttributesAreCamelCase: boolean,
+  isEntitySelectable: (entity: Entity) => boolean
+  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
 };
 
 const TableRow = <Entity extends EntityBase>({
@@ -62,21 +65,29 @@ const TableRow = <Entity extends EntityBase>({
   index,
   actionsRef,
   entityAttributesAreCamelCase,
+  isEntitySelectable,
+  setSelectedEntities,
 }: Props<Entity>) => {
   const toggleRowSelect = useCallback(
     () => onToggleEntitySelect(entity.id),
     [entity.id, onToggleEntitySelect],
   );
 
-  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
+  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity, setSelectedEntities)}</ButtonToolbar> : null;
+
+  const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
+
+  const title = `${isSelected ? 'Deselect' : 'Select'} entity`;
 
   return (
     <tr>
       {displaySelect && (
-        <td>
+        <td aria-label="Select cell">
           <RowCheckbox onChange={toggleRowSelect}
-                       title={`${isSelected ? 'Deselect' : 'Select'} entity`}
-                       checked={isSelected} />
+                       title={title}
+                       checked={isSelected}
+                       disabled={isSelectDisabled}
+                       aria-label={title} />
         </td>
       )}
       {columns.map((column) => {

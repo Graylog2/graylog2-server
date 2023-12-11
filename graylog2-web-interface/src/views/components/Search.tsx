@@ -80,7 +80,7 @@ const SearchArea = styled(PageContentLayout)(() => {
         /* overflow auto is required to display the message table widget height correctly */
         overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
-    `}
+`}
 `;
 });
 
@@ -112,15 +112,12 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-type Props = {
-  InfoBarSlot?: React.ComponentType,
-  SearchAreaContainer?: React.ComponentType,
-}
-
-const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
+const Search = () => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-  const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
+  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar } = useSearchPageLayout();
+  const InfoBar = infoBar?.component;
+  const SearchAreaContainer = searchAreaContainer?.component;
 
   useEffect(() => {
     refreshSearch();
@@ -167,7 +164,7 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
                               <SearchArea as={SearchAreaContainer}>
                                 <IfInteractive>
                                   <HeaderElements />
-                                  {InfoBarSlot && <InfoBarSlot />}
+                                  {InfoBar && <InfoBar />}
                                   <IfDashboard>
                                     {!editingWidget && <DashboardSearchBar />}
                                   </IfDashboard>
@@ -199,11 +196,6 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
       </ExternalValueActionsProvider>
     </>
   );
-};
-
-Search.defaultProps = {
-  InfoBarSlot: undefined,
-  SearchAreaContainer: undefined,
 };
 
 export default Search;

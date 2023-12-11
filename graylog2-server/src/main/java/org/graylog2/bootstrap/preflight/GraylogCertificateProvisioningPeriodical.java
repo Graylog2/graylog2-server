@@ -36,7 +36,8 @@ import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.notifications.Notification;
@@ -87,7 +88,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final String ERROR_MESSAGE_PREFIX = "Error trying to connect to data node ";
 
     private final DataNodeProvisioningService dataNodeProvisioningService;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     private final CaConfiguration configuration;
     private final CsrMongoStorage csrStorage;
@@ -108,7 +109,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final CertChainMongoStorage certMongoStorage,
                                                     final CaService caService,
                                                     final Configuration configuration,
-                                                    final NodeService nodeService,
+                                                    final NodeService<DataNodeDto> nodeService,
                                                     final CsrSigner csrSigner,
                                                     final ClusterConfigService clusterConfigService,
                                                     final @Named("password_secret") String passwordSecret,

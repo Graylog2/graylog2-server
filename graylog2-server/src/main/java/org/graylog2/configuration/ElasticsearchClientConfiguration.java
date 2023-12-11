@@ -100,4 +100,10 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
+
+    @Parameter(value = "indexer_max_concurrent_searches")
+    Integer indexerMaxConcurrentSearches = null;
+
+    @Parameter(value = "indexer_max_concurrent_shard_requests")
+    Integer indexerMaxConcurrentShardRequests = null;
 }

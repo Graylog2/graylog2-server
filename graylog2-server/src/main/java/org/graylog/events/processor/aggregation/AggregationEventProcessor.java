@@ -226,7 +226,7 @@ public class AggregationEventProcessor implements EventProcessor {
                               EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
         Set<String> streams = getStreams(parameters);
         if (streams.isEmpty()) {
-            streams = new HashSet<>(permittedStreams.load(streamId -> true));
+            streams = new HashSet<>(permittedStreams.loadAllMessageStreams(streamId -> true));
         }
 
         final AtomicInteger messageCount = new AtomicInteger(0);
