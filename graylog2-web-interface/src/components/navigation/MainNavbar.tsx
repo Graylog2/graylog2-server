@@ -132,6 +132,7 @@ const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Arra
   if (existingDropdownItemIndex >= 0) {
     const existingDropdownItem = result[existingDropdownItemIndex];
     const newDropdownItem = {
+      ...current,
       ...existingDropdownItem,
       children: [
         ...existingDropdownItem.children,
