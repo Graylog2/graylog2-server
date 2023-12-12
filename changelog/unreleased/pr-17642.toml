@@ -1,5 +1,5 @@
 type = "f"
-message = "Fix reporting erroneous distribution of table column width"
+message = "Fix distribution of table column width for print version of data table and message list widget"
 
 issues = ["Graylog2/graylog-plugin-enterprise#6158"]
 pulls = ["17642"]
