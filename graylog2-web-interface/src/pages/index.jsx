@@ -68,7 +68,6 @@ const RoleEditPage = loadAsync(() => import('./RoleEditPage'));
 const RolesOverviewPage = loadAsync(() => import('./RolesOverviewPage'));
 const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
-const SecurityPage = loadAsync(() => import('./SecurityPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
 const ShowEventNotificationPage = loadAsync(() => import('./ShowEventNotificationPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
@@ -157,7 +156,6 @@ export {
   RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
-  SecurityPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,
