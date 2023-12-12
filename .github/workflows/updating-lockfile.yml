@@ -31,13 +31,13 @@ jobs:
 
       - name: Get head SHA of PR
         id: pr-head-sha
-        if: ${{ steps.pr-create.outputs.pull-request-operation != "closed" }}
+        if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
         run: >
           git fetch &&
           echo "sha=$(git rev-parse origin/$(gh pr view ${{ steps.pr-create.outputs.pull-request-number }} --json headRefName --template '{{.headRefName}}'))" >> $GITHUB_OUTPUT
 
       - name: Request dispatched PR build
-        if: ${{ steps.pr-create.outputs.pull-request-operation != "closed" }}
+        if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo=${{ github.repository }}
