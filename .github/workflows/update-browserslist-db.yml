@@ -22,7 +22,7 @@ jobs:
         run: npx browserslist@latest --update-db
       - name: Create/Update Pull Request
         id: pr-create
-        uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
+        uses: Graylog2/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38
         with:
           title: Updating browserslist DB.
           body: This PR was created by a job that is running periodically to update the browserslist db automatically. See [here](https://github.com/browserslist/browserslist#browsers-data-updating) for details.
@@ -32,12 +32,15 @@ jobs:
           commit-message: Updating browserslist DB.
           delete-branch: true
 
-      - name: Get head SHA of PR
-        id: pr-head-sha
+      - name: Get headRef and SHA of PR
+        id: pr-infos
         if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
-        run: >
-          git fetch &&
-          echo "sha=$(git rev-parse origin/$(gh pr view ${{ steps.pr-create.outputs.pull-request-number }} --json headRefName --template '{{.headRefName}}'))" >> $GITHUB_OUTPUT
+        run: |
+          HEADREF=$(gh pr view ${{ steps.pr-create.outputs.pull-request-number }} --json headRefName --template '{{.headRefName}}')
+          echo "sha=$(git rev-parse origin/$HEADREF)" >> $GITHUB_OUTPUT
+          echo "headref=$HEADREF" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Request dispatched PR build
         if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
@@ -45,9 +48,9 @@ jobs:
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo=${{ github.repository }}
           -f caller_pr_nr=${{ steps.pr-create.outputs.pull-request-number }}
-          -f caller_base_branch=${{ github.base_ref || github.ref_name }}
-          -f caller_head_branch=${{ github.head_ref }}
-          -f head_sha=${{ steps.pr-head-sha.outputs.sha }}
+          -f caller_base_branch=master
+          -f caller_head_branch=${{ steps.pr-infos.outputs.headref }}
+          -f head_sha=${{ steps.pr-infos.outputs.sha }}
           -f initial_actor="Dr. Lint-a-lot"
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
