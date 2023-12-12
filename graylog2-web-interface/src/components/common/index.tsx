@@ -74,6 +74,7 @@ export { default as LinkToNode } from './LinkToNode';
 export { default as ListingWithCount } from './ListingWithCount';
 export { default as LoadingIndicator } from './LoadingIndicator';
 export { default as LocaleSelect } from './LocaleSelect';
+export { default as LookupTableFields } from './LookupTableFields';
 export { default as Markdown } from './Markdown';
 export { default as MessageDetailsDefinitionList } from './MessageDetailsDefinitionList';
 export { default as ModalSubmit } from './ModalSubmit';
