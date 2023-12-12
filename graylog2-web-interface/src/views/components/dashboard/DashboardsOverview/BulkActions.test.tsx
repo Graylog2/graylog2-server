@@ -34,6 +34,13 @@ jest.mock('util/UserNotification', () => ({
 }));
 
 describe('DashboardsOverview BulkActionsRow', () => {
+  const useSelectedEntitiesResponse = {
+    selectedEntities: [],
+    setSelectedEntities: () => {},
+    selectEntity: () => {},
+    deselectEntity: () => {},
+  };
+
   const openActionsDropdown = async () => {
     await screen.findByRole('button', {
       name: /bulk actions/i,
@@ -47,10 +54,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
   beforeEach(() => {
     window.confirm = jest.fn(() => true);
 
-    asMock(useSelectedEntities).mockReturnValue({
-      selectedEntities: [],
-      setSelectedEntities: () => {},
-    });
+    asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
   });
 
   it('should delete selected dashboards', async () => {
@@ -58,6 +62,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
     const setSelectedEntities = jest.fn();
 
     asMock(useSelectedEntities).mockReturnValue({
+      ...useSelectedEntitiesResponse,
       selectedEntities: ['dashboard-id-1', 'dashboard-id-2'],
       setSelectedEntities,
     });
@@ -89,6 +94,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
     const setSelectedEntities = jest.fn();
 
     asMock(useSelectedEntities).mockReturnValue({
+      ...useSelectedEntitiesResponse,
       selectedEntities: ['dashboard-id-1', 'dashboard-id-2'],
       setSelectedEntities,
     });

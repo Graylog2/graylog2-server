@@ -34,7 +34,7 @@ jest.mock('util/UserNotification', () => ({
 
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
-describe('SavedSearches BulkActionsRow', () => {
+describe('SavedSearches BulkActions', () => {
   const openActionsDropdown = async () => {
     await screen.findByRole('button', {
       name: /bulk actions/i,
@@ -51,6 +51,8 @@ describe('SavedSearches BulkActionsRow', () => {
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: [],
       setSelectedEntities: () => {},
+      selectEntity: () => {},
+      deselectEntity: () => {},
     });
   });
 
@@ -61,6 +63,8 @@ describe('SavedSearches BulkActionsRow', () => {
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: ['saved-search-id-1', 'saved-search-id-2'],
       setSelectedEntities,
+      selectEntity: () => {},
+      deselectEntity: () => {},
     });
 
     render(<BulkActions />);
@@ -92,6 +96,8 @@ describe('SavedSearches BulkActionsRow', () => {
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: ['saved-search-id-1', 'saved-search-id-2'],
       setSelectedEntities,
+      selectEntity: () => {},
+      deselectEntity: () => {},
     });
 
     render(<BulkActions />);

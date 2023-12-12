@@ -23,15 +23,16 @@ import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/ho
 import IndexSetCustomFieldTypeRemoveModal
   from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
-  setSelectedFields: React.Dispatch<React.SetStateAction<Array<string>>>
   refetchFieldTypes: () => void,
 }
 
-const FieldTypeActions = ({ fieldType, indexSetId, setSelectedFields, refetchFieldTypes }: Props) => {
+const FieldTypeActions = ({ fieldType, indexSetId, refetchFieldTypes }: Props) => {
+  const { setSelectedEntities } = useSelectedEntities();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
@@ -46,12 +47,12 @@ const FieldTypeActions = ({ fieldType, indexSetId, setSelectedFields, refetchFie
               title={`Edit field type for ${fieldType.fieldName}`}
               tabIndex={0}>
         Edit {
-        fieldType.isReserved && (
-          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-            We use reserved fields internally and expect a certain structure from them. Changing the field type for
-            reserved fields might impact the stability of Graylog
-          </HoverForHelp>
-        )
+          fieldType.isReserved && (
+            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+              We use reserved fields internally and expect a certain structure from them. Changing the field type for
+              reserved fields might impact the stability of Graylog
+            </HoverForHelp>
+          )
       }
       </Button>
       {fieldType.isCustom && (
@@ -68,7 +69,7 @@ const FieldTypeActions = ({ fieldType, indexSetId, setSelectedFields, refetchFie
                                             fields={[fieldType.fieldName]}
                                             onClose={toggleResetModal}
                                             indexSetIds={[indexSetId]}
-                                            setSelectedFields={setSelectedFields} />
+                                            setSelectedFields={setSelectedEntities} />
       )}
       {showEditModal && (
         <ChangeFieldTypeModal initialSelectedIndexSets={[indexSetId]}

@@ -24,24 +24,20 @@ import IndexSetCustomFieldTypeRemoveModal
   from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 
 type Props = {
-  selectedFields: Array<string>,
-  setSelectedFields: React.Dispatch<React.SetStateAction<Array<string>>>,
   indexSetId: string,
 }
 
-const BulkActions = ({ selectedFields, setSelectedFields, indexSetId }: Props) => {
+const BulkActions = ({ indexSetId }: Props) => {
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
 
   return (
-    <BulkActionsDropdown selectedEntities={selectedFields} setSelectedEntities={setSelectedFields}>
+    <BulkActionsDropdown>
       <MenuItem onSelect={toggleResetModal}>Reset</MenuItem>
       {showResetModal && (
         <IndexSetCustomFieldTypeRemoveModal show
-                                            fields={selectedFields}
                                             onClose={toggleResetModal}
-                                            indexSetIds={[indexSetId]}
-                                            setSelectedFields={setSelectedFields} />
+                                            indexSetIds={[indexSetId]} />
       )}
     </BulkActionsDropdown>
   );

@@ -44,6 +44,13 @@ jest.mock('@graylog/server-api', () => ({
 }));
 
 describe('StreamsOverview BulkActionsRow', () => {
+  const useSelectedEntitiesResponse = {
+    selectedEntities: [],
+    setSelectedEntities: () => {},
+    selectEntity: () => {},
+    deselectEntity: () => {},
+  };
+
   const openActionsDropdown = async () => {
     await screen.findByRole('button', {
       name: /bulk actions/i,
@@ -80,15 +87,14 @@ describe('StreamsOverview BulkActionsRow', () => {
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: [],
       setSelectedEntities: () => {},
+      selectEntity: () => {},
+      deselectEntity: () => {},
     });
   });
 
   describe('assign index set', () => {
     it('should assign index set', async () => {
-      asMock(useSelectedEntities).mockReturnValue({
-        selectedEntities: ['stream-id-1', 'stream-id-2'],
-        setSelectedEntities: () => {},
-      });
+      asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
 
       render(<BulkActions indexSets={indexSets} />);
 
@@ -104,8 +110,8 @@ describe('StreamsOverview BulkActionsRow', () => {
       asMock(Streams.assignToIndexSet).mockImplementation(() => Promise.reject(new Error('Unexpected error!')));
 
       asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
         selectedEntities: ['stream-id-1', 'stream-id-2'],
-        setSelectedEntities: () => {},
       });
 
       render(<BulkActions indexSets={indexSets} />);
@@ -131,6 +137,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       const setSelectedEntities = jest.fn();
 
       asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
         selectedEntities: ['stream-id-1', 'stream-id-2'],
         setSelectedEntities: setSelectedEntities,
       });
@@ -162,6 +169,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       const setSelectedEntities = jest.fn();
 
       asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
         selectedEntities: ['stream-id-1', 'stream-id-2'],
         setSelectedEntities: setSelectedEntities,
       });
@@ -193,6 +201,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       const setSelectedEntities = jest.fn();
 
       asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
         selectedEntities: ['stream-id-1', 'stream-id-2'],
         setSelectedEntities: setSelectedEntities,
       });
@@ -222,6 +231,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       const setSelectedEntities = jest.fn();
 
       asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
         selectedEntities: ['stream-id-1', 'stream-id-2'],
         setSelectedEntities: setSelectedEntities,
       });
@@ -251,6 +261,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       const setSelectedEntities = jest.fn();
 
       asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
         selectedEntities: ['stream-id-1', 'stream-id-2'],
         setSelectedEntities: setSelectedEntities,
       });
@@ -280,6 +291,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       const setSelectedEntities = jest.fn();
 
       asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
         selectedEntities: ['stream-id-1', 'stream-id-2'],
         setSelectedEntities: setSelectedEntities,
       });
@@ -302,6 +314,7 @@ describe('StreamsOverview BulkActionsRow', () => {
   describe('search in streams action', () => {
     it('should render link', async () => {
       asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
         selectedEntities: ['stream-id-1', 'stream-id-2'],
         setSelectedEntities: () => {},
       });

@@ -188,7 +188,7 @@ type Props<Entity extends EntityBase> = {
   /** Active page size */
   pageSize?: number
   /** Actions for each row. */
-  rowActions?: (entity: Entity, setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>) => React.ReactNode,
+  rowActions?: (entity: Entity) => React.ReactNode,
   /** Which columns should be displayed. */
   visibleColumns: Array<string>,
 };
