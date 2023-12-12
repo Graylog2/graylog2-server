@@ -22,12 +22,14 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import MenuItem from 'components/bootstrap/MenuItem';
 import IndexSetCustomFieldTypeRemoveModal
   from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
   indexSetId: string,
 }
 
 const BulkActions = ({ indexSetId }: Props) => {
+  const { selectedEntities } = useSelectedEntities();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
 
@@ -36,6 +38,7 @@ const BulkActions = ({ indexSetId }: Props) => {
       <MenuItem onSelect={toggleResetModal}>Reset</MenuItem>
       {showResetModal && (
         <IndexSetCustomFieldTypeRemoveModal show
+                                            fields={selectedEntities}
                                             onClose={toggleResetModal}
                                             indexSetIds={[indexSetId]} />
       )}

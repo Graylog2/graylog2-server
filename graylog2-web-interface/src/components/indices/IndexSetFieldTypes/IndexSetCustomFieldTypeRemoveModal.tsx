@@ -47,12 +47,14 @@ const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
 type Props = {
   show: boolean,
   onClose: () => void,
+  fields: Array<string>,
   indexSetIds: Array<string>,
 }
 
 type ContentProps = {
   indexSetIds: Array<string>,
   indexSets: Record<string, IndexSet>,
+  fields: Array<string>,
   setRotated: React.Dispatch<React.SetStateAction<boolean>>
   rotated: boolean,
 }
@@ -63,9 +65,8 @@ const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string
   return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
 };
 
-const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, setRotated, rotated, indexSetIds }: ContentProps) => {
-  const { selectedEntities } = useSelectedEntities();
-  const fieldsStr = selectedEntities.join(', ');
+const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, rotated, indexSetIds }: ContentProps) => {
+  const fieldsStr = fields.join(', ');
   const indexSetsStr = indexSetIds.map((id) => indexSets[id].title).join(', ');
 
   return (
@@ -87,8 +88,8 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, setRotated, rotated, 
   );
 };
 
-const IndexSetCustomFieldTypeRemoveModal = ({ show, onClose, indexSetIds }: Props) => {
-  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds }: Props) => {
+  const { setSelectedEntities } = useSelectedEntities();
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
   const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
@@ -109,7 +110,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, onClose, indexSetIds }: Prop
     e.preventDefault();
     setRemovalResponse(null);
 
-    removeCustomFieldTypeMutation({ fields: selectedEntities, indexSets: indexSetIds, rotated })
+    removeCustomFieldTypeMutation({ fields, indexSets: indexSetIds, rotated })
       .then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_REMOVED, {
           app_pathname: telemetryPathName,
@@ -120,7 +121,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, onClose, indexSetIds }: Prop
                         },
         });
       });
-  }, [selectedEntities, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
+  }, [fields, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_CLOSED, { app_pathname: telemetryPathName, app_action_value: 'removed-custom-field-type-closed' });
@@ -142,6 +143,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, onClose, indexSetIds }: Prop
       {!indexSets ? <Spinner /> : (
         <IndexSetCustomFieldTypeRemoveContent rotated={rotated}
                                               setRotated={setRotated}
+                                              fields={fields}
                                               indexSetIds={indexSetIds}
                                               indexSets={indexSets} />
       )}

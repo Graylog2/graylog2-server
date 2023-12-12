@@ -144,10 +144,6 @@ const IndexSetFieldTypesList = () => {
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
-  const renderBulkActions = useCallback(() => (
-    <BulkActions indexSetId={indexSetId} />
-  ), [indexSetId]);
-
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
@@ -186,7 +182,7 @@ const IndexSetFieldTypesList = () => {
                                             columnDefinitions={attributes}
                                             rowActions={renderActions}
                                             bulkSelection={{
-                                              actions: renderBulkActions,
+                                              actions: <BulkActions indexSetId={indexSetId} />,
                                               isEntitySelectable,
                                             }} />
       )}

@@ -132,7 +132,8 @@ const useElementsWidths = <Entity extends EntityBase>({
 
 const mergeColumnsRenderers = <Entity extends EntityBase>(columns: Array<Column>, customColumnRenderers: ColumnRenderers<Entity>) => {
   const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
-  const renderersByAttribute = Object.fromEntries(columns.map(({ id, type }) => {
+
+  return Object.fromEntries(columns.map(({ id, type }) => {
     const typeRenderer = renderers.types?.[type];
     const attributeRenderer = renderers.attributes?.[id];
 
@@ -140,8 +141,6 @@ const mergeColumnsRenderers = <Entity extends EntityBase>(columns: Array<Column>
 
     return [id, columnRenderer];
   }));
-
-  return renderersByAttribute;
 };
 
 type Props<Entity extends EntityBase> = {

@@ -84,12 +84,7 @@ describe('StreamsOverview BulkActionsRow', () => {
   };
 
   beforeEach(() => {
-    asMock(useSelectedEntities).mockReturnValue({
-      selectedEntities: [],
-      setSelectedEntities: () => {},
-      selectEntity: () => {},
-      deselectEntity: () => {},
-    });
+    asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
   });
 
   describe('assign index set', () => {

@@ -20,10 +20,8 @@ import React, { useState } from 'react';
 import { Button } from 'components/bootstrap';
 import { HoverForHelp } from 'components/common';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
-import IndexSetCustomFieldTypeRemoveModal
-  from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
+import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
-import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
   fieldType: IndexSetFieldType,
@@ -32,7 +30,6 @@ type Props = {
 }
 
 const FieldTypeActions = ({ fieldType, indexSetId, refetchFieldTypes }: Props) => {
-  const { setSelectedEntities } = useSelectedEntities();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
@@ -68,8 +65,7 @@ const FieldTypeActions = ({ fieldType, indexSetId, refetchFieldTypes }: Props) =
         <IndexSetCustomFieldTypeRemoveModal show
                                             fields={[fieldType.fieldName]}
                                             onClose={toggleResetModal}
-                                            indexSetIds={[indexSetId]}
-                                            setSelectedFields={setSelectedEntities} />
+                                            indexSetIds={[indexSetId]} />
       )}
       {showEditModal && (
         <ChangeFieldTypeModal initialSelectedIndexSets={[indexSetId]}
