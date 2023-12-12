@@ -36,16 +36,19 @@ import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
-import { loadDashboard } from 'views/logic/views/Actions';
+import { loadAsDashboard, loadDashboard } from 'views/logic/views/Actions';
 import createSearch from 'views/logic/slices/createSearch';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import type { GetState } from 'views/types';
 import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import fetchSearch from 'views/logic/views/fetchSearch';
+import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
+import useView from 'views/hooks/useView';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -224,6 +227,18 @@ const _onCopyToDashboard = (selectedDashboardId: string | undefined | null) => a
     .then(addPageToDashboard(targetDashboard, view, queryId));
 };
 
+const _onCreateNewDashboard = async (view: View, queryId: string, history: HistoryFunction) => {
+  const newDashboard = CopyPageToDashboard(queryId, view, View
+    .create()
+    .toBuilder()
+    .state({})
+    .type(View.Type.Dashboard)
+    .search(Search.create().toBuilder().queries([]).build())
+    .build());
+
+  loadAsDashboard(history, newDashboard);
+};
+
 const AdaptableQueryTabs = ({
   maxWidth,
   queries,
@@ -234,6 +249,8 @@ const AdaptableQueryTabs = ({
   queryTitleEditModal,
   dashboardId,
 }: Props) => {
+  const view = useView();
+  const queryId = useCurrentQueryId();
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
@@ -251,6 +268,8 @@ const AdaptableQueryTabs = ({
     .catch((error) => {
       UserNotification.error(`Copying dashboard page failed with error ${error}`);
     }), [dispatch, history]);
+
+  const onCreateNewDashboard = () => _onCreateNewDashboard(view, queryId, history);
 
   const openTitleEditModal = useCallback((activeQueryTitle: string) => {
     if (queryTitleEditModal) {
@@ -376,6 +395,7 @@ const AdaptableQueryTabs = ({
       )}
       {showCopyToDashboardModal && (
         <CopyToDashboardForm onCopyToDashboard={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
+                             onCreateNewDashboard={onCreateNewDashboard}
                              onCancel={toggleCopyToDashboardModal}
                              activeDashboardId={dashboardId}
                              submitButtonText="Copy page"
