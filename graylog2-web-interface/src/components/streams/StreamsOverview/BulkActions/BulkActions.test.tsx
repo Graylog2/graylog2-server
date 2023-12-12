@@ -89,7 +89,10 @@ describe('StreamsOverview BulkActionsRow', () => {
 
   describe('assign index set', () => {
     it('should assign index set', async () => {
-      asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+      });
 
       render(<BulkActions indexSets={indexSets} />);
 
