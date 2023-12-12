@@ -143,7 +143,7 @@ const StyledTable = styled(Table)<{ $stickyHeader: boolean, $borderedHeader: boo
   }
   
   @media print {
-    tr.fields-row > td {
+    th {
       min-width: 0;
     }
   }
