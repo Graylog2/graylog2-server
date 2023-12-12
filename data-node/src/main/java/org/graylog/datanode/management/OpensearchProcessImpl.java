@@ -22,7 +22,6 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchInfo;
 import org.graylog.datanode.process.ProcessEvent;
@@ -31,8 +30,8 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +52,7 @@ import java.util.stream.Collectors;
 class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
+    public static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
     private final StateMachineTracerAggregator tracerAggregator;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -70,12 +70,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final Queue<String> stdout;
     private final Queue<String> stderr;
     private final CustomCAX509TrustManager trustManager;
-    private final Path hostsfile;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
     private final Configuration configuration;
 
 
-    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService nodeService) {
+    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService<DataNodeDto> nodeService) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = ProcessStateMachine.createNew();
         tracerAggregator = new StateMachineTracerAggregator();
@@ -85,7 +84,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.trustManager = trustManager;
         this.nodeService = nodeService;
         this.configuration = configuration;
-        this.hostsfile = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir().resolve("unicast_hosts.txt");
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
@@ -157,10 +155,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private void writeSeedHostsList() {
         try {
-            final Set<String> current = nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
+            final Path hostsfile = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(UNICAST_HOSTS_FILE);
+            final Set<String> current = nodeService.allActive().values().stream().map(DataNodeDto::getClusterAddress).filter(Objects::nonNull).collect(Collectors.toSet());
             Files.write(hostsfile, current, Charset.defaultCharset(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } catch (IOException iox) {
-            LOG.error("Could not write to file: {} - {}", hostsfile, iox.getMessage());
+            LOG.error("Could not write to file: {} - {}", UNICAST_HOSTS_FILE, iox.getMessage());
         }
 
     }
@@ -202,6 +201,19 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
             onEvent(ProcessEvent.PROCESS_STOPPED);
             commandLineProcess.close();
         }
+    }
+
+    @Override
+    public void onRemove() {
+        LOG.info("Starting removal of OpenSearch node");
+        if (this.commandLineProcess != null) {
+            onEvent(ProcessEvent.PROCESS_REMOVE);
+        }
+    }
+
+    @Override
+    public void onReset() {
+        onEvent(ProcessEvent.RESET);
     }
 
     @Override

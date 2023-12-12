@@ -14,10 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { ButtonToolbar as BootstrapButtonToolbar } from 'react-bootstrap';
+import * as React from 'react';
+import styled from 'styled-components';
 
-const ButtonToolbar = BootstrapButtonToolbar;
+import OriginalButtonGroup from './ButtonGroup';
+
+const StyledButtonToolbar = styled(OriginalButtonGroup)`
+  gap: 0.25em;
+`;
+
+const ButtonToolbar = (props: React.ComponentProps<typeof StyledButtonToolbar>) => (
+  <StyledButtonToolbar role="toolbar" {...props} />
+);
 
 /** @component */
 export default ButtonToolbar;

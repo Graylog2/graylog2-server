@@ -22,19 +22,26 @@ import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import type User from 'logic/users/User';
 import AppConfig from 'util/AppConfig';
 import isReservedField from 'views/logic/IsReservedField';
+import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 
 const ChangeFieldType = ({
   field,
   onClose,
 }: ActionComponentProps) => {
   const [show, setShow] = useState(true);
-
   const handleOnClose = useCallback(() => {
     setShow(false);
     onClose();
   }, [onClose]);
 
-  return show ? <ChangeFieldTypeModal field={field} onClose={handleOnClose} show={show} /> : null;
+  const initialSelection = useInitialSelection();
+
+  return show ? (
+    <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
+                          onClose={handleOnClose}
+                          initialData={{ fieldName: field }}
+                          show />
+  ) : null;
 };
 
 const hasMappingPermission = (currentUser: User) => currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');

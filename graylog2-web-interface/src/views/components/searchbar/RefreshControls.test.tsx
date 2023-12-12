@@ -16,32 +16,23 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import 'helpers/mocking/react-dom_mock';
 import { Form, Formik, useFormikContext } from 'formik';
 import userEvent from '@testing-library/user-event';
 
-import { RefreshActions } from 'views/stores/RefreshStore';
 import { asMock } from 'helpers/mocking';
-import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import Button from 'preflight/components/common/Button';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 
 import RefreshControls from './RefreshControls';
 
 jest.useFakeTimers();
 
-jest.mock('./useRefreshConfig');
-
-jest.mock('views/stores/RefreshStore', () => ({
-  RefreshActions: {
-    enable: jest.fn(),
-    disable: jest.fn(),
-  },
-  RefreshStore: {},
-}));
-
 jest.mock('hooks/useSearchConfiguration');
+jest.mock('views/hooks/useAutoRefresh');
+jest.mock('views/hooks/useMinimumRefreshInterval');
 
 const autoRefreshOptions = {
   PT1S: '1 second',
@@ -76,7 +67,20 @@ describe('RefreshControls', () => {
     );
   };
 
+  const autoRefreshContextValue = {
+    refreshConfig: null,
+    stopAutoRefresh: () => {},
+    startAutoRefresh: () => {},
+  };
+
   beforeEach(() => {
+    asMock(useAutoRefresh).mockReturnValue(autoRefreshContextValue);
+
+    asMock(useMinimumRefreshInterval).mockReturnValue({
+      data: 'PT1S',
+      isInitialLoading: false,
+    });
+
     asMock(useSearchConfiguration).mockReturnValue({
       config: {
         auto_refresh_timerange_options: autoRefreshOptions,
@@ -99,7 +103,11 @@ describe('RefreshControls', () => {
     ${false}     | ${300000}
     ${false}     | ${1000}
   `('renders refresh controls with enabled: $enabled and interval: $interval', async ({ enabled, interval }) => {
-      asMock(useRefreshConfig).mockReturnValue({ enabled, interval });
+      asMock(useAutoRefresh).mockReturnValue({
+        ...autoRefreshContextValue,
+        refreshConfig: { enabled, interval },
+      });
+
       render(<SUT />);
 
       await screen.findByLabelText(/refresh search controls/i);
@@ -107,25 +115,38 @@ describe('RefreshControls', () => {
   });
 
   it('should start the interval', async () => {
-    asMock(useRefreshConfig).mockReturnValue({ enabled: false, interval: 1000 });
+    const startAutoRefresh = jest.fn();
+
+    asMock(useAutoRefresh).mockReturnValue({
+      ...autoRefreshContextValue,
+      startAutoRefresh,
+      refreshConfig: { enabled: false, interval: 1000 },
+    });
+
     render(<SUT />);
 
     userEvent.click(await screen.findByTitle(/start refresh/i));
 
-    expect(RefreshActions.enable).toHaveBeenCalled();
+    await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledWith(1000));
   });
 
   it('should stop the interval', async () => {
-    asMock(useRefreshConfig).mockReturnValue({ enabled: true, interval: 1000 });
+    const stopAutoRefresh = jest.fn();
+
+    asMock(useAutoRefresh).mockReturnValue({
+      ...autoRefreshContextValue,
+      stopAutoRefresh,
+      refreshConfig: { enabled: true, interval: 1000 },
+    });
+
     render(<SUT />);
 
     userEvent.click(await screen.findByTitle(/pause refresh/i));
 
-    expect(RefreshActions.disable).toHaveBeenCalled();
+    expect(stopAutoRefresh).toHaveBeenCalled();
   });
 
   it('should submit the form when there are changes when starting the interval', async () => {
-    asMock(useRefreshConfig).mockReturnValue({ enabled: false, interval: 5000 });
     const onSubmitMock = jest.fn();
 
     render(
@@ -141,7 +162,13 @@ describe('RefreshControls', () => {
   });
 
   it('should stop the interval when there are form changes while the interval is active', async () => {
-    asMock(useRefreshConfig).mockReturnValue({ enabled: true, interval: 5000 });
+    const stopAutoRefresh = jest.fn();
+
+    asMock(useAutoRefresh).mockReturnValue({
+      ...autoRefreshContextValue,
+      stopAutoRefresh,
+      refreshConfig: { enabled: true, interval: 5000 },
+    });
 
     render(
       <SUT>
@@ -151,6 +178,6 @@ describe('RefreshControls', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
 
-    await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalled());
+    await waitFor(() => expect(stopAutoRefresh).toHaveBeenCalled());
   });
 });

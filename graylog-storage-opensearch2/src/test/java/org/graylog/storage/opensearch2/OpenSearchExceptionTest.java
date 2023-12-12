@@ -27,7 +27,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.rest.RestStatus;
+import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -143,7 +143,7 @@ public class OpenSearchExceptionTest {
         RestStatus restStatus = RestStatus.BAD_REQUEST;
         OpenSearchStatusException statusException = new OpenSearchStatusException(
                 "status msg", restStatus, responseException);
-        final OpenSearchClient openSearchClient = new OpenSearchClient(restHighLevelClient, true, new ObjectMapper());
+        final OpenSearchClient openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapper());
 
         Exception exception = assertThrows(BatchSizeTooLargeException.class, () -> {
             openSearchClient.execute((a, b) -> {throw statusException;});

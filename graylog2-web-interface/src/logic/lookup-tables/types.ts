@@ -30,6 +30,7 @@ export type LookupTableCacheConfig = {
   expire_after_access_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
   expire_after_write?: number,
   expire_after_write_unit?: 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | null,
+  ignore_null?: boolean,
 };
 
 export type LookupTableCache = GenericEntityType & {

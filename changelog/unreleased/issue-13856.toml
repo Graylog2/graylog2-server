@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix problems with unknown-field validation warnings on fields like gl2_source_input. From now on, Query Validation never treats special GL fields as unknown."
+
+issues = ["13856"]
+pulls = ["17515"]

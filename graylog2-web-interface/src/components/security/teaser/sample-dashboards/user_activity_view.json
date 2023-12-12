@@ -1,0 +1,743 @@
+{
+  "id": "graylog-security-views__user-activity",
+  "type": "DASHBOARD",
+  "title": "User Activity",
+  "summary": "Read Only User",
+  "description": "in development",
+  "search_id": "656510c70548c8792779eea9",
+  "properties": [],
+  "state": {
+    "a118ddfe-2322-456c-8ba2-5d9079676e0c": {
+      "selected_fields": null,
+      "formatting": {
+        "highlighting": []
+      },
+      "titles": {
+        "tab": {
+          "title": "User Activity"
+        },
+        "widget": {
+          "a5c96581-122b-4d9a-913b-bdaf8c990ea8": "authentication success trend",
+          "9b905524-cb5d-4d47-b224-42da47cb7cdf": "IAM Modifications by event_source_product (Top 15)",
+          "ba9282b8-cc2c-4650-9699-d7ce052b20ad": "authentication failure trend",
+          "692bb05f-dfc2-4764-bfcd-453b842e945a": "IAM Modifications by event_source (Top 15)",
+          "96cb3dc8-b2ab-4b36-ba1d-30149513b09c": "Logon Failure by event_source_product (top 15) (copy)",
+          "a77c32bb-1e84-454b-82ee-f27ca197c66b": "All Logon Attempts",
+          "212dcc45-6d3f-42a7-af63-0b55075175b8": "Logon Attempts by user_name (top 15)",
+          "b111ed31-ffa4-458b-b939-160c462c0021": "IAM Modifications by gim_event_type (Top 15)",
+          "164c12b3-5a04-41f6-b96e-27904401493f": "IAM Modifications by target_user_name (Top 15)",
+          "7517ce6a-8e53-4766-b706-1a9d39057544": "Logon Failure by user_name (top 15)",
+          "9f50e265-1b30-4ff0-b408-e17069320478": "IAM Modifications by source_user_name (Top 15)",
+          "05b8268d-afd5-4664-bbc3-e71e813bc3f8": "Logon, Success",
+          "ea61576d-8369-4c98-ac2c-3e135d862edb": "Msg Count by user_name (Top 15)",
+          "b2fd1fad-0677-4205-ba5e-2aacbdaee565": "Logon, Failure",
+          "35796a85-feb3-4c91-b291-875b932e54f1": "IAM Modifications by user_name (Top 15)",
+          "eece74d8-c1ff-4162-b8c4-316fbd4c3b60": "High Illuminate Alerts by user_name (Top 15)"
+        }
+      },
+      "widgets": [
+        {
+          "id": "9f50e265-1b30-4ff0-b408-e17069320478",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "source_user_name"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(source_user_name AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "212dcc45-6d3f-42a7-af63-0b55075175b8",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [
+              {
+                "fields": [
+                  "event_outcome"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "failure",
+                  "chart_color": "#ff943f"
+                },
+                {
+                  "field_name": "success",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": false,
+            "row_pivots": [
+              {
+                "fields": [
+                  "user_name"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "stack",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(user_name AND event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
+          },
+          "streams": []
+        },
+        {
+          "id": "164c12b3-5a04-41f6-b96e-27904401493f",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "target_user_name"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(target_user_name AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "ea61576d-8369-4c98-ac2c-3e135d862edb",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#758085"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "user_name"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:user_name AND NOT user_name:(_undefined_ OR not-found)"
+          },
+          "streams": []
+        },
+        {
+          "id": "9b905524-cb5d-4d47-b224-42da47cb7cdf",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "event_source_product"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source_product AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "eece74d8-c1ff-4162-b8c4-316fbd4c3b60",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#bf360c"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "user_name"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(user_name AND alert_severity) AND alert_severity:(high OR critical)"
+          },
+          "streams": []
+        },
+        {
+          "id": "692bb05f-dfc2-4764-bfcd-453b842e945a",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "event_source"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_source AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "05b8268d-afd5-4664-bbc3-e71e813bc3f8",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "numeric",
+            "visualization_config": {
+              "trend": true,
+              "trend_preference": "NEUTRAL"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success)"
+          },
+          "streams": []
+        },
+        {
+          "id": "35796a85-feb3-4c91-b291-875b932e54f1",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "user_name"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(user_name AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "b111ed31-ffa4-458b-b939-160c462c0021",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": [
+                {
+                  "field_name": "count()",
+                  "chart_color": "#4b6ab7"
+                }
+              ]
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "fields": [
+                  "gim_event_type"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 0
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_type AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+          },
+          "streams": []
+        },
+        {
+          "id": "b2fd1fad-0677-4205-ba5e-2aacbdaee565",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "numeric",
+            "visualization_config": {
+              "trend": true,
+              "trend_preference": "LOWER"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(failure)"
+          },
+          "streams": []
+        },
+        {
+          "id": "a77c32bb-1e84-454b-82ee-f27ca197c66b",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "numeric",
+            "visualization_config": {
+              "trend": true,
+              "trend_preference": "NEUTRAL"
+            },
+            "event_annotation": false
+          },
+          "filters": [],
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
+          },
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "9b905524-cb5d-4d47-b224-42da47cb7cdf": [
+          "92ae66d3-01ee-4212-bafc-64e0556f758c"
+        ],
+        "692bb05f-dfc2-4764-bfcd-453b842e945a": [
+          "ba849865-e780-4b8a-befa-45d57e6daf81"
+        ],
+        "a77c32bb-1e84-454b-82ee-f27ca197c66b": [
+          "dd7d662c-80e2-43aa-94f2-80967d8a552a",
+          "0362927a-9421-43d5-94da-9c191125e18b"
+        ],
+        "212dcc45-6d3f-42a7-af63-0b55075175b8": [
+          "5c481eb4-22ed-4293-8f76-b7e1dff34463"
+        ],
+        "b111ed31-ffa4-458b-b939-160c462c0021": [
+          "203d3836-e66a-44d4-afdb-ba84fa42a14c"
+        ],
+        "164c12b3-5a04-41f6-b96e-27904401493f": [
+          "50f93c36-27d0-4597-8a97-c54d2a0afb9e"
+        ],
+        "9f50e265-1b30-4ff0-b408-e17069320478": [
+          "365f7227-b00d-4ec8-8ac3-a6ecff90d9a2"
+        ],
+        "05b8268d-afd5-4664-bbc3-e71e813bc3f8": [
+          "9259b90a-eb32-435f-b917-7791982549cc",
+          "a5d2fe76-1ddf-4463-88a5-b81a00b4d13e"
+        ],
+        "ea61576d-8369-4c98-ac2c-3e135d862edb": [
+          "4ec800c1-7f5c-46c3-bbb6-73d63af302b7"
+        ],
+        "b2fd1fad-0677-4205-ba5e-2aacbdaee565": [
+          "1ca21123-be19-491d-9ffc-158aa1efb039",
+          "9f5b2059-efa0-4390-a679-90d3fadc6dc4"
+        ],
+        "35796a85-feb3-4c91-b291-875b932e54f1": [
+          "0599f94e-96a2-48cd-9ebc-2f69e033c656"
+        ],
+        "eece74d8-c1ff-4162-b8c4-316fbd4c3b60": [
+          "93f0da96-11e3-4e81-9269-f0e7fd1151d5"
+        ]
+      },
+      "positions": {
+        "9b905524-cb5d-4d47-b224-42da47cb7cdf": {
+          "col": 1,
+          "row": 47,
+          "height": 4,
+          "width": 6
+        },
+        "692bb05f-dfc2-4764-bfcd-453b842e945a": {
+          "col": 1,
+          "row": 51,
+          "height": 4,
+          "width": 6
+        },
+        "a77c32bb-1e84-454b-82ee-f27ca197c66b": {
+          "col": 1,
+          "row": 33,
+          "height": 2,
+          "width": 4
+        },
+        "212dcc45-6d3f-42a7-af63-0b55075175b8": {
+          "col": 1,
+          "row": 35,
+          "height": 4,
+          "width": 6
+        },
+        "b111ed31-ffa4-458b-b939-160c462c0021": {
+          "col": 1,
+          "row": 39,
+          "height": 4,
+          "width": 6
+        },
+        "164c12b3-5a04-41f6-b96e-27904401493f": {
+          "col": 7,
+          "row": 43,
+          "height": 4,
+          "width": 6
+        },
+        "9f50e265-1b30-4ff0-b408-e17069320478": {
+          "col": 7,
+          "row": 39,
+          "height": 4,
+          "width": 6
+        },
+        "05b8268d-afd5-4664-bbc3-e71e813bc3f8": {
+          "col": 5,
+          "row": 33,
+          "height": 2,
+          "width": 4
+        },
+        "ea61576d-8369-4c98-ac2c-3e135d862edb": {
+          "col": 7,
+          "row": 47,
+          "height": 4,
+          "width": 6
+        },
+        "b2fd1fad-0677-4205-ba5e-2aacbdaee565": {
+          "col": 9,
+          "row": 33,
+          "height": 2,
+          "width": 4
+        },
+        "35796a85-feb3-4c91-b291-875b932e54f1": {
+          "col": 1,
+          "row": 43,
+          "height": 4,
+          "width": 6
+        },
+        "eece74d8-c1ff-4162-b8c4-316fbd4c3b60": {
+          "col": 7,
+          "row": 35,
+          "height": 4,
+          "width": 6
+        }
+      }
+    }
+  },
+  "created_at": "2021-03-15T20:32:50.170Z",
+  "owner": "john.hartley"
+}

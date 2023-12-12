@@ -18,11 +18,6 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import type { PluginRoute } from 'graylog-web-plugin';
 
-import App from 'routing/App';
-import PageContentLayout from 'components/layout/PageContentLayout';
-import AppConfig from 'util/AppConfig';
-import RoutePaths from 'routing/Routes';
-import { appPrefixed } from 'util/URLUtils';
 import {
   AuthenticationCreatePage,
   AuthenticationBackendCreatePage,
@@ -38,6 +33,7 @@ import {
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
+  DataNodesPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
@@ -58,6 +54,7 @@ import {
   IndexSetPage,
   IndicesPage,
   InputsPage,
+  KeyboardShortcutsPage,
   LoggersPage,
   LUTCachesPage,
   LUTDataAdaptersPage,
@@ -73,7 +70,6 @@ import {
   RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
-  SecurityPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,
@@ -103,7 +99,13 @@ import {
   UsersOverviewPage,
   ViewEventDefinitionPage,
   SidecarFailureTrackingPage,
+  IndexSetFieldTypesPage,
 } from 'pages';
+import AppConfig from 'util/AppConfig';
+import { appPrefixed } from 'util/URLUtils';
+import App from 'routing/App';
+import PageContentLayout from 'components/layout/PageContentLayout';
+import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
@@ -210,6 +212,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.INDEX_SETS.CREATE, element: <IndexSetCreationPage /> },
             { path: RoutePaths.SYSTEM.INDEX_SETS.SHOW(':indexSetId'), element: <IndexSetPage /> },
             { path: RoutePaths.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId'), element: <IndexSetConfigurationPage /> },
+            { path: RoutePaths.SYSTEM.INDEX_SETS.FIELD_TYPES(':indexSetId'), element: <IndexSetFieldTypesPage /> },
 
             { path: RoutePaths.SYSTEM.INDICES.LIST, element: <IndicesPage /> },
             !isCloud && (
@@ -241,7 +244,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
-
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.OVERVIEW, element: <DataNodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
             !isCloud && (
@@ -285,7 +288,6 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },
             { path: RoutePaths.SYSTEM.ENTERPRISE, element: <EnterprisePage /> },
-            { path: RoutePaths.SECURITY, element: <SecurityPage /> },
 
             { path: RoutePaths.SYSTEM.SIDECARS.OVERVIEW, element: <SidecarsPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.STATUS(':sidecarId'), element: <SidecarStatusPage /> },
@@ -296,6 +298,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId'), element: <SidecarEditConfigurationPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
+            { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
             ...standardPluginRoutes,
             { path: '*', element: <NotFoundPage displayPageLayout={false} /> },
           ].filter((route) => !!route),

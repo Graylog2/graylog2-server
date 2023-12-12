@@ -204,13 +204,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CREATE)
     public Response createCollector(@ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull Collector request) throws BadRequestException {
-        Collector collector = collectorService.fromRequest(request);
-        final ValidationResult validationResult = validate(collector);
-        if (validationResult.failed()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
-        }
-        etagService.invalidateAllCollectors();
-        return Response.ok().entity(collectorService.save(collector)).build();
+        return saveCollector(collectorService.fromRequest(request));
     }
 
     @PUT
@@ -223,11 +217,15 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                                      @PathParam("id") String id,
                                      @ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull Collector request) throws BadRequestException {
-        Collector collector = collectorService.fromRequest(id, request);
+        return saveCollector(collectorService.fromRequest(id, request));
+    }
+
+    private Response saveCollector(Collector collector) {
         final ValidationResult validationResult = validate(collector);
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
+
         etagService.invalidateAllCollectors();
         return Response.ok().entity(collectorService.save(collector)).build();
     }

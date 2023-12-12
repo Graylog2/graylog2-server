@@ -218,8 +218,8 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .sort(sort.map(SortConfig.fromJSON))
       .visualization(visualization)
       .rollup(rollup)
-      .visualizationConfig(visualization_config !== null ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
-      .formattingSettings(formatting_settings === null ? undefined : WidgetFormattingSettings.fromJSON(formatting_settings))
+      .visualizationConfig(visualization_config ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
+      .formattingSettings(formatting_settings ? WidgetFormattingSettings.fromJSON(formatting_settings) : undefined)
       .eventAnnotation(event_annotation)
       .build();
   }

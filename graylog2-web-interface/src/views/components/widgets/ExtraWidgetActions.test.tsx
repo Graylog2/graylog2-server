@@ -60,7 +60,7 @@ describe('ExtraWidgetActions', () => {
   it('returns `null` if no action is configured', () => {
     asMock(useWidgetActions).mockReturnValue([]);
 
-    const { container } = render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
+    const { container } = render(<ExtraWidgetActions widget={widget} />);
 
     expect(container).toBeEmptyDOMElement();
   });
@@ -68,7 +68,7 @@ describe('ExtraWidgetActions', () => {
   it('returns `null` if no action is not hidden', () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsHidden]);
 
-    const { container } = render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
+    const { container } = render(<ExtraWidgetActions widget={widget} />);
 
     expect(container).toBeEmptyDOMElement();
   });
@@ -76,7 +76,7 @@ describe('ExtraWidgetActions', () => {
   it('renders action which has no `isHidden`', async () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);
 
-    render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
+    render(<ExtraWidgetActions widget={widget} />);
 
     await screen.findByText('Dummy Action');
   });
@@ -84,7 +84,7 @@ describe('ExtraWidgetActions', () => {
   it('renders action where `isHidden` returns `false`', async () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
 
-    render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
+    render(<ExtraWidgetActions widget={widget} />);
 
     await screen.findByText('Dummy Action');
   });
@@ -92,7 +92,7 @@ describe('ExtraWidgetActions', () => {
   it('clicking menu item triggers action', async () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
 
-    render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
+    render(<ExtraWidgetActions widget={widget} />);
 
     const menuItem = await screen.findByText('Dummy Action');
 
@@ -108,23 +108,10 @@ describe('ExtraWidgetActions', () => {
       })));
   });
 
-  it('clicking menu item triggers `onSelect` to close menu', async () => {
-    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
-    const onSelect = jest.fn();
-
-    render(<ExtraWidgetActions onSelect={onSelect} widget={widget} />);
-
-    const menuItem = await screen.findByText('Dummy Action');
-
-    await userEvent.click(menuItem);
-
-    await waitFor(() => expect(onSelect).toHaveBeenCalled());
-  });
-
   it('renders divider if at least one action is present', async () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);
 
-    render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
+    render(<ExtraWidgetActions widget={widget} />);
 
     await screen.findByRole('separator');
   });
@@ -132,7 +119,7 @@ describe('ExtraWidgetActions', () => {
   it('renders a disabled action disabled', async () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsDisabled]);
 
-    render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
+    render(<ExtraWidgetActions widget={widget} />);
 
     const menuItem = await screen.findByRole('presentation');
 

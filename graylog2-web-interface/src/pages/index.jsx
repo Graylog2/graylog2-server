@@ -30,6 +30,7 @@ const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitio
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
+const DataNodesPage = loadAsync(() => import('./DataNodesPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
 const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
@@ -50,6 +51,7 @@ const IndexSetCreationPage = loadAsync(() => import('./IndexSetCreationPage'));
 const IndexSetPage = loadAsync(() => import('./IndexSetPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
+const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
@@ -66,7 +68,6 @@ const RoleEditPage = loadAsync(() => import('./RoleEditPage'));
 const RolesOverviewPage = loadAsync(() => import('./RolesOverviewPage'));
 const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
-const SecurityPage = loadAsync(() => import('./SecurityPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
 const ShowEventNotificationPage = loadAsync(() => import('./ShowEventNotificationPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
@@ -98,6 +99,8 @@ const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
 const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
 
+const IndexSetFieldTypesPage = loadAsync(() => import('./IndexSetFieldTypesPage'));
+
 export {
   AuthenticationCreatePage,
   AuthenticationPage,
@@ -113,6 +116,7 @@ export {
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
+  DataNodesPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
@@ -130,9 +134,11 @@ export {
   IndexerFailuresPage,
   IndexSetConfigurationPage,
   IndexSetCreationPage,
+  IndexSetFieldTypesPage,
   IndexSetPage,
   IndicesPage,
   InputsPage,
+  KeyboardShortcutsPage,
   LoadingPage,
   LoggersPage,
   LoginPage,
@@ -150,7 +156,6 @@ export {
   RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
-  SecurityPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,

@@ -41,6 +41,12 @@ jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
+
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   ['listStreams', () => ({ then: jest.fn() })],
   'availableStreams',

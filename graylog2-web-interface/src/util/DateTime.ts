@@ -21,7 +21,7 @@ export type DateTime = string | number | Moment | Date;
 
 export type DateTimeFormats = keyof typeof DATE_TIME_FORMATS;
 
-// This file provides utility functions to handle times. By default most functions return a UTC date.
+// This file provides utility functions to handle times. By default, most functions return a UTC date.
 
 export const DATE_TIME_FORMATS = {
   default: 'YYYY-MM-DD HH:mm:ss', // default format when displaying date times
@@ -121,3 +121,13 @@ export const toUTCFromTz = (dateTime: string, sourceTimezone: string) => {
 
   return moment.tz(dateTime, sourceTimezone);
 };
+
+/**
+ * Takes a duration (e.g. in milliseconds or seconds, or as a ISO8601 duration) and returns it in seconds.
+ */
+export const durationInSeconds = (duration: string | number) => moment.duration(duration).asSeconds();
+
+/**
+ * Takes a duration (e.g. in milliseconds or seconds, or as a ISO8601 duration) and returns it in minutes.
+ */
+export const durationInMinutes = (duration: string | number) => moment.duration(duration).asMinutes();

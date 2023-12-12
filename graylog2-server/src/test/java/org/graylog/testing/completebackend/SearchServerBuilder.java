@@ -18,7 +18,6 @@ package org.graylog.testing.completebackend;
 
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.util.ArrayList;
