@@ -21,22 +21,28 @@ import FindWidgetAndQueryIdInView from 'views/logic/views/FindWidgetAndQueryIdIn
 import type { TitleType } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
 import View from 'views/logic/views/View';
+import type Widget from 'views/logic/widgets/Widget';
 
-const CreateViewWithOneWidget = (view: View, widgetId: string) => {
-  const [newWidget, currentQueryId] = FindWidgetAndQueryIdInView(widgetId, view);
+const GetViewState = (view: View, newWidget: Widget, currentQueryId: string): ViewState => {
   const currentViewState = view.state.get(currentQueryId);
   const widgetMappings = Immutable.Map({ [newWidget.id]: currentViewState.widgetMapping.get(newWidget.id) });
   const titles = Immutable.Map<TitleType, Map<string, string>>({
     widget: Immutable.Map({ [newWidget.id]: currentViewState.titles.get('widget').get(newWidget.id) }),
   });
   const widgetPosition = currentViewState.widgetPositions[newWidget.id].toBuilder().col(0).row(0).build();
-  const viewState = ViewState.create()
+
+  return ViewState.create()
     .toBuilder()
     .widgets([newWidget])
     .titles(titles)
     .widgetPositions({ [newWidget.id]: widgetPosition })
     .widgetMapping(widgetMappings)
     .build();
+};
+
+const CreateViewWithOneWidget = (view: View, widgetId: string) => {
+  const [newWidget, currentQueryId] = FindWidgetAndQueryIdInView(widgetId, view);
+  const viewState = GetViewState(view, newWidget, currentQueryId);
 
   return View.create()
     .toBuilder()
