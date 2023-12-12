@@ -75,7 +75,7 @@ Changed fields:
 Added fields:
 - `event_created`: Contains the `published` log value.
 - `event_source_product`: Contains the static value `okta`.
-- `vendor_subtype`: Contains the `eventType` log value.
+- `vendor_event_type`: Contains the `eventType` log value.
 - `vendor_version`: Contains the `version` log value.
 
 ### F5 BIG-IP input
