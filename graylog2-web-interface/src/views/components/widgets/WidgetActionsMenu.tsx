@@ -48,7 +48,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import CreateViewWithOneWidget from 'views/logic/views/CreateViewWithOneWidget';
+import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -96,7 +96,7 @@ const _onCopyToDashboard = async (
 };
 
 const _onCreateNewDashboard = async (view: View, widgetId: string, history: HistoryFunction) => {
-  const newView = CreateViewWithOneWidget(view, widgetId);
+  const newView = ExtractWidgetIntoNewView(view, widgetId);
 
   loadAsDashboard(history, newView);
 };
