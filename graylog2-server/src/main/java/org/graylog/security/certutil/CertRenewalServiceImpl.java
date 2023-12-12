@@ -222,16 +222,19 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     }
 
     @Override
+    public DataNodeDto addProvisioningInformation(DataNodeDto node) {
+        final var keystore = loadKeyStoreForNode(node);
+        final var certificate = keystore.flatMap(this::getCertificateForNode);
+        final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        final var config = getDataNodeProvisioningConfig(node).orElseThrow(() -> new IllegalStateException("No config found for data node " + node.getNodeId()));
+        return node.toBuilder().setProvisioningInformation(new CertRenewalService.ProvisioningInformation(
+                config.state(), config.errorMsg(), certValidUntil.orElse(null)
+        )).build();
+    }
+
+    @Override
     public List<DataNodeDto> addProvisioningInformation(Collection<DataNodeDto> nodes) {
-        return nodes.stream().map(node -> {
-            final var keystore = loadKeyStoreForNode(node);
-            final var certificate = keystore.flatMap(this::getCertificateForNode);
-            final var certValidUntil = certificate.map(cert -> cert.getNotAfter().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            final var config = getDataNodeProvisioningConfig(node).orElseThrow(() -> new IllegalStateException("No config found for data node " + node.getNodeId()));
-            return node.toBuilder().setProvisioningInformation(new CertRenewalService.ProvisioningInformation(
-                    config.state(), config.errorMsg(), certValidUntil.orElse(null)
-            )).build();
-        }).toList();
+        return nodes.stream().map(this::addProvisioningInformation).toList();
     }
 
     private Optional<DataNodeProvisioningConfig> getDataNodeProvisioningConfig(final Node node) {

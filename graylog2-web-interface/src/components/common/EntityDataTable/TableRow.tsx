@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
@@ -26,6 +26,7 @@ import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.th`
+  float: right;
   text-align: right;
 
   .btn-toolbar {
@@ -47,6 +48,7 @@ type Props<Entity extends EntityBase> = {
   index: number,
   rowActions?: (entity: Entity) => React.ReactNode,
   entityAttributesAreCamelCase: boolean,
+  isEntitySelectable: (entity: Entity) => boolean,
 };
 
 const TableRow = <Entity extends EntityBase>({
@@ -59,6 +61,7 @@ const TableRow = <Entity extends EntityBase>({
   index,
   actionsRef,
   entityAttributesAreCamelCase,
+  isEntitySelectable,
 }: Props<Entity>) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const isSelected = !!selectedEntities?.includes(entity.id);
@@ -74,13 +77,19 @@ const TableRow = <Entity extends EntityBase>({
 
   const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
 
+  const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
+
+  const title = `${isSelected ? 'Deselect' : 'Select'} entity`;
+
   return (
     <tr>
       {displaySelect && (
-        <td>
+        <td aria-label="Select cell">
           <RowCheckbox onChange={toggleRowSelect}
-                       title={`${isSelected ? 'Deselect' : 'Select'} entity`}
-                       checked={isSelected} />
+                       title={title}
+                       checked={isSelected}
+                       disabled={isSelectDisabled}
+                       aria-label={title} />
         </td>
       )}
       {columns.map((column) => {

@@ -33,5 +33,46 @@
     {
       "value": "text"
     }
+  ],
+  "numbers": [
+    {
+      "value": 1
+    },
+    {
+      "value": 2
+    },
+    {
+      "value": 3
+    }
+  ],
+  "decimals": [
+    {
+      "value": 1.1
+    },
+    {
+      "value": 2.2
+    },
+    {
+      "value": 3.3
+    }
+  ],
+  "booleans": [
+    {
+      "value": true
+    },
+    {
+      "value": true
+    }
+  ],
+  "strings": [
+    {
+      "value": "one"
+    },
+    {
+      "value": "two"
+    },
+    {
+      "value": "three"
+    }
   ]
 }

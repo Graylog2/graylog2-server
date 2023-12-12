@@ -21,6 +21,8 @@ import AppConfig from 'util/AppConfig';
 import { extendedSearchPath, viewsPath } from 'views/Constants';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
+export const SECURITY_PATH = '/security';
+
 type RoutesRelativeTimeRange = {
   relative: number
 };
@@ -64,7 +66,13 @@ const Routes = {
       show: (notificationId: string) => `/alerts/notifications/${notificationId}`,
     },
   },
-  SECURITY: '/security',
+  SECURITY: {
+    OVERVIEW: `${SECURITY_PATH}/overview`,
+    USER_ACTIVITY: `${SECURITY_PATH}/user-activity`,
+    HOST_ACTIVITY: `${SECURITY_PATH}/host-activity`,
+    NETWORK_ACTIVITY: `${SECURITY_PATH}/network-activity`,
+    ANOMALIES: `${SECURITY_PATH}/anomalies`,
+  },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   WELCOME: '/welcome',
@@ -375,7 +383,7 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
 const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
 
 /**
- * Exported constants for using strings to check if a plugin is registered by it's description.
+ * Exported constants for using strings to check if a plugin is registered by its description.
  *
  */
 export const ENTERPRISE_ROUTE_DESCRIPTION = 'Enterprise';

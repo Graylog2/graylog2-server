@@ -18,10 +18,15 @@ package org.graylog2.datanode;
 
 import com.google.inject.ImplementedBy;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.nodes.DataNodeDto;
 
 @ImplementedBy(DataNodeServiceImpl.class)
 public interface DataNodeService {
-    void removeNode(String nodeId) throws NodeNotFoundException;
+    DataNodeDto removeNode(String nodeId) throws NodeNotFoundException;
 
-    void resetNode(String nodeId) throws NodeNotFoundException;
+    DataNodeDto resetNode(String nodeId) throws NodeNotFoundException;
+
+    DataNodeDto stopNode(String nodeId) throws NodeNotFoundException;
+
+    DataNodeDto startNode(String nodeId) throws NodeNotFoundException;
 }

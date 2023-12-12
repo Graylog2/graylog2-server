@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix filebeat path for sidecar default templates and default configurations."
+
+issues = ["17526"]
+pulls = ["17624"]

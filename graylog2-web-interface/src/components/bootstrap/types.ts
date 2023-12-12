@@ -18,3 +18,4 @@ import type { DropdownButton } from 'components/bootstrap';
 
 export type SelectCallback = (eventKey: any) => void;
 export type Sizes = React.ComponentProps<typeof DropdownButton>['bsSize'];
+export type BsSize = Sizes;

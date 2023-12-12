@@ -27,7 +27,6 @@ type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
 const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entity>>, selectedEntityIds: Array<string>) => {
   const checkboxRef = useRef<HTMLInputElement>();
-
   const checkboxStatus: CheckboxStatus = useMemo(() => {
     const selectedEntities = data.filter(({ id }) => selectedEntityIds.includes(id));
 
@@ -89,7 +88,8 @@ const BulkSelectHead = <Entity extends EntityBase>({
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
                    title={title}
-                   disabled={!data?.length} />
+                   disabled={!data?.length}
+                   aria-label={title} />
     </td>
   );
 };

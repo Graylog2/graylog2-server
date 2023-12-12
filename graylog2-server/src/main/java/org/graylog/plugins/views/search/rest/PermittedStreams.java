@@ -21,10 +21,7 @@ import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
-
-import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
@@ -42,13 +39,19 @@ public class PermittedStreams {
         this(() -> streamService.loadAll().stream().map(org.graylog2.plugin.streams.Stream::getId));
     }
 
-    public ImmutableSet<String> load(StreamPermissions streamPermissions) {
+    public ImmutableSet<String> loadAllMessageStreams(final StreamPermissions streamPermissions) {
         return allStreamsProvider.get()
                 // Unless explicitly queried, exclude event and failure indices by default
                 // Having these indices in every search, makes sorting almost impossible
                 // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
                 // TODO: this filter could be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
                 .filter(id -> !NON_MESSAGE_STREAM_IDS.contains(id))
+                .filter(streamPermissions::canReadStream)
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    public ImmutableSet<String> loadAll(final StreamPermissions streamPermissions) {
+        return allStreamsProvider.get()
                 .filter(streamPermissions::canReadStream)
                 .collect(ImmutableSet.toImmutableSet());
     }

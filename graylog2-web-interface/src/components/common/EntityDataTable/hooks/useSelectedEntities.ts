@@ -22,7 +22,7 @@ const useSelectedEntities = () => {
   const contextValue = useContext(BulkSelectContext);
 
   if (!contextValue) {
-    throw new Error('useSelectedEntities hook needs to be used inside CurrentUserContext.Provider');
+    throw new Error('useSelectedEntities hook needs to be used inside BulkSelectContext.Provider');
   }
 
   return contextValue;
