@@ -375,7 +375,7 @@ const AdaptableQueryTabs = ({
                                          activeQueryId={activeQueryId} />
       )}
       {showCopyToDashboardModal && (
-        <CopyToDashboardForm onSubmit={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
+        <CopyToDashboardForm onCopyToDashboard={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
                              onCancel={toggleCopyToDashboardModal}
                              activeDashboardId={dashboardId}
                              submitButtonText="Copy page"

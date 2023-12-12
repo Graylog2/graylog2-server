@@ -27,7 +27,7 @@ type Props = {
   onCopyToDashboard: (selectedDashboardId: string | undefined | null) => Promise<void>,
   submitButtonText: string,
   submitLoadingText: string,
-  onCreateNewDashboard: () => Promise<void>,
+  onCreateNewDashboard?: () => Promise<void>,
 };
 
 const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, submitLoadingText, activeDashboardId, onCreateNewDashboard }: Props) => {
@@ -124,12 +124,14 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
             ) : <span>No dashboards found</span>}
           </PaginatedList>
         )}
+        {onCreateNewDashboard && (
         <Input type="checkbox"
                id="create-new-dashboard"
                name="createNewDashboard"
                label="Create a new dashboard"
                onChange={toggleCreateNewDashboard}
                checked={createNewDashboard} />
+        )}
       </Modal.Body>
       <Modal.Footer>
         <ModalSubmit submitButtonText={submitButtonText}
@@ -147,6 +149,7 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
 
 CopyToDashboardForm.defaultProps = {
   activeDashboardId: undefined,
+  onCreateNewDashboard: undefined,
 };
 
 export default CopyToDashboardForm;
