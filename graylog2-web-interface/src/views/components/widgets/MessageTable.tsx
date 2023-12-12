@@ -54,7 +54,6 @@ const Table = styled.table(({ theme }) => css`
       font-size: inherit !important;
       white-space: break-spaces !important;
       word-break: break-all !important;
-      min-width: 0 !important;
     }
 
     th,
