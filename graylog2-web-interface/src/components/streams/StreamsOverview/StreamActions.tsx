@@ -115,11 +115,9 @@ const StreamActions = ({
         app_action_value: 'stream-item-delete',
       });
 
-      StreamsStore.remove(stream.id, (response) => {
+      StreamsStore.remove(stream.id).then(() => {
         deselectEntity(stream.id);
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
-
-        return response;
       }).catch((error) => {
         UserNotification.error(`An error occurred while deleting the stream. ${error}`);
       });
