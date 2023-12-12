@@ -95,7 +95,7 @@ const _onCopyToDashboard = async (
   setShowCopyToDashboard(false);
 };
 
-const _onCreateNewDashboard = (view: View, widgetId: string, history: HistoryFunction) => {
+const _onCreateNewDashboard = async (view: View, widgetId: string, history: HistoryFunction) => {
   const newView = CreateViewWithOneWidget(view, widgetId);
 
   loadAsDashboard(history, newView);
@@ -262,11 +262,6 @@ const WidgetActionsMenu = ({
               Copy to Dashboard
             </MenuItem>
           </IfSearch>
-          <IfSearch>
-            <MenuItem onSelect={onCreateNewDashboard}>
-              Create new dashboard
-            </MenuItem>
-          </IfSearch>
           {widget.isExportable && <MenuItem onSelect={() => setShowExport(true)}>Export</MenuItem>}
           <IfDashboard>
             <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>
@@ -281,10 +276,11 @@ const WidgetActionsMenu = ({
         </WidgetActionDropdown>
 
         {showCopyToDashboard && (
-          <CopyToDashboard onSubmit={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
+          <CopyToDashboard onCopyToDashboard={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
                            onCancel={() => setShowCopyToDashboard(false)}
                            submitLoadingText="Copying widget..."
-                           submitButtonText="Copy widget" />
+                           submitButtonText="Copy widget"
+                           onCreateNewDashboard={onCreateNewDashboard} />
         )}
 
         {showExport && (
