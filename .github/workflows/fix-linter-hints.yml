@@ -62,8 +62,8 @@ jobs:
         if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
         run: |
           HEADREF=$(gh pr view ${{ steps.pr-create.outputs.pull-request-number }} --json headRefName --template '{{.headRefName}}')
-          echo "head-ref=$HEADREF" >> $GITHUB_OUTPUT
           echo "sha=$(git rev-parse origin/$HEADREF)" >> $GITHUB_OUTPUT
+          echo "headref=$HEADREF" >> $GITHUB_OUTPUT
 
       - name: Request dispatched PR build
         if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
@@ -72,7 +72,7 @@ jobs:
           -f caller_repo=${{ github.repository }}
           -f caller_pr_nr=${{ steps.pr-create.outputs.pull-request-number }}
           -f caller_base_branch=master
-          -f caller_head_branch=${{ steps.pr-infos.outputs.head-ref }}
+          -f caller_head_branch=${{ steps.pr-infos.outputs.headref }}
           -f head_sha=${{ steps.pr-infos.outputs.sha }}
           -f initial_actor="Dr. Lint-a-lot"
         env:
