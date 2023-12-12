@@ -38,18 +38,6 @@ From now on, Graylog will shutdown on OutOfMemoryError, trying to log some basic
 Log parsing changes have been made several inputs in preparation for Illuminate parsing content. Note that additional 
 message parsing for these inputs is expected to be released in an upcoming release of Graylog Illuminate.
 
-### AWS Security Lake input
-
-Changed fields:
-- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. 
-- The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `time` value. The `event_created` field now contains the previous `time` value for backwards-compatibility.
-
-Added fields:
-- `event_created`: Contains the `time` log value.
-- `event_source_input`: Contains the static value `aws_security_lake`.
-- `vendor_event_description`: Contains the value which was previously present in the `message` log field.
-- `vendor_version`: Contains the `metadata.product.version` log value.
-
 ### Office 365 input
 
 Changed fields:
