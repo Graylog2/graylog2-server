@@ -18,7 +18,7 @@ import * as Immutable from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import generateId from 'logic/generateId';
-import type { FiltersType } from 'views/types';
+import type { FiltersType, SearchFilter } from 'views/types';
 import type { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 
 import type { SearchType } from './SearchType';
@@ -43,8 +43,8 @@ export type QueryJson = {
   id: QueryId,
   query: any,
   timerange: any,
-  filter?: FilterType,
-  filters?: FiltersType,
+  filter?: { [key: string]: any },
+  filters?: Array<SearchFilter>,
   search_types: any,
 };
 
@@ -200,7 +200,7 @@ export default class Query {
       query,
       timerange,
       filter,
-      filters,
+      filters: filters?.toArray(),
       search_types: searchTypes,
     };
   }
@@ -214,7 +214,7 @@ export default class Query {
   static fromJSON(value: QueryJson): Query {
     const { id, query, timerange, filter, filters, search_types } = value;
 
-    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, filters ? Immutable.List(filters) : filters);
+    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, filters ? Immutable.List(filters) : undefined);
   }
 }
 

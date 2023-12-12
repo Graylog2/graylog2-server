@@ -44,6 +44,15 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
     private static final String FIELD_TIME_ZONE = "time_zone";
+    private static final String FIELD_LOOKUP_RECIPIENT_EMAILS = "lookup_recipient_emails";
+    private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_NAME = "recipients_lut_name";
+    private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_KEY = "recipients_lut_key";
+    private static final String FIELD_LOOKUP_SENDER_EMAIL = "lookup_sender_email";
+    private static final String FIELD_SENDER_LOOKUP_TABLE_NAME = "sender_lut_name";
+    private static final String FIELD_SENDER_LOOKUP_TABLE_KEY = "sender_lut_key";
+    private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
+    private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
+    private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract ValueReference sender();
@@ -69,6 +78,33 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     @JsonProperty(FIELD_TIME_ZONE)
     public abstract ValueReference timeZone();
 
+    @JsonProperty(FIELD_LOOKUP_RECIPIENT_EMAILS)
+    public abstract ValueReference lookupRecipientEmails();
+
+    @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_NAME)
+    public abstract ValueReference recipientsLUTName();
+
+    @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
+    public abstract ValueReference recipientsLUTKey();
+
+    @JsonProperty(FIELD_LOOKUP_SENDER_EMAIL)
+    public abstract ValueReference lookupSenderEmail();
+
+    @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_NAME)
+    public abstract ValueReference senderLUTName();
+
+    @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_KEY)
+    public abstract ValueReference senderLUTKey();
+
+    @JsonProperty(FIELD_LOOKUP_REPLY_TO_EMAIL)
+    public abstract ValueReference lookupReplyToEmail();
+
+    @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_NAME)
+    public abstract ValueReference replyToLUTName();
+
+    @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
+    public abstract ValueReference replyToLUTKey();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -84,7 +120,16 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                     .type(TYPE_NAME)
                     .htmlBodyTemplate(ValueReference.of(""))
                     .timeZone(ValueReference.of("UTC"))
-                    .replyTo(ValueReference.of(""));
+                    .replyTo(ValueReference.of(""))
+                    .lookupRecipientEmails(ValueReference.of(false))
+                    .recipientsLUTName(ValueReference.of(""))
+                    .recipientsLUTKey(ValueReference.of(""))
+                    .lookupSenderEmail(ValueReference.of(false))
+                    .senderLUTName(ValueReference.of(""))
+                    .senderLUTKey(ValueReference.of(""))
+                    .lookupReplyToEmail(ValueReference.of(false))
+                    .replyToLUTName(ValueReference.of(""))
+                    .replyToLUTKey(ValueReference.of(""));
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -111,12 +156,39 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonProperty(FIELD_TIME_ZONE)
         public abstract Builder timeZone(ValueReference timeZone);
 
+        @JsonProperty(FIELD_LOOKUP_RECIPIENT_EMAILS)
+        public abstract Builder lookupRecipientEmails(ValueReference lookupRecipientEmails);
+
+        @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_NAME)
+        public abstract Builder recipientsLUTName(ValueReference recipientsLUTName);
+
+        @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
+        public abstract Builder recipientsLUTKey(ValueReference recipientsLUTKey);
+
+        @JsonProperty(FIELD_LOOKUP_SENDER_EMAIL)
+        public abstract Builder lookupSenderEmail(ValueReference lookupSenderEmail);
+
+        @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_NAME)
+        public abstract Builder senderLUTName(ValueReference senderLUTName);
+
+        @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_KEY)
+        public abstract Builder senderLUTKey(ValueReference senderLUTKey);
+
+        @JsonProperty(FIELD_LOOKUP_REPLY_TO_EMAIL)
+        public abstract Builder lookupReplyToEmail(ValueReference lookupReplyToEmail);
+
+        @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_NAME)
+        public abstract Builder replyToLUTName(ValueReference replyToLUTName);
+
+        @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
+        public abstract Builder replyToLUTKey(ValueReference replyToLUTKey);
+
         public abstract EmailEventNotificationConfigEntity build();
     }
 
     @Override
     public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
-        return EmailEventNotificationConfig.builder()
+        EmailEventNotificationConfig.Builder builder = EmailEventNotificationConfig.builder()
                 .sender(sender().asString(parameters))
                 .replyTo(replyTo().asString())
                 .subject(subject().asString(parameters))
@@ -124,7 +196,25 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .htmlBodyTemplate(htmlBodyTemplate().asString())
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
-                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
-                .build();
+                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)));
+        final boolean lookupRecipientEmails = lookupRecipientEmails().asBoolean(parameters);
+        builder.lookupRecipientEmails(lookupRecipientEmails);
+        if (lookupRecipientEmails) {
+            builder.recipientsLUTName(recipientsLUTName().asString(parameters))
+                    .recipientsLUTKey(recipientsLUTKey().asString(parameters));
+        }
+        final boolean lookupSenderEmail = lookupSenderEmail().asBoolean(parameters);
+        builder.lookupSenderEmail(lookupSenderEmail);
+        if (lookupSenderEmail) {
+            builder.senderLUTName(senderLUTName().asString(parameters))
+                    .senderLUTKey(senderLUTKey().asString(parameters));
+        }
+        final boolean lookupReplyToEmail = lookupReplyToEmail().asBoolean(parameters);
+        builder.lookupReplyToEmail(lookupReplyToEmail);
+        if (lookupReplyToEmail) {
+            builder.replyToLUTName(replyToLUTName().asString(parameters))
+                    .replyToLUTKey(replyToLUTKey().asString(parameters));
+        }
+        return builder.build();
     }
 }

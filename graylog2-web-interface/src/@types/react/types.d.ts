@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine;
 
-public class LuceneQueryParsingException extends Exception {
-    public LuceneQueryParsingException(Throwable throwable) {
-        super(throwable);
-    }
+declare namespace React {
+  interface HTMLAttributes {
+    inert?: ''
+  }
 }
