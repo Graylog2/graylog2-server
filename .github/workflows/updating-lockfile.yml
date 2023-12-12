@@ -2,7 +2,7 @@ name: Updating yarn lockfile
 
 on:
   schedule:
-    - cron: '0 */12 * * *'
+    - cron: '0 */12 * * MON-FRI'
 
   workflow_dispatch:
 
@@ -18,6 +18,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Create/Update Pull Request
+        id: pr-create
         uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
         with:
           title: Updating yarn lockfile
@@ -27,3 +28,23 @@ jobs:
           committer: Gary Bot <garybot2@graylog.com>
           commit-message: Updating yarn lockfile
           delete-branch: true
+
+      - name: Get head SHA of PR
+        id: pr-head-sha
+        if: ${{ steps.pr-create.outputs.pull-request-operation != "closed" }}
+        run: >
+          git fetch &&
+          echo "sha=$(git rev-parse origin/$(gh pr view ${{ steps.pr-create.outputs.pull-request-number }} --json headRefName --template '{{.headRefName}}'))" >> $GITHUB_OUTPUT
+
+      - name: Request dispatched PR build
+        if: ${{ steps.pr-create.outputs.pull-request-operation != "closed" }}
+        run: >
+          gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
+          -f caller_repo=${{ github.repository }}
+          -f caller_pr_nr=${{ steps.pr-create.outputs.pull-request-number }}
+          -f caller_base_branch=${{ github.base_ref || github.ref_name }}
+          -f caller_head_branch=${{ github.head_ref }}
+          -f head_sha=${{ steps.pr-head-sha.outputs.sha }}
+          -f initial_actor="Dr. Lint-a-lot"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
