@@ -52,7 +52,7 @@ const HotspotTrigger = styled.button(({ theme }) => css`
   
   &::before {
     background: ${theme.colors.variant.warning};
-    content: "";
+    content: '';
     width: 100%;
     height: 100%;
     position: absolute;
