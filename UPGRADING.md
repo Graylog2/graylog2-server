@@ -55,7 +55,7 @@ Added fields:
 Removed fields:
 - `answers`
 - `api`
-- `class_name` (value is still available in the `source` field)
+- `class_name` (this value is still available in the `source` field)
 - `cloud`
 - `compliance`
 - `confidence`
