@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.parser.RuleLangLexer;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
@@ -27,9 +28,12 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Valid
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -37,11 +41,15 @@ public class ValidVariables implements Validator {
 
     private final Map<String, RuleFragment> actions;
     private Map<String, Class<?>> variables;
+    private final Set<String> tokenNames;
 
     @Inject
     public ValidVariables(RuleBuilderRegistry ruleBuilderRegistry) {
         this.actions = ruleBuilderRegistry.actions();
         this.variables = new HashMap<>();
+
+        this.tokenNames = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        this.tokenNames.addAll(Arrays.asList(RuleLangLexer.tokenNames));
     }
 
     @Override
@@ -64,11 +72,15 @@ public class ValidVariables implements Validator {
         ImmutableList<ParameterDescriptor> parameterDescriptors = functionDescriptor.params();
         for(ParameterDescriptor parameterDescriptor: parameterDescriptors) {
             String parameterName = parameterDescriptor.name();
+
             Object value = stepParameters.get(parameterName);
             Class<?> variableType = getVariableType(value);
 
             if (!parameterDescriptor.optional() && value == null) {
                 return new ValidationResult(true, f("Missing parameter %s", parameterName));
+            }
+            if (value != null && tokenNames.contains(value.toString())) {
+                return new ValidationResult(true, f("Illegal reserved identifier <%s>", value));
             }
 
             //$ means it is stored in another variable and we need to fetch and verify that type

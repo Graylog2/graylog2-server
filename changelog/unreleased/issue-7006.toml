@@ -1,0 +1,9 @@
+type = "c"
+message = "An error message is displayed if a variable in a pipeline rule is given a reserved name."
+details.user = """
+The rule language includes a number of reserved keywords, e.g. `let`, `and`, `then`, etc.
+Variable names may not match any of these keywords.
+"""
+
+issues = ["7006"]
+pulls = [""]
