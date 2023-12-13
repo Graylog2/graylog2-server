@@ -24,6 +24,7 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 import Store from 'logic/local-storage/Store';
+import type { Perspective } from 'components/perspectives/types';
 
 import PerspectivesContext from './PerspectivesContext';
 
@@ -51,17 +52,25 @@ const usePersistedSetting = (settingKey: string) => {
   return useMemo(() => [setting, setSetting], [setSetting, setting]);
 };
 
+const initialPerspective = (availablePerspectives: Array<Perspective>, persistedPerspective: string | undefined) => {
+  if (persistedPerspective && !!availablePerspectives.find(({ id }) => persistedPerspective === id)) {
+    return persistedPerspective;
+  }
+
+  return 'default';
+};
+
 const PerspectivesProvider = ({ children }: PropsWithChildren) => {
+  const allPerspectives = usePluginEntities('perspectives');
+  const availablePerspectives = allPerspectives
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true));
   const [persistedPerspective, setPersistedPerspective] = usePersistedSetting('perspective');
-  const [activePerspective, setActivePerspective] = useState(persistedPerspective ?? 'default');
+  const [activePerspective, setActivePerspective] = useState<string>(initialPerspective(availablePerspectives, persistedPerspective));
   const setActivePerspectiveWithPersistence = useCallback((newPerspective: string) => {
     setActivePerspective(newPerspective);
 
     return setPersistedPerspective(newPerspective);
   }, [setPersistedPerspective]);
-  const allPerspectives = usePluginEntities('perspectives');
-  const availablePerspectives = allPerspectives
-    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true));
 
   const contextValue = useMemo(() => ({
     activePerspective,
