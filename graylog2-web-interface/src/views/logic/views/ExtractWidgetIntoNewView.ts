@@ -20,6 +20,7 @@ import type { Map } from 'immutable';
 import FindWidgetAndQueryIdInView from 'views/logic/views/FindWidgetAndQueryIdInView';
 import type { TitleType, TitlesMap } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
+import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type Search from 'views/logic/search/Search';
 import type Widget from 'views/logic/widgets/Widget';
@@ -58,26 +59,27 @@ type CreateViewWithOneWidgetProps = {
   widgetPosition: WidgetPosition,
   widgetMapping: WidgetMapping,
   queryId: string,
+  viewType?: ViewType,
 }
 
-const CreateViewWithOneWidget = ({ titles, search, widget, widgetPosition, widgetMapping, queryId }: CreateViewWithOneWidgetProps) => {
+const CreateViewWithOneWidget = ({ titles, search, widget, widgetPosition, widgetMapping, queryId, viewType = View.Type.Search }: CreateViewWithOneWidgetProps) => {
   const viewState = GetViewState({ widget, widgetPosition, widgetMapping, titles });
 
   return View.create()
     .toBuilder()
     .newId()
-    .type(View.Type.Search)
+    .type(viewType)
     .search(search)
     .state({ [queryId]: viewState })
     .build();
 };
 
-const ExtractWidgetIntoNewView = (view: View, widgetId: string) => {
+const ExtractWidgetIntoNewView = (view: View, widgetId: string, viewType: ViewType = View.Type.Search) => {
   const [widget, queryId] = FindWidgetAndQueryIdInView(widgetId, view);
   const { widgetPosition, widgetMapping, titles } = ExtractViewStateDataForWidget({ widgetId, view, queryId });
   const { search } = view;
 
-  return CreateViewWithOneWidget({ titles, widgetPosition, widget, queryId, widgetMapping, search });
+  return CreateViewWithOneWidget({ titles, widgetPosition, widget, queryId, widgetMapping, search, viewType });
 };
 
 export default ExtractWidgetIntoNewView;
