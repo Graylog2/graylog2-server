@@ -61,7 +61,8 @@ class LookupTableFieldValueProviderForm extends React.Component {
                          onKeyChange={this.handleSelectChange('key_field')}
                          selectedTableName={provider.table_name}
                          selectedKeyName={provider.key_field}
-                         validation={validation} />
+                         nameValidation={validation.errors.table_name}
+                         keyValidation={validation.errors.key_field} />
     );
   }
 }

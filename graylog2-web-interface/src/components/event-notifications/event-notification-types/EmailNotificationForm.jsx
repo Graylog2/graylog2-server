@@ -16,13 +16,12 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 
-import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
+import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect, LookupTableFields } from 'components/common';
 import UsersSelectField from 'components/users/UsersSelectField';
-import { Col, ControlLabel, FormGroup, HelpBlock, Input, Row } from 'components/bootstrap';
+import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 
@@ -85,10 +84,6 @@ const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpadding="
 \${end}
 `;
 
-const EmailLookupRow = styled(Row)`
-  margin-bottom: -9px;
-`;
-
 class EmailNotificationForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
@@ -129,6 +124,10 @@ class EmailNotificationForm extends React.Component {
     const { name } = event.target;
 
     this.propagateChange(name, getValueFromInput(event.target));
+  };
+
+  handleSelectChange = (key, value) => {
+    this.propagateChange(key, value);
   };
 
   handleTimeZoneChange = (nextValue) => {
@@ -217,30 +216,14 @@ class EmailNotificationForm extends React.Component {
     const { config, validation } = this.props;
 
     return (
-      <EmailLookupRow>
-        <Col md={6}>
-          <Input id="lookup-table-name"
-                 name="recipients_lut_name"
-                 label="Lookup Table Name"
-                 type="text"
-                 bsStyle={validation.errors.recipients_lut_name ? 'error' : null}
-                 help={get(validation, 'errors.recipients_lut_name[0]', 'The lookup table name to search for email recipients.')}
-                 value={config.recipients_lut_name || ''}
-                 onChange={this.handleChange}
-                 required />
-        </Col>
-        <Col md={6}>
-          <Input id="lookup-table-key"
-                 name="recipients_lut_key"
-                 label="Lookup Table Key"
-                 type="text"
-                 bsStyle={validation.errors.recipients_lut_key ? 'error' : null}
-                 help={get(validation, 'errors.recipients_lut_key[0]', 'The lookup table key to use when looking up email recipients.')}
-                 value={config.recipients_lut_key || ''}
-                 onChange={this.handleChange}
-                 required />
-        </Col>
-      </EmailLookupRow>
+      <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('recipients_lut_name', value)}
+                         onKeyChange={(value) => this.handleSelectChange('recipients_lut_key', value)}
+                         selectedTableName={config.recipients_lut_name || ''}
+                         selectedKeyName={config.recipients_lut_key || ''}
+                         nameValidation={validation.errors.recipients_lut_name}
+                         keyValidation={validation.errors.recipients_lut_key}
+                         lookupTableNameLabel="Recipients Lookup Table Name"
+                         lookupTableKeyLabel="Recipients Lookup Table Key" />
     );
   };
 
@@ -263,30 +246,14 @@ class EmailNotificationForm extends React.Component {
     const { config, validation } = this.props;
 
     return (
-      <EmailLookupRow>
-        <Col md={6}>
-          <Input id="sender-lookup-table-name"
-                 name="sender_lut_name"
-                 label="Sender Lookup Table Name"
-                 type="text"
-                 bsStyle={validation.errors.sender_lut_name ? 'error' : null}
-                 help={get(validation, 'errors.sender_lut_name[0]', 'The lookup table name to search for the sender email address.')}
-                 value={config.sender_lut_name || ''}
-                 onChange={this.handleChange}
-                 required />
-        </Col>
-        <Col md={6}>
-          <Input id="sender-lookup-table-key"
-                 name="sender_lut_key"
-                 label="Sender Lookup Table Key"
-                 type="text"
-                 bsStyle={validation.errors.sender_lut_key ? 'error' : null}
-                 help={get(validation, 'errors.sender_lut_key[0]', 'The lookup table key to use when looking up the sender email address.')}
-                 value={config.sender_lut_key || ''}
-                 onChange={this.handleChange}
-                 required />
-        </Col>
-      </EmailLookupRow>
+      <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('sender_lut_name', value)}
+                         onKeyChange={(value) => this.handleSelectChange('sender_lut_key', value)}
+                         selectedTableName={config.sender_lut_name || ''}
+                         selectedKeyName={config.sender_lut_key || ''}
+                         nameValidation={validation.errors.sender_lut_name}
+                         keyValidation={validation.errors.sender_lut_key}
+                         lookupTableNameLabel="Sender Lookup Table Name"
+                         lookupTableKeyLabel="Sender Lookup Table Key" />
     );
   };
 
@@ -309,30 +276,14 @@ class EmailNotificationForm extends React.Component {
     const { config, validation } = this.props;
 
     return (
-      <EmailLookupRow>
-        <Col md={6}>
-          <Input id="reply-to-lookup-table-name"
-                 name="reply_to_lut_name"
-                 label="Reply To Lookup Table Name"
-                 type="text"
-                 bsStyle={validation.errors.reply_to_lut_name ? 'error' : null}
-                 help={get(validation, 'errors.reply_to_lut_name[0]', 'The lookup table name to search for the reply to email address.')}
-                 value={config.reply_to_lut_name || ''}
-                 onChange={this.handleChange}
-                 required />
-        </Col>
-        <Col md={6}>
-          <Input id="reply-to-lookup-table-key"
-                 name="reply_to_lut_key"
-                 label="Reply To Lookup Table Key"
-                 type="text"
-                 bsStyle={validation.errors.reply_to_lut_key ? 'error' : null}
-                 help={get(validation, 'errors.reply_to_lut_key[0]', 'The lookup table key to use when looking up the reply to email address.')}
-                 value={config.reply_to_lut_key || ''}
-                 onChange={this.handleChange}
-                 required />
-        </Col>
-      </EmailLookupRow>
+      <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('reply_to_lut_name', value)}
+                         onKeyChange={(value) => this.handleSelectChange('reply_to_lut_key', value)}
+                         selectedTableName={config.reply_to_lut_name || ''}
+                         selectedKeyName={config.reply_to_lut_key || ''}
+                         nameValidation={validation.errors.reply_to_lut_name}
+                         keyValidation={validation.errors.reply_to_lut_key}
+                         lookupTableNameLabel="Reply To Lookup Table Name"
+                         lookupTableKeyLabel="Reply To Lookup Table Key" />
     );
   };
 

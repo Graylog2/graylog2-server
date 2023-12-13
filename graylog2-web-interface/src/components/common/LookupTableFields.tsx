@@ -36,10 +36,13 @@ type Props = {
   onKeyChange: () => void,
   selectedTableName: string,
   selectedKeyName: string,
-  validation?: any,
+  nameValidation: string,
+  keyValidation: string,
+  lookupTableNameLabel?: string,
+  lookupTableKeyLabel?: string,
 };
 
-const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, selectedKeyName, validation = { errors: {} } }: Props) => {
+const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, selectedKeyName, nameValidation, keyValidation, lookupTableNameLabel = '', lookupTableKeyLabel = '' }: Props) => {
   const { data: allFieldTypes } = useFieldTypes([], ALL_MESSAGES_TIMERANGE);
   const lookupTables = useStore(LookupTablesStore);
   const currentUser = useCurrentUser();
@@ -84,9 +87,9 @@ const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, 
 
   return (
     <Row className="row-sm">
-      <Col md={7} lg={6}>
-        <FormGroup controlId="lookup-provider-table" validationState={validation.errors.table_name ? 'error' : null}>
-          <ControlLabel>Select Lookup Table</ControlLabel>
+      <Col md={6}>
+        <FormGroup controlId="lookup-provider-table" validationState={nameValidation ? 'error' : null}>
+          <ControlLabel>{lookupTableNameLabel || 'Select Lookup Table'}</ControlLabel>
           <Select name="event-field-table-name"
                   placeholder="Select Lookup Table"
                   onChange={onTableNameChange}
@@ -95,12 +98,13 @@ const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, 
                   matchProp="label"
                   required />
           <HelpBlock>
-            {validation.errors.table_name || 'Select the Lookup Table Graylog should use to get the value.'}
+            {nameValidation || 'Select the Lookup Table Graylog should use to get the value.'}
           </HelpBlock>
         </FormGroup>
-
-        <FormGroup controlId="lookup-provider-table" validationState={validation.errors.key_field ? 'error' : null}>
-          <ControlLabel>Lookup Table Key Field</ControlLabel>
+      </Col>
+      <Col md={6}>
+        <FormGroup controlId="lookup-provider-table" validationState={keyValidation ? 'error' : null}>
+          <ControlLabel>{lookupTableKeyLabel || 'Lookup Table Key Field'}</ControlLabel>
           <Select name="lookup-provider-key"
                   placeholder="Select Field"
                   onChange={onKeyChange}
@@ -110,7 +114,7 @@ const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, 
                   allowCreate
                   required />
           <HelpBlock>
-            {validation.errors.key_field || 'Message Field name whose value will be used as Lookup Table Key.'}
+            {keyValidation || 'Message Field name whose value will be used as Lookup Table Key.'}
           </HelpBlock>
         </FormGroup>
       </Col>
@@ -119,7 +123,8 @@ const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, 
 };
 
 LookupTableFields.defaultProps = {
-  validation: undefined,
+  lookupTableNameLabel: undefined,
+  lookupTableKeyLabel: undefined,
 };
 
 export default LookupTableFields;
