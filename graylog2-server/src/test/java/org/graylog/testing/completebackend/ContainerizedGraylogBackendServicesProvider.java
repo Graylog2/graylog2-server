@@ -46,9 +46,9 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         servicesCache = new ConcurrentHashMap<>();
     }
 
-    public Services getServices(SearchVersion searchVersion, MongodbServer mongodbVersion, final boolean withMailServerEnabled, List<String> enabledFeatureFlags) {
+    public Services getServices(SearchVersion searchVersion, MongodbServer mongodbVersion, final boolean withMailServerEnabled, final boolean webhookServerEnabled, List<String> enabledFeatureFlags) {
         var lookupKey = Services.buildLookupKey(searchVersion, mongodbVersion, withMailServerEnabled, enabledFeatureFlags);
-        return servicesCache.computeIfAbsent(lookupKey, (k) -> Services.create(searchVersion, mongodbVersion, withMailServerEnabled, enabledFeatureFlags));
+        return servicesCache.computeIfAbsent(lookupKey, (k) -> Services.create(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags));
     }
 
     @Override
@@ -67,11 +67,15 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         private final MongoDBInstance mongoDBInstance;
         private final MailServerContainer mailServerContainer;
 
-        private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, List<String> enabledFeatureFlags) {
+        private final WebhookServerContainer webhookServerInstance;
+
+
+        private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, List<String> enabledFeatureFlags) {
             final Network network = Network.newNetwork();
 
             final MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
             final MailServerContainer emailServerInstance = withMailServerEnabled ? MailServerContainer.createStarted(network) : null;
+            final WebhookServerContainer webhookServerInstance = withWebhookServerEnabled ? WebhookServerContainer.createStarted(network) : null;
 
             final var builder = SearchServerInstanceProvider.getBuilderFor(searchVersion).orElseThrow(() -> new UnsupportedOperationException("Search version " + searchVersion + " not supported."));
             SearchServerInstance searchServer = builder
@@ -82,14 +86,15 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                     .featureFlags(enabledFeatureFlags)
                     .build();
 
-            return new Services(network, searchServer, mongoDB, emailServerInstance);
+            return new Services(network, searchServer, mongoDB, emailServerInstance, webhookServerInstance);
         }
 
-        private Services(Network network, SearchServerInstance searchServer, MongoDBInstance mongoDBInstance, @Nullable MailServerContainer mailServerContainer) {
+        private Services(Network network, SearchServerInstance searchServer, MongoDBInstance mongoDBInstance, @Nullable MailServerContainer mailServerContainer, @Nullable WebhookServerContainer webhookServerInstance) {
             this.network = network;
             this.searchServerInstance = searchServer;
             this.mongoDBInstance = mongoDBInstance;
             this.mailServerContainer = mailServerContainer;
+            this.webhookServerInstance = webhookServerInstance;
         }
 
         private static String buildLookupKey(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, List<String> enabledFeatureFlags) {
@@ -126,6 +131,10 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         public void cleanUp() {
             mongoDBInstance.dropDatabase();
             searchServerInstance.cleanUp();
+        }
+
+        public WebhookServerInstance getWebhookServerContainer() {
+            return webhookServerInstance;
         }
     }
 }

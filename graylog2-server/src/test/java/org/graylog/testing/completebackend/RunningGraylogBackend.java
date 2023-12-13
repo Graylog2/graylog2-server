@@ -98,6 +98,11 @@ public class RunningGraylogBackend implements GraylogBackend {
         }
     }
 
+    @Override
+    public Optional<WebhookServerInstance> getWebhookServerInstance() {
+        return Optional.empty();
+    }
+
     private static boolean isPortOpen(final String host, final int port) {
         try (Socket ignored = new Socket(host, port)) {
             return true;
