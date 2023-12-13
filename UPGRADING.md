@@ -33,6 +33,51 @@ Because of an error in HttpCore 4.4.12, which is required by Elasticsearch and o
 The Reactor was stopped, which prevented proper Graylog operation and the reason (OutOfMemoryError) was not clearly visible.
 From now on, Graylog will shutdown on OutOfMemoryError, trying to log some basic information about the thread and memory consumption during this event.
 
+## Input log parsing changes
+
+Log parsing changes have been made several inputs in preparation for Illuminate parsing content. Note that additional 
+message parsing for these inputs is expected to be released in an upcoming release of Graylog Illuminate.
+
+### Office 365 input
+
+Changed fields:
+- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. 
+- The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `CreationTime` value. The `event_created` field now contains the previous `CreationTime` value for backwards-compatibility.
+- `vendor_event_description`: Now contains the value which was previously present in the `message` log field.
+
+Added fields:
+- `event_created`: Contains the `CreationTime` log value.
+- `event_source_product`: Contains the static value `o365`.
+- `vendor_subtype`: Contains the `Workload` log value.
+- `vendor_version`: Contains the `Version` log value.
+
+### Okta Log Events input
+
+Several log parsing changes have been made to the Okta Log Events input in preparation for Illuminate parsing content.
+
+Changed fields:
+- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. 
+- The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `published` value. The `event_created` field now contains the previous `published` value for backwards-compatibility.
+- `vendor_event_description`: Now contains the value which was previously present in the `message` log field.
+
+Added fields:
+- `event_created`: Contains the `published` log value.
+- `event_source_product`: Contains the static value `okta`.
+- `vendor_event_type`: Contains the `eventType` log value.
+- `vendor_version`: Contains the `version` log value.
+
+### F5 BIG-IP input
+
+Changed fields:
+- `message`: Now contains the full text content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility.
+- The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `vendorTimestamp`, `eventCreated`, or `timestamp` values. The `event_created` field now contains the previous `vendorTimestamp`, `eventCreated`, or `timestamp` value for backwards-compatibility.
+- `source`: Now contains the `host` log value if present, or the static value `F5 BIG-IP` used previously if not.
+- `vendor_event_description`: Now contains the value which was previously present in the `message` log field.
+
+Added fields:
+- `event_created`: Contains the `vendorTimestamp`, `eventCreated`, or `timestamp` log value.
+- `event_source_product`: Contains the static value `f5_big-ip`.
+
 ## CrowdStrike input log parsing changes
 
 Several log parsing changes have been made to the CrowdStrike input.
