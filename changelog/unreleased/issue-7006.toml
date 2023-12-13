@@ -6,4 +6,4 @@ Variable names may not match any of these keywords.
 """
 
 issues = ["7006"]
-pulls = [""]
+pulls = ["17680"]
