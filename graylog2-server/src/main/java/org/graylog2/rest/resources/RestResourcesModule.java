@@ -91,6 +91,7 @@ import org.graylog2.rest.resources.system.jobs.ServiceManagerResource;
 import org.graylog2.rest.resources.system.jobs.SystemJobResource;
 import org.graylog2.rest.resources.system.logs.LoggersResource;
 import org.graylog2.rest.resources.system.lookup.LookupTableResource;
+import org.graylog2.rest.resources.system.monitoring.MonitoringResource;
 import org.graylog2.rest.resources.system.outputs.OutputResource;
 import org.graylog2.rest.resources.system.processing.ClusterProcessingStatusResource;
 import org.graylog2.rest.resources.system.processing.SystemProcessingStatusResource;
@@ -139,6 +140,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(JournalResource.class);
         addSystemRestResource(LoggersResource.class);
         addSystemRestResource(MessagesResource.class);
+        addSystemRestResource(MonitoringResource.class);
         addSystemRestResource(NotificationsResource.class);
         addSystemRestResource(StatsResource.class);
         addSystemRestResource(SystemShutdownResource.class);

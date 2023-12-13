@@ -22,6 +22,9 @@ import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.QueryExecutionStats;
+import org.graylog.plugins.views.search.engine.monitoring.collection.InMemoryCappedQueryExecutionStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.QueryExecutionStatsCollector;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -54,6 +57,8 @@ import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasF
 public class VersionAwareStorageModule extends AbstractModule {
     @Override
     protected void configure() {
+        //TODO: maxSize configurable, feature flag to turn on and off? Bind in different module?
+        bind(new TypeLiteral<QueryExecutionStatsCollector<QueryExecutionStats>>() {}).toInstance(new InMemoryCappedQueryExecutionStatsCollector<>(1000));
         bind(StreamsForFieldRetriever.class).toProvider(StreamsForFieldRetrieverProvider.class);
         bind(CountsAdapter.class).toProvider(CountsAdapterProvider.class);
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);
