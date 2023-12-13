@@ -1,0 +1,7 @@
+type = "c"
+message = "Changed logging in Message class. When invalid message key is found and ignored, that fact is logged with INFO level. Rate limited log is used in order to not overwhelm logs with this kind of log messages."
+
+issues = [""]
+pulls = ["17601"]
+
+
