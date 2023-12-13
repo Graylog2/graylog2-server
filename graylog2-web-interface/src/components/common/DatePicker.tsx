@@ -59,6 +59,14 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
+const isValidDateProp = (date: string | undefined) => {
+  if (!date) {
+    return true;
+  }
+
+  return isValidDate(toDateObject(date, ['date']));
+};
+
 type Props = {
   date?: string | undefined,
   onChange: (day: Date, modifiers: DayModifiers, event: React.MouseEvent<HTMLDivElement>) => void,
@@ -67,6 +75,10 @@ type Props = {
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
+  if (!isValidDateProp(date)) {
+    throw Error(`Date time provided for date picker "${date}" is not valid. The expected format is ${DATE_TIME_FORMATS.date}.`);
+  }
+
   const modifiers = useMemo(() => ({
     selected: (moddedDate: Date) => {
       if (!date) {
