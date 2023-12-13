@@ -25,12 +25,17 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.utils.GelfInputUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
 public class PivotAggregationSearchIT {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PivotAggregationSearchIT.class);
 
     private final GraylogApis graylogApis;
     private final WebhookServerInstance webhookTester;
@@ -109,16 +114,20 @@ public class PivotAggregationSearchIT {
 
         postMessages();
 
-        final List<WebhookRequest> requests;
+        try {
+            final List<WebhookRequest> requests = webhookTester.waitForRequests((req) -> req.bodyAsJsonPath().read("event_definition_id").equals(eventDefinitionID));
+            Assertions.assertThat(requests)
+                    .isNotEmpty()
+                    .allSatisfy(req -> {
+                        final String message = req.bodyAsJsonPath().read("event.message");
+                        Assertions.assertThat(message).isEqualTo("my alert def: (Empty Value)|(Empty Value)|(Empty Value) - count()=3.0");
+                    });
 
-        requests = webhookTester.waitForRequests((req) -> req.bodyAsJsonPath().read("event_definition_id").equals(eventDefinitionID));
+        } catch (ExecutionException | RetryException e) {
+            LOG.error(this.graylogApis.backend().getLogs());
+            throw e;
+        }
 
-        Assertions.assertThat(requests)
-                .isNotEmpty()
-                .allSatisfy(req -> {
-                    final String message = req.bodyAsJsonPath().read("event.message");
-                    Assertions.assertThat(message).isEqualTo("my alert def: (Empty Value)|(Empty Value)|(Empty Value) - count()=3.0");
-                });
 
         graylogApis.eventsNotifications().deleteNotification(notificationID);
         graylogApis.eventDefinitions().deleteDefinition(eventDefinitionID);
