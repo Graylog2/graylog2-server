@@ -40,7 +40,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class ValidVariables implements Validator {
 
     private final Map<String, RuleFragment> actions;
-    private Map<String, Class<?>> variables;
+    private final Map<String, Class<?>> variables;
     private final Set<String> tokenNames;
 
     @Inject
@@ -48,7 +48,7 @@ public class ValidVariables implements Validator {
         this.actions = ruleBuilderRegistry.actions();
         this.variables = new HashMap<>();
 
-        this.tokenNames = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        this.tokenNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         this.tokenNames.addAll(Arrays.asList(RuleLangLexer.tokenNames));
     }
 
@@ -72,7 +72,6 @@ public class ValidVariables implements Validator {
         ImmutableList<ParameterDescriptor> parameterDescriptors = functionDescriptor.params();
         for(ParameterDescriptor parameterDescriptor: parameterDescriptors) {
             String parameterName = parameterDescriptor.name();
-
             Object value = stepParameters.get(parameterName);
             Class<?> variableType = getVariableType(value);
 
