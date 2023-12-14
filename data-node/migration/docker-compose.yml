@@ -85,8 +85,8 @@ services:
       - "./admin-key.pem:/usr/share/opensearch/config/admin-key.pem"
       - "./keystore.jks:/usr/share/opensearch/config/keystore.jks"
       - "./custom-opensearch.yml:/usr/share/opensearch/config/opensearch.yml"
-#      - "./opensearch-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
-      - "./datanode-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+      - "./opensearch-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+#      - "./datanode-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
 
   opensearch3:
     image: "opensearchproject/opensearch:2.10.0"
@@ -121,8 +121,8 @@ services:
       - "./admin-key.pem:/usr/share/opensearch/config/admin-key.pem"
       - "./keystore.jks:/usr/share/opensearch/config/keystore.jks"
       - "./custom-opensearch.yml:/usr/share/opensearch/config/opensearch.yml"
-#      - "./opensearch-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
-      - "./datanode-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+      - "./opensearch-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
+#      - "./datanode-security-config.yml:/usr/share/opensearch/config/opensearch-security/config.yml"
 
   datanode1:
     image: "${DATANODE_IMAGE:-graylog/graylog-datanode:5.2.0}"
@@ -207,9 +207,9 @@ services:
       GRAYLOG_HTTP_EXTERNAL_URI: "http://127.0.0.1:9000/"
       GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
       GRAYLOG_REPORT_DISABLE_SANDBOX: "true"
-#      GRAYLOG_CA_KEYSTORE_FILE: "/usr/share/graylog/data/keystore.jks"
-#      GRAYLOG_CA_PASSWORD: "password"
-#      GRAYLOG_ELASTICSEARCH_HOSTS: "https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200"
+      GRAYLOG_CA_KEYSTORE_FILE: "/usr/share/graylog/data/keystore.jks"
+      GRAYLOG_CA_PASSWORD: "password"
+      GRAYLOG_ELASTICSEARCH_HOSTS: "https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200"
 #      GRAYLOG_ENABLE_PREFLIGHT_WEB: "true"
     ports:
       - "9000:9000"        # Graylog web interface and REST API
