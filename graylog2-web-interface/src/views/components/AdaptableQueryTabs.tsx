@@ -49,6 +49,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import useView from 'views/hooks/useView';
+import useIsNew from 'views/hooks/useIsNew';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -250,6 +251,7 @@ const AdaptableQueryTabs = ({
   dashboardId,
 }: Props) => {
   const view = useView();
+  const isNew = useIsNew();
   const queryId = useCurrentQueryId();
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
@@ -395,7 +397,7 @@ const AdaptableQueryTabs = ({
       )}
       {showCopyToDashboardModal && (
         <CopyToDashboardForm onCopyToDashboard={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
-                             onCreateNewDashboard={onCreateNewDashboard}
+                             onCreateNewDashboard={isNew ? undefined : onCreateNewDashboard}
                              onCancel={toggleCopyToDashboardModal}
                              activeDashboardId={dashboardId}
                              submitButtonText="Copy page"
