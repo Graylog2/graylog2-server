@@ -18,6 +18,7 @@
 import DataTable from './DataTable';
 
 export { default as TableDataCell } from './TableDataCell';
+export { default as TableHeaderCell } from './TableHeaderCell';
 export { default as bindings } from './bindings';
 
 export default DataTable;
