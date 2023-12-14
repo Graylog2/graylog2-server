@@ -77,7 +77,8 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS2.class);
 
         bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS2.class);
-
+        bindForSupportedVersion(RemoteReindexingMigrationAdapter.class).to(RemoteReindexingMigrationAdapterOS2.class);
+        
         install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
