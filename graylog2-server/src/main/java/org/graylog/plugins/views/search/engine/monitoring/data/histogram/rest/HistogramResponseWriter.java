@@ -34,8 +34,6 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 
 @Provider
@@ -58,7 +56,13 @@ public class HistogramResponseWriter implements MessageBodyWriter<Histogram> {
     }
 
     @Override
-    public void writeTo(Histogram histogram, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
+    public void writeTo(final Histogram histogram,
+                        final Class<?> aClass,
+                        final Type type,
+                        final Annotation[] annotations,
+                        final MediaType mediaType,
+                        final MultivaluedMap<String, Object> multivaluedMap,
+                        OutputStream outputStream) throws IOException, WebApplicationException {
         switch (mediaType.toString()) {
             case MediaType.APPLICATION_JSON -> writeJson(histogram, outputStream);
             case MoreMediaTypes.TEXT_CSV -> writeCsv(histogram, outputStream);
@@ -77,9 +81,7 @@ public class HistogramResponseWriter implements MessageBodyWriter<Histogram> {
 
             //schema
             final List<String> schema = histogram.schema();
-            Deque<String> commentedSchema = new LinkedList<>(schema);
-            commentedSchema.addFirst("#");
-            csvWriter.writeNext(commentedSchema.toArray(new String[0]));
+            csvWriter.writeNext(schema.toArray(new String[0]));
 
             // rows
             histogram.bins().stream()
