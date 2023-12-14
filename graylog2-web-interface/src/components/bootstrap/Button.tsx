@@ -126,6 +126,7 @@ const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disab
     },
     label: {
       gap: '0.25em',
+      overflow: 'visible',
     },
   };
 };
