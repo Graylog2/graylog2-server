@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datatiering.retention;
+package org.graylog2.indexer.retention.executors;
 
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
@@ -27,40 +27,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class RetentionExecutor {
+public class TimeBasedRetentionExecutor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RetentionExecutor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TimeBasedRetentionExecutor.class);
 
     private final Indices indices;
     private final JobSchedulerClock clock;
     private final ActivityWriter activityWriter;
+    private final RetentionExecutor retentionExecutor;
 
     @Inject
-    public RetentionExecutor(Indices indices,
-                             JobSchedulerClock clock,
-                             ActivityWriter activityWriter) {
+    public TimeBasedRetentionExecutor(Indices indices,
+                                      JobSchedulerClock clock,
+                                      ActivityWriter activityWriter,
+                                      RetentionExecutor retentionExecutor) {
         this.indices = indices;
         this.clock = clock;
         this.activityWriter = activityWriter;
+        this.retentionExecutor = retentionExecutor;
     }
 
     private static boolean hasCurrentWriteAlias(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, String indexName) {
         return deflectorIndices.getOrDefault(indexName, Collections.emptySet()).contains(indexSet.getWriteIndexAlias());
     }
 
-    public void retain(IndexSet indexSet, IndexLifetimeConfig config, Retention retention) {
+    public void retain(IndexSet indexSet, IndexLifetimeConfig config, RetentionExecutor.RetentionAction action, String actionName) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
         // Account for DST and time zones in determining age
@@ -77,37 +75,12 @@ public class RetentionExecutor {
         if (removeCount > 0) {
             final String msg = "Running retention for " + removeCount + " aged-out indices.";
             LOG.info(msg);
-            activityWriter.write(new Activity(msg, RetentionExecutor.class));
+            activityWriter.write(new Activity(msg, TimeBasedRetentionExecutor.class));
 
-            runRetention(indexSet, deflectorIndices, removeCount, retention);
+            retentionExecutor.runRetention(indexSet, removeCount, action, actionName);
         }
     }
 
-
-    private void runRetention(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, int removeCount, Retention retention) {
-        final Set<String> orderedIndices = Arrays.stream(indexSet.getManagedIndices())
-                .filter(indexName -> !indices.isReopened(indexName))
-                .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
-                .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        LinkedList<String> orderedIndicesDescending = new LinkedList<>();
-
-        orderedIndices
-                .stream()
-                .skip(orderedIndices.size() - removeCount)
-                // reverse order to archive oldest index first
-                .collect(Collectors.toCollection(LinkedList::new)).descendingIterator().
-                forEachRemaining(orderedIndicesDescending::add);
-
-        String indexNamesAsString = String.join(", ", orderedIndicesDescending);
-
-        final String msg = "Running data tier retention for indices <" + indexNamesAsString + ">";
-        LOG.info(msg);
-        activityWriter.write(new Activity(msg, RetentionExecutor.class));
-
-        retention.retain(orderedIndicesDescending);
-    }
 
     private boolean exceedsAgeLimit(String indexName, long cutoffSoft, long cutoffHard) {
         Optional<DateTime> closingDate = indices.indexClosingDate(indexName);
@@ -123,9 +96,4 @@ public class RetentionExecutor {
         LOG.warn(f("Unable to determine creation or closing dates for Index %s - forcing retention", indexName));
         return true;
     }
-
-    public interface Retention{
-        void retain(List<String> indexNames);
-    }
-
 }

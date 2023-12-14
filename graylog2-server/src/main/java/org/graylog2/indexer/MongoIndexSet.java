@@ -57,19 +57,13 @@ import static org.graylog2.audit.AuditEventTypes.ES_WRITE_INDEX_UPDATE;
 import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
 
 public class MongoIndexSet implements IndexSet {
-    private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
-
     public static final String SEPARATOR = "_";
     public static final String DEFLECTOR_SUFFIX = "deflector";
-
     // TODO: Hardcoded archive suffix. See: https://github.com/Graylog2/graylog2-server/issues/2058
     // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
     public static final String WARM_INDEX_INFIX = "warm_";
-    public interface Factory {
-        MongoIndexSet create(IndexSetConfig config);
-    }
-
+    private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
     private final IndexSetConfig config;
     private final String writeIndexAlias;
     private final Indices indices;
@@ -82,7 +76,6 @@ public class MongoIndexSet implements IndexSet {
     private final SystemJobManager systemJobManager;
     private final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     private final ActivityWriter activityWriter;
-
     @Inject
     public MongoIndexSet(@Assisted final IndexSetConfig config,
                          final Indices indices,
@@ -175,7 +168,7 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public Optional<Integer> extractIndexNumber(final String indexName) {
-        final int beginIndex = config.indexPrefix().length() + 1;
+        final int beginIndex = indexPrefixLength(indexName);
         if (indexName.length() < beginIndex) {
             return Optional.empty();
         }
@@ -186,6 +179,14 @@ public class MongoIndexSet implements IndexSet {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    private int indexPrefixLength(String indexName) {
+        int length = config.indexPrefix().length() + 1;
+        if (indexName.contains(WARM_INDEX_INFIX)) {
+            length += WARM_INDEX_INFIX.length();
+        }
+        return length;
     }
 
     @VisibleForTesting
@@ -394,5 +395,9 @@ public class MongoIndexSet implements IndexSet {
     @Override
     public String toString() {
         return "MongoIndexSet{" + "config=" + config + '}';
+    }
+
+    public interface Factory {
+        MongoIndexSet create(IndexSetConfig config);
     }
 }

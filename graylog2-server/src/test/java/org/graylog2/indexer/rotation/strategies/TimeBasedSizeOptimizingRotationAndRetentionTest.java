@@ -22,6 +22,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
+import org.graylog2.indexer.retention.executors.RetentionExecutor;
+import org.graylog2.indexer.retention.executors.TimeBasedRetentionExecutor;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.common.IndexRotator;
@@ -54,7 +56,6 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class TimeBasedSizeOptimizingRotationAndRetentionTest {
@@ -70,6 +71,9 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
 
     @Mock
     private AuditEventSender auditEventSender;
+
+    @Mock
+    private ActivityWriter activityWriter;
 
     private JobSchedulerTestClock clock;
 
@@ -92,7 +96,13 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
                 .build();
 
         final DeletionRetentionStrategyConfig deletionRetention = DeletionRetentionStrategyConfig.createDefault();
-        deletionRetentionStrategy = new DeletionRetentionStrategy(indices, mock(ActivityWriter.class), nodeId, auditEventSender, clock);
+        RetentionExecutor retentionExecutor = new RetentionExecutor(activityWriter, indices);
+        deletionRetentionStrategy = new DeletionRetentionStrategy(
+                indices,
+                nodeId,
+                auditEventSender,
+                null,
+                new TimeBasedRetentionExecutor(indices,clock, activityWriter,retentionExecutor));
 
         indexSet = new TestIndexSet(IndexSetConfig.builder()
                 .title("test index")

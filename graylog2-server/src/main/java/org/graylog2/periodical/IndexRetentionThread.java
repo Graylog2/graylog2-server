@@ -145,6 +145,6 @@ public class IndexRetentionThread extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return (int) MINUTES.toSeconds(5);
+        return (int) MINUTES.toSeconds(1);
     }
 }
