@@ -1,6 +1,4 @@
 type = "c"
 message = "Unify the way numeric fields are displayed in the message table widget, compared with the data table widget."
 
-pulls = ["17618"]
-
-
+pulls = ["17693"]
