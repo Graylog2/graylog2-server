@@ -128,7 +128,7 @@ config:
           type: jwt
           challenge: false
           config:
-            signing_key: "base64 encoded GRAYLOG_PASSWORD_SECRET from .env file
+            signing_key: "base64 encoded GRAYLOG_PASSWORD_SECRET from .env file"
             jwt_header: "Authorization"
             jwt_url_parameter: null
             roles_key: "os_roles"
