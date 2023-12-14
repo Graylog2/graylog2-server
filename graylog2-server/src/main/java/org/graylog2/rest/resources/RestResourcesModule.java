@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources;
 
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest.HistogramResponseWriter;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.CertificateRenewalResource;
 import org.graylog2.contentstream.rest.ContentStreamResource;
@@ -140,7 +141,9 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(JournalResource.class);
         addSystemRestResource(LoggersResource.class);
         addSystemRestResource(MessagesResource.class);
-        addSystemRestResource(MonitoringResource.class);
+        if (configuration.isQueryLatencyMonitoringEnabled()) {
+            addMonitoringResources();
+        }
         addSystemRestResource(NotificationsResource.class);
         addSystemRestResource(StatsResource.class);
         addSystemRestResource(SystemShutdownResource.class);
@@ -243,5 +246,10 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamRuleResource.class);
         addSystemRestResource(StreamResource.class);
         addSystemRestResource(StreamRuleInputsResource.class);
+    }
+
+    private void addMonitoringResources() {
+        jerseyAdditionalComponentsBinder().addBinding().toInstance(HistogramResponseWriter.class);
+        addSystemRestResource(MonitoringResource.class);
     }
 }

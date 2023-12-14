@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.engine;
 
 import org.graylog.plugins.views.ViewsModule;
-import org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest.HistogramResponseWriter;
 import org.graylog.plugins.views.search.engine.normalization.DecorateQueryStringsNormalizer;
 import org.graylog.plugins.views.search.engine.normalization.PluggableSearchNormalization;
 import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
@@ -35,7 +34,5 @@ public class EngineBindings extends ViewsModule {
         // Triggering set binder explicitly, so no injection errors are being caused if no implementation is bound.
         searchPostValidationNormalizerBinder();
         registerSearchValidator(TimeRangeValidator.class);
-
-        jerseyAdditionalComponentsBinder().addBinding().toInstance(HistogramResponseWriter.class);
     }
 }

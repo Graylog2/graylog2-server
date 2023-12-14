@@ -24,7 +24,9 @@ import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.engine.QueryExecutionStats;
 import org.graylog.plugins.views.search.engine.monitoring.collection.InMemoryCappedQueryExecutionStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpExecutionStatsCollector;
 import org.graylog.plugins.views.search.engine.monitoring.collection.QueryExecutionStatsCollector;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -55,10 +57,15 @@ import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasF
 
 
 public class VersionAwareStorageModule extends AbstractModule {
+
+    private final Configuration configuration;
+
+    public VersionAwareStorageModule(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
-        //TODO: maxSize configurable, feature flag to turn on and off? Bind in different module?
-        bind(new TypeLiteral<QueryExecutionStatsCollector<QueryExecutionStats>>() {}).toInstance(new InMemoryCappedQueryExecutionStatsCollector<>(1000));
         bind(StreamsForFieldRetriever.class).toProvider(StreamsForFieldRetrieverProvider.class);
         bind(CountsAdapter.class).toProvider(CountsAdapterProvider.class);
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);
@@ -80,6 +87,13 @@ public class VersionAwareStorageModule extends AbstractModule {
     }
 
     private void bindQueryBackend() {
+        if (configuration.isQueryLatencyMonitoringEnabled() && configuration.getQueryLatencyMonitoringWindowSize() > 0) {
+            bind(new TypeLiteral<QueryExecutionStatsCollector<QueryExecutionStats>>() {})
+                    .toInstance(new InMemoryCappedQueryExecutionStatsCollector<>(configuration.getQueryLatencyMonitoringWindowSize()));
+        } else {
+            bind(new TypeLiteral<QueryExecutionStatsCollector<QueryExecutionStats>>() {})
+                    .toInstance(new NoOpExecutionStatsCollector<>());
+        }
         bind(new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
                 .toProvider(ElasticsearchBackendProvider.class);
     }

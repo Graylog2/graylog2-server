@@ -26,7 +26,7 @@ public class InMemoryCappedQueryExecutionStatsCollector<T> implements QueryExecu
     private final CircularFifoQueue<T> cappedQueue;
 
     public InMemoryCappedQueryExecutionStatsCollector(final int maxSize) {
-        this.cappedQueue = new CircularFifoQueue<>(maxSize); //TODO: max size should be configurable
+        this.cappedQueue = new CircularFifoQueue<>(maxSize);
     }
 
     @Override

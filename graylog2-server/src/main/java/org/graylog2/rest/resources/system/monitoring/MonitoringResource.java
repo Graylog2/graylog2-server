@@ -112,7 +112,7 @@ public class MonitoringResource extends RestResource {
                             final NamedBinDefinition binDefinition = new NamedBinDefinition(entry.getKey().toString());
                             final long max = entry.getValue().stream().mapToLong(x -> x).max().orElse(0);
                             final long average = (long) entry.getValue().stream().mapToLong(x -> x).average().orElse(0);
-                            return new MultiValueBin<>(binDefinition, List.of(average, max, (long) (totalStats > 0 ? (float) entry.getValue().size() / totalStats : 0)));
+                            return new MultiValueBin<>(binDefinition, List.of(average, max, (long) ((totalStats > 0 ? (float) entry.getValue().size() / totalStats : 0) * 100)));
                         }
                 )
                 .toList();
