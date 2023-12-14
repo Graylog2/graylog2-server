@@ -34,6 +34,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import { TableDataCell } from 'views/components/datatable';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -90,11 +91,6 @@ const MessageDetailRow = styled.tr`
     padding-right: 0;
   }
 `;
-
-const StyledTd = styled.td<{ $isNumeric: boolean }>(({ $isNumeric, theme }) => css`
-  ${$isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
-  ${$isNumeric ? 'text-align: right' : ''}
-`);
 
 type Props = {
   config: MessagesWidgetConfig,
@@ -170,7 +166,7 @@ const MessageTableEntry = ({
             const type = fieldType(selectedFieldName, message, fields);
 
             return (
-              <StyledTd $isNumeric={type.isNumeric()} key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
+              <TableDataCell $isNumeric={type.isNumeric()} key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
                 {_renderStrong(
                   <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
                     <TypeSpecificValue value={message.fields[selectedFieldName]}
@@ -180,7 +176,7 @@ const MessageTableEntry = ({
                   </CustomHighlighting>,
                   idx === 0,
                 )}
-              </StyledTd>
+              </TableDataCell>
             );
           })}
         </FieldsRow>
@@ -194,6 +190,7 @@ const MessageTableEntry = ({
 
         {expanded && (
           <MessageDetailRow>
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td colSpan={colSpanFixup}>
               <MessageDetail message={message}
                              fields={fields}

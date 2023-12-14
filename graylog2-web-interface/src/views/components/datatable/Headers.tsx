@@ -32,13 +32,13 @@ import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
-import FieldSortIcon from 'views/components/datatable/FieldSortIcon';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Icon } from 'components/common';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
+import FieldSortIcon from './FieldSortIcon';
 import styles from './DataTable.css';
 
 const StyledTh = styled.th`
