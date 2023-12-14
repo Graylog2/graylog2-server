@@ -58,7 +58,7 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
                 .jsonProvider(new JacksonJsonNodeJsonProvider(objectMapper))
                 .build();
 
-        jsonParam = ParameterDescriptor.type("json", Object.class).description("A parsed JSON tree").build();
+        jsonParam = ParameterDescriptor.type("json", Object.class).description("A parsed JSON tree or String representation of a JSON tree").build();
         // sigh generics and type erasure
         //noinspection unchecked
         pathsParam = ParameterDescriptor.type("paths",
@@ -85,7 +85,7 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
             }
         } else {
             throw new IllegalArgumentException(context.pipelineErrorMessage(
-                    "`json` parameter must be a parsed JSON tree or String representation of a parsed JSON tree"));
+                    "`json` parameter must be a parsed JSON tree or String representation of a JSON tree"));
         }
 
         final Map<String, JsonPath> paths = pathsParam.required(args, context);
