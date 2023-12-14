@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 
-import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect, LookupTableFields } from 'components/common';
+import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
+import { LookupTableFields } from 'components/lookup-tables';
 import UsersSelectField from 'components/users/UsersSelectField';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';

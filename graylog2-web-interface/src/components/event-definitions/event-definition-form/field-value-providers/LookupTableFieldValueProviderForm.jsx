@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { LookupTableFields } from 'components/common';
+import { LookupTableFields } from 'components/lookup-tables';
 
 class LookupTableFieldValueProviderForm extends React.Component {
   static propTypes = {
