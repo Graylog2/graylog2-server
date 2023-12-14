@@ -24,6 +24,7 @@ import View from 'views/logic/views/View';
 import { IfPermitted } from 'components/common';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import useCreateSearch from 'views/hooks/useCreateSearch';
+import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 
 import SearchPage from './SearchPage';
 
@@ -36,7 +37,7 @@ const NewDashboardPage = () => {
   const searchView = location?.state?.view;
 
   const viewPromise = useMemo(() => (searchView?.search
-    ? Promise.resolve(viewTransformer(searchView))
+    ? Promise.resolve(UpdateSearchForWidgets(viewTransformer(searchView)))
     : ViewGenerator({ type: View.Type.Dashboard })),
   // This should be run only once upon mount on purpose.
   // eslint-disable-next-line react-hooks/exhaustive-deps

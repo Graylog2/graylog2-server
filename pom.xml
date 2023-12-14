@@ -112,7 +112,7 @@
         <commons-email.version>1.5</commons-email.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-net.version>3.10.0</commons-net.version>
-        <commons-validator.version>1.7</commons-validator.version>
+        <commons-validator.version>1.8.0</commons-validator.version>
         <commons-io.version>2.15.1</commons-io.version>
         <disruptor.version>3.4.4</disruptor.version>
         <error-prone.version>2.23.0</error-prone.version>
@@ -152,7 +152,7 @@
         <mongojack.version>2.10.1.4</mongojack.version>
         <mongojack4.version>4.8.1-1</mongojack4.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.101.Final</netty.version>
+        <netty.version>4.1.103.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -167,7 +167,7 @@
         <shiro.version>1.13.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.4.8</oshi.version>
+        <oshi.version>6.4.9</oshi.version>
         <siv-mode.version>1.5.0</siv-mode.version>
         <slf4j.version>2.0.9</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
@@ -192,7 +192,7 @@
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
         <mockito.version>5.8.0</mockito.version>
-        <restassured.version>5.3.2</restassured.version>
+        <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.19.3</testcontainers.version>
         <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
@@ -524,12 +524,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

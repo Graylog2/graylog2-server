@@ -145,7 +145,7 @@ describe('Welcome', () => {
       }));
 
       render(<Welcome />);
-      await screen.findByText(/You do not have opened any searches\/dashboards yet/i);
+      await screen.findByText(/You have not opened any searches\/dashboards yet/i);
     });
   });
 

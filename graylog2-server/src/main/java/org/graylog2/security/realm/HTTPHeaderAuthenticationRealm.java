@@ -28,8 +28,9 @@ import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.AuthServiceException;
 import org.graylog.security.authservice.AuthServiceResult;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.resources.system.SessionsResource;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
-import org.graylog2.shared.security.RemoteAddressAuthenticationToken;
+import org.graylog2.shared.security.PossibleTrustedHeaderToken;
 import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.utilities.IpSubnet;
@@ -63,7 +64,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
         this.authServiceAuthenticator = authServiceAuthenticator;
         this.trustedProxies = trustedProxies;
 
-        setAuthenticationTokenClass(RemoteAddressAuthenticationToken.class);
+        setAuthenticationTokenClass(PossibleTrustedHeaderToken.class);
         setCachingEnabled(false);
         // Credentials will be matched via the authentication service itself so we don't need Shiro to do it
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
@@ -71,7 +72,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        final RemoteAddressAuthenticationToken remoteAddrToken = (RemoteAddressAuthenticationToken) token;
+        final PossibleTrustedHeaderToken headerToken = (PossibleTrustedHeaderToken) token;
         final HTTPHeaderAuthConfig config = loadConfig();
 
         if (!config.enabled()) {
@@ -89,17 +90,24 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
                 return null;
             }
 
-            final String remoteAddr = remoteAddrToken.getRemoteAddr();
-            if (inTrustedSubnets(remoteAddr)) {
-                return doAuthenticate(username, config, remoteAddr);
+            final String remoteAddr = headerToken.getRemoteAddr();
+            if (!inTrustedSubnets(remoteAddr)) {
+                LOG.warn("Request with trusted HTTP header <{}={}> received from <{}> which is not in the trusted proxies: <{}>",
+                        config.usernameHeader(),
+                        username,
+                        remoteAddr,
+                        JOINER.join(trustedProxies));
+                return null;
             }
 
-            LOG.warn("Request with trusted HTTP header <{}={}> received from <{}> which is not in the trusted proxies: <{}>",
-                    config.usernameHeader(),
-                    username,
-                    remoteAddr,
-                    JOINER.join(trustedProxies));
-            return null;
+            final Set<Class<?>> matchedResources = headerToken.getMatchedResources();
+            if (!matchedResources.contains(SessionsResource.class) && matchedResources.size() == 1) {
+                LOG.debug("Not allowing trusted header auth for request matching resource(s) {}. Only session-related " +
+                        "requests may use trusted header auth.", matchedResources);
+                return null;
+            }
+
+            return doAuthenticate(username, config, remoteAddr);
         }
 
         return null;

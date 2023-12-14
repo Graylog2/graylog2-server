@@ -113,7 +113,8 @@
     "twix": "^1.1.4",
     "typeahead.js": "^0.11.1",
     "urijs": "^1.19.6",
-    "uuid": "9.0.1"
+    "uuid": "9.0.1",
+    "wicg-inert": "^3.1.2"
   },
   "devDependencies": {
     "@types/chroma-js": "^2.1.3",

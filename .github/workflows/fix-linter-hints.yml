@@ -2,7 +2,7 @@ name: Fix linter hints
 
 on:
   schedule:
-    - cron: '0 */8 * * *'
+    - cron: '0 */8 * * MON-FRI'
 
   workflow_dispatch:
 
@@ -46,7 +46,8 @@ jobs:
         run: |
           /bin/sh ../.github/scripts/web-code-quality.sh | curl -X POST -H 'Content-Type: application/json' -d @- ${{ secrets.DEV_METRICS_URL }}
       - name: Create/Update Pull Request
-        uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
+        id: pr-create
+        uses: Graylog2/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38
         with:
           title: Fixing linter hints automatically
           body: This PR was created by a job that is running periodically to find and fix linter hints.
@@ -55,3 +56,26 @@ jobs:
           committer: Dr. Lint-a-lot <garybot2@graylog.com>
           commit-message: Running lint --fix
           delete-branch: true
+
+      - name: Get headRef and SHA of PR
+        id: pr-infos
+        if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
+        run: |
+          HEADREF=$(gh pr view ${{ steps.pr-create.outputs.pull-request-number }} --json headRefName --template '{{.headRefName}}')
+          echo "sha=$(git rev-parse origin/$HEADREF)" >> $GITHUB_OUTPUT
+          echo "headref=$HEADREF" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Request dispatched PR build
+        if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
+        run: >
+          gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
+          -f caller_repo=${{ github.repository }}
+          -f caller_pr_nr=${{ steps.pr-create.outputs.pull-request-number }}
+          -f caller_base_branch=master
+          -f caller_head_branch=${{ steps.pr-infos.outputs.headref }}
+          -f head_sha=${{ steps.pr-infos.outputs.sha }}
+          -f initial_actor="Dr. Lint-a-lot"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
