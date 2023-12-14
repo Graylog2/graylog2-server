@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine.monitoring.collection;
+package org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation;
 
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
-public class NoOpExecutionStatsCollector<T> implements QueryExecutionStatsCollector<T> {
+public interface BinChooser<T, S> {
 
-    @Override
-    public void storeStats(T stats) {
+    Optional<T> chooseBin(final List<T> availableBins, final S stats);
 
-    }
-
-    @Override
-    public List<T> getAllStats() {
-        return Collections.emptyList();
-    }
+    Optional<Comparator<T>> getBinComparator();
 }

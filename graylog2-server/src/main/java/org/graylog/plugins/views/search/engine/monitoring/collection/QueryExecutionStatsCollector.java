@@ -16,13 +16,13 @@
  */
 package org.graylog.plugins.views.search.engine.monitoring.collection;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface QueryExecutionStatsCollector<T> {
 
     void storeStats(T stats);
 
-    Collection<T> getAllStats();
+    List<T> getAllStats();
 
 
 }

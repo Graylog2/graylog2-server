@@ -23,13 +23,11 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QueryExecutionStats;
 import org.graylog.plugins.views.search.engine.monitoring.collection.QueryExecutionStatsCollector;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.Histogram;
-import org.graylog.plugins.views.search.engine.monitoring.data.histogram.MultiValueBin;
-import org.graylog.plugins.views.search.engine.monitoring.data.histogram.NamedBinDefinition;
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.TimerangeHistogramCreation;
+import org.graylog.plugins.views.search.engine.monitoring.data.time.PeriodChooser;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.joda.time.Duration;
 import org.joda.time.Period;
 
 import javax.inject.Inject;
@@ -39,13 +37,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.function.BiFunction;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -54,74 +48,39 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/system/monitoring")
 public class MonitoringResource extends RestResource {
 
+    public static final String AVG_FUNCTION_NAME = "Avg. duration (ms)";
+    public static final String MAX_FUNCTION_NAME = "Max. duration (ms)";
+    public static final String PERCENT_FUNCTION_NAME = "Percent. of recent queries";
     private final QueryExecutionStatsCollector<QueryExecutionStats> executionStatsCollector;
+    private final TimerangeHistogramCreation<Period, QueryExecutionStats> timerangeHistogramCreation;
+
 
     @Inject
     public MonitoringResource(final QueryExecutionStatsCollector<QueryExecutionStats> executionStatsCollector) {
         this.executionStatsCollector = executionStatsCollector;
-    }
-
-
-    //TODO: for verification and debugging, will probably be removed in final version
-    @GET
-    @Timed
-    @ApiOperation(value = "Get internal Graylog system messages")
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("data_points")
-    public String getDataPoints() {
-        List<Period> periods = new ArrayList<>(SearchesClusterConfig.createDefault().relativeTimerangeOptions().keySet());
-        final Collection<QueryExecutionStats> allStats = executionStatsCollector.getAllStats();
-        StringBuilder sb = new StringBuilder();
-        for (QueryExecutionStats stat : allStats) {
-            final Optional<Period> properPeriod = periods.stream()
-                    .filter(per -> matches(per, stat.effectiveTimeRange()))
-                    .findFirst();
-            sb.append(properPeriod.map(Objects::toString).orElse("-"))
-                    .append(" ").append(stat.duration()).append("\n");
-        }
-        return sb.toString();
+        Map<String, BiFunction<Collection<QueryExecutionStats>, Integer, Number>> valueFunctions = new LinkedHashMap<>();
+        valueFunctions.put(MonitoringResource.AVG_FUNCTION_NAME,
+                (executionStats, numTotalStats) -> (long) executionStats.stream().mapToLong(QueryExecutionStats::duration).average().orElse(0L));
+        valueFunctions.put(MonitoringResource.MAX_FUNCTION_NAME,
+                (executionStats, numTotalStats) -> executionStats.stream().mapToLong(QueryExecutionStats::duration).max().orElse(0L));
+        valueFunctions.put(MonitoringResource.PERCENT_FUNCTION_NAME,
+                (executionStats, numTotalStats) -> (long) (100 * (numTotalStats > 0 ? (float) executionStats.size() / numTotalStats : 0L)));
+        this.timerangeHistogramCreation = new TimerangeHistogramCreation<>(
+                new ArrayList<>(SearchesClusterConfig.createDefault().relativeTimerangeOptions().keySet()),
+                new PeriodChooser(),
+                valueFunctions
+        );
     }
 
     @GET
     @Timed
-    @ApiOperation(value = "Get internal Graylog system messages")
+    @ApiOperation(value = "Get timerange-based histogram of queries durations and percentage in recent query population")
     @Path("timerange_histogram")
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.TEXT_CSV})
     public Histogram getTimerangeHistogram() {
-        List<Period> periods = new ArrayList<>(SearchesClusterConfig.createDefault().relativeTimerangeOptions().keySet());
-        periods.sort(Comparator.comparing(Period::toStandardDuration));
         final Collection<QueryExecutionStats> allStats = executionStatsCollector.getAllStats();
-
-        Map<Period, Collection<Long>> histogramPreparation = new LinkedHashMap<>();
-        periods.forEach(p -> histogramPreparation.put(p, new LinkedList<>()));
-        allStats.forEach(queryExecutionStats -> {
-                    periods.stream()
-                            .filter(per -> matches(per, queryExecutionStats.effectiveTimeRange()))
-                            .findFirst()
-                            .ifPresent(per -> histogramPreparation.get(per).add(queryExecutionStats.duration()));
-
-                }
-        );
-
-        int totalStats = allStats.size();
-
-
-        final List<MultiValueBin<NamedBinDefinition>> bins = histogramPreparation.entrySet().stream()
-                .map(
-                        entry -> {
-                            final NamedBinDefinition binDefinition = new NamedBinDefinition(entry.getKey().toString());
-                            final long max = entry.getValue().stream().mapToLong(x -> x).max().orElse(0);
-                            final long average = (long) entry.getValue().stream().mapToLong(x -> x).average().orElse(0);
-                            return new MultiValueBin<>(binDefinition, List.of(average, max, (long) ((totalStats > 0 ? (float) entry.getValue().size() / totalStats : 0) * 100)));
-                        }
-                )
-                .toList();
-        return new Histogram(List.of("Timerange", "Max. duration (ms)", "Avg. duration (ms)", "Percent. of recent queries"), bins);
+        return timerangeHistogramCreation.create(allStats);
     }
-
-    private boolean matches(Period binRange, TimeRange statsRange) {
-        return binRange.toStandardDuration().compareTo(new Duration(statsRange.getFrom().toInstant(), statsRange.getTo().toInstant())) >= 0;
-    }
-
 
 }
+

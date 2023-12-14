@@ -19,7 +19,7 @@ package org.graylog.plugins.views.search.engine.monitoring.collection;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 public class InMemoryCappedQueryExecutionStatsCollector<T> implements QueryExecutionStatsCollector<T> {
 
@@ -37,7 +37,7 @@ public class InMemoryCappedQueryExecutionStatsCollector<T> implements QueryExecu
     }
 
     @Override
-    public Collection<T> getAllStats() {
+    public List<T> getAllStats() {
         synchronized (cappedQueue) {
             return new ArrayList<>(cappedQueue);
         }
