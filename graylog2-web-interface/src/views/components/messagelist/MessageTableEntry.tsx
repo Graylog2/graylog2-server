@@ -91,6 +91,11 @@ const MessageDetailRow = styled.tr`
   }
 `;
 
+const StyledTd = styled.td<{ $isNumeric: boolean }>(({ $isNumeric, theme }) => css`
+  ${$isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
+  ${$isNumeric ? 'text-align: right' : ''}
+`);
+
 type Props = {
   config: MessagesWidgetConfig,
   disableSurroundingSearch?: boolean,
@@ -165,7 +170,7 @@ const MessageTableEntry = ({
             const type = fieldType(selectedFieldName, message, fields);
 
             return (
-              <td key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
+              <StyledTd $isNumeric={type.isNumeric()} key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
                 {_renderStrong(
                   <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
                     <TypeSpecificValue value={message.fields[selectedFieldName]}
@@ -175,7 +180,7 @@ const MessageTableEntry = ({
                   </CustomHighlighting>,
                   idx === 0,
                 )}
-              </td>
+              </StyledTd>
             );
           })}
         </FieldsRow>

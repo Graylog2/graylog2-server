@@ -103,6 +103,10 @@ const TableHead = styled.thead(({ theme }) => css`
   }
 `);
 
+const StyledTh = styled.th<{ $isNumeric: boolean }>(({ $isNumeric }) => css`
+  ${$isNumeric ? 'text-align: right;' : ''}
+`);
+
 type Props = {
   activeQueryId: string,
   config: MessagesWidgetConfig,
@@ -156,23 +160,27 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
         <Table className="table table-condensed">
           <TableHead>
             <tr>
-              {selectedFields.toSeq().map((selectedFieldName) => (
-                <th key={selectedFieldName}>
-                  <Field type={_fieldTypeFor(selectedFieldName, fields)}
-                         name={selectedFieldName}
-                         queryId={activeQueryId}>
-                    {selectedFieldName}
-                  </Field>
-                  <InteractiveContext.Consumer>
-                    {(interactive) => (interactive && (
-                      <FieldSortIcon fieldName={selectedFieldName}
-                                     onSortChange={onSortChange}
-                                     setLoadingState={setLoadingState}
-                                     config={config} />
-                    ))}
-                  </InteractiveContext.Consumer>
-                </th>
-              )).toArray()}
+              {selectedFields.toSeq().map((selectedFieldName) => {
+                const type = _fieldTypeFor(selectedFieldName, fields);
+
+                return (
+                  <StyledTh key={selectedFieldName} $isNumeric={type.isNumeric()}>
+                    <Field type={type}
+                           name={selectedFieldName}
+                           queryId={activeQueryId}>
+                      {selectedFieldName}
+                    </Field>
+                    <InteractiveContext.Consumer>
+                      {(interactive) => (interactive && (
+                        <FieldSortIcon fieldName={selectedFieldName}
+                                       onSortChange={onSortChange}
+                                       setLoadingState={setLoadingState}
+                                       config={config} />
+                      ))}
+                    </InteractiveContext.Consumer>
+                  </StyledTh>
+                );
+              }).toArray()}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {
