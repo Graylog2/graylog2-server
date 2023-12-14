@@ -52,31 +52,32 @@ const usePersistedSetting = (settingKey: string) => {
   return useMemo(() => [setting, setSetting], [setSetting, setting]);
 };
 
-const initialPerspective = (availablePerspectives: Array<Perspective>, persistedPerspective: string | undefined) => {
-  if (persistedPerspective && !!availablePerspectives.find(({ id }) => persistedPerspective === id)) {
-    return persistedPerspective;
-  }
-
-  return 'default';
-};
-
-const PerspectivesProvider = ({ children }: PropsWithChildren) => {
-  const allPerspectives = usePluginEntities('perspectives');
-  const availablePerspectives = allPerspectives
-    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true));
+const useActivePerspectiveState = (availablePerspectives: Array<Perspective>) => {
   const [persistedPerspective, setPersistedPerspective] = usePersistedSetting('perspective');
-  const [activePerspective, setActivePerspective] = useState<string>(initialPerspective(availablePerspectives, persistedPerspective));
+  const [activePerspective, setActivePerspective] = useState(persistedPerspective ?? 'default');
   const setActivePerspectiveWithPersistence = useCallback((newPerspective: string) => {
     setActivePerspective(newPerspective);
 
     return setPersistedPerspective(newPerspective);
   }, [setPersistedPerspective]);
 
+  return {
+    activePerspective: availablePerspectives.find(({ id }) => id === activePerspective) ? activePerspective : 'default',
+    setActivePerspective: setActivePerspectiveWithPersistence,
+  };
+};
+
+const PerspectivesProvider = ({ children }: PropsWithChildren) => {
+  const allPerspectives = usePluginEntities('perspectives');
+  const availablePerspectives = allPerspectives
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true));
+  const { activePerspective, setActivePerspective } = useActivePerspectiveState(availablePerspectives);
+
   const contextValue = useMemo(() => ({
     activePerspective,
     availablePerspectives,
-    setActivePerspective: setActivePerspectiveWithPersistence,
-  }), [activePerspective, availablePerspectives, setActivePerspectiveWithPersistence]);
+    setActivePerspective,
+  }), [activePerspective, availablePerspectives, setActivePerspective]);
 
   return (
     <PerspectivesContext.Provider value={contextValue}>
