@@ -15,14 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMutation } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { ModalSubmit } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { SessionActions } from 'stores/sessions/SessionStore';
-import type FetchError from 'logic/errors/FetchError';
+import useLogin from 'components/login/useLogin';
 
 type Props = {
   onErrorChange: (message?: string) => void,
@@ -40,19 +38,8 @@ const SigninButton = styled(ModalSubmit)(({ theme }) => css`
   }
 `);
 
-const performLogin = ([username, password, host]: [string, string, string]) => SessionActions.login(username, password, host);
-
 const LoginForm = ({ onErrorChange }: Props) => {
-  const { mutateAsync: login, isLoading } = useMutation(performLogin,
-    {
-      onError: (error: FetchError) => {
-        if (error.additional.status === 401) {
-          onErrorChange('Invalid credentials, please verify them and retry.');
-        } else {
-          onErrorChange(`Error - the server returned: ${error.additional.status} - ${error.message}`);
-        }
-      },
-    });
+  const { login, isLoading } = useLogin(onErrorChange);
 
   const onSignInClicked = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,7 +49,7 @@ const LoginForm = ({ onErrorChange }: Props) => {
     const password = formData.get('password') as string;
     const location = document.location.host;
 
-    return login([username, password, location]);
+    return login(username, password, location);
   };
 
   return (
