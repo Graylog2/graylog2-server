@@ -1,4 +1,0 @@
-type = "added"
-message = "Added new LookupTableFields component to be used in EmailNotificationsForm and in LookupTableFieldValueProviderForm"
-
-pulls = ["17682"]
