@@ -141,12 +141,6 @@ const StyledTable = styled(Table)<{ $stickyHeader: boolean, $borderedHeader: boo
   th:hover i.sort-order-item {
     color: ${theme.colors.global.textAlt};
   }
-  
-  @media print {
-    tr.fields-row > td {
-      min-width: 0;
-    }
-  }
 `);
 
 type Props = {
