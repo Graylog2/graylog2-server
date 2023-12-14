@@ -16,7 +16,10 @@
  */
 package org.graylog.plugins.views.search.engine.monitoring.data.histogram;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
-public record Histogram<D extends BinDefinition>(List<? extends Bin<D>> bins) {
+public record Histogram(@JsonProperty List<String> schema,
+                        @JsonProperty List<MultiValueBin<NamedBinDefinition>> bins) {
 }

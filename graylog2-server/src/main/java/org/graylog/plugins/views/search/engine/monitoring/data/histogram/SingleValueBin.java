@@ -16,11 +16,20 @@
  */
 package org.graylog.plugins.views.search.engine.monitoring.data.histogram;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public record SingleValueBin<D extends BinDefinition, T extends Number>(D binDefinition, T value) implements Bin<D> {
+import static org.graylog.plugins.views.search.engine.monitoring.data.histogram.Bin.SINGLE_BIN_TYPE;
 
+@JsonTypeName(SINGLE_BIN_TYPE)
+public record SingleValueBin<D extends BinDefinition>(@JsonProperty D binDefinition,
+                                                      @JsonProperty Number value) implements Bin<D> {
+
+    @JsonIgnore
     public List<String> toDataLine() {
         final List<String> definition = binDefinition.description();
         final List<String> result = new ArrayList<>(definition.size() + 1);

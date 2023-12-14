@@ -16,9 +16,21 @@
  */
 package org.graylog.plugins.views.search.engine.monitoring.data.histogram;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.util.List;
 
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = BinDefinition.TYPE)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = NamedBinDefinition.class, name = BinDefinition.NAMED_BIN_TYPE),
+})
 public interface BinDefinition {
+
+    String TYPE = "type";
+    String NAMED_BIN_TYPE = "NamedBinDefinition";
 
     List<String> description();
 }

@@ -34,10 +34,13 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 @Provider
 @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.TEXT_CSV})
-public class HistogramResponseWriter implements MessageBodyWriter<Histogram<?>> {
+public class HistogramResponseWriter implements MessageBodyWriter<Histogram> {
 
     private final ObjectMapper objectMapper;
 
@@ -55,7 +58,7 @@ public class HistogramResponseWriter implements MessageBodyWriter<Histogram<?>> 
     }
 
     @Override
-    public void writeTo(Histogram<?> histogram, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
+    public void writeTo(Histogram histogram, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
         switch (mediaType.toString()) {
             case MediaType.APPLICATION_JSON -> writeJson(histogram, outputStream);
             case MoreMediaTypes.TEXT_CSV -> writeCsv(histogram, outputStream);
@@ -63,15 +66,20 @@ public class HistogramResponseWriter implements MessageBodyWriter<Histogram<?>> 
         }
     }
 
-    private void writeJson(final Histogram<?> histogram, OutputStream outputStream) throws IOException {
+    private void writeJson(final Histogram histogram, OutputStream outputStream) throws IOException {
         objectMapper.writeValue(outputStream, histogram);
     }
 
-    private void writeCsv(final Histogram<?> histogram, OutputStream outputStream) throws IOException {
+    private void writeCsv(final Histogram histogram, OutputStream outputStream) throws IOException {
         try (final CSVWriter csvWriter = new CSVWriter(new PrintWriter(outputStream, true, StandardCharsets.UTF_8),
                 CSVWriter.DEFAULT_SEPARATOR,
                 CSVWriter.NO_QUOTE_CHARACTER)) {
-            //TODO: schema/headers?
+
+            //schema
+            final List<String> schema = histogram.schema();
+            Deque<String> commentedSchema = new LinkedList<>(schema);
+            commentedSchema.addFirst("#");
+            csvWriter.writeNext(commentedSchema.toArray(new String[0]));
 
             // rows
             histogram.bins().stream()

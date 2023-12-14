@@ -16,11 +16,19 @@
  */
 package org.graylog.plugins.views.search.engine.monitoring.data.histogram;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.util.List;
 
-public record NamedBinDefinition(String binName) implements BinDefinition {
+import static org.graylog.plugins.views.search.engine.monitoring.data.histogram.BinDefinition.NAMED_BIN_TYPE;
+
+@JsonTypeName(NAMED_BIN_TYPE)
+public record NamedBinDefinition(@JsonProperty String binName) implements BinDefinition {
 
     @Override
+    @JsonIgnore
     public List<String> description() {
         return List.of(binName);
     }

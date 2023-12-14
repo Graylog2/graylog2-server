@@ -16,14 +16,22 @@
  */
 package org.graylog.plugins.views.search.engine.monitoring.data.histogram;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public record MultiValueBin<D extends BinDefinition, T extends Number>(D binDefinition,
-                                                                       List<T> values) implements Bin<D> {
+import static org.graylog.plugins.views.search.engine.monitoring.data.histogram.Bin.MULTI_BIN_TYPE;
+
+@JsonTypeName(MULTI_BIN_TYPE)
+public record MultiValueBin<D extends BinDefinition>(@JsonProperty D binDefinition,
+                                                     @JsonProperty List<Number> values) implements Bin<D> {
 
 
     @Override
+    @JsonIgnore
     public List<String> toDataLine() {
         final List<String> definition = binDefinition.description();
         final List<String> result = new ArrayList<>(definition.size() + values().size());

@@ -22,7 +22,6 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QueryExecutionStats;
 import org.graylog.plugins.views.search.engine.monitoring.collection.QueryExecutionStatsCollector;
-import org.graylog.plugins.views.search.engine.monitoring.data.histogram.Bin;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.Histogram;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.MultiValueBin;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.NamedBinDefinition;
@@ -88,7 +87,7 @@ public class MonitoringResource extends RestResource {
     @ApiOperation(value = "Get internal Graylog system messages")
     @Path("timerange_histogram")
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.TEXT_CSV})
-    public Histogram<NamedBinDefinition> getTimerangeHistogram() {
+    public Histogram getTimerangeHistogram() {
         List<Period> periods = new ArrayList<>(SearchesClusterConfig.createDefault().relativeTimerangeOptions().keySet());
         periods.sort(Comparator.comparing(Period::toStandardDuration));
         final Collection<QueryExecutionStats> allStats = executionStatsCollector.getAllStats();
@@ -107,17 +106,17 @@ public class MonitoringResource extends RestResource {
         int totalStats = allStats.size();
 
 
-        final List<? extends Bin<NamedBinDefinition>> bins = histogramPreparation.entrySet().stream()
+        final List<MultiValueBin<NamedBinDefinition>> bins = histogramPreparation.entrySet().stream()
                 .map(
                         entry -> {
                             final NamedBinDefinition binDefinition = new NamedBinDefinition(entry.getKey().toString());
                             final long max = entry.getValue().stream().mapToLong(x -> x).max().orElse(0);
                             final long average = (long) entry.getValue().stream().mapToLong(x -> x).average().orElse(0);
-                            return new MultiValueBin<>(binDefinition, List.of(average, max, totalStats > 0 ? (float) entry.getValue().size() / totalStats : 0));
+                            return new MultiValueBin<>(binDefinition, List.of(average, max, (long) (totalStats > 0 ? (float) entry.getValue().size() / totalStats : 0)));
                         }
                 )
                 .toList();
-        return new Histogram<>(bins);
+        return new Histogram(List.of("Timerange", "Max. duration (ms)", "Avg. duration (ms)", "Percent. of recent queries"), bins);
     }
 
     private boolean matches(Period binRange, TimeRange statsRange) {
