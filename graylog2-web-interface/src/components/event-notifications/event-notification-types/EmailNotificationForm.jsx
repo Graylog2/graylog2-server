@@ -214,6 +214,21 @@ class EmailNotificationForm extends React.Component {
 
   emailLookupFormGroup = () => {
     const { config, validation } = this.props;
+    // eslint-disable-next-line no-template-curly-in-string
+    const placeholderText = '${event.group_by_fields.group_by_field}';
+
+    const customKeyField = (
+      <Input id="recipients-table-key"
+             name="recipients_lut_key"
+             label="Recipients Lookup Table Key"
+             type="text"
+             placeholder={placeholderText}
+             bsStyle={validation.errors.recipients_lut_key ? 'error' : null}
+             help={get(validation, 'errors.recipients_lut_key[0]', 'Event Field name whose value will be used as Lookup Table Key.')}
+             value={config.recipients_lut_key || ''}
+             onChange={this.handleChange}
+             required />
+    );
 
     return (
       <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('recipients_lut_name', value)}
@@ -223,7 +238,7 @@ class EmailNotificationForm extends React.Component {
                          nameValidation={validation.errors.recipients_lut_name}
                          keyValidation={validation.errors.recipients_lut_key}
                          lookupTableNameLabel="Recipients Lookup Table Name"
-                         lookupTableKeyLabel="Recipients Lookup Table Key" />
+                         customKeyField={customKeyField} />
     );
   };
 
@@ -244,6 +259,21 @@ class EmailNotificationForm extends React.Component {
 
   senderLookupFormGroup = () => {
     const { config, validation } = this.props;
+    // eslint-disable-next-line no-template-curly-in-string
+    const placeholderText = '${event.group_by_fields.group_by_field}';
+
+    const customKeyField = (
+      <Input id="sender-lookup-table-key"
+             name="sender_lut_key"
+             label="Sender Lookup Table Key"
+             type="text"
+             placeholder={placeholderText}
+             bsStyle={validation.errors.sender_lut_key ? 'error' : null}
+             help={get(validation, 'errors.sender_lut_key[0]', 'Event Field name whose value will be used as Lookup Table Key.')}
+             value={config.sender_lut_key || ''}
+             onChange={this.handleChange}
+             required />
+    );
 
     return (
       <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('sender_lut_name', value)}
@@ -253,7 +283,7 @@ class EmailNotificationForm extends React.Component {
                          nameValidation={validation.errors.sender_lut_name}
                          keyValidation={validation.errors.sender_lut_key}
                          lookupTableNameLabel="Sender Lookup Table Name"
-                         lookupTableKeyLabel="Sender Lookup Table Key" />
+                         customKeyField={customKeyField} />
     );
   };
 
@@ -274,6 +304,21 @@ class EmailNotificationForm extends React.Component {
 
   replyToLookupFormGroup = () => {
     const { config, validation } = this.props;
+    // eslint-disable-next-line no-template-curly-in-string
+    const placeholderText = '${event.group_by_fields.group_by_field}';
+
+    const customKeyField = (
+      <Input id="reply-to-lookup-table-key"
+             name="reply_to_lut_key"
+             label="Reply To Lookup Table Key"
+             type="text"
+             placeholder={placeholderText}
+             bsStyle={validation.errors.reply_to_lut_key ? 'error' : null}
+             help={get(validation, 'errors.reply_to_lut_key[0]', 'Event Field name whose value will be used as Lookup Table Key.')}
+             value={config.reply_to_lut_key || ''}
+             onChange={this.handleChange}
+             required />
+    );
 
     return (
       <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('reply_to_lut_name', value)}
@@ -283,7 +328,7 @@ class EmailNotificationForm extends React.Component {
                          nameValidation={validation.errors.reply_to_lut_name}
                          keyValidation={validation.errors.reply_to_lut_key}
                          lookupTableNameLabel="Reply To Lookup Table Name"
-                         lookupTableKeyLabel="Reply To Lookup Table Key" />
+                         customKeyField={customKeyField} />
     );
   };
 

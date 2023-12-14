@@ -40,9 +40,10 @@ type Props = {
   keyValidation: string,
   lookupTableNameLabel?: string,
   lookupTableKeyLabel?: string,
+  customKeyField?: React.ReactNode,
 };
 
-const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, selectedKeyName, nameValidation, keyValidation, lookupTableNameLabel = '', lookupTableKeyLabel = '' }: Props) => {
+const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, selectedKeyName, nameValidation, keyValidation, lookupTableNameLabel = '', lookupTableKeyLabel = '', customKeyField }: Props) => {
   const { data: allFieldTypes } = useFieldTypes([], ALL_MESSAGES_TIMERANGE);
   const lookupTables = useStore(LookupTablesStore);
   const currentUser = useCurrentUser();
@@ -102,22 +103,28 @@ const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, 
           </HelpBlock>
         </FormGroup>
       </Col>
-      <Col md={6}>
-        <FormGroup controlId="lookup-provider-table" validationState={keyValidation ? 'error' : null}>
-          <ControlLabel>{lookupTableKeyLabel || 'Lookup Table Key Field'}</ControlLabel>
-          <Select name="lookup-provider-key"
-                  placeholder="Select Field"
-                  onChange={onKeyChange}
-                  options={formatMessageFields(allFieldTypes)}
-                  value={selectedKeyName}
-                  matchProp="label"
-                  allowCreate
-                  required />
-          <HelpBlock>
-            {keyValidation || 'Message Field name whose value will be used as Lookup Table Key.'}
-          </HelpBlock>
-        </FormGroup>
-      </Col>
+      {customKeyField ? (
+        <Col md={6}>
+          {customKeyField}
+        </Col>
+      ) : (
+        <Col md={6}>
+          <FormGroup controlId="lookup-provider-table" validationState={keyValidation ? 'error' : null}>
+            <ControlLabel>{lookupTableKeyLabel || 'Lookup Table Key Field'}</ControlLabel>
+            <Select name="lookup-provider-key"
+                    placeholder="Select Field"
+                    onChange={onKeyChange}
+                    options={formatMessageFields(allFieldTypes)}
+                    value={selectedKeyName}
+                    matchProp="label"
+                    allowCreate
+                    required />
+            <HelpBlock>
+              {keyValidation || 'Message Field name whose value will be used as Lookup Table Key.'}
+            </HelpBlock>
+          </FormGroup>
+        </Col>
+      )}
     </Row>
   );
 };
@@ -125,6 +132,7 @@ const LookupTableFields = ({ onTableNameChange, onKeyChange, selectedTableName, 
 LookupTableFields.defaultProps = {
   lookupTableNameLabel: undefined,
   lookupTableKeyLabel: undefined,
+  customKeyField: null,
 };
 
 export default LookupTableFields;
