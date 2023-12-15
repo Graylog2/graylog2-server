@@ -17,14 +17,19 @@
 package org.graylog.plugins.views.aggregations;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import io.restassured.response.ValidatableResponse;
+import org.graylog.events.processor.aggregation.PivotAggregationSearch;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
@@ -41,6 +46,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -160,6 +166,48 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("POST", "count()"), equalTo(45))
                 .body(pathToMetricResult("PUT", "count()"), equalTo(43))
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
+    void testUnknownFieldsPivot() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(Values.builder().fields(List.of("http_method", "unknown_field_1", "unknown_field_2")).build())
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(4));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of("GET", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(860))
+                .body(pathToMetricResult(List.of("DELETE", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(52))
+                .body(pathToMetricResult(List.of("POST", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(45))
+                .body(pathToMetricResult(List.of("PUT", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(43));
+    }
+
+
+    @ContainerMatrixTest
+    void testAllUnknownFieldsPivot() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(Values.builder().fields(List.of("unknown_field_1", "unknown_field_2", "unknown_field_3")).build())
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(2));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of("(Empty Value)", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(860));
     }
 
     @ContainerMatrixTest
