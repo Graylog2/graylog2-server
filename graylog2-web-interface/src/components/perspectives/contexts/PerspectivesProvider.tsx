@@ -76,7 +76,6 @@ const PerspectivesProvider = ({ children }: PropsWithChildren) => {
   const availablePerspectives = allPerspectives
     .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true));
   const { activePerspective, setActivePerspective } = useActivePerspectiveState(availablePerspectives);
-
   const contextValue = useMemo(() => ({
     activePerspective,
     availablePerspectives,

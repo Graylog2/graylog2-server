@@ -19,10 +19,23 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { asMock } from 'helpers/mocking';
+
+jest.mock('hooks/usePluginEntities');
 
 describe('useActivePerspective', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+  beforeEach(() => {
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({
+      perspectives: [
+        {
+          id: 'default',
+          title: 'Default Perspective',
+          brandComponent: () => <div>Default perspective</div>,
+          welcomeRoute: '',
+        },
+      ],
+    }[entityKey]));
   });
 
   const wrapper = ({ children }: React.PropsWithChildren) => (
@@ -34,7 +47,7 @@ describe('useActivePerspective', () => {
   it('should return active perspective', async () => {
     const { result } = renderHook(() => useActivePerspective(), { wrapper });
 
-    expect(result.current.activePerspective).toEqual('default');
+    expect(result.current.activePerspective.id).toEqual('default');
   });
 
   it('should throw error when being used outside of PerspectivesContext', async () => {
