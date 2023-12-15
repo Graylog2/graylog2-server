@@ -11,6 +11,17 @@ Create/include a locally generated Docker image for Graylog or the DataNode by u
 At the time of writing this, if you test/develop on macOS and you're struggling with setting `vm.max_map_count` for Docker,
 you're running the latest Docker version, which is incompatible with macOS Sonoma. Your only chance is to downgrade Docker.
 
+## Things to watch out for
+The following is a list of items that I did not put in much effort/time to test but should be kept in mind to avoid potential issues:
+- keep hostnames as they are
+- keep the cluster name
+
+Otherwise you might create issues with existing meta data in OpenSearch.
+
+
+In a lot of cases, missing a step or having an error, you have no other chance as to start over completely. Which might not be
+possible in PROD environments. So make sure you have backups ;-)
+
 ## Migrating an existing OpenSearch 2.x or 1.3.x cluster
 
 This is a preliminary guide to migrate an existing OpenSearch 2.x or 1.3.x cluster into a DataNode cluster.
@@ -18,6 +29,10 @@ Basis was the `cluster` from our `docker compose` github repository. But we only
 
 It is based on Docker to be able to reproduce all the steps consistently. Real installations will surely
 differ. The steps can be also used to migrate a OS packages install.
+
+## Migrating Elasticsearch 7.10
+
+see additional info at the end of this document
 
 ### Contents of this directory:
 
@@ -135,3 +150,22 @@ Now you should be able the log into graylog at `http://localhost:9000` with your
 configuration with DataNodes.
 
 
+## Migrating Elasticsearch 7.10
+
+Migration from Elasticsearch 7.10 needs an additional step. ES 7.10 does not understand JWT authentication.
+So you have to first migrate to OpenSearch before running the update of the security information.
+Look at the supplied `es710-docker-compose.yml` as an example. Please note that except for the servicename, I changed the cluster name
+and hostnames etc. to `opensearch`. In a regular setting, it would be the other way around and you would have to pull the
+elasticsearch names through the whole process into the DataNode.
+
+Start the Elasticsearch cluster, add some data etc. `docker compose up -d elasticsearch1 elasticsearch2 elasticsearch3`
+stop it again `docker compose stop elasticsearch1 elasticsearch2 elasticsearch3`.
+
+Start the OpenSearch cluster in place of the Elasticsearch cluster. It points to the same data directory.
+`docker compose up -d opensearch1 opensearch2 opensearch3`. The `es710-docker-compose.yml` already points to the
+security config with the JWT auth settings. Make sure you added the correct bas64 encoded secret.
+
+Run the `securityadmin.sh` as described above and just follow the steps for an OpenSearch 1.3 migration as described.
+
+Please also note that the ElasticSearch example does not contain any certificates for ElasticSearch but uses generated certificates 
+once you started the OpenSearch cluster.
