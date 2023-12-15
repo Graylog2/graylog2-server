@@ -21,7 +21,7 @@ import java.util.Collection;
 public class PercentageValueComputation<T> implements ValueComputation<T, Long> {
 
     @Override
-    public Long computeValue(Collection<T> elementsInBin, int totalElements) {
+    public Long computeValue(final Collection<T> elementsInBin, final int totalElements) {
         if (totalElements > 0) {
             return (long) (100 * ((float) elementsInBin.size() / totalElements));
         } else {

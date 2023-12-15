@@ -22,7 +22,7 @@ import java.util.Optional;
 
 public interface BinChooser<T, S> {
 
-    Optional<T> chooseBin(final List<T> availableBins, final S stats);
+    Optional<T> chooseBin(final List<T> availableBins, final S singleElement);
 
     Optional<Comparator<T>> getBinComparator();
 }

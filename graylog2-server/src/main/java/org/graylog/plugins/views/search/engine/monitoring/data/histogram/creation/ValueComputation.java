@@ -18,6 +18,12 @@ package org.graylog.plugins.views.search.engine.monitoring.data.histogram.creati
 
 import java.util.Collection;
 
+/**
+ * Computes value for single bin of the histogram.
+ *
+ * @param <T> Type of elements in the bin
+ * @param <V> Type of computed value
+ */
 public interface ValueComputation<T, V> {
 
     V computeValue(Collection<T> elementsInBin, int totalElements);

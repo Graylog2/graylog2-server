@@ -28,7 +28,7 @@ public class MaxValueComputation<T> implements ValueComputation<T, Long> {
     }
 
     @Override
-    public Long computeValue(Collection<T> elementsInBin, int totalElements) {
+    public Long computeValue(final Collection<T> elementsInBin, final int totalElements) {
         return elementsInBin.stream()
                 .mapToLong(valueRetrievalFunction)
                 .max()

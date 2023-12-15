@@ -28,7 +28,7 @@ public class AverageValueComputation<T> implements ValueComputation<T, Long> {
     }
 
     @Override
-    public Long computeValue(Collection<T> elementsInBin, int totalElements) {
+    public Long computeValue(final Collection<T> elementsInBin, final int totalElements) {
         return (long) elementsInBin.stream()
                 .mapToLong(valueRetrievalFunction)
                 .average()
