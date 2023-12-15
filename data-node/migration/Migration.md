@@ -11,9 +11,9 @@ Create/include a locally generated Docker image for Graylog or the DataNode by u
 At the time of writing this, if you test/develop on macOS and you're struggling with setting `vm.max_map_count` for Docker,
 you're running the latest Docker version, which is incompatible with macOS Sonoma. Your only chance is to downgrade Docker.
 
-## Migrating an existing OpenSearch 2.x cluster
+## Migrating an existing OpenSearch 2.x or 1.3.x cluster
 
-This is a preliminary guide to migrate an existing OpenSearch 2.x cluster into a DataNode cluster.
+This is a preliminary guide to migrate an existing OpenSearch 2.x or 1.3.x cluster into a DataNode cluster.
 Basis was the `cluster` from our `docker compose` github repository. But we only use one MongoDB and one Graylog node.
 
 It is based on Docker to be able to reproduce all the steps consistently. Real installations will surely
@@ -69,6 +69,10 @@ Modify the `env` file like with the regular docker compose examples that we prov
 #### The file `datanode-security-config.yml`
 Convert the `GRAYLOG_PASSWORD_SECRET` to base64 e.g. by doing `echo "The password secret you chose" | base64` and
 put it into line 131 of `datanode-security-config.yml`
+
+### OpenSearch 1.3.x
+
+To run this with OpenSearch 1.3.x, replace the used Docker image `2.10.0` with `1.3.1` for all 3 services.
 
 ### Create your containers
 
