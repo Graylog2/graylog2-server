@@ -38,7 +38,6 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import FieldSortIcon from './FieldSortIcon';
-import styles from './DataTable.css';
 import TableHeaderCell from './TableHeaderCell';
 
 const CenteredTh = styled(TableHeaderCell)`
@@ -110,7 +109,6 @@ const HeaderField = ({
     <TableHeaderCell ref={thRef}
                      key={`${prefix}${field}`}
                      colSpan={span}
-                     className={styles.leftAligned}
                      $isNumeric={type.isNumeric()}
                      $borderedHeader={borderedHeader}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
@@ -147,7 +145,6 @@ type HeaderFieldForValueProps = {
 const HeaderFieldForValue = ({ field, value, span = 1, prefix = '', type, borderedHeader }: HeaderFieldForValueProps) => (
   <CenteredTh key={`${prefix}${field}-${value}`}
               colSpan={span}
-              className={styles.leftAligned}
               $borderedHeader={borderedHeader}>
     <Value field={field} value={value} type={type} />
   </CenteredTh>
@@ -158,7 +155,7 @@ HeaderFieldForValue.defaultProps = {
   prefix: '',
 };
 
-const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} className={styles.leftAligned} />;
+const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} />;
 
 type ColumnHeadersProps = {
   borderedHeader: boolean,
