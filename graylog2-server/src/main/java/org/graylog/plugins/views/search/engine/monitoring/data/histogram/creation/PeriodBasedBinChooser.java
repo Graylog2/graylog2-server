@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine.monitoring.data.time;
+package org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation;
 
 import org.graylog.plugins.views.search.engine.QueryExecutionStats;
-import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.BinChooser;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.Duration;
 import org.joda.time.Period;
@@ -26,7 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class PeriodChooser implements BinChooser<Period, QueryExecutionStats> {
+public class PeriodBasedBinChooser implements BinChooser<Period, QueryExecutionStats> {
 
     @Override
     public Optional<Period> chooseBin(final List<Period> availablePeriods, final QueryExecutionStats stats) {

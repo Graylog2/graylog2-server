@@ -20,7 +20,6 @@ import org.graylog.plugins.views.search.engine.QueryExecutionStats;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.Histogram;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.MultiValueBin;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.NamedBinDefinition;
-import org.graylog.plugins.views.search.engine.monitoring.data.time.PeriodChooser;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.resources.system.monitoring.MonitoringResource;
 import org.joda.time.DateTime;
@@ -33,32 +32,29 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
-import static org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.TimerangeHistogramCreation.OUTSIDE_AVAILABLE_BINS_BIN_NAME;
-import static org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.TimerangeHistogramCreation.TIMERANGE;
+import static org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.MultiValueSingleInputHistogramCreation.OUTSIDE_AVAILABLE_BINS_BIN_NAME;
 import static org.graylog2.rest.resources.system.monitoring.MonitoringResource.AVG_FUNCTION_NAME;
 import static org.graylog2.rest.resources.system.monitoring.MonitoringResource.MAX_FUNCTION_NAME;
 import static org.graylog2.rest.resources.system.monitoring.MonitoringResource.PERCENT_FUNCTION_NAME;
+import static org.graylog2.rest.resources.system.monitoring.MonitoringResource.TIMERANGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TimerangeHistogramCreationTest {
+class MultiValueSingleInputHistogramCreationTest {
 
-    private TimerangeHistogramCreation<Period, QueryExecutionStats> toTest;
+    private MultiValueSingleInputHistogramCreation<Period, QueryExecutionStats> toTest;
 
     @BeforeEach
     void setUp() {
-        Map<String, BiFunction<Collection<QueryExecutionStats>, Integer, Number>> valueFunctions = new LinkedHashMap<>();
-        valueFunctions.put(MonitoringResource.AVG_FUNCTION_NAME,
-                (executionStats, numTotalStats) -> (long) executionStats.stream().mapToLong(QueryExecutionStats::duration).average().orElse(0L));
-        valueFunctions.put(MonitoringResource.MAX_FUNCTION_NAME,
-                (executionStats, numTotalStats) -> executionStats.stream().mapToLong(QueryExecutionStats::duration).max().orElse(0L));
-        valueFunctions.put(MonitoringResource.PERCENT_FUNCTION_NAME,
-                (executionStats, numTotalStats) -> (long) (100 * (numTotalStats > 0 ? (float) executionStats.size() / numTotalStats : 0L)));
-        toTest = new TimerangeHistogramCreation<>(
+        Map<String, ValueComputation<QueryExecutionStats, Long>> valueFunctions = new LinkedHashMap<>();
+        valueFunctions.put(MonitoringResource.AVG_FUNCTION_NAME, new AverageValueComputation<>(QueryExecutionStats::duration));
+        valueFunctions.put(MonitoringResource.MAX_FUNCTION_NAME, new MaxValueComputation<>(QueryExecutionStats::duration));
+        valueFunctions.put(MonitoringResource.PERCENT_FUNCTION_NAME, new PercentageValueComputation<>());
+        toTest = new MultiValueSingleInputHistogramCreation<>(
                 List.of(Period.hours(2), Period.hours(4), Period.days(2), Period.days(4)),
-                new PeriodChooser(),
-                valueFunctions
+                new PeriodBasedBinChooser(),
+                valueFunctions,
+                TIMERANGE
         );
     }
 

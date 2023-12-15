@@ -27,29 +27,34 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-public class TimerangeHistogramCreation<T, S> {
+/**
+ * Creates histogram of objects of type S, with T used for x-axis.
+ *
+ * @param <T> Type of features of objects that are used to decide in which bin of histogram result is placed.
+ * @param <S> Type of objects used to create histogram.
+ */
+public class MultiValueSingleInputHistogramCreation<T, S> {
 
-    static final String OUTSIDE_AVAILABLE_BINS_BIN_NAME = "Longer periods";
-    static final String TIMERANGE = "Timerange";
+    static final String OUTSIDE_AVAILABLE_BINS_BIN_NAME = "Higher";
 
     private final BinChooser<T, S> binChooser;
     private final List<T> availableBins;
 
-    private final Map<String, BiFunction<Collection<S>, Integer, Number>> valueFunctions;
+    private final Map<String, ValueComputation<S, Long>> valueFunctions;
 
     private final List<String> schema = new ArrayList<>(4);
 
-    public TimerangeHistogramCreation(final Collection<T> availableBins,
-                                      final BinChooser<T, S> binChooser,
-                                      final Map<String, BiFunction<Collection<S>, Integer, Number>> valueFunctions) {
+    public MultiValueSingleInputHistogramCreation(final Collection<T> availableBins,
+                                                  final BinChooser<T, S> binChooser,
+                                                  final Map<String, ValueComputation<S, Long>> valueFunctions,
+                                                  final String inputDescription) {
         this.availableBins = new ArrayList<>(availableBins);
         this.binChooser = binChooser;
         this.binChooser.getBinComparator().ifPresent(this.availableBins::sort);
         this.valueFunctions = valueFunctions;
-        this.schema.add(TIMERANGE);
+        this.schema.add(inputDescription);
         this.schema.addAll(valueFunctions.keySet());
     }
 
@@ -81,7 +86,7 @@ public class TimerangeHistogramCreation<T, S> {
                                                          final Collection<S> executionStats,
                                                          final int numTotalStats) {
         final NamedBinDefinition binDefinition = new NamedBinDefinition(binName);
-        final List<Number> values = valueFunctions.values().stream().map(func -> func.apply(executionStats, numTotalStats)).toList();
+        final List<Long> values = valueFunctions.values().stream().map(func -> func.computeValue(executionStats, numTotalStats)).toList();
         return new MultiValueBin<>(binDefinition, values);
     }
 }

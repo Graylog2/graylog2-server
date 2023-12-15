@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine.monitoring.data.time;
+package org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation;
 
 import org.graylog.plugins.views.search.engine.QueryExecutionStats;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -30,13 +30,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PeriodChooserTest {
+class PeriodBasedBinChooserTest {
 
-    private PeriodChooser toTest;
+    private PeriodBasedBinChooser toTest;
 
     @BeforeEach
     void setUp() {
-        toTest = new PeriodChooser();
+        toTest = new PeriodBasedBinChooser();
     }
 
     @Test

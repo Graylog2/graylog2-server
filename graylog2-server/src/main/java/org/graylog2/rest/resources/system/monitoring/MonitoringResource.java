@@ -23,8 +23,12 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QueryExecutionStats;
 import org.graylog.plugins.views.search.engine.monitoring.collection.QueryExecutionStatsCollector;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.Histogram;
-import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.TimerangeHistogramCreation;
-import org.graylog.plugins.views.search.engine.monitoring.data.time.PeriodChooser;
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.AverageValueComputation;
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.MaxValueComputation;
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.MultiValueSingleInputHistogramCreation;
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.PercentageValueComputation;
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.PeriodBasedBinChooser;
+import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.ValueComputation;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -39,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -51,35 +54,34 @@ public class MonitoringResource extends RestResource {
     public static final String AVG_FUNCTION_NAME = "Avg. duration (ms)";
     public static final String MAX_FUNCTION_NAME = "Max. duration (ms)";
     public static final String PERCENT_FUNCTION_NAME = "Percent. of recent queries";
+    public static final String TIMERANGE = "Timerange";
     private final QueryExecutionStatsCollector<QueryExecutionStats> executionStatsCollector;
-    private final TimerangeHistogramCreation<Period, QueryExecutionStats> timerangeHistogramCreation;
+    private final MultiValueSingleInputHistogramCreation<Period, QueryExecutionStats> histogramCreator;
 
 
     @Inject
     public MonitoringResource(final QueryExecutionStatsCollector<QueryExecutionStats> executionStatsCollector) {
         this.executionStatsCollector = executionStatsCollector;
-        Map<String, BiFunction<Collection<QueryExecutionStats>, Integer, Number>> valueFunctions = new LinkedHashMap<>();
-        valueFunctions.put(MonitoringResource.AVG_FUNCTION_NAME,
-                (executionStats, numTotalStats) -> (long) executionStats.stream().mapToLong(QueryExecutionStats::duration).average().orElse(0L));
-        valueFunctions.put(MonitoringResource.MAX_FUNCTION_NAME,
-                (executionStats, numTotalStats) -> executionStats.stream().mapToLong(QueryExecutionStats::duration).max().orElse(0L));
-        valueFunctions.put(MonitoringResource.PERCENT_FUNCTION_NAME,
-                (executionStats, numTotalStats) -> (long) (100 * (numTotalStats > 0 ? (float) executionStats.size() / numTotalStats : 0L)));
-        this.timerangeHistogramCreation = new TimerangeHistogramCreation<>(
+        Map<String, ValueComputation<QueryExecutionStats, Long>> valueFunctions = new LinkedHashMap<>();
+        valueFunctions.put(MonitoringResource.AVG_FUNCTION_NAME, new AverageValueComputation<>(QueryExecutionStats::duration));
+        valueFunctions.put(MonitoringResource.MAX_FUNCTION_NAME, new MaxValueComputation<>(QueryExecutionStats::duration));
+        valueFunctions.put(MonitoringResource.PERCENT_FUNCTION_NAME, new PercentageValueComputation<>());
+        this.histogramCreator = new MultiValueSingleInputHistogramCreation<>(
                 new ArrayList<>(SearchesClusterConfig.createDefault().relativeTimerangeOptions().keySet()),
-                new PeriodChooser(),
-                valueFunctions
+                new PeriodBasedBinChooser(),
+                valueFunctions,
+                TIMERANGE
         );
     }
 
     @GET
     @Timed
     @ApiOperation(value = "Get timerange-based histogram of queries durations and percentage in recent query population")
-    @Path("timerange_histogram")
+    @Path("query_duration_histogram")
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.TEXT_CSV})
-    public Histogram getTimerangeHistogram() {
+    public Histogram getQueryDurationHistogram() {
         final Collection<QueryExecutionStats> allStats = executionStatsCollector.getAllStats();
-        return timerangeHistogramCreation.create(allStats);
+        return histogramCreator.create(allStats);
     }
 
 }
