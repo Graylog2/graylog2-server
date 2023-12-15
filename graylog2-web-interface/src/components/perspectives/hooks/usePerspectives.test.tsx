@@ -19,28 +19,9 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
+import { defaultPerspective, examplePerspective, unavailablePerspective } from 'fixtures/perspectives';
 
-jest.mock('hooks/usePluginEntities', () => () => ([
-  {
-    id: 'default',
-    title: 'Default Perspective',
-    brandComponent: () => {},
-    welcomeRoute: '',
-  },
-  {
-    id: 'example-perspective',
-    title: 'Example Perspective',
-    brandComponent: () => {},
-    welcomeRoute: '',
-  },
-  {
-    id: 'unavailable-perspective',
-    title: 'Unavailable Perspective',
-    brandComponent: () => {},
-    welcomeRoute: '',
-    useCondition: () => false,
-  },
-]));
+jest.mock('hooks/usePluginEntities', () => () => [defaultPerspective, examplePerspective, unavailablePerspective]);
 
 describe('usePerspectives', () => {
   afterEach(() => {
@@ -56,7 +37,7 @@ describe('usePerspectives', () => {
   it('should return available perspectives', async () => {
     const { result } = renderHook(() => usePerspectives(), { wrapper });
 
-    expect(result.current.map(({ id }) => id)).toEqual(['default', 'example-perspective']);
+    expect(result.current.map(({ id }) => id)).toEqual([defaultPerspective.id, examplePerspective.id]);
   });
 
   it('should throw error when being used outside of PerspectivesContext', async () => {

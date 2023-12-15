@@ -21,20 +21,14 @@ import useActivePerspective from 'components/perspectives/hooks/useActivePerspec
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { asMock } from 'helpers/mocking';
+import { defaultPerspective } from 'fixtures/perspectives';
 
 jest.mock('hooks/usePluginEntities');
 
 describe('useActivePerspective', () => {
   beforeEach(() => {
     asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      perspectives: [
-        {
-          id: 'default',
-          title: 'Default Perspective',
-          brandComponent: () => <div>Default perspective</div>,
-          welcomeRoute: '',
-        },
-      ],
+      perspectives: [defaultPerspective],
     }[entityKey]));
   });
 
@@ -47,7 +41,7 @@ describe('useActivePerspective', () => {
   it('should return active perspective', async () => {
     const { result } = renderHook(() => useActivePerspective(), { wrapper });
 
-    expect(result.current.activePerspective.id).toEqual('default');
+    expect(result.current.activePerspective).toEqual(defaultPerspective);
   });
 
   it('should throw error when being used outside of PerspectivesContext', async () => {

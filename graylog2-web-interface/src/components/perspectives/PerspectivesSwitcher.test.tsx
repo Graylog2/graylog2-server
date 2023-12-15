@@ -23,6 +23,7 @@ import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 import { asMock } from 'helpers/mocking';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import mockHistory from 'helpers/mocking/mockHistory';
+import { defaultPerspective, examplePerspective } from 'fixtures/perspectives';
 
 import PerspectivesSwitcher from './PerspectivesSwitcher';
 
@@ -34,20 +35,7 @@ jest.mock('routing/useHistory');
 describe('PerspectivesSwitcher', () => {
   let history;
   const setActivePerspective = jest.fn();
-  const mockedPerspectives = [
-    {
-      id: 'default',
-      title: 'Default Perspective',
-      brandComponent: () => <div>Default perspective</div>,
-      welcomeRoute: '',
-    },
-    {
-      id: 'example-perspective',
-      title: 'Example Perspective',
-      brandComponent: () => <div />,
-      welcomeRoute: '/example-perspective',
-    },
-  ];
+  const mockedPerspectives = [defaultPerspective, examplePerspective];
 
   beforeEach(() => {
     history = mockHistory();
@@ -71,10 +59,10 @@ describe('PerspectivesSwitcher', () => {
     render(<PerspectivesSwitcher />);
 
     userEvent.click(await screen.findByRole('button', { name: /change ui perspective/i }));
-    userEvent.click(await screen.findByText(/example perspective/i));
+    userEvent.click(await screen.findByText(new RegExp(examplePerspective.title, 'i')));
 
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith('/example-perspective'));
+    await waitFor(() => expect(history.push).toHaveBeenCalledWith(examplePerspective.welcomeRoute));
 
-    expect(setActivePerspective).toHaveBeenCalledWith('example-perspective');
+    expect(setActivePerspective).toHaveBeenCalledWith(examplePerspective.id);
   });
 });
