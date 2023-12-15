@@ -142,14 +142,6 @@ const EventDefinitionsContainer = () => {
     <EventDefinitionActions eventDefinition={listItem} refetchEventDefinitions={refetchEventDefinitions} />
   ), [refetchEventDefinitions]);
 
-  const renderBulkActions = (
-    selectedEventDefinitionsIds: Array<string>,
-    setSelectedEventDefinitionsIds: (eventDefinitionsId: Array<string>) => void,
-  ) => (
-    <BulkActions selectedDefinitionsIds={selectedEventDefinitionsIds}
-                 setSelectedEventDefinitionsIds={setSelectedEventDefinitionsIds} />
-  );
-
   if (isLoadingLayoutPreferences || isLoadingEventDefinitions) {
     return <Spinner />;
   }
@@ -176,7 +168,7 @@ const EventDefinitionsContainer = () => {
                                             onSortChange={onSortChange}
                                             onPageSizeChange={onPageSizeChange}
                                             pageSize={layoutConfig.pageSize}
-                                            bulkSelection={{ actions: renderBulkActions }}
+                                            bulkSelection={{ actions: <BulkActions /> }}
                                             activeSort={layoutConfig.sort}
                                             actionsCellWidth={160}
                                             rowActions={renderEventDefinitionActions}
