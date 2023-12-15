@@ -61,8 +61,12 @@ const useActivePerspectiveState = (availablePerspectives: Array<Perspective>) =>
     return setPersistedPerspective(newPerspective);
   }, [setPersistedPerspective]);
 
+  const findPerspective = useCallback((perspective: string) => (
+    availablePerspectives.find(({ id }) => id === perspective)
+  ), [availablePerspectives]);
+
   return {
-    activePerspective: availablePerspectives.find(({ id }) => id === activePerspective) ? activePerspective : 'default',
+    activePerspective: findPerspective(activePerspective) ?? findPerspective('default'),
     setActivePerspective: setActivePerspectiveWithPersistence,
   };
 };

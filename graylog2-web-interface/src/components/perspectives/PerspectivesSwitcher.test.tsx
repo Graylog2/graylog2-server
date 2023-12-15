@@ -34,28 +34,29 @@ jest.mock('routing/useHistory');
 describe('PerspectivesSwitcher', () => {
   let history;
   const setActivePerspective = jest.fn();
+  const mockedPerspectives = [
+    {
+      id: 'default',
+      title: 'Default Perspective',
+      brandComponent: () => <div>Default perspective</div>,
+      brandLink: '',
+    },
+    {
+      id: 'example-perspective',
+      title: 'Example Perspective',
+      brandComponent: () => <div />,
+      brandLink: '/example-perspective',
+    },
+  ];
 
   beforeEach(() => {
     history = mockHistory();
     asMock(useHistory).mockReturnValue(history);
 
-    asMock(usePerspectives).mockReturnValue([
-      {
-        id: 'default',
-        title: 'Default Perspective',
-        brandComponent: () => <div>Default perspective</div>,
-        brandLink: '',
-      },
-      {
-        id: 'example-perspective',
-        title: 'Example Perspective',
-        brandComponent: () => <div />,
-        brandLink: '/example-perspective',
-      },
-    ]);
+    asMock(usePerspectives).mockReturnValue(mockedPerspectives);
 
     asMock(useActivePerspective).mockReturnValue({
-      activePerspective: 'default',
+      activePerspective: mockedPerspectives[0],
       setActivePerspective,
     });
   });

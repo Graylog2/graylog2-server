@@ -21,9 +21,11 @@ import Routes from 'routing/Routes';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { useStore } from 'stores/connect';
 import useHistory from 'routing/useHistory';
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 
 const StartPage = () => {
   const { currentUser } = useStore(CurrentUserStore);
+  const { activePerspective } = useActivePerspective();
   const isLoading = !currentUser;
   const history = useHistory();
 
@@ -49,8 +51,9 @@ const StartPage = () => {
       return;
     }
 
+    console.log('startpage', { activePerspective });
     redirect(Routes.WELCOME);
-  }, [currentUser?.startpage, redirect]);
+  }, [activePerspective, currentUser?.startpage, redirect]);
 
   useEffect(() => {
     CurrentUserStore.reload();
