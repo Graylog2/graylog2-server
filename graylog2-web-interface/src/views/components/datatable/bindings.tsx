@@ -16,9 +16,10 @@
  */
 
 import type { VisualizationType } from 'views/types';
-import DataTable from 'views/components/datatable/DataTable';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+
+import DataTable from './DataTable';
 
 type DataTableVisualizationConfigFormValues = {
   pinnedColumns: Array<string>,
