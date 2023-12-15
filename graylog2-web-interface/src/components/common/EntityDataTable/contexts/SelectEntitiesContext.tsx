@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import * as React from 'react';
+import type { SetStateAction } from 'react';
 
-import BulkSelectContext from 'components/common/EntityDataTable/contexts/SelectEntitiesContext';
+import { singleton } from 'logic/singleton';
 
-const useSelectedEntities = () => {
-  const contextValue = useContext(BulkSelectContext);
+import type { EntityBase } from '../types';
 
-  if (!contextValue) {
-    throw new Error('useSelectedEntities hook needs to be used inside BulkSelectContext.Provider');
-  }
+type ContextValue = {
+  selectedEntities: Array<EntityBase['id']>,
+  setSelectedEntities: (setSelectedEntitiesArgument: SetStateAction<EntityBase['id'][]>) => void,
+  selectEntity: (entityId: EntityBase['id']) => void,
+  deselectEntity: (entityId: EntityBase['id']) => void,
+} | undefined
 
-  return contextValue;
-};
+const SelectEntitiesContext = React.createContext<ContextValue>(undefined);
 
-export default useSelectedEntities;
+export default singleton('contexts.SelectEntitiesContext', () => SelectEntitiesContext);

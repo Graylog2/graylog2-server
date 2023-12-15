@@ -24,7 +24,7 @@ const MessagesContainer = styled.div`
   width: 100%;
 `;
 
-const StyledTable = styled(Table)<{ $stickyHeader: boolean, $borderedHeader: boolean }>(({ theme, $stickyHeader, $borderedHeader }) => css`
+const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme, $stickyHeader }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
   margin: 0;
@@ -46,16 +46,6 @@ const StyledTable = styled(Table)<{ $stickyHeader: boolean, $borderedHeader: boo
   td,
   th {
     position: relative;
-  }
-
-  > thead th {
-    border: 0;
-    font-size: ${theme.fonts.size.small};
-    font-weight: normal;
-    background-color: ${theme.colors.gray[90]};
-    color: ${theme.utils.readableColor(theme.colors.gray[90])};
-    white-space: nowrap;
-    ${$borderedHeader ? `border: 1px solid ${theme.colors.table.backgroundAlt}` : ''}
   }
 
   > tbody td {
@@ -147,18 +137,16 @@ type Props = {
   children: React.ReactNode,
   striped?: boolean,
   bordered?: boolean,
-  borderedHeader?: boolean,
   stickyHeader?: boolean,
   condensed?: boolean,
 };
 
-const MessagesTable = ({ children, condensed, striped, bordered, stickyHeader, borderedHeader }: Props) => (
+const MessagesTable = ({ children, condensed, striped, bordered, stickyHeader }: Props) => (
   <MessagesContainer>
     <StyledTable condensed={condensed}
                  striped={striped}
                  bordered={bordered}
-                 $stickyHeader={stickyHeader}
-                 $borderedHeader={borderedHeader}>
+                 $stickyHeader={stickyHeader}>
       {children}
     </StyledTable>
   </MessagesContainer>
@@ -170,7 +158,6 @@ MessagesTable.propTypes = {
   striped: PropTypes.bool,
   bordered: PropTypes.bool,
   stickyHeader: PropTypes.bool,
-  borderedHeader: PropTypes.bool,
 };
 
 MessagesTable.defaultProps = {
@@ -178,7 +165,6 @@ MessagesTable.defaultProps = {
   striped: false,
   bordered: false,
   stickyHeader: false,
-  borderedHeader: false,
 };
 
 export default MessagesTable;

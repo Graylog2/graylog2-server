@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
 
-import BulkSelectContext from 'components/common/EntityDataTable/contexts/SelectEntitiesContext';
+import DataTable from './DataTable';
 
-const useSelectedEntities = () => {
-  const contextValue = useContext(BulkSelectContext);
+export { default as TableDataCell } from './TableDataCell';
+export { default as TableHeaderCell } from './TableHeaderCell';
+export { default as bindings } from './bindings';
 
-  if (!contextValue) {
-    throw new Error('useSelectedEntities hook needs to be used inside BulkSelectContext.Provider');
-  }
-
-  return contextValue;
-};
-
-export default useSelectedEntities;
+export default DataTable;

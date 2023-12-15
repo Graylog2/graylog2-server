@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import styled, { css } from 'styled-components';
 
-import BulkSelectContext from 'components/common/EntityDataTable/contexts/SelectEntitiesContext';
+const TableDataCell = styled.td<{ $isNumeric: boolean }>(({ $isNumeric, theme }) => css`
+  ${$isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
+  ${$isNumeric ? 'text-align: right' : ''}
+`);
 
-const useSelectedEntities = () => {
-  const contextValue = useContext(BulkSelectContext);
-
-  if (!contextValue) {
-    throw new Error('useSelectedEntities hook needs to be used inside BulkSelectContext.Provider');
-  }
-
-  return contextValue;
-};
-
-export default useSelectedEntities;
+export default TableDataCell;

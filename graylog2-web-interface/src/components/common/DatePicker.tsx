@@ -22,9 +22,7 @@ import styled, { css } from 'styled-components';
 
 import 'react-day-picker/lib/style.css';
 
-import type { DateTime } from 'util/DateTime';
-import { isValidDate } from 'util/DateTime';
-import useUserDateTime from 'hooks/useUserDateTime';
+import { isValidDate, toDateObject, adjustFormat, DATE_TIME_FORMATS } from 'util/DateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   width: 100%;
@@ -61,42 +59,41 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
-const useSelectedDate = (date: DateTime | undefined) => {
-  const { toUserTimezone } = useUserDateTime();
-
-  if (!isValidDate(date)) {
-    return undefined;
+const isValidDateProp = (date: string | undefined) => {
+  if (!date) {
+    return true;
   }
 
-  return toUserTimezone(date);
+  return isValidDate(toDateObject(date, ['date']));
 };
 
 type Props = {
-  date?: DateTime | undefined,
+  date?: string | undefined,
   onChange: (day: Date, modifiers: DayModifiers, event: React.MouseEvent<HTMLDivElement>) => void,
   fromDate?: Date,
   showOutsideDays?: boolean,
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
-  const { formatTime } = useUserDateTime();
-  const selectedDate = useSelectedDate(date);
+  if (!isValidDateProp(date)) {
+    throw Error(`Date time provided for date picker "${date}" is not valid. The expected format is ${DATE_TIME_FORMATS.date}.`);
+  }
 
   const modifiers = useMemo(() => ({
     selected: (moddedDate: Date) => {
-      if (!selectedDate) {
+      if (!date) {
         return false;
       }
 
-      return formatTime(selectedDate, 'date') === formatTime(moddedDate, 'date');
+      return date === adjustFormat(moddedDate, 'date');
     },
     disabled: {
       before: new Date(fromDate),
     },
-  }), [formatTime, fromDate, selectedDate]);
+  }), [fromDate, date]);
 
   return (
-    <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
+    <StyledDayPicker initialMonth={date ? toDateObject(date).toDate() : undefined}
                      onDayClick={onChange}
                      modifiers={modifiers}
                      showOutsideDays={showOutsideDays} />

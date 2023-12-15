@@ -128,10 +128,9 @@ const IndexSetFieldTypesList = () => {
     },
   }), [fieldTypes]);
 
-  const renderActions = useCallback((fieldType: IndexSetFieldType, setSelectedFields: React.Dispatch<React.SetStateAction<Array<string>>>) => (
+  const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
-                      setSelectedFields={setSelectedFields}
                       refetchFieldTypes={refetchFieldTypes} />
   ), [indexSetId, refetchFieldTypes]);
 
@@ -144,15 +143,6 @@ const IndexSetFieldTypesList = () => {
     paginationQueryParameter.resetPage();
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
-
-  const renderBulkActions = useCallback((
-    selectedFields: Array<string>,
-    setSelectedFields: (fieldName: Array<string>) => void,
-  ) => (
-    <BulkActions selectedFields={selectedFields}
-                 setSelectedFields={setSelectedFields}
-                 indexSetId={indexSetId} />
-  ), [indexSetId]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -192,7 +182,7 @@ const IndexSetFieldTypesList = () => {
                                             columnDefinitions={attributes}
                                             rowActions={renderActions}
                                             bulkSelection={{
-                                              actions: renderBulkActions,
+                                              actions: <BulkActions indexSetId={indexSetId} />,
                                               isEntitySelectable,
                                             }} />
       )}

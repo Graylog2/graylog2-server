@@ -19,7 +19,7 @@ import MockAction from 'helpers/mocking/MockAction';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type Widget from 'views/logic/widgets/Widget';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 
 import bindings from './bindings';
 
