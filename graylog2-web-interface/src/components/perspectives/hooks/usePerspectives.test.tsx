@@ -21,7 +21,8 @@ import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import { defaultPerspective, examplePerspective, unavailablePerspective } from 'fixtures/perspectives';
 
-jest.mock('hooks/usePluginEntities', () => () => [defaultPerspective, examplePerspective, unavailablePerspective]);
+const mockedPerspectives = [defaultPerspective, examplePerspective, unavailablePerspective];
+jest.mock('hooks/usePluginEntities', () => () => mockedPerspectives);
 
 describe('usePerspectives', () => {
   afterEach(() => {
