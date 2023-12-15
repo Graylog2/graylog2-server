@@ -28,6 +28,12 @@ import type { Perspective } from 'components/perspectives/types';
 
 import PerspectivesContext from './PerspectivesContext';
 
+const DEFAULT_PERSPECTIVE = 'default';
+
+const findPerspective = (perspectives: Array<Perspective>, perspectiveId: string) => (
+  perspectives.find(({ id }) => id === perspectiveId)
+);
+
 const usePersistedSetting = (settingKey: string) => {
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
     username: userStore.currentUser?.username,
@@ -54,19 +60,17 @@ const usePersistedSetting = (settingKey: string) => {
 
 const useActivePerspectiveState = (availablePerspectives: Array<Perspective>) => {
   const [persistedPerspective, setPersistedPerspective] = usePersistedSetting('perspective');
-  const [activePerspective, setActivePerspective] = useState(persistedPerspective ?? 'default');
+  const [activePerspective, setActivePerspective] = useState<string>(
+    findPerspective(availablePerspectives, persistedPerspective) ? persistedPerspective : DEFAULT_PERSPECTIVE,
+  );
   const setActivePerspectiveWithPersistence = useCallback((newPerspective: string) => {
     setActivePerspective(newPerspective);
 
     return setPersistedPerspective(newPerspective);
   }, [setPersistedPerspective]);
 
-  const findPerspective = useCallback((perspective: string) => (
-    availablePerspectives.find(({ id }) => id === perspective)
-  ), [availablePerspectives]);
-
   return {
-    activePerspective: findPerspective(activePerspective) ?? findPerspective('default'),
+    activePerspective: findPerspective(availablePerspectives, activePerspective),
     setActivePerspective: setActivePerspectiveWithPersistence,
   };
 };
