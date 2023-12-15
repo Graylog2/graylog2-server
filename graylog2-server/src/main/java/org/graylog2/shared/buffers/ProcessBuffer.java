@@ -51,7 +51,7 @@ public class ProcessBuffer extends Buffer {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
     private final Meter incomingMessages;
-    private final ProcessBufferProcessor[] processors;
+    private final PartitioningWorkHandler<ProcessBufferProcessor, MessageEvent>[] processors;
 
     @Inject
     public ProcessBuffer(MetricRegistry metricRegistry,
@@ -86,11 +86,14 @@ public class ProcessBuffer extends Buffer {
         LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>.",
                 ringBufferSize, waitStrategy.getClass().getSimpleName());
 
-        processors = new ProcessBufferProcessor[processorCount];
+        //noinspection unchecked
+        processors = new PartitioningWorkHandler[processorCount];
         for (int i = 0; i < processorCount; i++) {
-            processors[i] = bufferProcessorFactory.create(decodingProcessorFactory.create(decodeTime, parseTime));
+            processors[i] = new PartitioningWorkHandler<>(
+                    bufferProcessorFactory.create(decodingProcessorFactory.create(decodeTime, parseTime)), i,
+                    processorCount);
         }
-        disruptor.handleEventsWithWorkerPool(processors);
+        disruptor.handleEventsWith(processors);
 
         ringBuffer = disruptor.start();
     }
@@ -116,10 +119,10 @@ public class ProcessBuffer extends Buffer {
         incomingMessages.mark(n);
     }
 
-    public ImmutableMap<String,String> getDump() {
+    public ImmutableMap<String, String> getDump() {
         final ImmutableMap.Builder<String, String> processBufferDump = ImmutableMap.builder();
         for (int i = 0, processorsLength = processors.length; i < processorsLength; i++) {
-            final ProcessBufferProcessor proc = processors[i];
+            final ProcessBufferProcessor proc = processors[i].getDelegate();
             processBufferDump.put("ProcessBufferProcessor #" + i, proc.getCurrentMessage().map(Message::toDumpString).orElse("idle"));
         }
         return processBufferDump.build();

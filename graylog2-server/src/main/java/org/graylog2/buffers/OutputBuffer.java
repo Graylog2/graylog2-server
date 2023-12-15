@@ -21,6 +21,7 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -30,6 +31,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.shared.buffers.LoggingExceptionHandler;
+import org.graylog2.shared.buffers.PartitioningWorkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,13 +82,13 @@ public class OutputBuffer extends Buffer {
         LOG.info("Initialized OutputBuffer with ring size <{}> and wait strategy <{}>.",
                 ringBufferSize, waitStrategy.getClass().getSimpleName());
 
-        final OutputBufferProcessor[] processors = new OutputBufferProcessor[processorCount];
-
+        @SuppressWarnings("unchecked")
+        final EventHandler<MessageEvent>[] processors = new PartitioningWorkHandler[processorCount];
         for (int i = 0; i < processorCount; i++) {
-            processors[i] = processorProvider.get();
+            processors[i] = new PartitioningWorkHandler<>(processorProvider.get(), i, processorCount);
         }
 
-        disruptor.handleEventsWithWorkerPool(processors);
+        disruptor.handleEventsWith(processors);
 
         ringBuffer = disruptor.start();
     }
