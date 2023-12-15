@@ -43,7 +43,7 @@ const ActivePerspectiveBrand = ({ children, className }: PropsWithChildren<{ cla
 
   return (
     <BrandContainer className={className}>
-      <BrandLink to={activePerspective.brandLink}>
+      <BrandLink to={activePerspective.welcomeRoute}>
         <ActiveBrandComponent />
       </BrandLink>
       {children}

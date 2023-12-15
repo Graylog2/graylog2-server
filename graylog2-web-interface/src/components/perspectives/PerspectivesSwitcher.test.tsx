@@ -39,13 +39,13 @@ describe('PerspectivesSwitcher', () => {
       id: 'default',
       title: 'Default Perspective',
       brandComponent: () => <div>Default perspective</div>,
-      brandLink: '',
+      welcomeRoute: '',
     },
     {
       id: 'example-perspective',
       title: 'Example Perspective',
       brandComponent: () => <div />,
-      brandLink: '/example-perspective',
+      welcomeRoute: '/example-perspective',
     },
   ];
 

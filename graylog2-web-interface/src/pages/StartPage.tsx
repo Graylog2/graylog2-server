@@ -51,7 +51,7 @@ const StartPage = () => {
       return;
     }
 
-    redirect(activePerspective.brandLink);
+    redirect(activePerspective.welcomeRoute);
   }, [activePerspective, currentUser?.startpage, redirect]);
 
   useEffect(() => {
