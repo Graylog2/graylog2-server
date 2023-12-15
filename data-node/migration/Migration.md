@@ -4,6 +4,10 @@ Caveat: preliminary - and only to have a minimal basis to find out which modific
 and to research/test possible improvements for a better user experience or find out the limits what we can actually do.
 Some of these steps could be useful in the future for PSO or support to migrate manually or fix problems that occurred during migration.
 
+#### Testing during development
+
+Create/include a locally generated Docker image for Graylog or the DataNode by using the `create-docker-images.sh`
+
 ## Migrating an existing OpenSearch 2.x cluster
 
 This is a preliminary guide to migrate an existing OpenSearch 2.x cluster into a DataNode cluster.
@@ -26,7 +30,9 @@ differ. The steps can be also used to migrate a OS packages install.
 You should be able to always start over by doing a `docker compose down -v` and taking back any modifications on the files.
 
 #### The file `cert.sh`
-Use the `cert.sh` script to generate the certificate certificates for the OpenSearch cluster.
+Use the `cert.sh` script to generate the certificate certificates for the OpenSearch cluster. Use "password" as the password 
+for certificate related stuff so that it matches the other scripts/files.
+
 For a cluster that uses no certificates, don't create certificates. Remove the following lines
 from each OpenSearch service in `docker-compose.yml`:
 
