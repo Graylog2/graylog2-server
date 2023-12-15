@@ -8,6 +8,9 @@ Some of these steps could be useful in the future for PSO or support to migrate 
 
 Create/include a locally generated Docker image for Graylog or the DataNode by using the `create-docker-images.sh`
 
+At the time of writing this, if you test/develop on macOS and you're struggling with setting `vm.max_map_count` for Docker,
+you're running the latest Docker version, which is incompatible with macOS Sonoma. Your only chance is to downgrade Docker.
+
 ## Migrating an existing OpenSearch 2.x cluster
 
 This is a preliminary guide to migrate an existing OpenSearch 2.x cluster into a DataNode cluster.
