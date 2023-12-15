@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
     public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdran";
+    private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackend.class);
+    public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdranHasToBeAtLeastSixtyFourCharactersInLength";
     public static final String ROOT_PASSWORD_PLAINTEXT = "admin";
     public static final String ROOT_PASSWORD_SHA_2 = DigestUtils.sha256Hex(ROOT_PASSWORD_PLAINTEXT);
 
