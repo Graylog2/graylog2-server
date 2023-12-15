@@ -62,7 +62,6 @@ const Table = styled.table(({ theme }) => css`
       left: 0;
       padding: 5px !important;
       position: static;
-      min-width: 0 !important;
     }
   }
 `);
