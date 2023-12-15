@@ -289,7 +289,7 @@ public class Configuration extends BaseConfiguration {
     @SuppressWarnings("unused")
     public void validatePasswordSecret() throws ValidationException {
         if (passwordSecret == null || passwordSecret.length() < 64) {
-            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
+            throw new ValidationException("The minimum length for \"password_secret\" is 64 characters.");
         }
     }
 
