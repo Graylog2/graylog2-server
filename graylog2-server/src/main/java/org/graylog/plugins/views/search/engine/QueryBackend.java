@@ -21,7 +21,7 @@ import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.engine.monitoring.collection.QueryExecutionStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
@@ -51,7 +51,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      */
     T generate(Query query, Set<SearchError> validationErrors);
 
-    QueryExecutionStatsCollector<QueryExecutionStats> getExecutionStatsCollector();
+    StatsCollector<QueryExecutionStats> getExecutionStatsCollector();
 
     default boolean isAllMessages(TimeRange timeRange) {
         return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();

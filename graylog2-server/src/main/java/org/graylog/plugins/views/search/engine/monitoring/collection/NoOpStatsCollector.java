@@ -16,13 +16,18 @@
  */
 package org.graylog.plugins.views.search.engine.monitoring.collection;
 
+import java.util.Collections;
 import java.util.List;
 
-public interface QueryExecutionStatsCollector<T> {
+public class NoOpStatsCollector<T> implements StatsCollector<T> {
 
-    void storeStats(T stats);
+    @Override
+    public void storeStats(T stats) {
 
-    List<T> getAllStats();
+    }
 
-
+    @Override
+    public List<T> getAllStats() {
+        return Collections.emptyList();
+    }
 }

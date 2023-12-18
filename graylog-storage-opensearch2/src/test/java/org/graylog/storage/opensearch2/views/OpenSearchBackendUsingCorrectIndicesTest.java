@@ -25,7 +25,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpExecutionStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -98,7 +98,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 indexLookup,
                 (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
-                new NoOpExecutionStatsCollector<>(),
+                new NoOpStatsCollector<>(),
                 false);
     }
 

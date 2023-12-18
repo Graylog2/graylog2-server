@@ -21,11 +21,11 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InMemoryCappedQueryExecutionStatsCollector<T> implements QueryExecutionStatsCollector<T> {
+public class InMemoryCappedStatsCollector<T> implements StatsCollector<T> {
 
     private final CircularFifoQueue<T> cappedQueue;
 
-    public InMemoryCappedQueryExecutionStatsCollector(final int maxSize) {
+    public InMemoryCappedStatsCollector(final int maxSize) {
         this.cappedQueue = new CircularFifoQueue<>(maxSize);
     }
 

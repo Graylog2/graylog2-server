@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.search.engine.QueryExecutionStats;
-import org.graylog.plugins.views.search.engine.monitoring.collection.QueryExecutionStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.Histogram;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.AverageValueComputation;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.MaxValueComputation;
@@ -57,12 +57,12 @@ public class MonitoringResource extends RestResource {
     public static final String MAX_FUNCTION_NAME = "Max. duration (ms)";
     public static final String PERCENT_FUNCTION_NAME = "Percent. of recent queries";
     public static final String TIMERANGE = "Timerange";
-    private final QueryExecutionStatsCollector<QueryExecutionStats> executionStatsCollector;
+    private final StatsCollector<QueryExecutionStats> executionStatsCollector;
     private final MultiValueSingleInputHistogramCreation<Period, QueryExecutionStats> histogramCreator;
 
 
     @Inject
-    public MonitoringResource(final QueryExecutionStatsCollector<QueryExecutionStats> executionStatsCollector) {
+    public MonitoringResource(final StatsCollector<QueryExecutionStats> executionStatsCollector) {
         this.executionStatsCollector = executionStatsCollector;
         Map<String, ValueComputation<QueryExecutionStats, Long>> valueFunctions = new LinkedHashMap<>();
         valueFunctions.put(MonitoringResource.AVG_FUNCTION_NAME, new AverageValueComputation<>(QueryExecutionStats::duration));
