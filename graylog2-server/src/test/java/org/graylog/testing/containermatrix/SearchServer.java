@@ -27,12 +27,14 @@ public enum SearchServer {
     OS1(OPENSEARCH, "1.3.12"),
     OS2(OPENSEARCH, "2.0.1"),
     OS2_4(OPENSEARCH, "2.4.1"),
-    OS2_LATEST(OPENSEARCH, "2.10.0"),
+    OS2_LATEST(OPENSEARCH, "2.11.0"),
     DATANODE_PRE_52(DATANODE, "5.1.0"),
     DATANODE_DEV(DATANODE, "5.2.0");
 
     public static final SearchServer DEFAULT_VERSION = DATANODE_DEV;
     public static final SearchServer DEFAULT_OPENSEARCH_VERSION = OS2_LATEST;
+
+    public static final String OPENSEARCH_VERSION_IN_DATANODE = "2.11.0";
 
     private final SearchVersion searchVersion;
 
