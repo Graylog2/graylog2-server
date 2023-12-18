@@ -86,7 +86,7 @@ public class MultiValueSingleInputHistogramCreation<T, S> {
                                                          final Collection<S> executionStats,
                                                          final int numTotalStats) {
         final NamedBinDefinition binDefinition = new NamedBinDefinition(binName);
-        final List<Long> values = valueFunctions.values().stream().map(func -> func.computeValue(executionStats, numTotalStats)).toList();
+        final List<Number> values = valueFunctions.values().stream().map(func -> func.computeValue(executionStats, numTotalStats)).collect(Collectors.toList());
         return new MultiValueBin<>(binDefinition, values);
     }
 }

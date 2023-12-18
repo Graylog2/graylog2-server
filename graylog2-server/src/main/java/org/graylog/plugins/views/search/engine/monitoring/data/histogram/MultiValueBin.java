@@ -27,7 +27,7 @@ import static org.graylog.plugins.views.search.engine.monitoring.data.histogram.
 
 @JsonTypeName(MULTI_BIN_TYPE)
 public record MultiValueBin<D extends BinDefinition>(@JsonProperty D binDefinition,
-                                                     @JsonProperty List<? extends Number> values) implements Bin<D> {
+                                                     @JsonProperty List<Number> values) implements Bin<D> {
 
 
     @Override
