@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.search.engine.QueryExecutionStats;
 import org.graylog.plugins.views.search.engine.monitoring.collection.QueryExecutionStatsCollector;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.Histogram;
@@ -32,6 +33,7 @@ import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creatio
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.Period;
 
 import javax.inject.Inject;
@@ -79,6 +81,7 @@ public class MonitoringResource extends RestResource {
     @ApiOperation(value = "Get timerange-based histogram of queries durations and percentage in recent query population")
     @Path("query_duration_histogram")
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.TEXT_CSV})
+    @RequiresPermissions({RestPermissions.MONITORING_READ})
     public Histogram getQueryDurationHistogram() {
         final Collection<QueryExecutionStats> allStats = executionStatsCollector.getAllStats();
         return histogramCreator.create(allStats);
