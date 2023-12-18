@@ -202,7 +202,7 @@ public class SearchAggregationsIT {
         final ValidatableResponse validatableResponse = execute(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
-                .body("rows", hasSize(1 ));
+                .body("rows", hasSize(1));
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
