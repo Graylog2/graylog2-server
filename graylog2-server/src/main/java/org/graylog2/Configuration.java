@@ -35,6 +35,7 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
+import org.graylog2.plugin.Tools;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
@@ -79,7 +80,7 @@ public class Configuration extends CaConfiguration {
     private int outputFlushInterval = 1;
 
     @Parameter(value = "outputbuffer_processors", required = true, validators = PositiveIntegerValidator.class)
-    private int outputBufferProcessors = 3;
+    private int outputBufferProcessors = Math.round(Tools.availableProcessors() * 0.16f + 0.6f);
 
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;

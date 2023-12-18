@@ -49,7 +49,7 @@ public abstract class BaseConfiguration extends PathConfiguration {
     protected int shutdownTimeout = 30000;
 
     @Parameter(value = "processbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
-    private int processBufferProcessors = 5;
+    private int processBufferProcessors = Math.round(Tools.availableProcessors() * 0.35f + 0.7f);
 
     @Parameter(value = "processor_wait_strategy", required = true)
     private String processorWaitStrategy = "blocking";
@@ -148,7 +148,7 @@ public abstract class BaseConfiguration extends PathConfiguration {
     public int getAsyncEventbusProcessors() {
         return asyncEventbusProcessors;
     }
-    
+
     public boolean isMessageJournalEnabled() {
         return messageJournalEnabled;
     }
