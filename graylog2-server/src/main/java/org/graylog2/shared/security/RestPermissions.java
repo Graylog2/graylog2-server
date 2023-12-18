@@ -164,6 +164,8 @@ public class RestPermissions implements PluginPermissions {
 
     public static final String DATANODE_REMOVE = "datanode:remove";
     public static final String DATANODE_RESET = "datanode:reset";
+    public static final String DATANODE_STOP = "datanode:stop";
+    public static final String DATANODE_START = "datanode:start";
 
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
@@ -194,6 +196,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DASHBOARDS_READ, ""))
             .add(create(DATANODE_REMOVE, ""))
             .add(create(DATANODE_RESET, ""))
+            .add(create(DATANODE_STOP, ""))
+            .add(create(DATANODE_START, ""))
             .add(create(DECORATORS_CREATE, ""))
             .add(create(DECORATORS_EDIT, ""))
             .add(create(DECORATORS_READ, ""))

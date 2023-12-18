@@ -14,10 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine;
+package org.graylog.datanode.filesystem.index.indexreader;
 
-public class LuceneQueryParsingException extends Exception {
-    public LuceneQueryParsingException(Throwable throwable) {
-        super(throwable);
-    }
+import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
+
+import java.nio.file.Path;
+
+public interface ShardStatsParser {
+    ShardStats read(Path path) throws IncompatibleIndexVersionException;
 }

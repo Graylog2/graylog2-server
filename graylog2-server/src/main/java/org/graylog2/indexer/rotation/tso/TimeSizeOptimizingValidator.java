@@ -63,11 +63,11 @@ public class TimeSizeOptimizingValidator {
                     ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod)));
         }
 
-        if (periodOtherThanDays(indexLifetimeMax)) {
+        if (periodOtherThanDays(indexLifetimeMax) && !elasticsearchConfiguration.allowFlexibleRetentionPeriod()) {
             return Optional.of(IndexSetValidator.Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
                     FIELD_INDEX_LIFETIME_MAX, indexLifetimeMax)));
         }
-        if (periodOtherThanDays(indexLifetimeMin)) {
+        if (periodOtherThanDays(indexLifetimeMin) && !elasticsearchConfiguration.allowFlexibleRetentionPeriod()) {
             return Optional.of(IndexSetValidator.Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
                     FIELD_INDEX_LIFETIME_MIN, indexLifetimeMin)));
         }

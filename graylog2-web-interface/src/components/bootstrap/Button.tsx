@@ -37,6 +37,8 @@ const sizeForMantine = (size: BsSize) => {
 
 export type StyleProps = ColorVariant | 'link';
 
+const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
+
 const styleProps = (style: StyleProps) => {
   switch (style) {
     case 'default': return { color: 'gray' };
@@ -104,6 +106,7 @@ const disabledStyles = (style: ColorVariant, other: Other) => {
 
   return {
     ':disabled': {
+      pointerEvents: 'all',
       color: colors.color,
       backgroundColor: colors.background,
       opacity: '0.65',
@@ -119,6 +122,7 @@ const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disab
     root: {
       ...sizeStyles,
       ':disabled': disableStyles,
+      color: other.colors.contrast[bsStyle],
     },
     label: {
       gap: '0.25em',
@@ -132,13 +136,14 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
     title, form, type, role, name, tabIndex, children,
   }, ref) => {
     const theme = useMantineTheme();
-    const styles = useMemo(() => generateStyles(theme.other, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
+    const style = mapStyle(bsStyle);
+    const styles = useMemo(() => generateStyles(theme.other, style, bsSize, disabled), [bsSize, disabled, style, theme.other]);
 
     const sharedProps = {
       id,
       'aria-label': ariaLabel,
       className,
-      ...styleProps(bsStyle),
+      ...styleProps(style),
       'data-testid': dataTestId,
       disabled,
       role,
