@@ -385,28 +385,6 @@ ZeroToThree
     :   [0-3]
     ;
 
-Identifier
-    :   [a-zA-Z_] [a-zA-Z_0-9]*
-    |   '`' ~[`]+ '`'
-    ;
-
-
-//
-// Whitespace and comments
-//
-
-WS  :  [ \t\r\n\u000C]+ -> skip
-    ;
-
-COMMENT
-    :   '/*' .*? '*/' -> skip
-    ;
-
-LINE_COMMENT
-    :   '//' ~[\r\n]* -> skip
-    ;
-
-
 // to support case insensitive keywords
 
 fragment A : [aA];
@@ -435,3 +413,23 @@ fragment W : [wW];
 fragment X : [xX];
 fragment Y : [yY];
 fragment Z : [zZ];
+
+Identifier
+    :   [a-zA-Z_] [a-zA-Z_0-9]*
+    |   '`' ~[`]+ '`'
+    ;
+
+//
+// Whitespace and comments
+//
+
+WS  :  [ \t\r\n\u000C]+ -> skip
+    ;
+
+COMMENT
+    :   '/*' .*? '*/' -> skip
+    ;
+
+LINE_COMMENT
+    :   '//' ~[\r\n]* -> skip
+    ;
