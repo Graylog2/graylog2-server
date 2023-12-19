@@ -34,8 +34,6 @@ public enum SearchServer {
     public static final SearchServer DEFAULT_VERSION = DATANODE_DEV;
     public static final SearchServer DEFAULT_OPENSEARCH_VERSION = OS2_LATEST;
 
-    public static final String OPENSEARCH_VERSION_IN_DATANODE = "2.11.0";
-
     private final SearchVersion searchVersion;
 
     SearchServer(final SearchVersion.Distribution distribution, final String version) {

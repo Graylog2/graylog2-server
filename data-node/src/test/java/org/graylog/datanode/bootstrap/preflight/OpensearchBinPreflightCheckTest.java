@@ -29,8 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Collections;
 
-import static org.graylog.testing.containermatrix.SearchServer.OPENSEARCH_VERSION_IN_DATANODE;
-
 public class OpensearchBinPreflightCheckTest {
 
     @TempDir
@@ -40,7 +38,7 @@ public class OpensearchBinPreflightCheckTest {
     void testNonexistentDirectory() {
         final Path baseDirectory = tempDir.resolve("nonexistent");
 
-        final OpensearchDistribution dist = new OpensearchDistribution(baseDirectory, OPENSEARCH_VERSION_IN_DATANODE);
+        final OpensearchDistribution dist = new OpensearchDistribution(baseDirectory, "2.10.0");
 
         final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> dist);
         Assertions.assertThatThrownBy(check::runCheck)
@@ -58,7 +56,7 @@ public class OpensearchBinPreflightCheckTest {
         // nonexistent!
         final Path executable = binDir.resolve("opensearch");
 
-        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, OPENSEARCH_VERSION_IN_DATANODE);
+        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, "2.10.0");
         final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> dist);
 
         Assertions.assertThatThrownBy(check::runCheck)
@@ -74,7 +72,7 @@ public class OpensearchBinPreflightCheckTest {
         final Path executable = binDir.resolve("opensearch");
         Files.createFile(executable);
 
-        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, OPENSEARCH_VERSION_IN_DATANODE);
+        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, "2.10.0");
 
         final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> dist);
         Assertions.assertThatThrownBy(check::runCheck)
@@ -92,7 +90,7 @@ public class OpensearchBinPreflightCheckTest {
         Files.createFile(executable);
        Files.setPosixFilePermissions(executable, Collections.singleton(PosixFilePermission.OWNER_EXECUTE));
 
-        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, OPENSEARCH_VERSION_IN_DATANODE);
+        final OpensearchDistribution dist = new OpensearchDistribution(baseDir, "2.10.0");
 
         final OpensearchBinPreflightCheck check = new OpensearchBinPreflightCheck(() -> dist);
         Assertions.assertThatCode(check::runCheck)
