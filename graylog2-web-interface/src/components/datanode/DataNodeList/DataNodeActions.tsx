@@ -44,8 +44,8 @@ const DIALOG_TYPES = {
 
 const DIALOG_TEXT = {
   [DIALOG_TYPES.REJOIN]: {
-    dialogTitle: 'Reset Datanode',
-    dialogBody: (datanode: string) => `Are you sure you want to reset datanode "${datanode}"?`,
+    dialogTitle: 'Rejoin Datanode',
+    dialogBody: (datanode: string) => `Are you sure you want to rejoin datanode "${datanode}"?`,
   },
   [DIALOG_TYPES.REMOVE]: {
     dialogTitle: 'Remove datanode',
@@ -114,6 +114,8 @@ const DataNodeActions = ({ dataNode }: Props) => {
     }
   };
 
+  const isDatanodeRunning = dataNode.data_node_status === 'AVAILABLE';
+
   return (
     <>
       <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
@@ -122,8 +124,8 @@ const DataNodeActions = ({ dataNode }: Props) => {
                              disabled={false}
                              dropdownZIndex={1000}>
         <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
-        <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>
-        <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>
+        {!isDatanodeRunning && <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>}
+        {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>
         <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
       </OverlayDropdownButton>

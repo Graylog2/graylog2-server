@@ -127,7 +127,16 @@ const DataNodeList = () => {
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
                     query={query}
-                    queryHelpComponent={<QueryHelper entityName="datanode" />} />
+                    queryHelpComponent={(
+                      <QueryHelper entityName="datanode"
+                                   commonFields={['name']}
+                                   example={(
+                                     <p>
+                                       Find entities with a description containing node:<br />
+                                       <code>name:node</code><br />
+                                     </p>
+                                   )} />
+                    )} />
       </SearchContainer>
       <div>
         {elements?.length === 0 ? (
