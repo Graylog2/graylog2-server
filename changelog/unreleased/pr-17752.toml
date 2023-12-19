@@ -1,0 +1,4 @@
+type = "c"
+message = "Updated Perspective Switcher style to not include the logo and a shorter title."
+
+pulls = ["17752"]
