@@ -38,17 +38,12 @@ const Container = styled.span`
 `;
 
 const ItemContainer = styled.span(({ theme }) => css`
-  padding-left: 15px;
   font-size: ${theme.fonts.size.large};
   display: flex;
   flex-direction: row;
   align-content: center;
   align-items: center;
 `);
-
-const Item = styled.span`
-  padding-left: 15px;
-`;
 
 const DropdownTrigger = styled.button`
   background: transparent;
@@ -86,11 +81,9 @@ const Switcher = () => {
           </Menu.Target>
         </ActivePerspectiveBrand>
         <StyledMenuDropdown>
-          {perspectives.map(({ brandComponent: BrandComponent, title, id }) => (
+          {perspectives.map(({ title, id }) => (
             <Menu.Item key={id} onClick={onChangePerspective(id)}>
-              <ItemContainer>
-                <BrandComponent /><Item>{title}</Item>
-              </ItemContainer>
+              <ItemContainer>{title}</ItemContainer>
             </Menu.Item>
           ))}
         </StyledMenuDropdown>
