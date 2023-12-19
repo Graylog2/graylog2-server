@@ -22,11 +22,11 @@ import DocsHelper from 'util/DocsHelper';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 
 const DataNodesMigrationPage = () => (
-  <DocumentTitle title="Data Nodes Migration">
+  <DocumentTitle title="Data nodes Migration">
     <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes Migration"
+    <PageHeader title="Data nodes Migration"
                 documentationLink={{
-                  title: 'Data Nodes documentation',
+                  title: 'Data nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
                 }}>
       <span>

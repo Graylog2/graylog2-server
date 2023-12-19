@@ -34,12 +34,14 @@ import {
 type Props = {
   dataNode: DataNode,
 };
+
 const DIALOG_TYPES = {
   STOP: 'stop',
   REJOIN: 'rejoin',
   REMOVE: 'remove',
   RENEW_CERT: 'renew',
 };
+
 const DIALOG_TEXT = {
   [DIALOG_TYPES.REJOIN]: {
     dialogTitle: 'Reset Datanode',

@@ -29,7 +29,7 @@ export const removeDataNode = async (datanodeId: string) => {
 
     UserNotification.success(`Datanode "${datanodeId}" removed successfully`);
   } catch (errorThrown) {
-    UserNotification.error(`Removing Datanode failed with status: ${errorThrown}`, 'Could not Remove the Datanode.');
+    UserNotification.error(`Removing Data node failed with status: ${errorThrown}`, 'Could not remove the Datanode.');
   }
 };
 
@@ -37,9 +37,9 @@ export const startDataNode = async (datanodeId: string) => {
   try {
     await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/start`));
 
-    UserNotification.success(`Datanode "${datanodeId}" started successfully`);
+    UserNotification.success(`Data node "${datanodeId}" started successfully`);
   } catch (errorThrown) {
-    UserNotification.error(`Starting Datanode failed with status: ${errorThrown}`, 'Could not start the Datanode.');
+    UserNotification.error(`Starting Data node failed with status: ${errorThrown}`, 'Could not start the Datanode.');
   }
 };
 
@@ -47,9 +47,9 @@ export const stopDataNode = async (datanodeId: string) => {
   try {
     await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/stop`));
 
-    UserNotification.success(`Datanode "${datanodeId}" stopped successfully`);
+    UserNotification.success(`Data node "${datanodeId}" stopped successfully`);
   } catch (errorThrown) {
-    UserNotification.error(`Stopping Datanode failed with status: ${errorThrown}`, 'Could not Stop the Datanode.');
+    UserNotification.error(`Stopping Data node failed with status: ${errorThrown}`, 'Could not stop the Datanode.');
   }
 };
 
@@ -57,9 +57,9 @@ export const rejoinDataNode = async (datanodeId: string) => {
   try {
     await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/reset`));
 
-    UserNotification.success(`Datanode "${datanodeId}" rejoined successfully`);
+    UserNotification.success(`Data node "${datanodeId}" rejoined successfully`);
   } catch (errorThrown) {
-    UserNotification.error(`Rejoining Datanode failed with status: ${errorThrown}`, 'Could not Rejoin the Datanode.');
+    UserNotification.error(`Rejoining Data node failed with status: ${errorThrown}`, 'Could not rejoin the Datanode.');
   }
 };
 
@@ -95,8 +95,8 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
     () => fetchDataNodes(params),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading datanodes failed with status: ${errorThrown}`,
-          'Could not load datanodes');
+        UserNotification.error(`Loading data nodes failed with status: ${errorThrown}`,
+          'Could not load data nodes');
       },
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval: 5000,

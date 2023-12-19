@@ -23,11 +23,11 @@ import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/Dat
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 
 const DataNodesClusterPage = () => (
-  <DocumentTitle title="Data Nodes Cluster">
+  <DocumentTitle title="Data nodes Cluster">
     <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes Cluster"
+    <PageHeader title="Data nodes Cluster"
                 documentationLink={{
-                  title: 'Data Nodes documentation',
+                  title: 'Data nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
                 }}>
       <span>
