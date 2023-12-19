@@ -190,6 +190,50 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("PUT", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(43));
     }
 
+    @ContainerMatrixTest
+    void testUnknownFieldsAroundUnknownPivot() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(Values.builder().fields(List.of("unknown_field_1", "http_method", "unknown_field_2")).build())
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(4));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of("(Empty Value)", "GET", "(Empty Value)"), List.of("count()")), equalTo(860))
+                .body(pathToMetricResult(List.of("(Empty Value)", "DELETE", "(Empty Value)"), List.of("count()")), equalTo(52))
+                .body(pathToMetricResult(List.of("(Empty Value)", "POST", "(Empty Value)"), List.of("count()")), equalTo(45))
+                .body(pathToMetricResult(List.of("(Empty Value)", "PUT", "(Empty Value)"), List.of("count()")), equalTo(43));
+    }
+
+    @ContainerMatrixTest
+    void testUnknownFieldFirstPivot() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(Values.builder().fields(List.of("unknown_field_1", "http_method")).build())
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(4));
+
+        final String searchTypeResult = PIVOT_PATH + ".rows";
+        validatableResponse
+                .rootPath(searchTypeResult)
+                .body(pathToMetricResult(List.of("(Empty Value)", "GET"), List.of("count()")), equalTo(860))
+                .body(pathToMetricResult(List.of("(Empty Value)", "DELETE"), List.of("count()")), equalTo(52))
+                .body(pathToMetricResult(List.of("(Empty Value)", "POST"), List.of("count()")), equalTo(45))
+                .body(pathToMetricResult(List.of("(Empty Value)", "PUT"), List.of("count()")), equalTo(43));
+    }
+
 
     @ContainerMatrixTest
     void testAllUnknownFieldsPivot() {
