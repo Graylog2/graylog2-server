@@ -21,6 +21,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
@@ -67,6 +68,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
         process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName()));
+        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration));
         return process;
     }
 
