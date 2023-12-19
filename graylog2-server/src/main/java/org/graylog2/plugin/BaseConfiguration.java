@@ -49,7 +49,7 @@ public abstract class BaseConfiguration extends PathConfiguration {
     protected int shutdownTimeout = 30000;
 
     @Parameter(value = "processbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
-    private int processBufferProcessors = Math.round(Tools.availableProcessors() * 0.35f + 0.7f);
+    private int processBufferProcessors = Math.round(Tools.availableProcessors() * 0.36f + 0.625f);
 
     @Parameter(value = "processor_wait_strategy", required = true)
     private String processorWaitStrategy = "blocking";

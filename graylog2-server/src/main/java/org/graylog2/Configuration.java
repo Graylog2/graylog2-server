@@ -80,7 +80,7 @@ public class Configuration extends CaConfiguration {
     private int outputFlushInterval = 1;
 
     @Parameter(value = "outputbuffer_processors", required = true, validators = PositiveIntegerValidator.class)
-    private int outputBufferProcessors = Math.round(Tools.availableProcessors() * 0.16f + 0.6f);
+    private int outputBufferProcessors = Math.round(Tools.availableProcessors() * 0.162f + 0.625f);
 
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
