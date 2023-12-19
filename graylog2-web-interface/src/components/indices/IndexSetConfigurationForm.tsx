@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
@@ -23,6 +23,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppConfig from 'util/AppConfig';
 import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
+import useIndexDefaults from 'pages/useIndexDefaults';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col, Row, Input, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
@@ -108,38 +109,41 @@ const IndexSetConfigurationForm = ({
   submitButtonText,
   submitLoadingText,
 } : Props) => {
+  const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
   const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
     { value: 'data_tiering', label: 'Data Tiering' },
     { value: 'legacy', label: 'Legacy (Deprecated)' },
   ];
 
   const initialSegment = () : RetentionConfigSegment => {
-    if (indexSet.data_tiering) return 'data_tiering';
+    if (indexSet.use_legacy_rotation) return 'legacy';
 
-    return 'legacy';
+    return 'data_tiering';
   };
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
-  const prepareRetentionConfig = (values: IndexSetFormValues) : IndexSet => {
+  const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
     if (selectedRetentionSegment === 'legacy') {
-      return { ...values, data_tiering: undefined };
+      return { ...values, data_tiering: undefined, use_legacy_rotation: true };
     }
 
     const configWithDataTiering = prepareDataTieringConfig(values, PluginStore);
 
+    if (loadingIndexDefaultsConfig || !indexDefaultsConfig) return { ...configWithDataTiering, use_legacy_rotation: false };
+
     const legacyDefaultConfig = {
-      retention_strategy: null,
-      retention_strategy_class: null,
-      rotation_strategy: null,
-      rotation_strategy_class: null,
+      rotation_strategy_class: indexDefaultsConfig.rotation_strategy_class,
+      rotation_strategy: indexDefaultsConfig.rotation_strategy_config as RotationStrategyConfig,
+      retention_strategy_class: indexDefaultsConfig.retention_strategy_class,
+      retention_strategy: indexDefaultsConfig.retention_strategy_config as RetentionStrategyConfig,
     };
 
-    return { ...configWithDataTiering, ...legacyDefaultConfig };
-  };
+    return { ...configWithDataTiering, ...legacyDefaultConfig, use_legacy_rotation: false };
+  }, [loadingIndexDefaultsConfig, indexDefaultsConfig, selectedRetentionSegment]);
 
-  const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfig(values));
+  const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfigBeforeSubmit(values));
 
   const onFieldTypeRefreshIntervalChange = (
     intervalValue: number,

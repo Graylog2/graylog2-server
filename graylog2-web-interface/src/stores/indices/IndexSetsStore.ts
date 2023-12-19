@@ -57,10 +57,10 @@ type IndexSetConfig = {
   index_prefix: string,
   shards: number,
   replicas: number,
-  rotation_strategy_class: string | null,
-  rotation_strategy: RotationStrategyConfig | null,
-  retention_strategy_class: string | null,
-  retention_strategy: RetentionStrategyConfig | null,
+  rotation_strategy_class: string,
+  rotation_strategy: RotationStrategyConfig,
+  retention_strategy_class: string,
+  retention_strategy: RetentionStrategyConfig,
   creation_date?: string,
   index_analyzer: string,
   index_optimization_max_num_segments: number,
@@ -69,6 +69,7 @@ type IndexSetConfig = {
   index_template_type?: string,
   writable: boolean,
   default?: boolean,
+  use_legacy_rotation?: boolean
 }
 
 export type IndexSet = IndexSetConfig & { data_tiering?: DataTieringConfig };

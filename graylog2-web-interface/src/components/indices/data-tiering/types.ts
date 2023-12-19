@@ -10,8 +10,8 @@ export type DataTieringConfig = {
   index_lifetime_min: string,
   index_lifetime_max: string,
   index_hot_lifetime_min?: string,
-  warm_tier_enabled?: boolean,
-  archive_before_deletion?: boolean,
+  warm_tier_enabled: boolean,
+  archive_before_deletion: boolean,
 }
 
 export type DataTieringFormValues = {
@@ -19,6 +19,6 @@ export type DataTieringFormValues = {
   index_lifetime_min: number,
   index_lifetime_max: number,
   index_hot_lifetime_min?: number,
-  warm_tier_enabled?: boolean,
-  archive_before_deletion?: boolean,
+  warm_tier_enabled: boolean,
+  archive_before_deletion: boolean,
 }
