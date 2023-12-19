@@ -29,8 +29,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
-import static org.graylog.testing.containermatrix.SearchServer.OPENSEARCH_VERSION_IN_DATANODE;
-
 class IndicesDirectoryParserTest {
 
 
@@ -48,7 +46,7 @@ class IndicesDirectoryParserTest {
         Assertions.assertThat(result.nodes())
                 .hasSize(1)
                 .allSatisfy(node -> {
-                    Assertions.assertThat(node.nodeVersion()).isEqualTo(OPENSEARCH_VERSION_IN_DATANODE);
+                    Assertions.assertThat(node.nodeVersion()).isEqualTo("2.10.0");
                     Assertions.assertThat(node.indices())
                             .hasSize(6)
                             .extracting(IndexInformation::indexName)
@@ -56,7 +54,7 @@ class IndicesDirectoryParserTest {
 
                     final IndexInformation graylog_0 = node.indices().stream().filter(i -> i.indexName().equals("graylog_0")).findFirst().orElseThrow(() -> new RuntimeException("Failed to detect graylog_0 index"));
 
-                    Assertions.assertThat(graylog_0.indexVersionCreated()).isEqualTo(OPENSEARCH_VERSION_IN_DATANODE);
+                    Assertions.assertThat(graylog_0.indexVersionCreated()).isEqualTo("2.10.0");
 
                     Assertions.assertThat(graylog_0.shards())
                             .hasSize(1)
