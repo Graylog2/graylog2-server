@@ -130,8 +130,6 @@ public class OpensearchRemovalTracer implements StateMachineTracer {
                 if (health.getRelocatingShards() == 0) {
                     process.stop();
                     executorService.shutdown();
-                    // TODO: set the state for this datanode to removed in nodes
-                    //  and include state in OpensearchProcessImpl.writeSeedHostsList
                 }
             } catch (IOException | OpenSearchStatusException e) {
                 process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
