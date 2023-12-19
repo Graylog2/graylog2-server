@@ -18,18 +18,16 @@ package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpRequestInterceptor;
-import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.client.CredentialsProvider;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.sniff.OpenSearchNodesSniffer;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -43,13 +41,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 @Singleton
-public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
-    private final Supplier<RestHighLevelClient> clientSupplier;
+public class RestClientProvider implements Provider<RestClient> {
+    private final Supplier<RestClient> clientSupplier;
     private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
 
     @SuppressWarnings("unused")
     @Inject
-    public RestHighLevelClientProvider(
+    public RestClientProvider(
             GracefulShutdownService shutdownService,
             @IndexerHosts List<URI> hosts,
             @Named("elasticsearch_connect_timeout") Duration connectTimeout,
@@ -65,6 +63,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
             @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             @Named("elasticsearch_mute_deprecation_warnings") boolean muteOpenSearchDeprecationWarnings,
+            @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
             CredentialsProvider credentialsProvider,
             TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
             @RunsWithDataNode Boolean runsWithDataNode,
@@ -74,29 +73,30 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
 
         clientSupplier = Suppliers.memoize(() -> {
-            final RestHighLevelClient client = buildClient(hosts,
+            final var client = buildClient(hosts,
                     connectTimeout,
                     socketTimeout,
                     maxTotalConnections,
                     maxTotalConnectionsPerRoute,
                     useExpectContinue,
                     muteOpenSearchDeprecationWarnings,
-                credentialsProvider,
+                    credentialsProvider,
                     runsWithDataNode || indexerUseJwtAuthentication,
-                    indexerJwtAuthTokenProvider);
+                    indexerJwtAuthTokenProvider,
+                    compressionEnabled);
 
-            var sniffer = LegacySnifferWrapper.create(
-                    client.getLowLevelClient(),
+            var sniffer = SnifferWrapper.create(
+                    client,
                     TimeUnit.SECONDS.toMillis(5),
                     discoveryFrequency,
                     mapDefaultScheme(defaultSchemeForDiscoveredNodes)
             );
 
             if (discoveryEnabled) {
-                sniffer.add(LegacyFilteredOpenSearchNodesSniffer.create(discoveryFilter));
+                sniffer.add(FilteredOpenSearchNodesSniffer.create(discoveryFilter));
             }
-            if(nodeActivity) {
-                sniffer.add(LegacyNodeListSniffer.create());
+            if (nodeActivity) {
+                sniffer.add(NodeListSniffer.create());
             }
 
             sniffer.build().ifPresent(s -> shutdownService.register(s::close));
@@ -107,18 +107,21 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
 
     private OpenSearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
         switch (defaultSchemeForDiscoveredNodes.toUpperCase(Locale.ENGLISH)) {
-            case "HTTP": return OpenSearchNodesSniffer.Scheme.HTTP;
-            case "HTTPS": return OpenSearchNodesSniffer.Scheme.HTTPS;
-            default: throw new IllegalArgumentException("Invalid default scheme for discovered OS nodes: " + defaultSchemeForDiscoveredNodes);
+            case "HTTP":
+                return OpenSearchNodesSniffer.Scheme.HTTP;
+            case "HTTPS":
+                return OpenSearchNodesSniffer.Scheme.HTTPS;
+            default:
+                throw new IllegalArgumentException("Invalid default scheme for discovered OS nodes: " + defaultSchemeForDiscoveredNodes);
         }
     }
 
     @Override
-    public RestHighLevelClient get() {
+    public RestClient get() {
         return this.clientSupplier.get();
     }
 
-    private RestHighLevelClient buildClient(
+    private RestClient buildClient(
             List<URI> hosts,
             Duration connectTimeout,
             Duration socketTimeout,
@@ -128,9 +131,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             boolean muteElasticsearchDeprecationWarnings,
             CredentialsProvider credentialsProvider,
             boolean isJwtAuthentication,
-            final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
+            final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
+            boolean compressionEnabled) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
-        final RestClientBuilder restClientBuilder = RestClient.builder(esHosts)
+        final var restClientBuilder = RestClient.builder(esHosts)
                 .setRequestConfigCallback(requestConfig -> {
                             requestConfig
                                     .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
@@ -145,26 +149,26 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 )
                 .setHttpClientConfigCallback(httpClientConfig -> {
                     httpClientConfig
-                        .setMaxConnTotal(maxTotalConnections)
-                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
+                            .setMaxConnTotal(maxTotalConnections)
+                            .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
 
-                    if(isJwtAuthentication) {
+                    if (isJwtAuthentication) {
                         httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", indexerJwtAuthTokenProvider.get()));
                     } else {
                         httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
                     }
 
-                    if(muteElasticsearchDeprecationWarnings) {
-                        httpClientConfig.addInterceptorFirst(new LegacyOpenSearchFilterDeprecationWarningsInterceptor());
+                    if (muteElasticsearchDeprecationWarnings) {
+                        httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
                     }
 
-                    if(hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
+                    if (hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
                         httpClientConfig.setSSLContext(trustManagerAndSocketFactoryProvider.getSslContext());
                     }
-
                     return httpClientConfig;
-                });
+                })
+                .setChunkedEnabled(compressionEnabled);
 
-        return new RestHighLevelClient(restClientBuilder);
+        return restClientBuilder.build();
     }
 }

@@ -18,17 +18,17 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import org.opensearch.client.Node;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class FilteredOpenSearchNodesSniffer implements NodesSniffer {
+class LegacyFilteredOpenSearchNodesSniffer implements LegacyNodesSniffer {
     private final String attribute;
     private final String value;
 
-    static FilteredOpenSearchNodesSniffer create(String filter) {
+    static LegacyFilteredOpenSearchNodesSniffer create(String filter) {
         final String attribute;
         final String value;
         if (!Strings.isNullOrEmpty(filter)) {
@@ -43,11 +43,11 @@ class FilteredOpenSearchNodesSniffer implements NodesSniffer {
             value = null;
         }
 
-        return new FilteredOpenSearchNodesSniffer(attribute, value);
+        return new LegacyFilteredOpenSearchNodesSniffer(attribute, value);
     }
 
     @VisibleForTesting
-    FilteredOpenSearchNodesSniffer(String attribute, String value) {
+    LegacyFilteredOpenSearchNodesSniffer(String attribute, String value) {
         this.attribute = attribute;
         this.value = value;
     }
