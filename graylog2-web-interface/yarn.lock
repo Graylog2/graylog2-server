@@ -1817,10 +1817,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@eslint/js@8.55.0":
-  version "8.55.0"
-  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.55.0.tgz#b721d52060f369aa259cf97392403cb9ce892ec6"
-  integrity sha512-qQfo2mxH5yVom1kacMtZZJFVdW+E70mqHMJvVg6WTLo+VBuQJ4TojZlfWBjK0ve5BdEeNAVxOsl/nvNMpJOaJA==
+"@eslint/js@8.56.0":
+  version "8.56.0"
+  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.56.0.tgz#ef20350fec605a7f7035a01764731b2de0f3782b"
+  integrity sha512-gMsVel9D7f2HLkBma9VbtzZRehRogVRfbr++f06nL2vnCGCNlzOD+/MUov/F4p8myyAHspEhVobgjpX64q5m6A==
 
 "@floating-ui/core@^1.2.6":
   version "1.2.6"
@@ -7108,11 +7108,11 @@ eslint-config-airbnb@19.0.4:
     "@tanstack/eslint-plugin-query" "4.36.1"
     "@typescript-eslint/eslint-plugin" "6.15.0"
     "@typescript-eslint/parser" "6.15.0"
-    eslint "8.55.0"
+    eslint "8.56.0"
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-83be384a-cf92-4fd1-9a13-d3fb9b3a25d3-1702973788359/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-b0c37495-a45f-4656-bdc8-f98023ba75b6-1702987691138/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.6.0"
     eslint-plugin-jest-dom "5.1.0"
@@ -7320,15 +7320,15 @@ eslint-visitor-keys@^3.4.3:
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-3.4.3.tgz#0cd72fe8550e3c2eae156a96a4dddcd1c8ac5800"
   integrity sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag==
 
-eslint@8.55.0:
-  version "8.55.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.55.0.tgz#078cb7b847d66f2c254ea1794fa395bf8e7e03f8"
-  integrity sha512-iyUUAM0PCKj5QpwGfmCAG9XXbZCWsqP/eWAWrG/W0umvjuLRBECwSFdt+rCntju0xEH7teIABPwXpahftIaTdA==
+eslint@8.56.0:
+  version "8.56.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.56.0.tgz#4957ce8da409dc0809f99ab07a1b94832ab74b15"
+  integrity sha512-Go19xM6T9puCOWntie1/P997aXxFsOi37JIHRWI514Hc6ZnaHGKY9xFhrU65RT6CcBEzZoGG1e6Nq+DT04ZtZQ==
   dependencies:
     "@eslint-community/eslint-utils" "^4.2.0"
     "@eslint-community/regexpp" "^4.6.1"
     "@eslint/eslintrc" "^2.1.4"
-    "@eslint/js" "8.55.0"
+    "@eslint/js" "8.56.0"
     "@humanwhocodes/config-array" "^0.11.13"
     "@humanwhocodes/module-importer" "^1.0.1"
     "@nodelib/fs.walk" "^1.2.8"
@@ -8557,13 +8557,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.6"
     "@types/jquery" "3.5.29"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-f32800b9-71f0-4421-978b-01d743e075e4-1702973788295/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-bc09946a-3bb0-4bba-9345-235fad4e48a1-1702987691017/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-f32800b9-71f0-4421-978b-01d743e075e4-1702973788295/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-bc09946a-3bb0-4bba-9345-235fad4e48a1-1702987691017/node_modules/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-f32800b9-71f0-4421-978b-01d743e075e4-1702973788295/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-bc09946a-3bb0-4bba-9345-235fad4e48a1-1702987691017/node_modules/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.29.4"
     moment-timezone "0.5.43"
