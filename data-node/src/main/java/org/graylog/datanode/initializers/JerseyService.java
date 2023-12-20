@@ -19,14 +19,18 @@ package org.graylog.datanode.initializers;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.base.JsonMappingExceptionMapper;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
@@ -57,12 +61,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.net.ssl.SSLContext;
-
-import jakarta.ws.rs.container.DynamicFeature;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.ext.ContextResolver;
-import jakarta.ws.rs.ext.ExceptionMapper;
-
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -191,7 +189,7 @@ public class JerseyService extends AbstractIdleService {
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
                 .registerClasses(
-                        JacksonJaxbJsonProvider.class,
+                        JacksonXmlBindJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
                         JacksonPropertyExceptionMapper.class)
