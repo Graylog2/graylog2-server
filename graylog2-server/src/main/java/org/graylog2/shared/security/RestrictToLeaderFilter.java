@@ -16,19 +16,17 @@
  */
 package org.graylog2.shared.security;
 
-import org.graylog2.cluster.leader.LeaderElectionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Priority;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import jakarta.annotation.Priority;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
+import org.graylog2.cluster.leader.LeaderElectionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 
 @Singleton

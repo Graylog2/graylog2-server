@@ -17,13 +17,11 @@
 package org.graylog2.shared.rest;
 
 import com.google.common.base.Strings;
-import org.graylog.util.uuid.ConcurrentUUID;
-
-import javax.annotation.Priority;
-
+import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
+import org.graylog.util.uuid.ConcurrentUUID;
 
 import java.io.IOException;
 

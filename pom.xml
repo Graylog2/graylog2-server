@@ -624,7 +624,6 @@
                                         <exclude>com.amazonaws:aws-java-sdk-bundle</exclude>
                                         <exclude>software.amazon.awssdk:bundle</exclude>
                                         <!-- Ban some javax dependencies after the move to jakarta -->
-                                        <!-- <exclude>javax.annotation:*</exclude> --> <!-- TODO: still used by repackaged Mongojack -->
                                         <exclude>javax.validation:*</exclude>
                                         <exclude>javax.ws.rs:javax.*</exclude>
                                         <exclude>com.fasterxml.jackson.jaxrs:*</exclude>
@@ -777,7 +776,20 @@
                             com.google.inject.Singleton
                             com.google.inject.Provider
                             com.google.inject.name.Named
+
+                            @defaultMessage Use jakarta.annotation.* instead
+                            javax.annotation.sql.**
+                            javax.annotation.security.**
+                            javax.annotation.Resources
+                            javax.annotation.Resource
+                            javax.annotation.Resource$AuthenticationType
+                            javax.annotation.ManagedBean
+                            javax.annotation.Generated
+                            javax.annotation.PreDestroy
+                            javax.annotation.Priority
+                            javax.annotation.PostConstruct
                         ]]>
+
                     </signatures>
                 </configuration>
                 <executions>
