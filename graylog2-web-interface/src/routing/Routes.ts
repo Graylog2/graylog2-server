@@ -91,6 +91,7 @@ const Routes = {
     INDICES: {
       LIST: '/system/indices',
       FAILURES: '/system/indices/failures',
+      FIELD_TYPE_PROFILES: '/system/indices/field_type_profiles',
     },
     INDEX_SETS: {
       CONFIGURATION: (indexSetId: string, from?: string) => {
