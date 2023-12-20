@@ -23,7 +23,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
 
 @AutoValue
 @WithBeanGetter
@@ -39,7 +40,7 @@ public abstract class WhitelistRegexGenerationRequest {
 
     @JsonCreator
     public static WhitelistRegexGenerationRequest create(@JsonProperty("url_template") @NotEmpty String urlTemplate,
-            @JsonProperty("placeholder") @Nullable String placeholder) {
+                                                         @JsonProperty("placeholder") @Nullable String placeholder) {
         return new AutoValue_WhitelistRegexGenerationRequest(urlTemplate, placeholder);
     }
 }

@@ -41,7 +41,8 @@ import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;

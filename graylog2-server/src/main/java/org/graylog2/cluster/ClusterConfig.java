@@ -26,7 +26,8 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
 
 @AutoValue
 @WithBeanGetter

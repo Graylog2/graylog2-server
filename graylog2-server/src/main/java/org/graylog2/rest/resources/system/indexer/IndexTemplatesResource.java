@@ -33,7 +33,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.NotBlank;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;

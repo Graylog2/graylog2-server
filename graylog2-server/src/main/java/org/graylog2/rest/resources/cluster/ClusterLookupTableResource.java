@@ -34,7 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;

@@ -18,7 +18,8 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Optional;
 
 @AutoValue
@@ -67,9 +68,13 @@ public abstract class ParsedTerm {
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder field(@NotNull String field);
+
         public abstract Builder value(@NotNull String value);
+
         public abstract Builder keyToken(@NotNull ImmutableToken keyToken);
+
         public abstract Builder valueToken(@NotNull ImmutableToken valueToken);
+
         public abstract ParsedTerm build();
     }
 }

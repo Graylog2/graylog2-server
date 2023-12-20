@@ -31,7 +31,8 @@ import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;

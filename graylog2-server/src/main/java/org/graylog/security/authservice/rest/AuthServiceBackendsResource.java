@@ -45,8 +45,9 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.UserOverviewDTO;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.BeanParam;

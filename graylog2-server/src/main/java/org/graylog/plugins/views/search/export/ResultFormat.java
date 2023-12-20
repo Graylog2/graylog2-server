@@ -26,8 +26,10 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Positive;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
+
 import java.util.LinkedHashSet;
 import java.util.Optional;
 

@@ -18,7 +18,8 @@ package org.graylog.plugins.views.search.engine;
 
 import org.joda.time.Period;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Optional;
 
 public class SearchConfig {

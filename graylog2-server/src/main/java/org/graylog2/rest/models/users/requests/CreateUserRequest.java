@@ -23,10 +23,12 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
 @JsonAutoDetect
@@ -84,7 +86,7 @@ public abstract class CreateUserRequest {
                                            @JsonProperty("roles") @Nullable List<String> roles,
                                            @JsonProperty("service_account") @Nullable Boolean isServiceAccount) {
         return new AutoValue_CreateUserRequest(username, password, email, firstName, lastName,
-                                               permissions, timezone, sessionTimeoutMs, startpage, roles,
+                permissions, timezone, sessionTimeoutMs, startpage, roles,
                 isServiceAccount != null && isServiceAccount);
     }
 }

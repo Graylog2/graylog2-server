@@ -27,7 +27,9 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;

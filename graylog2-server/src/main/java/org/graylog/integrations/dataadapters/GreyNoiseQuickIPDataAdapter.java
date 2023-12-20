@@ -46,7 +46,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -208,9 +210,9 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
         @Override
         public Config defaultConfiguration() {
             return Config.builder()
-                         .type(NAME)
-                         .apiToken(EncryptedValue.createUnset())
-                         .build();
+                    .type(NAME)
+                    .apiToken(EncryptedValue.createUnset())
+                    .build();
         }
 
     }

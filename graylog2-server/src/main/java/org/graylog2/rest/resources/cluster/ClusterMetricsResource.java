@@ -32,8 +32,9 @@ import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.POST;

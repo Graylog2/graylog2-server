@@ -27,7 +27,8 @@ import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;

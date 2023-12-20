@@ -26,7 +26,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;

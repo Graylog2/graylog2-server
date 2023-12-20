@@ -25,7 +25,9 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;

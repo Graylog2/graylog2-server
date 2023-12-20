@@ -32,8 +32,9 @@ import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.Duration;
 
 import javax.inject.Inject;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;

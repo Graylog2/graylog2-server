@@ -176,7 +176,7 @@
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>6.0.11</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
-        <validation-api.version>2.0.1.Final</validation-api.version>
+        <validation-api.version>3.0.2</validation-api.version>
         <zstd.version>1.5.5-11</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
@@ -626,6 +626,7 @@
                                         <!-- Ban some javax dependencies after the move to jakarta -->
                                         <exclude>javax.ws.rs:javax.*</exclude>
                                         <exclude>com.fasterxml.jackson.jaxrs:*</exclude>
+                                        <exclude>javax.validation:*</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>

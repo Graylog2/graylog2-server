@@ -22,7 +22,8 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;

@@ -46,7 +46,8 @@ import org.graylog2.utilities.IpSubnet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;

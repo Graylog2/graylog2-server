@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @AutoValue
 @WithBeanGetter
@@ -34,7 +34,7 @@ public abstract class DataNodeLifecycleEvent {
 
     @JsonProperty
     public abstract DataNodeLifecycleTrigger trigger();
-    
+
     @JsonCreator
     public static DataNodeLifecycleEvent create(
             @JsonProperty("node_id") @Valid String nodeId,

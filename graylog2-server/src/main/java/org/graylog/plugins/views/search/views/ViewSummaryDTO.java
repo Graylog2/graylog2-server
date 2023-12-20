@@ -30,7 +30,9 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;

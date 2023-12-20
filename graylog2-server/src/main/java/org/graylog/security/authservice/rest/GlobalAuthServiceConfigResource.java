@@ -28,7 +28,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;

@@ -35,8 +35,9 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;

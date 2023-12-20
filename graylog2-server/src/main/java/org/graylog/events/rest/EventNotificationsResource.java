@@ -56,7 +56,8 @@ import org.graylog2.shared.security.RestPermissions;
 import javax.inject.Inject;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import javax.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.NotBlank;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;

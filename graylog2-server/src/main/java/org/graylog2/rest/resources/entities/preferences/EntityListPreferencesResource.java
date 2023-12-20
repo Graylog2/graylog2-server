@@ -33,7 +33,8 @@ import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPr
 import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;

@@ -16,8 +16,9 @@
  */
 package org.graylog2.validation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
 import java.nio.charset.StandardCharsets;
 
 public class SizeInBytesValidator implements ConstraintValidator<SizeInBytes, String> {

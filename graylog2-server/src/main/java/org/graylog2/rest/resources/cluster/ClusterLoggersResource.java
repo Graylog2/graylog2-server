@@ -37,8 +37,9 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;

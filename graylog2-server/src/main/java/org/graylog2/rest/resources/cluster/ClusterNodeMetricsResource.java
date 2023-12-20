@@ -39,8 +39,9 @@ import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;

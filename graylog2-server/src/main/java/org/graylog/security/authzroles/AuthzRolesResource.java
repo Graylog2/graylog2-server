@@ -42,8 +42,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DELETE;

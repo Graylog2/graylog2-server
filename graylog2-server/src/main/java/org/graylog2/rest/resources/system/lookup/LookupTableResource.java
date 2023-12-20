@@ -68,9 +68,10 @@ import org.mongojack.DBSort;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.Validator;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;

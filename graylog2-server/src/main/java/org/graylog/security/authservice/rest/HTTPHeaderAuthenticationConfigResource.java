@@ -27,7 +27,8 @@ import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
+
+import jakarta.validation.Valid;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;

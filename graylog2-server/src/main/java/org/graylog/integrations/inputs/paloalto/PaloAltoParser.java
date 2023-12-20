@@ -31,7 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -146,9 +148,9 @@ public class PaloAltoParser {
     }
 
     /**
-     * @param timestamp The message timestamp.
+     * @param timestamp      The message timestamp.
      * @param messagePayload The full CSV message payload. eg. <14>Aug 22 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22...
-     * @param source The message source.
+     * @param source         The message source.
      * @return The PaloAltoMessageBase, which contains all data needed to build the message.
      */
     private PaloAltoMessageBase buildPaloAltoMessageBase(DateTime timestamp, String messagePayload, String source) {

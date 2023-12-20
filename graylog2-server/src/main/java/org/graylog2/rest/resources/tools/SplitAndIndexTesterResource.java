@@ -24,9 +24,9 @@ import org.graylog2.rest.models.tools.requests.SplitAndIndexTestRequest;
 import org.graylog2.rest.models.tools.responses.SplitAndIndexTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;

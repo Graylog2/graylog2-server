@@ -43,7 +43,8 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;

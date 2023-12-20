@@ -47,7 +47,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;

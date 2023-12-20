@@ -28,7 +28,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

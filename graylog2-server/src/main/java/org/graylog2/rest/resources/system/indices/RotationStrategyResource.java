@@ -34,7 +34,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;

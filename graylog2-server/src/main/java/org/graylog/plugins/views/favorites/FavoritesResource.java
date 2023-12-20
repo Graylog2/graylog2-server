@@ -27,8 +27,9 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.rest.models.PaginatedResponse;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;

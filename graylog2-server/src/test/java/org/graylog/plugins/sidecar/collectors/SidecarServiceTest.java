@@ -45,7 +45,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
+
 import java.util.List;
 import java.util.Set;
 

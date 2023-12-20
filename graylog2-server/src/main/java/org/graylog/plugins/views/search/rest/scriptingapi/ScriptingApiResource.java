@@ -44,8 +44,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.ValidationException;
+
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;

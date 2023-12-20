@@ -52,7 +52,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
+
+import jakarta.validation.Valid;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;

@@ -37,7 +37,8 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;

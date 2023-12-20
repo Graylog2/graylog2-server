@@ -19,7 +19,7 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @AutoValue
 public abstract class WorldMapVisualizationConfig implements VisualizationConfig {

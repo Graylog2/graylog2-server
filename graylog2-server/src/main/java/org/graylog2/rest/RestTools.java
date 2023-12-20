@@ -25,7 +25,8 @@ import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.utilities.IpSubnet;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedMap;

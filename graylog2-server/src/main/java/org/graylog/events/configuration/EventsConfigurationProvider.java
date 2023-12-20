@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Optional;
 
 public class EventsConfigurationProvider implements Provider<EventsConfiguration> {

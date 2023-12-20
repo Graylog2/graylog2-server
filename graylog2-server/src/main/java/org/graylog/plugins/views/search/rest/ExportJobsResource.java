@@ -29,7 +29,8 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
+
+import jakarta.validation.Valid;
 
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;

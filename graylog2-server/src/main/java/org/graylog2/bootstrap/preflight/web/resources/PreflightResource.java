@@ -37,8 +37,9 @@ import org.graylog2.plugin.rest.ApiError;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;

@@ -23,7 +23,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 
 import javax.inject.Inject;
-import javax.validation.ValidationException;
+
+import jakarta.validation.ValidationException;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

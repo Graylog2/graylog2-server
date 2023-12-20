@@ -23,13 +23,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Null;
+
+import jakarta.validation.constraints.Null;
 
 @AutoValue
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class VersionResponse {
     public abstract String number();
+
     @Nullable
     public abstract String distribution();
 

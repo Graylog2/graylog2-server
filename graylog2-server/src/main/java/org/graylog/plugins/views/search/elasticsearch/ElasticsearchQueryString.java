@@ -26,7 +26,9 @@ import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Optional;
 
 @AutoValue
