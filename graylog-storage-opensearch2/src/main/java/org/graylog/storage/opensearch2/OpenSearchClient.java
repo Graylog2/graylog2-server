@@ -150,6 +150,14 @@ public class OpenSearchClient {
     public <R> R execute(ThrowingFunction<org.opensearch.client.opensearch.OpenSearchClient, R, IOException> fn) {
         return execute(fn, "An error occurred: ");
     }
+
+    public <R> R execute(ThrowingSupplier<R, IOException> fn, String errorMessage) {
+        try {
+            return fn.get();
+        } catch (Exception e) {
+            throw exceptionFrom(e, errorMessage);
+        }
+    }
     @WithSpan
     public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {

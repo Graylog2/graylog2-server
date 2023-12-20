@@ -73,7 +73,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private Client client;
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
-    private List<String> featureFlags;
+    private final List<String> featureFlags;
 
     public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
         super(version, hostname, network, heapSize);
