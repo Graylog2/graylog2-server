@@ -619,11 +619,12 @@
                                         <exclude>asm:asm</exclude>
                                         <!-- Mockito should by now have all the features we need. -->
                                         <exclude>org.powermock</exclude>
-
                                         <!-- Ban AWS SDK bundle dependencies for v1 and v2. These would add hundreds of
                                              megabytes to our production artifacts and must be avoided. -->
                                         <exclude>com.amazonaws:aws-java-sdk-bundle</exclude>
                                         <exclude>software.amazon.awssdk:bundle</exclude>
+                                        <!-- Ban some javax dependencies after the move to jakarta -->
+                                        <exclude>javax.ws.rs:javax.ws.rs-api</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
