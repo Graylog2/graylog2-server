@@ -115,6 +115,8 @@ const DataNodeActions = ({ dataNode }: Props) => {
   };
 
   const isDatanodeRunning = dataNode.data_node_status === 'AVAILABLE';
+  const isDatanodeRemoved = dataNode.data_node_status === 'REMOVED';
+  const isRemovingDatanode = dataNode.data_node_status === 'REMOVING';
 
   return (
     <>
@@ -126,8 +128,8 @@ const DataNodeActions = ({ dataNode }: Props) => {
         <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
         {!isDatanodeRunning && <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>}
         {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
-        <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>
-        <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
+        {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
+        {(!isDatanodeRemoved || isRemovingDatanode) && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>}
       </OverlayDropdownButton>
       {showDialog && (
         <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
