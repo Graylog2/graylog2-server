@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix issue preventing the array_contains pipeline function from working with json arrays"
+
+pulls = ["17611"]
