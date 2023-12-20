@@ -23,15 +23,15 @@ import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/Dat
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 
 const DataNodesClusterPage = () => (
-  <DocumentTitle title="Data nodes Cluster">
+  <DocumentTitle title="Data Nodes Cluster">
     <DataNodesPageNavigation />
-    <PageHeader title="Data nodes Cluster"
+    <PageHeader title="Data Nodes Cluster"
                 documentationLink={{
-                  title: 'Data nodes documentation',
+                  title: 'Data Nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
                 }}>
       <span>
-        Graylog data nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
+        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
       </span>
     </PageHeader>
     <Row className="content">
