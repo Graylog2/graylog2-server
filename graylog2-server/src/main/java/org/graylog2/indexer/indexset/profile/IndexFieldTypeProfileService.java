@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset.profile;
 
 import com.mongodb.BasicDBObject;
+import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -26,6 +27,7 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.mongojack.DBQuery;
+import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -59,23 +61,26 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         this.db.createIndex(new BasicDBObject(IndexFieldTypeProfile.NAME_FIELD_NAME, 1), new BasicDBObject("unique", false));
     }
 
+    public boolean update(final String profileId, final IndexFieldTypeProfile updatedProfile) {
+        final WriteResult<IndexFieldTypeProfile, ObjectId> writeResult = db.updateById(new ObjectId(profileId), updatedProfile);
+        return writeResult.getN() > 0;
+    }
+
     public PageListResponse<IndexFieldTypeProfile> getPaginated(final int page,
                                                                 final int perPage,
-                                                                final String sort,
+                                                                final String sortField,
                                                                 final String order) {
 
-        final PaginatedList<IndexFieldTypeProfile> paginated = findPaginatedWithQueryAndSort(DBQuery.empty(), getSortBuilder(sort, order), page, perPage);
+        final PaginatedList<IndexFieldTypeProfile> paginated = findPaginatedWithQueryAndSort(
+                DBQuery.empty(),
+                getSortBuilder(order, sortField),
+                page,
+                perPage);
         final int total = paginated.grandTotal().orElse(0L).intValue();
         return PageListResponse.create("",
-                PaginatedList.PaginationInfo.create(
-                        total,
-                        paginated.size(),
-                        page,
-                        perPage),
-                total,
-                sort,
-                order,
                 paginated,
+                sortField,
+                order,
                 ATTRIBUTES,
                 DEFAULTS);
     }

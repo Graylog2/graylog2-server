@@ -21,8 +21,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileData;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -34,12 +36,16 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_CREATE;
+import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_DELETE;
+import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_UPDATE;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -85,16 +91,27 @@ public class IndexFieldTypeProfileResource extends RestResource {
 
     @POST
     @Timed
-    @NoAuditEvent("TODO!") //TODO: audit events for profiles
+    @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_CREATE)
     @ApiOperation(value = "Creates a new profile")
-    public void save(@ApiParam(name = "profile") IndexFieldTypeProfile profile) {
-        profileService.save(profile);
+    public IndexFieldTypeProfile create(@ApiParam(name = "profileData") IndexFieldTypeProfileData profileData) {
+        return profileService.save(new IndexFieldTypeProfile(profileData));
+    }
+
+    @PUT
+    @Timed
+    @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_UPDATE)
+    @ApiOperation(value = "Updates existing profile")
+    public void update(@ApiParam(name = "profile") IndexFieldTypeProfile profile) {
+        final boolean updated = profileService.update(profile.id(), profile);
+        if (!updated) {
+            throw new NotFoundException("Profile does not exist : " + profile.id());
+        }
     }
 
     @DELETE
     @Path("/{profile_id}")
     @Timed
-    @NoAuditEvent("TODO!") //TODO: audit events for profiles
+    @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_DELETE)
     @ApiOperation(value = "Removes a profile")
     public void delete(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
         profileService.delete(profileId);

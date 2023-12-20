@@ -32,4 +32,8 @@ public record IndexFieldTypeProfile(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @
     public static final String NAME_FIELD_NAME = "name";
     public static final String DESCRIPTION_FIELD_NAME = "description";
     public static final String CUSTOM_MAPPINGS_FIELD_NAME = "custom_field_mappings";
+
+    public IndexFieldTypeProfile(final IndexFieldTypeProfileData data) {
+        this(null, data.name(), data.description(), data.customFieldMappings());
+    }
 }
