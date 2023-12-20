@@ -26,7 +26,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.core.MultivaluedMap;
+
+import jakarta.ws.rs.core.MultivaluedMap;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;

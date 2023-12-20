@@ -20,9 +20,11 @@ import com.google.common.base.Strings;
 import org.graylog.util.uuid.ConcurrentUUID;
 
 import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
+
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+
 import java.io.IOException;
 
 // Needs to run before ShiroAuthorizationFilter

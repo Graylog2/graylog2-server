@@ -50,7 +50,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
+
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

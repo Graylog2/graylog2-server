@@ -27,7 +27,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.ws.rs.BadRequestException;
+import jakarta.ws.rs.BadRequestException;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

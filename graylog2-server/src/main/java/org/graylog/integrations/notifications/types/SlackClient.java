@@ -33,7 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Singleton
 public class SlackClient {

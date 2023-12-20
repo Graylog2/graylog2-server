@@ -74,11 +74,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
+
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ExceptionMapper;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -217,7 +219,7 @@ public class JerseyService extends AbstractIdleService {
         return resources
                 .stream()
                 .map(resource -> {
-                    final javax.ws.rs.Path pathAnnotation = Resource.getPath(resource);
+                    final jakarta.ws.rs.Path pathAnnotation = Resource.getPath(resource);
                     final String resourcePathSuffix = Strings.nullToEmpty(pathAnnotation.value());
                     final String resourcePath = resourcePathSuffix.startsWith("/") ? pathPrefix + resourcePathSuffix : pathPrefix + "/" + resourcePathSuffix;
 
@@ -295,11 +297,11 @@ public class JerseyService extends AbstractIdleService {
 
     private Map<String, MediaType> mediaTypeMappings() {
         return ImmutableMap.of(
-            "json", MediaType.APPLICATION_JSON_TYPE,
-            "ndjson", MoreMediaTypes.APPLICATION_NDJSON_TYPE,
-            "csv", MoreMediaTypes.TEXT_CSV_TYPE,
-            "log", MoreMediaTypes.TEXT_PLAIN_TYPE,
-            "gelf-ndjson", MoreMediaTypes.APPLICATION_NDGELF_TYPE
+                "json", MediaType.APPLICATION_JSON_TYPE,
+                "ndjson", MoreMediaTypes.APPLICATION_NDJSON_TYPE,
+                "csv", MoreMediaTypes.TEXT_CSV_TYPE,
+                "log", MoreMediaTypes.TEXT_PLAIN_TYPE,
+                "gelf-ndjson", MoreMediaTypes.APPLICATION_NDGELF_TYPE
         );
     }
 

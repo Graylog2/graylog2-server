@@ -24,10 +24,11 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.core.Configuration;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.core.Configuration;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;

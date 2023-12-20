@@ -53,7 +53,7 @@ public class GenerateApiDefinition {
         final ClassGraph classGraph = new ClassGraph().enableAnnotationInfo().acceptPackages(controllerPackages);
 
         try (final ScanResult scanResult = classGraph.scan()) {
-            for (final ClassInfo classInfo : scanResult.getClassesWithAnnotation("javax.ws.rs.Path")) {
+            for (final ClassInfo classInfo : scanResult.getClassesWithAnnotation("jakarta.ws.rs.Path")) {
                 resources.add(classInfo.loadClass());
             }
         }

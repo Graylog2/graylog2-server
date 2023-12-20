@@ -38,7 +38,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.core.EntityTag;
+
+import jakarta.ws.rs.core.EntityTag;
+
 import java.nio.charset.StandardCharsets;
 
 import static com.codahale.metrics.MetricRegistry.name;

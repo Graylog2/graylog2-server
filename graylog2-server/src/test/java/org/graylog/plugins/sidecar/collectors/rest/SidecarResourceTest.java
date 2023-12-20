@@ -38,9 +38,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 
 import static org.graylog.plugins.sidecar.collectors.rest.assertj.ResponseAssert.assertThat;

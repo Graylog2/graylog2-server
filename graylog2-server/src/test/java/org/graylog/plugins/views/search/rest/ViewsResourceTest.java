@@ -54,9 +54,10 @@ import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -148,7 +149,7 @@ public class ViewsResourceTest {
                 mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
-                searchFilterVisibilityChecker( Collections.singletonList("<<You cannot see this filter>>")),
+                searchFilterVisibilityChecker(Collections.singletonList("<<You cannot see this filter>>")),
                 EMPTY_VIEW_RESOLVERS,
                 SEARCH
         );

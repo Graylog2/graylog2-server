@@ -39,13 +39,15 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -79,7 +81,7 @@ public class RetentionStrategyResource extends RestResource {
     @Path("strategies")
     @Timed
     @ApiOperation(value = "List available retention strategies",
-            notes = "This resource returns a list of all available retention strategies on this Graylog node.")
+                  notes = "This resource returns a list of all available retention strategies on this Graylog node.")
     public RetentionStrategies list() {
         final Set<RetentionStrategyDescription> strategies = retentionStrategies.keySet()
                 .stream()
@@ -96,9 +98,9 @@ public class RetentionStrategyResource extends RestResource {
     @Path("strategies/{strategy}")
     @Timed
     @ApiOperation(value = "Show JSON schema for configuration of given retention strategies",
-            notes = "This resource returns a JSON schema for the configuration of the given retention strategy.")
+                  notes = "This resource returns a JSON schema for the configuration of the given retention strategy.")
     public RetentionStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the retention strategy", required = true)
-                                   @PathParam("strategy") @NotEmpty String strategyName) {
+                                                     @PathParam("strategy") @NotEmpty String strategyName) {
         return getRetentionStrategyDescription(strategyName);
     }
 

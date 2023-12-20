@@ -18,8 +18,9 @@ package org.graylog2.shared.rest;
 
 import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+
 import java.io.IOException;
 
 public class VerboseCsrfProtectionFilter extends CsrfProtectionFilter {

@@ -43,15 +43,17 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.net.URI;
 
 @RequiresAuthentication
@@ -90,7 +92,7 @@ public class StaticFieldsResource extends RestResource {
         if (input == null) {
             final String msg = "Input <" + inputId + "> not found.";
             LOG.error(msg);
-            throw new javax.ws.rs.NotFoundException(msg);
+            throw new jakarta.ws.rs.NotFoundException(msg);
         }
 
         // Check if key is a valid message key.
@@ -144,13 +146,13 @@ public class StaticFieldsResource extends RestResource {
         if (input == null) {
             final String msg = "Input <" + inputId + "> not found.";
             LOG.error(msg);
-            throw new javax.ws.rs.NotFoundException(msg);
+            throw new jakarta.ws.rs.NotFoundException(msg);
         }
 
         if (!input.getStaticFields().containsKey(key)) {
             final String msg = "No such static field [" + key + "] on input <" + inputId + ">.";
             LOG.error(msg);
-            throw new javax.ws.rs.NotFoundException(msg);
+            throw new jakarta.ws.rs.NotFoundException(msg);
         }
 
         input.getStaticFields().remove(key);

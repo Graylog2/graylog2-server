@@ -22,8 +22,9 @@ import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 
 import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Response;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.core.Response;
 
 public class PipelineRuleService {
 

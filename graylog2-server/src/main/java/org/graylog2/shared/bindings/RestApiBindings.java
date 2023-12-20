@@ -26,11 +26,11 @@ import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.IndexHtmlGeneratorProvider;
 import org.graylog2.web.resources.WebResourcesModule;
 
-import javax.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.container.DynamicFeature;
 
 public class RestApiBindings extends PluginModule {
     private final Configuration configuration;
-    
+
     public RestApiBindings(final Configuration configuration) {
         this.configuration = configuration;
     }

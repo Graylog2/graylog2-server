@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.io.IOException;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class RequestClient {
     private static final Logger LOG = LoggerFactory.getLogger(RequestClient.class);

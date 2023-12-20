@@ -18,9 +18,11 @@ package org.graylog2.shared.rest;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+
 import java.io.IOException;
 
 public class EmbeddingControlFilter implements ContainerResponseFilter {

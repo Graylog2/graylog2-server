@@ -85,7 +85,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

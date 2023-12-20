@@ -44,7 +44,7 @@ import java.net.URL;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class HTTPAlarmCallback implements AlarmCallback {
     private static final String CK_URL = "url";
@@ -57,7 +57,7 @@ public class HTTPAlarmCallback implements AlarmCallback {
 
     @Inject
     public HTTPAlarmCallback(final OkHttpClient httpClient, final ObjectMapper objectMapper,
-            UrlWhitelistService whitelistService) {
+                             UrlWhitelistService whitelistService) {
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
         this.whitelistService = whitelistService;

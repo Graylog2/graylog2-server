@@ -103,8 +103,8 @@ import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
 
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;

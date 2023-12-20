@@ -38,8 +38,8 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.system.activities.ActivityWriter;
 
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;

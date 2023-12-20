@@ -54,8 +54,10 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;

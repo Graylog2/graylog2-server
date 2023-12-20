@@ -19,10 +19,10 @@ package org.graylog2.shared.rest.exceptionmappers;
 import org.glassfish.jersey.spi.ExtendedExceptionMapper;
 import org.graylog2.plugin.rest.ApiError;
 
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 public class WebApplicationExceptionMapper implements ExtendedExceptionMapper<WebApplicationException> {
     @Override

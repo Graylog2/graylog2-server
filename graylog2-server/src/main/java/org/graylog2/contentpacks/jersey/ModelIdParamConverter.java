@@ -20,8 +20,10 @@ import org.graylog2.contentpacks.model.ModelId;
 
 import javax.annotation.Nullable;
 import javax.inject.Singleton;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ParamConverterProvider;
+
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 

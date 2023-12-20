@@ -57,10 +57,12 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
+
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ExceptionMapper;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -112,7 +114,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Subscribe
     public synchronized void handleOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) throws Exception {
-        if(apiHttpServer == null) {
+        if (apiHttpServer == null) {
             // this is the very first start of the jersey service
             LOG.info("Starting Data node REST API");
         } else {
@@ -229,7 +231,7 @@ public class JerseyService extends AbstractIdleService {
         final boolean isSecuredInstance = sslEngineConfigurator != null;
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
 
-        if(isSecuredInstance) {
+        if (isSecuredInstance) {
             resourceConfig.register(new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode"));
         }
         resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));

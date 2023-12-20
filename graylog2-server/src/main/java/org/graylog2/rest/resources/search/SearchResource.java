@@ -57,8 +57,9 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -132,14 +133,14 @@ public abstract class SearchResource extends RestResource {
                                                  boolean decorate,
                                                  Optional<String> streamId) {
         final SearchResponse result = SearchResponse.create(sr.getOriginalQuery(),
-            sr.getBuiltQuery(),
-            indexRangeListToValueList(sr.getUsedIndices()),
-            resultMessageListtoValueList(sr.getResults()),
-            sr.getFields(),
-            sr.tookMs(),
-            sr.getTotalResults(),
-            timeRange.getFrom(),
-            timeRange.getTo());
+                sr.getBuiltQuery(),
+                indexRangeListToValueList(sr.getUsedIndices()),
+                resultMessageListtoValueList(sr.getResults()),
+                sr.getFields(),
+                sr.tookMs(),
+                sr.getTotalResults(),
+                timeRange.getFrom(),
+                timeRange.getTo());
 
         return decorate ? decoratorProcessor.decorate(result, streamId) : result;
     }
@@ -163,11 +164,11 @@ public abstract class SearchResource extends RestResource {
 
         for (IndexRange indexRange : indexRanges) {
             result.add(IndexRangeSummary.create(
-                indexRange.indexName(),
-                indexRange.begin(),
-                indexRange.end(),
-                indexRange.calculatedAt(),
-                indexRange.calculationDuration()));
+                    indexRange.indexName(),
+                    indexRange.begin(),
+                    indexRange.end(),
+                    indexRange.calculatedAt(),
+                    indexRange.calculationDuration()));
         }
 
         return result;
@@ -175,9 +176,9 @@ public abstract class SearchResource extends RestResource {
 
     protected List<ResultMessageSummary> resultMessageListtoValueList(List<ResultMessage> resultMessages) {
         return resultMessages.stream()
-            // TODO module merge: migrate to resultMessage.getMessage() instead of Map<String, Object> via getFields()
-            .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
-            .collect(Collectors.toList());
+                // TODO module merge: migrate to resultMessage.getMessage() instead of Map<String, Object> via getFields()
+                .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
+                .collect(Collectors.toList());
     }
 
     protected Sorting buildSorting(String sort) {

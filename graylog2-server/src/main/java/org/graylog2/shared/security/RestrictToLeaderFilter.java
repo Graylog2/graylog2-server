@@ -23,10 +23,12 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
+
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+
 import java.io.IOException;
 
 @Singleton

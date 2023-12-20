@@ -21,7 +21,8 @@ import com.github.rholder.retry.RetryException;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
 
-import javax.ws.rs.HttpMethod;
+import jakarta.ws.rs.HttpMethod;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;

@@ -24,8 +24,9 @@ import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
+
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 
 
 public class UserContextFactory implements Factory<UserContext> {

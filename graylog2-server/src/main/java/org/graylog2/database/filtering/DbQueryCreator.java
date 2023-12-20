@@ -23,7 +23,8 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryParser;
 
-import javax.ws.rs.BadRequestException;
+import jakarta.ws.rs.BadRequestException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

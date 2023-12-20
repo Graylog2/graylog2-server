@@ -19,11 +19,12 @@ package org.graylog2.bootstrap.preflight.web;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.util.encoders.Base64;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -61,7 +62,7 @@ public class BasicAuthFilter implements ContainerRequestFilter {
 
         final String[] parts = usernameAndPassword.split(":");
 
-        if(parts.length != 2) {
+        if (parts.length != 2) {
             abortRequestUnauthorized(requestContext, "You cannot access this resource, invalid username/password combination!");
             return;
         }

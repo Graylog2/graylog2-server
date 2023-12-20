@@ -47,8 +47,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
+
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
