@@ -20,7 +20,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider.Services;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
@@ -37,12 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackend.class);
-    public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdran";
+    public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdranHasToBeAtLeastSixtyFourCharactersInLength";
     public static final String ROOT_PASSWORD_PLAINTEXT = "admin";
     public static final String ROOT_PASSWORD_SHA_2 = DigestUtils.sha256Hex(ROOT_PASSWORD_PLAINTEXT);
 

@@ -1,0 +1,496 @@
+{
+  "id": "656510c70548c8792779eea6",
+  "queries": [
+    {
+      "id": "ec57fdf4-03b8-4bd6-b436-623c0cfc6111",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "from": 300,
+        "type": "relative"
+      },
+      "filter": null,
+      "filters": [],
+      "search_types": [
+        {
+          "timerange": {
+            "source": "search_type",
+            "id": "fed6c1cd-f163-4477-8d90-197fb9e335a9",
+            "offset": "1i",
+            "type": "offset"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product AND anomaly_detector_name) AND event_source_product:graylog_anomaly"
+          },
+          "streams": [],
+          "id": "b25e0d1f-2784-4adc-ade9-63ad9d4ad227",
+          "name": "trend",
+          "series": [
+            {
+              "type": "card",
+              "id": "card(anomaly_detector_name)",
+              "field": "anomaly_detector_name"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product) AND event_source_product:graylog_anomaly AND _exists_:(timestamp AND anomaly_detector_name)"
+          },
+          "streams": [],
+          "id": "21f587b5-01dc-41e4-8e2a-7e8b81c3cc29",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": false,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "fields": [
+                "timestamp"
+              ],
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "anomaly_detector_name"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product) AND event_source_product:graylog_anomaly AND _exists_:(anomaly_detector_name AND anomaly_grade)"
+          },
+          "streams": [],
+          "id": "12aad469-7450-4615-becb-f8b85734c77b",
+          "name": "chart",
+          "series": [
+            {
+              "type": "avg",
+              "id": "Average anomaly_grade",
+              "field": "anomaly_grade"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "anomaly_detector_name"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "source": "search_type",
+            "id": "12b9aec3-574d-445a-9048-13c66cdbd4fd",
+            "offset": "1i",
+            "type": "offset"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product) AND event_source_product:graylog_anomaly"
+          },
+          "streams": [],
+          "id": "f2bd8935-d87d-4bfe-a342-a938c55f37db",
+          "name": "trend",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product AND user_name) AND event_source_product:graylog_anomaly AND _exists_:(user_name)"
+          },
+          "streams": [],
+          "id": "d79aaf59-307c-458f-81ac-1b70ceeb20c7",
+          "name": "chart",
+          "series": [
+            {
+              "type": "card",
+              "id": "card(user_name)",
+              "field": "user_name"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product) AND event_source_product:graylog_anomaly AND _exists_:(timestamp AND user_name)"
+          },
+          "streams": [],
+          "id": "773fee94-65f4-49d4-9fc3-43c26f51eee7",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": false,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "fields": [
+                "timestamp"
+              ],
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "user_name"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product AND anomaly_detector_name) AND event_source_product:graylog_anomaly"
+          },
+          "streams": [],
+          "id": "fed6c1cd-f163-4477-8d90-197fb9e335a9",
+          "name": "chart",
+          "series": [
+            {
+              "type": "card",
+              "id": "card(anomaly_detector_name)",
+              "field": "anomaly_detector_name"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product) AND event_source_product:graylog_anomaly AND _exists_:(user_name AND anomaly_grade)"
+          },
+          "streams": [],
+          "id": "1fa3fbfe-0d41-42d1-86b1-d666cdcd6273",
+          "name": "chart",
+          "series": [
+            {
+              "type": "avg",
+              "id": "Average anomaly_grade",
+              "field": "anomaly_grade"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "user_name"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "source": "search_type",
+            "id": "d79aaf59-307c-458f-81ac-1b70ceeb20c7",
+            "offset": "1i",
+            "type": "offset"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product AND user_name) AND event_source_product:graylog_anomaly AND _exists_:(user_name)"
+          },
+          "streams": [],
+          "id": "1a43c579-b833-425c-aed4-fc68b7bbb4c5",
+          "name": "trend",
+          "series": [
+            {
+              "type": "card",
+              "id": "card(user_name)",
+              "field": "user_name"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": " _exists_:(event_source_product AND timestamp) AND event_source_product:graylog_anomaly"
+          },
+          "streams": [],
+          "id": "d78463c2-70c3-449d-bc54-9f9c751b8541",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "fields": [
+                "timestamp"
+              ],
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product AND anomaly_grade) AND event_source_product:graylog_anomaly AND anomaly_grade:[0.7 TO 1.0]"
+          },
+          "streams": [],
+          "id": "1328c9b4-73fd-43d4-a64c-3c82706c7d90",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "source": "search_type",
+            "id": "1328c9b4-73fd-43d4-a64c-3c82706c7d90",
+            "offset": "1i",
+            "type": "offset"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product AND anomaly_grade) AND event_source_product:graylog_anomaly AND anomaly_grade:[0.7 TO 1.0]"
+          },
+          "streams": [],
+          "id": "eb43d78b-e874-494c-9299-4aff97bffc13",
+          "name": "trend",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product) AND event_source_product:graylog_anomaly"
+          },
+          "streams": [],
+          "id": "12b9aec3-574d-445a-9048-13c66cdbd4fd",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(event_source_product) AND event_source_product:graylog_anomaly AND _exists_:(timestamp AND anomaly_detector_name AND anomaly_confidence)"
+          },
+          "streams": [],
+          "id": "0f79f847-f210-4333-86c2-71e58ee8230d",
+          "name": "chart",
+          "series": [
+            {
+              "type": "avg",
+              "id": "avg(anomaly_confidence)",
+              "field": "anomaly_confidence"
+            }
+          ],
+          "sort": [],
+          "rollup": false,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "fields": [
+                "timestamp"
+              ],
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "anomaly_detector_name"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "filter": null,
+          "filters": []
+        }
+      ]
+    }
+  ],
+  "parameters": []
+}
