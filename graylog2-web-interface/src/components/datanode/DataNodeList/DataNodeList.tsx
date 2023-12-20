@@ -48,9 +48,9 @@ const DEFAULT_LAYOUT = {
 const columnDefinitions = [
   { id: 'hostname', title: 'Name', sortable: true, permissions: [] },
   { id: 'transport_address', title: 'Transport address' },
-  { id: 'status', title: 'Status', sortable: true },
+  { id: 'status', title: 'Status', sortable: false },
   { id: 'is_leader', title: 'Is leader', sortable: true },
-  { id: 'cert_valid_until', title: 'Certificate valid until', sortable: true },
+  { id: 'cert_valid_until', title: 'Certificate valid until', sortable: false },
 ];
 
 const columnRenderers: ColumnRenderers<DataNode> = {
