@@ -44,8 +44,7 @@ public class ClusterOS2IT extends ClusterIT {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         return new ClusterAdapterOS2(openSearchInstance.openSearchClient(),
                 timeout,
-                new CatApi(objectMapper, openSearchInstance.openSearchClient()),
-                new PlainJsonApi(objectMapper, openSearchInstance.openSearchClient()));
+                new PlainJsonApi(objectMapper, openSearchInstance.openSearchClient(), null));
     }
 
     @Override
