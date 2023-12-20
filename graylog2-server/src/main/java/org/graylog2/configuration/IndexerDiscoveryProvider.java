@@ -100,7 +100,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
                         .withRetryListener(new RetryListener() {
                             @Override
                             public void onRetry(Attempt attempt) {
-                                if (!attempt.hasResult()) {
+                                if (!attempt.hasResult() || isEmptyList(attempt.getResult())) {
                                     if (connectionAttempts == 0) {
                                         LOG.info("Datanode is not available. Retry #{}", attempt.getAttemptNumber());
                                     } else {
@@ -123,6 +123,10 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
         LOG.info("No indexer hosts configured, using fallback {}", DEFAULT_INDEXER_HOST);
         return Collections.singletonList(DEFAULT_INDEXER_HOST);
 
+    }
+
+    private boolean isEmptyList(Object result) {
+        return result instanceof List<?> && ((List<?>)result).isEmpty();
     }
 
     private List<URI> discover() {
