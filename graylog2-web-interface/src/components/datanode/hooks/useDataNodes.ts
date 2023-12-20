@@ -96,7 +96,7 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`,
-          'Could not load data nodes');
+          'Could not load Data Nodes');
       },
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval: 5000,
