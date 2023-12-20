@@ -44,7 +44,7 @@ const DIALOG_TYPES = {
 
 const DIALOG_TEXT = {
   [DIALOG_TYPES.REJOIN]: {
-    dialogTitle: 'Rejoin Data node',
+    dialogTitle: 'Rejoin Data Node',
     dialogBody: (datanode: string) => `Are you sure you want to rejoin Data Node "${datanode}"?`,
   },
   [DIALOG_TYPES.REMOVE]: {
