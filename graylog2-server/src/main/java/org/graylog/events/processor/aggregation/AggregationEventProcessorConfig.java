@@ -53,6 +53,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamEntityId;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
@@ -247,7 +248,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @Override
     public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final ImmutableSet<String> streamRefs = ImmutableSet.copyOf(streams().stream()
-                .map(streamId -> entityDescriptorIds.get(streamId, ModelTypes.STREAM_V1))
+                .map(streamId -> getStreamEntityId(streamId, entityDescriptorIds))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet()));
@@ -269,7 +270,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         streams().forEach(streamId -> {
             final EntityDescriptor depStream = EntityDescriptor.builder()
                     .id(ModelId.of(streamId))
-                    .type(ModelTypes.STREAM_V1)
+                    .type(ModelTypes.STREAM_REF_V1)
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
