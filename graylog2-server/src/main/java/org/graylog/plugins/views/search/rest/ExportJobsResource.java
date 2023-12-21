@@ -28,7 +28,7 @@ import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.Valid;
 

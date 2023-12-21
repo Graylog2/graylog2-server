@@ -44,7 +44,7 @@ import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserOverviewDTO;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

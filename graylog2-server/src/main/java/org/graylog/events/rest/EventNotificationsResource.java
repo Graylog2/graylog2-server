@@ -53,7 +53,8 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 

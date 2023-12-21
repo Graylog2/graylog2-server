@@ -32,7 +32,8 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -186,7 +187,7 @@ public class IndexerClusterCheckerThread extends Periodical {
                         .addSeverity(Notification.Severity.URGENT)
                         .addDetail("nodes", String.join(", ", entry.getValue()));
                 notificationService.publishIfFirst(notification);
-                for (String node: entry.getValue()) {
+                for (String node : entry.getValue()) {
                     LOG.warn("Elasticsearch node [{}] triggered [{}] due to low free disk space",
                             node,
                             entry.getKey());

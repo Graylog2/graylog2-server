@@ -27,9 +27,10 @@ import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.mongojack.internal.MongoJackModule;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 
 @Singleton

@@ -26,7 +26,8 @@ import org.graylog2.bootstrap.preflight.PreflightConstants;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;

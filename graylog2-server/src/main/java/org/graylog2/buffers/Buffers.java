@@ -28,7 +28,8 @@ import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;

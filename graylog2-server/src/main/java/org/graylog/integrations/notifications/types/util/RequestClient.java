@@ -26,7 +26,8 @@ import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;

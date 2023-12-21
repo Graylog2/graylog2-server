@@ -24,7 +24,8 @@ import org.graylog.plugins.views.Requirement;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 

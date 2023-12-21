@@ -25,8 +25,9 @@ import org.apache.shiro.cache.CacheManager;
 import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.shared.metrics.MetricUtils;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;

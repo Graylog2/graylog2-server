@@ -22,7 +22,8 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidationResult;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class ValidAction implements Validator {

@@ -22,7 +22,8 @@ import org.graylog2.database.MongoConnection;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 import static org.graylog2.telemetry.user.db.TelemetryUserSettingsDto.FIELD_USER_ID;

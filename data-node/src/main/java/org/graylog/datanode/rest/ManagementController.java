@@ -22,7 +22,7 @@ import org.graylog2.datanode.DataNodeLifecycleTrigger;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.POST;

@@ -22,7 +22,8 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreLocation;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.cluster.certificates.CertificatesService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.security.KeyStore;
 import java.util.Optional;
 

@@ -28,7 +28,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.DisplayGettingStarted;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;

@@ -36,8 +36,8 @@ import org.graylog2.rest.resources.system.inputs.RemoteInputStatesResource;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;

@@ -27,7 +27,8 @@ import org.joda.time.Period;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,7 +38,7 @@ public class ImportService extends PaginatedDbService<CollectorUpload> {
 
     @Inject
     public ImportService(MongoConnection mongoConnection,
-                         MongoJackObjectMapperProvider mapper){
+                         MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, CollectorUpload.class, COLLECTION_NAME);
     }
 

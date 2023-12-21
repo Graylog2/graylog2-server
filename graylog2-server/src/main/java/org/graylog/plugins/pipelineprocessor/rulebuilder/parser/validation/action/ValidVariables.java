@@ -26,7 +26,8 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidationResult;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -62,7 +63,7 @@ public class ValidVariables implements Validator {
         }
 
         ImmutableList<ParameterDescriptor> parameterDescriptors = functionDescriptor.params();
-        for(ParameterDescriptor parameterDescriptor: parameterDescriptors) {
+        for (ParameterDescriptor parameterDescriptor : parameterDescriptors) {
             String parameterName = parameterDescriptor.name();
             Object value = stepParameters.get(parameterName);
             Class<?> variableType = getVariableType(value);

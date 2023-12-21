@@ -33,7 +33,9 @@ import org.joda.time.DurationFieldType;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -70,7 +72,7 @@ public class IndexSetValidator {
             return Optional.of(refreshIntervalViolation);
         }
 
-        final Violation  rotationViolation = validateRotation(newConfig.rotationStrategy());
+        final Violation rotationViolation = validateRotation(newConfig.rotationStrategy());
         if (rotationViolation != null) {
             return Optional.of(rotationViolation);
         }

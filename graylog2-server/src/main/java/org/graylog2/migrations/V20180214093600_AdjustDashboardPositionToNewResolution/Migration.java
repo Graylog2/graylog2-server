@@ -26,7 +26,8 @@ import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +52,9 @@ public class Migration extends org.graylog2.migrations.Migration {
     }
 
 
-    public ZonedDateTime createdAt() { return ZonedDateTime.parse("2018-02-14T09:36:00Z"); }
+    public ZonedDateTime createdAt() {
+        return ZonedDateTime.parse("2018-02-14T09:36:00Z");
+    }
 
     @Override
     public void upgrade() {
@@ -79,7 +82,7 @@ public class Migration extends org.graylog2.migrations.Migration {
                         .width(newWidth)
                         .height(newHeight)
                         .col(newCol)
-                        .row( newRow)
+                        .row(newRow)
                         .build());
             }
             try {
@@ -107,7 +110,7 @@ public class Migration extends org.graylog2.migrations.Migration {
         public abstract Map<String, String> dashboard_ids();
 
         @JsonCreator
-        public static MigrationCompleted create(@JsonProperty("dashboard_ids")Map<String, String> dashboardIds) {
+        public static MigrationCompleted create(@JsonProperty("dashboard_ids") Map<String, String> dashboardIds) {
             return new AutoValue_Migration_MigrationCompleted(dashboardIds);
         }
     }

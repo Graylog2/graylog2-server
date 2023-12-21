@@ -39,7 +39,7 @@ import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

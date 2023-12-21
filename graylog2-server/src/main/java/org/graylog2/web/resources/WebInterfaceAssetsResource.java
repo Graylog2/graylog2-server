@@ -31,8 +31,9 @@ import org.graylog2.web.PluginAssets;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;

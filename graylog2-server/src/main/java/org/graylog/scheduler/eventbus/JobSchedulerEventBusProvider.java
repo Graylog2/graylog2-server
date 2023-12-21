@@ -18,8 +18,8 @@ package org.graylog.scheduler.eventbus;
 
 import com.codahale.metrics.MetricRegistry;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 /**
  * Creates a {@link JobSchedulerEventBus} instance.

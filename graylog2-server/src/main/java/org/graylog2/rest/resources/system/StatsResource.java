@@ -29,7 +29,7 @@ import org.graylog2.shared.system.stats.network.NetworkStats;
 import org.graylog2.shared.system.stats.os.OsStats;
 import org.graylog2.shared.system.stats.process.ProcessStats;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

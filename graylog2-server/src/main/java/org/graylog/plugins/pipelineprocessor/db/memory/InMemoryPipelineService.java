@@ -24,7 +24,8 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

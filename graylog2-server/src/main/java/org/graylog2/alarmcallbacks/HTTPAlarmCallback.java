@@ -37,7 +37,8 @@ import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;

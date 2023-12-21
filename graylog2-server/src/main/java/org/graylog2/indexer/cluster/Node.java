@@ -18,7 +18,8 @@ package org.graylog2.indexer.cluster;
 
 import org.graylog2.storage.SearchVersion;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class Node {

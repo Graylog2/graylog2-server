@@ -22,7 +22,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.streams.StreamRouter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

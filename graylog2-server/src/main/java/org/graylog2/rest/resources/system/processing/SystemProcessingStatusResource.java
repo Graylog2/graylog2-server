@@ -25,7 +25,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.system.processing.DBProcessingStatusService;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;

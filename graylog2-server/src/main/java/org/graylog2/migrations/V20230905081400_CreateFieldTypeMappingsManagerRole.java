@@ -18,7 +18,8 @@ package org.graylog2.migrations;
 
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.Set;
 

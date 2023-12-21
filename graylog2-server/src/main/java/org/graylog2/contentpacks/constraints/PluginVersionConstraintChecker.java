@@ -25,7 +25,8 @@ import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;

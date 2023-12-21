@@ -27,7 +27,8 @@ import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
     @Inject
     public LinkFieldDecorator(@Assisted Decorator decorator) {
         this.linkField = (String) requireNonNull(decorator.config().get(CK_LINK_FIELD),
-                                                   CK_LINK_FIELD + " cannot be null");
+                CK_LINK_FIELD + " cannot be null");
     }
 
     @WithSpan
@@ -115,9 +116,9 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
      *
      * All URLS that do not start with the protocol "http" or "https" protocol scheme are considered invalid.
      * All other non-URL text strings will be considered invalid. This includes inline javascript expressions such as:
-     *  - javascript:...
-     *  - alert()
-     *  - or any other javascript expressions.
+     * - javascript:...
+     * - alert()
+     * - or any other javascript expressions.
      */
     private boolean isValidUrl(String url) {
         return URL_VALIDATOR.isValid(url);

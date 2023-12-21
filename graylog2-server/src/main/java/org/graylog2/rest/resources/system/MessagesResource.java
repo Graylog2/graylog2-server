@@ -31,7 +31,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.activities.SystemMessage;
 import org.graylog2.system.activities.SystemMessageService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

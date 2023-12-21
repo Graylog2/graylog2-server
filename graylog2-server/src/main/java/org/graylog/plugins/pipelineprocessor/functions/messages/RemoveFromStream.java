@@ -26,8 +26,9 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;

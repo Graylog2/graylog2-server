@@ -22,7 +22,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.ValidationException;
 

@@ -39,7 +39,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;

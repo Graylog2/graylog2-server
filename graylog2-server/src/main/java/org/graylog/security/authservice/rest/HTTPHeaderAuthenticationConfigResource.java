@@ -26,7 +26,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.Valid;
 

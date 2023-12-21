@@ -18,7 +18,8 @@ package org.graylog.plugins.sidecar.filter;
 
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
+
 import java.util.function.Predicate;
 
 public interface AdministrationFilter extends Predicate<Sidecar> {
@@ -27,9 +28,16 @@ public interface AdministrationFilter extends Predicate<Sidecar> {
     }
 
     interface Factory {
-        @Named("collector") AdministrationFilter createCollectorFilter(String collectorId);
-        @Named("configuration") AdministrationFilter createConfigurationFilter(String configurationId);
-        @Named("os") AdministrationFilter createOsFilter(String os);
-        @Named("status") AdministrationFilter createStatusFilter(int status);
+        @Named("collector")
+        AdministrationFilter createCollectorFilter(String collectorId);
+
+        @Named("configuration")
+        AdministrationFilter createConfigurationFilter(String configurationId);
+
+        @Named("os")
+        AdministrationFilter createOsFilter(String os);
+
+        @Named("status")
+        AdministrationFilter createStatusFilter(int status);
     }
 }

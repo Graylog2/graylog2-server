@@ -31,7 +31,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;

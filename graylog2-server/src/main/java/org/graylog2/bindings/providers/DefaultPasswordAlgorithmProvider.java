@@ -18,9 +18,10 @@ package org.graylog2.bindings.providers;
 
 import org.graylog2.plugin.security.PasswordAlgorithm;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+
 import java.util.Map;
 
 public class DefaultPasswordAlgorithmProvider implements Provider<PasswordAlgorithm> {

@@ -48,7 +48,8 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -113,7 +114,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
 
     public abstract ModelType getModelType();
 
-    protected void  ensureV1(Entity entity) {
+    protected void ensureV1(Entity entity) {
         if (!(entity instanceof EntityV1)) {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
@@ -130,8 +131,8 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     }
 
     protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
-                                         Map<String, ValueReference> parameters,
-                                         Map<EntityDescriptor, Object> nativeEntities, User user) {
+                                           Map<String, ValueReference> parameters,
+                                           Map<EntityDescriptor, Object> nativeEntities, User user) {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
         final Map<String, ViewStateDTO> viewStateMap = new LinkedHashMap<>(viewEntity.state().size());
         for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {

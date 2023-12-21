@@ -24,7 +24,8 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesReques
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

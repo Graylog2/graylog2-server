@@ -30,7 +30,8 @@ import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -96,11 +97,11 @@ public class FormatStringDecorator implements SearchResponseDecorator {
     @Inject
     public FormatStringDecorator(@Assisted Decorator decorator, Engine templateEngine) {
         final String formatString = (String) requireNonNull(decorator.config().get(CK_FORMAT_STRING),
-                                                            CK_FORMAT_STRING + " cannot be null");
+                CK_FORMAT_STRING + " cannot be null");
         this.targetField = (String) requireNonNull(decorator.config().get(CK_TARGET_FIELD),
-                                                   CK_TARGET_FIELD + " cannot be null");
+                CK_TARGET_FIELD + " cannot be null");
         requireAllFields = (boolean) requireNonNull(decorator.config().get(CK_REQUIRE_ALL_FIELDS),
-                                                    CK_REQUIRE_ALL_FIELDS + " cannot be null");
+                CK_REQUIRE_ALL_FIELDS + " cannot be null");
         template = requireNonNull(templateEngine, "templateEngine").getTemplate(formatString);
         usedVariables = template.getUsedVariableDescriptions();
     }

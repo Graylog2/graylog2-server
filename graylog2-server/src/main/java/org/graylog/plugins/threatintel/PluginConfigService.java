@@ -34,8 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -113,6 +115,7 @@ public class PluginConfigService {
     /**
      * Used by {@link PluginConfigService} to return the previously observed and current configuration
      * so that clients can act on changes if they need to.
+     *
      * @param <T> the plugin cluster configuration class
      */
     public static class ConfigVersions<T> {

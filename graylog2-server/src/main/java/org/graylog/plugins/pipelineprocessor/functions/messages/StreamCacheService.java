@@ -27,9 +27,11 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamsChangedEvent;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

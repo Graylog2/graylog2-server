@@ -21,7 +21,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.mongojack.JacksonDBCollection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 class SearchService {
     protected final JacksonDBCollection<Search, ObjectId> db;
@@ -38,7 +38,11 @@ class SearchService {
         return db.insert(search).getSavedId();
     }
 
-    public void remove(ObjectId searchID) { db.removeById(searchID); }
+    public void remove(ObjectId searchID) {
+        db.removeById(searchID);
+    }
 
-    long count() { return db.count(); }
+    long count() {
+        return db.count();
+    }
 }

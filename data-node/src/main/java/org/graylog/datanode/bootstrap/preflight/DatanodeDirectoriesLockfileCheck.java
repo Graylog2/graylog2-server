@@ -23,7 +23,8 @@ import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.plugin.system.NodeId;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;

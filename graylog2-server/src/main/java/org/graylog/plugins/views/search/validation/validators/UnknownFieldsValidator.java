@@ -26,7 +26,8 @@ import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog.plugins.views.search.validation.validators.util.UnknownFieldsListLimiter;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

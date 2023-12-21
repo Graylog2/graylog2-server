@@ -26,7 +26,7 @@ import freemarker.template.TemplateExceptionHandler;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;

@@ -35,7 +35,9 @@ import software.amazon.awssdk.regions.Region;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -111,7 +113,7 @@ public class AWSCodec extends AbstractCodec {
                     "AWS Message Type",
                     Region.US_EAST_1.id(),
                     AWSMessageType.getMessageTypes().stream()
-                                  .collect(Collectors.toMap(AWSMessageType::toString, AWSMessageType::getLabel)),
+                            .collect(Collectors.toMap(AWSMessageType::toString, AWSMessageType::getLabel)),
                     "The type of AWS message that this input will receive.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
 

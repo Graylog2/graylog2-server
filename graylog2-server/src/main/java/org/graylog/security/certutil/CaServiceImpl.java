@@ -35,9 +35,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,7 +90,7 @@ public class CaServiceImpl implements CaService {
 
     @Override
     public CA get() throws KeyStoreStorageException {
-        if(configuration.configuredCaExists()) {
+        if (configuration.configuredCaExists()) {
             return new CA("local CA", CAType.LOCAL);
         } else {
             var keystore = keystoreStorage.readKeyStore(mongoDbCaLocation, passwordSecret.toCharArray());
@@ -128,8 +130,8 @@ public class CaServiceImpl implements CaService {
             }
             keystoreStorage.writeKeyStore(mongoDbCaLocation, keyStore, passwordCharArray, passwordSecret.toCharArray());
             triggerCaChangedEvent();
-       } catch (IOException | KeyStoreStorageException | NoSuchAlgorithmException | CertificateException |
-                KeyStoreException | NoSuchProviderException ex) {
+        } catch (IOException | KeyStoreStorageException | NoSuchAlgorithmException | CertificateException |
+                 KeyStoreException | NoSuchProviderException ex) {
             LOG.error("Could not write CA: " + ex.getMessage(), ex);
             throw new CACreationException("Could not write CA: " + ex.getMessage(), ex);
         }
@@ -146,10 +148,10 @@ public class CaServiceImpl implements CaService {
 
     @Override
     public Optional<KeyStore> loadKeyStore() throws KeyStoreStorageException {
-        if(configuration.configuredCaExists()) {
+        if (configuration.configuredCaExists()) {
             return keystoreStorage.readKeyStore(manuallyProvidedCALocation, configuration.getCaPassword().toCharArray());
         } else {
             return keystoreStorage.readKeyStore(mongoDbCaLocation, passwordSecret.toCharArray());
         }
-     }
+    }
 }

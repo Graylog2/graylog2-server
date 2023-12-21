@@ -22,7 +22,7 @@ import com.google.common.io.Resources;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 

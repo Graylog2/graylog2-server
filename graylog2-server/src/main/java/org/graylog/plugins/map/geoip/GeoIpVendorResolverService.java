@@ -21,7 +21,7 @@ import com.codahale.metrics.Timer;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A service to create a {@link GeoIpResolver} for a given configuration file and {@link DatabaseVendorType}.

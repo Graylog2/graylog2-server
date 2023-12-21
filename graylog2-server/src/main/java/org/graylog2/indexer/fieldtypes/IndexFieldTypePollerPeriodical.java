@@ -37,8 +37,9 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -245,6 +246,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     /**
      * Removes the field type polling job for the now deleted index set.
+     *
      * @param event index set deletion event
      */
     @SuppressWarnings("unused")
@@ -258,6 +260,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
     /**
      * Removes the index field type data for the deleted index.
+     *
      * @param event index deletion event
      */
     @SuppressWarnings("unused")

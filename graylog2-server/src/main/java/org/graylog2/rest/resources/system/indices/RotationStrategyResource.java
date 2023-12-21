@@ -40,8 +40,9 @@ import org.graylog2.rest.models.system.indices.RotationStrategies;
 import org.graylog2.rest.models.system.indices.RotationStrategyDescription;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

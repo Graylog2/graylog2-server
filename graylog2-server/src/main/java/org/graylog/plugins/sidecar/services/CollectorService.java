@@ -26,8 +26,10 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -66,8 +68,8 @@ public class CollectorService extends PaginatedDbService<Collector> {
     public Collector findByNameExcludeId(String name, String id) {
         return db.findOne(
                 DBQuery.and(
-                    DBQuery.is("name", name),
-                    DBQuery.notEquals("_id", id))
+                        DBQuery.is("name", name),
+                        DBQuery.notEquals("_id", id))
         );
     }
 
@@ -102,7 +104,7 @@ public class CollectorService extends PaginatedDbService<Collector> {
                 request.executeParameters(),
                 request.validationParameters(),
                 request.defaultTemplate()
-                );
+        );
     }
 
     public Collector fromRequest(String id, Collector request) {

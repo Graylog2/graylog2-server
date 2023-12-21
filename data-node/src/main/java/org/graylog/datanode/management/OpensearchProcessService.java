@@ -31,9 +31,9 @@ import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
@@ -103,13 +103,13 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         } else {
 
             String noConfigMessage = """
-                \n
-                ========================================================================================================
-                It seems you are starting Data node for the first time. The current configuration is not sufficient to
-                start the indexer process because a security configuration is missing. You have to either provide http
-                and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
-                ========================================================================================================
-                """;
+                    \n
+                    ========================================================================================================
+                    It seems you are starting Data node for the first time. The current configuration is not sufficient to
+                    start the indexer process because a security configuration is missing. You have to either provide http
+                    and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
+                    ========================================================================================================
+                    """;
             LOG.info(noConfigMessage);
         }
         eventBus.post(new OpensearchConfigurationChangeEvent(config));

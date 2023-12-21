@@ -25,7 +25,8 @@ import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 import java.util.Set;
 

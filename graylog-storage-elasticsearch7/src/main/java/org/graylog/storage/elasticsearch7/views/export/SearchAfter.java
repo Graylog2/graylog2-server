@@ -25,7 +25,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.Search
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.plugin.Message;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

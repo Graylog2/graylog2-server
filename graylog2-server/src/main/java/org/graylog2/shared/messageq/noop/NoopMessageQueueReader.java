@@ -19,7 +19,7 @@ package org.graylog2.shared.messageq.noop;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.shared.messageq.MessageQueueReader;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class NoopMessageQueueReader extends AbstractIdleService implements MessageQueueReader {

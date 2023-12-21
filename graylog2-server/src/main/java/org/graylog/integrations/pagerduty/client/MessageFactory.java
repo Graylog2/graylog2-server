@@ -30,7 +30,8 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -121,8 +122,7 @@ public class MessageFactory {
         }
         try {
             return new Link(new URL(streamUrl), stream.getTitle());
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new IllegalStateException("Error when building the stream link URL.", e);
         }
     }

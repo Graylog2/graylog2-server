@@ -24,15 +24,14 @@ import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class PaginatedGrokPatternService extends PaginatedDbService<GrokPattern> {
     private static final String COLLECTION_NAME = "grok_patterns";
 
     @Inject
     public PaginatedGrokPatternService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider mapper)
-    {
+                                       MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, GrokPattern.class, COLLECTION_NAME);
     }
 

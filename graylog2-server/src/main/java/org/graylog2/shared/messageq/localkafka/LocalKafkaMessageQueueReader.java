@@ -31,9 +31,10 @@ import org.graylog2.shared.metrics.HdrHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -127,7 +128,7 @@ public class LocalKafkaMessageQueueReader extends AbstractMessageQueueReader {
                 log.debug("Processing {} messages from journal.", encodedRawMessages.size());
                 for (final Journal.JournalReadEntry encodedRawMessage : encodedRawMessages) {
                     final RawMessage rawMessage = RawMessage.decode(encodedRawMessage.getPayload(),
-                                                                    encodedRawMessage.getOffset());
+                            encodedRawMessage.getOffset());
                     readerMetrics.readBytes().mark(encodedRawMessage.getPayload().length);
                     if (rawMessage == null) {
                         // never insert null objects into the ringbuffer, as that is useless

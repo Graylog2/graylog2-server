@@ -29,20 +29,20 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class CEFUDPInput extends MessageInput {
     private static final String NAME = "CEF UDP";
 
     @AssistedInject
     public CEFUDPInput(@Assisted Configuration configuration,
-                        MetricRegistry metricRegistry,
-                        final UdpTransport.Factory udpTransportFactory,
-                        final LocalMetricRegistry localRegistry,
-                        CEFCodec.Factory codec,
-                        Config config,
-                        Descriptor descriptor,
-                        ServerStatus serverStatus) {
+                       MetricRegistry metricRegistry,
+                       final UdpTransport.Factory udpTransportFactory,
+                       final LocalMetricRegistry localRegistry,
+                       CEFCodec.Factory codec,
+                       Config config,
+                       Descriptor descriptor,
+                       ServerStatus serverStatus) {
         super(
                 metricRegistry,
                 configuration,

@@ -16,7 +16,8 @@
  */
 package org.graylog2.shared.system.stats.os;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.lang.management.ManagementFactory;
 
 @Singleton

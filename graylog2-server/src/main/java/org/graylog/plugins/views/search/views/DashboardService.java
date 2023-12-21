@@ -19,7 +19,7 @@ package org.graylog.plugins.views.search.views;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class DashboardService {
     private final ViewService viewService;

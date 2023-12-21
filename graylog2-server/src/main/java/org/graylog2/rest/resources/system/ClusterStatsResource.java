@@ -26,7 +26,7 @@ import org.graylog2.system.stats.ClusterStatsService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.mongo.MongoStats;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

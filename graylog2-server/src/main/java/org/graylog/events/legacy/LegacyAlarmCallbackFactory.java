@@ -21,7 +21,8 @@ import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
 import org.graylog2.plugin.configuration.Configuration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Set;
 

@@ -21,7 +21,8 @@ import org.graylog2.shared.buffers.RawMessageEvent;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 
 @Singleton

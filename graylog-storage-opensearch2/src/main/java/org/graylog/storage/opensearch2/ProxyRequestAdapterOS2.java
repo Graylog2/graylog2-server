@@ -23,7 +23,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 
 public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {

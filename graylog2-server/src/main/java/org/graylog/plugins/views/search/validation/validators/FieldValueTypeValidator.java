@@ -34,7 +34,8 @@ import org.graylog.plugins.views.search.validation.ValidationMode;
 import org.graylog.plugins.views.search.validation.ValidationRequest;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class FieldValueTypeValidator implements QueryValidator {
      * TODO: remove this block in the moment when search filters support enterprise parameters
      */
     private List<ValidationMessage> ignoreForSearchFilters(final List<ValidationMessage> validationMessages, final ValidationContext context) {
-        if(context.request().validationMode() == ValidationMode.SEARCH_FILTER) {
+        if (context.request().validationMode() == ValidationMode.SEARCH_FILTER) {
             return Collections.emptyList();
         }
         return validationMessages;

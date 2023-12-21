@@ -28,7 +28,7 @@ import org.graylog2.rest.models.system.responses.ReaderPermissionResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.Permissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

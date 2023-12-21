@@ -30,7 +30,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -79,7 +80,7 @@ public class V20180924111644_AddDefaultGrokPatterns extends Migration {
 
             try {
                 contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", "admin");
-            } catch(ContentPackException e) {
+            } catch (ContentPackException e) {
                 LOG.warn("Could not install default grok patterns: the installation found some modified default grok" +
                         "patterns in your setup and did not update them. If you wish to use the default grok" +
                         "patterns we provide, please delete the modified grok pattern and install the 'Default grok" +

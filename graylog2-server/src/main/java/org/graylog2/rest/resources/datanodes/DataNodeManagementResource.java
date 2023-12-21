@@ -30,7 +30,7 @@ import org.graylog2.datanode.DataNodeService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;

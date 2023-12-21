@@ -26,7 +26,8 @@ import org.graylog2.database.PaginatedList;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;

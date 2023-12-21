@@ -30,7 +30,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -106,7 +107,7 @@ public class V20161215163900_MoveIndexSetDefaultConfig extends Migration {
 
         @JsonCreator
         public static MigrationCompleted create(@JsonProperty("index_set_ids") Set<String> indexSetIds) {
-            return new AutoValue_V20161215163900_MoveIndexSetDefaultConfig_MigrationCompleted (indexSetIds);
+            return new AutoValue_V20161215163900_MoveIndexSetDefaultConfig_MigrationCompleted(indexSetIds);
         }
     }
 }

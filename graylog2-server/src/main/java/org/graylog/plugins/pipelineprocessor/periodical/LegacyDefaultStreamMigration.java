@@ -26,7 +26,7 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 

@@ -24,8 +24,9 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;

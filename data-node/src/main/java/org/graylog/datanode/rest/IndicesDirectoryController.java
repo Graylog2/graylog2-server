@@ -24,7 +24,7 @@ import org.graylog.datanode.filesystem.index.dto.NodeInformation;
 import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

@@ -27,7 +27,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.constraints.NotNull;
 

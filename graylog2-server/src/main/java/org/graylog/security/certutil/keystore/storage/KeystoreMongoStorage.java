@@ -20,7 +20,8 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.cluster.certificates.CertificatesService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.KeyStore;

@@ -60,7 +60,8 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -190,11 +191,11 @@ public class PivotAggregationSearch implements AggregationSearch {
 
     private ImmutableSet<String> extractSourceStreams(PivotResult pivotResult) {
         return pivotResult.rows().stream()
-            // "non-leaf" values can show up when the "rollup" feature is enabled in the pivot search type
-            .filter(row -> "leaf".equals(row.source()))
-            // We can just take the first key value because we only group by "streams"
-            .map(row -> row.key().get(0))
-            .collect(ImmutableSet.toImmutableSet());
+                // "non-leaf" values can show up when the "rollup" feature is enabled in the pivot search type
+                .filter(row -> "leaf".equals(row.source()))
+                // We can just take the first key value because we only group by "streams"
+                .map(row -> row.key().get(0))
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     @VisibleForTesting
@@ -343,7 +344,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             }
 
             DateTime resultTimestamp;
-            try{
+            try {
                 resultTimestamp = DateTime.parse(timeKey).withZone(DateTimeZone.UTC);
             } catch (IllegalArgumentException e) {
                 throw new IllegalStateException("Failed to create event for: " + eventDefinition.title() + " (possibly due to non-existing grouping fields)", e);
@@ -371,9 +372,9 @@ public class PivotAggregationSearch implements AggregationSearch {
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username), Collections.emptySet());
         try {
             Uninterruptibles.getUninterruptibly(
-                searchJob.getResultFuture(),
-                configurationProvider.get().eventsSearchTimeout(),
-                TimeUnit.MILLISECONDS);
+                    searchJob.getResultFuture(),
+                    configurationProvider.get().eventsSearchTimeout(),
+                    TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             throw new EventProcessorException("Error executing search job: " + e.getMessage(), false, eventDefinition, e);
         } catch (TimeoutException e) {
@@ -393,18 +394,18 @@ public class PivotAggregationSearch implements AggregationSearch {
      */
     private Query getSourceStreamsQuery(AggregationEventProcessorParameters parameters) {
         final Pivot pivot = Pivot.builder()
-            .id(STREAMS_PIVOT_ID)
-            .rollup(true)
-            .rowGroups(ImmutableList.of(Values.builder().limit(Integer.MAX_VALUE).field("streams").build()))
-            .series(ImmutableList.of(Count.builder().id(STREAMS_PIVOT_COUNT_ID).build()))
-            .build();
+                .id(STREAMS_PIVOT_ID)
+                .rollup(true)
+                .rowGroups(ImmutableList.of(Values.builder().limit(Integer.MAX_VALUE).field("streams").build()))
+                .series(ImmutableList.of(Count.builder().id(STREAMS_PIVOT_COUNT_ID).build()))
+                .build();
 
         final Set<SearchType> searchTypes = Collections.singleton(pivot);
         final Query.Builder queryBuilder = Query.builder()
-            .id(STREAMS_QUERY_ID)
-            .searchTypes(searchTypes)
-            .query(ElasticsearchQueryString.of(config.query()))
-            .timerange(parameters.timerange());
+                .id(STREAMS_QUERY_ID)
+                .searchTypes(searchTypes)
+                .query(ElasticsearchQueryString.of(config.query()))
+                .timerange(parameters.timerange());
 
         final Set<String> streams = getStreams(parameters);
         if (!streams.isEmpty()) {
@@ -417,12 +418,12 @@ public class PivotAggregationSearch implements AggregationSearch {
     /**
      * Returns the query to compute the aggregation.
      *
-     * @param parameters processor parameters
+     * @param parameters     processor parameters
      * @param searchWithinMs processor search within period. Used to build the date range buckets
      * @param executeEveryMs
      * @return aggregation query
      */
-     protected Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
+    protected Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(true);
@@ -533,7 +534,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             // By dividing it before casting we avoid a potential int overflow
             to = from.plusSeconds((int) (searchWithinMs / 1000));
             ranges.add(DateRange.builder().from(from).to(to).build());
-            from = from.plusSeconds((int) executeEveryMs/ 1000);
+            from = from.plusSeconds((int) executeEveryMs / 1000);
         } while (to.isBefore(timeRange.getTo()));
 
         return DateRangeBucket.builder().field("timestamp").ranges(ranges.build()).build();

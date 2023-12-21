@@ -52,7 +52,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.net.URL;
 import java.util.Locale;
 import java.util.Objects;
@@ -132,14 +133,14 @@ public class KinesisTransport extends ThrottleableTransport2 {
         validateEndpoint(iamEndpoint, "Kinesis");
 
         final AWSRequest awsRequest = AWSRequestImpl.builder()
-                                                    .region(region.id())
-                                                    .awsAccessKeyId(key)
-                                                    .awsSecretAccessKey(secret)
-                                                    .assumeRoleArn(assumeRoleArn)
-                                                    .cloudwatchEndpoint(cloudwatchEndpoint)
-                                                    .dynamodbEndpoint(dynamodbEndpoint)
-                                                    .iamEndpoint(iamEndpoint)
-                                                    .kinesisEndpoint(kinesisEndpoint).build();
+                .region(region.id())
+                .awsAccessKeyId(key)
+                .awsSecretAccessKey(secret)
+                .assumeRoleArn(assumeRoleArn)
+                .cloudwatchEndpoint(cloudwatchEndpoint)
+                .dynamodbEndpoint(dynamodbEndpoint)
+                .iamEndpoint(iamEndpoint)
+                .kinesisEndpoint(kinesisEndpoint).build();
 
         final int batchSize = configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE);
         final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);

@@ -32,7 +32,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -79,12 +80,14 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
                 states.forEach((String id, Object obj) -> {
                     final Document state = (Document) obj;
                     if (state.get("widgets") instanceof List) {
-                        @SuppressWarnings("unchecked") final List<Document> widgets = (List) state.get("widgets");
+                        @SuppressWarnings("unchecked")
+                        final List<Document> widgets = (List) state.get("widgets");
                         for (final Document widget : widgets) {
                             final String type = widget.getString("type");
                             if (type.equals("messages")) {
                                 final Document config = widget.get("config", Document.class);
-                                @SuppressWarnings("unchecked") final List<String> fields = (List) config.get("fields");
+                                @SuppressWarnings("unchecked")
+                                final List<String> fields = (List) config.get("fields");
                                 fields.add(0, "timestamp");
                                 if (fields.contains("message")) {
                                     config.put("show_message_row", true);
@@ -112,7 +115,8 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
         final String widgetId = UUID.randomUUID().toString();
 
         /* Preparations */
-        @SuppressWarnings("unchecked") final List<String> selectedFields = (List) state.get("selected_fields");
+        @SuppressWarnings("unchecked")
+        final List<String> selectedFields = (List) state.get("selected_fields");
         selectedFields.add(0, "timestamp");
         final boolean showMessageRow = selectedFields.contains("message");
         if (showMessageRow) {
@@ -126,7 +130,8 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
 
 
         /* Add widget */
-        @SuppressWarnings("unchecked") final List<Document> widgets = (List) state.get("widgets");
+        @SuppressWarnings("unchecked")
+        final List<Document> widgets = (List) state.get("widgets");
         final Document newMessageList = createMessageList(widgetId, selectedFields, showMessageRow);
         widgets.add(newMessageList);
 
@@ -178,7 +183,8 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
     private List<String> getWidgetMappingSearchTypeIds(Document widgetMappings) {
         final List<String> widgetMappingSearchTypeIds = new ArrayList<>();
         for (final Map.Entry mapping : widgetMappings.entrySet()) {
-            @SuppressWarnings("unchecked") final List<String> searchIds = (ArrayList) mapping.getValue();
+            @SuppressWarnings("unchecked")
+            final List<String> searchIds = (ArrayList) mapping.getValue();
             widgetMappingSearchTypeIds.addAll(searchIds);
         }
         return widgetMappingSearchTypeIds;
@@ -195,10 +201,12 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
 
         final List<String> searchTypeId = new ArrayList<>();
 
-        @SuppressWarnings("unchecked") final List<Document> queries = (ArrayList) search.get("queries");
+        @SuppressWarnings("unchecked")
+        final List<Document> queries = (ArrayList) search.get("queries");
         for (final Document query : queries) {
             if (query.getString("id").equals(stateId)) {
-                @SuppressWarnings("unchecked") final List<Document> searchTypes = (ArrayList) query.get("search_types");
+                @SuppressWarnings("unchecked")
+                final List<Document> searchTypes = (ArrayList) query.get("search_types");
                 searchTypeId.addAll(searchTypes.stream().map(searchType -> searchType.getString("id"))
                         .filter(search_id -> !widgetMappingSearchTypeIds.contains(search_id)).collect(Collectors.toList()));
             }

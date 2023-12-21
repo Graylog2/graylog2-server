@@ -47,7 +47,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
@@ -177,6 +179,7 @@ public class JsonPathCodec extends AbstractCodec {
             throw new JsonFlattenException("Warning: JSON contains type not supported by the flatten method. JsonNode: " + jsonNode);
         }
     }
+
     public static class JsonFlattenException extends Exception {
         public JsonFlattenException(String errorMessage) {
             super(errorMessage);
@@ -230,7 +233,8 @@ public class JsonPathCodec extends AbstractCodec {
                     "If set, the whole JSON will be flattened and returned as message fields."
             ));
 
-            return r;        }
+            return r;
+        }
 
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {

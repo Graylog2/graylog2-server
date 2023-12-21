@@ -24,8 +24,9 @@ import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -138,6 +139,7 @@ public class FailureSubmissionService {
 
     /**
      * Submits Elasticsearch indexing errors to the failure queue
+     *
      * @param indexingErrors a collection of indexing errors
      */
     public void submitIndexingErrors(Collection<IndexingError> indexingErrors) {

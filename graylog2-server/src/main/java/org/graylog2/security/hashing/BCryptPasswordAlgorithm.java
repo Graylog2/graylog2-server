@@ -19,8 +19,8 @@ package org.graylog2.security.hashing;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

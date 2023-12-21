@@ -21,8 +21,9 @@ import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
 import org.graylog2.storage.SearchVersion;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.Map;
 
 public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider extends VersionAwareProvider<V20170607164210_MigrateReopenedIndicesToAliases.ClusterState> {

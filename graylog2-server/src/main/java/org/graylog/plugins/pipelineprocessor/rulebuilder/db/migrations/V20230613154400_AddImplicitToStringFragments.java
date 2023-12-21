@@ -26,7 +26,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;

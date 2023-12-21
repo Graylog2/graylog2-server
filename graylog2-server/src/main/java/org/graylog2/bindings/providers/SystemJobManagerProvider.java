@@ -20,8 +20,8 @@ import com.codahale.metrics.MetricRegistry;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 public class SystemJobManagerProvider implements Provider<SystemJobManager> {
     private static SystemJobManager systemJobManager = null;

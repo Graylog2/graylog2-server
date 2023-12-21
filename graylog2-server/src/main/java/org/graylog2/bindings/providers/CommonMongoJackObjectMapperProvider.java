@@ -30,8 +30,9 @@ import org.graylog2.jackson.MongoZonedDateTimeSerializer;
 import org.graylog2.security.encryption.EncryptedValueMapperConfig;
 import org.joda.time.DateTime;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 

@@ -25,7 +25,7 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.rest.models.system.codecs.responses.CodecTypeInfo;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;

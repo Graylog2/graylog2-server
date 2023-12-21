@@ -22,7 +22,8 @@ import org.graylog2.migrations.MaintenanceStrategiesHelper;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.concurrent.TimeUnit;
 
 public class IndexSetsDefaultConfigurationFactory {

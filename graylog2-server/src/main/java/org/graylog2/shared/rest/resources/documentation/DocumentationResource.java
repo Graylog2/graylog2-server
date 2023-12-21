@@ -31,7 +31,7 @@ import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

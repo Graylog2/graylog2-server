@@ -26,7 +26,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class GELFTCPInput extends MessageInput {
 
@@ -41,7 +41,7 @@ public class GELFTCPInput extends MessageInput {
                         Config config,
                         Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry, configuration, tcpFactory.create(overrideDelimiter(configuration)), localRegistry, gelfCodecFactory.create(configuration),
-              config, descriptor, serverStatus);
+                config, descriptor, serverStatus);
     }
 
     // Make sure that delimiter is null-byte for GELF. This is needed to support setups where the GELF TCP input

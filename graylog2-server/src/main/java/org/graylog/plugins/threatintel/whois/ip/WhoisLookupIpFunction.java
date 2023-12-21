@@ -26,7 +26,8 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class WhoisLookupIpFunction extends LookupTableFunction<WhoisIpLookupResult> {

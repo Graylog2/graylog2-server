@@ -31,7 +31,7 @@ import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

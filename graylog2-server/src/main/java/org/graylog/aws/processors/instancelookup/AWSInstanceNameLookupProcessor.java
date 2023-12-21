@@ -34,7 +34,8 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -146,7 +147,7 @@ public class AWSInstanceNameLookupProcessor implements MessageProcessor {
 
         for (Message message : messages) {
             Object awsGroupId = message.getField(AWS.SOURCE_GROUP_IDENTIFIER);
-            if(awsGroupId != null && awsGroupId.equals(true)) {
+            if (awsGroupId != null && awsGroupId.equals(true)) {
                 // This is a message from one of our own inputs and we want to do a lookup.
                 TRANSLATABLE_FIELD_NAMES.stream().filter(fieldName -> message.hasField(fieldName)).forEach(fieldName -> {
                     // Make it so!

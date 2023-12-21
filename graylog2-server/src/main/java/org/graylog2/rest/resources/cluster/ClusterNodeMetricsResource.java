@@ -37,8 +37,8 @@ import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 import org.graylog2.shared.security.RestPermissions;
 import retrofit2.Response;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

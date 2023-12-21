@@ -28,7 +28,7 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class AbuseChRansomDomainLookupFunction extends LookupTableFunction<GenericLookupResult> {
 
@@ -62,7 +62,7 @@ public class AbuseChRansomDomainLookupFunction extends LookupTableFunction<Gener
         final LookupResult lookupResult = this.lookupFunction.lookup(domain.trim());
         if (lookupResult != null && !lookupResult.isEmpty() && lookupResult.singleValue() != null) {
             if (lookupResult.singleValue() instanceof Boolean) {
-                return (Boolean)lookupResult.singleValue() ? GenericLookupResult.TRUE : GenericLookupResult.FALSE;
+                return (Boolean) lookupResult.singleValue() ? GenericLookupResult.TRUE : GenericLookupResult.FALSE;
             }
             if (lookupResult.singleValue() instanceof String) {
                 return Boolean.valueOf((String) lookupResult.singleValue()) ? GenericLookupResult.TRUE : GenericLookupResult.FALSE;

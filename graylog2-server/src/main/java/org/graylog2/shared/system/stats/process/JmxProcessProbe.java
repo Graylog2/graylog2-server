@@ -18,7 +18,8 @@ package org.graylog2.shared.system.stats.process;
 
 import org.graylog2.shared.SuppressForbidden;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;

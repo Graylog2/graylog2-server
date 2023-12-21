@@ -32,7 +32,8 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
 
 public class CloudTrailCodec extends AbstractCodec {
     public static final String NAME = "AWSCloudTrail";

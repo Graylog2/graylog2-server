@@ -25,8 +25,9 @@ import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,7 +66,7 @@ public class IndicesDirectoryParser {
 
         final Path nodesPath = path.resolve("nodes");
 
-        if(!Files.exists(nodesPath)) {
+        if (!Files.exists(nodesPath)) {
             return IndexerDirectoryInformation.empty(path);
         }
 

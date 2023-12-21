@@ -23,7 +23,8 @@ import org.graylog.datanode.configuration.certificates.KeystoreReEncryption;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;

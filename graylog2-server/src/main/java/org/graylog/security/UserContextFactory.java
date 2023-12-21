@@ -22,8 +22,8 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.SecurityContext;

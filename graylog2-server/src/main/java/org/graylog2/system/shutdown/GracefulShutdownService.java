@@ -22,7 +22,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -97,9 +98,10 @@ public class GracefulShutdownService extends AbstractIdleService {
 
     /**
      * Register a shutdown hook with the service.
+     *
      * @param shutdownHook a class that implements {@link GracefulShutdownHook}
      * @throws IllegalStateException if the server shutdown is already in progress and the hook cannot be registered
-     * @throws NullPointerException if the shutdown hook argument is null
+     * @throws NullPointerException  if the shutdown hook argument is null
      */
     public void register(GracefulShutdownHook shutdownHook) {
         if (isShuttingDown.get()) {
@@ -113,9 +115,10 @@ public class GracefulShutdownService extends AbstractIdleService {
      * Remove a previously registered shutdown hook from the service.
      * <p>
      * This needs to be called if a registered service will be stopped before the server shuts down.
+     *
      * @param shutdownHook a class that implements {@link GracefulShutdownHook}
      * @throws IllegalStateException if the server shutdown is already in progress and the hook cannot be unregistered
-     * @throws NullPointerException if the shutdown hook argument is null
+     * @throws NullPointerException  if the shutdown hook argument is null
      */
     public void unregister(GracefulShutdownHook shutdownHook) {
         if (isShuttingDown.get()) {

@@ -19,7 +19,7 @@ package org.graylog2.shared.buffers;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.journal.RawMessage;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class NoopInputBuffer implements InputBuffer {

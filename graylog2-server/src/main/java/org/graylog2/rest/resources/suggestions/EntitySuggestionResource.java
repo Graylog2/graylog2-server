@@ -25,7 +25,7 @@ import org.graylog2.database.suggestions.EntitySuggestionResponse;
 import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;

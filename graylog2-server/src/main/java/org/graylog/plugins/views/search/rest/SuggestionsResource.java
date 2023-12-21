@@ -45,7 +45,7 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleR
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;

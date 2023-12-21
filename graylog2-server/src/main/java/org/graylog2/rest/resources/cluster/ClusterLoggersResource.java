@@ -35,8 +35,8 @@ import org.graylog2.rest.resources.system.logs.RemoteLoggersResource;
 import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;

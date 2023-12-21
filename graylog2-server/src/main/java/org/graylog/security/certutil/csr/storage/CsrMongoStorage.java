@@ -22,7 +22,8 @@ import org.bouncycastle.operator.OperatorException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;

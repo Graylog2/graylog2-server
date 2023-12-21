@@ -54,7 +54,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -157,11 +159,11 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
         final List<NetFlowV9Packet> netFlowV9Packets = decodeV9Packets(buffer);
 
         return netFlowV9Packets.stream().map(netFlowV9Packet -> netFlowV9Packet.records().stream()
-                .filter(record -> record instanceof NetFlowV9Record)
-                .map(record -> NetFlowFormatter.toMessage(netFlowV9Packet.header(), record, sender))
-                .collect(Collectors.toList())
-        ).flatMap(Collection::stream)
-         .collect(Collectors.toList());
+                        .filter(record -> record instanceof NetFlowV9Record)
+                        .map(record -> NetFlowFormatter.toMessage(netFlowV9Packet.header(), record, sender))
+                        .collect(Collectors.toList())
+                ).flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     @VisibleForTesting

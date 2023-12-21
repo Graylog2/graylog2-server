@@ -24,7 +24,8 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;

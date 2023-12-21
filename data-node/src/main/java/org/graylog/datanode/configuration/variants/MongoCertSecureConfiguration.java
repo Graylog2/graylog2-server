@@ -26,8 +26,9 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLoca
 import org.graylog2.cluster.certificates.CertificatesService;
 import org.graylog2.plugin.system.NodeId;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 

@@ -40,7 +40,7 @@ import software.amazon.awssdk.services.cloudwatchlogs.model.InvalidParameterExce
 import software.amazon.awssdk.services.cloudwatchlogs.model.PutSubscriptionFilterRequest;
 import software.amazon.awssdk.services.cloudwatchlogs.paginators.DescribeLogGroupsIterable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.BadRequestException;
 

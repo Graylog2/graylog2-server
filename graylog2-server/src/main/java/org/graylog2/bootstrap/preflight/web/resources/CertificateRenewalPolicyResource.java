@@ -21,7 +21,7 @@ import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.constraints.NotNull;
 

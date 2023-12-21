@@ -18,7 +18,8 @@ package org.graylog2.contentstream;
 
 import org.graylog.enterprise.EnterpriseService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 
 public class ContentStreamFeedTagsService implements ContentStreamFeedTags {

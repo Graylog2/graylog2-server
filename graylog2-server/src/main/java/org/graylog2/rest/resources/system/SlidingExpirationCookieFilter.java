@@ -21,7 +21,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.shared.security.ShiroPrincipal;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;

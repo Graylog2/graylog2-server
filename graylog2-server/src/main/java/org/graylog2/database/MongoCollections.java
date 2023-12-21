@@ -23,8 +23,8 @@ import org.graylog.shaded.mongojack4.org.mongojack.JacksonMongoCollection;
 import org.graylog.shaded.mongojack4.org.mongojack.internal.MongoJackModule;
 import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class MongoCollections {

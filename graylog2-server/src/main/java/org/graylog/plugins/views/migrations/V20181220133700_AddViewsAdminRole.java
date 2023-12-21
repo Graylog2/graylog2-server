@@ -21,7 +21,8 @@ import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationHelpers;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 public class V20181220133700_AddViewsAdminRole extends Migration {

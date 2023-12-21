@@ -25,7 +25,8 @@ import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.ThrowingBiFunction;
 import org.graylog2.indexer.ElasticsearchException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 
 public class ExportClient {

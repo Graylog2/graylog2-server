@@ -20,7 +20,7 @@ import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.container.ContainerRequestContext;

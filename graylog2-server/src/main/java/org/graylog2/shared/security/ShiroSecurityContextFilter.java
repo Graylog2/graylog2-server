@@ -35,9 +35,10 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.rest.RestTools;
 import org.graylog2.utilities.IpSubnet;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

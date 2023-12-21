@@ -38,7 +38,7 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleR
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

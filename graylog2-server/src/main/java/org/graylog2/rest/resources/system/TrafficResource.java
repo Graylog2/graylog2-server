@@ -25,7 +25,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.joda.time.Duration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;

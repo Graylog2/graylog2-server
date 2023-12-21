@@ -25,7 +25,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;

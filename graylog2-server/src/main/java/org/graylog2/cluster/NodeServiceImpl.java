@@ -19,7 +19,8 @@ package org.graylog2.cluster;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.plugin.system.NodeId;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;

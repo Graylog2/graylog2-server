@@ -23,7 +23,8 @@ import org.graylog2.database.MongoConnection;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 

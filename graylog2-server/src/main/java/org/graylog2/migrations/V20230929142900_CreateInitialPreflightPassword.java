@@ -26,7 +26,8 @@ import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;

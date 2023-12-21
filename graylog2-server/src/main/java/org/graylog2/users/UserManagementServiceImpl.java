@@ -28,7 +28,7 @@ import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.UserManagementService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class UserManagementServiceImpl extends UserServiceImpl implements UserManagementService {
 

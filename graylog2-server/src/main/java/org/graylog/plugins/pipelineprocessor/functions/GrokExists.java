@@ -25,7 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.grok.GrokPatternRegistry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -62,7 +62,7 @@ public class GrokExists extends AbstractFunction<Boolean> {
 
         final boolean patternExists = grokPatternRegistry.grokPatternExists(pattern);
         if (!patternExists && logWhenNotFound) {
-           log.info(context.pipelineErrorMessage("Grok Pattern " + pattern + " does not exist."));
+            log.info(context.pipelineErrorMessage("Grok Pattern " + pattern + " does not exist."));
         }
 
         return patternExists;
@@ -70,15 +70,15 @@ public class GrokExists extends AbstractFunction<Boolean> {
 
     @Override
     public FunctionDescriptor<Boolean> descriptor() {
-       return FunctionDescriptor.<Boolean>builder()
-               .name(NAME)
-               .returnType(Boolean.class)
-               .params(of(patternParam, doLog))
-               .description("Checks if the given Grok pattern exists in Graylog.")
-               .ruleBuilderEnabled()
-               .ruleBuilderName("Check for grok pattern")
-               .ruleBuilderTitle("Check if grok pattern named '${pattern}' exists in Graylog")
-               .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.PATTERN)
-               .build();
+        return FunctionDescriptor.<Boolean>builder()
+                .name(NAME)
+                .returnType(Boolean.class)
+                .params(of(patternParam, doLog))
+                .description("Checks if the given Grok pattern exists in Graylog.")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Check for grok pattern")
+                .ruleBuilderTitle("Check if grok pattern named '${pattern}' exists in Graylog")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.PATTERN)
+                .build();
     }
 }

@@ -18,7 +18,7 @@ package org.graylog.util;
 
 import org.graylog2.plugin.Tools;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 public class HostnameProvider implements Provider<Hostname> {
     /**

@@ -28,8 +28,9 @@ import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -101,6 +102,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
         }
         return mongoIndexSets.build();
     }
+
     @Override
     public Set<IndexSet> getAll() {
         return ImmutableSet.copyOf(findAllMongoIndexSets());
@@ -118,10 +120,10 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Override
     public Optional<IndexSet> getForIndex(String indexName) {
         return findAllMongoIndexSets()
-            .stream()
-            .filter(indexSet -> indexSet.isManagedIndex(indexName))
-            .map(indexSet -> (IndexSet)indexSet)
-            .findFirst();
+                .stream()
+                .filter(indexSet -> indexSet.isManagedIndex(indexName))
+                .map(indexSet -> (IndexSet) indexSet)
+                .findFirst();
     }
 
     @Override
@@ -215,8 +217,8 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Override
     public boolean isUp() {
         return findAllMongoIndexSets().stream()
-            .filter(indexSet -> indexSet.getConfig().isWritable())
-            .allMatch(MongoIndexSet::isUp);
+                .filter(indexSet -> indexSet.getConfig().isWritable())
+                .allMatch(MongoIndexSet::isUp);
     }
 
     @Override

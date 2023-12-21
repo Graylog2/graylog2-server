@@ -35,7 +35,8 @@ import org.graylog.aws.config.Proxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 
 @Singleton
@@ -66,7 +67,7 @@ public class InstanceLookupTable {
             try {
                 AmazonEC2 ec2Client;
 
-                if(proxyUrl != null) {
+                if (proxyUrl != null) {
                     ec2Client = AmazonEC2Client.builder()
                             .withCredentials(awsAuthProvider)
                             .withRegion(region)
@@ -123,7 +124,7 @@ public class InstanceLookupTable {
                         }
                     }
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 LOG.error("Error when trying to refresh AWS instance lookup table in [{}]", region.getName(), e);
             }
         }
@@ -144,7 +145,7 @@ public class InstanceLookupTable {
             }
 
             // If it's not an EC2 instance, we might still find it in our list of network interfaces.
-            if(networkInterfaces.containsKey(ip)) {
+            if (networkInterfaces.containsKey(ip)) {
                 NetworkInterface iface = networkInterfaces.get(ip);
                 switch (determineType(iface)) {
                     case RDS:
@@ -162,7 +163,7 @@ public class InstanceLookupTable {
 
             // The IP address is not known to us. This most likely means it is an external public IP.
             return DiscoveredInstance.UNDISCOVERED;
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOG.error("Error when trying to match IP to AWS instance. Marking as undiscovered.", e);
             return DiscoveredInstance.UNDISCOVERED;
         }
@@ -178,7 +179,7 @@ public class InstanceLookupTable {
                 LOG.warn("Unexpected ELB name in network interface description: [{}]", iface.getDescription());
                 return "unknown-name";
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOG.warn("Could not get ELB name from network interface description. Description was [{}]", iface.getDescription(), e);
             return "unknown-name";
         }
@@ -195,9 +196,9 @@ public class InstanceLookupTable {
      */
     private InstanceType determineType(NetworkInterface iface) {
         String ownerId;
-        if(iface.getAssociation() != null) {
+        if (iface.getAssociation() != null) {
             ownerId = iface.getAssociation().getIpOwnerId();
-        } else if(iface.getRequesterId().equals("amazon-rds")) {
+        } else if (iface.getRequesterId().equals("amazon-rds")) {
             ownerId = "amazon-rds";
         } else {
             LOG.debug("AWS network interface with no association: [{}]", iface.getDescription());
@@ -205,11 +206,11 @@ public class InstanceLookupTable {
         }
 
         // not using switch here because it might become nasty complicated for other instance types
-        if("amazon".equals(ownerId)) {
+        if ("amazon".equals(ownerId)) {
             return InstanceType.EC2;
-        } else if("amazon-elb".equals(ownerId)) {
+        } else if ("amazon-elb".equals(ownerId)) {
             return InstanceType.ELB;
-        } else if("amazon-rds".equals(ownerId)) {
+        } else if ("amazon-rds".equals(ownerId)) {
             return InstanceType.RDS;
         } else {
             return InstanceType.UNKNOWN;
@@ -218,7 +219,7 @@ public class InstanceLookupTable {
 
     private String getNameOfInstance(Instance x) {
         for (Tag tag : x.getTags()) {
-            if("Name".equals(tag.getKey())) {
+            if ("Name".equals(tag.getKey())) {
                 return tag.getValue();
             }
         }

@@ -20,7 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.sidecar.rest.models.CollectorStatusList;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class StatusAdministrationFilter implements AdministrationFilter {
     private final Sidecar.Status status;

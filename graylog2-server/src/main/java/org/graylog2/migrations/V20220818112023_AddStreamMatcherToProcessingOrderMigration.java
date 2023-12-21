@@ -25,7 +25,8 @@ import org.graylog2.messageprocessors.StreamMatcherFilterProcessor;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;

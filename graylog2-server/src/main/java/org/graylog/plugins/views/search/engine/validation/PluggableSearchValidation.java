@@ -22,7 +22,8 @@ import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 

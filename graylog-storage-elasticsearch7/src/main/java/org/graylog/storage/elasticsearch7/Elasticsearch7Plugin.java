@@ -23,7 +23,8 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.storage.SearchVersion;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;

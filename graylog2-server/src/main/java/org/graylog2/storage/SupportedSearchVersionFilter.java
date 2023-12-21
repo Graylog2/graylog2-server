@@ -22,7 +22,7 @@ import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.container.ContainerRequestContext;

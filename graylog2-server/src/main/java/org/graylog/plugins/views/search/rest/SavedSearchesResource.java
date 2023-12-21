@@ -34,7 +34,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;

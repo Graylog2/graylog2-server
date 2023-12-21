@@ -32,7 +32,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -68,32 +69,32 @@ public class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews extends 
         }
 
         final List<ViewWidgetLimitMigration> widgetLimitMigrations = StreamSupport.stream(this.views.find().spliterator(), false)
-            .flatMap(document -> {
-                final String viewId = document.get("_id", ObjectId.class).toHexString();
-                final Map<String, Document> state = document.get("state", Collections.emptyMap());
-                return state.entrySet().stream()
-                    .flatMap(entry -> {
-                        final String queryId = entry.getKey();
-                        final List<Document> widgets = entry.getValue().get("widgets", Collections.emptyList());
-                        return EntryStream.of(widgets)
-                            .filter(widget -> "aggregation".equals(widget.getValue().getString("type")))
-                            .flatMap(widgetEntry -> {
-                                final Document widget = widgetEntry.getValue();
-                                final Integer widgetIndex = widgetEntry.getKey();
-                                final Document config = widget.get("config", new Document());
-                                final boolean hasRowLimit = config.containsKey("row_limit");
-                                final boolean hasColumnLimit = config.containsKey("column_limit");
-                                final Optional<Integer> rowLimit = Optional.ofNullable(config.getInteger("row_limit"));
-                                final Optional<Integer> columnLimit = Optional.ofNullable(config.getInteger("column_limit"));
+                .flatMap(document -> {
+                    final String viewId = document.get("_id", ObjectId.class).toHexString();
+                    final Map<String, Document> state = document.get("state", Collections.emptyMap());
+                    return state.entrySet().stream()
+                            .flatMap(entry -> {
+                                final String queryId = entry.getKey();
+                                final List<Document> widgets = entry.getValue().get("widgets", Collections.emptyList());
+                                return EntryStream.of(widgets)
+                                        .filter(widget -> "aggregation".equals(widget.getValue().getString("type")))
+                                        .flatMap(widgetEntry -> {
+                                            final Document widget = widgetEntry.getValue();
+                                            final Integer widgetIndex = widgetEntry.getKey();
+                                            final Document config = widget.get("config", new Document());
+                                            final boolean hasRowLimit = config.containsKey("row_limit");
+                                            final boolean hasColumnLimit = config.containsKey("column_limit");
+                                            final Optional<Integer> rowLimit = Optional.ofNullable(config.getInteger("row_limit"));
+                                            final Optional<Integer> columnLimit = Optional.ofNullable(config.getInteger("column_limit"));
 
-                                if (widgetIndex != null && (hasRowLimit || hasColumnLimit)) {
-                                    return Stream.of(new ViewWidgetLimitMigration(viewId, queryId, widgetIndex, rowLimit, columnLimit));
-                                }
-                                return Stream.empty();
+                                            if (widgetIndex != null && (hasRowLimit || hasColumnLimit)) {
+                                                return Stream.of(new ViewWidgetLimitMigration(viewId, queryId, widgetIndex, rowLimit, columnLimit));
+                                            }
+                                            return Stream.empty();
+                                        });
                             });
-                    });
-            })
-            .collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
 
         final List<WriteModel<Document>> operations = widgetLimitMigrations.stream()
                 .flatMap(widgetMigration -> {
@@ -160,7 +161,8 @@ public class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews extends 
         return new Document(key, value);
     }
 
-    public record ViewWidgetLimitMigration(String viewId, String queryId, Integer widgetIndex, Optional<Integer> rowLimit, Optional<Integer> columnLimit) {}
+    public record ViewWidgetLimitMigration(String viewId, String queryId, Integer widgetIndex,
+                                           Optional<Integer> rowLimit, Optional<Integer> columnLimit) {}
 
     public record MigrationCompleted(@JsonProperty("migrated_widgets") Integer migratedViews) {}
 }

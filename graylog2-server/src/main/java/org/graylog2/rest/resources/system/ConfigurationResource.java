@@ -27,7 +27,7 @@ import org.graylog2.configuration.ExposedConfiguration;
 import org.graylog2.configuration.retrieval.SingleConfigurationValueRetriever;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.constraints.NotEmpty;
 

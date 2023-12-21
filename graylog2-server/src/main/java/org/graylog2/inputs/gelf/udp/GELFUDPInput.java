@@ -26,7 +26,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class GELFUDPInput extends MessageInput {
 
@@ -38,7 +38,7 @@ public class GELFUDPInput extends MessageInput {
                         UdpTransport.Factory udpFactory,
                         GelfCodec.Factory gelfCodecFactory, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry, configuration, udpFactory.create(configuration), localRegistry, gelfCodecFactory.create(configuration),
-              config, descriptor, serverStatus);
+                config, descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<GELFUDPInput> {

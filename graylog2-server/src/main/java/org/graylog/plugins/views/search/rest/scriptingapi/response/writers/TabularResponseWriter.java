@@ -24,7 +24,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchem
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.rest.MoreMediaTypes;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;

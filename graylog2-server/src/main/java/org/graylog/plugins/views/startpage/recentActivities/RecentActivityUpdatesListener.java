@@ -20,7 +20,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.security.events.EntitySharesUpdateEvent;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -38,7 +39,7 @@ public class RecentActivityUpdatesListener {
     @Subscribe
     public void createUpdateRecentActivityFor(final RecentActivityEvent event) {
         // first, if we delete an entity, we have to remove old entries from the Recent Activities collection because some info is no longer available from the catalog.
-        if(event.activityType().equals(ActivityType.DELETE)) {
+        if (event.activityType().equals(ActivityType.DELETE)) {
             recentActivityService.deleteAllEntriesForEntity(event.grn());
         }
 
@@ -75,7 +76,7 @@ public class RecentActivityUpdatesListener {
                         .itemGrn(event.entity())
                         .userName(event.user().getFullName())
                         .grantee(e.grantee().toString())
-                        .build()) );
+                        .build()));
     }
 
 }

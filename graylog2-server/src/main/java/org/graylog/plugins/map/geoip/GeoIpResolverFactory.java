@@ -21,7 +21,7 @@ import com.codahale.metrics.Timer;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 /**
  * A factory to create ASN and Location {@link GeoIpResolver} resolvers based on the {@link DatabaseVendorType} contained in

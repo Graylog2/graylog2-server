@@ -35,7 +35,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -195,14 +196,14 @@ public class StreamRouterEngineTest {
     public void testInvertedContainsMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
         final StreamRuleMock rule = new StreamRuleMock(
-            ImmutableMap.<String, Object>builder()
-                .put("_id", new ObjectId())
-                .put("field", "testfield")
-                .put("inverted", true)
-                .put("value", "testvalue")
-                .put("type", StreamRuleType.CONTAINS.toInteger())
-                .put("stream_id", stream.getId())
-                .build()
+                ImmutableMap.<String, Object>builder()
+                        .put("_id", new ObjectId())
+                        .put("field", "testfield")
+                        .put("inverted", true)
+                        .put("value", "testvalue")
+                        .put("type", StreamRuleType.CONTAINS.toInteger())
+                        .put("stream_id", stream.getId())
+                        .build()
         );
 
         stream.setStreamRules(Lists.newArrayList(rule));

@@ -24,7 +24,7 @@ import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.plugin.Version;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;

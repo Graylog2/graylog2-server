@@ -25,8 +25,9 @@ import okhttp3.OkHttpClient.Builder;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustAllX509TrustManager;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;

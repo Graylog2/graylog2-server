@@ -27,7 +27,8 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -80,14 +81,14 @@ public class KinesisPayloadDecoder {
         if (awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS || awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_RAW) {
             final CloudWatchLogSubscriptionData logSubscriptionData = decompressCloudWatchMessages(payloadBytes, objectMapper);
             return logSubscriptionData.logEvents().stream()
-                                      .map(le -> {
-                                          DateTime timestamp = new DateTime(le.timestamp(), DateTimeZone.UTC);
-                                          return KinesisLogEntry.create(kinesisStream,
-                                                                        // Use the log group and stream returned from CloudWatch.
-                                                                        logSubscriptionData.logGroup(),
-                                                                        logSubscriptionData.logStream(), timestamp, le.message());
-                                      })
-                                      .collect(Collectors.toList());
+                    .map(le -> {
+                        DateTime timestamp = new DateTime(le.timestamp(), DateTimeZone.UTC);
+                        return KinesisLogEntry.create(kinesisStream,
+                                // Use the log group and stream returned from CloudWatch.
+                                logSubscriptionData.logGroup(),
+                                logSubscriptionData.logStream(), timestamp, le.message());
+                    })
+                    .collect(Collectors.toList());
         } else if (awsMessageType == AWSMessageType.KINESIS_RAW) {
             // The best timestamp available is the approximate arrival time of the message to the Kinesis stream.
             final DateTime timestamp = new DateTime(approximateArrivalTimestamp.toEpochMilli(), DateTimeZone.UTC);

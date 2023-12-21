@@ -31,7 +31,9 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.nio.charset.StandardCharsets;
 
 @Codec(name = "raw", displayName = "Raw String")

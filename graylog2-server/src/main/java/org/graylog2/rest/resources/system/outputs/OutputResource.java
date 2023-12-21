@@ -40,7 +40,7 @@ import org.graylog2.streams.OutputService;
 import org.graylog2.utilities.ConfigurationMapConverter;
 import org.joda.time.DateTime;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;

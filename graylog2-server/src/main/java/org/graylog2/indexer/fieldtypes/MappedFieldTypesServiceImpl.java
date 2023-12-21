@@ -24,7 +24,8 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;

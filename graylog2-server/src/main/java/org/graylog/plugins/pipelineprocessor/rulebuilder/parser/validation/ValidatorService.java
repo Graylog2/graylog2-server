@@ -24,8 +24,9 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

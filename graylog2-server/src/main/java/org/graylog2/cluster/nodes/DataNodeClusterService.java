@@ -19,7 +19,7 @@ package org.graylog2.cluster.nodes;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class DataNodeClusterService extends AbstractNodeService<DataNodeEntity, DataNodeDto> {
 

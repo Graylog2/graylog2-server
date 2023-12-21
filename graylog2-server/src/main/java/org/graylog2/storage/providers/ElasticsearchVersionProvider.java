@@ -24,10 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -66,10 +68,10 @@ public class ElasticsearchVersionProvider implements Provider<SearchVersion> {
 
         try {
             return this.cachedVersion.get(() -> {
-                final Optional<SearchVersion> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
-                probedVersion.ifPresent(version -> LOG.info("Elasticsearch cluster is running " + version));
-                return probedVersion;
-            })
+                        final Optional<SearchVersion> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
+                        probedVersion.ifPresent(version -> LOG.info("Elasticsearch cluster is running " + version));
+                        return probedVersion;
+                    })
                     .orElseThrow(() -> new ElasticsearchProbeException(NO_HOST_REACHABLE_ERROR + "!"));
         } catch (ExecutionException | InterruptedException e) {
             throw new ElasticsearchProbeException(NO_HOST_REACHABLE_ERROR + ": ", e);

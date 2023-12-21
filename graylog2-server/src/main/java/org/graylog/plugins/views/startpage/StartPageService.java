@@ -34,7 +34,8 @@ import org.graylog2.rest.models.PaginatedResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -108,7 +109,7 @@ public class StartPageService {
         final var type = view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
         final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
         final var item = new LastOpenedDTO(grnRegistry.newGRN(type, view.id()), DateTime.now(DateTimeZone.UTC));
-        if(lastOpenedItems.isPresent()) {
+        if (lastOpenedItems.isPresent()) {
             var loi = lastOpenedItems.get();
             var items = filterForExistingIdAndCapAtMaximum(loi, item.grn(), MAXIMUM_LAST_OPENED_PER_USER);
             loi.items().clear();

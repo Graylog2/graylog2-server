@@ -30,8 +30,8 @@ import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

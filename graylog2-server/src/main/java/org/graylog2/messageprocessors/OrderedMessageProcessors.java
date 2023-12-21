@@ -28,7 +28,8 @@ import org.graylog2.utilities.LenientExplicitOrdering;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -77,7 +78,7 @@ public class OrderedMessageProcessors implements Iterable<MessageProcessor> {
 
         final Collection<MessageProcessor> enabledMessageProcessors =
                 Collections2.filter(sortedCopy,
-                                    mp -> config == null || !config.disabledProcessors().contains(mp.getClass().getCanonicalName()));
+                        mp -> config == null || !config.disabledProcessors().contains(mp.getClass().getCanonicalName()));
         LOG.debug("New active message processors: {}", enabledMessageProcessors);
         sortedProcessors.set(ImmutableList.copyOf(enabledMessageProcessors));
     }

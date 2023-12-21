@@ -21,8 +21,9 @@ import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.messageq.AbstractMessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.Optional;
 

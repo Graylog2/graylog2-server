@@ -26,7 +26,8 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserAndTeamsConfig;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;

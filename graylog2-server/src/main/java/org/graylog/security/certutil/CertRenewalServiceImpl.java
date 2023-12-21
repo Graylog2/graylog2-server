@@ -38,9 +38,10 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -151,11 +152,11 @@ public class CertRenewalServiceImpl implements CertRenewalService {
     protected void checkCaCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
         try {
             final var keystore = caService.loadKeyStore();
-            if(keystore.isPresent()) {
+            if (keystore.isPresent()) {
                 final var ks = keystore.get();
                 final var nextRenewal = getNextRenewal();
                 final var caCert = ks.getCertificate(CA_KEY_ALIAS);
-                if(needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
+                if (needsRenewal(nextRenewal, renewalPolicy, (X509Certificate) caCert)) {
                     notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL, "ca cert");
                 }
             }
@@ -174,7 +175,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     private Optional<X509Certificate> getCertificateForNode(KeyStore keyStore) {
         try {
-            return Optional.of((X509Certificate)keyStore.getCertificate(CertConstants.DATANODE_KEY_ALIAS));
+            return Optional.of((X509Certificate) keyStore.getCertificate(CertConstants.DATANODE_KEY_ALIAS));
         } catch (KeyStoreException e) {
             return Optional.empty();
         }
@@ -186,7 +187,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
         return activeDataNodes.values().stream().map(node -> {
             final var keystore = loadKeyStoreForNode(node);
             final var certificate = keystore.flatMap(this::getCertificateForNode);
-            if(certificate.isPresent() && needsRenewal(nextRenewal, renewalPolicy, certificate.get())) {
+            if (certificate.isPresent() && needsRenewal(nextRenewal, renewalPolicy, certificate.get())) {
                 return node;
             }
             return null;
@@ -243,24 +244,24 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     private void notifyManualRenewalForNode(final List<DataNodeDto> nodes) {
         final var key = String.join(",", nodes.stream().map(Node::getNodeId).toList());
-        if(!notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)) {
+        if (!notificationService.isFirst(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)) {
             notificationService.fixed(Notification.Type.CERTIFICATE_NEEDS_RENEWAL);
         }
         Notification notification = notificationService.buildNow()
-                    .addType(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)
-                    .addSeverity(Notification.Severity.URGENT)
-                    .addKey(key)
-                    .addDetail("nodes", key);
+                .addType(Notification.Type.CERTIFICATE_NEEDS_RENEWAL)
+                .addSeverity(Notification.Severity.URGENT)
+                .addKey(key)
+                .addDetail("nodes", key);
         notificationService.publishIfFirst(notification);
     }
 
     protected void checkDataNodesCertificatesForRenewal(final RenewalPolicy renewalPolicy) {
         final var nodes = findNodesThatNeedCertificateRenewal(renewalPolicy);
-        if(nodes.isEmpty()) {
+        if (nodes.isEmpty()) {
             return;
         }
 
-        if(RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
+        if (RenewalPolicy.Mode.AUTOMATIC.equals(renewalPolicy.mode())) {
             nodes.forEach(node -> initiateRenewalForNode(node.getNodeId()));
         } else {
             notifyManualRenewalForNode(nodes);

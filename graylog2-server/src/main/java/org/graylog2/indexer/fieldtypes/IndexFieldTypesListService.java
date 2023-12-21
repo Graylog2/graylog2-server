@@ -31,7 +31,8 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.jetbrains.annotations.NotNull;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;

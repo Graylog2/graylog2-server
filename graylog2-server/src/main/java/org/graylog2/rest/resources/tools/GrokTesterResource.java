@@ -30,7 +30,7 @@ import org.graylog2.rest.models.tools.requests.GrokTestRequest;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;

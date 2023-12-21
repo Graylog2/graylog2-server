@@ -20,7 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 

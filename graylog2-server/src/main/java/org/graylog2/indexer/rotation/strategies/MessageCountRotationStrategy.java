@@ -27,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.text.MessageFormat;
 import java.util.Locale;
 
@@ -67,11 +69,11 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
             final boolean shouldRotate = numberOfMessages > config.maxDocsPerIndex();
             final MessageFormat format = shouldRotate ?
                     new MessageFormat(
-                    "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",
-                    Locale.ENGLISH) :
+                            "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",
+                            Locale.ENGLISH) :
                     new MessageFormat(
-                    "Number of messages in <{0}> ({1}) is lower than the limit ({2}). Not doing anything.",
-                    Locale.ENGLISH);
+                            "Number of messages in <{0}> ({1}) is lower than the limit ({2}). Not doing anything.",
+                            Locale.ENGLISH);
             String message = format.format(new Object[]{index, numberOfMessages, config.maxDocsPerIndex()});
             return createResult(shouldRotate, message);
         } catch (IndexNotFoundException e) {

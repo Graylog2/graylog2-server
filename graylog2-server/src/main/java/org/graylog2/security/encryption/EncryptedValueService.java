@@ -20,9 +20,11 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.graylog2.security.AESTools;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.security.GeneralSecurityException;
 
 import static com.google.common.base.Preconditions.checkArgument;

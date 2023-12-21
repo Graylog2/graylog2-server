@@ -27,8 +27,8 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteDeflectorResource;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;

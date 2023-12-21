@@ -20,7 +20,7 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog2.plugin.Version;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

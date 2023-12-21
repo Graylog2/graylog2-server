@@ -20,7 +20,8 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.security.UserContext;
 import org.graylog2.rest.models.system.SystemJobSummary;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;

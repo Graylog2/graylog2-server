@@ -20,7 +20,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.Message;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.Map;
 import java.util.Optional;
 

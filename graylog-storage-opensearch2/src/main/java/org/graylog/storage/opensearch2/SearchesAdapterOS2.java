@@ -36,7 +36,8 @@ import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -131,8 +132,8 @@ public class SearchesAdapterOS2 implements SearchesAdapter {
 
     private List<ResultMessage> extractResultMessages(SearchResponse searchResult) {
         return Streams.stream(searchResult.getHits())
-                    .map(hit -> ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
-                    .collect(Collectors.toList());
+                .map(hit -> ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
+                .collect(Collectors.toList());
     }
 
     @Override

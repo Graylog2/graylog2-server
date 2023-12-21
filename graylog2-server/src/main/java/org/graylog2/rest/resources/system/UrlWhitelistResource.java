@@ -35,7 +35,7 @@ import org.graylog2.system.urlwhitelist.RegexHelper;
 import org.graylog2.system.urlwhitelist.UrlWhitelist;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

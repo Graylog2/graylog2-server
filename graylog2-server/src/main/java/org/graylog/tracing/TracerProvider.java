@@ -19,8 +19,8 @@ package org.graylog.tracing;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 /**
  * Relies on the opentelemetry javaagent to provide an implementation of a tracer. If the javaagent is not present,

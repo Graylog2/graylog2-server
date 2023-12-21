@@ -30,7 +30,7 @@ import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;

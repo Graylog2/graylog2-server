@@ -25,7 +25,8 @@ import org.graylog2.inputs.encryption.EncryptedInputConfigMigration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.inputs.MessageInputFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;

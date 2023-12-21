@@ -28,7 +28,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -82,8 +83,7 @@ public class ArrayContains extends AbstractArrayFunction<Boolean> {
                 final Number number = ((NumericNode) element).numberValue();
                 if (value.equals(number.intValue())) {
                     return true;
-                }
-                else if (value.equals(number.longValue())) {
+                } else if (value.equals(number.longValue())) {
                     return true;
                 }
             } else if (element instanceof JsonNode) {

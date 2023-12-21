@@ -25,7 +25,8 @@ import org.graylog2.inputs.transports.netty.EventLoopGroupProvider;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.transports.Transport;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 

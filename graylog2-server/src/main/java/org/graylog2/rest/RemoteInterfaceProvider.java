@@ -27,8 +27,9 @@ import org.graylog2.security.realm.SessionAuthenticator;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.time.Duration;
 
 public class RemoteInterfaceProvider {
@@ -40,8 +41,8 @@ public class RemoteInterfaceProvider {
     public RemoteInterfaceProvider(ObjectMapper objectMapper,
                                    OkHttpClient okHttpClient,
                                    @Named("proxied_requests_default_call_timeout")
-                                       com.github.joschi.jadconfig.util.Duration defaultProxyTimeout
-                                   ) {
+                                   com.github.joschi.jadconfig.util.Duration defaultProxyTimeout
+    ) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
         this.defaultProxyTimeout = Duration.ofMillis(defaultProxyTimeout.toMilliseconds());
@@ -82,6 +83,7 @@ public class RemoteInterfaceProvider {
 
         return retrofit.create(interfaceClass);
     }
+
     public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
         return get(node, authorizationToken, interfaceClass, defaultProxyTimeout);
     }

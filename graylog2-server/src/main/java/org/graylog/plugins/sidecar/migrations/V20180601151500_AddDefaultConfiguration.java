@@ -22,13 +22,14 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 public class V20180601151500_AddDefaultConfiguration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20180601151500_AddDefaultConfiguration.class);
 
-     private final ClusterConfigService clusterConfigService;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public V20180601151500_AddDefaultConfiguration(ClusterConfigService clusterConfigService) {

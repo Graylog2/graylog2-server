@@ -20,7 +20,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.GlobalMetricNames;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class TrafficAccounting {
     private final Counter outputByteCounter;

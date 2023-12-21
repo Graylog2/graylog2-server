@@ -54,7 +54,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -167,13 +168,11 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 if (EntityDescriptorIds.isSystemStreamDescriptor(descriptor)) {
                     try {
                         streams.add(streamService.load(descriptor.id().id()));
-                    }
-                    catch (NotFoundException e) {
+                    } catch (NotFoundException e) {
                         LOG.warn("Default stream {} not found!", descriptor.id().id(), e);
                         throw new MissingNativeEntityException(descriptor);
                     }
-                }
-                else {
+                } else {
                     throw new MissingNativeEntityException(descriptor);
                 }
             }

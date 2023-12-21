@@ -26,7 +26,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;

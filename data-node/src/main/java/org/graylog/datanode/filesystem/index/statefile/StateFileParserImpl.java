@@ -31,7 +31,8 @@ import org.graylog.shaded.opensearch2.org.apache.lucene.store.IndexInput;
 import org.graylog.shaded.opensearch2.org.opensearch.common.lucene.store.InputStreamIndexInput;
 import org.graylog2.jackson.TypeReferences;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;

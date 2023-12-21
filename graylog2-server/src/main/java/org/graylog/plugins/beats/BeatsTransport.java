@@ -33,7 +33,8 @@ import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 

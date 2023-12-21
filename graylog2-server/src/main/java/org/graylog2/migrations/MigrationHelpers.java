@@ -30,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -122,7 +124,7 @@ public class MigrationHelpers {
 
     @Nullable
     public String ensureUserHelper(String userName, String password, String firstName, String lastName, String email,
-                             Set<String> expectedRoles, boolean isServiceAccount) {
+                                   Set<String> expectedRoles, boolean isServiceAccount) {
         User previousUser = null;
         try {
             previousUser = userService.load(userName);

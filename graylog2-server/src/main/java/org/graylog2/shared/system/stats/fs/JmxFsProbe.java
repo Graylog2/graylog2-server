@@ -20,7 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;

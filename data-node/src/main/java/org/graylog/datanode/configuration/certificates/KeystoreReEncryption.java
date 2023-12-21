@@ -21,8 +21,9 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.SmartKeystoreStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreLocation;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.security.KeyStore;
 import java.util.Optional;
 

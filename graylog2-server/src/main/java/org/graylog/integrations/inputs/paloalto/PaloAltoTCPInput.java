@@ -30,7 +30,7 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog.integrations.inputs.paloalto.PaloAltoCodec.CK_SYSTEM_TEMPLATE;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoCodec.CK_THREAT_TEMPLATE;

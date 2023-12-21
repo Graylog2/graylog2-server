@@ -25,7 +25,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -66,7 +67,7 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
         // The default index set must have been created first.
         checkState(clusterConfigService.get(DefaultIndexSetCreated.class) != null, "The default index set hasn't been created yet. This is a bug!");
 
-        final IndexSetConfig defaultIndexSet= indexSetService.getDefault();
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         migrateIndexSet(defaultIndexSet, elasticsearchConfiguration.getDefaultIndexTemplateName());
 
         final List<IndexSetConfig> allWithoutDefault = indexSetService.findAll()

@@ -43,7 +43,7 @@ import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;

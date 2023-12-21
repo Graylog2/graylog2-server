@@ -33,7 +33,8 @@ import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 import oshi.util.tuples.Pair;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;

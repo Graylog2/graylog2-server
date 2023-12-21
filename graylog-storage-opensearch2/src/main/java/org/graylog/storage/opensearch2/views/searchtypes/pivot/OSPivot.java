@@ -42,7 +42,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;

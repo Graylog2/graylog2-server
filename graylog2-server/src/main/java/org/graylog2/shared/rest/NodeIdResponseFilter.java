@@ -18,7 +18,7 @@ package org.graylog2.shared.rest;
 
 import org.graylog2.plugin.system.NodeId;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;

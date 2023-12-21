@@ -19,8 +19,9 @@ package org.graylog.events.processor.storage;
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.event.EventWithContext;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.Map;
 

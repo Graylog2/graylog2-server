@@ -28,7 +28,7 @@ import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestrictToLeader;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;

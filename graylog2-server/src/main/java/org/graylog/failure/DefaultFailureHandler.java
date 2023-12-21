@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexFailureService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A fallback failure handler, which persists submitted failures in Mongo via {@link IndexFailureService}.

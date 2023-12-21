@@ -38,7 +38,8 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;

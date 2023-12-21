@@ -25,7 +25,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Composable
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog2.indexer.indices.Template;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 
 public class ComposableIndexTemplateAdapter implements IndexTemplateAdapter {

@@ -30,7 +30,8 @@ import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +45,6 @@ import java.util.stream.Collectors;
  * At the moment this is only the COMMONAPACHELOG pattern, but if we find more issues with the default patterns we
  * <em>should</em> be able to adjust this migration by adding more patterns instead of having to write additional
  * migrations.
- *
  */
 public class V20191121145100_FixDefaultGrokPatterns extends Migration {
     private static final Logger log = LoggerFactory.getLogger(V20191121145100_FixDefaultGrokPatterns.class);
@@ -54,11 +54,11 @@ public class V20191121145100_FixDefaultGrokPatterns extends Migration {
 
     @VisibleForTesting
     static final List<PatternToMigrate> patternsToMigrate = ImmutableList.of(
-        PatternToMigrate.builder()
-                      .name("COMMONAPACHELOG")
-                      .migrateFrom("%{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)")
-                      .migrateTo("%{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp;date;dd/MMM/yyyy:HH:mm:ss Z}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)")
-                      .build()
+            PatternToMigrate.builder()
+                    .name("COMMONAPACHELOG")
+                    .migrateFrom("%{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)")
+                    .migrateTo("%{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp;date;dd/MMM/yyyy:HH:mm:ss Z}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)")
+                    .build()
     );
 
     @Inject
@@ -132,7 +132,9 @@ public class V20191121145100_FixDefaultGrokPatterns extends Migration {
     @AutoValue
     public static abstract class PatternToMigrate {
         public abstract String name();
+
         public abstract String migrateFrom();
+
         public abstract String migrateTo();
 
         public static Builder builder() {
@@ -142,8 +144,11 @@ public class V20191121145100_FixDefaultGrokPatterns extends Migration {
         @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder name(String name);
+
             public abstract Builder migrateFrom(String migrateFrom);
+
             public abstract Builder migrateTo(String migrateTo);
+
             public abstract PatternToMigrate build();
         }
     }

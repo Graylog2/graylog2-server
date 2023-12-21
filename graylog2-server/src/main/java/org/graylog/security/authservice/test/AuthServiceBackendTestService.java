@@ -21,7 +21,8 @@ import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.DBAuthServiceBackendService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 

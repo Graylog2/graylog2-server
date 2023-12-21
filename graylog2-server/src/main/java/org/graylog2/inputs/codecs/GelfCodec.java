@@ -44,7 +44,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -64,8 +66,8 @@ public class GelfCodec extends AbstractCodec {
         super(configuration);
         this.aggregator = aggregator;
         this.objectMapper = new ObjectMapper().enable(
-            JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
-            JsonParser.Feature.ALLOW_TRAILING_COMMA);
+                JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
+                JsonParser.Feature.ALLOW_TRAILING_COMMA);
         this.decompressSizeLimit = configuration.getInt(CK_DECOMPRESS_SIZE_LIMIT, DEFAULT_DECOMPRESS_SIZE_LIMIT);
     }
 
@@ -303,11 +305,11 @@ public class GelfCodec extends AbstractCodec {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest requestedConfiguration = super.getRequestedConfiguration();
             requestedConfiguration.addField(new NumberField(
-                CK_DECOMPRESS_SIZE_LIMIT,
-                "Decompressed size limit",
-                DEFAULT_DECOMPRESS_SIZE_LIMIT,
-                "The maximum number of bytes after decompression.",
-                ConfigurationField.Optional.OPTIONAL));
+                    CK_DECOMPRESS_SIZE_LIMIT,
+                    "Decompressed size limit",
+                    DEFAULT_DECOMPRESS_SIZE_LIMIT,
+                    "The maximum number of bytes after decompression.",
+                    ConfigurationField.Optional.OPTIONAL));
 
             return requestedConfiguration;
         }

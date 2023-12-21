@@ -34,7 +34,8 @@ import org.graylog2.users.events.UserDeletedEvent;
 import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> {
