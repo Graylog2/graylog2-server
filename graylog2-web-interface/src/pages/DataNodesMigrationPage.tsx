@@ -20,6 +20,7 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
+import MigrationWizard from 'components/datanode/migrations/MigrationWizard';
 
 const DataNodesMigrationPage = () => (
   <DocumentTitle title="Data Nodes Migration">
@@ -35,7 +36,7 @@ const DataNodesMigrationPage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        TODO: Migration Component
+        <MigrationWizard />
       </Col>
     </Row>
   </DocumentTitle>
