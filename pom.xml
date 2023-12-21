@@ -771,7 +771,7 @@
                             org.junit.jupiter.params.shadow.**
                             org.apache.http.util.**
 
-                            @defaultMessage Prefer using jakarta.inject.
+                            @defaultMessage Use jakarta.inject.
                             com.google.inject.Inject
                             com.google.inject.Scope
                             com.google.inject.Singleton
@@ -779,7 +779,9 @@
                             com.google.inject.name.Named
                             javax.inject.**
 
-                            @defaultMessage Use jakarta.annotation.* instead
+                            javax.persistence.** @ Use jakarta.persistence.
+
+                            @defaultMessage Use jakarta.annotation.
                             javax.annotation.sql.**
                             javax.annotation.security.**
                             javax.annotation.Resources
