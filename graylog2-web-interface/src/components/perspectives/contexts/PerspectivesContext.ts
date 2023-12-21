@@ -20,7 +20,7 @@ import { singleton } from 'logic/singleton';
 import type { Perspective } from 'components/perspectives/types';
 
 type PerspectivesContextType = {
-  activePerspective: string,
+  activePerspective: Perspective,
   availablePerspectives: Array<Perspective>
   setActivePerspective: (perspectiveId: string) => void
 }

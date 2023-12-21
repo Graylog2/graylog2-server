@@ -15,16 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type * as React from 'react';
+import React from 'react';
 
-export type Perspective = {
-  id: string,
-  title: string,
-  welcomeRoute: string,
-  brandComponent: React.ComponentType<{
-    className?: string,
-    disabled?: boolean,
-    href?: string,
-  }>,
-  useCondition?: () => boolean
-}
+export const defaultPerspective = {
+  id: 'default',
+  title: 'Default Perspective',
+  brandComponent: () => <div>Default perspective</div>,
+  welcomeRoute: '',
+};
+
+export const examplePerspective = {
+  id: 'example-perspective',
+  title: 'Example Perspective',
+  brandComponent: () => <div />,
+  welcomeRoute: '',
+};
+
+export const unavailablePerspective = {
+  id: 'unavailable-perspective',
+  title: 'Unavailable Perspective',
+  brandComponent: () => <div />,
+  welcomeRoute: '',
+  useCondition: () => false,
+};
