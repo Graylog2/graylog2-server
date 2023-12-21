@@ -103,7 +103,7 @@
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.2</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
-        <byte-buddy.version>1.14.10</byte-buddy.version>
+        <byte-buddy.version>1.14.11</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.165</classgraph.version>
@@ -469,7 +469,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.12.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
