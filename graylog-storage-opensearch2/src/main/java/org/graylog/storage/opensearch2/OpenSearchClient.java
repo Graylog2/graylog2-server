@@ -99,6 +99,10 @@ public class OpenSearchClient {
         return execute((c, requestOptions) -> c.search(searchRequest, requestOptions), errorMessage);
     }
 
+    public org.opensearch.client.opensearch.core.SearchResponse<IndexedMessage> singleSearch(org.opensearch.client.opensearch.core.SearchRequest searchRequest, String errorMessage) {
+        return execute(c -> c.search(searchRequest, IndexedMessage.class), errorMessage);
+    }
+
     public List<MultiSearchResponse.Item> msearch(List<SearchRequest> searchRequests, String errorMessage) {
         var multiSearchRequest = new MultiSearchRequest();
 

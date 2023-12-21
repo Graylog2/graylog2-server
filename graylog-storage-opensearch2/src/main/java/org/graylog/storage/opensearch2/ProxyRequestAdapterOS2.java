@@ -16,12 +16,13 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.opensearch2.org.apache.http.entity.ContentType;
-import org.graylog.shaded.opensearch2.org.apache.http.entity.InputStreamEntity;
-import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.opensearch.client.Request;
+import org.opensearch.client.ResponseException;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 
 import jakarta.inject.Inject;
 
@@ -29,10 +30,12 @@ import java.io.IOException;
 
 public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
     private final OpenSearchClient client;
+    private final RestClient restClient;
 
     @Inject
-    public ProxyRequestAdapterOS2(OpenSearchClient openSearchClient) {
+    public ProxyRequestAdapterOS2(OpenSearchClient openSearchClient, RestClient restClient) {
         this.client = openSearchClient;
+        this.restClient = restClient;
     }
 
     @Override
@@ -41,11 +44,7 @@ public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
         osRequest.setEntity(new InputStreamEntity(request.body(), ContentType.APPLICATION_JSON));
 
         try {
-            final var osResponse = client.execute((c, requestOptions) -> {
-                osRequest.setOptions(requestOptions);
-
-                return c.getLowLevelClient().performRequest(osRequest);
-            }, "Unable to proxy request to data node");
+            final var osResponse = client.execute(() -> restClient.performRequest(osRequest), "Unable to proxy request to data node");
 
             return new ProxyResponse(osResponse.getStatusLine().getStatusCode(), osResponse.getEntity().getContent());
         } catch (OpenSearchException openSearchException) {

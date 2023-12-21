@@ -74,7 +74,7 @@ public class SearchRequestFactory {
                 : queryStringQuery(query).allowLeadingWildcard(allowLeadingWildcardSearches);
 
         final Optional<BoolQueryBuilder> rangeQueryBuilder = searchCommand.range()
-                .map(TimeRangeQueryFactory::create)
+                .map(LegacyTimeRangeQueryFactory::create)
                 .map(rangeQuery -> boolQuery().must(rangeQuery));
         final Optional<BoolQueryBuilder> filterQueryBuilder = searchCommand.filter()
                 .filter(filter -> !isWildcardQuery(filter))
