@@ -37,6 +37,7 @@ import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.opensearch.client.RestClient;
 import org.opensearch.client.opensearch.core.MsearchRequest;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
@@ -64,6 +65,7 @@ public class OpenSearchClient {
 
     private final RestHighLevelClient client;
     private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
+    private final RestClient restClient;
     private final boolean compressionEnabled;
     private final Optional<Integer> indexerMaxConcurrentSearches;
     private final Optional<Integer> indexerMaxConcurrentShardRequests;
@@ -72,12 +74,14 @@ public class OpenSearchClient {
     @Inject
     public OpenSearchClient(RestHighLevelClient client,
                             org.opensearch.client.opensearch.OpenSearchClient openSearchClient,
+                            RestClient restClient,
                             @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
                             @Named("indexer_max_concurrent_searches") @Nullable Integer indexerMaxConcurrentSearches,
                             @Named("indexer_max_concurrent_shard_requests") @Nullable Integer indexerMaxConcurrentShardRequests,
                             ObjectMapper objectMapper) {
         this.client = client;
         this.openSearchClient = openSearchClient;
+        this.restClient = restClient;
         this.compressionEnabled = compressionEnabled;
         this.indexerMaxConcurrentSearches = Optional.ofNullable(indexerMaxConcurrentSearches);
         this.indexerMaxConcurrentShardRequests = Optional.ofNullable(indexerMaxConcurrentShardRequests);
@@ -85,8 +89,8 @@ public class OpenSearchClient {
     }
 
     @VisibleForTesting
-    public OpenSearchClient(RestHighLevelClient client, org.opensearch.client.opensearch.OpenSearchClient openSearchClient, ObjectMapper objectMapper) {
-        this(client, openSearchClient, false, null, null, objectMapper);
+    public OpenSearchClient(RestHighLevelClient client, org.opensearch.client.opensearch.OpenSearchClient openSearchClient, RestClient restClient, ObjectMapper objectMapper) {
+        this(client, openSearchClient, restClient, false, null, null, objectMapper);
     }
 
     public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
@@ -155,7 +159,7 @@ public class OpenSearchClient {
     @WithSpan
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) {
         try {
-            return fn.apply(client, requestOptions());
+            return fn.apply(client, legacyRequestOptions());
         } catch (Exception e) {
             throw exceptionFrom(e, errorMessage);
         }
@@ -180,10 +184,18 @@ public class OpenSearchClient {
             throw exceptionFrom(e, errorMessage);
         }
     }
+
+    public <R> R executeLowLevel(ThrowingBiFunction<RestClient, org.opensearch.client.RequestOptions, R, IOException> fn, String errorMessage) {
+        try {
+            return fn.apply(restClient, requestOptions());
+        } catch (Exception e) {
+            throw exceptionFrom(e, errorMessage);
+        }
+    }
     @WithSpan
     public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {
-            return fn.apply(client, requestOptions());
+            return fn.apply(client, legacyRequestOptions());
         } catch (IOException e) {
             if (e.getCause() instanceof ContentTooLongException) {
                 throw new BatchSizeTooLargeException(e.getMessage());
@@ -194,13 +206,22 @@ public class OpenSearchClient {
         }
     }
 
-    private RequestOptions requestOptions() {
+    private RequestOptions legacyRequestOptions() {
         return compressionEnabled
                 ? RequestOptions.DEFAULT.toBuilder()
                 .addHeader("Accept-Encoding", "gzip")
                 .addHeader("Content-type", "application/json")
                 .build()
                 : RequestOptions.DEFAULT;
+    }
+
+    private org.opensearch.client.RequestOptions requestOptions() {
+        return compressionEnabled
+                ? org.opensearch.client.RequestOptions.DEFAULT.toBuilder()
+                .addHeader("Accept-Encoding", "gzip")
+                .addHeader("Content-type", "application/json")
+                .build()
+                : org.opensearch.client.RequestOptions.DEFAULT;
     }
 
     private OpenSearchException exceptionFrom(Exception e, String errorMessage) {
