@@ -38,14 +38,6 @@ import SearchActions from './SearchActions';
 import BulkActions from '../BulkActions';
 import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from '../Constants';
 
-const renderBulkActions = (
-  selectedSavedSearchIds: Array<string>,
-  setSelectedSavedSearchIds: (streamIds: Array<string>) => void,
-) => (
-  <BulkActions selectedSavedSearchIds={selectedSavedSearchIds}
-               setSelectedSavedSearchIds={setSelectedSavedSearchIds} />
-);
-
 type Props = {
   activeSavedSearchId: string,
   deleteSavedSearch: (view: View) => Promise<View>,
@@ -152,7 +144,7 @@ const SavedSearchesOverview = ({
                                visibleColumns={layoutConfig.displayedAttributes}
                                columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                onColumnsChange={onColumnsChange}
-                               bulkSelection={{ actions: renderBulkActions }}
+                               bulkSelection={{ actions: <BulkActions /> }}
                                onSortChange={onSortChange}
                                activeSort={layoutConfig.sort}
                                pageSize={searchParams.pageSize}

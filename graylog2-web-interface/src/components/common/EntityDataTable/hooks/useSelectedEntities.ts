@@ -14,22 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useContext } from 'react';
 
-import type { SetStateAction } from 'react';
-import { useCallback, useState } from 'react';
-import isFunction from 'lodash/isFunction';
+import BulkSelectContext from 'components/common/EntityDataTable/contexts/SelectEntitiesContext';
 
-const useSelectedEntities = <T>(initialSelection: Array<T>, onChangeSelection: (selectedEntities: Array<T>) => void): [Array<T>, (setSelectedEntitiesArgument: SetStateAction<Array<T>>) => void] => {
-  const [selectedEntities, setSelectedEntities] = useState<Array<T>>(initialSelection ?? []);
+const useSelectedEntities = () => {
+  const contextValue = useContext(BulkSelectContext);
 
-  const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<T>>) => {
-    const newState = isFunction(setSelectedEntitiesArgument) ? setSelectedEntitiesArgument(selectedEntities) : setSelectedEntitiesArgument;
+  if (!contextValue) {
+    throw new Error('useSelectedEntities hook needs to be used inside BulkSelectContext.Provider');
+  }
 
-    setSelectedEntities(newState);
-    if (onChangeSelection) onChangeSelection(newState);
-  }, [onChangeSelection, selectedEntities]);
-
-  return [selectedEntities, _setSelectedEntities];
+  return contextValue;
 };
 
 export default useSelectedEntities;
