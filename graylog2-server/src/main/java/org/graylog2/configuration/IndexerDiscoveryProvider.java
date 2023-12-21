@@ -29,18 +29,15 @@ import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -65,8 +62,8 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     @Inject
     public IndexerDiscoveryProvider(
             @Named("elasticsearch_hosts") List<URI> hosts,
-            @Named("elasticsearch_version_probe_attempts") int connectionAttempts,
-            @Named("elasticsearch_version_probe_delay") Duration delayBetweenAttempts,
+            @Named("datanode_startup_connection_attempts") int connectionAttempts,
+            @Named("datanode_startup_connection_delay") Duration delayBetweenAttempts,
             PreflightConfigService preflightConfigService,
             NodeService<DataNodeDto> nodeService) {
         this.hosts = hosts;
