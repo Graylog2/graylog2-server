@@ -116,4 +116,5 @@ public class IndexFieldTypeProfileResource extends RestResource {
     public void delete(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
         profileService.delete(profileId);
     }
+
 }

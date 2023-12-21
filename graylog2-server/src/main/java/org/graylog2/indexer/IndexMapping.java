@@ -37,6 +37,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     @Override
     public Template toTemplate(IndexSetConfig indexSetConfig, String indexPattern, Long order) {
+        //TODO: in next step, combine profile with customFieldMappings
         return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order, indexSetConfig.customFieldMappings());
     }
 

@@ -30,6 +30,7 @@ import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,6 +38,7 @@ import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.CUSTOM
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.ID_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.NAME_FIELD_NAME;
+import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 
 
 public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldTypeProfile> {
@@ -61,7 +63,14 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         this.db.createIndex(new BasicDBObject(IndexFieldTypeProfile.NAME_FIELD_NAME, 1), new BasicDBObject("unique", false));
     }
 
+    @Override
+    public IndexFieldTypeProfile save(final IndexFieldTypeProfile indexFieldTypeProfile) {
+        indexFieldTypeProfile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
+        return super.save(indexFieldTypeProfile);
+    }
+
     public boolean update(final String profileId, final IndexFieldTypeProfile updatedProfile) {
+        updatedProfile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
         final WriteResult<IndexFieldTypeProfile, ObjectId> writeResult = db.updateById(new ObjectId(profileId), updatedProfile);
         return writeResult.getN() > 0;
     }
@@ -76,13 +85,18 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
                 getSortBuilder(order, sortField),
                 page,
                 perPage);
-        final int total = paginated.grandTotal().orElse(0L).intValue();
         return PageListResponse.create("",
                 paginated,
                 sortField,
                 order,
                 ATTRIBUTES,
                 DEFAULTS);
+    }
+
+    private void checkFieldTypeCanBeChanged(final String fieldName) {
+        if (FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldName)) {
+            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS);
+        }
     }
 
 }
