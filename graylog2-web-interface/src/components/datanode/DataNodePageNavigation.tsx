@@ -21,9 +21,9 @@ import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
-  { title: 'Overview', path: Routes.SYSTEM.DATANODES.OVERVIEW, exactPathMatch: true },
-  { title: 'Monitoring & Management', path: Routes.SYSTEM.DATANODES.OVERVIEW },
-  { title: 'Migrations', path: Routes.SYSTEM.DATANODES.OVERVIEW },
+  { title: 'Data Nodes', path: Routes.SYSTEM.DATANODES.LIST, exactPathMatch: true },
+  { title: 'Cluster', path: Routes.SYSTEM.DATANODES.CLUSTER },
+  { title: 'Migration', path: Routes.SYSTEM.DATANODES.MIGRATION },
 ];
 
 const DataNodesPageNavigation = () => (

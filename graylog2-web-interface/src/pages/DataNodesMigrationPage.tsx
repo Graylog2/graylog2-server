@@ -20,26 +20,25 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
-import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
 
-const DataNodesPage = () => (
-  <DocumentTitle title="Data Nodes">
+const DataNodesMigrationPage = () => (
+  <DocumentTitle title="Data Nodes Migration">
     <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes"
+    <PageHeader title="Data Nodes Migration"
                 documentationLink={{
                   title: 'Data Nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
                 }}>
       <span>
-        Graylog data nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
+        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
       </span>
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        <DataNodeList />
+        TODO: Migration Component
       </Col>
     </Row>
   </DocumentTitle>
 );
 
-export default DataNodesPage;
+export default DataNodesMigrationPage;

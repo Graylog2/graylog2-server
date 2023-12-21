@@ -19,27 +19,27 @@ import React from 'react';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
+import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
-import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
 
-const DataNodesPage = () => (
-  <DocumentTitle title="Data Nodes">
+const DataNodesClusterPage = () => (
+  <DocumentTitle title="Data Nodes Cluster">
     <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes"
+    <PageHeader title="Data Nodes Cluster"
                 documentationLink={{
                   title: 'Data Nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
                 }}>
       <span>
-        Graylog data nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
+        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
       </span>
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        <DataNodeList />
+        <DataNodeConfiguration />
       </Col>
     </Row>
   </DocumentTitle>
 );
 
-export default DataNodesPage;
+export default DataNodesClusterPage;
