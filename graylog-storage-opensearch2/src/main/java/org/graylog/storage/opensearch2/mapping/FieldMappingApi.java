@@ -23,7 +23,6 @@ import com.google.common.collect.Streams;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
-import org.opensearch.client.RestClient;
 
 import javax.annotation.Nullable;
 
@@ -36,15 +35,12 @@ import java.util.stream.Collectors;
 public class FieldMappingApi {
     private final ObjectMapper objectMapper;
     private final OpenSearchClient client;
-    private final RestClient restClient;
 
     @Inject
     public FieldMappingApi(ObjectMapper objectMapper,
-                           OpenSearchClient client,
-                           RestClient restClient) {
+                           OpenSearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
-        this.restClient = restClient;
     }
 
     @AutoValue
@@ -59,8 +55,10 @@ public class FieldMappingApi {
     }
 
     public Map<String, FieldMapping> fieldTypes(String index) {
-        final JsonNode result = client.execute(() -> {
-            final Response response = restClient.performRequest(request(index));
+        final JsonNode result = client.executeLowLevel((restClient, requestOptions) -> {
+            final var request = request(index);
+            request.setOptions(requestOptions);
+            final Response response = restClient.performRequest(request);
             return objectMapper.readTree(response.getEntity().getContent());
         }, "Unable to retrieve field types of index " + index);
         final JsonNode fields = result.path(index).path("mappings").path("properties");

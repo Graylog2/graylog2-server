@@ -19,26 +19,23 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opensearch.client.Request;
-import org.opensearch.client.RestClient;
 
 import jakarta.inject.Inject;
 
 public class PlainJsonApi {
     private final ObjectMapper objectMapper;
     private final OpenSearchClient client;
-    private final RestClient restClient;
 
     @Inject
     public PlainJsonApi(ObjectMapper objectMapper,
-                        OpenSearchClient client,
-                        RestClient restClient) {
+                        OpenSearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
-        this.restClient = restClient;
     }
 
     public JsonNode perform(Request request, String errorMessage) {
-        return client.execute(() -> {
+        return client.executeLowLevel((restClient, requestOptions) -> {
+            request.setOptions(requestOptions);
             final var response = restClient.performRequest(request);
             return objectMapper.readTree(response.getEntity().getContent());
         }, errorMessage);

@@ -86,10 +86,10 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         RestHighLevelClient restHighLevelClient = buildRestHighLevelClient();
         final var objectMapper = new ObjectMapperProvider().get();
         final var restClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new OpenSearchClientProvider(restClient, objectMapper).get(), objectMapper);
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new OpenSearchClientProvider(restClient, objectMapper).get(), restClient, objectMapper);
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS2(openSearchClient, restClient);
+        adapters = new AdaptersOS2(openSearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         if (isFirstContainerStart) {
             afterContainerCreated();

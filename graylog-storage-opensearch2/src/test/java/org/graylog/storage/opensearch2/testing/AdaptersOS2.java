@@ -45,17 +45,14 @@ import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.opensearch.client.RestClient;
 
 public class AdaptersOS2 implements Adapters {
 
     private final OpenSearchClient client;
-    private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public AdaptersOS2(OpenSearchClient client, RestClient restClient) {
+    public AdaptersOS2(OpenSearchClient client) {
         this.client = client;
-        this.restClient = restClient;
         this.objectMapper = new ObjectMapperProvider().get();
     }
 
@@ -113,7 +110,7 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client, restClient), configuration, new StreamsForFieldRetrieverOS2(client));
+        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client), configuration, new StreamsForFieldRetrieverOS2(client));
     }
 
 }
