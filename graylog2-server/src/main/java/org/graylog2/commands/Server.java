@@ -166,7 +166,7 @@ public class Server extends ServerBootstrap {
     protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
-                new VersionAwareStorageModule(),
+                new VersionAwareStorageModule(configuration),
                 new ConfigurationModule(configuration),
                 new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
