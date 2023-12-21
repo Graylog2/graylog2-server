@@ -37,6 +37,9 @@ import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.opensearch.client.opensearch.core.MsearchRequest;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
+import org.opensearch.client.opensearch.core.msearch.RequestItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,6 +98,11 @@ public class OpenSearchClient {
         return firstResponseFrom(result, errorMessage);
     }
 
+    public MultiSearchResponseItem<IndexedMessage> search(MsearchRequest searchRequest, String errorMessage) {
+        final var result = execute(c -> c.msearch(searchRequest, IndexedMessage.class), errorMessage);
+        return result.responses().get(0);
+    }
+
     public SearchResponse singleSearch(SearchRequest searchRequest, String errorMessage) {
         return execute((c, requestOptions) -> c.search(searchRequest, requestOptions), errorMessage);
     }
@@ -116,6 +124,16 @@ public class OpenSearchClient {
 
         return Streams.stream(result)
                 .collect(Collectors.toList());
+    }
+
+    public List<MultiSearchResponseItem<IndexedMessage>> msearch2(List<RequestItem> msearchRequests, String errorMessage) {
+        final var result = execute(c -> c.msearch(builder -> {
+            indexerMaxConcurrentShardRequests.ifPresent(max -> builder.maxConcurrentShardRequests(Long.valueOf(max)));
+            indexerMaxConcurrentSearches.ifPresent(max -> builder.maxConcurrentSearches(Long.valueOf(max)));
+            return builder.searches(msearchRequests);
+        }, IndexedMessage.class), errorMessage);
+
+        return result.responses();
     }
 
     private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
