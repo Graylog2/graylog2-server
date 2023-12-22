@@ -43,6 +43,8 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserOverviewDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
@@ -77,6 +79,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Api(value = "System/Authentication/Services/Backends", description = "Manage authentication service backends")
 @RequiresAuthentication
 public class AuthServiceBackendsResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(AuthServiceBackendsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(UserOverviewDTO.FIELD_USERNAME, SearchQueryField.create(UserOverviewDTO.FIELD_USERNAME))
             .put(UserOverviewDTO.FIELD_FULL_NAME, SearchQueryField.create(UserOverviewDTO.FIELD_FULL_NAME))
@@ -113,7 +116,12 @@ public class AuthServiceBackendsResource extends RestResource {
         String type = null;
         final AuthServiceBackendDTO activeBackendConfig = globalAuthServiceConfig.getActiveBackendConfig().orElse(null);
         if (activeBackendConfig != null) {
-            type = activeBackendConfig.config().type();
+            try {
+                type = activeBackendConfig.config().type();
+            } catch (UnsupportedOperationException e) {
+                LOG.info("Ignoring stale auth backend configuration {}", activeBackendConfig.description());
+                type = null;
+            }
         }
         return toResponse(type);
     }
