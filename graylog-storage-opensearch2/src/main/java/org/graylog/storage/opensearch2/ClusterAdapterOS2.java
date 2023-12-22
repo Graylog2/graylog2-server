@@ -152,22 +152,30 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     @Override
     public Optional<String> nodeIdToName(String nodeId) {
         return nodeById(nodeId)
-                .map(org.opensearch.client.opensearch.nodes.info.NodeInfo::name);
+                .map(Node::name);
     }
 
     @Override
     public Optional<String> nodeIdToHostName(String nodeId) {
         return nodeById(nodeId)
-                .map(org.opensearch.client.opensearch.nodes.info.NodeInfo::host);
+                .map(Node::host);
     }
 
-    private Optional<org.opensearch.client.opensearch.nodes.info.NodeInfo> nodeById(String nodeId) {
+    record Node(String id, String name, String host) {}
+
+    private Optional<Node> nodeById(String nodeId) {
         if (Strings.isNullOrEmpty(nodeId)) {
             return Optional.empty();
         }
-        final var response = client.execute(c -> c.nodes().info(builder -> builder.nodeId(nodeId)), "Unable to retrieve node information for node id " + nodeId);
+        final var request = new Request("GET", "/_nodes/" + nodeId);
+        final var response = jsonApi.perform(request, "Unable to retrieve node information for node id " + nodeId);
 
-        return Optional.ofNullable(response.nodes().get(nodeId));
+        return Optional.ofNullable(response)
+                .map(r -> r.get("nodes"))
+                .filter(n -> !n.isMissingNode())
+                .map(n -> n.get(nodeId))
+                .filter(n -> !n.isMissingNode())
+                .map(n -> new Node(nodeId, n.get("name").asText(), n.get("host").asText()));
     }
 
     @Override
