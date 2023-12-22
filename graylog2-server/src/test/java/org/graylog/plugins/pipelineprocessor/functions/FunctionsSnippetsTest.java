@@ -410,7 +410,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IpAnonymize.NAME, new IpAnonymize());
 
         functions.put(StringArrayAdd.NAME, new StringArrayAdd());
-        functions.put(ArrayContains.NAME, new ArrayContains());
+        functions.put(ArrayContains.NAME, new ArrayContains(objectMapper));
         functions.put(ArrayRemove.NAME, new ArrayRemove());
 
         functionRegistry = new FunctionRegistry(functions);
@@ -427,6 +427,55 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void jsonpath() {
+        final String json = "{\n" +
+                "    \"store\": {\n" +
+                "        \"book\": [\n" +
+                "            {\n" +
+                "                \"category\": \"reference\",\n" +
+                "                \"author\": \"Nigel Rees\",\n" +
+                "                \"title\": \"Sayings of the Century\",\n" +
+                "                \"price\": 8.95\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"category\": \"fiction\",\n" +
+                "                \"author\": \"Evelyn Waugh\",\n" +
+                "                \"title\": \"Sword of Honour\",\n" +
+                "                \"price\": 12.99\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"category\": \"fiction\",\n" +
+                "                \"author\": \"Herman Melville\",\n" +
+                "                \"title\": \"Moby Dick\",\n" +
+                "                \"isbn\": \"0-553-21311-3\",\n" +
+                "                \"price\": 8.99\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"category\": \"fiction\",\n" +
+                "                \"author\": \"J. R. R. Tolkien\",\n" +
+                "                \"title\": \"The Lord of the Rings\",\n" +
+                "                \"isbn\": \"0-395-19395-8\",\n" +
+                "                \"price\": 22.99\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"bicycle\": {\n" +
+                "            \"color\": \"red\",\n" +
+                "            \"price\": 19.95\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"expensive\": 10\n" +
+                "}";
+
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule, new Message(json, "test", Tools.nowUTC()));
+
+        assertThat(message.hasField("author_first")).isTrue();
+        assertThat(message.getField("author_first")).isEqualTo("Nigel Rees");
+        assertThat(message.hasField("author_last")).isTrue();
+        assertThat(message.hasField("this_should_exist")).isTrue();
+    }
+
+    @Test
+    public void jsonpathFromMessageField() {
         final String json = "{\n" +
                 "    \"store\": {\n" +
                 "        \"book\": [\n" +
@@ -1543,16 +1592,31 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void arrayContains() {
+    public void arrayContains() throws IOException {
         final Rule rule = parser.parseRule(ruleForTest(), false);
-        final Message message = evaluateRule(rule);
-        assertThat(actionsTriggered.get()).isTrue();
-        assertThat(message).isNotNull();
-        assertThat(message.getField("contains_number")).isEqualTo(true);
-        assertThat(message.getField("does_not_contain_number")).isEqualTo(false);
-        assertThat(message.getField("contains_string")).isEqualTo(true);
-        assertThat(message.getField("contains_string_case_insensitive")).isEqualTo(true);
-        assertThat(message.getField("contains_string_case_sensitive")).isEqualTo(false);
+        final Message message = new Message("message", "source", DateTime.now(DateTimeZone.UTC));
+        try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
+            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+            message.addField("json_with_arrays", jsonString);
+            evaluateRule(rule, message);
+            assertThat(actionsTriggered.get()).isTrue();
+            assertThat(message).isNotNull();
+            assertThat(message.getField("contains_number")).isEqualTo(true);
+            assertThat(message.getField("does_not_contain_number")).isEqualTo(false);
+            assertThat(message.getField("contains_string")).isEqualTo(true);
+            assertThat(message.getField("contains_string_case_insensitive")).isEqualTo(true);
+            assertThat(message.getField("contains_string_case_sensitive")).isEqualTo(false);
+
+            assertThat(message.getField("path_array_strings_contains")).isEqualTo(true);
+            assertThat(message.getField("path_array_numbers_contains")).isEqualTo(true);
+            assertThat(message.getField("path_array_decimals_contains")).isEqualTo(true);
+            assertThat(message.getField("path_array_booleans_contains")).isEqualTo(true);
+
+            assertThat(message.getField("path_array_not_strings_contains")).isEqualTo(false);
+            assertThat(message.getField("path_array_not_numbers_contains")).isEqualTo(false);
+            assertThat(message.getField("path_array_not_decimals_contains")).isEqualTo(false);
+            assertThat(message.getField("path_array_not_booleans_contains")).isEqualTo(false);
+        }
     }
 
     @Test

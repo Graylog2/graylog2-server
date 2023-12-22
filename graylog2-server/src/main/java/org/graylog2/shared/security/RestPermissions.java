@@ -109,6 +109,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String METRICS_READALL = "metrics:readall";
     public static final String METRICS_READHISTORY = "metrics:readhistory";
     @Deprecated public static final String NODE_SHUTDOWN = "node:shutdown";
+    public static final String MONITORING_READ = "monitoring:read";
     public static final String NOTIFICATIONS_DELETE = "notifications:delete";
     public static final String NOTIFICATIONS_READ = "notifications:read";
     public static final String OUTPUTS_CREATE = "outputs:create";
@@ -164,6 +165,8 @@ public class RestPermissions implements PluginPermissions {
 
     public static final String DATANODE_REMOVE = "datanode:remove";
     public static final String DATANODE_RESET = "datanode:reset";
+    public static final String DATANODE_STOP = "datanode:stop";
+    public static final String DATANODE_START = "datanode:start";
 
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
@@ -194,6 +197,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DASHBOARDS_READ, ""))
             .add(create(DATANODE_REMOVE, ""))
             .add(create(DATANODE_RESET, ""))
+            .add(create(DATANODE_STOP, ""))
+            .add(create(DATANODE_START, ""))
             .add(create(DECORATORS_CREATE, ""))
             .add(create(DECORATORS_EDIT, ""))
             .add(create(DECORATORS_READ, ""))

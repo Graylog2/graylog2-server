@@ -39,7 +39,7 @@ type SearchExecution = {
   done: boolean,
 };
 
-type SearchJobResult = {
+export type SearchJobResult = {
   execution: SearchExecution,
   id: SearchJobId,
   owner: string,

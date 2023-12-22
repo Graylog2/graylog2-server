@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-const BackgroundColor = styled.div<{ $color: string }>(({ theme, $color }) => css`
+const BackgroundColor = styled.span<{ $color: string }>(({ theme, $color }) => css`
   background-color: ${$color};
   color: ${theme.utils.contrastingColor($color)};
   width: fit-content;

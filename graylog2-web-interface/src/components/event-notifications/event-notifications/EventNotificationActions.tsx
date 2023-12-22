@@ -31,6 +31,7 @@ import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
   isTestLoading: boolean,
@@ -40,6 +41,7 @@ type Props = {
 };
 
 const EventNotificationActions = ({ isTestLoading, notification, refetchEventNotification, onTest }: Props) => {
+  const { deselectEntity } = useSelectedEntities();
   const [showDialog, setShowDialog] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(undefined);
   const sendTelemetry = useSendTelemetry();
@@ -63,6 +65,8 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
   const handleDelete = () => {
     EventNotificationsActions.delete(notification).then(
       () => {
+        deselectEntity(notification.id);
+
         UserNotification.success('Event Notification deleted successfully',
           `Event Notification "${notification.title}" was deleted successfully.`);
       },

@@ -56,6 +56,7 @@ import type { WidgetMapping } from 'views/logic/views/types';
 import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
+import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -83,7 +84,7 @@ export interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetCo
 }
 
 export interface WidgetResults {
- [key: string]: Result,
+  [key: string]: Result,
 }
 
 export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Results = WidgetResults> {
@@ -195,6 +196,7 @@ export interface SystemConfigurationComponentProps {
 
 export interface SystemConfiguration {
   configType: string;
+  displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
 }
 
@@ -238,10 +240,10 @@ export type MessagePreviewOption = {
 }
 
 type ExternalActionsHookData = {
-      error: Error | null;
-      externalValueActions: Array<ActionDefinition> | null;
-      isLoading: boolean;
-      isError: boolean
+  error: Error | null;
+  externalValueActions: Array<ActionDefinition> | null;
+  isLoading: boolean;
+  isError: boolean
 }
 
 type MessageAugmentation = {
@@ -380,6 +382,10 @@ export interface RootState {
   undoRedo: UndoRedoState
 }
 
+export interface ExtraArguments {
+  searchExecutors: SearchExecutors;
+}
+
 export type GetState = () => RootState;
 
 export type ViewsReducer = {
@@ -449,19 +455,5 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
-  }
-}
-export interface ViewActions {
-  save: {
-    isShown: boolean,
-  };
-  saveAs: {
-    isShown: boolean,
-  };
-  share: {
-    isShown: boolean,
-  }
-  actionsDropdown: {
-    isShown: boolean,
   }
 }
