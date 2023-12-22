@@ -20,14 +20,14 @@ export type CustomFieldMapping = {
   type: string,
 }
 export type IndexSetFieldTypeProfileJson = {
-  id: string,
+  id?: string,
   name: string,
   description: string,
   custom_field_mappings: Array<CustomFieldMapping>,
 }
 
 export type IndexSetFieldTypeProfile = {
-  id: string,
+  id?: string,
   name: string,
   description: string,
   customFieldMappings: Array<CustomFieldMapping>,

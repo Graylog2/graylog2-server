@@ -19,18 +19,18 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { Button } from 'components/bootstrap';
-import AddProfileModal from 'components/indices/IndexSetFiledTypeProfiles/AddProfileModal';
+import CreateNewProfileModal from 'components/indices/IndexSetFiledTypeProfiles/CreateNewProfileModal';
 
-const AddProfileButton = () => {
+const CreateNewProfileButton = () => {
   const [showModal, setShowModal] = useState(false);
   const toggleModal = () => setShowModal((cur) => !cur);
 
   return (
     <>
       <Button bsStyle="success" onClick={toggleModal}>Create new profile</Button>
-      {showModal && <AddProfileModal show={showModal} onClose={toggleModal} />}
+      {showModal && <CreateNewProfileModal show={showModal} onClose={toggleModal} />}
     </>
   );
 };
 
-export default AddProfileButton;
+export default CreateNewProfileButton;

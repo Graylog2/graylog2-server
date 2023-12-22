@@ -23,29 +23,24 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import ProfileModalForm from 'components/indices/IndexSetFiledTypeProfiles/ProfileModalForm';
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
+import useProfileMutations from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations';
 
 type Props = {
   show: boolean,
   onClose: () => void,
 }
 
-const AddProfileModal = ({
+const CreateNewProfileModal = ({
   show,
   onClose,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
+  const { createProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
-  const onSubmit = useCallback((v: IndexSetFieldTypeProfile) => {
-    console.log({ v });
-    /*
-    putFieldTypeMutation({
-      indexSetSelection,
-      newFieldType: type,
-      rotated,
-      field: fieldName,
-    }).then(() => {
+  const onSubmit = useCallback((profile: IndexSetFieldTypeProfile) => {
+    createProfile(profile).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CREATED, {
         app_pathname: telemetryPathName,
         app_action_value:
@@ -53,10 +48,8 @@ const AddProfileModal = ({
       });
 
       onClose();
-    }).then(() => onSubmitCallback && onSubmitCallback());
-
-     */
-  }, []);
+    });
+  }, [createProfile, onClose, sendTelemetry, telemetryPathName]);
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_OPENED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-opened' });
@@ -76,4 +69,4 @@ const AddProfileModal = ({
   );
 };
 
-export default AddProfileModal;
+export default CreateNewProfileModal;

@@ -21,7 +21,7 @@ import { Formik, Form, FieldArray, Field } from 'formik';
 
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import { FormikInput, IconButton, Select, ModalSubmit } from 'components/common';
-import { Modal } from 'components/bootstrap';
+import { Button, HelpBlock, Modal } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import { defaultCompare } from 'logic/DefaultCompare';
@@ -59,14 +59,14 @@ const ProfileModalForm = ({ initialValues, submitButtonText, title, onCancel, on
     })), [fieldTypes]);
   const fields = useMemo(() => (isLoading ? [] : data.map(({ value: { name } }) => ({ value: name, label: name }))), [data, isLoading]);
 
-  const _onSubmit = (v) => {
-    onSubmit(v);
+  const _onSubmit = (profile: IndexSetFieldTypeProfile) => {
+    onSubmit(profile);
   };
 
   return (
     <Formik<IndexSetFieldTypeProfile> initialValues={initialValues}
                                       onSubmit={_onSubmit}>
-      {({ isSubmitting, isValidating, values }) => (
+      {({ isSubmitting, isValidating, values: { customFieldMappings } }) => (
         <Form>
           <Modal.Header closeButton>
             <Modal.Title>{title}</Modal.Title>
@@ -76,18 +76,23 @@ const ProfileModalForm = ({ initialValues, submitButtonText, title, onCancel, on
                          label="Profile name"
                          id="index-set-field-type-profile-name"
                          placeholder="Type a profile name"
+                         help="A descriptive name of the new profile"
                          required />
             <FormikInput name="description"
                          id="index-set-field-type-profile-description"
                          placeholder="Type a profile description"
                          label="Description"
                          type="textarea"
+                         help="Longer description for Profile"
                          rows={6} />
             <FieldArray name="customFieldMappings"
                         render={({ remove, push }) => (
                           <>
                             <StyledLabel>Setup mappings</StyledLabel>
-                            {values.customFieldMappings.map((_, index) => (
+                            <HelpBlock>
+                              Here you can setup type mapping to any filed
+                            </HelpBlock>
+                            {customFieldMappings.map((_, index) => (
                               // eslint-disable-next-line react/no-array-index-key
                               <Item key={index}>
                                 <Field name={`customFieldMappings.${index}.field`} required>
@@ -119,10 +124,10 @@ const ProfileModalForm = ({ initialValues, submitButtonText, title, onCancel, on
                                                   required />
                                   )}
                                 </Field>
-                                {index !== 0 && <IconButton name="trash-alt" onClick={() => (remove(index))} title="Remove mapping" />}
+                                {(customFieldMappings.length > 1) && <IconButton name="trash-alt" onClick={() => (remove(index))} title="Remove mapping" />}
                               </Item>
                             ))}
-                            <IconButton onClick={() => push({})} name="plus" title="Add new mapping" />
+                            <Button bsSize="xs" onClick={() => push({})} name="plus" title="Add mapping">Add mapping</Button>
                           </>
                         )} />
           </Modal.Body>
