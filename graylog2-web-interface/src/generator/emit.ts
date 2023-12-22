@@ -128,7 +128,58 @@ const emitTemplateString = (path: string) => {
 
 const cleanVariableName = (name: string) => name.replace(/-(\w?)/g, (substr) => (substr[1] ? substr[1].toUpperCase() : ''));
 
-const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryParameter: Parameter[], rawProduces: string[]) => {
+const isArrayType = (type: Type): boolean => type.type === 'array' || (type.type === 'type_reference' && type.name.endsWith('Array'));
+
+const emitFormDataAssignments = ({ name, type }: Parameter) => {
+  if (isArrayType(type)) {
+    return ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+      ts.factory.createPropertyAccessExpression(
+        ts.factory.createIdentifier(name),
+        ts.factory.createIdentifier('forEach'),
+      ),
+      undefined,
+      [ts.factory.createArrowFunction(
+        undefined,
+        undefined,
+        [ts.factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          ts.factory.createIdentifier('f'),
+          undefined,
+          undefined,
+          undefined,
+        )],
+        undefined,
+        ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+        ts.factory.createCallExpression(
+          ts.factory.createPropertyAccessExpression(
+            ts.factory.createIdentifier('formData'),
+            ts.factory.createIdentifier('append'),
+          ),
+          undefined,
+          [
+            ts.factory.createStringLiteral(name),
+            ts.factory.createIdentifier('f'),
+          ],
+        ),
+      )],
+    ));
+  }
+
+  return ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+    ts.factory.createPropertyAccessExpression(
+      ts.factory.createIdentifier('formData'),
+      ts.factory.createIdentifier('append'),
+    ),
+    undefined,
+    [
+      ts.factory.createStringLiteral(name),
+      ts.factory.createIdentifier(name),
+    ],
+  ));
+};
+
+const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryParameter: Parameter[], rawProduces: string[], formDataParameters: Parameter[]) => {
   const produces = rawProduces || [];
   const queryParameters = ts.factory.createObjectLiteralExpression(
     queryParameter.map((q) => ts.factory.createPropertyAssignment(
@@ -136,6 +187,28 @@ const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryPar
       ts.factory.createIdentifier(cleanVariableName(q.name)),
     )),
   );
+
+  const formDataAssignments = formDataParameters.map(emitFormDataAssignments);
+
+  const formDataStatements = formDataParameters.length > 0 ? [
+    ts.factory.createVariableStatement(
+      undefined,
+      ts.factory.createVariableDeclarationList(
+        [ts.factory.createVariableDeclaration(
+          ts.factory.createIdentifier('formData'),
+          undefined,
+          undefined,
+          ts.factory.createNewExpression(
+            ts.factory.createIdentifier('FormData'),
+            undefined,
+            [],
+          ),
+        )],
+        ts.NodeFlags.Const,
+      ),
+    ),
+    ...formDataAssignments,
+  ] : [];
 
   const headers = ts.factory.createObjectLiteralExpression(
     [ts.factory.createPropertyAssignment(
@@ -145,8 +218,16 @@ const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryPar
     true,
   );
 
+  // eslint-disable-next-line no-nested-ternary
+  const body = formDataParameters.length > 0
+    ? ts.factory.createIdentifier('formData')
+    : bodyParameter
+      ? ts.factory.createIdentifier(bodyParameter.name)
+      : ts.factory.createNull();
+
   return ts.factory.createBlock(
     [
+      ...formDataStatements,
       ts.factory.createReturnStatement(
         ts.factory.createCallExpression(
           ts.factory.createIdentifier(REQUEST_FUNCTION_NAME),
@@ -154,7 +235,7 @@ const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryPar
           [
             emitString(method),
             emitTemplateString(path),
-            bodyParameter ? ts.factory.createIdentifier(bodyParameter.name) : ts.factory.createNull(),
+            body,
             queryParameters,
             headers,
           ],
@@ -282,6 +363,7 @@ const emitRoute = ({
   const parameters = rawParameters.map((parameter) => ({ ...parameter, name: cleanParameterName(parameter.name) }));
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
+  const formDataParameters = parameters.filter((parameter) => parameter.paramType === 'formdata');
 
   const jsDoc = ts.factory.createJSDocComment(summary,
     ts.factory.createNodeArray(
@@ -306,7 +388,7 @@ const emitRoute = ({
         undefined,
         parameters.sort(sortByOptionality).map(emitFunctionParameter),
         emitPromiseResultType(emitType(type)),
-        emitBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces),
+        emitBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces, formDataParameters),
       )],
   };
 };
