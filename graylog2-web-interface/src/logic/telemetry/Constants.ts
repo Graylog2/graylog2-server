@@ -460,6 +460,11 @@ export const TELEMETRY_EVENT_TYPE = {
     UNASSIGNED: 'Team Unassigned',
     DELETED: 'Team Deleted',
   },
+  INDEX_SET_FIELD_TYPE_PROFILE: {
+    NEW_OPENED: 'Index Set Field Type Profile Creating New Opened',
+    NEW_CLOSED: 'Index Set Field Type Profile Creating New Closed',
+    CREATED: 'Index Set Field Type Profile Created',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {

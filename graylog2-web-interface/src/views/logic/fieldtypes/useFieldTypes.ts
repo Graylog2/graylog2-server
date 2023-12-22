@@ -69,7 +69,7 @@ const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => 
   }
 };
 
-const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[], refetch: () => void } => {
+const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[], refetch: () => void, isLoading?: boolean } => {
   const { userTimezone } = useUserDateTime();
   const _timerange = useMemo(() => normalizeTimeRange(timerange, userTimezone), [timerange, userTimezone]);
 

@@ -22,30 +22,16 @@ import { qualifyUrl } from 'util/URLUtils';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+import type {
+  IndexSetFieldTypeProfileJson,
+  IndexSetFieldTypeProfile,
+} from 'components/indices/IndexSetFiledTypeProfiles/types';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
   list: [],
   attributes: [],
 };
-
-export type CustomFieldMapping = {
-  field: string,
-  type: string,
-}
-export type IndexSetFieldTypeProfileJson = {
-  id: string,
-  name: string,
-  description: string,
-  custom_field_mappings: Array<CustomFieldMapping>,
-}
-
-export type IndexSetFieldTypeProfile = {
-  id: string,
-  name: string,
-  description: string,
-  customFieldMappings: Array<CustomFieldMapping>,
-}
 
 const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
   const indexSetFieldTypeUrl = qualifyUrl('/system/indices/index_sets/profiles/paginated');
@@ -73,7 +59,7 @@ const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
     }));
 };
 
-const useIndexSetFieldTypeProfiles = (searchParams: SearchParams, { enabled }): {
+const useProfiles = (searchParams: SearchParams, { enabled }): {
   data: {
     list: Readonly<Array<IndexSetFieldTypeProfile>>,
     pagination: { total: number },
@@ -102,4 +88,4 @@ const useIndexSetFieldTypeProfiles = (searchParams: SearchParams, { enabled }): 
   });
 };
 
-export default useIndexSetFieldTypeProfiles;
+export default useProfiles;

@@ -34,9 +34,9 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type {
   CustomFieldMapping,
   IndexSetFieldTypeProfile,
-} from 'components/indices/IndexSetFiledTypeProfiles/hooks/useIndexSetFieldTypeProfiles';
-import useIndexSetFieldTypeProfiles
-  from 'components/indices/IndexSetFiledTypeProfiles/hooks/useIndexSetFieldTypeProfiles';
+} from 'components/indices/IndexSetFiledTypeProfiles/types';
+import useProfiles
+  from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfiles';
 
 export const ENTITY_TABLE_ID = 'index-set-field-type-profiles';
 export const DEFAULT_LAYOUT = {
@@ -82,7 +82,7 @@ const IndexSetFieldTypeProfilesList = () => {
   const {
     isLoading,
     data: { list, pagination, attributes },
-  } = useIndexSetFieldTypeProfiles(
+  } = useProfiles(
     searchParams,
     { enabled: !isLoadingLayoutPreferences },
   );

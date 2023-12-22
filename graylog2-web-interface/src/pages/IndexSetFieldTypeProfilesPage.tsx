@@ -24,6 +24,7 @@ import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import IndexSetFieldTypeProfilesList from 'components/indices/IndexSetFiledTypeProfiles/IndexSetFieldTypeProfilesList';
+import AddProfileButton from 'components/indices/IndexSetFiledTypeProfiles/AddProfileButton';
 
 const IndexSetFieldTypeProfilesPage = () => {
   const navigate = useNavigate();
@@ -49,7 +50,8 @@ const IndexSetFieldTypeProfilesPage = () => {
                       <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
                         <Button bsStyle="info">Index sets</Button>
                       </LinkContainer>
-                    )}>
+                    )}
+                    actions={<AddProfileButton />}>
           <span>
             You can modify the current field type profiles configuration or create the new one.
           </span>
