@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset.profile;
 
 import com.mongodb.BasicDBObject;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -29,7 +30,6 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Locale;
 
