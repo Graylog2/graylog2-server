@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_CREATE;
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_DELETE;
-import static org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService.BLACKLISTED_FIELDS;
+import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -117,8 +117,8 @@ public class FieldTypeMappingsResource extends RestResource {
     }
 
     private void checkFieldIsAllowedToBeChanged(String fieldName) {
-        if (BLACKLISTED_FIELDS.contains(fieldName)) {
-            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + BLACKLISTED_FIELDS);
+        if (FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldName)) {
+            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS);
         }
     }
 

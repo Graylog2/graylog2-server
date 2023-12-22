@@ -27,6 +27,8 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.QueryExecutionStats;
+import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -78,6 +80,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     private final OSGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
+    private final StatsCollector<QueryExecutionStats> executionStatsCollector;
 
     @Inject
     public OpenSearchBackend(Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -85,6 +88,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                              IndexLookup indexLookup,
                              OSGeneratedQueryContext.Factory queryContextFactory,
                              UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
+                             StatsCollector<QueryExecutionStats> executionStatsCollector,
                              @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.openSearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
@@ -92,6 +96,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
+        this.executionStatsCollector = executionStatsCollector;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -99,6 +104,11 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         return (queryString.isEmpty() || queryString.trim().equals("*"))
                 ? QueryBuilders.matchAllQuery()
                 : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
+    }
+
+    @Override
+    public StatsCollector<QueryExecutionStats> getExecutionStatsCollector() {
+        return this.executionStatsCollector;
     }
 
     @Override

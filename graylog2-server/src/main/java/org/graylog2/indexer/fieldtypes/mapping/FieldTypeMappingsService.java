@@ -22,6 +22,7 @@ import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.plugin.Message;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.slf4j.Logger;
@@ -38,13 +39,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.plugin.Message.RESERVED_SETTABLE_FIELDS;
-
 public class FieldTypeMappingsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldTypeMappingsService.class);
-
-    public static final Set<String> BLACKLISTED_FIELDS = RESERVED_SETTABLE_FIELDS;
 
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
@@ -62,7 +59,7 @@ public class FieldTypeMappingsService {
     public void changeFieldType(final CustomFieldMapping customMapping,
                                 final Set<String> indexSetsIds,
                                 final boolean rotateImmediately) {
-        if (BLACKLISTED_FIELDS.contains(customMapping.fieldName())) {
+        if (Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(customMapping.fieldName())) {
             throw new IllegalArgumentException("Changing field type of " + customMapping.fieldName() + " is not allowed.");
         }
         for (String indexSetId : indexSetsIds) {

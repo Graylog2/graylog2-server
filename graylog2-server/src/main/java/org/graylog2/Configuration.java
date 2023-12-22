@@ -204,6 +204,12 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "enable_preflight_web")
     private boolean enablePreflightWeb = false;
 
+    @Parameter(value = "query_latency_monitoring_enabled")
+    private boolean queryLatencyMonitoringEnabled = false;
+
+    @Parameter(value = "query_latency_monitoring_window_size")
+    private int queryLatencyMonitoringWindowSize = 0;
+
     @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
     private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
 
@@ -495,6 +501,14 @@ public class Configuration extends CaConfiguration {
 
     public boolean enablePreflightWebserver() {
         return enablePreflightWeb;
+    }
+
+    public boolean isQueryLatencyMonitoringEnabled() {
+        return queryLatencyMonitoringEnabled;
+    }
+
+    public int getQueryLatencyMonitoringWindowSize() {
+        return queryLatencyMonitoringWindowSize;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

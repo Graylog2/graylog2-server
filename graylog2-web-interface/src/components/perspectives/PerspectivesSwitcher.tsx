@@ -64,9 +64,9 @@ const Switcher = () => {
   const history = useHistory();
 
   const onChangePerspective = useCallback((nextPerspectiveId: string) => () => {
-    const { brandLink } = perspectives.find(({ id }) => id === nextPerspectiveId);
+    const { welcomeRoute } = perspectives.find(({ id }) => id === nextPerspectiveId);
 
-    history.push(brandLink);
+    history.push(welcomeRoute);
     setActivePerspective(nextPerspectiveId);
   }, [history, perspectives, setActivePerspective]);
 

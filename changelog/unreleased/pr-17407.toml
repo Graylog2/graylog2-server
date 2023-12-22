@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix allow displayName in systemConfiguration plugin export."
+
+issues = ["15939"]
+pulls = ["17407"]
