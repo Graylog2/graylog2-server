@@ -107,6 +107,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_MESSAGE_ID, notAnalyzedString())
+                .put(Message.FIELD_STREAMS, notAnalyzedString())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
                 .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true));
 
@@ -117,10 +118,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                     .forEach(customMapping -> builder.put(customMapping.fieldName(), type(customMapping.toPhysicalType())));
         }
 
-        //those 2 fields have not been yet made reserved, so they can be added to ImmutableMap only if they do not exist in Custom Mapping
-        if (customFieldMappings == null || !customFieldMappings.containsCustomMappingForField(Message.FIELD_STREAMS)) {
-            builder.put(Message.FIELD_STREAMS, notAnalyzedString());
-        }
+        //those FIELD_FULL_MESSAGE field have not been yet made reserved, so it can be added to ImmutableMap only if they do not exist in Custom Mapping
         if (customFieldMappings == null || !customFieldMappings.containsCustomMappingForField(Message.FIELD_FULL_MESSAGE)) {
             builder.put(Message.FIELD_FULL_MESSAGE, analyzedString(analyzer, false));
         }
