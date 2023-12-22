@@ -79,9 +79,9 @@ public class CAResource {
     @Path("/upload")
     @NoAuditEvent("No Audit Event needed")
     @ApiOperation("Upload a CA")
-    public Response uploadCA(@ApiParam(name = "password") @FormDataParam("password") String password, @ApiParam(name = "files") @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
+    public Response uploadCA(@ApiParam(name = "password") @FormDataParam("password") String password, @ApiParam(name = "files") @FormDataParam("files") List<FormDataBodyPart> files) {
         try {
-            caService.upload(password, bodyParts);
+            caService.upload(password, files);
             return Response.ok().build();
         } catch (CACreationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
