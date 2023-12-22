@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.system.field_types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 public record FieldTypeProfileUnsetRequest(@NotNull @NotEmpty
