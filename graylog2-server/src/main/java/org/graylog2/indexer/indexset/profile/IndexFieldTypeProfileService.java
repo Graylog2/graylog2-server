@@ -51,7 +51,7 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
 
     static final String INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME = "index_field_type_profiles";
 
-    public static final List<EntityAttribute> ATTRIBUTES = List.of(
+    private static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(ID_FIELD_NAME).title("Profile Id").hidden(true).sortable(true).build(),
             EntityAttribute.builder().id(NAME_FIELD_NAME).title("Profile Name")
                     .sortable(true)
