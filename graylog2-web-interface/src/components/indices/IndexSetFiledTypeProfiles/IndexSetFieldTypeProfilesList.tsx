@@ -26,17 +26,17 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type {
-  CustomFieldMapping,
   IndexSetFieldTypeProfile,
 } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import useProfiles
   from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfiles';
+import useExpandedSectionsRenderer from 'components/indices/IndexSetFiledTypeProfiles/ExpandedSectionsRenderer';
+import useCustomColumnRenderers from 'components/indices/IndexSetFiledTypeProfiles/CustomColumnRenderers';
 
 export const ENTITY_TABLE_ID = 'index-set-field-type-profiles';
 export const DEFAULT_LAYOUT = {
@@ -49,7 +49,6 @@ export const DEFAULT_LAYOUT = {
 const IndexSetFieldTypeProfilesList = () => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
-  const { data: { fieldTypes } } = useFieldTypes();
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -86,26 +85,6 @@ const IndexSetFieldTypeProfilesList = () => {
     searchParams,
     { enabled: !isLoadingLayoutPreferences },
   );
-  const customColumnRenderers = useMemo(() => ({
-    attributes: {
-      custom_field_mappings: {
-        renderCell: (customFieldTypes: Array<CustomFieldMapping>) => (
-          <>
-            {customFieldTypes.map(({ field, type }, index) => {
-              const isLast = index === customFieldTypes.length - 1;
-
-              return (
-                <span>
-                  <b>{field}: </b><i>{fieldTypes[type]}{isLast ? '' : ', '}</i>
-                </span>
-              );
-            })}
-          </>
-        ),
-        minWidth: 300,
-      },
-    },
-  }), [fieldTypes]);
 
   const onSearch = useCallback((val: string) => {
     paginationQueryParameter.resetPage();
@@ -116,6 +95,9 @@ const IndexSetFieldTypeProfilesList = () => {
     paginationQueryParameter.resetPage();
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
+
+  const expandedSectionsRenderer = useExpandedSectionsRenderer();
+  const customColumnRenderers = useCustomColumnRenderers();
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -151,7 +133,8 @@ const IndexSetFieldTypeProfilesList = () => {
                                                    onPageSizeChange={onPageSizeChange}
                                                    actionsCellWidth={120}
                                                    columnRenderers={customColumnRenderers}
-                                                   columnDefinitions={attributes} />
+                                                   columnDefinitions={attributes}
+                                                   expandedSectionsRenderer={expandedSectionsRenderer} />
       )}
     </PaginatedList>
   );

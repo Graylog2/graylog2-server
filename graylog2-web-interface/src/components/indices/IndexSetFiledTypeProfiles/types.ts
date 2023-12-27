@@ -27,7 +27,7 @@ export type IndexSetFieldTypeProfileJson = {
 }
 
 export type IndexSetFieldTypeProfile = {
-  id?: string,
+  id: string,
   name: string,
   description: string,
   customFieldMappings: Array<CustomFieldMapping>,

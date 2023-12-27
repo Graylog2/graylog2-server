@@ -48,9 +48,9 @@ const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
         id: profile.id,
         name: profile.name,
         description: profile.description,
-        customFieldMappings: profile.custom_field_mappings.map((fieldMapping) => ({
-          id: fieldMapping.field,
-          field: fieldMapping.field,
+        customFieldMappings: [...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings].map((fieldMapping, index) => ({
+          id: `${fieldMapping.field}_${index}`,
+          field: `${fieldMapping.field}_${index}`,
           type: fieldMapping.type,
         })),
       })),

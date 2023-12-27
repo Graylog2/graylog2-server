@@ -90,7 +90,7 @@ const ProfileModalForm = ({ initialValues, submitButtonText, title, onCancel, on
                           <>
                             <StyledLabel>Setup mappings</StyledLabel>
                             <HelpBlock>
-                              Here you can setup type mapping to any filed
+                              Here you can setup type mapping to any filed. If the needed field is not exist on the list you can type it and create
                             </HelpBlock>
                             {customFieldMappings.map((_, index) => (
                               // eslint-disable-next-line react/no-array-index-key
