@@ -23,6 +23,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
@@ -63,6 +64,8 @@ class IndicesTest {
 
     @Mock
     private IndicesAdapter indicesAdapter;
+    @Mock
+    private IndexFieldTypeProfileService profileService;
 
     @BeforeEach
     public void setup() {
@@ -71,7 +74,8 @@ class IndicesTest {
                 nodeId,
                 auditEventSender,
                 eventBus,
-                indicesAdapter
+                indicesAdapter,
+                profileService
         );
     }
 
