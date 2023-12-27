@@ -42,7 +42,7 @@
     "html-webpack-plugin": "^5.5.0",
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "jquery": "3.7.1",
-    "moment": "2.29.4",
+    "moment": "2.30.0",
     "moment-timezone": "0.5.43",
     "prop-types": "15.8.1",
     "react": "16.14.0",
