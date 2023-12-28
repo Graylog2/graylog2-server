@@ -167,7 +167,7 @@ class IndicesTest {
         verify(indexMappingTemplateMock).toTemplate(
                 new TemplateIndexSetConfig("standard", "test_*",
                         new CustomFieldMappings(List.of(
-                                new CustomFieldMapping("f1", "ip"), //from profile
+                                new CustomFieldMapping("f1", "string"), //from individual custom mapping
                                 new CustomFieldMapping("f2", "long"), //from individual custom mapping
                                 new CustomFieldMapping("f3", "ip") //from profile
                         )))
@@ -248,7 +248,7 @@ class IndicesTest {
         verify(indexMappingTemplateMock).toTemplate(
                 new TemplateIndexSetConfig("standard", "test_*",
                         new CustomFieldMappings(List.of(
-                                new CustomFieldMapping("f1", "ip"), //from profile
+                                new CustomFieldMapping("f1", "string"), //from individual custom mapping
                                 new CustomFieldMapping("f2", "long"), //from individual custom mapping
                                 new CustomFieldMapping("f3", "ip") //from profile
                         ))),

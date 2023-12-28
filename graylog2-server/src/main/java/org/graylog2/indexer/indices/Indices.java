@@ -241,7 +241,7 @@ public class Indices {
             if (fieldTypeProfile.isPresent() && !fieldTypeProfile.get().customFieldMappings().isEmpty()) {
                 return new TemplateIndexSetConfig(indexSetConfig.indexAnalyzer(),
                         indexSet.getIndexWildcard(),
-                        customFieldMappings.mergeWith(fieldTypeProfile.get().customFieldMappings()));
+                        fieldTypeProfile.get().customFieldMappings().mergeWith(customFieldMappings));
             }
         }
 
