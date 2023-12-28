@@ -16,12 +16,12 @@
  */
 package org.graylog2.indexer;
 
-public class MessageIndexTemplateProvider extends BasicIndexTemplateProvider {
+public class MessageIndexTemplateProvider extends BasicIndexTemplateProvider<IndexMapping> {
 
     public static final String MESSAGE_TEMPLATE_TYPE = "messages";
 
     @Override
-    protected IndexMappingTemplate createTemplateInstance() {
+    protected IndexMapping createTemplateInstance() {
         return new IndexMapping7();
     }
 

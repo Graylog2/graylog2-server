@@ -16,13 +16,13 @@
  */
 package org.graylog2.indexer;
 
-public class EventIndexTemplateProvider extends BasicIndexTemplateProvider {
+public class EventIndexTemplateProvider extends BasicIndexTemplateProvider<EventsIndexMapping> {
 
     public static final String EVENT_TEMPLATE_TYPE = "events";
 
     @Override
-    protected IndexMappingTemplate createTemplateInstance() {
+    protected EventsIndexMapping createTemplateInstance() {
         return new EventsIndexMapping7();
     }
-    
+
 }

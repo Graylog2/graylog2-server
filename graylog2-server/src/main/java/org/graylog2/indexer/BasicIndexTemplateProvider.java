@@ -24,11 +24,11 @@ import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
 import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 
-public abstract class BasicIndexTemplateProvider implements IndexTemplateProvider {
+public abstract class BasicIndexTemplateProvider<T extends IndexMappingTemplate> implements IndexTemplateProvider<T> {
 
     @NotNull
     @Override
-    public IndexMappingTemplate create(@NotNull SearchVersion searchVersion,
+    public T create(@NotNull SearchVersion searchVersion,
                                        IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         if (isProperSearchVersion(searchVersion)) {
             return createTemplateInstance();
@@ -43,5 +43,5 @@ public abstract class BasicIndexTemplateProvider implements IndexTemplateProvide
                 || searchVersion.satisfies(DATANODE, "^5.2.0");
     }
 
-    protected abstract IndexMappingTemplate createTemplateInstance();
+    protected abstract T createTemplateInstance();
 }
