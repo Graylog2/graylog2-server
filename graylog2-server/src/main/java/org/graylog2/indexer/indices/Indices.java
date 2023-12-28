@@ -195,6 +195,12 @@ public class Indices {
                 .toTemplate(templateIndexSetConfig);
     }
 
+    Template buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
+        final TemplateIndexSetConfig templateIndexSetConfig = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
+        return indexMappingFactory.createIndexMapping(indexSetConfig)
+                .toTemplate(templateIndexSetConfig, 0L);
+    }
+
     public void deleteIndexTemplate(IndexSet indexSet) {
         final String templateName = indexSet.getConfig().indexTemplateName();
 
@@ -222,12 +228,6 @@ public class Indices {
 
         auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         return true;
-    }
-
-    private Template buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
-        final TemplateIndexSetConfig templateIndexSetConfig = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
-        return indexMappingFactory.createIndexMapping(indexSetConfig)
-                .toTemplate(templateIndexSetConfig, 0L);
     }
 
     public TemplateIndexSetConfig getTemplateIndexSetConfig(
