@@ -48,6 +48,7 @@ import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.metrics.MetricUtils;
@@ -470,12 +471,8 @@ public class PipelineInterpreter implements MessageProcessor {
         }
     }
 
-    public static RateLimitedLog getRateLimitedLog(Class clazz) {
-        final Logger baseLog = LoggerFactory.getLogger(clazz);
-        return RateLimitedLog
-                .withRateLimit(baseLog)
-                .maxRate(5).every(Duration.ofSeconds(10))
-                .build();
+    public static RateLimitedLog getRateLimitedLog(final Class<?> clazz) {
+        return RateLimitedLogFactory.createRateLimitedLog(clazz, 5, Duration.ofSeconds(10));
     }
 
     public static class State {

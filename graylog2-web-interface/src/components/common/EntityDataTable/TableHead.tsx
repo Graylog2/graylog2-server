@@ -75,8 +75,6 @@ const TableHead = <Entity extends EntityBase>({
   displayActionsCol,
   displayBulkSelectCol,
   onSortChange,
-  selectedEntities,
-  setSelectedEntities,
 }: {
   actionsColWidth: number | undefined,
   activeSort: Sort,
@@ -88,8 +86,6 @@ const TableHead = <Entity extends EntityBase>({
   displayActionsCol: boolean,
   displayBulkSelectCol: boolean,
   onSortChange: (newSort: Sort) => void,
-  selectedEntities: Array<string>,
-  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
 }) => {
   const sortedColumns = useMemo(
     () => columns.sort((col1, col2) => columnsOrder.indexOf(col1.id) - columnsOrder.indexOf(col2.id)),
@@ -99,11 +95,7 @@ const TableHead = <Entity extends EntityBase>({
   return (
     <thead>
       <tr>
-        {displayBulkSelectCol && (
-          <BulkSelectHead data={data}
-                          selectedEntities={selectedEntities}
-                          setSelectedEntities={setSelectedEntities} />
-        )}
+        {displayBulkSelectCol && <BulkSelectHead data={data} />}
         {sortedColumns.map((column) => {
           const columnRenderer = columnRenderersByAttribute[column.id];
 

@@ -34,7 +34,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.ConnectionCallback;
 import javax.ws.rs.core.Context;
@@ -126,30 +125,14 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * Gets an authentication token to be used in an Authorization header of forwarded requests by extracting
-     * authentication information from the original request.
-     * <p>
-     * Only extracts an auth token from the request if the request is authenticated. This is to make sure that
-     * forwarded requests will also not be authenticated.
-     * <p>
-     * If the request is authenticated, but not by means of an authentication token, this method will fail with
-     * a {@link NotAuthorizedException} because we can't easily make up a token to use for forwarded requests in that
-     * case.
+     * Gets an authentication token to be used in an Authorization header of forwarded requests. It was extracted
+     * from the authentication information of the original request.
      *
      * @return An authentication token if the request was authenticated and one could be extracted from the original
-     * request. Null otherwise.
-     * @throws NotAuthorizedException if the original request was authenticated, but no authentication token could
-     *                                be created from the request headers.
      */
     @Nullable
     protected String getAuthenticationToken() {
-        if (getSubject().isAuthenticated()) {
-            if (authenticationToken == null) {
-                throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
-            }
-            return authenticationToken;
-        }
-        return null;
+        return authenticationToken;
     }
 
     /**
@@ -408,7 +391,8 @@ public abstract class ProxiedResource extends RestResource {
 
     /**
      * Helper function to remove the {@link CallResult} wrapper
-     * @param input   responses that are wrapped with a {@link CallResult}
+     *
+     * @param input responses that are wrapped with a {@link CallResult}
      * @return the response in the legacy format of {@code Map<String, Optional<T>>}
      */
     protected <T> Map<String, Optional<T>> stripCallResult(Map<String, CallResult<T>> input) {

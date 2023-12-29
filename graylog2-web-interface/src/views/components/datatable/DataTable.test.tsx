@@ -26,7 +26,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';

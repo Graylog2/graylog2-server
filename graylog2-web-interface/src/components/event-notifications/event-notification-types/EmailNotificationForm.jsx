@@ -20,6 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 
 import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
+import { LookupTableFields } from 'components/lookup-tables';
 import UsersSelectField from 'components/users/UsersSelectField';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -101,6 +102,15 @@ class EmailNotificationForm extends React.Component {
     user_recipients: [],
     email_recipients: [],
     time_zone: 'UTC',
+    lookup_recipient_emails: false,
+    recipients_lut_name: null,
+    recipients_lut_key: null,
+    lookup_sender_email: false,
+    sender_lut_name: null,
+    sender_lut_key: null,
+    lookup_reply_to_email: false,
+    reply_to_lut_name: null,
+    reply_to_lut_key: null,
   };
 
   propagateChange = (key, value) => {
@@ -117,8 +127,60 @@ class EmailNotificationForm extends React.Component {
     this.propagateChange(name, getValueFromInput(event.target));
   };
 
+  handleSelectChange = (key, value) => {
+    this.propagateChange(key, value);
+  };
+
   handleTimeZoneChange = (nextValue) => {
     this.propagateChange('time_zone', nextValue);
+  };
+
+  handleUseRecipientLookupChange = (event) => {
+    const { config, onChange } = this.props;
+    const nextConfig = cloneDeep(config);
+    const nextValue = getValueFromInput(event.target);
+    nextConfig.lookup_recipient_emails = nextValue;
+
+    if (nextValue) {
+      nextConfig.email_recipients = [];
+    } else {
+      nextConfig.recipients_lut_name = null;
+      nextConfig.recipients_lut_key = null;
+    }
+
+    onChange(nextConfig);
+  };
+
+  handleUseReplyToLookupChange = (event) => {
+    const { config, onChange } = this.props;
+    const nextConfig = cloneDeep(config);
+    const nextValue = getValueFromInput(event.target);
+    nextConfig.lookup_reply_to_email = nextValue;
+
+    if (nextValue) {
+      nextConfig.reply_to = '';
+    } else {
+      nextConfig.reply_to_lut_name = null;
+      nextConfig.reply_to_lut_key = null;
+    }
+
+    onChange(nextConfig);
+  };
+
+  handleUseSenderLookupChange = (event) => {
+    const { config, onChange } = this.props;
+    const nextConfig = cloneDeep(config);
+    const nextValue = getValueFromInput(event.target);
+    nextConfig.lookup_sender_email = nextValue;
+
+    if (nextValue) {
+      nextConfig.sender = '';
+    } else {
+      nextConfig.sender_lut_name = null;
+      nextConfig.sender_lut_key = null;
+    }
+
+    onChange(nextConfig);
   };
 
   handleBodyTemplateChange = (nextValue) => {
@@ -130,6 +192,146 @@ class EmailNotificationForm extends React.Component {
   };
 
   handleRecipientsChange = (key) => (nextValue) => this.propagateChange(key, nextValue === '' ? [] : nextValue.split(','));
+
+  emailRecipientsFormGroup = () => {
+    const { config, validation } = this.props;
+
+    return (
+      <FormGroup controlId="notification-email-recipients"
+                 validationState={validation.errors.recipients ? 'error' : null}><ControlLabel>Email recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
+        <MultiSelect id="notification-email-recipients"
+                     value={Array.isArray(config.email_recipients) ? config.email_recipients.join(',') : ''}
+                     addLabelText={'Add email "{label}"?'}
+                     placeholder="Type email address"
+                     options={[]}
+                     onChange={this.handleRecipientsChange('email_recipients')}
+                     allowCreate />
+        <HelpBlock>
+          {get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
+        </HelpBlock>
+      </FormGroup>
+    );
+  };
+
+  emailLookupFormGroup = () => {
+    const { config, validation } = this.props;
+    // eslint-disable-next-line no-template-curly-in-string
+    const placeholderText = '${event.group_by_fields.group_by_field}';
+
+    const customKeyField = (
+      <Input id="recipients-table-key"
+             name="recipients_lut_key"
+             label="Recipients Lookup Table Key"
+             type="text"
+             placeholder={placeholderText}
+             bsStyle={validation.errors.recipients_lut_key ? 'error' : null}
+             help={get(validation, 'errors.recipients_lut_key[0]', 'Event Field name whose value will be used as Lookup Table Key.')}
+             value={config.recipients_lut_key || ''}
+             onChange={this.handleChange}
+             required />
+    );
+
+    return (
+      <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('recipients_lut_name', value)}
+                         onKeyChange={(value) => this.handleSelectChange('recipients_lut_key', value)}
+                         selectedTableName={config.recipients_lut_name || ''}
+                         selectedKeyName={config.recipients_lut_key || ''}
+                         nameValidation={validation.errors.recipients_lut_name}
+                         keyValidation={validation.errors.recipients_lut_key}
+                         lookupTableNameLabel="Recipients Lookup Table Name"
+                         customKeyField={customKeyField} />
+    );
+  };
+
+  senderInput = () => {
+    const { config, validation } = this.props;
+
+    return (
+      <Input id="notification-sender"
+             name="sender"
+             label={<ControlLabel>Sender <small className="text-muted">(Optional)</small></ControlLabel>}
+             type="text"
+             bsStyle={validation.errors.sender ? 'error' : null}
+             help={get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
+             value={config.sender || ''}
+             onChange={this.handleChange} />
+    );
+  };
+
+  senderLookupFormGroup = () => {
+    const { config, validation } = this.props;
+    // eslint-disable-next-line no-template-curly-in-string
+    const placeholderText = '${event.group_by_fields.group_by_field}';
+
+    const customKeyField = (
+      <Input id="sender-lookup-table-key"
+             name="sender_lut_key"
+             label="Sender Lookup Table Key"
+             type="text"
+             placeholder={placeholderText}
+             bsStyle={validation.errors.sender_lut_key ? 'error' : null}
+             help={get(validation, 'errors.sender_lut_key[0]', 'Event Field name whose value will be used as Lookup Table Key.')}
+             value={config.sender_lut_key || ''}
+             onChange={this.handleChange}
+             required />
+    );
+
+    return (
+      <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('sender_lut_name', value)}
+                         onKeyChange={(value) => this.handleSelectChange('sender_lut_key', value)}
+                         selectedTableName={config.sender_lut_name || ''}
+                         selectedKeyName={config.sender_lut_key || ''}
+                         nameValidation={validation.errors.sender_lut_name}
+                         keyValidation={validation.errors.sender_lut_key}
+                         lookupTableNameLabel="Sender Lookup Table Name"
+                         customKeyField={customKeyField} />
+    );
+  };
+
+  replyToInput = () => {
+    const { config, validation } = this.props;
+
+    return (
+      <Input id="notification-replyto"
+             name="reply_to"
+             label="Reply-To (Optional)"
+             type="text"
+             bsStyle={validation.errors.replyto ? 'error' : null}
+             help={get(validation, 'errors.reply_to[0]', 'The email address that recipients should use for replies.')}
+             value={config.reply_to || ''}
+             onChange={this.handleChange} />
+    );
+  };
+
+  replyToLookupFormGroup = () => {
+    const { config, validation } = this.props;
+    // eslint-disable-next-line no-template-curly-in-string
+    const placeholderText = '${event.group_by_fields.group_by_field}';
+
+    const customKeyField = (
+      <Input id="reply-to-lookup-table-key"
+             name="reply_to_lut_key"
+             label="Reply To Lookup Table Key"
+             type="text"
+             placeholder={placeholderText}
+             bsStyle={validation.errors.reply_to_lut_key ? 'error' : null}
+             help={get(validation, 'errors.reply_to_lut_key[0]', 'Event Field name whose value will be used as Lookup Table Key.')}
+             value={config.reply_to_lut_key || ''}
+             onChange={this.handleChange}
+             required />
+    );
+
+    return (
+      <LookupTableFields onTableNameChange={(value) => this.handleSelectChange('reply_to_lut_name', value)}
+                         onKeyChange={(value) => this.handleSelectChange('reply_to_lut_key', value)}
+                         selectedTableName={config.reply_to_lut_name || ''}
+                         selectedKeyName={config.reply_to_lut_key || ''}
+                         nameValidation={validation.errors.reply_to_lut_name}
+                         keyValidation={validation.errors.reply_to_lut_key}
+                         lookupTableNameLabel="Reply To Lookup Table Name"
+                         customKeyField={customKeyField} />
+    );
+  };
 
   render() {
     const { config, validation } = this.props;
@@ -145,23 +347,25 @@ class EmailNotificationForm extends React.Component {
                value={config.subject || ''}
                onChange={this.handleChange}
                required />
-        <Input id="notification-replyto"
-               name="reply_to"
-               label="Reply-To (Optional)"
-               type="text"
-               bsStyle={validation.errors.replyto ? 'error' : null}
-               help={get(validation, 'errors.reply_to[0]', 'The email address that recipients should use for replies.')}
-               value={config.reply_to || ''}
-               onChange={this.handleChange} />
+        {config.lookup_reply_to_email ? this.replyToLookupFormGroup() : this.replyToInput()}
+        <FormGroup>
+          <Input type="checkbox"
+                 id="lookup_reply_to_email"
+                 name="lookup_reply_to_email"
+                 label="Use lookup table for Reply To email"
+                 onChange={this.handleUseReplyToLookupChange}
+                 checked={config.lookup_reply_to_email} />
+        </FormGroup>
         <HideOnCloud>
-          <Input id="notification-sender"
-                 name="sender"
-                 label={<ControlLabel>Sender <small className="text-muted">(Optional)</small></ControlLabel>}
-                 type="text"
-                 bsStyle={validation.errors.sender ? 'error' : null}
-                 help={get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender. Leave it empty to use the default sender address.')}
-                 value={config.sender || ''}
-                 onChange={this.handleChange} />
+          {config.lookup_sender_email ? this.senderLookupFormGroup() : this.senderInput()}
+          <FormGroup>
+            <Input type="checkbox"
+                   id="lookup_sender_email"
+                   name="lookup_sender_email"
+                   label="Use lookup table for Sender email"
+                   onChange={this.handleUseSenderLookupChange}
+                   checked={config.lookup_sender_email} />
+          </FormGroup>
         </HideOnCloud>
 
         <IfPermitted permissions="users:list">
@@ -176,20 +380,14 @@ class EmailNotificationForm extends React.Component {
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
-
-        <FormGroup controlId="notification-email-recipients"
-                   validationState={validation.errors.recipients ? 'error' : null}>
-          <ControlLabel>Email recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
-          <MultiSelect id="notification-email-recipients"
-                       value={Array.isArray(config.email_recipients) ? config.email_recipients.join(',') : ''}
-                       addLabelText={'Add email "{label}"?'}
-                       placeholder="Type email address"
-                       options={[]}
-                       onChange={this.handleRecipientsChange('email_recipients')}
-                       allowCreate />
-          <HelpBlock>
-            {get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
-          </HelpBlock>
+        {config.lookup_recipient_emails ? this.emailLookupFormGroup() : this.emailRecipientsFormGroup()}
+        <FormGroup>
+          <Input type="checkbox"
+                 id="lookup_recipient_emails"
+                 name="lookup_recipient_emails"
+                 label="Use lookup table for Email Recipients"
+                 onChange={this.handleUseRecipientLookupChange}
+                 checked={config.lookup_recipient_emails} />
         </FormGroup>
         <Input id="notification-time-zone"
                help="Time zone used for timestamps in the email body."
