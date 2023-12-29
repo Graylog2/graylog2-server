@@ -31,6 +31,7 @@ export const UPDATE_WIDGET_PREVIEW_BTN_TEXT = 'Update preview';
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
 
 const StyledButtonToolbar = styled(ButtonToolbar)`
+  justify-content: space-between;
   margin-bottom: 10px;
 `;
 

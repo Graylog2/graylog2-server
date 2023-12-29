@@ -13,10 +13,6 @@
     grid-column: 1;
 }
 
-:local(.leftAligned) {
-    left: 0;
-}
-
 @media print {
     table.messages {
         font-size: 1rem !important; /* theme.fonts.size.body */

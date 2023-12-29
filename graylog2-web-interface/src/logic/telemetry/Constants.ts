@@ -47,6 +47,7 @@ export const TELEMETRY_EVENT_TYPE = {
     MOVE: 'Search Widget Moved',
     DUPLICATE: 'Search Widget Duplicate',
     COPY_TO_DASHBOARD: 'Search Widget Copy To Dashboard Clicked',
+    CREATE_NEW_DASHBOARD: 'Search Widget Create New Dashboard Clicked',
     SEARCH_WIDGET_HORIZONTAL_STRETCH: 'Search Widget Horizontal Width Toggled',
     SEARCH_WIDGET_EXTRA_ACTION: 'Search Widget Extra Action Clicked',
     WIDGET_EDIT_TOGGLED: 'Search Widget Edit Toggled',

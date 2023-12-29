@@ -214,6 +214,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public void onReset() {
         onEvent(ProcessEvent.RESET);
+        restart();
     }
 
     @Override

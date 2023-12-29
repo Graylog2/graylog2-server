@@ -18,32 +18,21 @@ package org.graylog.events.notifications.types;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
-import com.google.common.net.HostAndPort;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.SimpleEmail;
-import org.graylog.events.notifications.EventNotificationContext;
-import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog2.alerts.EmailRecipients;
-import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.jackson.TypeReferences;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.email.EmailFactory;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,32 +43,23 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class EmailSender {
     private static final Logger LOG = LoggerFactory.getLogger(EmailSender.class);
 
-    private final EmailRecipients.Factory emailRecipientsFactory;
     private final NotificationService notificationService;
     private final NodeId nodeId;
-    private final ObjectMapperProvider objectMapperProvider;
     private final Engine templateEngine;
     private final Engine htmlTemplateEngine;
     private final EmailFactory emailFactory;
-    private final URI httpExternalUri;
 
     @Inject
-    public EmailSender(EmailRecipients.Factory emailRecipientsFactory,
-                       NotificationService notificationService,
+    public EmailSender(NotificationService notificationService,
                        NodeId nodeId,
-                       ObjectMapperProvider objectMapperProvider,
                        Engine templateEngine,
                        @Named("HtmlSafe") Engine htmlTemplateEngine,
-                       EmailFactory emailFactory,
-                       HttpConfiguration httpConfiguration) {
-        this.emailRecipientsFactory = requireNonNull(emailRecipientsFactory, "emailRecipientsFactory");
+                       EmailFactory emailFactory) {
         this.notificationService = requireNonNull(notificationService, "notificationService");
         this.nodeId = requireNonNull(nodeId, "nodeId");
-        this.objectMapperProvider = requireNonNull(objectMapperProvider, "objectMapperProvider)");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
         this.htmlTemplateEngine = requireNonNull(htmlTemplateEngine, "htmlTemplateEngine");
         this.emailFactory = requireNonNull(emailFactory, "emailFactory");
-        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
     }
 
     @VisibleForTesting
@@ -111,14 +91,7 @@ public class EmailSender {
         return htmlTemplateEngine.transform(config.htmlBodyTemplate(), model);
     }
 
-    private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog, DateTimeZone timeZone) {
-        final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
-        Map<String,Object> model = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
-        model.put("http_external_uri", this.httpExternalUri);
-        return model;
-    }
-
-    private void sendEmail(EmailEventNotificationConfig config, String emailAddress, Map<String, Object> model) throws TransportConfigurationException, EmailException {
+    private void sendEmail(EmailEventNotificationConfig config, String emailAddress, String sender, String replyTo, Map<String, Object> model) throws TransportConfigurationException, EmailException {
         LOG.debug("Sending mail to " + emailAddress);
         if (!emailFactory.isEmailTransportEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
@@ -126,12 +99,12 @@ public class EmailSender {
 
         final Email email = createEmailWithBody(config, model);
 
-        if (!isNullOrEmpty(config.sender())) {
-            email.setFrom(config.sender());
+        if (!isNullOrEmpty(sender)) {
+            email.setFrom(sender);
         }
 
-        if (!isNullOrEmpty(config.replyTo())) {
-            email.addReplyTo(config.replyTo());
+        if (!isNullOrEmpty(replyTo)) {
+            email.addReplyTo(replyTo);
         }
 
         if (email.getFromAddress() == null) {
@@ -158,15 +131,11 @@ public class EmailSender {
     }
 
     // TODO: move EmailRecipients class to events code
-    void sendEmails(EmailEventNotificationConfig notificationConfig, EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) throws TransportConfigurationException, EmailException, ConfigurationError {
+    void sendEmails(EmailRecipients emailRecipients, String sender, String replyTo, EmailEventNotificationConfig config,
+                    String notificationId, Map<String, Object> model) throws TransportConfigurationException, EmailException {
         if (!emailFactory.isEmailTransportEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
-
-        final EmailRecipients emailRecipients = emailRecipientsFactory.create(
-                new ArrayList<>(notificationConfig.userRecipients()),
-                new ArrayList<>(notificationConfig.emailRecipients())
-        );
 
         if (emailRecipients.isEmpty()) {
             LOG.debug("Cannot send emails: empty recipient list.");
@@ -174,26 +143,20 @@ public class EmailSender {
         }
 
         final Set<String> recipientsSet = emailRecipients.getEmailRecipients();
-        if (recipientsSet.size() == 0) {
+        if (recipientsSet.isEmpty()) {
             final Notification notification = notificationService.buildNow()
                     .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.NORMAL)
-                    .addDetail("title", f("No recipients have been defined for notification with ID [%s]!", ctx.notificationId()))
+                    .addDetail("title", f("No recipients have been defined for notification with ID [%s]!", notificationId))
                     .addDetail("description", "To fix this, go to the notification configuration and add at least one alert recipient.");
             notificationService.publishIfFirst(notification);
         }
 
-        final Map<String, Object> model = getModel(ctx, backlog, notificationConfig.timeZone());
 
         for (String email : recipientsSet) {
-            sendEmail(notificationConfig, email, model);
+            sendEmail(config, email, sender, replyTo, model);
         }
     }
 
-    static class ConfigurationError extends Exception {
-        ConfigurationError(String message) {
-            super(message);
-        }
-    }
 }
