@@ -19,11 +19,13 @@ package org.graylog2.indexer.indexset.profile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 
+import javax.annotation.Nonnull;
+
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.CUSTOM_MAPPINGS_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.NAME_FIELD_NAME;
 
 public record IndexFieldTypeProfileData(@JsonProperty(NAME_FIELD_NAME) String name,
                                         @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
-                                        @JsonProperty(CUSTOM_MAPPINGS_FIELD_NAME) CustomFieldMappings customFieldMappings) {
+                                        @JsonProperty(CUSTOM_MAPPINGS_FIELD_NAME) @Nonnull CustomFieldMappings customFieldMappings) {
 }

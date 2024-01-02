@@ -18,11 +18,14 @@ package org.graylog2.indexer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
@@ -35,7 +38,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
+import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +57,25 @@ class IndexMappingTest {
     void setUp() {
         indexSetConfig = mock(IndexSetConfig.class);
         when(indexSetConfig.indexAnalyzer()).thenReturn("standard");
+    }
+
+    @Test
+    void doesNotAllowOverridingBlacklistedFieldsWithCustomMapping() {
+        IndexMapping indexMapping = new IndexMapping7();
+        for (String blackListedField : FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS) {
+            final Map<String, Map<String, Object>> fieldProperties = indexMapping.fieldProperties("english", new CustomFieldMappings(List.of(new CustomFieldMapping(blackListedField, "geo-point"))));
+            final Map<String, Object> forBlackListedField = fieldProperties.get(blackListedField);
+            assertTrue(forBlackListedField == null || !forBlackListedField.get("type").equals("geo_point"));
+        }
+    }
+
+    @Test
+    void allowsOverridingNonBlacklistedFieldsWithCustomMapping() {
+        IndexMapping indexMapping = new IndexMapping7();
+        final Map<String, Map<String, Object>> fieldProperties = indexMapping.fieldProperties("english", new CustomFieldMappings(List.of(new CustomFieldMapping("sampleField", "geo-point"))));
+        final Map<String, Object> forSampleField = fieldProperties.get("sampleField");
+        assertEquals("geo_point", forSampleField.get("type"));
+
     }
 
     @ParameterizedTest
