@@ -84,7 +84,8 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
                         s.put("type", s.get("function"));
                         s.remove("function");
 
-                        if (s.containsKey("field") && s.get("field") == null) {
+                        if (s.containsKey("field") && s.get("field") == null
+                                && (s.get("type") == "card" || s.get("type") == "max" || s.get("type") == "percentile")) {
                             invalidSeries = true;
                         } else {
                             newSeries.add(s);
