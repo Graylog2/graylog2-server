@@ -23,12 +23,16 @@ import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types'
 const Item = styled.div`
   display: flex;
   gap: 5px;
+  flex-wrap: wrap;
+  // white-space: nowrap;
 `;
 
 const List = styled.div`
-display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;//repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1em;
+  // display: flex;
+  // flex-wrap: wrap;
 `;
 const CustomFieldTypesList = ({ list, fieldTypes }: { list: Array<CustomFieldMapping>, fieldTypes: FieldTypes }) => (
   <List>

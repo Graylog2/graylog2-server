@@ -14,17 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
 
-import * as React from 'react';
-
-import { Button } from 'components/bootstrap';
+import { Button, ButtonToolbar } from 'components/bootstrap';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
 
-const CreateNewProfileButton = () => (
-  <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE}>
-    <Button bsStyle="success">Create new profile</Button>
-  </LinkContainer>
+const ProfileActions = ({ profile }: { profile: IndexSetFieldTypeProfile }) => (
+  <ButtonToolbar>
+    <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profile.id)}>
+      <Button bsSize="xs">
+        Edit
+      </Button>
+    </LinkContainer>
+  </ButtonToolbar>
 );
 
-export default CreateNewProfileButton;
+export default ProfileActions;

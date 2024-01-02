@@ -14,26 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
-import slice from 'lodash/slice';
+import React from 'react';
 
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import CustomFieldTypesList from 'components/indices/IndexSetFiledTypeProfiles/CustomFieldTypesList';
-import { CUSTOM_FIELD_TYPE_LIST_SIZE } from 'components/indices/IndexSetFiledTypeProfiles/Constants';
 
 type Props = {
   customFieldMappings: IndexSetFieldTypeProfile['customFieldMappings'],
   fieldTypes: FieldTypes,
-  profileId: string,
 }
 
-const ExpandedCustomFieldTypes = ({ customFieldMappings, fieldTypes, profileId }: Props) => {
-  const list = useMemo(() => slice(customFieldMappings, CUSTOM_FIELD_TYPE_LIST_SIZE - 1), [customFieldMappings]);
-
-  // return <CustomFieldMappingsTable customFieldMappings={customFieldMappings} profileId={profileId} fieldTypes={fieldTypes} />;
-
-  return <CustomFieldTypesList list={list} fieldTypes={fieldTypes} />;
-};
+const ExpandedCustomFieldTypes = ({ customFieldMappings, fieldTypes }: Props) => <CustomFieldTypesList list={customFieldMappings} fieldTypes={fieldTypes} />;
 
 export default ExpandedCustomFieldTypes;

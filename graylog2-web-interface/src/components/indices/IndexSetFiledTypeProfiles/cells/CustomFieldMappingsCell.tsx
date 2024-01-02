@@ -15,25 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import take from 'lodash/take';
+import { styled } from 'styled-components';
 
 import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { CUSTOM_FIELD_TYPE_LIST_SIZE } from 'components/indices/IndexSetFiledTypeProfiles/Constants';
-import CustomFieldTypesList from 'components/indices/IndexSetFiledTypeProfiles/CustomFieldTypesList';
-import { Button } from 'components/bootstrap';
+import { CountBadge } from 'components/common';
 
-const CustomFieldMappingsCell = ({ customFieldTypes, profile, fieldTypes }: { customFieldTypes : Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile, fieldTypes: FieldTypes }) => {
+const StyledCountBadge = styled(CountBadge)`
+  cursor: pointer;
+`;
+
+const CustomFieldMappingsCell = ({ customFieldTypes, profile }: { customFieldTypes : Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile }) => {
   const { toggleSection } = useExpandedSections();
-  const customFieldTypesToShow = take(customFieldTypes, CUSTOM_FIELD_TYPE_LIST_SIZE);
-  const restItemsQuantity = customFieldTypes.length - customFieldTypesToShow.length;
 
   return (
-    <>
-      <CustomFieldTypesList list={customFieldTypesToShow} fieldTypes={fieldTypes} />
-      {restItemsQuantity > 0 && <Button bsStyle="link" onClick={() => toggleSection(profile.id, 'customFieldMapping')}>...and {restItemsQuantity} more</Button>}
-    </>
+    <StyledCountBadge onClick={() => toggleSection(profile.id, 'customFieldMapping')}>{customFieldTypes.length}</StyledCountBadge>
   );
 };
 

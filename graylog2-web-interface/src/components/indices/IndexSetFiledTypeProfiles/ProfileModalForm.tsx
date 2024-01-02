@@ -20,17 +20,27 @@ import React, { useMemo } from 'react';
 import { Formik, Form, FieldArray, Field } from 'formik';
 
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
-import { FormikInput, IconButton, Select, ModalSubmit } from 'components/common';
-import { Button, HelpBlock, Modal } from 'components/bootstrap';
+import { FormikInput, IconButton, Select, FormSubmit } from 'components/common';
+import { Button, Col, HelpBlock } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 const StyledSelect = styled(Select)`
-  width: 400px;
-  margin-bottom: 20px;
+  flex-basis: 100%;
 `;
 
+const SelectGroup = styled.div`
+  flex-grow: 1;
+  display: flex;
+  gap: 5px;
+`;
+const List = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 15px;
+`;
 const StyledLabel = styled.h5`
   font-weight: bold;
   margin-bottom: 5px;
@@ -39,16 +49,20 @@ const StyledLabel = styled.h5`
 const Item = styled.div`
   display: flex;
   gap: 5px;
+  align-items: center;
+`;
+
+const StyledFormSubmit = styled(FormSubmit)`
+  margin-top: 15px;
 `;
 type Props = {
   initialValues?: IndexSetFieldTypeProfile,
   submitButtonText: string,
   onCancel: () => void,
-  title: string,
   onSubmit: (profile: IndexSetFieldTypeProfile) => void
 }
 
-const ProfileModalForm = ({ initialValues, submitButtonText, title, onCancel, onSubmit }: Props) => {
+const ProfileModalForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Props) => {
   const { data, isLoading } = useFieldTypes(undefined, undefined);
   const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMapping();
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
@@ -64,14 +78,11 @@ const ProfileModalForm = ({ initialValues, submitButtonText, title, onCancel, on
   };
 
   return (
-    <Formik<IndexSetFieldTypeProfile> initialValues={initialValues}
-                                      onSubmit={_onSubmit}>
-      {({ isSubmitting, isValidating, values: { customFieldMappings } }) => (
-        <Form>
-          <Modal.Header closeButton>
-            <Modal.Title>{title}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+    <Col lg={8}>
+      <Formik<IndexSetFieldTypeProfile> initialValues={initialValues}
+                                        onSubmit={_onSubmit}>
+        {({ isSubmitting, isValidating, values: { customFieldMappings } }) => (
+          <Form>
             <FormikInput name="name"
                          label="Profile name"
                          id="index-set-field-type-profile-name"
@@ -92,54 +103,56 @@ const ProfileModalForm = ({ initialValues, submitButtonText, title, onCancel, on
                             <HelpBlock>
                               Here you can setup type mapping to any filed. If the needed field is not exist on the list you can type it and create
                             </HelpBlock>
-                            {customFieldMappings.map((_, index) => (
-                              // eslint-disable-next-line react/no-array-index-key
-                              <Item key={index}>
-                                <Field name={`customFieldMappings.${index}.field`} required>
-                                  {({ field: { name, value, onChange } }) => (
-                                    <StyledSelect options={fields}
-                                                  value={value}
-                                                  name={name}
-                                                  inputId={name}
-                                                  onChange={(newVal) => {
-                                                    onChange({ target: { value: newVal, name } });
-                                                  }}
-                                                  placeholder="Select or type the field"
-                                                  disabled={isLoading}
-                                                  required
-                                                  allowCreate />
-                                  )}
-                                </Field>
-                                <Field name={`customFieldMappings.${index}.type`} required>
-                                  {({ field: { name, value, onChange } }) => (
-                                    <StyledSelect options={fieldTypeOptions}
-                                                  value={value}
-                                                  name={name}
-                                                  inputId={name}
-                                                  onChange={(newVal) => {
-                                                    onChange({ target: { value: newVal, name } });
-                                                  }}
-                                                  placeholder="Select field type"
-                                                  disabled={isLoadingFieldTypes}
-                                                  required />
-                                  )}
-                                </Field>
-                                {(customFieldMappings.length > 1) && <IconButton name="trash-alt" onClick={() => (remove(index))} title="Remove mapping" />}
-                              </Item>
-                            ))}
+                            <List>
+                              {customFieldMappings.map((_, index) => (
+                                // eslint-disable-next-line react/no-array-index-key
+                                <Item key={index}>
+                                  <SelectGroup>
+                                    <Field name={`customFieldMappings.${index}.field`} required>
+                                      {({ field: { name, value, onChange } }) => (
+                                        <StyledSelect options={fields}
+                                                      value={value}
+                                                      name={name}
+                                                      inputId={name}
+                                                      onChange={(newVal) => {
+                                                        onChange({ target: { value: newVal, name } });
+                                                      }}
+                                                      placeholder="Select or type the field"
+                                                      disabled={isLoading}
+                                                      required
+                                                      allowCreate />
+                                      )}
+                                    </Field>
+                                    <Field name={`customFieldMappings.${index}.type`} required>
+                                      {({ field: { name, value, onChange } }) => (
+                                        <StyledSelect options={fieldTypeOptions}
+                                                      value={value}
+                                                      name={name}
+                                                      inputId={name}
+                                                      onChange={(newVal) => {
+                                                        onChange({ target: { value: newVal, name } });
+                                                      }}
+                                                      placeholder="Select field type"
+                                                      disabled={isLoadingFieldTypes}
+                                                      required />
+                                      )}
+                                    </Field>
+                                  </SelectGroup>
+                                  {(customFieldMappings.length > 1) && <IconButton name="trash-alt" onClick={() => (remove(index))} title="Remove mapping" />}
+                                </Item>
+                              ))}
+                            </List>
                             <Button bsSize="xs" onClick={() => push({})} name="plus" title="Add mapping">Add mapping</Button>
                           </>
                         )} />
-          </Modal.Body>
-          <Modal.Footer>
-            <ModalSubmit submitButtonText={submitButtonText}
-                         onCancel={onCancel}
-                         disabledSubmit={isValidating}
-                         isSubmitting={isSubmitting} />
-          </Modal.Footer>
-        </Form>
-      )}
-    </Formik>
+            <StyledFormSubmit submitButtonText={submitButtonText}
+                              onCancel={onCancel}
+                              disabledSubmit={isValidating}
+                              isSubmitting={isSubmitting} />
+          </Form>
+        )}
+      </Formik>
+    </Col>
   );
 };
 

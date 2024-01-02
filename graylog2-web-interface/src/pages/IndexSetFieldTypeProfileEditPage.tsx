@@ -14,52 +14,42 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Loader } from '@mantine/core';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Row, Col, Button } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
-import useCurrentUser from 'hooks/useCurrentUser';
-import ProfilesList from 'components/indices/IndexSetFiledTypeProfiles/ProfilesList';
-import CreateNewProfileButton from 'components/indices/IndexSetFiledTypeProfiles/CreateNewProfileButton';
+import { Button, Col, Row } from 'components/bootstrap';
+import useProfile from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfile';
+import useParams from 'routing/useParams';
+import EditProfile from 'components/indices/IndexSetFiledTypeProfiles/EditProfile';
 
-const IndexSetFieldTypeProfilesPage = () => {
-  const navigate = useNavigate();
-  const currentUser = useCurrentUser();
-
-  useEffect(() => {
-    const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
-
-    if (!hasMappingPermission) {
-      navigate(Routes.NOTFOUND);
-    }
-  }, [currentUser.permissions, navigate]);
+const IndexSetFieldTypeProfileEditPage = () => {
+  const { profileId } = useParams();
+  const { data, isFetched } = useProfile(profileId);
 
   return (
-    <DocumentTitle title="Index Set Field Type Profiles">
+    <DocumentTitle title="Edit Index Set Field Type Profile">
       <div>
-        <PageHeader title="Configure Index Set Field Type Profiles"
+        <PageHeader title={`Edit  "${data?.name}" Index Set Field Type Profiles`}
                     documentationLink={{
                       title: 'Index model documentation',
                       path: DocsHelper.PAGES.INDEX_MODEL,
                     }}
                     topActions={(
-                      <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                        <Button bsStyle="info">Index sets</Button>
+                      <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>
+                        <Button bsStyle="info">Profiles</Button>
                       </LinkContainer>
-                    )}
-                    actions={<CreateNewProfileButton />}>
+                    )}>
           <span>
-            You can modify the current field type profiles configuration or create the new one.
+            {`You can modify "${data?.name}" field type profiles configuration.`}
           </span>
         </PageHeader>
-
         <Row className="content">
           <Col md={12}>
-            <ProfilesList />
+            {isFetched ? <EditProfile profile={data} /> : <Loader />}
           </Col>
         </Row>
       </div>
@@ -67,4 +57,4 @@ const IndexSetFieldTypeProfilesPage = () => {
   );
 };
 
-export default IndexSetFieldTypeProfilesPage;
+export default IndexSetFieldTypeProfileEditPage;

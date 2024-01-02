@@ -32,6 +32,26 @@ const INITIAL_DATA = {
   list: [],
   attributes: [],
 };
+const randomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const getRandomString = () => [...Array(randomNumber(10, 35))].map(() => Math.random().toString(36)[2]).join('');
+
+const getRandomType = () => {
+  const types = {
+    date: 'Date',
+    boolean: 'Boolean',
+    string: 'String (aggregatable)',
+    string_fts: 'String (full-text searchable)',
+    double: 'Number (Floating Point)',
+    binary: 'Binary Data',
+    ip: 'IP',
+    long: 'Number',
+    'geo-point': 'Geo Point',
+  };
+
+  const typeArr = Object.keys(types);
+
+  return typeArr[randomNumber(0, typeArr.length - 1)];
+};
 
 const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
   const indexSetFieldTypeUrl = qualifyUrl('/system/indices/index_sets/profiles/paginated');
@@ -48,10 +68,10 @@ const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
         id: profile.id,
         name: profile.name,
         description: profile.description,
-        customFieldMappings: [...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings, ...profile.custom_field_mappings].map((fieldMapping, index) => ({
+        customFieldMappings: profile.custom_field_mappings.map((fieldMapping, index) => ({
           id: `${fieldMapping.field}_${index}`,
-          field: `${fieldMapping.field}_${index}`,
-          type: fieldMapping.type,
+          field: `${getRandomString()}_${index}`,
+          type: getRandomType(),
         })),
       })),
       pagination: { total },

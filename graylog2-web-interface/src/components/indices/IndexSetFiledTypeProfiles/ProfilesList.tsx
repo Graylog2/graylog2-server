@@ -37,6 +37,7 @@ import useProfiles
   from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfiles';
 import useExpandedSectionsRenderer from 'components/indices/IndexSetFiledTypeProfiles/ExpandedSectionsRenderer';
 import useCustomColumnRenderers from 'components/indices/IndexSetFiledTypeProfiles/CustomColumnRenderers';
+import useProfileActions from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileActions';
 
 export const ENTITY_TABLE_ID = 'index-set-field-type-profiles';
 export const DEFAULT_LAYOUT = {
@@ -46,7 +47,7 @@ export const DEFAULT_LAYOUT = {
   columnsOrder: ['name', 'description', 'custom_field_mappings'],
 };
 
-const IndexSetFieldTypeProfilesList = () => {
+const ProfilesList = () => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -98,6 +99,7 @@ const IndexSetFieldTypeProfilesList = () => {
 
   const expandedSectionsRenderer = useExpandedSectionsRenderer();
   const customColumnRenderers = useCustomColumnRenderers();
+  const profileActions = useProfileActions();
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -134,10 +136,11 @@ const IndexSetFieldTypeProfilesList = () => {
                                                    actionsCellWidth={120}
                                                    columnRenderers={customColumnRenderers}
                                                    columnDefinitions={attributes}
-                                                   expandedSectionsRenderer={expandedSectionsRenderer} />
+                                                   expandedSectionsRenderer={expandedSectionsRenderer}
+                                                   rowActions={profileActions} />
       )}
     </PaginatedList>
   );
 };
 
-export default IndexSetFieldTypeProfilesList;
+export default ProfilesList;

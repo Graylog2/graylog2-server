@@ -25,11 +25,10 @@ const useExpandedSectionsRenderer = () => {
 
   return useMemo(() => ({
     customFieldMapping: {
-      title: 'Rest Custom Field Mappings',
-      content: ({ customFieldMappings, id }: IndexSetFieldTypeProfile) => (
+      title: 'Custom Field Mappings',
+      content: ({ customFieldMappings }: IndexSetFieldTypeProfile) => (
         <ExpandedCustomFieldTypes customFieldMappings={customFieldMappings}
-                                  fieldTypes={fieldTypes}
-                                  profileId={id} />
+                                  fieldTypes={fieldTypes} />
       ),
     },
   }), [fieldTypes]);
