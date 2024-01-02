@@ -16,13 +16,16 @@
  */
 package org.graylog.datanode.metrics;
 
+import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
@@ -33,7 +36,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 
 public class ConfigureMetricsIndexSettings implements StateMachineTracer {
@@ -58,7 +64,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
             process.restClient().ifPresent(client -> {
 
                 updateDataStreamTemplate(client);
-                createDataStreamBackingIndex(client);
+                configureMetricsIsm(client);
 
             });
         }
@@ -96,6 +102,21 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     }
 
     private void configureMetricsIsm(RestHighLevelClient client) {
+        //TODO dynamically create ism with config values using either jackson or freemarker
+        try {
+            final URL resource = getClass().getResource("metrics-ism.json");
+            File metricsIsm = new File(resource.getFile());
+            final String ism = FileUtils.readFileToString(metricsIsm, Charset.defaultCharset());
+            final Request ismRequest = new Request("PUT", "_plugins/_ism/policies/gl_purge_metrics");
+            ismRequest.setJsonEntity(ism);
+            final Response response = client.getLowLevelClient().performRequest(ismRequest);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                log.error("Error creating ism for metrics rollup (Status {})", response.getStatusLine().getStatusCode());
+            }
+        } catch (IOException e) {
+            log.error("Could not read ism config for metrics");
+        }
+
     }
 
 }
