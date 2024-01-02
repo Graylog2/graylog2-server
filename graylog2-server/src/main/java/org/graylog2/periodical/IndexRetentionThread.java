@@ -83,7 +83,7 @@ public class IndexRetentionThread extends Periodical {
             final IndexSetConfig config = indexSet.getConfig();
             if (config.dataTiering() != null) {
                 dataTieringOrchestrator.retain(indexSet);
-            }else{
+            } else {
                 final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());
 
                 if (retentionStrategyProvider == null) {
@@ -145,6 +145,6 @@ public class IndexRetentionThread extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return (int) MINUTES.toSeconds(1);
+        return (int) MINUTES.toSeconds(5);
     }
 }

@@ -62,7 +62,8 @@ public class MongoIndexSet implements IndexSet {
     // TODO: Hardcoded archive suffix. See: https://github.com/Graylog2/graylog2-server/issues/2058
     // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
-    public static final String WARM_INDEX_INFIX = "warm_";
+    public static final String KEYWORD_WARM = "warm";
+    public static final String WARM_INDEX_INFIX = KEYWORD_WARM + "_";
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
     private final IndexSetConfig config;
     private final String writeIndexAlias;
@@ -76,6 +77,7 @@ public class MongoIndexSet implements IndexSet {
     private final SystemJobManager systemJobManager;
     private final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     private final ActivityWriter activityWriter;
+
     @Inject
     public MongoIndexSet(@Assisted final IndexSetConfig config,
                          final Indices indices,
@@ -183,7 +185,7 @@ public class MongoIndexSet implements IndexSet {
 
     private int indexPrefixLength(String indexName) {
         int length = config.indexPrefix().length() + 1;
-        if (indexName.contains(WARM_INDEX_INFIX)) {
+        if (indexName.contains("_" + WARM_INDEX_INFIX)) {
             length += WARM_INDEX_INFIX.length();
         }
         return length;

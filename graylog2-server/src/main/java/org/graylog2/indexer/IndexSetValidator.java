@@ -134,10 +134,14 @@ public class IndexSetValidator {
 
     @Nullable
     private Violation validatePrefix(IndexSetConfig newConfig) {
+        if (newConfig.indexPrefix().contains(MongoIndexSet.KEYWORD_WARM)) {
+            return Violation.create(f("Index prefix '%s' contains reserved keyword 'warm'!", newConfig.indexPrefix()));
+        }
+
         // Build an example index name with the new prefix and check if this would be managed by an existing index set
         final String indexName = newConfig.indexPrefix() + MongoIndexSet.SEPARATOR + "0";
         if (indexSetRegistry.isManagedIndex(indexName)) {
-            return Violation.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with an existing index set!");
+            return Violation.create(f("Index prefix '%s' would conflict with an existing index set!", newConfig.indexPrefix()));
         }
 
         // Check if the new index set configuration has a more generic index prefix than an existing index set,
@@ -147,7 +151,9 @@ public class IndexSetValidator {
         // This avoids problems with wildcard matching like "graylog_*".
         for (final IndexSet indexSet : indexSetRegistry) {
             if (newConfig.indexPrefix().startsWith(indexSet.getIndexPrefix()) || indexSet.getIndexPrefix().startsWith(newConfig.indexPrefix())) {
-                return Violation.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with existing index set prefix \"" + indexSet.getIndexPrefix() + "\"");
+                return Violation.create(f("Index prefix '%s' would conflict with existing index set prefix '%s'",
+                        newConfig.indexPrefix(),
+                        indexSet.getIndexPrefix()));
             }
         }
         return null;
