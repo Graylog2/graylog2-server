@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.lookup;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.common.reflect.TypeToken;
@@ -108,9 +109,9 @@ public class LookupAll extends AbstractFunction<List<Object>> {
         return Collections.singletonList(value.toString());
     }
 
-    // Convert any ValueNode to native Java type objects.
+    // Convert any JsonNode to native Java type objects.
     private Object convertValue(Object o) {
-        if (o instanceof ValueNode node) {
+        if (o instanceof JsonNode node) {
             return objectMapper.convertValue(node, Object.class);
         }
         return o;

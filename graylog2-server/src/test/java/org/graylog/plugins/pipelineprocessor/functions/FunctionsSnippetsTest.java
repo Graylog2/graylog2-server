@@ -1399,9 +1399,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void lookupAll() throws IOException {
-        doReturn(LookupResult.single("number_val1")).when(lookupTable).lookup(Long.valueOf(1));
-        doReturn(LookupResult.single("number_val2")).when(lookupTable).lookup(Long.valueOf(2));
-        doReturn(LookupResult.single("number_val3")).when(lookupTable).lookup(Long.valueOf(3));
+        doReturn(LookupResult.single("number_val1")).when(lookupTable).lookup(1);
+        doReturn(LookupResult.single("number_val2")).when(lookupTable).lookup(2);
+        doReturn(LookupResult.single("number_val3")).when(lookupTable).lookup(3);
+
+        doReturn(LookupResult.single("number_val1")).when(lookupTable).lookup(1L);
+        doReturn(LookupResult.single("number_val2")).when(lookupTable).lookup(2L);
+        doReturn(LookupResult.single("number_val3")).when(lookupTable).lookup(3L);
 
         doReturn(LookupResult.single("decimal_val1")).when(lookupTable).lookup(1.1);
         doReturn(LookupResult.single("decimal_val2")).when(lookupTable).lookup(2.2);
@@ -1420,6 +1424,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             evaluateRule(rule, message);
             assertThat(actionsTriggered.get()).isTrue();
         }
+
+        verify(lookupTable).lookup(1);
+        verify(lookupTable).lookup(2);
+        verify(lookupTable).lookup(3);
+
+        verify(lookupTable).lookup(1L);
+        verify(lookupTable).lookup(2L);
+        verify(lookupTable).lookup(3L);
+
+        verify(lookupTable, times(2)).lookup(1.1);
+        verify(lookupTable, times(2)).lookup(2.2);
+        verify(lookupTable, times(2)).lookup(3.3);
+
+        verify(lookupTable, times(2)).lookup("one");
+        verify(lookupTable, times(2)).lookup("two");
+        verify(lookupTable, times(2)).lookup("three");
+
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("json_numbers_results")).isEqualTo(Arrays.asList("number_val1", "number_val2", "number_val3"));
+        assertThat(message.getField("json_decimals_results")).isEqualTo(Arrays.asList("decimal_val1", "decimal_val2", "decimal_val3"));
+        assertThat(message.getField("json_strings_results")).isEqualTo(Arrays.asList("string_val1", "string_val2", "string_val3"));
 
         assertThat(message.getField("numbers_results")).isEqualTo(Arrays.asList("number_val1", "number_val2", "number_val3"));
         assertThat(message.getField("decimals_results")).isEqualTo(Arrays.asList("decimal_val1", "decimal_val2", "decimal_val3"));
