@@ -22,6 +22,8 @@ import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.WriteModel;
 import org.bson.Document;
+import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -70,24 +72,38 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
             var config = doc.get("config", Document.class);
             var series = config.getList("series", Document.class, Collections.emptyList());
             var needsUpdate = false;
+            var invalidSeries = false;
             var newSeries = new ArrayList<Document>(series.size());
 
             for (var s : series) {
-                if (!s.containsKey("function")) {
-                    newSeries.add(s);
-                } else {
-                    needsUpdate = true;
-                    s.put("type", s.get("function"));
-                    s.remove("function");
-                    newSeries.add(s);
+                if (!invalidSeries) {
+                    if (!s.containsKey("function")) {
+                        newSeries.add(s);
+                    } else {
+                        needsUpdate = true;
+                        s.put("type", s.get("function"));
+                        s.remove("function");
+
+                        if (s.containsKey("field") && s.get("field") == null) {
+                            invalidSeries = true;
+                        } else {
+                            newSeries.add(s);
+                        }
+                    }
                 }
+            }
+            if (invalidSeries) {
+                newSeries.clear();
+                Document newConditions = new Document();
+                newConditions.put("expression", null);
+                config.put("conditions", newConditions);
+                doc.put(EventDefinitionDto.FIELD_STATE, EventDefinition.State.DISABLED);
             }
             if (needsUpdate) {
                 config.put("series", newSeries);
                 doc.put("config", config);
                 bulkOperations.add(new ReplaceOneModel<>(Filters.eq("_id", doc.getObjectId("_id")), doc, new ReplaceOptions().upsert(false)));
             }
-
         }
         if (bulkOperations.size() > 0) {
             collection.bulkWrite(bulkOperations);
