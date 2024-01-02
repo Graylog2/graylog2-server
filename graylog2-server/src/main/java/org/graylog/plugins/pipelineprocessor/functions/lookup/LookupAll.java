@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.lookup;
 
-import com.google.common.base.Functions;
-import com.google.common.collect.Lists;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.common.reflect.TypeToken;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -30,8 +30,11 @@ import org.graylog2.plugin.lookup.LookupResult;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -46,17 +49,19 @@ public class LookupAll extends AbstractFunction<List<Object>> {
 
     private final ParameterDescriptor<String, LookupTableService.Function> lookupTableParam;
     private final ParameterDescriptor<Object, List<Object>> keysParam;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public LookupAll(LookupTableService lookupTableService) {
+    public LookupAll(LookupTableService lookupTableService, ObjectMapper objectMapper) {
         lookupTableParam = string("lookup_table", LookupTableService.Function.class)
                 .description("The existing lookup table to use to lookup the given keys")
                 .transform(tableName -> lookupTableService.newBuilder().lookupTable(tableName).build())
                 .build();
         keysParam = object("keys", LIST_RETURN_TYPE)
                 .description("The keys to lookup in the table")
-                .transform(LookupAll::transformValueToList)
+                .transform(this::transformToList)
                 .build();
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -93,11 +98,21 @@ public class LookupAll extends AbstractFunction<List<Object>> {
                 .build();
     }
 
-    private static List<Object> transformValueToList(Object value) {
-        if (value instanceof List) {
-            return Lists.transform((List) value, Functions.toStringFunction());
-        } else {
-            return Collections.singletonList(value.toString());
+    private List<Object> transformToList(Object value) {
+        if (value instanceof Collection<?>) {
+            return ((Collection<?>) value).stream()
+                    .map(this::convertValue)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
         }
+        return Collections.singletonList(value.toString());
+    }
+
+    // Convert any ValueNode to native Java type objects.
+    private Object convertValue(Object o) {
+        if (o instanceof ValueNode node) {
+            return objectMapper.convertValue(node, Object.class);
+        }
+        return o;
     }
 }

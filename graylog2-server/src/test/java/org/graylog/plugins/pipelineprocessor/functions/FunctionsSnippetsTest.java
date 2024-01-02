@@ -398,7 +398,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
         functions.put(LookupHasValue.NAME, new LookupHasValue(lookupTableService));
         functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
-        functions.put(LookupAll.NAME, new LookupAll(lookupTableService));
+        functions.put(LookupAll.NAME, new LookupAll(lookupTableService, objectMapper));
 
         functions.put(MapRemove.NAME, new MapRemove());
         functions.put(MapSet.NAME, new MapSet());
@@ -1398,20 +1398,32 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupAll() {
-        doReturn(LookupResult.single("val1")).when(lookupTable).lookup("key1");
-        doReturn(LookupResult.single("val2")).when(lookupTable).lookup("key2");
-        doReturn(LookupResult.single("val3")).when(lookupTable).lookup("key3");
+    public void lookupAll() throws IOException {
+        doReturn(LookupResult.single("number_val1")).when(lookupTable).lookup(Long.valueOf(1));
+        doReturn(LookupResult.single("number_val2")).when(lookupTable).lookup(Long.valueOf(2));
+        doReturn(LookupResult.single("number_val3")).when(lookupTable).lookup(Long.valueOf(3));
+
+        doReturn(LookupResult.single("decimal_val1")).when(lookupTable).lookup(1.1);
+        doReturn(LookupResult.single("decimal_val2")).when(lookupTable).lookup(2.2);
+        doReturn(LookupResult.single("decimal_val3")).when(lookupTable).lookup(3.3);
+
+        doReturn(LookupResult.single("string_val1")).when(lookupTable).lookup("one");
+        doReturn(LookupResult.single("string_val2")).when(lookupTable).lookup("two");
+        doReturn(LookupResult.single("string_val3")).when(lookupTable).lookup("three");
 
         final Rule rule = parser.parseRule(ruleForTest(), false);
-        final Message message = evaluateRule(rule);
+        final Message message = new Message("message", "source", DateTime.now(DateTimeZone.UTC));
 
-        verify(lookupTable).lookup("key1");
-        verify(lookupTable).lookup("key2");
-        verify(lookupTable).lookup("key3");
-        verifyNoMoreInteractions(lookupTable);
+        try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
+            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+            message.addField("json_with_arrays", jsonString);
+            evaluateRule(rule, message);
+            assertThat(actionsTriggered.get()).isTrue();
+        }
 
-        assertThat(message.getField("results")).isEqualTo(Arrays.asList("val1", "val2", "val3"));
+        assertThat(message.getField("numbers_results")).isEqualTo(Arrays.asList("number_val1", "number_val2", "number_val3"));
+        assertThat(message.getField("decimals_results")).isEqualTo(Arrays.asList("decimal_val1", "decimal_val2", "decimal_val3"));
+        assertThat(message.getField("strings_results")).isEqualTo(Arrays.asList("string_val1", "string_val2", "string_val3"));
     }
 
     @Test
