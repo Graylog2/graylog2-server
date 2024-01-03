@@ -24,6 +24,10 @@ public abstract class EntityScope {
 
     public abstract boolean isMutable();
 
+    public boolean isMutable(ScopedEntity existingEntity, ScopedEntity updatedEntity) {
+        return isMutable();
+    }
+
     public abstract boolean isDeletable();
 
     @Override

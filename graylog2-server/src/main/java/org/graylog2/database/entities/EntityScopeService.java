@@ -57,6 +57,20 @@ public final class EntityScopeService {
         return entityScope.isMutable();
     }
 
+    public boolean isMutable(ScopedEntity existingEntity, ScopedEntity updatedEntity) {
+        Objects.requireNonNull(existingEntity, "Entity must not be null");
+        String scope = existingEntity.scope();
+        if (scope == null || scope.isEmpty()) {
+            return true;
+        }
+
+        EntityScope entityScope = entityScopes.get(scope.toUpperCase(Locale.ROOT));
+        if (entityScope == null) {
+            throw new IllegalArgumentException("Entity Scope does not exist: " + scope);
+        }
+
+        return entityScope.isMutable(existingEntity, updatedEntity);
+    }
 
     public boolean isDeletable(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
