@@ -4,11 +4,7 @@ when
 then
     let json = parse_json(to_string($message.json_with_arrays));
             let selectedPath = select_jsonpath(json: json,
-                paths: { numbers: "$.numbers[*].value",
-                         number: "$.numbers[0].value",
-                         decimals: "$.decimals[*].value",
-                         booleans: "$.booleans[*].value",
-                         strings: "$.strings[*].value"});
+                paths: {strings: "$.strings[*].value"});
 
     set_field("json_results", lookup_all("table", selectedPath.strings));
     set_field("results", lookup_all("table", ["one", "two", "three"]));
