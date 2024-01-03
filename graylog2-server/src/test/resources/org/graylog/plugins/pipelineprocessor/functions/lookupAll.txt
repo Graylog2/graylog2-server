@@ -10,13 +10,9 @@ then
                          booleans: "$.booleans[*].value",
                          strings: "$.strings[*].value"});
 
-    set_field("json_numbers_results", lookup_all("table", selectedPath.numbers));
-    set_field("json_decimals_results", lookup_all("table", selectedPath.decimals));
-    set_field("json_strings_results", lookup_all("table", selectedPath.strings));
-
-    set_field("numbers_results", lookup_all("table", [1, 2, 3]));
-    set_field("decimals_results", lookup_all("table", [1.1, 2.2, 3.3]));
-    set_field("strings_results", lookup_all("table", ["one", "two", "three"]));
+    set_field("json_results", lookup_all("table", selectedPath.strings));
+    set_field("results", lookup_all("table", ["one", "two", "three"]));
+    set_field("single_result", lookup_all("table", "one"));
 
     trigger_test();
 end
