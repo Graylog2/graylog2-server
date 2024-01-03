@@ -21,7 +21,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import ProfileModalForm from 'components/indices/IndexSetFiledTypeProfiles/ProfileModalForm';
+import ProfileForm from 'components/indices/IndexSetFiledTypeProfiles/ProfileForm';
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import useProfileMutations from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
@@ -60,7 +60,7 @@ const EditProfile = ({
   }, [navigate, sendTelemetry, telemetryPathName]);
 
   return (
-    <ProfileModalForm onCancel={onCancel} submitButtonText="Save profile" onSubmit={onSubmit} initialValues={profile} />
+    <ProfileForm onCancel={onCancel} submitButtonText="Save profile" onSubmit={onSubmit} initialValues={profile} />
   );
 };
 

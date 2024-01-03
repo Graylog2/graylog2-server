@@ -122,7 +122,7 @@ const ProfileFormSelect = ({ onChange, options, error, name, value, placeholder,
   </SelectContainer>
 );
 
-const ProfileModalForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Props) => {
+const ProfileForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Props) => {
   const { data, isLoading } = useFieldTypes(undefined, undefined);
   const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMapping();
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
@@ -211,8 +211,8 @@ const ProfileModalForm = ({ initialValues, submitButtonText, onCancel, onSubmit 
   );
 };
 
-ProfileModalForm.defaultProps = {
+ProfileForm.defaultProps = {
   initialValues: { name: '', description: '', customFieldMappings: [{ type: '', field: '' }] },
 };
 
-export default ProfileModalForm;
+export default ProfileForm;

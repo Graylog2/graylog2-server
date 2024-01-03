@@ -18,19 +18,14 @@ import React, { useMemo } from 'react';
 
 import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import CustomFieldMappingsCell from 'components/indices/IndexSetFiledTypeProfiles/cells/CustomFieldMappingsCell';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 
-const useCustomColumnRenderers = () => {
-  const { data: { fieldTypes } } = useFieldTypes();
-
-  return useMemo(() => ({
-    attributes: {
-      custom_field_mappings: {
-        renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => <CustomFieldMappingsCell profile={profile} customFieldTypes={customFieldTypes} fieldTypes={fieldTypes} />,
-        width: 4,
-      },
+const useCustomColumnRenderers = () => useMemo(() => ({
+  attributes: {
+    custom_field_mappings: {
+      renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => <CustomFieldMappingsCell profile={profile} customFieldTypes={customFieldTypes} />,
+      width: 4,
     },
-  }), [fieldTypes]);
-};
+  },
+}), []);
 
 export default useCustomColumnRenderers;
