@@ -213,10 +213,6 @@ const ConfigurationForm = ({
     setShowPreviewModal(true);
   };
 
-  const _onShowImports = () => {
-    setShowUploadsModal(true);
-  };
-
   const _formatCollector = (collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
 
   const _formatCollectorOptions = () => {
@@ -338,12 +334,6 @@ const ConfigurationForm = ({
                         bsSize="sm"
                         onClick={_onShowSource}>
                   Preview
-                </Button>
-                <Button className="pull-right"
-                        bsStyle="link"
-                        bsSize="sm"
-                        onClick={_onShowImports}>
-                  Migrate
                 </Button>
                 <HelpBlock>
                   {_formatValidationMessage('template', 'Required. Collector configuration, see quick reference for more information.')}

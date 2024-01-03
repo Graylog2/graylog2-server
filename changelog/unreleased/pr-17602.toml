@@ -1,0 +1,5 @@
+type = "r"
+message = "Removed legacy Sidecar collector migration link in UI."
+
+issues = [""]
+pulls = ["17602"]
