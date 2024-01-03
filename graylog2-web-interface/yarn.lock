@@ -7,7 +7,7 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adobe/css-tools@^4.0.1", "@adobe/css-tools@^4.3.1":
+"@adobe/css-tools@^4.0.1", "@adobe/css-tools@^4.3.2":
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/@adobe/css-tools/-/css-tools-4.3.2.tgz#a6abc715fb6884851fca9dad37fc34739a04fd11"
   integrity sha512-DA5a1C0gD/pLOvhv33YMrbf2FK3oUzwNl9oOJqE4XVjuEtt6XIakRcsd7eLiOSPkp1kTRQGICTA8cKra/vFbjw==
@@ -2809,12 +2809,12 @@
     lz-string "^1.4.4"
     pretty-format "^27.0.2"
 
-"@testing-library/jest-dom@6.1.5":
-  version "6.1.5"
-  resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-6.1.5.tgz#0a635d0ad4a1a880089d967299d94e9cfc81fbe1"
-  integrity sha512-3y04JLW+EceVPy2Em3VwNr95dOKqA8DhR0RJHhHKDZNYXcVXnEK7WIrpj4eYU8SVt/qYZ2aRWt/WgQ+grNES8g==
+"@testing-library/jest-dom@6.1.6":
+  version "6.1.6"
+  resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-6.1.6.tgz#d9a3ce61cd74ea792622d3da78a830f6786e8d93"
+  integrity sha512-YwuiOdYEcxhfC2u5iNKlvg2Q5MgbutovP6drq7J1HrCbvR+G58BbtoCoq+L/kNlrNFsu2Kt3jaFAviLVxYHJZg==
   dependencies:
-    "@adobe/css-tools" "^4.3.1"
+    "@adobe/css-tools" "^4.3.2"
     "@babel/runtime" "^7.9.2"
     aria-query "^5.0.0"
     chalk "^3.0.0"
@@ -3305,9 +3305,9 @@
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
 "@types/react-beautiful-dnd@^13.0.0":
-  version "13.1.7"
-  resolved "https://registry.yarnpkg.com/@types/react-beautiful-dnd/-/react-beautiful-dnd-13.1.7.tgz#cc8038896ee7dee99b8bfd0eaed0a02a8617bedc"
-  integrity sha512-jQZLov9OkD0xRQkqz8/lx66bHYAYv+g4+POBqnH5Jtt/xo4MygzM879Q9sxAiosPBdNj1JYTdbPxDn3dNRYgow==
+  version "13.1.8"
+  resolved "https://registry.yarnpkg.com/@types/react-beautiful-dnd/-/react-beautiful-dnd-13.1.8.tgz#f52d3ea07e1e19159d6c3c4a48c8da3d855e60b4"
+  integrity sha512-E3TyFsro9pQuK4r8S/OL6G99eq7p8v29sX0PM7oT8Z+PJfZvSQTx4zTQbUJ+QZXioAF0e7TGBEcA1XhYhCweyQ==
   dependencies:
     "@types/react" "*"
 
@@ -7072,7 +7072,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-14d02987-9a3f-469a-a7bd-99ffdf95161b-1704197282109/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-c26c9b4b-9742-4cbf-9944-4bfc15ff2eb3-1704269587851/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.6.1"
     eslint-plugin-jest-dom "5.1.0"
@@ -8512,13 +8512,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.6"
     "@types/jquery" "3.5.29"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-64604308-9d84-45fc-b0a9-2b14f4517df3-1704197281805/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-d78af818-8048-4b5f-8e67-b20ae4e2f74b-1704269587740/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-64604308-9d84-45fc-b0a9-2b14f4517df3-1704197281805/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-d78af818-8048-4b5f-8e67-b20ae4e2f74b-1704269587740/node_modules/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-64604308-9d84-45fc-b0a9-2b14f4517df3-1704197281805/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-d78af818-8048-4b5f-8e67-b20ae4e2f74b-1704269587740/node_modules/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.44"
@@ -10087,7 +10087,7 @@ jest-pnp-resolver@^1.2.2:
   dependencies:
     "@jest/types" "29.6.1"
     "@testing-library/dom" "9.3.3"
-    "@testing-library/jest-dom" "6.1.5"
+    "@testing-library/jest-dom" "6.1.6"
     "@testing-library/react" "12.1.5"
     "@testing-library/react-hooks" "^8.0.0"
     "@testing-library/user-event" "^13.5.0"
@@ -12258,10 +12258,10 @@ postcss-selector-parser@^6.0.4:
     uniq "^1.0.1"
     util-deprecate "^1.0.2"
 
-postcss-styled-syntax@0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/postcss-styled-syntax/-/postcss-styled-syntax-0.6.2.tgz#bf04aaef27da7a9c86531068ac12de628f77e501"
-  integrity sha512-uJ9IuvbkuKGKkbWw3IoBaZA73eIIjSx8+X0Z9+hY4dez4TzeXOxa4my5cKmkUKWcCg8aOE/n2iuMnpKbZVDmsw==
+postcss-styled-syntax@0.6.3:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/postcss-styled-syntax/-/postcss-styled-syntax-0.6.3.tgz#9c7d646c11348e857cc3270294df471837fd9585"
+  integrity sha512-woEkwRaHWnVOVjToQKeQkRYasTwa3WY+0A7hcY0HmiBw458nxmWFbt7+XMvuGWwB4VYjNqeWYNr04Hx9/GVTpA==
   dependencies:
     typescript "^5.3.3"
 
@@ -14510,10 +14510,10 @@ styled-components@6.1.1:
 "stylelint-config-graylog@file:packages/stylelint-config-graylog":
   version "1.0.0"
   dependencies:
-    postcss-styled-syntax "0.6.2"
+    postcss-styled-syntax "0.6.3"
     stylelint "16.1.0"
     stylelint-config-recommended "14.0.0"
-    stylelint-config-standard "35.0.0"
+    stylelint-config-standard "36.0.0"
     stylelint-config-styled-components "0.1.1"
 
 stylelint-config-recommended@14.0.0, stylelint-config-recommended@^14.0.0:
@@ -14521,10 +14521,10 @@ stylelint-config-recommended@14.0.0, stylelint-config-recommended@^14.0.0:
   resolved "https://registry.yarnpkg.com/stylelint-config-recommended/-/stylelint-config-recommended-14.0.0.tgz#b395c7014838d2aaca1755eebd914d0bb5274994"
   integrity sha512-jSkx290CglS8StmrLp2TxAppIajzIBZKYm3IxT89Kg6fGlxbPiTiyH9PS5YUuVAFwaJLl1ikiXX0QWjI0jmgZQ==
 
-stylelint-config-standard@35.0.0:
-  version "35.0.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-standard/-/stylelint-config-standard-35.0.0.tgz#f4574670affb72b6c99d2b5ca5ad010a11ee8d19"
-  integrity sha512-JyQrNZk2BZwVKFauGGxW2U6RuhIfQ4XoHHo+rBzMHcAkLnwI/knpszwXjzxiMgSfcxbZBckM7Vq4LHoANTR85g==
+stylelint-config-standard@36.0.0:
+  version "36.0.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-standard/-/stylelint-config-standard-36.0.0.tgz#6704c044d611edc12692d4a5e37b039a441604d4"
+  integrity sha512-3Kjyq4d62bYFp/Aq8PMKDwlgUyPU4nacXsjDLWJdNPRUgpuxALu1KnlAHIj36cdtxViVhXexZij65yM0uNIHug==
   dependencies:
     stylelint-config-recommended "^14.0.0"
 
