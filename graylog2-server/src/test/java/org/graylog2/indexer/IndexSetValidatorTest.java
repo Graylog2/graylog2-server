@@ -26,16 +26,13 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
-import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -46,11 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class IndexSetValidatorTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private IndexSetRegistry indexSetRegistry;
@@ -63,7 +57,7 @@ public class IndexSetValidatorTest {
 
     private IndexSetValidator validator;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, false);
     }
@@ -84,11 +78,8 @@ public class IndexSetValidatorTest {
     public void validateWhenAlreadyManaged() {
         final String prefix = "graylog_index";
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
-        final IndexSet indexSet = mock(IndexSet.class);
 
-        when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.isManagedIndex("graylog_index_0")).thenReturn(true);
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
         when(newConfig.indexPrefix()).thenReturn(prefix);
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
@@ -152,8 +143,6 @@ public class IndexSetValidatorTest {
         // no max retention period configured
         assertThat(validator.validate(testIndexSetConfig())).isNotPresent();
 
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
-
         // max retention period >= effective retention period
         when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(10));
         assertThat(validator.validate(testIndexSetConfig())).isNotPresent();
@@ -185,8 +174,6 @@ public class IndexSetValidatorTest {
         when(newConfig.indexPrefix()).thenReturn(prefix);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
         when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
-        ValidationResult validationResult = new ValidationResult().addError("fieldName", "error");
-        when(retentionStrategyConfig.validate(elasticsearchConfiguration)).thenReturn(validationResult);
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
@@ -224,6 +211,16 @@ public class IndexSetValidatorTest {
 
         assertThat(validator.validate(testIndexSetConfig().toBuilder().dataTiering(mock(DataTieringConfig.class)).build())).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("cloud"));
+    }
+
+    @Test
+    public void testWarmTierKeywordReserved() {
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexPrefix("warm_").build();
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, true);
+
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("contains reserved keyword 'warm_'!"));
     }
 
     private IndexSetConfig testIndexSetConfig() {

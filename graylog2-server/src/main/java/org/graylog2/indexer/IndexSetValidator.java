@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
 
+import static org.graylog2.indexer.MongoIndexSet.WARM_INDEX_INFIX;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
@@ -134,10 +135,15 @@ public class IndexSetValidator {
 
     @Nullable
     private Violation validatePrefix(IndexSetConfig newConfig) {
+        if (newConfig.indexPrefix().contains(WARM_INDEX_INFIX)) {
+            return Violation.create(f("Index prefix '%s' contains reserved keyword '%s'!",
+                    newConfig.indexPrefix(), WARM_INDEX_INFIX));
+        }
+
         // Build an example index name with the new prefix and check if this would be managed by an existing index set
         final String indexName = newConfig.indexPrefix() + MongoIndexSet.SEPARATOR + "0";
         if (indexSetRegistry.isManagedIndex(indexName)) {
-            return Violation.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with an existing index set!");
+            return Violation.create(f("Index prefix '%s' would conflict with an existing index set!", newConfig.indexPrefix()));
         }
 
         // Check if the new index set configuration has a more generic index prefix than an existing index set,
@@ -147,7 +153,9 @@ public class IndexSetValidator {
         // This avoids problems with wildcard matching like "graylog_*".
         for (final IndexSet indexSet : indexSetRegistry) {
             if (newConfig.indexPrefix().startsWith(indexSet.getIndexPrefix()) || indexSet.getIndexPrefix().startsWith(newConfig.indexPrefix())) {
-                return Violation.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with existing index set prefix \"" + indexSet.getIndexPrefix() + "\"");
+                return Violation.create(f("Index prefix '%s' would conflict with existing index set prefix '%s'",
+                        newConfig.indexPrefix(),
+                        indexSet.getIndexPrefix()));
             }
         }
         return null;

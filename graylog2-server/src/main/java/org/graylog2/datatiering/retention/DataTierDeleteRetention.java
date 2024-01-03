@@ -22,6 +22,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.retention.executors.TimeBasedRetentionExecutor;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class DataTierDeleteRetention {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataTierDeleteRetention.class);
 
-    private final RetentionExecutor retentionExecutor;
+    private final TimeBasedRetentionExecutor timeBasedRetentionExecutor;
     private final Indices indices;
 
     private final AuditEventSender auditEventSender;
@@ -45,21 +46,21 @@ public class DataTierDeleteRetention {
     private final NodeId nodeId;
 
     @Inject
-    public DataTierDeleteRetention(RetentionExecutor retentionExecutor,
+    public DataTierDeleteRetention(TimeBasedRetentionExecutor timeBasedRetentionExecutor,
                                    Indices indices,
                                    AuditEventSender auditEventSender,
                                    NodeId nodeId) {
-        this.retentionExecutor = retentionExecutor;
+        this.timeBasedRetentionExecutor = timeBasedRetentionExecutor;
         this.indices = indices;
         this.auditEventSender = auditEventSender;
         this.nodeId = nodeId;
     }
 
     public void retain(IndexSet indexSet, IndexLifetimeConfig config) {
-        retentionExecutor.retain(indexSet, config, this::retain);
+        timeBasedRetentionExecutor.retain(indexSet, config, this::retain, this.getClass().getCanonicalName());
     }
 
-    private void retain(List<String> indexNames) {
+    private void retain(List<String> indexNames, IndexSet indexSet) {
         indexNames.forEach(indexName -> {
             final Stopwatch sw = Stopwatch.createStarted();
 
