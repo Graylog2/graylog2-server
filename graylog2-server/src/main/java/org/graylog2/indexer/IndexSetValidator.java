@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
 
+import static org.graylog2.indexer.MongoIndexSet.WARM_INDEX_INFIX;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
@@ -134,8 +135,9 @@ public class IndexSetValidator {
 
     @Nullable
     private Violation validatePrefix(IndexSetConfig newConfig) {
-        if (newConfig.indexPrefix().contains(MongoIndexSet.KEYWORD_WARM)) {
-            return Violation.create(f("Index prefix '%s' contains reserved keyword 'warm'!", newConfig.indexPrefix()));
+        if (newConfig.indexPrefix().contains(WARM_INDEX_INFIX)) {
+            return Violation.create(f("Index prefix '%s' contains reserved keyword '%s'!",
+                    newConfig.indexPrefix(), WARM_INDEX_INFIX));
         }
 
         // Build an example index name with the new prefix and check if this would be managed by an existing index set

@@ -215,12 +215,12 @@ public class IndexSetValidatorTest {
 
     @Test
     public void testWarmTierKeywordReserved() {
-        IndexSetConfig config = testIndexSetConfig().toBuilder().indexPrefix("warm").build();
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexPrefix("warm_").build();
 
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, true);
 
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
-                assertThat(v.message()).contains("contains reserved keyword 'warm'!"));
+                assertThat(v.message()).contains("contains reserved keyword 'warm_'!"));
     }
 
     private IndexSetConfig testIndexSetConfig() {
