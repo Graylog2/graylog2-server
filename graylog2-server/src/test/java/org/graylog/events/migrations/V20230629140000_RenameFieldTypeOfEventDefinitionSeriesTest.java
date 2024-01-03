@@ -94,32 +94,25 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
     @Test
     @MongoDBFixtures("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions.json")
     public void migratesEventDefinitionsProperly() {
-        this.migration.upgrade();
-
-        final V20230629140000_RenameFieldTypeOfEventDefinitionSeries.MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted).isNotNull();
-
-        assertThat(eventDefinitionsCollection.countDocuments()).isEqualTo(4);
-
-        var actualCollection = collectionToJson();
         var expectedCollection = resourceFile("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json");
-
-        uncheckedJSONAssertEquals(expectedCollection, actualCollection);
+        runMigration(5, expectedCollection);
     }
 
     @Test
     @MongoDBFixtures("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json")
     public void doesNotChangeMigratedEventDefinitions() {
+        var expectedCollection = resourceFile("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json");
+        runMigration(5, expectedCollection);
+    }
+
+    private void runMigration(int expectedCount, String expectedCollection) {
         this.migration.upgrade();
 
         final V20230629140000_RenameFieldTypeOfEventDefinitionSeries.MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted).isNotNull();
-
-        assertThat(eventDefinitionsCollection.countDocuments()).isEqualTo(4);
+        assertThat(eventDefinitionsCollection.countDocuments()).isEqualTo(expectedCount);
 
         var actualCollection = collectionToJson();
-        var expectedCollection = resourceFile("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json");
-
         uncheckedJSONAssertEquals(expectedCollection, actualCollection);
     }
 

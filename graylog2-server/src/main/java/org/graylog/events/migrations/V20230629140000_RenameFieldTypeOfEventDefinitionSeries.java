@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20230629140000_RenameFieldTypeOfEventDefinitionSeries.class);
@@ -67,51 +68,55 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
         ));
 
         var bulkOperations = new ArrayList<WriteModel<? extends Document>>();
-
         for (Document doc : result) {
-            var config = doc.get("config", Document.class);
-            var series = config.getList("series", Document.class, Collections.emptyList());
-            var needsUpdate = false;
-            var invalidSeries = false;
-            var newSeries = new ArrayList<Document>(series.size());
-
-            for (var s : series) {
-                if (!invalidSeries) {
-                    if (!s.containsKey("function")) {
-                        newSeries.add(s);
-                    } else {
-                        needsUpdate = true;
-                        s.put("type", s.get("function"));
-                        s.remove("function");
-
-                        if (s.containsKey("field") && s.get("field") == null
-                                && (s.get("type") == "card" || s.get("type") == "max" || s.get("type") == "percentile")) {
-                            invalidSeries = true;
-                        } else {
-                            newSeries.add(s);
-                        }
-                    }
-                }
-            }
-            if (invalidSeries) {
-                newSeries.clear();
-                Document newConditions = new Document();
-                newConditions.put("expression", null);
-                config.put("conditions", newConditions);
-                doc.put(EventDefinitionDto.FIELD_STATE, EventDefinition.State.DISABLED);
-            }
-            if (needsUpdate) {
-                config.put("series", newSeries);
-                doc.put("config", config);
-                bulkOperations.add(new ReplaceOneModel<>(Filters.eq("_id", doc.getObjectId("_id")), doc, new ReplaceOptions().upsert(false)));
-            }
+            processDoc(doc, bulkOperations);
         }
         if (bulkOperations.size() > 0) {
             collection.bulkWrite(bulkOperations);
         }
-
         this.clusterConfigService.write(new MigrationCompleted());
     }
 
+    private void processDoc(Document doc, List<WriteModel<? extends Document>> bulkOperations) {
+        var config = doc.get("config", Document.class);
+        var series = config.getList("series", Document.class, Collections.emptyList());
+        var needsUpdate = false;
+        var invalidSeries = false;
+        var newSeries = new ArrayList<Document>(series.size());
+
+        for (var s : series) {
+            if (invalidSeries) {
+                break;
+            }
+            if (!s.containsKey("function")) {
+                newSeries.add(s);
+            } else {
+                needsUpdate = true;
+                s.put("type", s.get("function"));
+                s.remove("function");
+
+                if (s.containsKey("field") && s.get("field") == null
+                        && (s.get("type").equals("card") || s.get("type").equals("max") || s.get("type").equals("percentile"))) {
+                    invalidSeries = true;
+                } else {
+                    newSeries.add(s);
+                }
+            }
+        }
+        if (invalidSeries) {
+            newSeries.clear();
+            Document newConditions = new Document();
+            newConditions.put("expression", null);
+            config.put("conditions", newConditions);
+            doc.put(EventDefinitionDto.FIELD_STATE, EventDefinition.State.DISABLED);
+        }
+        if (needsUpdate) {
+            config.put("series", newSeries);
+            doc.put("config", config);
+            bulkOperations.add(new ReplaceOneModel<>(Filters.eq("_id", doc.getObjectId("_id")), doc, new ReplaceOptions().upsert(false)));
+        }
+    }
+
     public record MigrationCompleted() {}
+
 }
