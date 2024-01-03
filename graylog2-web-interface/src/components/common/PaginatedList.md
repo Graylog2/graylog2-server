@@ -30,7 +30,7 @@ const PaginatedListExample = createReactClass({
       <PaginatedList totalItems={items.length}
                      pageSize={pageSize}
                      onChange={this.onPageChange}
-                     pageSizes={[5, 10, 20]}>`
+                     pageSizes={[5, 10, 20]}>
         <table className="table">
           <thead>
             <tr>
