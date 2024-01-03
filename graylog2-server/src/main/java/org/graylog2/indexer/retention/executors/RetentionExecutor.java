@@ -59,7 +59,7 @@ public class RetentionExecutor {
         final Set<String> orderedIndices = Arrays.stream(indexSet.getManagedIndices())
                 .filter(indexName -> !indices.isReopened(indexName))
                 .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
-                .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))
+                .sorted(indexSet.indexComparator())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         LinkedList<String> orderedIndicesDescending = new LinkedList<>();
