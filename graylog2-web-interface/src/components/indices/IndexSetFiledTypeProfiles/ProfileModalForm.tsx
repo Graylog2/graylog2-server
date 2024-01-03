@@ -18,15 +18,17 @@
 import { styled } from 'styled-components';
 import React, { useMemo } from 'react';
 import { Formik, Form, FieldArray, Field } from 'formik';
+import countBy from 'lodash/countBy';
+import { Loader } from '@mantine/core';
 
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import { FormikInput, IconButton, Select, FormSubmit } from 'components/common';
-import { Button, Col, HelpBlock } from 'components/bootstrap';
+import { Button, Col, HelpBlock, Input } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import { defaultCompare } from 'logic/DefaultCompare';
 
-const StyledSelect = styled(Select)`
+const SelectContainer = styled.div`
   flex-basis: 100%;
 `;
 
@@ -62,6 +64,64 @@ type Props = {
   onSubmit: (profile: IndexSetFieldTypeProfile) => void
 }
 
+const getFieldError = (field: string, occurrences: number) => {
+  if (!field) return 'Filed is required';
+  if (occurrences > 1) return 'This field occurs several times';
+
+  return undefined;
+};
+
+const validate = (formValues: IndexSetFieldTypeProfile) => {
+  const errors: { name?: string, customFieldMappings?: Array<{ field?: string, type?: string }>} = {};
+
+  if (!formValues.name) {
+    errors.name = 'Profile name is required';
+  }
+
+  const fieldsOccurrences = countBy(formValues.customFieldMappings, 'field');
+
+  const customFieldMappings: Array<{ field: string, type: string }> = formValues
+    .customFieldMappings
+    .map(({ field, type }) => {
+      if (field && type && (fieldsOccurrences[field] === 1)) return undefined;
+
+      return ({
+        field: getFieldError(field, fieldsOccurrences[field]),
+        type: !type && 'Type is required',
+      });
+    });
+
+  if (customFieldMappings.filter((item) => item).length > 0) {
+    errors.customFieldMappings = customFieldMappings;
+  }
+
+  return errors;
+};
+
+type ProfileFormSelectProps = {
+  onChange: (param: { target: { value: string, name: string } }) => void,
+  options: Array<{ value: string, label: string, disabled?: boolean }>,
+  error: string,
+  name: string,
+  value: string,
+  placeholder: string,
+  allowCreate: boolean,
+}
+const ProfileFormSelect = ({ onChange, options, error, name, value, placeholder, allowCreate }: ProfileFormSelectProps) => (
+  <SelectContainer>
+    <Input error={error} name={name}>
+      <Select options={options}
+              value={value}
+              inputId={name}
+              onChange={(newVal) => {
+                onChange({ target: { value: newVal, name } });
+              }}
+              placeholder={placeholder}
+              allowCreate={allowCreate} />
+    </Input>
+  </SelectContainer>
+);
+
 const ProfileModalForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Props) => {
   const { data, isLoading } = useFieldTypes(undefined, undefined);
   const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMapping();
@@ -80,7 +140,9 @@ const ProfileModalForm = ({ initialValues, submitButtonText, onCancel, onSubmit 
   return (
     <Col lg={8}>
       <Formik<IndexSetFieldTypeProfile> initialValues={initialValues}
-                                        onSubmit={_onSubmit}>
+                                        onSubmit={_onSubmit}
+                                        validate={validate}
+                                        validateOnChange>
         {({ isSubmitting, isValidating, values: { customFieldMappings } }) => (
           <Form>
             <FormikInput name="name"
@@ -104,37 +166,30 @@ const ProfileModalForm = ({ initialValues, submitButtonText, onCancel, onSubmit 
                               Here you can setup type mapping to any filed. If the needed field is not exist on the list you can type it and create
                             </HelpBlock>
                             <List>
-                              {customFieldMappings.map((_, index) => (
+                              {(isLoading || isLoadingFieldTypes) ? <Loader /> : customFieldMappings.map((_, index) => (
                                 // eslint-disable-next-line react/no-array-index-key
                                 <Item key={index}>
                                   <SelectGroup>
                                     <Field name={`customFieldMappings.${index}.field`} required>
-                                      {({ field: { name, value, onChange } }) => (
-                                        <StyledSelect options={fields}
-                                                      value={value}
-                                                      name={name}
-                                                      inputId={name}
-                                                      onChange={(newVal) => {
-                                                        onChange({ target: { value: newVal, name } });
-                                                      }}
-                                                      placeholder="Select or type the field"
-                                                      disabled={isLoading}
-                                                      required
-                                                      allowCreate />
+                                      {({ field: { name, value, onChange }, meta: { error } }) => (
+                                        <ProfileFormSelect value={value}
+                                                           onChange={onChange}
+                                                           options={fields}
+                                                           name={name}
+                                                           error={error}
+                                                           placeholder="Select ot type field name"
+                                                           allowCreate />
                                       )}
                                     </Field>
                                     <Field name={`customFieldMappings.${index}.type`} required>
-                                      {({ field: { name, value, onChange } }) => (
-                                        <StyledSelect options={fieldTypeOptions}
-                                                      value={value}
-                                                      name={name}
-                                                      inputId={name}
-                                                      onChange={(newVal) => {
-                                                        onChange({ target: { value: newVal, name } });
-                                                      }}
-                                                      placeholder="Select field type"
-                                                      disabled={isLoadingFieldTypes}
-                                                      required />
+                                      {({ field: { name, value, onChange }, meta: { error } }) => (
+                                        <ProfileFormSelect value={value}
+                                                           onChange={onChange}
+                                                           options={fieldTypeOptions}
+                                                           name={name}
+                                                           error={error}
+                                                           placeholder="Select field type"
+                                                           allowCreate={false} />
                                       )}
                                     </Field>
                                   </SelectGroup>
