@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Loader } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
@@ -25,10 +26,21 @@ import { Button, Col, Row } from 'components/bootstrap';
 import useProfile from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfile';
 import useParams from 'routing/useParams';
 import EditProfile from 'components/indices/IndexSetFiledTypeProfiles/EditProfile';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 const IndexSetFieldTypeProfileEditPage = () => {
   const { profileId } = useParams();
   const { data, isFetched } = useProfile(profileId);
+  const navigate = useNavigate();
+  const currentUser = useCurrentUser();
+
+  useEffect(() => {
+    const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
+
+    if (!hasMappingPermission) {
+      navigate(Routes.NOTFOUND);
+    }
+  }, [currentUser.permissions, navigate]);
 
   return (
     <DocumentTitle title="Edit Index Set Field Type Profile">
