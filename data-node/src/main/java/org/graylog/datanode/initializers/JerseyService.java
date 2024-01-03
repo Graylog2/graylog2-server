@@ -66,6 +66,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -229,8 +230,11 @@ public class JerseyService extends AbstractIdleService {
         final boolean isSecuredInstance = sslEngineConfigurator != null;
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
 
-        if(isSecuredInstance) {
-            resourceConfig.register(new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode"));
+        if (isSecuredInstance) {
+            final BasicAuthFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
+            resourceConfig.register(
+                    new DatanodeAuthFilter(basicAuthFilter, configuration.getPasswordSecret()));
+
         }
         resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));
 

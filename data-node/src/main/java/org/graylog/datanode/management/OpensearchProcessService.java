@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;

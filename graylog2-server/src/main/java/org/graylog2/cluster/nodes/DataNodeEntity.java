@@ -38,6 +38,10 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
         return (String) fields.get("cluster_address");
     }
 
+    public String getRestApiAddress() {
+        return (String) fields.get("rest_api_address");
+    }
+
     public DataNodeStatus getDataNodeStatus() {
         if (!fields.containsKey("datanode_status")) {
             return null;
@@ -56,6 +60,7 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
                 .setLeader(this.isLeader())
                 .setClusterAddress(this.getClusterAddress())
                 .setDataNodeStatus(this.getDataNodeStatus())
+                .setRestApiAddress(this.getRestApiAddress())
                 .build();
     }
 
