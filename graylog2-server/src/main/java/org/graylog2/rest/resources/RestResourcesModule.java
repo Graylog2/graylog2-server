@@ -18,6 +18,7 @@ package org.graylog2.rest.resources;
 
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest.HistogramResponseWriter;
 import org.graylog2.Configuration;
+import org.graylog2.bootstrap.preflight.web.resources.CAResource;
 import org.graylog2.bootstrap.preflight.web.resources.CertificateRenewalResource;
 import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -156,6 +157,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(CertificateRenewalResource.class);
         addSystemRestResource(DataNodeApiProxyResource.class);
         addSystemRestResource(DataNodeManagementResource.class);
+        addSystemRestResource(CAResource.class);
     }
 
     private void addDebugResources() {

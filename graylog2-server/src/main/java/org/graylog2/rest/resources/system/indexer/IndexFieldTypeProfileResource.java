@@ -42,6 +42,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_DELETE;
@@ -58,7 +59,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     private final IndexFieldTypeProfileService profileService;
 
     @Inject
-    public IndexFieldTypeProfileResource(IndexFieldTypeProfileService profileService) {
+    public IndexFieldTypeProfileResource(final IndexFieldTypeProfileService profileService) {
         this.profileService = profileService;
     }
 
@@ -79,6 +80,8 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @ApiOperation(value = "Gets profile by id")
     public PageListResponse<IndexFieldTypeProfile> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                           @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                           @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                            @ApiParam(name = "sort",
                                                                      value = "The field to sort the result on",
                                                                      required = true,
@@ -86,7 +89,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
                                                            @DefaultValue(IndexFieldTypeProfile.NAME_FIELD_NAME) @QueryParam("sort") String sort,
                                                            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                            @DefaultValue("asc") @QueryParam("order") String order) {
-        return profileService.getPaginated(page, perPage, sort, order);
+        return profileService.getPaginated(query, filters, page, perPage, sort, order);
     }
 
     @POST
@@ -116,4 +119,5 @@ public class IndexFieldTypeProfileResource extends RestResource {
     public void delete(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
         profileService.delete(profileId);
     }
+
 }
