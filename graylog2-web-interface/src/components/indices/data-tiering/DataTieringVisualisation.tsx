@@ -121,7 +121,7 @@ const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot,
   const theme = useTheme();
 
   const percentageFor = (days: number) => {
-    if (days <= 0) return 0;
+    if (days <= 0 || maxDays <= 0) return 0;
 
     return ((days / maxDays) * 100);
   };
