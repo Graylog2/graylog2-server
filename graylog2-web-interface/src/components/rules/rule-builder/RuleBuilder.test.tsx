@@ -215,8 +215,8 @@ describe('RuleBuilder', () => {
   });
 
   it('simulator parser should convert KeyValue pairs to JSON', () => {
-    const keyValuePairs = 'a=a a a a\nb=b,b,b,b\n\n   "d    :    d"   \nc=`c`\ne:\n   f   =\n';
-    const keyValuePairsAsJson = '{"a":"a a a a","b":"b,b,b,b","d":"d","c":"c"}';
+    const keyValuePairs = 'a:a a a a\nb:b,b,b,b\n\n   f   :\n';
+    const keyValuePairsAsJson = '{"a":"a a a a","b":"b,b,b,b"}';
 
     expect(jsonifyText(keyValuePairs)).toEqual(keyValuePairsAsJson);
   });

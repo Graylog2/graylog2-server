@@ -76,6 +76,10 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
     public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
     public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
+
+    public static final String INDEX_FIELD_TYPE_PROFILE_CREATE = PREFIX + "index_field_type_profile:create";
+    public static final String INDEX_FIELD_TYPE_PROFILE_UPDATE = PREFIX + "index_field_type_profile:update";
+    public static final String INDEX_FIELD_TYPE_PROFILE_DELETE = PREFIX + "index_field_type_profile:delete";
     public static final String EXTRACTOR_UPDATE = PREFIX + "extractor:update";
     public static final String GETTING_STARTED_GUIDE_OPT_OUT_CREATE = PREFIX + "getting_started_guide_opt_out:create";
     public static final String GRANTS_UPDATE = PREFIX + "grants:update";
@@ -223,6 +227,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(GROK_PATTERN_DELETE)
             .add(GROK_PATTERN_IMPORT_CREATE)
             .add(GROK_PATTERN_UPDATE)
+            .add(INDEX_FIELD_TYPE_PROFILE_CREATE)
+            .add(INDEX_FIELD_TYPE_PROFILE_DELETE)
+            .add(INDEX_FIELD_TYPE_PROFILE_UPDATE)
             .add(INDEX_SET_CREATE)
             .add(INDEX_SET_DELETE)
             .add(INDEX_SET_UPDATE)

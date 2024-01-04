@@ -31,12 +31,11 @@ const jsonifyText = (text: string): string => {
         text
           .trim()
           .replace(/^\s*\n/gm, '')
-          .replace(/"|'|`/g, '')
-          .replace(/=/g, ':')
+          .replace(/"/g, '\\"')
           .split('\n')
           .map((line) => line.trim().split(':').map((keyValue) => keyValue.trim()))
           .filter((keyValue) => keyValue[0] && keyValue[1])
-          .map((keyValue) => `${keyValue[0]}":"${keyValue.slice(1).join(':')}`)
+          .map((keyValue) => `${keyValue[0].replace(/\\"/g, '').trim()}":"${keyValue.slice(1).join(':').trim()}`)
           .join('","')
       }"}`;
 

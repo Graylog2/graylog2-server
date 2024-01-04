@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fields `gl2_message_id` and `streams` are now reserved and cannot be changed by custom mappings. No reserved field can be changed when you manually change custom mappings in MongoDB - it will be ignored."
+
+issues = ["17728"]
+pulls = ["17766"]
