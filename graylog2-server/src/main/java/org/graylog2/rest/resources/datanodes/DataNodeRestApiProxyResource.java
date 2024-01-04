@@ -69,7 +69,7 @@ public class DataNodeRestApiProxyResource extends RestResource {
 
     @GET
     @ApiOperation(value = "GET request to Data Node's API")
-    @AuditEvent(type = DATANODE_API_REQUEST)
+    @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
     public Response requestGet(@ApiParam(name = "path", required = true)
                                @PathParam("path") String path,
                                @Context ContainerRequestContext requestContext) throws IOException {
@@ -78,7 +78,7 @@ public class DataNodeRestApiProxyResource extends RestResource {
 
     @POST
     @ApiOperation(value = "POST request to Data Node's API")
-    @AuditEvent(type = DATANODE_API_REQUEST)
+    @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
     public Response requestPost(@ApiParam(name = "path", required = true)
                                 @PathParam("path") String path,
                                 @Context ContainerRequestContext requestContext) throws IOException {
@@ -87,7 +87,7 @@ public class DataNodeRestApiProxyResource extends RestResource {
 
     @PUT
     @ApiOperation(value = "PUT request to Data Node's API")
-    @AuditEvent(type = DATANODE_API_REQUEST)
+    @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
     public Response requestPut(@ApiParam(name = "path", required = true)
                                @PathParam("path") String path,
                                @Context ContainerRequestContext requestContext) throws IOException {
@@ -96,7 +96,7 @@ public class DataNodeRestApiProxyResource extends RestResource {
 
     @DELETE
     @ApiOperation(value = "DELETE request to Data Node's API")
-    @AuditEvent(type = DATANODE_API_REQUEST)
+    @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
     public Response requestDelete(@ApiParam(name = "path", required = true)
                                   @PathParam("path") String path,
                                   @Context ContainerRequestContext requestContext) throws IOException {
