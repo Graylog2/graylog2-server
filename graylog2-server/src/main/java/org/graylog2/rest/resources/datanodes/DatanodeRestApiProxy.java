@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.datanodes;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Objects;
 
 @Singleton
 public class DatanodeRestApiProxy implements ProxyRequestAdapter {
@@ -66,8 +68,9 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                 wrapWithLeadingSlash(request.path())
         );
 
-        // TODO: finish passing request body
-        //httpEntityEnclosingRequest.setEntity(new InputStreamEntity(request.body()));
+        if (hasBody(request)) {
+            httpEntityEnclosingRequest.setEntity(new InputStreamEntity(request.body()));
+        }
 
         final HttpHost host = nodeService.allActive().values().stream()
                 .filter(DataNodeDto::isLeader)
@@ -78,6 +81,11 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
         final CloseableHttpResponse response = httpClient.execute(host, httpEntityEnclosingRequest);
         return new ProxyResponse(response.getStatusLine().getStatusCode(), response.getEntity().getContent());
+    }
+
+    private boolean hasBody(ProxyRequest request) throws IOException {
+        final boolean isGetOrPost = Objects.equals(request.method(), "POST") || Objects.equals(request.method(), "PUT");
+        return isGetOrPost && request.body().available() > 0;
     }
 
     private String wrapWithLeadingSlash(String path) {
