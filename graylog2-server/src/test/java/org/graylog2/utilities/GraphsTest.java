@@ -99,7 +99,6 @@ public class GraphsTest {
 
         Graphs.merge(mutableGraph, singletonGraph);
         assertThat(mutableGraph).isEqualTo(singletonGraph);
-        assertThat(mutableGraph).isEqualTo(mutableGraph);
     }
 
     @Test
