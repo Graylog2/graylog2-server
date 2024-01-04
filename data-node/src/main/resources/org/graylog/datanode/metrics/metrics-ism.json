@@ -31,7 +31,8 @@
                   {
                     "date_histogram": {
                       "source_field": "timestamp",
-                      "interval": "hour"
+                      "fixed_interval": "60m",
+                      "timezone": "America/Los_Angeles"
                     }
                   }
                 ],

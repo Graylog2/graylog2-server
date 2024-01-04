@@ -32,6 +32,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposabl
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
+import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
             process.restClient().ifPresent(client -> {
 
                 updateDataStreamTemplate(client);
+                createDataStreamBackingIndex(client); // TODO: create if not exists
                 configureMetricsIsm(client);
 
             });
@@ -72,8 +74,25 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
     private void updateDataStreamTemplate(RestHighLevelClient client) {
         Settings settings = Settings.EMPTY; // use default settings
+        final CompressedXContent mappings;
+        try {
+            mappings = new CompressedXContent("""
+                    {
+                        "properties": {
+                            "timestamp": {
+                                "type": "date",
+                                "format":"yyyy-MM-dd HH:mm:ss.SSS||strict_date_optional_time||epoch_millis"
+                            },
+                            "node": {
+                                "type": "keyword"
+                            }
+                        }
+                    }""");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         ComposableIndexTemplate template = new ComposableIndexTemplate(List.of(configuration.getMetricsStream() + "*"),
-                new Template(settings, null, null),
+                new Template(settings, mappings, null),
                 null, null, null, null, // all default
                 new ComposableIndexTemplate.DataStreamTemplate(new DataStream.TimestampField(configuration.getMetricsTimestamp())));
         var request = new PutComposableIndexTemplateRequest()
@@ -104,17 +123,20 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     private void configureMetricsIsm(RestHighLevelClient client) {
         //TODO dynamically create ism with config values using either jackson or freemarker
         try {
+            final Request delRequest = new Request("DELETE", "_plugins/_ism/policies/gl_purge_metrics");
+            final Response delResponse = client.getLowLevelClient().performRequest(delRequest);
+
             final URL resource = getClass().getResource("metrics-ism.json");
             File metricsIsm = new File(resource.getFile());
             final String ism = FileUtils.readFileToString(metricsIsm, Charset.defaultCharset());
             final Request ismRequest = new Request("PUT", "_plugins/_ism/policies/gl_purge_metrics");
             ismRequest.setJsonEntity(ism);
             final Response response = client.getLowLevelClient().performRequest(ismRequest);
-            if (response.getStatusLine().getStatusCode() != 200) {
+            if (response.getStatusLine().getStatusCode() != 201) {
                 log.error("Error creating ism for metrics rollup (Status {})", response.getStatusLine().getStatusCode());
             }
         } catch (IOException e) {
-            log.error("Could not read ism config for metrics");
+            log.error("Could not read ism config for metrics", e);
         }
 
     }
