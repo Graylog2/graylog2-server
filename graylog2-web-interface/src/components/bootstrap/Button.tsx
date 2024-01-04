@@ -126,6 +126,7 @@ const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disab
     },
     label: {
       gap: '0.25em',
+      overflow: 'visible',
     },
   };
 };
@@ -156,10 +157,10 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
     if (href) {
       return (
-        <StyledButton<'a'> component="a"
-                           href={href}
-                           onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-                           {...sharedProps}>
+        <StyledButton component="a"
+                      href={href}
+                      onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+                      {...sharedProps}>
           {children}
         </StyledButton>
       );

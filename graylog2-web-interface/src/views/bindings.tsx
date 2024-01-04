@@ -43,7 +43,7 @@ import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHandler';
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';

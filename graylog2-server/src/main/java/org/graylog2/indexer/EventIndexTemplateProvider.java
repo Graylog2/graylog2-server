@@ -16,28 +16,13 @@
  */
 package org.graylog2.indexer;
 
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.storage.SearchVersion;
-
-import javax.annotation.Nonnull;
-
-import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
-import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
-import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
-
-public class EventIndexTemplateProvider implements IndexTemplateProvider {
+public class EventIndexTemplateProvider extends BasicIndexTemplateProvider<EventsIndexMapping> {
 
     public static final String EVENT_TEMPLATE_TYPE = "events";
 
     @Override
-    public IndexMappingTemplate create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig) {
-        if (searchVersion.satisfies(ELASTICSEARCH, "^7.0.0")
-                || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")
-                || searchVersion.satisfies(DATANODE, "^5.2.0")
-        ) {
-            return new EventsIndexMapping7();
-        } else {
-            throw new ElasticsearchException("Unsupported Search version: " + searchVersion);
-        }
+    protected EventsIndexMapping createTemplateInstance() {
+        return new EventsIndexMapping7();
     }
+
 }

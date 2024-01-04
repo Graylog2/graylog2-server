@@ -62,7 +62,8 @@ describe('CopyToDashboardForm', () => {
 
   const SUT = (props: Partial<React.ComponentProps<typeof CopyToDashboardForm>>) => (
     <CopyToDashboardForm onCancel={() => {}}
-                         onSubmit={() => Promise.resolve()}
+                         onCopyToDashboard={() => Promise.resolve()}
+                         onCreateNewDashboard={() => Promise.resolve()}
                          submitButtonText="Submit"
                          submitLoadingText="Submitting..."
                          {...props} />
@@ -126,9 +127,9 @@ describe('CopyToDashboardForm', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('should handle onSubmit with a previous selection', async () => {
+  it('should handle onCopyToDashboard with a previous selection', async () => {
     const onSubmit = jest.fn(() => Promise.resolve());
-    const { getByText } = render(<SUT onSubmit={onSubmit} />);
+    const { getByText } = render(<SUT onCopyToDashboard={onSubmit} />);
     const firstView = getByText('view 1');
 
     fireEvent.click(firstView);
@@ -138,6 +139,21 @@ describe('CopyToDashboardForm', () => {
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith('view-1');
+  });
+
+  it('should handle onCreateNewDashboard', async () => {
+    const onSubmit = jest.fn(() => Promise.resolve());
+    const { findByLabelText } = render(<SUT onCreateNewDashboard={onSubmit} />);
+
+    const checkBox = await findByLabelText(/create a new dashboard/i);
+
+    fireEvent.click(checkBox);
+    submitModal();
+
+    await screen.findByRole('button', { name: /submit/i, hidden: true });
+
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledWith();
   });
 
   it('should query for all dashboards & specific dashboards', async () => {

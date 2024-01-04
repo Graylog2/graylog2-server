@@ -31,6 +31,7 @@ type Props = {
 const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const initialDateTime = toUTCFromTz(dateTime, userTimezone);
+  const initialDate = formatTime(initialDateTime, 'date');
 
   const _onDatePicked = (selectedDate: Date) => {
     if (!!startDate && DateUtils.isDayBefore(selectedDate, startDate)) {
@@ -48,7 +49,7 @@ const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
   };
 
   return (
-    <DatePicker date={initialDateTime}
+    <DatePicker date={initialDate}
                 onChange={_onDatePicked}
                 fromDate={startDate} />
   );

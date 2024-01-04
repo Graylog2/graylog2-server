@@ -19,12 +19,14 @@ package org.graylog2.indexer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.Message;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 
 /**
  * Representing the message type mapping in Elasticsearch. This is giving ES more
@@ -34,8 +36,12 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     public static final String TYPE_MESSAGE = "message";
 
     @Override
-    public Template toTemplate(IndexSetConfig indexSetConfig, String indexPattern, Long order) {
-        return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order, indexSetConfig.customFieldMappings());
+    public Template toTemplate(final TemplateIndexSetConfig indexSetConfig,
+                               final Long order) {
+        return messageTemplate(indexSetConfig.indexWildcard(),
+                indexSetConfig.indexAnalyzer(),
+                order,
+                indexSetConfig.customFieldMappings());
     }
 
     protected Map<String, Object> analyzerKeyword() {
@@ -98,7 +104,6 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                                                                final CustomFieldMappings customFieldMappings) {
         final ImmutableMap.Builder<String, Map<String, Object>> builder = ImmutableMap.<String, Map<String, Object>>builder()
                 .put(Message.FIELD_MESSAGE, analyzedString(analyzer, false))
-                .put(Message.FIELD_FULL_MESSAGE, analyzedString(analyzer, false))
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
                 .put(Message.FIELD_TIMESTAMP, typeTimeWithMillis())
@@ -106,12 +111,20 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_MESSAGE_ID, notAnalyzedString())
+                .put(Message.FIELD_STREAMS, notAnalyzedString())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
-                .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true))
-                .put(Message.FIELD_STREAMS, notAnalyzedString());
+                .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true));
+
 
         if (customFieldMappings != null) {
-            customFieldMappings.forEach(customMapping -> builder.put(customMapping.fieldName(), type(customMapping.toPhysicalType())));
+            customFieldMappings.stream()
+                    .filter(customMapping -> !FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(customMapping.fieldName())) //someone might have hardcoded reserved field mapping on MongoDB level, bypassing checks
+                    .forEach(customMapping -> builder.put(customMapping.fieldName(), type(customMapping.toPhysicalType())));
+        }
+
+        //those FIELD_FULL_MESSAGE field have not been yet made reserved, so it can be added to ImmutableMap only if they do not exist in Custom Mapping
+        if (customFieldMappings == null || !customFieldMappings.containsCustomMappingForField(Message.FIELD_FULL_MESSAGE)) {
+            builder.put(Message.FIELD_FULL_MESSAGE, analyzedString(analyzer, false));
         }
 
         return builder.build();
