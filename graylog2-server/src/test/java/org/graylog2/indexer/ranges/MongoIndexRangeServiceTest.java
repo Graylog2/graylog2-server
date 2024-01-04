@@ -256,8 +256,6 @@ public class MongoIndexRangeServiceTest {
     @Test
     @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void testHandleIndexDeletion() throws Exception {
-        when(indexSetRegistry.isManagedIndex("graylog_1")).thenReturn(true);
-
         assertThat(indexRangeService.findAll()).hasSize(2);
 
         localEventBus.post(IndicesDeletedEvent.create(Collections.singleton("graylog_1")));
