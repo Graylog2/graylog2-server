@@ -60,6 +60,7 @@ class NodePingPeriodicalTest {
                 .setLeader(true)
                 .setTransportAddress(uri.toString())
                 .setClusterAddress(cluster)
+                .setRestApiAddress(datanodeRestApi)
                 .setDataNodeStatus(ProcessState.AVAILABLE.getDataNodeStatus())
                 .setHostname("localhost")
                 .build()
