@@ -20,9 +20,15 @@ import com.google.common.eventbus.EventBus;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
+import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
@@ -38,11 +44,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,6 +74,8 @@ class IndicesTest {
 
     @Mock
     private IndicesAdapter indicesAdapter;
+    @Mock
+    private IndexFieldTypeProfileService profileService;
 
     @BeforeEach
     public void setup() {
@@ -71,7 +84,8 @@ class IndicesTest {
                 nodeId,
                 auditEventSender,
                 eventBus,
-                indicesAdapter
+                indicesAdapter,
+                profileService
         );
     }
 
@@ -127,7 +141,126 @@ class IndicesTest {
         assertEquals(0, indicesBlocksStatus.countBlockedIndices());
     }
 
-    private TestIndexSet indexSetConfig(String indexPrefix, String indexTemplaNameName, String indexTemplateType) {
+    @Test
+    void testUsesCustomMappingsAndProfileWhileGettingTemplate() {
+        final TestIndexSet testIndexSet = indexSetConfig("test",
+                "test-template-profiles",
+                "custom",
+                "000000000000000000000013",
+                new CustomFieldMappings(List.of(
+                        new CustomFieldMapping("f1", "string"),
+                        new CustomFieldMapping("f2", "long")
+                )));
+        doReturn(Optional.of(new IndexFieldTypeProfile(
+                "000000000000000000000013",
+                "test_profile",
+                "Test profile",
+                new CustomFieldMappings(List.of(
+                        new CustomFieldMapping("f1", "ip"),
+                        new CustomFieldMapping("f3", "ip")
+                )))
+        )).when(profileService).get("000000000000000000000013");
+        IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.getConfig());
+        underTest.getIndexTemplate(testIndexSet);
+
+        verify(indexMappingTemplateMock).toTemplate(
+                new TemplateIndexSetConfig("standard", "test_*",
+                        new CustomFieldMappings(List.of(
+                                new CustomFieldMapping("f1", "string"), //from individual custom mapping
+                                new CustomFieldMapping("f2", "long"), //from individual custom mapping
+                                new CustomFieldMapping("f3", "ip") //from profile
+                        )))
+        );
+    }
+
+    @Test
+    void testUsesCustomMappingsWhileGettingTemplateWhenProfileIsNull() {
+        final CustomFieldMappings individualCustomFieldMappings = new CustomFieldMappings(List.of(
+                new CustomFieldMapping("f1", "string"),
+                new CustomFieldMapping("f2", "long")
+        ));
+        final TestIndexSet testIndexSet = indexSetConfig("test",
+                "test-template-profiles",
+                "custom",
+                "000000000000000000000013",
+                individualCustomFieldMappings);
+        doReturn(Optional.of(new IndexFieldTypeProfile(
+                "000000000000000000000013",
+                "empty_test_profile",
+                "Empty test profile",
+                new CustomFieldMappings(List.of()))
+        )).when(profileService).get("000000000000000000000013");
+        IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.getConfig());
+        underTest.getIndexTemplate(testIndexSet);
+
+        verify(indexMappingTemplateMock).toTemplate(
+                new TemplateIndexSetConfig("standard", "test_*",
+                        individualCustomFieldMappings)
+        );
+    }
+
+    @Test
+    void testUsesCustomMappingsWhileGettingTemplateWhenProfileHasNoOwnMappings() {
+        final CustomFieldMappings individualCustomFieldMappings = new CustomFieldMappings(List.of(
+                new CustomFieldMapping("f1", "string"),
+                new CustomFieldMapping("f2", "long")
+        ));
+        final TestIndexSet testIndexSet = indexSetConfig("test",
+                "test-template-profiles",
+                "custom",
+                "000000000000000000000013",
+                individualCustomFieldMappings);
+        IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.getConfig());
+        underTest.getIndexTemplate(testIndexSet);
+
+        verify(indexMappingTemplateMock).toTemplate(
+                new TemplateIndexSetConfig("standard", "test_*",
+                        individualCustomFieldMappings)
+        );
+    }
+
+    @Test
+    void testUsesCustomMappingsAndProfileWhileBuildingTemplate() {
+        final TestIndexSet testIndexSet = indexSetConfig("test",
+                "test-template-profiles",
+                "custom",
+                "000000000000000000000013",
+                new CustomFieldMappings(List.of(
+                        new CustomFieldMapping("f1", "string"),
+                        new CustomFieldMapping("f2", "long")
+                )));
+        doReturn(Optional.of(new IndexFieldTypeProfile(
+                "000000000000000000000013",
+                "test_profile",
+                "Test profile",
+                new CustomFieldMappings(List.of(
+                        new CustomFieldMapping("f1", "ip"),
+                        new CustomFieldMapping("f3", "ip")
+                )))
+        )).when(profileService).get("000000000000000000000013");
+        IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.getConfig());
+        underTest.buildTemplate(testIndexSet, testIndexSet.getConfig());
+
+        verify(indexMappingTemplateMock).toTemplate(
+                new TemplateIndexSetConfig("standard", "test_*",
+                        new CustomFieldMappings(List.of(
+                                new CustomFieldMapping("f1", "string"), //from individual custom mapping
+                                new CustomFieldMapping("f2", "long"), //from individual custom mapping
+                                new CustomFieldMapping("f3", "ip") //from profile
+                        ))),
+                0L
+        );
+    }
+
+    private TestIndexSet indexSetConfig(final String indexPrefix,
+                                        final String indexTemplaNameName,
+                                        final String indexTemplateType,
+                                        final String profileId,
+                                        final CustomFieldMappings customFieldMappings) {
         return new TestIndexSet(IndexSetConfig.builder()
                 .id("index-set-1")
                 .title("Index set 1")
@@ -145,6 +278,12 @@ class IndicesTest {
                 .indexTemplateType(indexTemplateType)
                 .indexOptimizationMaxNumSegments(1)
                 .indexOptimizationDisabled(false)
+                .fieldTypeProfile(profileId)
+                .customFieldMappings(customFieldMappings)
                 .build());
+    }
+
+    private TestIndexSet indexSetConfig(String indexPrefix, String indexTemplaNameName, String indexTemplateType) {
+        return indexSetConfig(indexPrefix, indexTemplaNameName, indexTemplateType, null, new CustomFieldMappings(List.of()));
     }
 }
