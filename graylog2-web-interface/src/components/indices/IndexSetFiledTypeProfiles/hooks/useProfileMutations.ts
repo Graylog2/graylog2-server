@@ -54,22 +54,22 @@ const useProfileMutation = () => {
 
   const post = useMutation(postProfile, {
     onError: (errorThrown) => {
-      UserNotification.error(`Editing index set field type profile failed with status: ${errorThrown}`,
-        'Could not edit index set field type profile');
+      UserNotification.error(`Creating index set field type profile failed with status: ${errorThrown}`,
+        'Could not create index set field type profile');
     },
     onSuccess: () => {
-      UserNotification.success('Index set field type profile has been successfully edited.', 'Success');
+      UserNotification.success('Index set field type profile has been successfully created.', 'Success!');
 
       return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
     },
   });
   const put = useMutation(putProfile, {
     onError: (errorThrown) => {
-      UserNotification.error(`Creating index set field type profile failed with status: ${errorThrown}`,
-        'Could not create index set field type profile');
+      UserNotification.error(`Updating index set field type profile failed with status: ${errorThrown}`,
+        'Could not update index set field type profile');
     },
     onSuccess: () => {
-      UserNotification.success('Index set field type profile has been successfully created.', 'Success');
+      UserNotification.success('Index set field type profile has been successfully updated.', 'Success!');
 
       return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
     },

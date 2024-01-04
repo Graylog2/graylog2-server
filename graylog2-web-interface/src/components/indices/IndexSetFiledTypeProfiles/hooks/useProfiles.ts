@@ -48,8 +48,8 @@ const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
         id: profile.id,
         name: profile.name,
         description: profile.description,
-        customFieldMappings: profile.custom_field_mappings.map((fieldMapping, index) => ({
-          id: `${fieldMapping.field}_${index}`,
+        customFieldMappings: profile.custom_field_mappings.map((fieldMapping) => ({
+          id: fieldMapping.field,
           field: fieldMapping.field,
           type: fieldMapping.type,
         })),
