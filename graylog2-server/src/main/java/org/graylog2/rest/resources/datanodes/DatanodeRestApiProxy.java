@@ -16,83 +16,60 @@
  */
 package org.graylog2.rest.resources.datanodes;
 
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.ssl.SSLContexts;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Objects;
 
 @Singleton
 public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
+    private final IndexerJwtAuthTokenProvider authTokenProvider;
     private final NodeService<DataNodeDto> nodeService;
-    private final CloseableHttpClient httpClient;
+    private final OkHttpClient httpClient;
 
     @Inject
-    public DatanodeRestApiProxy(IndexerJwtAuthTokenProvider authTokenProvider, NodeService<DataNodeDto> nodeService, X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyManagementException {
+    public DatanodeRestApiProxy(IndexerJwtAuthTokenProvider authTokenProvider, NodeService<DataNodeDto> nodeService, OkHttpClient okHttpClient) throws NoSuchAlgorithmException, KeyManagementException {
+        this.authTokenProvider = authTokenProvider;
         this.nodeService = nodeService;
-        httpClient = createHttpClient(authTokenProvider, trustManager);
-    }
-
-    private static CloseableHttpClient createHttpClient(IndexerJwtAuthTokenProvider authTokenProvider, X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext sslcontext = SSLContexts.custom().setProtocol("ssl").build();
-        sslcontext.init(null, new X509TrustManager[]{trustManager}, new SecureRandom());
-
-        return HttpClientBuilder.create()
-                .setSSLContext(sslcontext)
-                .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", authTokenProvider.get()))
-                .build();
+        httpClient = okHttpClient;
     }
 
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
-        final BasicHttpEntityEnclosingRequest httpEntityEnclosingRequest = new BasicHttpEntityEnclosingRequest(
-                request.method(),
-                wrapWithLeadingSlash(request.path())
-        );
-
-        if (hasBody(request)) {
-            httpEntityEnclosingRequest.setEntity(new InputStreamEntity(request.body()));
-        }
-
-        final HttpHost host = nodeService.allActive().values().stream()
+        final String host = nodeService.allActive().values().stream()
                 .filter(DataNodeDto::isLeader)
                 .map(DataNodeDto::getRestApiAddress)
-                .map(HttpHost::create)
                 .findFirst()
+                .map(url -> StringUtils.removeEnd(url, "/"))
                 .orElseThrow(() -> new IllegalStateException("No datanode present"));
 
-        final CloseableHttpResponse response = httpClient.execute(host, httpEntityEnclosingRequest);
-        return new ProxyResponse(response.getStatusLine().getStatusCode(), response.getEntity().getContent());
+        final Request builder = new Request.Builder()
+                .url(host + "/" + request.path())
+                .addHeader("Authorization", authTokenProvider.get())
+                .method(request.method(), getBody(request))
+                .build();
+
+        final Response response = httpClient.newCall(builder).execute();
+        return new ProxyResponse(response.code(), response.body().byteStream());
     }
 
-    private boolean hasBody(ProxyRequest request) throws IOException {
-        final boolean isGetOrPost = Objects.equals(request.method(), "POST") || Objects.equals(request.method(), "PUT");
-        return isGetOrPost && request.body().available() > 0;
-    }
-
-    private String wrapWithLeadingSlash(String path) {
-        if (!path.startsWith("/")) {
-            return "/" + path;
-        } else {
-            return path;
-        }
+    @NotNull
+    private static RequestBody getBody(ProxyRequest request) throws IOException {
+        return RequestBody.create(IOUtils.toByteArray(request.body()), MediaType.parse("application/json"));
     }
 }
