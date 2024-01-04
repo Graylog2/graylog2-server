@@ -46,6 +46,10 @@ const MessageDetailsDefinitionList = styled.dl(({ theme }) => css`
     }
   }
 
+  &.message-details-fields {
+    overflow: hidden;
+  }
+
   &.message-details-fields span:not(:last-child) dd {
     border-bottom: 1px solid ${theme.colors.gray[90]};
   }
