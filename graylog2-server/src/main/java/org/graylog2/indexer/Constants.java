@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer;
 
-public class Constants {
-    public static final String COMPOSABLE_INDEX_TEMPLATES_FEATURE = "composable_index_templates";
-    public static final String FIELD_TYPES_MANAGEMENT_FEATURE = "field_types_management";
-    public static final String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
+public interface Constants {
+    String COMPOSABLE_INDEX_TEMPLATES_FEATURE = "composable_index_templates";
+    String FIELD_TYPES_MANAGEMENT_FEATURE = "field_types_management";
+    String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
 }

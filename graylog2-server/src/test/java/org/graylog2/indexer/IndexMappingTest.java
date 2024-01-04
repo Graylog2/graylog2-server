@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.junit.Assert;
@@ -51,12 +52,13 @@ class IndexMappingTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    private IndexSetConfig indexSetConfig;
+    private TemplateIndexSetConfig templateIndexSetConfig;
 
     @BeforeEach
     void setUp() {
-        indexSetConfig = mock(IndexSetConfig.class);
-        when(indexSetConfig.indexAnalyzer()).thenReturn("standard");
+        templateIndexSetConfig = mock(TemplateIndexSetConfig.class);
+        when(templateIndexSetConfig.indexAnalyzer()).thenReturn("standard");
+        when(templateIndexSetConfig.indexWildcard()).thenReturn("sampleIndexTemplate");
     }
 
     @Test
@@ -87,7 +89,7 @@ class IndexMappingTest {
         final SearchVersion version = SearchVersion.decode(versionString);
         final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, Mockito.mock(IndexSetConfig.class));
 
-        var template = mapping.toTemplate(indexSetConfig, "sampleIndexTemplate");
+        var template = mapping.toTemplate(templateIndexSetConfig);
         final String fixture = resourceFile(expectedTemplateFileName);
 
         JSONAssert.assertEquals(json(template), fixture, true);

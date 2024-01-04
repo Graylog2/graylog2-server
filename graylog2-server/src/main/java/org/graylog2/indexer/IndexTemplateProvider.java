@@ -21,9 +21,9 @@ import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
 
-public interface IndexTemplateProvider {
+public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
 
     @Nonnull
-    IndexMappingTemplate create(@Nonnull SearchVersion elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig)
+    T create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig)
             throws IgnoreIndexTemplate;
 }
