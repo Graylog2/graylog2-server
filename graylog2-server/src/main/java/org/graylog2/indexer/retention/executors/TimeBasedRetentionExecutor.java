@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.retention.executors;
 
+import com.google.common.base.Joiner;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -71,6 +73,21 @@ public class TimeBasedRetentionExecutor {
                 .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
                 .filter(indexName -> exceedsAgeLimit(indexName, cutoffSoft, cutoffHard))
                 .count();
+
+        if (LOG.isDebugEnabled()) {
+            var debug = deflectorIndices.keySet().stream()
+                    .collect(Collectors.toMap(k -> k, k -> Map.of(
+                            "isReopened", indices.isReopened(k),
+                            "hasCurrentWriteAlias", hasCurrentWriteAlias(indexSet, deflectorIndices, k),
+                            "exceedsAgeLimit", exceedsAgeLimit(k, cutoffSoft, cutoffHard),
+                            "closingDate", indices.indexClosingDate(k),
+                            "creationDate", indices.indexCreationDate(k)
+                    )));
+            Joiner.MapJoiner mapJoiner = Joiner.on("\n").withKeyValueSeparator("=");
+            LOG.debug("Debug info retain for indexSet <{}>: (min {}, max {}) removeCount: {} details: <{}>",
+                    indexSet.getIndexPrefix(), config.indexLifetimeMin(), config.indexLifetimeMax(),
+                    removeCount, mapJoiner.join(debug));
+        }
 
         if (removeCount > 0) {
             final String msg = "Running retention for " + removeCount + " aged-out indices.";

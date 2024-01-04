@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.retention.executors;
 
-import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +44,7 @@ class TimeBasedRetentionExecutorTest extends AbstractRetentionExecutorTest {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        underTest = new TimeBasedRetentionExecutor(indices, new JobSchedulerSystemClock(), activityWriter, retentionExecutor);
+        underTest = new TimeBasedRetentionExecutor(indices, clock, activityWriter, retentionExecutor);
     }
 
     @Test
@@ -53,7 +52,7 @@ class TimeBasedRetentionExecutorTest extends AbstractRetentionExecutorTest {
         underTest.retain(indexSet, getIndexLifetimeConfig(10, 12), action, "action");
 
         verify(action, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).containsExactly("index1", "index2", "index3");
+        assertThat(retainedIndexName.getValue()).containsExactly("test_1", "test_2", "test_3");
     }
 
     @Test
@@ -65,24 +64,24 @@ class TimeBasedRetentionExecutorTest extends AbstractRetentionExecutorTest {
 
     @Test
     public void timeBasedMissingClosingDate() {
-        when(indices.indexClosingDate("index1")).thenReturn(Optional.empty());
-        when(indices.indexCreationDate("index1")).thenReturn(Optional.of(NOW.minusDays(17)));
+        when(indices.indexClosingDate("test_1")).thenReturn(Optional.empty());
+        when(indices.indexCreationDate("test_1")).thenReturn(Optional.of(NOW.minusDays(17)));
 
         underTest.retain(indexSet, getIndexLifetimeConfig(14, 16), action, "action");
 
         verify(action, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).containsExactly("index1");
+        assertThat(retainedIndexName.getValue()).containsExactly("test_1");
     }
 
     @Test
     public void timeBasedNoDates() {
-        when(indices.indexClosingDate("index1")).thenReturn(Optional.empty());
-        when(indices.indexCreationDate("index1")).thenReturn(Optional.empty());
+        when(indices.indexClosingDate("test_1")).thenReturn(Optional.empty());
+        when(indices.indexCreationDate("test_1")).thenReturn(Optional.empty());
 
         underTest.retain(indexSet, getIndexLifetimeConfig(14, 16), action, "action");
 
         verify(action, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).containsExactly("index1");
+        assertThat(retainedIndexName.getValue()).containsExactly("test_1");
     }
 
 }
