@@ -36,6 +36,7 @@ import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRAT
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary.FIELD_USE_LEGACY_ROTATION;
 
 @AutoValue
 @JsonAutoDetect
@@ -55,11 +56,12 @@ public abstract class IndexSetUpdateRequest {
                                                @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                                @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                                @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
-                                               @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiers) {
+                                               @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiers,
+                                               @JsonProperty(FIELD_USE_LEGACY_ROTATION) Boolean userLegacyRotation) {
         return new AutoValue_IndexSetUpdateRequest(title, description, isWritable, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy,
                 indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                dataTiers);
+                dataTiers, userLegacyRotation);
     }
 
     public static IndexSetUpdateRequest fromIndexSetConfig(IndexSetConfig indexSet) {
@@ -76,7 +78,8 @@ public abstract class IndexSetUpdateRequest {
                 indexSet.indexOptimizationMaxNumSegments(),
                 indexSet.indexOptimizationDisabled(),
                 indexSet.fieldTypeRefreshInterval(),
-                indexSet.dataTiering());
+                indexSet.dataTiering(),
+                indexSet.dataTiering() == null);
 
     }
 
@@ -129,6 +132,9 @@ public abstract class IndexSetUpdateRequest {
     @JsonProperty(FIELD_DATA_TIERING)
     public abstract DataTieringConfig dataTiering();
 
+    @JsonProperty(FIELD_USE_LEGACY_ROTATION)
+    public abstract Boolean useLegacyRotation();
+
     public IndexSetConfig toIndexSetConfig(String id, IndexSetConfig oldConfig) {
         return IndexSetConfig.builder()
                 .id(id)
@@ -152,7 +158,7 @@ public abstract class IndexSetUpdateRequest {
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
-                .dataTiering(dataTiering())
+                .dataTiering(Boolean.FALSE.equals(useLegacyRotation()) ? dataTiering() : null)
                 .build();
     }
 }

@@ -14,38 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/bootstrap';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
-import 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
-import 'components/indices/retention'; // Load rotation plugin UI plugins from core.
+import { DataTieringSummary, DATA_TIERING_TYPE } from 'components/indices/data-tiering';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-class IndicesConfiguration extends React.Component {
-  static propTypes = {
-    indexSet: PropTypes.object.isRequired,
-  };
+type Props = {
+  indexSet: IndexSet
+}
 
-  render() {
-    const { indexSet } = this.props;
+const IndicesConfiguration = ({ indexSet } : Props) => {
+  if (!indexSet.writable) {
+    return (
+      <Row>
+        <Col md={12}>
+          Index set is not writable and will not be included in index rotation and retention.
+          It is also not possible to assign it to a stream.
+        </Col>
+      </Row>
+    );
+  }
 
-    if (!indexSet.writable) {
-      return (
-        <Row>
-          <Col md={12}>
-            Index set is not writable and will not be included in index rotation and retention.
-            It is also not possible to assign it to a stream.
-          </Col>
-        </Row>
-      );
-    }
+  const dataTieringConfig = indexSet.data_tiering;
 
+  if (!dataTieringConfig) {
     const rotationConfig = {
       strategy: indexSet.rotation_strategy_class,
       config: indexSet.rotation_strategy,
     };
+
     const retentionConfig = {
       strategy: indexSet.retention_strategy_class,
       config: indexSet.retention_strategy,
@@ -64,6 +64,22 @@ class IndicesConfiguration extends React.Component {
       </Row>
     );
   }
-}
+
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+
+  return (
+    <Row>
+      <Col md={6}>
+        <DataTieringSummary config={dataTieringConfig} />
+      </Col>
+      {dataTieringPlugin && (
+        <Col md={6}>
+          <dataTieringPlugin.TiersSummary config={dataTieringConfig} />
+        </Col>
+      )}
+
+    </Row>
+  );
+};
 
 export default IndicesConfiguration;

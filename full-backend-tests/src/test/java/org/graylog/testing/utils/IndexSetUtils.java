@@ -82,7 +82,8 @@ public class IndexSetUtils {
                 false,
                 Duration.standardSeconds(5L),
                 null,
-                null
+                null,
+                true
         );
 
         return createIndexSet(spec, indexSetSummary);
