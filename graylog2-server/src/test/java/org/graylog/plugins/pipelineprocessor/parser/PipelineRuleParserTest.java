@@ -396,6 +396,16 @@ public class PipelineRuleParserTest extends BaseParserTest {
         }
     }
 
+    @Test
+    public void invalidIdentifier() {
+        try {
+            parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().size());
+            assertEquals(SyntaxError.class, Iterables.getOnlyElement(e.getErrors()).getClass());
+        }
+    }
 
     public static class CustomObject {
         private final String id;

@@ -1,0 +1,5 @@
+type = "c"
+message = "Provide more verbose error messages for HTTPJSONPath data adapter."
+
+issues = ["17649"]
+pulls = ["17801"]
