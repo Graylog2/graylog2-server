@@ -38,11 +38,6 @@ public class IndexMapping7 extends IndexMapping {
     }
 
     @Override
-    Template createTemplate(String indexPattern, Long order, Template.Settings settings, Template.Mappings mappings) {
-        return Template.create(indexPattern, mappings, order, settings);
-    }
-
-    @Override
     protected String dateFormat() {
         return ConstantsES7.ES_DATE_FORMAT;
     }
