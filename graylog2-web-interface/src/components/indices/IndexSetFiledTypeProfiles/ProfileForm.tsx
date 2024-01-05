@@ -40,7 +40,6 @@ const SelectGroup = styled.div`
 const List = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
   margin-bottom: 15px;
 `;
 const StyledLabel = styled.h5`
@@ -51,7 +50,6 @@ const StyledLabel = styled.h5`
 const Item = styled.div`
   display: flex;
   gap: 5px;
-  align-items: center;
 `;
 
 const StyledFormSubmit = styled(FormSubmit)`
