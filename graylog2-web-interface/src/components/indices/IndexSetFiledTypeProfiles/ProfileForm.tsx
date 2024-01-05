@@ -25,7 +25,7 @@ import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledT
 import { FormikInput, IconButton, Select, FormSubmit } from 'components/common';
 import { Button, Col, HelpBlock, Input } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 const SelectContainer = styled.div`
@@ -109,13 +109,14 @@ type ProfileFormSelectProps = {
 }
 const ProfileFormSelect = ({ onChange, options, error, name, value, placeholder, allowCreate }: ProfileFormSelectProps) => (
   <SelectContainer>
-    <Input error={error} name={name}>
+    <Input error={error} name={name} id={name}>
       <Select options={options}
               value={value}
               inputId={name}
               onChange={(newVal) => {
                 onChange({ target: { value: newVal, name } });
               }}
+              inputProps={{ 'aria-label': `Select ${name}` }}
               placeholder={placeholder}
               allowCreate={allowCreate} />
     </Input>

@@ -31,7 +31,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -74,7 +74,7 @@ const ChangeFieldTypeModal = ({
   initialData,
 }: Props) => {
   const [{ fieldName, type }, setModalData] = useState<{ fieldName?: string, type?: string }>(initialData);
-  const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypes();
+  const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMappings();
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)

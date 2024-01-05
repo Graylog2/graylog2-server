@@ -24,7 +24,7 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
 import ProfilesList from 'components/indices/IndexSetFiledTypeProfiles/ProfilesList';
 import useProfiles from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfiles';
@@ -50,7 +50,7 @@ const renderIndexSetFieldTypeProfilesList = () => render(
 jest.mock('routing/useParams', () => jest.fn());
 
 jest.mock('components/indices/IndexSetFiledTypeProfiles/hooks/useProfiles', () => jest.fn());
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
@@ -71,7 +71,7 @@ describe('IndexSetFieldTypesList', () => {
       isInitialLoading: false,
     });
 
-    asMock(useFieldTypes).mockReturnValue({
+    asMock(useFieldTypesForMappings).mockReturnValue({
       data: {
         fieldTypes: {
           string: 'String type',

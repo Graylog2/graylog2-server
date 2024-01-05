@@ -20,7 +20,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { SystemFieldTypes } from '@graylog/server-api';
 
 const mockFieldType = {
@@ -42,7 +42,7 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-const renderUseFieldTypeHook = () => renderHook(() => useFieldTypes());
+const renderUseFieldTypeHook = () => renderHook(() => useFieldTypesForMappings());
 
 describe('useFieldType custom hook', () => {
   afterEach(() => {

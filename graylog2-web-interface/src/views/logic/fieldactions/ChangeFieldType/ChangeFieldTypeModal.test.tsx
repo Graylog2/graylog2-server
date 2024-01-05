@@ -28,7 +28,7 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import type { Attributes } from 'stores/PaginationTypes';
 import suppressConsole from 'helpers/suppressConsole';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 
 const onCloseMock = jest.fn();
 const renderChangeFieldTypeModal = ({
@@ -111,7 +111,7 @@ const paginatedFieldUsage = ({
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
@@ -124,7 +124,7 @@ describe('ChangeFieldTypeModal', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    asMock(useFieldTypes).mockReturnValue({
+    asMock(useFieldTypesForMappings).mockReturnValue({
       isLoading: false,
       data: {
         fieldTypes: {

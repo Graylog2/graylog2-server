@@ -18,10 +18,10 @@ import React, { useMemo } from 'react';
 
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
 import ExpandedCustomFieldTypes from 'components/indices/IndexSetFiledTypeProfiles/ExpandedCustomFieldTypes';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 
 const useExpandedSectionsRenderer = () => {
-  const { data: { fieldTypes } } = useFieldTypes();
+  const { data: { fieldTypes } } = useFieldTypesForMappings();
 
   return useMemo(() => ({
     customFieldMapping: {
