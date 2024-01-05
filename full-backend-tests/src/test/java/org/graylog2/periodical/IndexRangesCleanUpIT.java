@@ -24,7 +24,6 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -43,13 +42,8 @@ public class IndexRangesCleanUpIT {
         this.api = api;
     }
 
-    @BeforeEach
-    public void setUp() {
-
-    }
-
     @ContainerMatrixTest
-    void testCleanUp() throws ExecutionException, RetryException, InterruptedException {
+    void testCleanUp() throws ExecutionException, RetryException {
         String indexSetId = api.indices().createIndexSet("Range clean up", "test index range clean up", RANGE_CLEANUP_PREFIX);
 
         //Rotate to create indices 0 & 1
@@ -63,7 +57,7 @@ public class IndexRangesCleanUpIT {
 
         assertThat(getIndexRangesList()).isNotEmpty().doesNotContain(INDEX_ONE);
 
-        //Deleting index set without deleting underyling indices
+        //Deleting index set without deleting underlying indices
         api.indices().deleteIndexSet(indexSetId, false);
         assertThat(getIndexRangesList()).isNotEmpty().contains(INDEX_TWO);
 
