@@ -18,15 +18,16 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import type { DataNode } from 'preflight/types';
 import useParams from 'routing/useParams';
-import useDataNodes, { rejoinDataNode, removeDataNode, startDataNode, stopDataNode } from 'components/datanode/hooks/useDataNodes';
+import { rejoinDataNode, removeDataNode, startDataNode, stopDataNode } from 'components/datanode/hooks/useDataNodes';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import { Row, Col, Label, Button } from 'components/bootstrap';
-import { ConfirmDialog, DocumentTitle, PageHeader, RelativeTime, Spinner } from 'components/common';
-import type { SearchParams } from 'stores/PaginationTypes';
+import { ConfirmDialog, DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import Icon from 'components/common/Icon';
+import useDataNode from 'components/datanode/hooks/useDataNode';
 
 const StyledHorizontalDl = styled.dl(({ theme }) => css`
   margin: ${theme.spacings.md} 0;
@@ -88,19 +89,18 @@ const DIALOG_TEXT = {
 
 const DataNodePage = () => {
   const { dataNodeId } = useParams();
-  const { data: { elements }, isInitialLoading } = useDataNodes({
-    query: '',
-    page: 1,
-    pageSize: 0,
-  } as SearchParams);
-
+  const { data, isInitialLoading, error } = useDataNode(dataNodeId);
   const [dialogType, setDialogType] = useState<string|null>(null);
 
   if (isInitialLoading) {
     return <Spinner />;
   }
 
-  const datanode = elements.find((node) => node.node_id === dataNodeId);
+  if (!isInitialLoading && (!data || error)) {
+    return <NoSearchResult>Error: {error?.message}</NoSearchResult>;
+  }
+
+  const datanode = data as DataNode;
   const datanodeDisabled = datanode.data_node_status !== 'AVAILABLE';
 
   const handleClearState = () => {
