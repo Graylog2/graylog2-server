@@ -20,13 +20,12 @@ import org.graylog2.shared.system.activities.Activity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,7 +46,7 @@ class CountBasedRetentionExecutorTest extends AbstractRetentionExecutorTest {
         underTest.retain(indexSet, 5, action, "action");
 
         verify(action, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).containsExactly("index1");
+        assertThat(retainedIndexName.getValue()).containsExactly("test_1");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
@@ -58,34 +57,30 @@ class CountBasedRetentionExecutorTest extends AbstractRetentionExecutorTest {
 
         verify(action, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
         // Ensure that the oldest indices come first
-        assertThat(retainedIndexName.getAllValues().get(0)).containsExactly("index1", "index2");
+        assertThat(retainedIndexName.getAllValues().get(0)).containsExactly("test_1", "test_2");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
 
     @Test
     public void shouldIgnoreReopenedIndexWhenCountingAgainstLimit() {
-        when(indices.isReopened(eq("index1"))).thenReturn(true);
+        // skip over test_2 because it is reopened
+        when(indices.isReopened(anyString())).then(a -> a.getArgument(0).equals("test_2"));
 
-        underTest.retain(indexSet, 5, action, "action");
+        underTest.retain(indexSet, 4, action, "action");
 
-        verify(action, never()).retain(anyList(), eq(indexSet));
+        verify(action, times(1)).retain(eq(List.of("test_1")), eq(indexSet));
 
-        verify(activityWriter, never()).write(any(Activity.class));
+        verify(activityWriter, times(2)).write(any(Activity.class));
     }
 
     @Test
     public void shouldIgnoreWriteAliasWhenDeterminingRetainedIndices() {
-        final String indexWithWriteIndexAlias = "index1";
-        final String writeIndexAlias = "WriteIndexAlias";
-
-        when(indexSet.getWriteIndexAlias()).thenReturn(writeIndexAlias);
-        indexMap.put(indexWithWriteIndexAlias, Collections.singleton(writeIndexAlias));
 
         underTest.retain(indexSet, 5, action, "action");
 
         verify(action, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).containsExactly("index2");
+        assertThat(retainedIndexName.getValue()).containsExactly("test_1");
 
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
