@@ -17,6 +17,7 @@
 package org.graylog.datanode.configuration;
 
 import org.assertj.core.api.Assertions;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -29,7 +30,7 @@ class DatanodeDirectoriesTest {
 
     @Test
     void testConfigDirPermissions(@TempDir Path dataDir, @TempDir Path logsDir, @TempDir Path configSourceDir, @TempDir Path configTargetDir) throws IOException {
-        final DatanodeDirectories datanodeDirectories = new DatanodeDirectories("12345", dataDir, logsDir, configSourceDir, configTargetDir);
+        final DatanodeDirectories datanodeDirectories = new DatanodeDirectories(dataDir, logsDir, configSourceDir, configTargetDir);
         final Path dir = datanodeDirectories.createOpensearchProcessConfigurationDir();
         Assertions.assertThat(Files.getPosixFilePermissions(dir)).
                 contains(
@@ -45,4 +46,26 @@ class DatanodeDirectoriesTest {
                         PosixFilePermission.OWNER_READ
                 );
     }
+
+    /**
+     * Remove in 6.0 together with the backwards compatibility of datanode dirs
+     */
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings("removal")
+    @Test
+    void testBackwardsCompatibility(@TempDir Path tempDir) throws IOException {
+        final Path withoutSubdir = DatanodeDirectories.backwardsCompatible(tempDir, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), "my_config_property");
+        Assertions.assertThat(withoutSubdir).isEqualTo(tempDir);
+
+        Files.createDirectories(tempDir.resolve("5ca1ab1e-0000-4000-a000-000000000000"));
+
+        final Path withSubdir = DatanodeDirectories.backwardsCompatible(tempDir, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), "my_config_property");
+
+        Assertions.assertThat(withSubdir)
+                .startsWith(tempDir)
+                .endsWith(Path.of("5ca1ab1e-0000-4000-a000-000000000000"));
+
+
+    }
+
 }

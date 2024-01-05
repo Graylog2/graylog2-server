@@ -116,8 +116,10 @@ public class MongoDBTestService implements AutoCloseable {
      * Drops the configured database.
      */
     public void dropDatabase() {
-        LOG.debug("Dropping database {}", mongoDatabase().getName());
-        mongoDatabase().drop();
+        if (container.isRunning()) {
+            LOG.debug("Dropping database {}", mongoDatabase().getName());
+            mongoDatabase().drop();
+        }
     }
 
     /**

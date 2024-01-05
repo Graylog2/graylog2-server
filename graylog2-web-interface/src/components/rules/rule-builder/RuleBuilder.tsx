@@ -260,7 +260,7 @@ const RuleBuilder = () => {
     history.push(Routes.SYSTEM.PIPELINES.RULES);
   };
 
-  const handleSave = async (event?: React.FormEvent<HTMLFormElement>, closeAfter: boolean = false) => {
+  const handleSave = async (event?: React.SyntheticEvent<HTMLElement>, closeAfter: boolean = false) => {
     event?.preventDefault();
 
     if (initialRule) {

@@ -1,0 +1,7 @@
+type = "fixed"
+message = "Fix Content pack install modal having two superposed modal element"
+
+issues = ["16834", "15752"]
+pulls = ["17073"]
+
+

@@ -16,7 +16,10 @@
  */
 package org.graylog.plugins.sidecar.rest.models;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -25,6 +28,7 @@ import javax.annotation.Nullable;
 
 @AutoValue
 @JsonAutoDetect
+@JsonIgnoreProperties({"default_template_crc"})
 public abstract class Collector {
     public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";

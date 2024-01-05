@@ -19,7 +19,7 @@ import React from 'react';
 
 import { Label } from 'components/bootstrap';
 import { RelativeTime, Icon } from 'components/common';
-import { IndexSizeSummary } from 'components/indices';
+import IndexSizeSummary from 'components/indices/IndexSizeSummary';
 
 class IndexSummary extends React.Component {
   static propTypes = {

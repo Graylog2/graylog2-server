@@ -16,15 +16,19 @@
  */
 package org.graylog2.cluster;
 
-import org.graylog2.plugin.database.PersistedService;
+
 import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * @deprecated Please use the generic org.graylog2.cluster.nodes.NodeService specifying the type of node
+ * to be returned (either server or data node).
+ */
+@Deprecated(since = "6.0")
 public interface NodeService {
-    Node.Type type();
 
     boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname);
 
@@ -38,23 +42,8 @@ public interface NodeService {
 
     Map<String, Node> byNodeIds(Collection<String> nodeIds);
 
-    Map<String, Node> allActive(Node.Type type);
-
-    /**
-     * Please use the {@link #allActive(Node.Type)} method and provide explicit type of the node. Otherwise,
-     * the implementation will fall back to {@link #type()} and provide only nodes of this type.
-     */
-    @Deprecated
     Map<String, Node> allActive();
 
-    void dropOutdated();
-
-    void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress) throws NodeNotFoundException;
-    default void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException {
-        markAsAlive(node, isLeader, restTransportAddress, null);
-    }
-
-    boolean isOnlyLeader(NodeId nodeIde);
-
     boolean isAnyLeaderPresent();
+
 }

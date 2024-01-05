@@ -1,0 +1,10 @@
+# PLEASE REMOVE COMMENTS AND OPTIONAL FIELDS! THANKS!
+
+# Entry type according to https://keepachangelog.com/en/1.0.0/
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "fixed"
+message = "Fix archiving when batch size exceeds ES/OS http.max_content_length."
+
+issues = ["Graylog2/graylog-plugin-enterprise#3318"]
+pulls = ["17449"]
+

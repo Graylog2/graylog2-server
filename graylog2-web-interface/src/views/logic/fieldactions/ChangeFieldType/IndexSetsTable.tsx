@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -22,9 +22,7 @@ import {
   Spinner,
   NoEntitiesExist,
   EntityDataTable,
-  Icon,
 } from 'components/common';
-import { Button } from 'components/bootstrap';
 import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/logic/fieldactions/ChangeFieldType/Constants';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { SearchParams, Sort } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
@@ -46,15 +44,7 @@ type Props = {
   initialSelection: Array<string>
 }
 
-const renderBulkActions = (
-  selectedDashboardIds: Array<string>,
-  setSelectedDashboardIds: (streamIds: Array<string>) => void,
-) => (
-  <BulkActionsDropdown selectedEntities={selectedDashboardIds} setSelectedEntities={setSelectedDashboardIds} />
-);
-
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelection }: Props) => {
-  const [showDetails, setShowDetails] = useState(false);
   const [activePage, setActivePage] = useState(1);
 
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -73,10 +63,6 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
   const { data: { list, attributes, pagination }, isLoading } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
 
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-
-  useEffect(() => {
-    setIndexSetSelection(initialSelection);
-  }, [initialSelection, setIndexSetSelection]);
 
   const onPageChange = useCallback(
     (newPage: number, newPageSize: number) => {
@@ -110,56 +96,42 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
     setIndexSetSelection(newSelection);
   }, [setIndexSetSelection]);
 
-  const toggleDetailsOpen = useCallback(() => {
-    setShowDetails((cur) => !cur);
-  }, []);
-
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
 
   return (
-    <>
-      <Button label={showDetails ? 'Hide index sets' : 'Show index sets'} bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
-        <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
-        {showDetails ? 'Hide index sets' : 'Show index sets'}
-      </Button>
-      {
-          showDetails && (
-            <Container>
-              <PaginatedList onChange={onPageChange}
-                             totalItems={pagination?.total}
-                             pageSize={layoutConfig.pageSize}
-                             activePage={activePage}
-                             showPageSizeSelect={false}
-                             useQueryParameter={false}>
-                {!list?.length && (
-                  <NoEntitiesExist>
-                    No index sets have been found.
-                  </NoEntitiesExist>
-                )}
-                {list.length && (
-                  <EntityDataTable<FieldTypeUsage> activeSort={layoutConfig.sort}
-                                                   bulkSelection={{
-                                                     onChangeSelection,
-                                                     initialSelection,
-                                                     actions: renderBulkActions,
-                                                   }}
-                                                   columnDefinitions={attributes}
-                                                   columnRenderers={columnRenderers}
-                                                   columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                                   data={list}
-                                                   onColumnsChange={onColumnsChange}
-                                                   onPageSizeChange={onPageSizeChange}
-                                                   onSortChange={onSortChange}
-                                                   pageSize={layoutConfig.pageSize}
-                                                   visibleColumns={layoutConfig.displayedAttributes} />
-                )}
-              </PaginatedList>
-            </Container>
-          )
-        }
-    </>
+    <Container>
+      <PaginatedList onChange={onPageChange}
+                     totalItems={pagination?.total}
+                     pageSize={layoutConfig.pageSize}
+                     activePage={activePage}
+                     showPageSizeSelect={false}
+                     useQueryParameter={false}>
+        {!list?.length && (
+          <NoEntitiesExist>
+            No index sets have been found.
+          </NoEntitiesExist>
+        )}
+        {list.length && (
+          <EntityDataTable<FieldTypeUsage> activeSort={layoutConfig.sort}
+                                           bulkSelection={{
+                                             onChangeSelection,
+                                             initialSelection,
+                                             actions: <BulkActionsDropdown />,
+                                           }}
+                                           columnDefinitions={attributes}
+                                           columnRenderers={columnRenderers}
+                                           columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+                                           data={list}
+                                           onColumnsChange={onColumnsChange}
+                                           onPageSizeChange={onPageSizeChange}
+                                           onSortChange={onSortChange}
+                                           pageSize={layoutConfig.pageSize}
+                                           visibleColumns={layoutConfig.displayedAttributes} />
+        )}
+      </PaginatedList>
+    </Container>
   );
 };
 

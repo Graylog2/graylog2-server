@@ -102,7 +102,7 @@ public class SearchResourceExecutionTest {
             }
         };
 
-        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of("Default Stream"));
+        when(searchUser.streams().loadMessageStreamsWithFallback()).thenReturn(ImmutableSet.of("Default Stream"));
     }
 
     @Test
@@ -234,7 +234,7 @@ public class SearchResourceExecutionTest {
         final Search search = makeNewSearch("search1");
         persistSearch(search);
 
-        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of());
+        when(searchUser.streams().loadMessageStreamsWithFallback()).thenReturn(ImmutableSet.of());
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> this.searchResource.executeQuery(search.id(), null, searchUser));
@@ -245,7 +245,7 @@ public class SearchResourceExecutionTest {
         final Search search = makeNewSearch("search1");
         final SearchDTO searchDTO = SearchDTO.fromSearch(search);
 
-        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of());
+        when(searchUser.streams().loadMessageStreamsWithFallback()).thenReturn(ImmutableSet.of());
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> this.searchResource.executeSyncJob(searchDTO, 0, searchUser));

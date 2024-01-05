@@ -14,25 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
-import { NavDropdown, MenuItem } from 'components/bootstrap';
+import { NavDropdown } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import useHistory from 'routing/useHistory';
+import useCurrentUser from 'hooks/useCurrentUser';
+import Menu from 'components/bootstrap/Menu';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
-type Props = {
-  fullName: string,
-  userId: string,
-  readOnly: boolean,
-};
+const FullName = styled.span`
+  text-transform: uppercase;
+  font-weight: 700;
+`;
 
-const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
+const UserMenu = () => {
+  const { fullName, readOnly, id: userId } = useCurrentUser();
   const history = useHistory();
   const route = readOnly
     ? Routes.SYSTEM.USERS.show(userId)
@@ -52,26 +54,20 @@ const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
 
   return (
     <NavDropdown title={<Icon name="user" size="lg" />}
-                 aria-label={`User Menu for ${fullName}`}
-                 id="user-menu-dropdown"
+                 hoverTitle={`User Menu for ${fullName}`}
                  noCaret>
-      <MenuItem header>{fullName}</MenuItem>
-      <MenuItem divider />
-      <MenuItem header>
+      <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
+      <Menu.Divider />
+      <Menu.Label>
         <ThemeModeToggle />
-      </MenuItem>
-      <MenuItem divider />
+      </Menu.Label>
+      <Menu.Divider />
       <LinkContainer to={route}>
-        <MenuItem>{label}</MenuItem>
+        <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <MenuItem onSelect={onLogoutClicked} icon="sign-out-alt">Log out</MenuItem>
+      <Menu.Item onClick={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
     </NavDropdown>
   );
-};
-
-UserMenu.propTypes = {
-  userId: PropTypes.string.isRequired,
-  fullName: PropTypes.string.isRequired,
 };
 
 export default UserMenu;

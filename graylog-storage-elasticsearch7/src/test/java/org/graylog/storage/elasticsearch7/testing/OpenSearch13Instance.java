@@ -63,7 +63,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     public OpenSearch13Instance init() {
         super.init();
         this.restHighLevelClient = buildRestClient();
-        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
+        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);
@@ -124,7 +124,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     public GenericContainer<?> buildContainer(String image, Network network) {
         return new OpenSearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", "-Xms2g -Xmx2g -Dlog4j2.formatMsgNoLookups=true")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")

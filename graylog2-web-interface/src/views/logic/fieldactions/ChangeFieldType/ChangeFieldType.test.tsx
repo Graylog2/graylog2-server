@@ -23,8 +23,25 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import asMock from 'helpers/mocking/AsMock';
+import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
+const paginatedFieldUsage = ({
+  data: {
+    list: [],
+    pagination: {
+      total: 0,
+      page: 1,
+      perPage: 1,
+      count: 1,
+    },
+    attributes: [],
+  },
+  refetch: () => {},
+  isInitialLoading: false,
+  isLoading: false,
+});
 const onClose = jest.fn();
 const renderChangeTypeAction = ({
   queryId = 'query-id',
@@ -41,6 +58,7 @@ describe('ChangeFieldType', () => {
   beforeAll(() => {
     loadViewsPlugin();
     asMock(useInitialSelection).mockReturnValue(['id-1', 'id-2']);
+    asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
   });
 
   afterAll(unloadViewsPlugin);
@@ -48,6 +66,6 @@ describe('ChangeFieldType', () => {
   it('Shows modal', async () => {
     renderChangeTypeAction({});
 
-    await screen.findByText('Change field field type');
+    await screen.findByText(/change field field type/i);
   });
 });

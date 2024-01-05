@@ -25,38 +25,11 @@ import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { getConfig } from 'components/configurations/helpers';
-import { PluginConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
-
-const pluginDisplayNames = [
-  {
-    configType: PluginConfigurationType.COLLECTORS_SYSTEM,
-    displayName: 'Collectors System',
-  },
-  {
-    configType: PluginConfigurationType.AWS,
-    displayName: 'AWS',
-  },
-  {
-    configType: PluginConfigurationType.THREAT_INTEL,
-    displayName: 'Threat Intelligence Lookup',
-  },
-  {
-    configType: PluginConfigurationType.FAILURE_PROCESSING,
-    displayName: 'Failure Processing',
-  },
-  {
-    configType: PluginConfigurationType.TRAFFIC_LIMIT_VIOLATION,
-    displayName: 'Traffic Limit Violation',
-  },
-  {
-    configType: PluginConfigurationType.GEO_LOCATION,
-    displayName: 'Geo-Location Processor',
-  },
-];
+import type { SelectCallback } from 'components/bootstrap/types';
 
 type PluginSectionLinkProps = {
   configType: string,
@@ -106,12 +79,11 @@ const PluginsConfig = () => {
         <Nav bsStyle="pills"
              stacked
              activeKey={activeSectionKey}
-             onSelect={setActiveSectionKey}>
-          {pluginSystemConfigs.map(({ configType }) => {
-            const obj = pluginDisplayNames.find((entry) => entry.configType === configType);
-            const displayName = obj?.displayName ?? configType;
+             onSelect={setActiveSectionKey as SelectCallback}>
+          {pluginSystemConfigs.map(({ displayName, configType }) => {
+            const name = displayName || configType;
 
-            return <PluginSectionLink configType={configType} displayName={displayName} />;
+            return <PluginSectionLink key={configType} configType={configType} displayName={name} />;
           })}
         </Nav>
       </Col>

@@ -42,7 +42,14 @@ import FieldTypesContext from '../contexts/FieldTypesContext';
 jest.mock('../searchbar/queryinput/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+
 jest.mock('views/components/useWidgetResults');
+
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),

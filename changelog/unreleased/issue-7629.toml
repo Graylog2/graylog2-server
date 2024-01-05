@@ -1,0 +1,5 @@
+type = "added"
+message = "Add Create new dashboard widget action"
+
+issues = ["7629"]
+pulls = ["17582"]

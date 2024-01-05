@@ -1,0 +1,495 @@
+{
+  "id": "656510c70548c8792779eea8",
+  "queries": [
+    {
+      "id": "82186cfa-4d37-46bd-a0b3-2b3246c8577f",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "from": 300,
+        "type": "relative"
+      },
+      "filter": null,
+      "filters": [],
+      "search_types": [
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+          },
+          "streams": [],
+          "id": "8282fb72-ff54-4da0-8140-5bc9fe5e554b",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(alert_severity_level) AND alert_severity_level:(5)"
+          },
+          "streams": [],
+          "id": "e11110d3-cdcc-49ef-8dc6-b6ff51ca2b8c",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_source_product) "
+          },
+          "streams": [],
+          "id": "2c67301a-5045-4eda-9896-3af06509c6d9",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source_product"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "source": "search_type",
+            "id": "ecdcb49a-0d42-4bb3-9b10-38cf702aaf2c",
+            "offset": "1i",
+            "type": "offset"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity) AND alert_severity:(high OR critical)"
+          },
+          "streams": [],
+          "id": "d4d86a4a-ae89-4308-9dfc-b6e99a4c1631",
+          "name": "trend",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "source": "search_type",
+            "id": "e11110d3-cdcc-49ef-8dc6-b6ff51ca2b8c",
+            "offset": "1i",
+            "type": "offset"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(alert_severity_level) AND alert_severity_level:(5)"
+          },
+          "streams": [],
+          "id": "df84164f-0235-42b0-8d94-64b3d0a7c394",
+          "name": "trend",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity) AND alert_severity:(medium)"
+          },
+          "streams": [],
+          "id": "01ef33ca-c700-4fa2-9e0b-0853db189931",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source AND alert_severity_level) AND alert_severity_level:(1 OR 2 OR 3)"
+          },
+          "streams": [],
+          "id": "c5af59ed-2734-4cee-956a-86009208abbb",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source AND event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(failure OR success)"
+          },
+          "streams": [],
+          "id": "61340106-d62e-4e51-b894-e34260767242",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": false,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_outcome"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_subcategory AND event_source)"
+          },
+          "streams": [],
+          "id": "07c45849-07d2-4888-b02a-e51f615177aa",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source_product AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+          },
+          "streams": [],
+          "id": "23721c34-008a-4e84-93bf-2494eeeb3a5b",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source_product"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "source": "search_type",
+            "id": "01ef33ca-c700-4fa2-9e0b-0853db189931",
+            "offset": "1i",
+            "type": "offset"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity) AND alert_severity:(medium)"
+          },
+          "streams": [],
+          "id": "e4bbbb8e-8c86-452d-8aa7-60f881b9c055",
+          "name": "trend",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source_product AND alert_severity_level) AND alert_severity_level:(1 OR 2 OR 3)"
+          },
+          "streams": [],
+          "id": "b50c7639-c710-43c8-94df-2b8d4f3a35d0",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source_product"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity) AND alert_severity:(high OR critical)"
+          },
+          "streams": [],
+          "id": "ecdcb49a-0d42-4bb3-9b10-38cf702aaf2c",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source_product AND event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
+          },
+          "streams": [],
+          "id": "d03b7484-ccb3-43dc-980d-ca53f997f0ad",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": false,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source_product"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_outcome"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "filter": null,
+          "filters": []
+        }
+      ]
+    }
+  ],
+  "parameters": []
+}

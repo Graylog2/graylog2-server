@@ -33,6 +33,7 @@ import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamMetrics;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final Meter incomingMessages;
 
     private final Timer processTime;
+    private final StreamMetrics streamMetrics;
     private final Meter outgoingMessages;
     private final OrderedMessageProcessors orderedMessageProcessors;
 
@@ -73,7 +75,8 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   MessageULIDGenerator messageULIDGenerator,
                                   @Assisted DecodingProcessor decodingProcessor,
                                   @DefaultStream Provider<Stream> defaultStreamProvider,
-                                  FailureSubmissionService failureSubmissionService) {
+                                  FailureSubmissionService failureSubmissionService,
+                                  StreamMetrics streamMetrics) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
@@ -86,6 +89,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
         processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
+        this.streamMetrics = streamMetrics;
         currentMessage = null;
     }
 
@@ -162,6 +166,8 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         }
 
         for (Message message : messages) {
+
+            message.getStreams().forEach(s -> streamMetrics.markIncomingMeter(s.getId()));
             message.ensureValidTimestamp();
 
             // If a message is received via the Cluster-to-Cluster Forwarder, it already has this field set

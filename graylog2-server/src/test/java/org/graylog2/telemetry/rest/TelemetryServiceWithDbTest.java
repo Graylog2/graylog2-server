@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -50,6 +51,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.CLUSTER;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.CURRENT_USER;
+import static org.graylog2.telemetry.rest.TelemetryTestHelper.DATA_NODES;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.LICENSE;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.PLUGIN;
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.SEARCH_CLUSTER;
@@ -88,6 +90,9 @@ public class TelemetryServiceWithDbTest {
     @Mock
     LeaderElectionService leaderElectionService;
 
+    @Mock
+    NodeService nodeService;
+
     TelemetryService telemetryService;
 
     @Before
@@ -111,7 +116,8 @@ public class TelemetryServiceWithDbTest {
                 new DBTelemetryUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
                 eventBus,
                 telemetryClusterService,
-                "unknown");
+                "unknown",
+                nodeService);
     }
 
     @Test
@@ -153,7 +159,7 @@ public class TelemetryServiceWithDbTest {
         telemetryService.updateTelemetryClusterData();
         Map<String, Object> telemetryResponse = telemetryService.getTelemetryResponse(saveUserSettings(true));
 
-        assertThat(telemetryResponse).containsOnlyKeys(USER_TELEMETRY_SETTINGS, CURRENT_USER, CLUSTER, LICENSE, PLUGIN, SEARCH_CLUSTER);
+        assertThat(telemetryResponse).containsOnlyKeys(USER_TELEMETRY_SETTINGS, CURRENT_USER, CLUSTER, LICENSE, PLUGIN, SEARCH_CLUSTER, DATA_NODES);
     }
 
 

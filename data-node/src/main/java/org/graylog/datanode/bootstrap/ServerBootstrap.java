@@ -73,10 +73,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog DataNode")
-    private final String pidFile = TMPDIR + FILE_SEPARATOR + "datanode.pid";
+    private String pidFile = TMPDIR + FILE_SEPARATOR + "datanode.pid";
 
     @Option(name = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
-    private final boolean noPidFile = false;
+    private boolean noPidFile = false;
 
     protected abstract void startNodeRegistration(Injector injector);
 

@@ -43,7 +43,7 @@ const EditTokensAction = ({
   wrapperComponent: WrapperComponent,
 }: {
   user: UserOverview,
-  wrapperComponent: Button | MenuItem,
+  wrapperComponent: React.ComponentType<any>,
 }) => (
   <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
     <WrapperComponent id={`edit-tokens-${id}`}
@@ -135,8 +135,6 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
             </MenuItem>
           )}
           <MenuItem id={`delete-user-${id}`}
-                    bsStyle="primary"
-                    bsSize="xs"
                     title={`Delete user ${fullName}`}
                     onClick={_deleteUser}>
             Delete

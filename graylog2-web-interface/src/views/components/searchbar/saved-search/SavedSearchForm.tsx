@@ -31,7 +31,7 @@ type Props = {
   toggleModal: () => void,
   isCreateNew: boolean,
   value: string,
-  target: Button | undefined | null,
+  target: typeof Button | undefined | null,
 };
 
 const StyledForm = styled.form`
@@ -53,7 +53,7 @@ const SavedSearchForm = (props: Props) => {
     target,
   } = props;
   const [title, setTitle] = useState(value);
-  const onChangeTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value), []);
+  const onChangeTitle = useCallback((e: React.FormEvent<unknown>) => setTitle((e.target as HTMLInputElement).value), []);
 
   const trimmedTitle = (title ?? '').trim();
   const disableSaveAs = trimmedTitle === '' || (!isCreateNew && trimmedTitle === value);

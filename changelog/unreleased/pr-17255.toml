@@ -1,0 +1,14 @@
+type = "c"
+message = "Datanode directries don't use nodeid subdirs anymore"
+
+pulls = ["17255"]
+
+details.user = """
+This update changes handling of datanode uses directories for configuration, data and logs. Originally the configuration
+paths opensearch_config_location, opensearch_data_location and opensearch_logs_location created subdirectories named
+after the Node-ID of this datanode. These subdirectories then stored the actual data. From now on the datanode stores its
+data directly in directories set in the configuration properties.
+
+This change is backwards compatible and will still use the Node-ID subdirectory if present, together with logging a warning
+recommending a configuration change.
+"""
