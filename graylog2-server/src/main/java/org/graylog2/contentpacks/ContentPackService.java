@@ -266,7 +266,7 @@ public class ContentPackService {
         final Traverser<Entity> entityTraverser = Traverser.forGraph(dependencyGraph);
         final Iterable<Entity> entitiesInOrder = entityTraverser.breadthFirst(rootEntity);
 
-        final Set<NativeEntityDescriptor> removedEntities = new HashSet<>();
+        final Map<NativeEntityDescriptor, Object> removedEntities = new HashMap<>();
         final Set<NativeEntityDescriptor> failedEntities = new HashSet<>();
         final Set<NativeEntityDescriptor> skippedEntities = new HashSet<>();
 
@@ -302,7 +302,7 @@ public class ContentPackService {
                             // The EntityFacade#delete() method expects the actual entity object
                             //noinspection unchecked
                             facade.delete(((NativeEntity) nativeEntity).entity());
-                            removedEntities.add(nativeEntityDescriptor);
+                            removedEntities.put(nativeEntityDescriptor, ((NativeEntity) nativeEntity).entity());
                         } catch (Exception e) {
                             LOG.warn("Couldn't remove native entity {}", nativeEntity);
                             failedEntities.add(nativeEntityDescriptor);
@@ -320,7 +320,7 @@ public class ContentPackService {
         LOG.debug("Deleted {} installation(s) of content pack {}", deletedInstallations, contentPack.id());
 
         return ContentPackUninstallation.builder()
-                .entities(ImmutableSet.copyOf(removedEntities))
+                .entities(ImmutableMap.copyOf(removedEntities))
                 .skippedEntities(ImmutableSet.copyOf(skippedEntities))
                 .failedEntities(ImmutableSet.copyOf(failedEntities))
                 .build();

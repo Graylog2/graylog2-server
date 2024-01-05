@@ -164,7 +164,7 @@ public class ContentPackServiceTest {
     private ContentPackV1 contentPack;
     private ContentPackInstallation contentPackInstallation;
     private GrokPattern grokPattern;
-    private ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors;
+    private ImmutableMap<NativeEntityDescriptor, Object> nativeEntityDescriptors;
 
     @Before
     public void setUp() throws Exception {
@@ -201,7 +201,7 @@ public class ContentPackServiceTest {
         ImmutableSet<Entity> entities = ImmutableSet.of(entityV1);
         NativeEntityDescriptor nativeEntityDescriptor = NativeEntityDescriptor
                 .create(ModelId.of("12345"), "dead-beef1", ModelTypes.GROK_PATTERN_V1, "NAME");
-        nativeEntityDescriptors = ImmutableSet.of(nativeEntityDescriptor);
+        nativeEntityDescriptors = ImmutableMap.of(nativeEntityDescriptor, entityV1);
         contentPack = ContentPackV1.builder()
                 .description("test")
                 .entities(entities)
@@ -215,7 +215,7 @@ public class ContentPackServiceTest {
         contentPackInstallation = ContentPackInstallation.builder()
                 .contentPackId(ModelId.of("dead-beef"))
                 .contentPackRevision(1)
-                .entities(nativeEntityDescriptors)
+                .entities(nativeEntityDescriptors.keySet())
                 .comment("Installed")
                 .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
                 .createdAt(Instant.now())
@@ -321,9 +321,9 @@ public class ContentPackServiceTest {
        /* Test skipped uninstall */
         when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("dead-beef1"))).thenReturn((long) 2);
         ContentPackUninstallation expectSkip = ContentPackUninstallation.builder()
-                .skippedEntities(nativeEntityDescriptors)
+                .skippedEntities(nativeEntityDescriptors.keySet())
                 .failedEntities(ImmutableSet.of())
-                .entities(ImmutableSet.of())
+                .entities(ImmutableMap.of())
                 .build();
         ContentPackUninstallation resultSkip = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultSkip).isEqualTo(expectSkip);
@@ -332,9 +332,9 @@ public class ContentPackServiceTest {
         when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("dead-beef1"))).thenReturn((long) 1);
         when(contentPackInstallService.countInstallationOfEntityByIdAndFoundOnSystem(ModelId.of("dead-beef1"))).thenReturn((long) 1);
         ContentPackUninstallation expectSkip2 = ContentPackUninstallation.builder()
-                .skippedEntities(nativeEntityDescriptors)
+                .skippedEntities(nativeEntityDescriptors.keySet())
                 .failedEntities(ImmutableSet.of())
-                .entities(ImmutableSet.of())
+                .entities(ImmutableMap.of())
                 .build();
         ContentPackUninstallation resultSkip2 = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultSkip2).isEqualTo(expectSkip2);
@@ -346,7 +346,7 @@ public class ContentPackServiceTest {
         ContentPackUninstallation expectFailure = ContentPackUninstallation.builder()
                 .skippedEntities(ImmutableSet.of())
                 .failedEntities(ImmutableSet.of())
-                .entities(ImmutableSet.of())
+                .entities(ImmutableMap.of())
                 .build();
 
         ContentPackUninstallation resultFailure = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
@@ -357,7 +357,7 @@ public class ContentPackServiceTest {
     public void getUninstallDetails() throws NotFoundException {
         /* Test will be uninstalled */
         when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("dead-beef1"))).thenReturn((long) 1);
-        ContentPackUninstallDetails expect = ContentPackUninstallDetails.create(nativeEntityDescriptors);
+        ContentPackUninstallDetails expect = ContentPackUninstallDetails.create(nativeEntityDescriptors.keySet());
         ContentPackUninstallDetails result = contentPackService.getUninstallDetails(contentPack, contentPackInstallation);
         assertThat(result).isEqualTo(expect);
 

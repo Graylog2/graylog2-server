@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 
@@ -31,7 +32,7 @@ public abstract class ContentPackUninstallation {
     private static final String FIELD_SKIPPED_ENTITIES = "skipped_entities";
 
     @JsonProperty(FIELD_ENTITIES)
-    public abstract ImmutableSet<NativeEntityDescriptor> entities();
+    public abstract ImmutableMap<NativeEntityDescriptor, Object> entities();
 
     @JsonProperty(FIELD_FAILED_ENTITIES)
     public abstract ImmutableSet<NativeEntityDescriptor> failedEntities();
@@ -53,7 +54,7 @@ public abstract class ContentPackUninstallation {
         }
 
         @JsonProperty(FIELD_ENTITIES)
-        public abstract Builder entities(ImmutableSet<NativeEntityDescriptor> entities);
+        public abstract Builder entities(ImmutableMap<NativeEntityDescriptor, Object> entities);
 
         @JsonProperty(FIELD_FAILED_ENTITIES)
         public abstract Builder failedEntities(ImmutableSet<NativeEntityDescriptor> failedEntities);
