@@ -51,12 +51,14 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -66,7 +68,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -231,9 +232,7 @@ public class JerseyService extends AbstractIdleService {
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
 
         if (isSecuredInstance) {
-            final BasicAuthFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
-            resourceConfig.register(
-                    new DatanodeAuthFilter(basicAuthFilter, configuration.getPasswordSecret()));
+            resourceConfig.register(createAuthFilter(configuration));
 
         }
         resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));
@@ -266,6 +265,13 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return httpServer;
+    }
+
+    @NotNull
+    private ContainerRequestFilter createAuthFilter(Configuration configuration) {
+        final ContainerRequestFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
+        final AuthTokenValidator tokenVerifier = new JwtTokenValidator(configuration.getPasswordSecret());
+        return new DatanodeAuthFilter(basicAuthFilter, tokenVerifier);
     }
 
     private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation)

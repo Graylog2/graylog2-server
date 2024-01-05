@@ -16,22 +16,15 @@
  */
 package org.graylog.datanode.initializers;
 
-import com.github.joschi.jadconfig.util.Duration;
-import io.jsonwebtoken.Jwts;
-import org.apache.commons.lang.RandomStringUtils;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.Mockito.mock;
@@ -40,16 +33,11 @@ class DatanodeAuthFilterTest {
 
     @Test
     void testValidJwtToken() throws IOException {
-
-        final String signingKey = RandomStringUtils.random(64);
-
-        final IndexerJwtAuthTokenProvider tokenProvider = new IndexerJwtAuthTokenProvider(signingKey, Duration.seconds(10), Duration.seconds(1));
-        final String token = tokenProvider.get();
-
         final ContainerRequestFilter fallbackFilter = Mockito.mock(ContainerRequestFilter.class);
-        final DatanodeAuthFilter datanodeAuthFilter = new DatanodeAuthFilter(fallbackFilter, signingKey);
 
-        final ContainerRequest request = mockRequest(token);
+        final DatanodeAuthFilter datanodeAuthFilter = new DatanodeAuthFilter(fallbackFilter, tokenValidator("123456789"));
+
+        final ContainerRequest request = mockRequest("Bearer 123456789");
 
         datanodeAuthFilter.filter(request);
 
@@ -57,13 +45,21 @@ class DatanodeAuthFilterTest {
         Mockito.verify(request, Mockito.never()).abortWith(Mockito.any());
     }
 
+    @NotNull
+    private static AuthTokenValidator tokenValidator(String expectedTokenValue) {
+        return token -> {
+            if (!expectedTokenValue.equals(token)) {
+                throw new TokenVerificationException("Invalid token!");
+            }
+        };
+    }
+
     @Test
     void testFallbackFilter() throws IOException {
-
-        final String signingKey = RandomStringUtils.random(64);
         final ContainerRequestFilter fallbackFilter = Mockito.mock(ContainerRequestFilter.class);
-        final DatanodeAuthFilter datanodeAuthFilter = new DatanodeAuthFilter(fallbackFilter, signingKey);
+        final DatanodeAuthFilter datanodeAuthFilter = new DatanodeAuthFilter(fallbackFilter, tokenValidator("123456789"));
 
+        // do not provide any header in the request(=null), we want to see the fallback kick in
         final ContainerRequest request = mockRequest(null);
 
         datanodeAuthFilter.filter(request);
@@ -73,22 +69,13 @@ class DatanodeAuthFilterTest {
     }
 
     @Test
-    void testNoneAlgorithm() throws IOException {
-        final Date now = new Date();
-        final String insecureToken = Jwts.builder()
-                .addClaims(Map.of("os_roles", "admin"))
-                .setIssuedAt(now)
-                .setSubject("admin")
-                .setIssuer("graylog")
-                .setNotBefore(now)
-                .setExpiration(new Date(now.getTime() + Duration.seconds(10).toMilliseconds()))
-                .compact();
+    void testInvalidToken() throws IOException {
 
-        final String signingKey = RandomStringUtils.random(64);
         final ContainerRequestFilter fallbackFilter = Mockito.mock(ContainerRequestFilter.class);
-        final DatanodeAuthFilter datanodeAuthFilter = new DatanodeAuthFilter(fallbackFilter, signingKey);
+        final DatanodeAuthFilter datanodeAuthFilter = new DatanodeAuthFilter(fallbackFilter, tokenValidator("123456789"));
 
-        final ContainerRequest request = mockRequest("Bearer " + insecureToken);
+        // this is not a token we see as valid. The filter should recognize that and abort the request
+        final ContainerRequest request = mockRequest("Bearer AABBCCDDEE");
 
         datanodeAuthFilter.filter(request);
 

@@ -16,28 +16,20 @@
  */
 package org.graylog.datanode.initializers;
 
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.spec.SecretKeySpec;
-import javax.inject.Named;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Collections;
 import java.util.Optional;
 
 /**
- * This is an authorization filter that  first try to verify presence and validity of a JWT token. If there is no
+ * This is an authorization filter that  first try to verify presence and validity of a bearer token. If there is no
  * bearer token available, it will fallback to basic auth (or whatever filter is configured as fallback).
  * Allowing both auth methods allows easy access directly from CLI or browser and machine-machine communication from the graylog server.
  */
@@ -47,12 +39,12 @@ public class DatanodeAuthFilter implements ContainerRequestFilter {
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
     private static final String AUTHENTICATION_SCHEME = "Bearer";
     private final ContainerRequestFilter fallbackFilter;
-    private final String signingKey;
+    private final AuthTokenValidator tokenVerifier;
 
 
-    public DatanodeAuthFilter(ContainerRequestFilter fallbackFilter, @Named("password_secret") String signingKey) {
+    public DatanodeAuthFilter(ContainerRequestFilter fallbackFilter, AuthTokenValidator tokenVerifier) {
         this.fallbackFilter = fallbackFilter;
-        this.signingKey = signingKey;
+        this.tokenVerifier = tokenVerifier;
     }
 
     private Optional<String> getBearerHeader(ContainerRequestContext requestContext) {
@@ -70,43 +62,20 @@ public class DatanodeAuthFilter implements ContainerRequestFilter {
             // no JWT token, we'll fallback to basic auth
             fallbackFilter.filter(requestContext);
         } else {
-            verifyJwtHeader(requestContext, header.get());
+            final String token = header.map(h -> h.replaceFirst(AUTHENTICATION_SCHEME + " ", "")).get();
+            try {
+                tokenVerifier.verifyToken(token);
+            } catch (TokenVerificationException e) {
+                LOG.error("Failed to verify auth token", e);
+                abortRequest(requestContext);
+            }
         }
     }
 
-    private void verifyJwtHeader(ContainerRequestContext requestContext, String authHeader) {
-        final String jwtToken = authHeader.replaceFirst(AUTHENTICATION_SCHEME + " ", "");
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-        Key signingKey = new SecretKeySpec(this.signingKey.getBytes(StandardCharsets.UTF_8), signatureAlgorithm.getJcaName());
-        final JwtParser parser = Jwts.parserBuilder()
-                .setSigningKey(signingKey)
-                .requireSubject("admin")
-                .requireIssuer("graylog")
-                .build();
-        try {
-            final Jwt parsed = parser.parse(jwtToken);
-            verifySignature(parsed, signatureAlgorithm);
-        } catch (Exception e) {
-            abortRequest(requestContext, e);
-        }
-    }
 
-    private void verifySignature(Jwt token, SignatureAlgorithm expectedAlgorithm) {
-        final SignatureAlgorithm usedAlgorithm = Optional.of(token.getHeader())
-                .map(h -> h.get("alg"))
-                .map(Object::toString)
-                .map(SignatureAlgorithm::forName)
-                .orElseThrow(() -> new IllegalArgumentException("Token doesn't provide valid signature algorithm"));
-
-        if (expectedAlgorithm != usedAlgorithm) {
-            throw new IllegalArgumentException("Token is using unsupported signature algorithm :" + usedAlgorithm);
-        }
-    }
-
-    private void abortRequest(ContainerRequestContext requestContext, Exception e) {
-        LOG.error("Failed to parse JWT auth header", e);
+    private void abortRequest(ContainerRequestContext requestContext) {
         requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                .entity("Failed to parse JWT auth header")
+                .entity("Failed to parse auth header")
                 .type(MediaType.TEXT_PLAIN_TYPE)
                 .build());
     }
