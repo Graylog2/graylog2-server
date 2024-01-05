@@ -26,7 +26,7 @@ import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledT
 import useProfileMutations from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
 
-const CreateNewProfile = () => {
+const CreateProfile = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -54,8 +54,8 @@ const CreateNewProfile = () => {
   }, [navigate, sendTelemetry, telemetryPathName]);
 
   return (
-    <ProfileForm onCancel={onCancel} submitButtonText="Create new profile" onSubmit={onSubmit} />
+    <ProfileForm onCancel={onCancel} submitButtonText="Create profile" onSubmit={onSubmit} />
   );
 };
 
-export default CreateNewProfile;
+export default CreateProfile;

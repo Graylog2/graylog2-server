@@ -60,7 +60,7 @@ const EditProfile = ({
   }, [navigate, sendTelemetry, telemetryPathName]);
 
   return (
-    <ProfileForm onCancel={onCancel} submitButtonText="Save profile" onSubmit={onSubmit} initialValues={profile} />
+    <ProfileForm onCancel={onCancel} submitButtonText="Update profile" onSubmit={onSubmit} initialValues={profile} />
   );
 };
 

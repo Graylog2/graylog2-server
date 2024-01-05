@@ -30,30 +30,17 @@ export const profile2JSON = {
 };
 
 export const profile1 = {
-  customFieldMappings: [{ field: 'http_method', type: 'string', id: 'http_method' }, { field: 'user_ip', type: 'ip', id: 'user_ip' }],
+  customFieldMappings: [{ field: 'http_method', type: 'string' }, { field: 'user_ip', type: 'ip' }],
   name: 'Profile 1',
   description: 'Description 1',
   id: '111',
 };
 export const profile2 = {
   customFieldMappings: [
-    { field: 'user_name', type: 'string', id: 'user_name' },
-    { field: 'logged_in', type: 'bool', id: 'logged_in' },
-    { field: 'sum', type: 'int', id: 'sum' },
+    { field: 'user_name', type: 'string' },
+    { field: 'logged_in', type: 'bool' },
+    { field: 'sum', type: 'int' },
   ],
-  name: 'Profile 2',
-  description: 'Description 2',
-  id: '222',
-};
-
-export const profile1FormValues = {
-  customFieldMappings: [{ field: 'http_method', type: 'string' }, { field: 'user_ip', type: 'ip' }],
-  name: 'Profile 1',
-  description: 'Description 1',
-  id: '111',
-};
-export const profile2FormValues = {
-  customFieldMappings: [{ field: 'user_name', type: 'string' }, { field: 'logged_in', type: 'boolean' }],
   name: 'Profile 2',
   description: 'Description 2',
   id: '222',

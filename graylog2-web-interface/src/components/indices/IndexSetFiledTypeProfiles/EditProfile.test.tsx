@@ -23,12 +23,13 @@ import asMock from 'helpers/mocking/AsMock';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import CreateNewProfile from 'components/indices/IndexSetFiledTypeProfiles/CreateNewProfile';
+import EditProfile from 'components/indices/IndexSetFiledTypeProfiles/EditProfile';
 import useProfileMutations from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations';
 import { simpleFields } from 'fixtures/fields';
+import { profile1 } from 'fixtures/indexSetFieldTypeProfiles';
 
-const renderCreateNewProfile = () => render(
-  <CreateNewProfile />,
+const renderEditProfile = () => render(
+  <EditProfile profile={profile1} />,
 );
 
 jest.mock('components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations', () => jest.fn());
@@ -76,34 +77,67 @@ describe('IndexSetFieldTypesList', () => {
     ));
   });
 
-  it('Run createProfile with form data', async () => {
-    renderCreateNewProfile();
+  it('Run editProfile with changed form data', async () => {
+    renderEditProfile();
 
     const name = await screen.findByRole('textbox', {
       name: /name/i,
       hidden: true,
     });
-    const description = await screen.findByRole('textbox', {
-      name: /description/i,
-      hidden: true,
-    });
+
     const fieldFirst = await screen.findByLabelText(/select customFieldMappings.0.field/i);
     const typeFirst = await screen.findByLabelText(/select customFieldMappings.0.type/i);
+    const submitButton = await screen.findByTitle(/update profile/i);
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => {
-      userEvent.paste(name, 'Profile new');
-      userEvent.paste(description, 'Profile description');
+      userEvent.paste(name, ' new name');
       await selectItem(fieldFirst, 'date');
       await selectItem(typeFirst, 'String type');
-      const submitButton = await screen.findByTitle(/create new profile/i);
       fireEvent.click(submitButton);
     });
 
-    expect(createMock).toHaveBeenCalledWith({
-      name: 'Profile new',
-      description: 'Profile description',
-      customFieldMappings: [{ field: 'date', type: 'string' }],
+    expect(editMock).toHaveBeenCalledWith({
+      name: 'Profile 1 new name',
+      description: 'Description 1',
+      id: '111',
+      customFieldMappings: [
+        { field: 'date', type: 'string' },
+        { field: 'user_ip', type: 'ip' },
+      ],
+    });
+  });
+
+  it('Run editProfile with added form data', async () => {
+    renderEditProfile();
+
+    const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
+
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      fireEvent.click(addMappingButton);
+    });
+
+    const fieldThird = await screen.findByLabelText(/select customFieldMappings.2.field/i);
+    const typeThird = await screen.findByLabelText(/select customFieldMappings.2.type/i);
+    const submitButton = await screen.findByTitle(/update profile/i);
+
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await selectItem(fieldThird, 'date');
+      await selectItem(typeThird, 'String type');
+      fireEvent.click(submitButton);
+    });
+
+    expect(editMock).toHaveBeenCalledWith({
+      name: 'Profile 1',
+      description: 'Description 1',
+      id: '111',
+      customFieldMappings: [
+        { field: 'http_method', type: 'string' },
+        { field: 'user_ip', type: 'ip' },
+        { field: 'date', type: 'string' },
+      ],
     });
   });
 });

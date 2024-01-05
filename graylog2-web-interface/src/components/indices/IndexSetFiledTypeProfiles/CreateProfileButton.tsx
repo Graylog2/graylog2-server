@@ -21,10 +21,10 @@ import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
 
-const CreateNewProfileButton = () => (
+const CreateProfileButton = () => (
   <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE}>
-    <Button bsStyle="success">Create new profile</Button>
+    <Button bsStyle="success">Create profile</Button>
   </LinkContainer>
 );
 
-export default CreateNewProfileButton;
+export default CreateProfileButton;

@@ -22,7 +22,7 @@ import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button, Col, Row } from 'components/bootstrap';
-import CreateNewProfile from 'components/indices/IndexSetFiledTypeProfiles/CreateNewProfile';
+import CreateProfile from 'components/indices/IndexSetFiledTypeProfiles/CreateProfile';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 const IndexSetFieldTypeProfileCreatePage = () => {
@@ -56,7 +56,7 @@ const IndexSetFieldTypeProfileCreatePage = () => {
         </PageHeader>
         <Row className="content">
           <Col md={12}>
-            <CreateNewProfile />
+            <CreateProfile />
           </Col>
         </Row>
       </div>

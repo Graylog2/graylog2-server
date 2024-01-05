@@ -87,7 +87,7 @@ const validate = (formValues: IndexSetFieldTypeProfile) => {
 
       return ({
         field: getFieldError(field, fieldsOccurrences[field]),
-        type: !type && 'Type is required',
+        type: !type ? 'Type is required' : undefined,
       });
     });
 
@@ -103,10 +103,11 @@ type ProfileFormSelectProps = {
   options: Array<{ value: string, label: string, disabled?: boolean }>,
   error: string,
   name: string,
-  value: string,
+  value: string | undefined | null,
   placeholder: string,
   allowCreate: boolean,
 }
+
 const ProfileFormSelect = ({ onChange, options, error, name, value, placeholder, allowCreate }: ProfileFormSelectProps) => (
   <SelectContainer>
     <Input error={error} name={name} id={name}>

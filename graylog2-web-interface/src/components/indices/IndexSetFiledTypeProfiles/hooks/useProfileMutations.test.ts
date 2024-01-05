@@ -22,7 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import useProfileMutations from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations';
-import { profile1JSON, profile1FormValues } from 'fixtures/indexSetFieldTypeProfiles';
+import { profile1JSON, profile1 } from 'fixtures/indexSetFieldTypeProfiles';
 
 const urlPrefix = '/system/indices/index_sets/profiles';
 
@@ -43,7 +43,7 @@ jest.mock('util/UserNotification', () => ({
 describe('useProfileMutations', () => {
   describe('editProfile', () => {
     const putUrl = qualifyUrl(`${urlPrefix}`);
-    const requestBody = profile1FormValues;
+    const requestBody = profile1;
 
     const requestBodyJSON = profile1JSON;
 
@@ -78,7 +78,7 @@ describe('useProfileMutations', () => {
 
   describe('createProfile', () => {
     const postUrl = qualifyUrl(`${urlPrefix}`);
-    const requestBody = profile1FormValues;
+    const requestBody = profile1;
 
     const requestBodyJSON = omit(profile1JSON, ['id']);
 
