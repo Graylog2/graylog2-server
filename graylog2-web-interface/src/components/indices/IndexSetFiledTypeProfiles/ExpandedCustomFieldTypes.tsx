@@ -25,6 +25,9 @@ type Props = {
   fieldTypes: FieldTypes,
 }
 
-const ExpandedCustomFieldTypes = ({ customFieldMappings, fieldTypes }: Props) => <CustomFieldTypesList list={customFieldMappings} fieldTypes={fieldTypes} />;
+const ExpandedCustomFieldTypes = ({ customFieldMappings, fieldTypes }: Props) => (
+  <CustomFieldTypesList list={customFieldMappings}
+                        fieldTypes={fieldTypes} />
+);
 
 export default ExpandedCustomFieldTypes;

@@ -22,7 +22,10 @@ import CustomFieldMappingsCell from 'components/indices/IndexSetFiledTypeProfile
 const useCustomColumnRenderers = () => useMemo(() => ({
   attributes: {
     custom_field_mappings: {
-      renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => <CustomFieldMappingsCell profile={profile} customFieldTypes={customFieldTypes} />,
+      renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => (
+        <CustomFieldMappingsCell profile={profile}
+                                 customFieldTypes={customFieldTypes} />
+      ),
       width: 4,
     },
   },
