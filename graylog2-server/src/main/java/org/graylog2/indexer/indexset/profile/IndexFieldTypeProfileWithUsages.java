@@ -14,8 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.indexset.profile;
 
-public interface ConstantsES7 {
-    String ES_DATE_FORMAT = "uuuu-MM-dd HH:mm:ss.SSS";
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
+import java.util.Set;
+
+/**
+ * Profile enriched with usage information, fetched from other collections.
+ */
+public record IndexFieldTypeProfileWithUsages(@JsonUnwrapped IndexFieldTypeProfile profile,
+                                              @JsonProperty("index_set_ids") Set<String> usagesInIndexSets) {
 }
