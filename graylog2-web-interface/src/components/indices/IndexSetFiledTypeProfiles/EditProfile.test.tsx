@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { render, screen, fireEvent, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
@@ -91,7 +90,7 @@ describe('IndexSetFieldTypesList', () => {
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => {
-      userEvent.paste(name, ' new name');
+      fireEvent.change(name, { target: { value: 'Profile 1 new name' } });
       await selectItem(fieldFirst, 'date');
       await selectItem(typeFirst, 'String type');
       fireEvent.click(submitButton);

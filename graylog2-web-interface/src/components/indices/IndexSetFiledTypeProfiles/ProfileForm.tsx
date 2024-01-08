@@ -156,14 +156,14 @@ const ProfileForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Pr
                          placeholder="Type a profile description"
                          label="Description"
                          type="textarea"
-                         help="Longer description for Profile"
+                         help="Longer description for profile"
                          rows={6} />
             <FieldArray name="customFieldMappings"
                         render={({ remove, push }) => (
                           <>
                             <StyledLabel>Setup mappings</StyledLabel>
                             <HelpBlock>
-                              Here you can setup type mapping to any filed. If the needed field is not exist on the list you can type it and create
+                              Here you can setup type mapping to any field.
                             </HelpBlock>
                             <List>
                               {(isLoading || isLoadingFieldTypes) ? <Loader /> : customFieldMappings.map((_, index) => (
@@ -177,7 +177,7 @@ const ProfileForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Pr
                                                            options={fields}
                                                            name={name}
                                                            error={error}
-                                                           placeholder="Select ot type field name"
+                                                           placeholder="Select or type field name"
                                                            allowCreate />
                                       )}
                                     </Field>

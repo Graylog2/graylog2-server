@@ -51,7 +51,9 @@ const IndexSetFieldTypeProfileCreatePage = () => {
                       </LinkContainer>
                     )}>
           <span>
-            You can create  field type profiles configuration.
+            With index set field type profiles you can bundle up custom field types into profiles.
+            Then you can assign this profile to any of index set.
+            On this page you can create new profile.
           </span>
         </PageHeader>
         <Row className="content">

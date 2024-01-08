@@ -56,7 +56,9 @@ const IndexSetFieldTypeProfileEditPage = () => {
                       </LinkContainer>
                     )}>
           <span>
-            {`You can modify "${data?.name}" field type profiles configuration.`}
+            With index set field type profiles you can bundle up custom field types into profiles.
+            Then you can assign this profile to any of index set.
+            {`On this page you can modify "${data?.name}" field type profiles configuration.`}
           </span>
         </PageHeader>
         <Row className="content">

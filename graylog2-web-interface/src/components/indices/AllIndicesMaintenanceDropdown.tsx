@@ -15,13 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 
 import { SystemIndexRanges } from '@graylog/server-api';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
-import useHistory from 'routing/useHistory';
-import Routes from 'routing/Routes';
-import useCurrentUser from 'hooks/useCurrentUser';
 
 const _onRecalculateAllIndexRange = () => {
   // eslint-disable-next-line no-alert
@@ -30,22 +26,12 @@ const _onRecalculateAllIndexRange = () => {
   }
 };
 
-const AllIndicesMaintenanceDropdown = () => {
-  const currentUser = useCurrentUser();
-  const history = useHistory();
-  const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
-  const onShowFieldTypes = useCallback(() => {
-    history.push(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
-  }, [history]);
-
-  return (
-    <ButtonGroup>
-      <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
-        <MenuItem eventKey="1" onClick={_onRecalculateAllIndexRange}>Cleanup & recalculate all index ranges</MenuItem>
-        {hasMappingPermission && <MenuItem eventKey="1" onClick={onShowFieldTypes}>Field type profiles</MenuItem>}
-      </DropdownButton>
-    </ButtonGroup>
-  );
-};
+const AllIndicesMaintenanceDropdown = () => (
+  <ButtonGroup>
+    <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
+      <MenuItem eventKey="1" onClick={_onRecalculateAllIndexRange}>Cleanup & recalculate all index ranges</MenuItem>
+    </DropdownButton>
+  </ButtonGroup>
+);
 
 export default AllIndicesMaintenanceDropdown;

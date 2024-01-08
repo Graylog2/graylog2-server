@@ -113,7 +113,7 @@ const ProfilesList = () => {
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
                     query={query}
-                    placeholder="Enter search query for the profile name...">
+                    placeholder="Search for profile name...">
           <EntityFilters attributes={attributes}
                          urlQueryFilters={urlQueryFilters}
                          setUrlQueryFilters={onChangeFilters} />
@@ -121,7 +121,7 @@ const ProfilesList = () => {
       </div>
       {pagination?.total === 0 && (
         <NoEntitiesExist>
-          No fields have been found.
+          No field type profiles have been found.
         </NoEntitiesExist>
       )}
       {!!list?.length && (

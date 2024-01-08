@@ -49,7 +49,9 @@ const IndexSetFieldTypeProfilesPage = () => {
                     }}
                     actions={<CreateProfileButton />}>
           <span>
-            You can modify the current field type profiles configuration or create the new one.
+            With index set field type profiles you can bundle up custom field types into profiles.
+            Then you can assign this profile to any of index set.
+            You can view and edit existing profiles or create new ones
           </span>
         </PageHeader>
 

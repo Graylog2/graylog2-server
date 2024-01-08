@@ -36,7 +36,7 @@ const IndicesConfigurationDropdown = ({ indexSetId }: { indexSetId: string }) =>
   return (
     <ButtonGroup>
       <DropdownButton bsStyle="info" title="Configuration" id="indices-configuration-actions" pullRight>
-        {hasMappingPermission && <MenuItem onClick={onShowFieldTypes}>Show index field types</MenuItem>}
+        {hasMappingPermission && <MenuItem onClick={onShowFieldTypes}>Configure index field types</MenuItem>}
       </DropdownButton>
     </ButtonGroup>
   );
