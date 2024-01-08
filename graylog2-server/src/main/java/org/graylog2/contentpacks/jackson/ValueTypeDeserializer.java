@@ -43,7 +43,7 @@ public class ValueTypeDeserializer extends StdDeserializer<ValueType> {
                 throw ctxt.weirdStringException(str, ValueType.class, e.getMessage());
             }
         } else {
-            throw ctxt.wrongTokenException(p, JsonToken.VALUE_STRING, "expected String " + Arrays.toString(ValueType.values()));
+            throw ctxt.wrongTokenException(p, handledType(), JsonToken.VALUE_STRING, "expected String " + Arrays.toString(ValueType.values()));
         }
     }
 }

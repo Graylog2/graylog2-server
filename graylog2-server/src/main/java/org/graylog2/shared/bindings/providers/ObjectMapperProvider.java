@@ -17,6 +17,7 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.codahale.metrics.json.MetricsModule;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -125,6 +126,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
+                // Starting from Jackson 2.16, the default for INCLUDE_SOURCE_IN_LOCATION was changed to `disabled`.
+                // We are explicitly enabling it again to get verbose output that helps with troubleshooting.
+                .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
                 .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)

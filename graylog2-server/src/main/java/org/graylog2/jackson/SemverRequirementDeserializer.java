@@ -41,16 +41,16 @@ public class SemverRequirementDeserializer extends StdDeserializer<Requirement> 
 
     @Override
     public Requirement deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
-        switch (p.getCurrentTokenId()) {
+        switch (p.currentTokenId()) {
             case JsonTokenId.ID_STRING:
                 final String str = p.getText().trim();
                 try {
                     return buildRequirement(str);
                 } catch (SemverException e) {
-                    ctxt.reportMappingException(e.getMessage());
+                    ctxt.reportInputMismatch(this, e.getMessage());
                 }
             default:
-                throw ctxt.wrongTokenException(p, JsonToken.VALUE_STRING, null);
+                throw ctxt.wrongTokenException(p, handledType(), JsonToken.VALUE_STRING, null);
         }
     }
 

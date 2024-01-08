@@ -40,17 +40,17 @@ public class SemverDeserializer extends StdDeserializer<Semver> {
 
     @Override
     public Semver deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
-        switch (p.getCurrentTokenId()) {
+        switch (p.currentTokenId()) {
             case JsonTokenId.ID_STRING:
             case JsonTokenId.ID_NUMBER_INT:
                 final String str = p.getText().trim();
                 try {
                     return buildSemver(str);
                 } catch (SemverException e) {
-                    ctxt.reportMappingException(e.getMessage());
+                    ctxt.reportInputMismatch(this, e.getMessage());
                 }
             default:
-                throw ctxt.wrongTokenException(p, JsonToken.VALUE_STRING, "expected String or Number");
+                throw ctxt.wrongTokenException(p, handledType(), JsonToken.VALUE_STRING, "expected String or Number");
         }
     }
 
