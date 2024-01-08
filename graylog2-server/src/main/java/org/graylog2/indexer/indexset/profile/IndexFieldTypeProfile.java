@@ -24,6 +24,9 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Represents profile as it is stored in Mongo.
+ */
 public record IndexFieldTypeProfile(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @ObjectId String id,
                                     @JsonProperty(NAME_FIELD_NAME) String name,
                                     @JsonProperty(DESCRIPTION_FIELD_NAME) String description,

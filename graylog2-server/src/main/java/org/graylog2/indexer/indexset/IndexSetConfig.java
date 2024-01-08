@@ -54,6 +54,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_CREATION_DATE = "creation_date";
     public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
     public static final String FIELD_REGULAR = "regular";
+    public static final String FIELD_PROFILE_ID = "field_type_profile";
     public static final String FIELD_ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
     public static final String FIELD_ROTATION_STRATEGY = "rotation_strategy";
     public static final String FIELD_RETENTION_STRATEGY_CLASS = "retention_strategy_class";
@@ -88,7 +89,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
                                         @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
-                                        @JsonProperty("field_type_profile") @Nullable String fieldTypeProfile,
+                                        @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering
     ) {
 
@@ -280,7 +281,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("custom_field_mappings")
     public abstract CustomFieldMappings customFieldMappings();
 
-    @JsonProperty("field_type_profile")
+    @JsonProperty(FIELD_PROFILE_ID)
     @Nullable
     public abstract String fieldTypeProfile();
 
