@@ -25,6 +25,8 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.scheduler.eventbus.JobCompletedEvent;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
+import org.graylog2.cluster.lock.Lock;
+import org.graylog2.cluster.lock.LockService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -59,6 +61,9 @@ public class JobExecutionEngine {
     private final JobTriggerUpdates.Factory jobTriggerUpdatesFactory;
     private final Map<String, Job.Factory> jobFactory;
     private final JobWorkerPool workerPool;
+    private final LockService lockService;
+    private final Map<String, Integer> maxConcurrencyMap;
+
     private Counter executionSuccessful;
     private Counter executionFailed;
     private Timer executionTime;
@@ -73,7 +78,10 @@ public class JobExecutionEngine {
                               JobScheduleStrategies scheduleStrategies,
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
                               Map<String, Job.Factory> jobFactory,
-                              @Assisted JobWorkerPool workerPool, MetricRegistry metricRegistry) {
+                              @Assisted JobWorkerPool workerPool,
+                              LockService lockService,
+                              JobSchedulerConfig schedulerConfig,
+                              MetricRegistry metricRegistry) {
         this.jobTriggerService = jobTriggerService;
         this.jobDefinitionService = jobDefinitionService;
         this.eventBus = eventBus;
@@ -81,6 +89,8 @@ public class JobExecutionEngine {
         this.jobTriggerUpdatesFactory = jobTriggerUpdatesFactory;
         this.jobFactory = jobFactory;
         this.workerPool = workerPool;
+        this.lockService = lockService;
+        this.maxConcurrencyMap = schedulerConfig.jobMaxConcurrency();
         this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "successful"));
         this.executionFailed = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed"));
         this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
@@ -124,7 +134,14 @@ public class JobExecutionEngine {
             if (triggerOptional.isPresent()) {
                 final JobTriggerDto trigger = triggerOptional.get();
 
-                if (!workerPool.execute(() -> handleTrigger(trigger))) {
+                final Optional<Lock> lock = getOptionalConcurrencyLock(trigger);
+                if (hasConcurrencyLimit(trigger) && !lock.isPresent()) {
+                    // The job couldn't be executed so we have to release the trigger again with the same nextTime
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
+                    return false;
+                }
+
+                if (!workerPool.execute(() -> handleTrigger(trigger, lock))) {
                     // The job couldn't be executed so we have to release the trigger again with the same nextTime
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
                     return false;
@@ -137,15 +154,25 @@ public class JobExecutionEngine {
         return false;
     }
 
+    private boolean hasConcurrencyLimit(JobTriggerDto trigger) {
+        return maxConcurrencyMap.containsKey(trigger.jobDefinitionType());
+    }
+
+    private Optional<Lock> getOptionalConcurrencyLock(JobTriggerDto trigger) {
+        if (hasConcurrencyLimit(trigger)) {
+            return lockService.lock(trigger.jobDefinitionType(), maxConcurrencyMap.get(trigger.jobDefinitionType()));
+        }
+        return Optional.empty();
+    }
+
     public void updateLockedJobs() {
         if (workerPool.anySlotsUsed()) {
             jobTriggerService.updateLockedJobTriggers();
         }
     }
 
-    private void handleTrigger(JobTriggerDto trigger) {
+    private void handleTrigger(JobTriggerDto trigger, Optional<Lock> lock) {
         LOG.trace("Locked trigger {} (owner={})", trigger.id(), trigger.lock().owner());
-
         try {
             final JobDefinitionDto jobDefinition = jobDefinitionService.get(trigger.jobDefinitionId())
                     .orElseThrow(() -> new IllegalStateException("Couldn't find job definition " + trigger.jobDefinitionId()));
@@ -155,7 +182,7 @@ public class JobExecutionEngine {
                 throw new IllegalStateException("Couldn't find job factory for type " + jobDefinition.config().type());
             }
 
-            executionTime.time(() -> executeJob(trigger, jobDefinition, job));
+            executionTime.time(() -> executeJob(trigger, jobDefinition, job, lock));
         } catch (IllegalStateException e) {
             // The trigger cannot be handled because of a permanent error so we mark the trigger as defective
             LOG.error("Couldn't handle trigger due to a permanent error {} - trigger won't be retried", trigger.id(), e);
@@ -167,12 +194,15 @@ public class JobExecutionEngine {
             LOG.error("Couldn't handle trigger {} - retrying at {}", trigger.id(), nextTime, e);
             jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime));
         } finally {
+            if (lock.isPresent()) {
+                lockService.unlock(lock.get());
+            }
             eventBus.post(JobCompletedEvent.INSTANCE);
         }
     }
 
     @WithSpan
-    private void executeJob(JobTriggerDto trigger, JobDefinitionDto jobDefinition, Job job) {
+    private void executeJob(JobTriggerDto trigger, JobDefinitionDto jobDefinition, Job job, Optional<Lock> lock) {
         Span.current().setAttribute(SCHEDULER_JOB_CLASS, job.getClass().getSimpleName())
                 .setAttribute(SCHEDULER_JOB_DEFINITION_TYPE, jobDefinition.config().type())
                 .setAttribute(SCHEDULER_JOB_DEFINITION_TITLE, jobDefinition.title())

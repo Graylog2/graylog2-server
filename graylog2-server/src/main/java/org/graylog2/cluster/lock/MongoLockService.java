@@ -87,6 +87,18 @@ public class MongoLockService implements LockService {
     }
 
     @Override
+    public Optional<Lock> lock(@Nonnull String resource, int maxConcurrency) {
+        Optional<Lock> optLock = Optional.empty();
+        for (int i = 0; i < maxConcurrency; i++) {
+            optLock = doLock(resource, resource + "-" + i);
+            if (optLock.isPresent()) {
+                return optLock;
+            }
+        }
+        return optLock;
+    }
+
+    @Override
     public Optional<Lock> extendLock(@Nonnull Lock lock) {
         if (lock != null) {
             return doLock(lock.resource(), lock.lockedBy());
