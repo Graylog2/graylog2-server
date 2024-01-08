@@ -32,7 +32,6 @@ import org.mockito.junit.MockitoRule;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.time.DateTimeException;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;

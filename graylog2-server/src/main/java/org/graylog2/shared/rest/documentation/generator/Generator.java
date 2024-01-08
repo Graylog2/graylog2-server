@@ -35,6 +35,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog2.shared.ServerVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -376,6 +378,10 @@ public class Generator {
             return createPrimitiveSchema("string");
         }
 
+        if (returnType.isAssignableFrom(FormDataBodyPart.class)) {
+            return createPrimitiveSchema("File");
+        }
+
         if (isPrimitive(returnType)) {
             return createPrimitiveSchema(mapPrimitives(returnType.getSimpleName()));
         }
@@ -627,6 +633,10 @@ public class Generator {
                     paramKind = Parameter.Kind.FORM;
                     final String annotationValue = ((FormParam) annotation).value();
                     param.setName(annotationValue);
+                } else if (annotation instanceof FormDataParam) {
+                    paramKind = Parameter.Kind.FORMDATA;
+                    final String annotationValue = ((FormDataParam) annotation).value();
+                    param.setName(annotationValue);
                 }
             }
 
@@ -857,7 +867,8 @@ public class Generator {
             HEADER,
             PATH,
             QUERY,
-            FORM
+            FORM,
+            FORMDATA
         }
     }
 }

@@ -18,16 +18,33 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import ThreatIntelPluginConfig from './components/ThreatIntelPluginConfig';
-import { SpamhausEDROPAdapterDocumentation, SpamhausEDROPAdapterFieldSet, SpamhausEDROPAdapterSummary } from './components/adapters/spamhaus-edrop';
-import { TorExitNodeAdapterDocumentation, TorExitNodeAdapterFieldSet, TorExitNodeAdapterSummary } from './components/adapters/torexitnode';
-import { WhoisAdapterDocumentation, WhoisAdapterFieldSet, WhoisAdapterSummary } from './components/adapters/whois/index';
-import { AbuseChRansomAdapterDocumentation, AbuseChRansomAdapterFieldSet, AbuseChRansomAdapterSummary } from './components/adapters/abusech/index';
+import {
+  SpamhausEDROPAdapterDocumentation,
+  SpamhausEDROPAdapterFieldSet,
+  SpamhausEDROPAdapterSummary,
+} from './components/adapters/spamhaus-edrop';
+import {
+  TorExitNodeAdapterDocumentation,
+  TorExitNodeAdapterFieldSet,
+  TorExitNodeAdapterSummary,
+} from './components/adapters/torexitnode';
+import {
+  WhoisAdapterDocumentation,
+  WhoisAdapterFieldSet,
+  WhoisAdapterSummary,
+} from './components/adapters/whois/index';
+import {
+  AbuseChRansomAdapterDocumentation,
+  AbuseChRansomAdapterFieldSet,
+  AbuseChRansomAdapterSummary,
+} from './components/adapters/abusech/index';
 import { OTXAdapterDocumentation, OTXAdapterFieldSet, OTXAdapterSummary } from './components/adapters/otx';
 
 const bindings = {
   systemConfigurations: [
     {
       component: ThreatIntelPluginConfig,
+      displayName: 'Threat Intelligence Lookup',
       configType: 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration',
     },
   ],
