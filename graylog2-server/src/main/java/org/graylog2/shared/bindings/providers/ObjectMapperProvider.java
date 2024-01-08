@@ -20,7 +20,7 @@ import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -129,7 +129,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 // Starting from Jackson 2.16, the default for INCLUDE_SOURCE_IN_LOCATION was changed to `disabled`.
                 // We are explicitly enabling it again to get verbose output that helps with troubleshooting.
                 .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION)
-                .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
+                .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy())
                 .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)
                 .setDateFormat(new StdDateFormat().withColonInTimeZone(false))

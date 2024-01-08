@@ -20,7 +20,7 @@ import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -78,7 +78,7 @@ public class QueryTest {
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-                .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
+                .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy())
                 .setTypeFactory(typeFactory)
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule())
@@ -115,7 +115,7 @@ public class QueryTest {
         ExecutionStateGlobalOverride.Builder executionState = ExecutionStateGlobalOverride.builder();
 
         executionState.timerange(RelativeRange.create(60));
-        executionState.searchTypesBuilder().put(messageListId,  SearchTypeExecutionState.builder().offset(150).limit(300).build());
+        executionState.searchTypesBuilder().put(messageListId, SearchTypeExecutionState.builder().offset(150).limit(300).build());
 
         final Query mergedQuery = query.applyExecutionState(executionState.build());
         assertThat(mergedQuery)
@@ -207,6 +207,7 @@ public class QueryTest {
             throw new RuntimeException("invalid time range", e);
         }
     }
+
     private Query.Builder validQueryBuilder() {
         return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(ElasticsearchQueryString.empty());
     }
