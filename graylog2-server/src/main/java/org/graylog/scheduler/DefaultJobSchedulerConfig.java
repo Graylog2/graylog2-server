@@ -18,8 +18,11 @@ package org.graylog.scheduler;
 
 import org.graylog2.cluster.leader.LeaderElectionService;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This is the default {@link JobSchedulerConfig}.
@@ -27,10 +30,12 @@ import javax.inject.Singleton;
 @Singleton
 public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
     private final LeaderElectionService leaderElectionService;
+    private final Map<String, Integer> jobMaxConcurrency;
 
     @Inject
     public DefaultJobSchedulerConfig(LeaderElectionService leaderElectionService) {
         this.leaderElectionService = leaderElectionService;
+        this.jobMaxConcurrency = new HashMap<>();
     }
 
     @Override
@@ -41,5 +46,11 @@ public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
     @Override
     public int numberOfWorkerThreads() {
         return 5;
+    }
+
+    @Override
+    @Nullable
+    public Map<String, Integer> jobMaxConcurrency() {
+        return jobMaxConcurrency;
     }
 }
