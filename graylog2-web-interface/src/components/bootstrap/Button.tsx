@@ -49,6 +49,11 @@ const styleProps = (style: StyleProps) => {
 
 const StyledButton = styled(MantineButton)`
   font-weight: 400;
+  text-decoration: none !important;
+
+  &:hover, &:focus {
+    color: inherit;
+  }
 `;
 
 type Props = React.PropsWithChildren<{
