@@ -78,11 +78,10 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     static class StaticRandomObjectIdProvider extends RandomObjectIdProvider {
-        private final Date date;
         private AtomicInteger counter;
+
         StaticRandomObjectIdProvider(Date date) {
             super(date);
-            this.date = date;
             this.counter = new AtomicInteger(0);
         }
 
@@ -94,7 +93,8 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
     @Before
     public void setUp() throws Exception {
-        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
+        final MongoJackObjectMapperProvider mapperProvider =
+                new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
         final DashboardsService dashboardsService = new DashboardsService(mongodb.mongoConnection(), mapperProvider);
 
         final RandomObjectIdProvider randomObjectIdProvider = new StaticRandomObjectIdProvider(new Date(1575020937839L));
@@ -157,7 +157,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
                         .build()
         );
 
-        assertViewsWritten(1,resourceFile("sample_dashboard-expected_views.json"));
+        assertViewsWritten(1, resourceFile("sample_dashboard-expected_views.json"));
         assertSearchesWritten(1, resourceFile("sample_dashboard-expected_searches.json"));
     }
 
@@ -245,22 +245,22 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
                 .findFirst();
         assertThat(nonImplementedWidget).isPresent();
         assertThat(nonImplementedWidget.get()).isEqualTo(NonImplementedWidget.create(
-                "5020d62d-24a0-4b0c-8819-78e668cc2428",
-                "TOTALLY_UNKNOWN_WIDGET",
-                ImmutableMap.<String, Object>builder()
-                        .put("valuetype", "total")
-                        .put("renderer", "line")
-                        .put("interpolation", "linear")
-                        .put("timerange", ImmutableMap.<String, Object>of(
-                                "type", "relative",
-                                "range", 28800
-                        ))
-                        .put("rangeType", "relative")
-                        .put("field", "nf_bytes")
-                        .put("query", "")
-                        .put("interval", "minute")
-                        .put("relative", 28800)
-                        .build()
+                        "5020d62d-24a0-4b0c-8819-78e668cc2428",
+                        "TOTALLY_UNKNOWN_WIDGET",
+                        ImmutableMap.<String, Object>builder()
+                                .put("valuetype", "total")
+                                .put("renderer", "line")
+                                .put("interpolation", "linear")
+                                .put("timerange", ImmutableMap.<String, Object>of(
+                                        "type", "relative",
+                                        "range", 28800
+                                ))
+                                .put("rangeType", "relative")
+                                .put("field", "nf_bytes")
+                                .put("query", "")
+                                .put("interval", "minute")
+                                .put("relative", 28800)
+                                .build()
                 )
         );
     }
@@ -383,28 +383,28 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
         final List<ViewWidget> widgetWithoutAttributes = new ArrayList<>(findNewWidgets.apply("4ce93e89-4771-4ce2-8b59-6dc058cbfd3b"));
         assertThat(widgetWithoutAttributes).hasSize(1);
-        assertThat(((AggregationWidget)widgetWithoutAttributes.get(0)).config().visualization()).isEqualTo("table");
+        assertThat(((AggregationWidget) widgetWithoutAttributes.get(0)).config().visualization()).isEqualTo("table");
 
         final List<ViewWidget> widgetWithOnlyShowPieChartIsFalse = new ArrayList<>(findNewWidgets.apply("5c12c588-be0c-436b-b999-ee18378efd45"));
         assertThat(widgetWithOnlyShowPieChartIsFalse).hasSize(1);
-        assertThat(((AggregationWidget)widgetWithOnlyShowPieChartIsFalse.get(0)).config().visualization()).isEqualTo("table");
+        assertThat(((AggregationWidget) widgetWithOnlyShowPieChartIsFalse.get(0)).config().visualization()).isEqualTo("table");
 
         final List<ViewWidget> widgetWithOnlyShowDataTableIsFalse = new ArrayList<>(findNewWidgets.apply("e6a16d9a-23c0-4b7f-93b5-d790b5d64672"));
         assertThat(widgetWithOnlyShowDataTableIsFalse).hasSize(1);
-        assertThat(((AggregationWidget)widgetWithOnlyShowDataTableIsFalse.get(0)).config().visualization()).isEqualTo("table");
+        assertThat(((AggregationWidget) widgetWithOnlyShowDataTableIsFalse.get(0)).config().visualization()).isEqualTo("table");
 
         final List<ViewWidget> widgetWithBothAttributesPresentButFalse = new ArrayList<>(findNewWidgets.apply("568c005a-11ec-4be9-acd7-b2aa509c07e0"));
         assertThat(widgetWithBothAttributesPresentButFalse).hasSize(1);
-        assertThat(((AggregationWidget)widgetWithBothAttributesPresentButFalse.get(0)).config().visualization()).isEqualTo("table");
+        assertThat(((AggregationWidget) widgetWithBothAttributesPresentButFalse.get(0)).config().visualization()).isEqualTo("table");
 
         final List<ViewWidget> widgetWithPieChartPresentAndTrue = new ArrayList<>(findNewWidgets.apply("2e3c5e76-bbfd-4ac3-a27b-7491a5cbf59a"));
         assertThat(widgetWithPieChartPresentAndTrue).hasSize(1);
-        assertThat(((AggregationWidget)widgetWithPieChartPresentAndTrue.get(0)).config().visualization()).isEqualTo("pie");
+        assertThat(((AggregationWidget) widgetWithPieChartPresentAndTrue.get(0)).config().visualization()).isEqualTo("pie");
 
         final List<ViewWidget> widgetWithBothPieChartAndDataTablePresentAndTrue = new ArrayList<>(findNewWidgets.apply("26a0a3e1-718f-4bfe-90a2-cb441390152d"));
         assertThat(widgetWithBothPieChartAndDataTablePresentAndTrue).hasSize(2);
         assertThat(widgetWithBothPieChartAndDataTablePresentAndTrue)
-                .extracting(viewWidget -> ((AggregationWidget)viewWidget).config().visualization())
+                .extracting(viewWidget -> ((AggregationWidget) viewWidget).config().visualization())
                 .containsExactlyInAnyOrder("table", "pie");
     }
 
@@ -448,7 +448,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
                         .build()
         );
 
-        assertViewsWritten(1,resourceFile("dashboard_with_widgets_missing_query_attributes-expected_views.json"));
+        assertViewsWritten(1, resourceFile("dashboard_with_widgets_missing_query_attributes-expected_views.json"));
         assertSearchesWritten(1, resourceFile("dashboard_with_widgets_missing_query_attributes-expected_searches.json"));
     }
 
