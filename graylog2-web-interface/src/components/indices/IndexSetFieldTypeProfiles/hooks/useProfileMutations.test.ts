@@ -21,7 +21,7 @@ import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
-import useProfileMutations from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations';
+import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import { profile1JSON, profile1 } from 'fixtures/indexSetFieldTypeProfiles';
 
 const urlPrefix = '/system/indices/index_sets/profiles';

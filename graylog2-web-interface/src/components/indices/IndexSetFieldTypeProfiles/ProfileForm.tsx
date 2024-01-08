@@ -19,10 +19,9 @@ import { styled } from 'styled-components';
 import React, { useMemo } from 'react';
 import { Formik, Form, FieldArray, Field } from 'formik';
 import countBy from 'lodash/countBy';
-import { Loader } from '@mantine/core';
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
-import { FormikInput, IconButton, Select, FormSubmit } from 'components/common';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import { FormikInput, IconButton, Select, FormSubmit, Spinner } from 'components/common';
 import { Button, Col, HelpBlock, Input } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
@@ -40,7 +39,6 @@ const SelectGroup = styled.div`
 const List = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
 `;
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -53,11 +51,12 @@ const Item = styled.div`
 `;
 
 const StyledFormSubmit = styled(FormSubmit)`
-  margin-top: 15px;
+  margin-top: 30px;
 `;
 type Props = {
   initialValues?: IndexSetFieldTypeProfile,
   submitButtonText: string,
+  submitLoadingText: string,
   onCancel: () => void,
   onSubmit: (profile: IndexSetFieldTypeProfile) => void
 }
@@ -122,7 +121,7 @@ const ProfileFormSelect = ({ onChange, options, error, name, value, placeholder,
   </SelectContainer>
 );
 
-const ProfileForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Props) => {
+const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCancel, onSubmit }: Props) => {
   const { data, isLoading } = useFieldTypes(undefined, undefined);
   const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMapping();
   const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
@@ -143,7 +142,7 @@ const ProfileForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Pr
                                         onSubmit={_onSubmit}
                                         validate={validate}
                                         validateOnChange>
-        {({ isSubmitting, isValidating, values: { customFieldMappings } }) => (
+        {({ isSubmitting, isValid, isValidating, values: { customFieldMappings } }) => (
           <Form>
             <FormikInput name="name"
                          label="Profile name"
@@ -166,7 +165,7 @@ const ProfileForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Pr
                               Here you can setup type mapping to any field.
                             </HelpBlock>
                             <List>
-                              {(isLoading || isLoadingFieldTypes) ? <Loader /> : customFieldMappings.map((_, index) => (
+                              {(isLoading || isLoadingFieldTypes) ? <Spinner /> : customFieldMappings.map((_, index) => (
                                 // eslint-disable-next-line react/no-array-index-key
                                 <Item key={index}>
                                   <SelectGroup>
@@ -202,8 +201,9 @@ const ProfileForm = ({ initialValues, submitButtonText, onCancel, onSubmit }: Pr
                         )} />
             <StyledFormSubmit submitButtonText={submitButtonText}
                               onCancel={onCancel}
-                              disabledSubmit={isValidating}
-                              isSubmitting={isSubmitting} />
+                              disabledSubmit={isValidating || !isValid}
+                              isSubmitting={isSubmitting}
+                              submitLoadingText={submitLoadingText} />
           </Form>
         )}
       </Formik>

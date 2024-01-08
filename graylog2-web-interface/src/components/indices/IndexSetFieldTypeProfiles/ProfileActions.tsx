@@ -14,11 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React from 'react';
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
-import ProfileActions from 'components/indices/IndexSetFiledTypeProfiles/ProfileActions';
+import { Button, ButtonToolbar } from 'components/bootstrap';
+import Routes from 'routing/Routes';
+import { LinkContainer } from 'components/common/router';
 
-const useProfileActions = () => useCallback((profile: IndexSetFieldTypeProfile) => <ProfileActions profile={profile} />, []);
+const ProfileActions = ({ profileId }: { profileId: string }) => (
+  <ButtonToolbar>
+    <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>
+      <Button bsSize="xs">
+        Edit
+      </Button>
+    </LinkContainer>
+  </ButtonToolbar>
+);
 
-export default useProfileActions;
+export default ProfileActions;

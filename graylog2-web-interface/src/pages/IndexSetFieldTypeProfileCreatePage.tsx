@@ -22,7 +22,7 @@ import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button, Col, Row } from 'components/bootstrap';
-import CreateProfile from 'components/indices/IndexSetFiledTypeProfiles/CreateProfile';
+import CreateProfile from 'components/indices/IndexSetFieldTypeProfiles/CreateProfile';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 const IndexSetFieldTypeProfileCreatePage = () => {
@@ -39,29 +39,27 @@ const IndexSetFieldTypeProfileCreatePage = () => {
 
   return (
     <DocumentTitle title="Create Index Set Field Type Profile">
-      <div>
-        <PageHeader title="Create Index Set Field Type Profiles"
-                    documentationLink={{
-                      title: 'Index model documentation',
-                      path: DocsHelper.PAGES.INDEX_MODEL,
-                    }}
-                    topActions={(
-                      <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>
-                        <Button bsStyle="info">Profiles</Button>
-                      </LinkContainer>
+      <PageHeader title="Create Index Set Field Type Profile"
+                  documentationLink={{
+                    title: 'Index model documentation',
+                    path: DocsHelper.PAGES.INDEX_MODEL,
+                  }}
+                  topActions={(
+                    <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>
+                      <Button bsStyle="info">Profiles</Button>
+                    </LinkContainer>
                     )}>
-          <span>
-            With index set field type profiles you can bundle up custom field types into profiles.
-            Then you can assign this profile to any of index set.
-            On this page you can create new profile.
-          </span>
-        </PageHeader>
-        <Row className="content">
-          <Col md={12}>
-            <CreateProfile />
-          </Col>
-        </Row>
-      </div>
+        <span>
+          With index set field type profiles you can bundle up custom field types into profiles.
+          Then you can assign this profile to any of index set.
+          On this page you can create new profile.
+        </span>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          <CreateProfile />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

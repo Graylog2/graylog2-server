@@ -16,18 +16,16 @@
  */
 import React from 'react';
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
-import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
-import CustomFieldTypesList from 'components/indices/IndexSetFiledTypeProfiles/CustomFieldTypesList';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import ExpandedCustomFieldTypes from 'components/indices/IndexSetFieldTypeProfiles/ExpandedCustomFieldTypes';
 
-type Props = {
-  customFieldMappings: IndexSetFieldTypeProfile['customFieldMappings'],
-  fieldTypes: FieldTypes,
-}
+const useExpandedSectionsRenderer = () => ({
+  customFieldMapping: {
+    title: 'Custom Field Mappings',
+    content: ({ customFieldMappings }: IndexSetFieldTypeProfile) => (
+      <ExpandedCustomFieldTypes customFieldMappings={customFieldMappings} />
+    ),
+  },
+});
 
-const ExpandedCustomFieldTypes = ({ customFieldMappings, fieldTypes }: Props) => (
-  <CustomFieldTypesList list={customFieldMappings}
-                        fieldTypes={fieldTypes} />
-);
-
-export default ExpandedCustomFieldTypes;
+export default useExpandedSectionsRenderer;

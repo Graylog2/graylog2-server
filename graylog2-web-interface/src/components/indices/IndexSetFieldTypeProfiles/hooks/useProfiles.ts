@@ -25,7 +25,7 @@ import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQue
 import type {
   IndexSetFieldTypeProfileJson,
   IndexSetFieldTypeProfile,
-} from 'components/indices/IndexSetFiledTypeProfiles/types';
+} from 'components/indices/IndexSetFieldTypeProfiles/types';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },

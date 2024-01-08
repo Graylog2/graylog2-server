@@ -22,15 +22,16 @@ import asMock from 'helpers/mocking/AsMock';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import ProfileForm from 'components/indices/IndexSetFiledTypeProfiles/ProfileForm';
+import EditProfile from 'components/indices/IndexSetFieldTypeProfiles/EditProfile';
+import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import { simpleFields } from 'fixtures/fields';
 import { profile1 } from 'fixtures/indexSetFieldTypeProfiles';
 
-const mockSubmit = jest.fn();
-const mockCancel = jest.fn();
-const renderProfileForm = ({ initialValues }) => render(
-  <ProfileForm onCancel={mockCancel} onSubmit={mockSubmit} submitButtonText="Submit" initialValues={initialValues} />,
+const renderEditProfile = () => render(
+  <EditProfile profile={profile1} />,
 );
+
+jest.mock('components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
@@ -42,6 +43,9 @@ const selectItem = async (select: HTMLElement, option: string | RegExp) => {
 };
 
 describe('IndexSetFieldTypesList', () => {
+  const createMock = jest.fn(() => Promise.resolve());
+  const editMock = jest.fn(() => Promise.resolve());
+
   beforeAll(loadViewsPlugin);
 
   afterAll(unloadViewsPlugin);
@@ -54,40 +58,57 @@ describe('IndexSetFieldTypesList', () => {
           int: 'Number(int)',
           bool: 'Boolean',
           ip: 'IP',
-          date: 'Date',
         },
       },
       isLoading: false,
     });
+
+    asMock(useProfileMutations).mockReturnValue(({
+      editProfile: editMock,
+      isEditLoading: false,
+      createProfile: createMock,
+      isCreateLoading: false,
+      isLoading: false,
+    }));
 
     asMock(useFieldTypes).mockImplementation(() => (
       { data: simpleFields().toArray(), refetch: jest.fn() }
     ));
   });
 
-  it('Do not run onSubmit when has empty name', async () => {
-    renderProfileForm({
-      initialValues: {
-        ...profile1,
-        name: '',
-      },
+  it('Run editProfile with changed form data', async () => {
+    renderEditProfile();
+
+    const name = await screen.findByRole('textbox', {
+      name: /name/i,
+      hidden: true,
     });
 
-    const submitButton = await screen.findByLabelText('Submit');
-    fireEvent.click(submitButton);
+    const fieldFirst = await screen.findByLabelText(/select customFieldMappings.0.field/i);
+    const typeFirst = await screen.findByLabelText(/select customFieldMappings.0.type/i);
+    const submitButton = await screen.findByTitle(/update profile/i);
 
-    expect(mockSubmit).not.toHaveBeenCalled();
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      fireEvent.change(name, { target: { value: 'Profile 1 new name' } });
+      await selectItem(fieldFirst, 'date');
+      await selectItem(typeFirst, 'String type');
+      fireEvent.click(submitButton);
+    });
+
+    expect(editMock).toHaveBeenCalledWith({
+      name: 'Profile 1 new name',
+      description: 'Description 1',
+      id: '111',
+      customFieldMappings: [
+        { field: 'date', type: 'string' },
+        { field: 'user_ip', type: 'ip' },
+      ],
+    });
   });
 
-  it('Do not run onSubmit when has empty customFieldMapping', async () => {
-    renderProfileForm({
-      initialValues: {
-        ...profile1,
-        customFieldMappings: [
-          { field: 'http_method', type: 'string' },
-        ],
-      },
-    });
+  it('Run editProfile with added form data', async () => {
+    renderEditProfile();
 
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
@@ -96,48 +117,26 @@ describe('IndexSetFieldTypesList', () => {
       fireEvent.click(addMappingButton);
     });
 
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
-    const submitButton = await screen.findByLabelText('Submit');
+    const fieldThird = await screen.findByLabelText(/select customFieldMappings.2.field/i);
+    const typeThird = await screen.findByLabelText(/select customFieldMappings.2.type/i);
+    const submitButton = await screen.findByTitle(/update profile/i);
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => {
-      await selectItem(typeSecond, 'String type');
-
+      await selectItem(fieldThird, 'date');
+      await selectItem(typeThird, 'String type');
       fireEvent.click(submitButton);
     });
 
-    expect(mockSubmit).not.toHaveBeenCalled();
-  });
-
-  it('Do not run onSubmit when has same fields in customFieldMapping', async () => {
-    renderProfileForm({
-      initialValues: {
-        ...profile1,
-        customFieldMappings: [
-          { field: 'http_method', type: 'string' },
-        ],
-      },
+    expect(editMock).toHaveBeenCalledWith({
+      name: 'Profile 1',
+      description: 'Description 1',
+      id: '111',
+      customFieldMappings: [
+        { field: 'http_method', type: 'string' },
+        { field: 'user_ip', type: 'ip' },
+        { field: 'date', type: 'string' },
+      ],
     });
-
-    const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
-
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      fireEvent.click(addMappingButton);
-    });
-
-    const fieldSecond = await screen.findByLabelText(/select customFieldMappings.1.field/i);
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
-    const submitButton = await screen.findByLabelText('Submit');
-
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await selectItem(typeSecond, 'String type');
-      await selectItem(fieldSecond, 'http_method');
-
-      fireEvent.click(submitButton);
-    });
-
-    expect(mockSubmit).not.toHaveBeenCalled();
   });
 });

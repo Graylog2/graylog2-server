@@ -16,19 +16,9 @@
  */
 import React from 'react';
 
-import { Button, ButtonToolbar } from 'components/bootstrap';
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
-import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import ProfileActions from 'components/indices/IndexSetFieldTypeProfiles/ProfileActions';
 
-const ProfileActions = ({ profile }: { profile: IndexSetFieldTypeProfile }) => (
-  <ButtonToolbar>
-    <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profile.id)}>
-      <Button bsSize="xs">
-        Edit
-      </Button>
-    </LinkContainer>
-  </ButtonToolbar>
-);
+const profileActions = ({ id }: IndexSetFieldTypeProfile) => <ProfileActions profileId={id} />;
 
-export default ProfileActions;
+export default profileActions;

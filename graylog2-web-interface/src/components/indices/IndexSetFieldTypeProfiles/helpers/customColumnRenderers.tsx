@@ -14,21 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 
-import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
-import CustomFieldMappingsCell from 'components/indices/IndexSetFiledTypeProfiles/cells/CustomFieldMappingsCell';
+import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import CustomFieldMappingsCell from 'components/indices/IndexSetFieldTypeProfiles/cells/CustomFieldMappingsCell';
 
-const useCustomColumnRenderers = () => useMemo(() => ({
+const customColumnRenderers = ({
   attributes: {
     custom_field_mappings: {
       renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => (
         <CustomFieldMappingsCell profile={profile}
                                  customFieldTypes={customFieldTypes} />
       ),
-      width: 4,
+      staticWidth: 200,
     },
   },
-}), []);
+});
 
-export default useCustomColumnRenderers;
+export default customColumnRenderers;

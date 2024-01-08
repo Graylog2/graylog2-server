@@ -21,47 +21,41 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import ProfileForm from 'components/indices/IndexSetFiledTypeProfiles/ProfileForm';
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
-import useProfileMutations from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations';
+import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
 
-type Props = {
-  profile: IndexSetFieldTypeProfile,
-}
-
-const EditProfile = ({
-  profile,
-}: Props) => {
+const CreateProfile = () => {
   const sendTelemetry = useSendTelemetry();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { editProfile } = useProfileMutations();
+  const navigate = useNavigate();
+  const { createProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
-  const onSubmit = useCallback((newProfile: IndexSetFieldTypeProfile) => {
-    editProfile(newProfile).then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT, {
+  const onSubmit = useCallback((profile: IndexSetFieldTypeProfile) => {
+    createProfile(profile).then(() => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CREATED, {
         app_pathname: telemetryPathName,
-        app_action_value: { mappingsQuantity: newProfile?.customFieldMappings?.length },
+        app_action_value: { mappingsQuantity: profile?.customFieldMappings?.length },
       });
 
       navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
     });
-  }, [editProfile, navigate, sendTelemetry, telemetryPathName]);
+  }, [createProfile, navigate, sendTelemetry, telemetryPathName]);
 
   useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_OPENED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-opened' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_OPENED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-opened' });
   }, [sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_CANCELED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-canceled' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_CANCELED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-canceled' });
     navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
   }, [navigate, sendTelemetry, telemetryPathName]);
 
   return (
-    <ProfileForm onCancel={onCancel} submitButtonText="Update profile" onSubmit={onSubmit} initialValues={profile} />
+    <ProfileForm onCancel={onCancel} submitButtonText="Create profile" submitLoadingText="Creating profile..." onSubmit={onSubmit} />
   );
 };
 
-export default EditProfile;
+export default CreateProfile;

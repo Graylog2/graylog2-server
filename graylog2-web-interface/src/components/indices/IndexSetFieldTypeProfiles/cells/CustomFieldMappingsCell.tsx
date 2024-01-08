@@ -17,7 +17,7 @@
 import React from 'react';
 import { styled } from 'styled-components';
 
-import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
+import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { CountBadge } from 'components/common';
 

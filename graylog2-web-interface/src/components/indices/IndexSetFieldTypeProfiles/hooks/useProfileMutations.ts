@@ -22,7 +22,7 @@ import UserNotification from 'util/UserNotification';
 import type {
   IndexSetFieldTypeProfile,
   IndexSetFieldTypeProfileJson,
-} from 'components/indices/IndexSetFiledTypeProfiles/types';
+} from 'components/indices/IndexSetFieldTypeProfiles/types';
 
 export const urlPrefix = '/system/indices/index_sets/profiles';
 

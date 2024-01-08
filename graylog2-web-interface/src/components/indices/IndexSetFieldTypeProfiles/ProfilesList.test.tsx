@@ -26,8 +26,8 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
-import ProfilesList from 'components/indices/IndexSetFiledTypeProfiles/ProfilesList';
-import useProfiles from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfiles';
+import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
+import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 
 const getData = (list = [profile1]) => (
   {

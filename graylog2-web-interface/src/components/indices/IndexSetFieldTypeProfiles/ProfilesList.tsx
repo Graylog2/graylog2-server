@@ -32,12 +32,12 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type {
   IndexSetFieldTypeProfile,
-} from 'components/indices/IndexSetFiledTypeProfiles/types';
+} from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useProfiles
-  from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfiles';
-import useExpandedSectionsRenderer from 'components/indices/IndexSetFiledTypeProfiles/ExpandedSectionsRenderer';
-import useCustomColumnRenderers from 'components/indices/IndexSetFiledTypeProfiles/CustomColumnRenderers';
-import useProfileActions from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileActions';
+  from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
+import useExpandedSectionsRenderer from 'components/indices/IndexSetFieldTypeProfiles/ExpandedSectionsRenderer';
+import customColumnRenderers from 'components/indices/IndexSetFieldTypeProfiles/helpers/customColumnRenderers';
+import profileActions from 'components/indices/IndexSetFieldTypeProfiles/helpers/profileActions';
 
 export const ENTITY_TABLE_ID = 'index-set-field-type-profiles';
 export const DEFAULT_LAYOUT = {
@@ -98,8 +98,6 @@ const ProfilesList = () => {
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
   const expandedSectionsRenderer = useExpandedSectionsRenderer();
-  const customColumnRenderers = useCustomColumnRenderers();
-  const profileActions = useProfileActions();
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;

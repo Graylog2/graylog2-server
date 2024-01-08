@@ -17,7 +17,7 @@
 import React from 'react';
 import { styled } from 'styled-components';
 
-import type { CustomFieldMapping } from 'components/indices/IndexSetFiledTypeProfiles/types';
+import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 const Item = styled.div`

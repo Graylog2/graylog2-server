@@ -22,7 +22,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import type {
   IndexSetFieldTypeProfileJson,
   IndexSetFieldTypeProfile,
-} from 'components/indices/IndexSetFiledTypeProfiles/types';
+} from 'components/indices/IndexSetFieldTypeProfiles/types';
 
 const INITIAL_DATA = null;
 

@@ -22,8 +22,8 @@ import asMock from 'helpers/mocking/AsMock';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import CreateProfile from 'components/indices/IndexSetFiledTypeProfiles/CreateProfile';
-import useProfileMutations from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations';
+import CreateProfile from 'components/indices/IndexSetFieldTypeProfiles/CreateProfile';
+import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import { simpleFields } from 'fixtures/fields';
 
 const renderCreateNewProfile = () => render(

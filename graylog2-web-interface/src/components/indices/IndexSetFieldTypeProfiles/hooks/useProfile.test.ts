@@ -20,7 +20,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
-import useProfile from 'components/indices/IndexSetFiledTypeProfiles/hooks/useProfile';
+import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { profile1JSON, profile1 } from 'fixtures/indexSetFieldTypeProfiles';

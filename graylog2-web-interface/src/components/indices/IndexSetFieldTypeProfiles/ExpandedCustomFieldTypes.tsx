@@ -14,24 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFiledTypeProfiles/types';
-import ExpandedCustomFieldTypes from 'components/indices/IndexSetFiledTypeProfiles/ExpandedCustomFieldTypes';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import CustomFieldTypesList from 'components/indices/IndexSetFieldTypeProfiles/CustomFieldTypesList';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 
-const useExpandedSectionsRenderer = () => {
+type Props = {
+  customFieldMappings: IndexSetFieldTypeProfile['customFieldMappings'],
+}
+
+const ExpandedCustomFieldTypes = ({ customFieldMappings }: Props) => {
   const { data: { fieldTypes } } = useFieldTypesForMappings();
 
-  return useMemo(() => ({
-    customFieldMapping: {
-      title: 'Custom Field Mappings',
-      content: ({ customFieldMappings }: IndexSetFieldTypeProfile) => (
-        <ExpandedCustomFieldTypes customFieldMappings={customFieldMappings}
-                                  fieldTypes={fieldTypes} />
-      ),
-    },
-  }), [fieldTypes]);
+  return (
+    <CustomFieldTypesList list={customFieldMappings}
+                          fieldTypes={fieldTypes} />
+  );
 };
 
-export default useExpandedSectionsRenderer;
+export default ExpandedCustomFieldTypes;
