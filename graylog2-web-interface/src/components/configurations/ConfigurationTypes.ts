@@ -25,14 +25,5 @@ enum ConfigurationType {
   USER_CONFIG = 'org.graylog2.users.UserConfiguration',
   CERTIFICATE_RENEWAL_POLICY_CONFIG = 'org.graylog2.plugin.certificates.RenewalPolicy',
 }
-
-enum PluginConfigurationType {
-  COLLECTORS_SYSTEM = 'org.graylog.plugins.collector.system.CollectorSystemConfiguration',
-  AWS = 'org.graylog.aws.config.AWSPluginConfiguration',
-  THREAT_INTEL = 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration',
-  FAILURE_PROCESSING = 'org.graylog.plugins.failure.config.EnterpriseFailureHandlingConfiguration',
-  TRAFFIC_LIMIT_VIOLATION = 'org.graylog.plugins.license.violations.TrafficLimitViolationSettings',
-  GEO_LOCATION = 'org.graylog.plugins.map.config.GeoIpResolverConfig',
-}
-
-export { ConfigurationType, PluginConfigurationType };
+export default ConfigurationType;
+export { ConfigurationType };

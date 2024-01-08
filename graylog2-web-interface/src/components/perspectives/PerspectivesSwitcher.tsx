@@ -38,17 +38,12 @@ const Container = styled.span`
 `;
 
 const ItemContainer = styled.span(({ theme }) => css`
-  padding-left: 15px;
   font-size: ${theme.fonts.size.large};
   display: flex;
   flex-direction: row;
   align-content: center;
   align-items: center;
 `);
-
-const Item = styled.span`
-  padding-left: 15px;
-`;
 
 const DropdownTrigger = styled.button`
   background: transparent;
@@ -69,9 +64,9 @@ const Switcher = () => {
   const history = useHistory();
 
   const onChangePerspective = useCallback((nextPerspectiveId: string) => () => {
-    const { brandLink } = perspectives.find(({ id }) => id === nextPerspectiveId);
+    const { welcomeRoute } = perspectives.find(({ id }) => id === nextPerspectiveId);
 
-    history.push(brandLink);
+    history.push(welcomeRoute);
     setActivePerspective(nextPerspectiveId);
   }, [history, perspectives, setActivePerspective]);
 
@@ -86,11 +81,9 @@ const Switcher = () => {
           </Menu.Target>
         </ActivePerspectiveBrand>
         <StyledMenuDropdown>
-          {perspectives.map(({ brandComponent: BrandComponent, title, id }) => (
+          {perspectives.map(({ title, id }) => (
             <Menu.Item key={id} onClick={onChangePerspective(id)}>
-              <ItemContainer>
-                <BrandComponent /><Item>{title}</Item>
-              </ItemContainer>
+              <ItemContainer>{title}</ItemContainer>
             </Menu.Item>
           ))}
         </StyledMenuDropdown>

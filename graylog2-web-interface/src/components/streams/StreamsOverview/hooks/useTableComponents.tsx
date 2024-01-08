@@ -29,15 +29,6 @@ const useTableElements = ({ indexSets }: { indexSets: Array<IndexSet> }) => {
                    indexSets={indexSets} />
   ), [indexSets]);
 
-  const bulkActions = useCallback((
-    selectedStreamIds: Array<string>,
-    setSelectedStreamIds: (streamIds: Array<string>) => void,
-  ) => (
-    <BulkActions selectedStreamIds={selectedStreamIds}
-                 setSelectedStreamIds={setSelectedStreamIds}
-                 indexSets={indexSets} />
-  ), [indexSets]);
-
   const renderExpandedRules = useCallback((stream: Stream) => (
     <ExpandedRulesSection stream={stream} />
   ), []);
@@ -55,7 +46,7 @@ const useTableElements = ({ indexSets }: { indexSets: Array<IndexSet> }) => {
 
   return {
     entityActions,
-    bulkActions,
+    bulkActions: <BulkActions indexSets={indexSets} />,
     expandedSections,
   };
 };
