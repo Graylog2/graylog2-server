@@ -34,7 +34,6 @@ import org.graylog2.shared.security.RestPermissions;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -47,7 +46,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_CREATE;
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_DELETE;
-import static org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService.BLACKLISTED_FIELDS;
+import static org.graylog2.audit.AuditEventTypes.INDEX_SET_UPDATE;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -84,15 +83,43 @@ public class FieldTypeMappingsResource extends RestResource {
                                     @Valid
                                     @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request) {
         checkPermissionsForCreation(request.indexSetsIds());
-        checkFieldIsAllowedToBeChanged(request.fieldName());
-
-        var type = CustomFieldMappings.AVAILABLE_TYPES.get(request.type());
-        if (type == null) {
-            throw new BadRequestException("Invalid type provided: " + request.type() + " - available types: " + CustomFieldMappings.AVAILABLE_TYPES.keySet());
-        }
 
         var customMapping = new CustomFieldMapping(request.fieldName(), request.type());
         fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
+
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/set_profile")
+    @Timed
+    @ApiOperation(value = "Set field type profile for certain index sets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized")
+    })
+    @AuditEvent(type = INDEX_SET_UPDATE)
+    public Response setProfile(@ApiParam(name = "request")
+                               @Valid
+                               @NotNull(message = "Request body is mandatory") final FieldTypeProfileChangeRequest request) {
+        checkPermissionsForCreation(request.indexSetsIds());
+        fieldTypeMappingsService.setProfile(request.indexSetsIds(), request.profileId(), request.rotateImmediately());
+
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/remove_profile_from")
+    @Timed
+    @ApiOperation(value = "Remove field type profile from certain index sets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized")
+    })
+    @AuditEvent(type = INDEX_SET_UPDATE)
+    public Response removeProfileFromIndexSets(@ApiParam(name = "request")
+                                               @Valid
+                                               @NotNull(message = "Request body is mandatory") final FieldTypeProfileUnsetRequest request) {
+        checkPermissionsForCreation(request.indexSetsIds());
+        fieldTypeMappingsService.removeProfileFromIndexSets(request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();
     }
@@ -112,13 +139,6 @@ public class FieldTypeMappingsResource extends RestResource {
 
         return fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
     }
-
-    private void checkFieldIsAllowedToBeChanged(String fieldName) {
-        if (BLACKLISTED_FIELDS.contains(fieldName)) {
-            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + BLACKLISTED_FIELDS);
-        }
-    }
-
 
     private void checkPermissionsForCreation(final Set<String> indexSetsIds) {
         indexSetsIds.forEach(indexSetId -> checkPermission(RestPermissions.TYPE_MAPPINGS_CREATE, indexSetId));

@@ -53,6 +53,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_CREATION_DATE = "creation_date";
     public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
     public static final String FIELD_REGULAR = "regular";
+    public static final String FIELD_PROFILE_ID = "field_type_profile";
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
@@ -150,6 +151,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("custom_field_mappings")
     public abstract CustomFieldMappings customFieldMappings();
 
+    @JsonProperty(FIELD_PROFILE_ID)
+    @Nullable
+    public abstract String fieldTypeProfile();
+
     @JsonIgnore
     public boolean isRegularIndex() {
         final String indexTemplate = indexTemplateType().orElse(null);
@@ -179,7 +184,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
-                                        @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings
+                                        @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
+                                        @JsonProperty("field_type_profile") @Nullable String fieldTypeProfile
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;
@@ -213,6 +219,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .indexOptimizationDisabled(indexOptimizationDisabled != null && indexOptimizationDisabled)
                 .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
                 .customFieldMappings(customFieldMappings == null ? new CustomFieldMappings() : customFieldMappings)
+                .fieldTypeProfile(fieldTypeProfile)
                 .build();
     }
 
@@ -239,7 +246,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return create(id, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings());
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null);
     }
 
     // Compatibility creator after field type refresh interval has been introduced
@@ -263,7 +270,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return create(null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings());
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null);
     }
 
     @Override
@@ -334,6 +341,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder fieldTypeRefreshInterval(Duration fieldTypeRefreshInterval);
 
         public abstract Builder customFieldMappings(CustomFieldMappings customFieldMappings);
+
+        public abstract Builder fieldTypeProfile(String fieldTypeProfile);
+
 
         public abstract IndexSetConfig build();
     }
