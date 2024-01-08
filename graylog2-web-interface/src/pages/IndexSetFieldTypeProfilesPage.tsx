@@ -17,40 +17,36 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { isPermitted } from 'util/PermissionsMixin';
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
-import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import ProfilesList from 'components/indices/IndexSetFiledTypeProfiles/ProfilesList';
 import CreateProfileButton from 'components/indices/IndexSetFiledTypeProfiles/CreateProfileButton';
+import { IndicesPageNavigation } from 'components/indices';
 
 const IndexSetFieldTypeProfilesPage = () => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
+  const hasMappingPermission = isPermitted(currentUser.permissions, 'typemappings:edit');
 
   useEffect(() => {
-    const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
-
     if (!hasMappingPermission) {
       navigate(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, navigate]);
+  }, [hasMappingPermission, navigate]);
 
   return (
     <DocumentTitle title="Index Set Field Type Profiles">
+      <IndicesPageNavigation />
       <div>
         <PageHeader title="Configure Index Set Field Type Profiles"
                     documentationLink={{
                       title: 'Index model documentation',
                       path: DocsHelper.PAGES.INDEX_MODEL,
                     }}
-                    topActions={(
-                      <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                        <Button bsStyle="info">Index sets</Button>
-                      </LinkContainer>
-                    )}
                     actions={<CreateProfileButton />}>
           <span>
             You can modify the current field type profiles configuration or create the new one.
