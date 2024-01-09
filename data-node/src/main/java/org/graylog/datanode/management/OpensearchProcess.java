@@ -40,6 +40,7 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
 
     URI getOpensearchBaseUrl();
     String getOpensearchClusterUrl();
+    String getDatanodeRestApiUrl();
 
     void onRemove();
 
