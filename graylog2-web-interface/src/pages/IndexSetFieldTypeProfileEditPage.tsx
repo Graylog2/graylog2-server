@@ -25,21 +25,19 @@ import { Button, Col, Row } from 'components/bootstrap';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useParams from 'routing/useParams';
 import EditProfile from 'components/indices/IndexSetFieldTypeProfiles/EditProfile';
-import useCurrentUser from 'hooks/useCurrentUser';
+import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const IndexSetFieldTypeProfileEditPage = () => {
   const { profileId } = useParams();
   const { data, isFetched } = useProfile(profileId);
   const navigate = useNavigate();
-  const currentUser = useCurrentUser();
+  const hasMappingPermission = useHasTypeMappingPermission();
 
   useEffect(() => {
-    const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
-
     if (!hasMappingPermission) {
       navigate(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, navigate]);
+  }, [hasMappingPermission, navigate]);
 
   return (
     <DocumentTitle title="Edit Index Set Field Type Profile">

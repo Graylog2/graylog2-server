@@ -17,20 +17,18 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import useCurrentUser from 'hooks/useCurrentUser';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
 import CreateProfileButton from 'components/indices/IndexSetFieldTypeProfiles/CreateProfileButton';
 import { IndicesPageNavigation } from 'components/indices';
+import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const IndexSetFieldTypeProfilesPage = () => {
   const navigate = useNavigate();
-  const currentUser = useCurrentUser();
-  const hasMappingPermission = isPermitted(currentUser.permissions, 'typemappings:edit');
+  const hasMappingPermission = useHasTypeMappingPermission();
 
   useEffect(() => {
     if (!hasMappingPermission) {

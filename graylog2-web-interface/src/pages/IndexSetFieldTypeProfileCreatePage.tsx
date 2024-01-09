@@ -23,19 +23,17 @@ import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button, Col, Row } from 'components/bootstrap';
 import CreateProfile from 'components/indices/IndexSetFieldTypeProfiles/CreateProfile';
-import useCurrentUser from 'hooks/useCurrentUser';
+import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const IndexSetFieldTypeProfileCreatePage = () => {
   const navigate = useNavigate();
-  const currentUser = useCurrentUser();
+  const hasMappingPermission = useHasTypeMappingPermission();
 
   useEffect(() => {
-    const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
-
     if (!hasMappingPermission) {
       navigate(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, navigate]);
+  }, [hasMappingPermission, navigate]);
 
   return (
     <DocumentTitle title="Create Index Set Field Type Profile">

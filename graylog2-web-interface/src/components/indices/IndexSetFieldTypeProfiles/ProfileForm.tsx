@@ -21,7 +21,7 @@ import { Formik, Form, FieldArray, Field } from 'formik';
 import countBy from 'lodash/countBy';
 
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import { FormikInput, IconButton, Select, FormSubmit, Spinner } from 'components/common';
+import { FormikInput, IconButton, Select, FormSubmit, Spinner, InputOptionalInfo } from 'components/common';
 import { Button, Col, HelpBlock, Input } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
@@ -153,7 +153,7 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
             <FormikInput name="description"
                          id="index-set-field-type-profile-description"
                          placeholder="Type a profile description"
-                         label="Description"
+                         label={<>Description <InputOptionalInfo /></>}
                          type="textarea"
                          help="Longer description for profile"
                          rows={6} />

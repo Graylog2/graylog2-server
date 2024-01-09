@@ -16,20 +16,17 @@
  */
 import React, { useCallback } from 'react';
 
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
 import useHistory from 'routing/useHistory';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const IndicesConfigurationDropdown = ({ indexSetId }: { indexSetId: string }) => {
-  const currentUser = useCurrentUser();
+  const hasMappingPermission = useHasTypeMappingPermission();
   const history = useHistory();
   const onShowFieldTypes = useCallback(() => {
     history.push(Routes.SYSTEM.INDEX_SETS.FIELD_TYPES(indexSetId));
   }, [history, indexSetId]);
-
-  const hasMappingPermission = isPermitted(currentUser.permissions, 'typemappings:edit');
 
   if (!hasMappingPermission) return null;
 
