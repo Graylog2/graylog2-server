@@ -1,8 +1,11 @@
 # Migration Guide
 
-Caveat: preliminary - and only to have a minimal basis to find out which modifications are necessary at the current codebase
+**Caveat**: preliminary - and only to have a minimal basis to find out which modifications are necessary at the current codebase
 and to research/test possible improvements for a better user experience or find out the limits what we can actually do.
 Some of these steps could be useful in the future for PSO or support to migrate manually or fix problems that occurred during migration.
+
+**Also: if you try to use this guide for a manual migration of a real prod system, all the preliniaries regarding certificates etc. probably 
+don't match your use case. Please adjust accordingly!**
 
 #### Testing during development
 
