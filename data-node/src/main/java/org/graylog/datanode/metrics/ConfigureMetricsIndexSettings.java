@@ -16,24 +16,20 @@
  */
 package org.graylog.datanode.metrics;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateDataStreamRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
-import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
-import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
+import org.graylog2.indexer.datastream.DataStreamAdapter;
+import org.graylog2.indexer.indices.Template;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +38,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 
 public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
@@ -49,6 +46,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
     private final OpensearchProcess process;
     private final Configuration configuration;
+    private DataStreamAdapter dataStreamAdapter;
 
     public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration) {
         this.process = process;
@@ -62,62 +60,30 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     @Override
     public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
         if (destination == ProcessState.AVAILABLE && source == ProcessState.STARTING) {
-            process.restClient().ifPresent(client -> {
-
-                updateDataStreamTemplate(client);
-                createDataStreamBackingIndex(client); // TODO: create if not exists
-                configureMetricsIsm(client);
-
+            process.openSearchClient().ifPresent(client -> {
+                if (dataStreamAdapter == null) {
+                    dataStreamAdapter = new DataStreamAdapterOS2(client, new ObjectMapperProvider().get());
+                }
+                Map<String, Object> mappings =
+                        ImmutableMap.of("timestamp",
+                                ImmutableMap.of(
+                                        "type", "date",
+                                        "format", "yyyy-MM-dd HH:mm:ss.SSS||strict_date_optional_time||epoch_millis"),
+                                "node", ImmutableMap.of("type", "keyword")
+                        );
+                Template template = new Template(List.of(configuration.getMetricsStream() + "*"),
+                        new Template.Mappings(mappings), 1L, new Template.Settings(Map.of()));
+                dataStreamAdapter.ensureDataStreamTemplate(configuration.getMetricsTemplate(), template, configuration.getMetricsTimestamp());
+                dataStreamAdapter.createDataStream(configuration.getMetricsStream());
             });
+            process.restClient().ifPresent(this::configureMetricsIsm);
+
+
         }
     }
 
     private void updateDataStreamTemplate(RestHighLevelClient client) {
-        Settings settings = Settings.EMPTY; // use default settings
-        final CompressedXContent mappings;
-        try {
-            mappings = new CompressedXContent("""
-                    {
-                        "properties": {
-                            "timestamp": {
-                                "type": "date",
-                                "format":"yyyy-MM-dd HH:mm:ss.SSS||strict_date_optional_time||epoch_millis"
-                            },
-                            "node": {
-                                "type": "keyword"
-                            }
-                        }
-                    }""");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        ComposableIndexTemplate template = new ComposableIndexTemplate(List.of(configuration.getMetricsStream() + "*"),
-                new Template(settings, mappings, null),
-                null, null, null, null, // all default
-                new ComposableIndexTemplate.DataStreamTemplate(new DataStream.TimestampField(configuration.getMetricsTimestamp())));
-        var request = new PutComposableIndexTemplateRequest()
-                .name(configuration.getMetricsTemplate())
-                .indexTemplate(template);
-        try {
-            final AcknowledgedResponse response = client.indices().putIndexTemplate(request, RequestOptions.DEFAULT);
-            if (!response.isAcknowledged()) {
-                log.error("Unable to create metrics data stream template");
-            }
-        } catch (IOException e) {
-            log.error("Unable to create metrics data stream template");
-        }
-    }
 
-    private void createDataStreamBackingIndex(RestHighLevelClient client) {
-        try {
-            CreateDataStreamRequest createDataStreamRequest = new CreateDataStreamRequest(configuration.getMetricsStream());
-            final AcknowledgedResponse response = client.indices().createDataStream(createDataStreamRequest, RequestOptions.DEFAULT);
-            if (!response.isAcknowledged()) {
-                log.error("Unable to create backing index for metrics data stream");
-            }
-        } catch (IOException e) {
-            log.error("Unable to create backing index for metrics data stream");
-        }
     }
 
     private void configureMetricsIsm(RestHighLevelClient client) {

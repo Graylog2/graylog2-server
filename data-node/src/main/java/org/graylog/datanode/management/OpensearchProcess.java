@@ -19,6 +19,7 @@ package org.graylog.datanode.management;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 
 import java.net.URI;
 import java.util.List;
@@ -29,6 +30,8 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     OpensearchInfo processInfo();
 
     Optional<RestHighLevelClient> restClient();
+
+    Optional<OpenSearchClient> openSearchClient();
 
     boolean isLeaderNode();
     void setLeaderNode(boolean isManagerNode);
@@ -41,4 +44,5 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     void onRemove();
 
     void onReset();
+
 }

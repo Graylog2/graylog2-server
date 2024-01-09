@@ -30,9 +30,11 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.security.CustomCAX509TrustManager;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +61,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<RestHighLevelClient> restClient = Optional.empty();
+    private Optional<OpenSearchClient> openSearchClient = Optional.empty();
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
 
@@ -102,6 +105,10 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     public Optional<RestHighLevelClient> restClient() {
         return restClient;
+    }
+
+    public Optional<OpenSearchClient> openSearchClient() {
+        return openSearchClient;
     }
 
     public OpensearchInfo processInfo() {
@@ -175,6 +182,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                     commandLineProcess = new OpensearchCommandLineProcess(config, this);
                     commandLineProcess.start();
                     restClient = Optional.of(createRestClient(config));
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, new ObjectMapperProvider().get()));
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );
