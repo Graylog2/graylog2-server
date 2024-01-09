@@ -91,7 +91,7 @@ class V20230601104500_AddSourcesPageV2Test {
         @Override
         public ContentPackUninstallation uninstallContentPack(ContentPack contentPack, ContentPackInstallation installation) {
             return ContentPackUninstallation.builder()
-                    .entities(ImmutableMap.of())
+                    .entities(ImmutableSet.of())
                     .failedEntities(ImmutableSet.of())
                     .skippedEntities(ImmutableSet.of())
                     .build();

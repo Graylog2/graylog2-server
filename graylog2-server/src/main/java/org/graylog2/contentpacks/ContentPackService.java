@@ -266,7 +266,8 @@ public class ContentPackService {
         final Traverser<Entity> entityTraverser = Traverser.forGraph(dependencyGraph);
         final Iterable<Entity> entitiesInOrder = entityTraverser.breadthFirst(rootEntity);
 
-        final Map<NativeEntityDescriptor, Object> removedEntities = new HashMap<>();
+        final Set<NativeEntityDescriptor> removedEntities = new HashSet<>();
+        final Map<ModelId, Object> removedEntityObjects = new HashMap<>();
         final Set<NativeEntityDescriptor> failedEntities = new HashSet<>();
         final Set<NativeEntityDescriptor> skippedEntities = new HashSet<>();
 
@@ -302,7 +303,8 @@ public class ContentPackService {
                             // The EntityFacade#delete() method expects the actual entity object
                             //noinspection unchecked
                             facade.delete(((NativeEntity) nativeEntity).entity());
-                            removedEntities.put(nativeEntityDescriptor, ((NativeEntity) nativeEntity).entity());
+                            removedEntities.add(nativeEntityDescriptor);
+                            removedEntityObjects.put(nativeEntityDescriptor.contentPackEntityId(), ((NativeEntity) nativeEntity).entity());
                         } catch (Exception e) {
                             LOG.warn("Couldn't remove native entity {}", nativeEntity);
                             failedEntities.add(nativeEntityDescriptor);
@@ -320,7 +322,8 @@ public class ContentPackService {
         LOG.debug("Deleted {} installation(s) of content pack {}", deletedInstallations, contentPack.id());
 
         return ContentPackUninstallation.builder()
-                .entities(ImmutableMap.copyOf(removedEntities))
+                .entities(ImmutableSet.copyOf(removedEntities))
+                .entityObjects(ImmutableMap.copyOf(removedEntityObjects))
                 .skippedEntities(ImmutableSet.copyOf(skippedEntities))
                 .failedEntities(ImmutableSet.copyOf(failedEntities))
                 .build();
