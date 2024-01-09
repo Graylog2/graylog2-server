@@ -339,6 +339,7 @@ public class AggregationEventProcessorTest {
         verify(moreSearch, times(1)).scrollQuery(
                 eq(config.query()),
                 eq(ImmutableSet.of("stream-3", "stream-2", "stream-1", "000000000000000000000001")),
+                eq(Collections.emptyList()),
                 eq(config.queryParameters()),
                 eq(parameters.timerange()),
                 eq(parameters.batchSize()),
@@ -377,6 +378,7 @@ public class AggregationEventProcessorTest {
         verify(moreSearch, times(1)).scrollQuery(
                 eq(config.query()),
                 eq(ImmutableSet.of("stream-3", "stream-2", "stream-1", "000000000000000000000001")),
+                eq(Collections.emptyList()),
                 eq(config.queryParameters()),
                 eq(parameters.timerange()),
                 eq(parameters.batchSize()),
@@ -510,7 +512,7 @@ public class AggregationEventProcessorTest {
         sourceMessagesWithAggregation(groupByFields, 1);
 
         String expectedQueryString = "(aQueryString) AND ((group_field_one:\"one\") AND (group_field_two:\"two\"))";
-        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(1), any());
+        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), any(), eq(1), any());
     }
 
     @Test
@@ -522,7 +524,7 @@ public class AggregationEventProcessorTest {
         sourceMessagesWithAggregation(groupByFields, 1);
 
         String expectedQueryString = "(aQueryString) AND ((group_field_one:\"\\\" \\\" \\* \\& \\? \\- \\\\\") AND (group_field_two:\"\\/ \\/ \\~ \\| \\[\\]\\{\\}\"))";
-        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(1), any());
+        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), any(), eq(1), any());
     }
 
     @Test
@@ -533,7 +535,7 @@ public class AggregationEventProcessorTest {
         sourceMessagesWithAggregation(groupByFields, 5);
 
         String expectedQueryString = "(aQueryString) AND (group_field_one:\"group_value_one\")";
-        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(5), any());
+        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), any(), eq(5), any());
     }
 
     @Test
@@ -542,7 +544,7 @@ public class AggregationEventProcessorTest {
         sourceMessagesWithAggregation(groupByFields, 5);
 
         String expectedQueryString = "aQueryString";
-        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(5), any());
+        verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), any(), eq(5), any());
     }
 
     // Helper to call sourceMessagesForEvent when testing query string values - we don't care about anything else
