@@ -52,7 +52,7 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
             EntityAttribute.builder().id(IndexSetFieldType.FIELD_NAME).title("Field name")
                     .sortable(true)
                     .build(),
-            EntityAttribute.builder().id(IndexSetFieldType.ORIGIN).title("Is Custom")
+            EntityAttribute.builder().id(IndexSetFieldType.ORIGIN).title("Origin")
                     .type(SearchQueryField.Type.STRING)
                     .sortable(true)
                     .filterable(true)
