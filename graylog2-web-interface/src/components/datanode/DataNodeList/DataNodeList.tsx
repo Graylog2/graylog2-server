@@ -75,7 +75,7 @@ const columnRenderers: ColumnRenderers<DataNode> = {
 };
 
 const entityActions = (dataNode: DataNode) => (
-  <DataNodeActions dataNode={dataNode} displayAs="dropdown" />
+  <DataNodeActions dataNode={dataNode} />
 );
 
 const SearchContainer = styled.div`

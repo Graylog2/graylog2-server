@@ -38,7 +38,7 @@ const ActionButton = styled(Button)`
 
 type Props = {
   dataNode: DataNode,
-  displayAs: 'dropdown'|'buttons',
+  displayAs?: 'dropdown'|'buttons',
 };
 
 const DIALOG_TYPES = {
@@ -157,6 +157,10 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
       )}
     </>
   );
+};
+
+DataNodeActions.defaultProps = {
+  displayAs: 'dropdown',
 };
 
 export default DataNodeActions;
