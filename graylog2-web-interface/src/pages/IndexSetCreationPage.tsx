@@ -21,7 +21,7 @@ import moment from 'moment';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { IndexSetConfigurationForm } from 'components/indices';
+import { IndexSetConfigurationForm, IndicesPageNavigation } from 'components/indices';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
@@ -100,6 +100,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
   return (
     <DocumentTitle title="Create Index Set">
+      <IndicesPageNavigation />
       <div>
         <PageHeader title="Create Index Set"
                     documentationLink={{

@@ -22,7 +22,7 @@ import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
   { title: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
-  { title: 'Field Type Profiles', path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, exactPathMatch: true },
+  { title: 'Field Type Profiles', path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, exactPathMatch: false },
 ];
 
 const IndicesPageNavigation = () => (
