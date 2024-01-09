@@ -103,7 +103,7 @@ const DateConfiguration = ({ name: fieldName, label, checkboxLabel }: {
             </SectionHeader>
             <AbsoluteDateInput name="from"
                                value={value}
-                               disabled={!value}
+                               disabled={value === undefined}
                                onChange={_onChange} />
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </div>
@@ -152,7 +152,7 @@ const validate = (values: FormValues) => {
     errors = { ...errors, until: rangeError };
   }
 
-  if (!values.from && !values.until) {
+  if (values.from === undefined && values.until === undefined) {
     errors = { ...errors, from: 'Remove filter to search from "All time" until "Now".' };
   }
 
