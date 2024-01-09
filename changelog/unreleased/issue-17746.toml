@@ -5,8 +5,8 @@ pulls = ["17775"]
 issues=["17746"]
 
 details.user = """
-Bfore this change was possible to create and manageme custom field type mappings
+Before this change it was possible to create and manageme custom field type mappings
 of existing index sets. For every new index set that is created,
 these steps have to be repeated though. This change gives an option to bundle up
-custom field types into profiles. Option to use that profiles on index sets will be added later
+custom field types into profiles.
 """
