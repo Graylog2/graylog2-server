@@ -21,11 +21,11 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.inmemory.InMemoryFilterExpressionParser;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
-import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.fieldtypes.utils.FieldTypeDTOsMerger;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.plugin.Message;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
@@ -132,7 +132,7 @@ public class IndexFieldTypesListService {
                                 fieldTypeDTO.fieldName(),
                                 REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType())),
                                 customFieldMappings.containsCustomMappingForField(fieldTypeDTO.fieldName()),
-                                FieldTypeMappingsService.BLACKLISTED_FIELDS.contains(fieldTypeDTO.fieldName())
+                        Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldTypeDTO.fieldName())
                         )
                 )
                 .filter(indexSetFieldType -> indexSetFieldType.fieldName().contains(fieldNameQuery))

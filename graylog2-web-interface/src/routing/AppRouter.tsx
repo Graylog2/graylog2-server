@@ -34,6 +34,8 @@ import {
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DataNodesPage,
+  DataNodesClusterPage,
+  DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
@@ -70,7 +72,6 @@ import {
   RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
-  SecurityPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,
@@ -110,6 +111,7 @@ import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import DataNodePage from 'pages/DataNodePage';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -245,7 +247,11 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.OVERVIEW, element: <DataNodesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.MIGRATION, element: <DataNodesMigrationPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
+
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
             !isCloud && (
@@ -289,7 +295,6 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },
             { path: RoutePaths.SYSTEM.ENTERPRISE, element: <EnterprisePage /> },
-            { path: RoutePaths.SECURITY, element: <SecurityPage /> },
 
             { path: RoutePaths.SYSTEM.SIDECARS.OVERVIEW, element: <SidecarsPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.STATUS(':sidecarId'), element: <SidecarStatusPage /> },

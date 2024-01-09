@@ -38,6 +38,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -73,6 +74,7 @@ const DIALOG_TEXT = {
 };
 
 const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Props) => {
+  const { deselectEntity } = useSelectedEntities();
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
   const [currentDefinition, setCurrentDefinition] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -167,6 +169,8 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
       case 'delete':
         EventDefinitionsActions.delete(currentDefinition).then(
           () => {
+            deselectEntity(currentDefinition.id);
+
             UserNotification.success('Event Definition deleted successfully',
               `Event Definition "${eventDefinition.title}" was deleted successfully.`);
           },

@@ -13,10 +13,10 @@
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "SSPL-1.0",
   "dependencies": {
-    "postcss-styled-syntax": "0.5.0",
-    "stylelint": "15.11.0",
-    "stylelint-config-recommended": "13.0.0",
-    "stylelint-config-standard": "34.0.0",
+    "postcss-styled-syntax": "0.6.4",
+    "stylelint": "16.1.0",
+    "stylelint-config-recommended": "14.0.0",
+    "stylelint-config-standard": "36.0.0",
     "stylelint-config-styled-components": "0.1.1"
   }
 }

@@ -17,6 +17,7 @@
 package org.junit.platform.engine.support.hierarchical;
 
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
+import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
@@ -42,6 +43,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExecutionContext> implements TestEngine {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
@@ -49,7 +51,8 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
             return providerClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
             throw new RuntimeException("Unable to construct instance of " + providerClass.getSimpleName() + ": ", e);
         }
     }
@@ -61,49 +64,56 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 GraylogBackend backend = RunningGraylogBackend.createStarted();
                 this.execute(request, descriptor.getChildren(), backend);
             } else if (descriptor instanceof ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor) {
-                SearchVersion esVersion = containerMatrixTestsDescriptor.getEsVersion();
-                MongodbServer mongoVersion = containerMatrixTestsDescriptor.getMongoVersion();
-                int[] extraPorts = containerMatrixTestsDescriptor.getExtraPorts();
-                List<URL> mongoDBFixtures = containerMatrixTestsDescriptor.getMongoDBFixtures();
-                List<String> enabledFeatureFlags = containerMatrixTestsDescriptor.getEnabledFeatureFlags();
-                PluginJarsProvider pluginJarsProvider = instantiateFactory(containerMatrixTestsDescriptor.getPluginJarsProvider());
-                MavenProjectDirProvider mavenProjectDirProvider = instantiateFactory(containerMatrixTestsDescriptor.getMavenProjectDirProvider());
-                boolean withEnabledMailServer = containerMatrixTestsDescriptor.withEnabledMailServer();
-
-                if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
-                    try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer)) {
-                        this.execute(request, descriptor.getChildren(), backend);
-                    } catch (Exception exception) {
-                        /* Fail hard if the containerized backend failed to start. */
-                        LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
-                        System.exit(1);
-//                        throw new JUnitException("Error executing tests for engine " + getId(), exception);
-                    }
-                } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
-                    for (TestDescriptor td : containerMatrixTestsDescriptor.getChildren()) {
-                        List<URL> fixtures = mongoDBFixtures;
-                        boolean preImportLicense = ContainerMatrixTestsConfiguration.defaultImportLicenses;
-                        if (td instanceof ContainerMatrixTestClassDescriptor) {
-                            fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
-                            preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
-                        }
-                        try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer)) {
-                            this.execute(request, Collections.singleton(td), backend);
-                        } catch (Exception exception) {
-                            /* Fail hard if the containerized backend failed to start. */
-                            LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
-                            System.exit(1);
-//                          throw new JUnitException("Error executing tests for engine " + getId(), exception);
-                        }
-                    }
-                } else {
-                    LOG.error("Unknown lifecycle: " + containerMatrixTestsDescriptor.getLifecycle());
+                try (var servicesProvider = new ContainerizedGraylogBackendServicesProvider()) {
+                    executeWithContainerizedGraylogBackend(request, containerMatrixTestsDescriptor, servicesProvider);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             } else {
                 LOG.error("All children of the root should be of type 'ContainerMatrixTestsDescriptor' or 'ContainerMatrixTestWithRunningESMongoTestsDescriptor'");
             }
             request.getEngineExecutionListener().executionFinished(descriptor, TestExecutionResult.successful());
         });
+    }
+
+    private void executeWithContainerizedGraylogBackend(ExecutionRequest request, ContainerMatrixTestsDescriptor descriptor, ContainerizedGraylogBackendServicesProvider servicesProvider) {
+        SearchVersion esVersion = descriptor.getEsVersion();
+        MongodbServer mongoVersion = descriptor.getMongoVersion();
+        int[] extraPorts = descriptor.getExtraPorts();
+        List<URL> mongoDBFixtures = descriptor.getMongoDBFixtures();
+        List<String> enabledFeatureFlags = descriptor.getEnabledFeatureFlags();
+        PluginJarsProvider pluginJarsProvider = instantiateFactory(descriptor.getPluginJarsProvider());
+        MavenProjectDirProvider mavenProjectDirProvider = instantiateFactory(descriptor.getMavenProjectDirProvider());
+        boolean withEnabledMailServer = descriptor.withEnabledMailServer();
+        final Map<String, String> configParams = descriptor.getAdditionalConfigurationParameters();
+
+        if (Lifecycle.VM.equals(descriptor.getLifecycle())) {
+            try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer, configParams)) {
+                this.execute(request, descriptor.getChildren(), backend);
+            } catch (Exception exception) {
+                /* Fail hard if the containerized backend failed to start. */
+                LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
+                System.exit(1);
+            }
+        } else if (Lifecycle.CLASS.equals(descriptor.getLifecycle())) {
+            for (TestDescriptor td : descriptor.getChildren()) {
+                List<URL> fixtures = mongoDBFixtures;
+                boolean preImportLicense = ContainerMatrixTestsConfiguration.defaultImportLicenses;
+                if (td instanceof ContainerMatrixTestClassDescriptor) {
+                    fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
+                    preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
+                }
+                try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer, configParams)) {
+                    this.execute(request, Collections.singleton(td), backend);
+                } catch (Exception exception) {
+                    /* Fail hard if the containerized backend failed to start. */
+                    LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
+                    System.exit(1);
+                }
+            }
+        } else {
+            LOG.error("Unknown lifecycle: " + descriptor.getLifecycle());
+        }
     }
 
     public void execute(ExecutionRequest request, Collection<? extends TestDescriptor> testDescriptors, GraylogBackend backend) {

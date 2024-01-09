@@ -56,7 +56,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @GET
     @ApiOperation(value = "Retrieve the list of all fields present in the system")
     public Set<MappedFieldTypeDTO> allFieldTypes(@Context SearchUser searchUser) {
-        final ImmutableSet<String> streams = searchUser.streams().loadAll();
+        final ImmutableSet<String> streams = searchUser.streams().loadAllMessageStreams();
         return mappedFieldTypesService.fieldTypesByStreamIds(streams, RelativeRange.allTime());
     }
 

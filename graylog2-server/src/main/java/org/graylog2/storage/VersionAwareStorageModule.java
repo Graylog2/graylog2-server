@@ -22,6 +22,11 @@ import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.QueryExecutionStats;
+import org.graylog.plugins.views.search.engine.monitoring.collection.InMemoryCappedStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -52,6 +57,13 @@ import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasF
 
 
 public class VersionAwareStorageModule extends AbstractModule {
+
+    private final Configuration configuration;
+
+    public VersionAwareStorageModule(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
         bind(StreamsForFieldRetriever.class).toProvider(StreamsForFieldRetrieverProvider.class);
@@ -75,6 +87,13 @@ public class VersionAwareStorageModule extends AbstractModule {
     }
 
     private void bindQueryBackend() {
+        if (configuration.isQueryLatencyMonitoringEnabled() && configuration.getQueryLatencyMonitoringWindowSize() > 0) {
+            bind(new TypeLiteral<StatsCollector<QueryExecutionStats>>() {})
+                    .toInstance(new InMemoryCappedStatsCollector<>(configuration.getQueryLatencyMonitoringWindowSize()));
+        } else {
+            bind(new TypeLiteral<StatsCollector<QueryExecutionStats>>() {})
+                    .toInstance(new NoOpStatsCollector<>());
+        }
         bind(new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
                 .toProvider(ElasticsearchBackendProvider.class);
     }

@@ -365,7 +365,7 @@ public class SidecarServiceTest {
 
     private static Collector getCollector() {
         return Collector.create("collector-id", "collector-name", "service", "linux",
-                "/path", "param", "valid param", "", null);
+                "/path", "param", "valid param", "");
     }
 
     private Sidecar getTestSidecar() {

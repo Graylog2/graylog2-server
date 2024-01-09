@@ -19,10 +19,12 @@ import React from 'react';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
+import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
+import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
 
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
+    <DataNodesPageNavigation />
     <PageHeader title="Data Nodes"
                 documentationLink={{
                   title: 'Data Nodes documentation',
@@ -34,7 +36,7 @@ const DataNodesPage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        <DataNodeConfiguration />
+        <DataNodeList />
       </Col>
     </Row>
   </DocumentTitle>

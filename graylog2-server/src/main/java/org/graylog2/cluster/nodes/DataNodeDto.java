@@ -38,6 +38,10 @@ public abstract class DataNodeDto extends NodeDto {
     @JsonProperty("cluster_address")
     public abstract String getClusterAddress();
 
+    @Nullable
+    @JsonProperty("rest_api_address")
+    public abstract String getRestApiAddress();
+
     @JsonProperty("data_node_status")
     public abstract DataNodeStatus getDataNodeStatus();
 
@@ -49,6 +53,7 @@ public abstract class DataNodeDto extends NodeDto {
     public Map<String, Object> toEntityParameters() {
         final Map<String, Object> params = super.toEntityParameters();
         params.put("cluster_address", getClusterAddress());
+        params.put("rest_api_address", getRestApiAddress());
         params.put("datanode_status", getDataNodeStatus());
         return params;
     }
@@ -67,12 +72,16 @@ public abstract class DataNodeDto extends NodeDto {
         @JsonProperty("cluster_address")
         public abstract Builder setClusterAddress(String clusterAddress);
 
+        @JsonProperty("rest_api_address")
+        public abstract Builder setRestApiAddress(String restApiAddress);
+
         @JsonProperty("datanode_status")
         public abstract Builder setDataNodeStatus(DataNodeStatus dataNodeStatus);
 
         public abstract Builder setProvisioningInformation(CertRenewalService.ProvisioningInformation provisioningInformation);
 
         public abstract DataNodeDto build();
+
 
     }
 }

@@ -21,13 +21,14 @@ import type { PropsWithChildren } from 'react';
 import MenuItem from 'components/bootstrap/MenuItem';
 import { DropdownButton } from 'components/bootstrap';
 
+import useSelectedEntities from './hooks/useSelectedEntities';
+
 type Props = PropsWithChildren<{
-  selectedEntities: Array<string>,
-  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
   keepMounted?: boolean,
 }>;
 
-const BulkActionsDropdown = ({ selectedEntities, setSelectedEntities, children, keepMounted }: Props) => {
+const BulkActionsDropdown = ({ children, keepMounted }: Props) => {
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const cancelEntitySelection = useCallback(() => setSelectedEntities([]), [setSelectedEntities]);
 
   return (

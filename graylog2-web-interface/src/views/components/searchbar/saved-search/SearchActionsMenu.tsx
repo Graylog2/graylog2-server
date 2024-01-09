@@ -149,7 +149,7 @@ const SearchActionsMenu = () => {
   }, [currentUser.permissions, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc]);
 
   const deleteSavedSearch = useCallback((deletedView: View) => ViewManagementActions.delete(deletedView)
-    .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
+    .then(() => UserNotification.success(`Deleting saved search "${deletedView.title}" was successful!`, 'Success!'))
     .then(() => {
       if (deletedView.id === view.id) {
         loadNewSearch(history);
@@ -157,7 +157,7 @@ const SearchActionsMenu = () => {
 
       return Promise.resolve();
     })
-    .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!')), [history, view.id]);
+    .catch((error) => UserNotification.error(`Deleting saved search failed: ${_extractErrorMessage(error)}`, 'Error!')), [history, view.id]);
 
   const _loadAsDashboard = useCallback(() => {
     loadAsDashboard(history, view);

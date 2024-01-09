@@ -31,6 +31,7 @@ import type {
 } from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import IndexSetsRemovalErrorAlert from 'components/indices/IndexSetFieldTypes/IndexSetsRemovalErrorAlert';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -45,16 +46,15 @@ const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
 
 type Props = {
   show: boolean,
-  fields: Array<string>,
   onClose: () => void,
+  fields: Array<string>,
   indexSetIds: Array<string>,
-  setSelectedFields: (fields: Array<string>) => void
 }
 
 type ContentProps = {
-  fields: Array<string>,
   indexSetIds: Array<string>,
   indexSets: Record<string, IndexSet>,
+  fields: Array<string>,
   setRotated: React.Dispatch<React.SetStateAction<boolean>>
   rotated: boolean,
 }
@@ -65,9 +65,9 @@ const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string
   return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
 };
 
-const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, rotated, indexSetIds }: ContentProps) => {
-  const fieldsStr = useMemo(() => fields.join(', '), [fields]);
-  const indexSetsStr = useMemo(() => indexSetIds.map((id) => indexSets[id].title).join(', '), [indexSetIds, indexSets]);
+const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, rotated, indexSetIds }: ContentProps) => {
+  const fieldsStr = fields.join(', ');
+  const indexSetsStr = indexSetIds.map((id) => indexSets[id].title).join(', ');
 
   return (
     <div>
@@ -88,19 +88,20 @@ const IndexSetCustomFieldTypeRemoveContent = ({ indexSets, fields, setRotated, r
   );
 };
 
-const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds, setSelectedFields }: Props) => {
+const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds }: Props) => {
+  const { setSelectedEntities } = useSelectedEntities();
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
   const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
   const onErrorHandler = useCallback((response: RemovalResponse) => {
     const failedFields = response.flatMap(((indexSet) => indexSet.failures.map(({ entityId }) => entityId)));
-    setSelectedFields(failedFields);
+    setSelectedEntities(failedFields);
     setRemovalResponse(response);
-  }, [setSelectedFields]);
+  }, [setSelectedEntities]);
   const onSuccessHandler = useCallback(() => {
     onClose();
-    setSelectedFields([]);
-  }, [onClose, setSelectedFields]);
+    setSelectedEntities([]);
+  }, [onClose, setSelectedEntities]);
   const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation({ onErrorHandler, onSuccessHandler });
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
@@ -139,14 +140,13 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
                         onCancel={onCancel}
                         show={show}
                         bsSize="large">
-      {!indexSets ? <Spinner />
-        : (
-          <IndexSetCustomFieldTypeRemoveContent rotated={rotated}
-                                                setRotated={setRotated}
-                                                indexSetIds={indexSetIds}
-                                                fields={fields}
-                                                indexSets={indexSets} />
-        )}
+      {!indexSets ? <Spinner /> : (
+        <IndexSetCustomFieldTypeRemoveContent rotated={rotated}
+                                              setRotated={setRotated}
+                                              fields={fields}
+                                              indexSetIds={indexSetIds}
+                                              indexSets={indexSets} />
+      )}
       {removalResponse && <IndexSetsRemovalErrorAlert removalResponse={removalResponse} indexSets={indexSets} />}
     </BootstrapModalForm>
   );

@@ -29,7 +29,7 @@ import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import View from 'views/logic/views/View';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';

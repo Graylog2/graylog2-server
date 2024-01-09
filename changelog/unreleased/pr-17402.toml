@@ -1,0 +1,5 @@
+type = "a"
+message = "Add start/stop lifecycle functions to data node. Add validations for triggering data node lifecycle functions."
+
+issues = ["17383"]
+pulls = ["17402"]

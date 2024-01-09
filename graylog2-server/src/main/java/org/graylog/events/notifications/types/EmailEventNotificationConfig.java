@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
@@ -34,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
@@ -81,6 +83,15 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_EMAIL_RECIPIENTS = "email_recipients";
     private static final String FIELD_USER_RECIPIENTS = "user_recipients";
     private static final String FIELD_TIME_ZONE = "time_zone";
+    private static final String FIELD_LOOKUP_RECIPIENT_EMAILS = "lookup_recipient_emails";
+    private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_NAME = "recipients_lut_name";
+    private static final String FIELD_RECIPIENTS_LOOKUP_TABLE_KEY = "recipients_lut_key";
+    private static final String FIELD_LOOKUP_SENDER_EMAIL = "lookup_sender_email";
+    private static final String FIELD_SENDER_LOOKUP_TABLE_NAME = "sender_lut_name";
+    private static final String FIELD_SENDER_LOOKUP_TABLE_KEY = "sender_lut_key";
+    private static final String FIELD_LOOKUP_REPLY_TO_EMAIL = "lookup_reply_to_email";
+    private static final String FIELD_REPLY_TO_LOOKUP_TABLE_NAME = "reply_to_lut_name";
+    private static final String FIELD_REPLY_TO_LOOKUP_TABLE_KEY = "reply_to_lut_key";
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
@@ -107,6 +118,39 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @JsonProperty(FIELD_TIME_ZONE)
     public abstract DateTimeZone timeZone();
 
+    @JsonProperty(FIELD_LOOKUP_RECIPIENT_EMAILS)
+    public abstract boolean lookupRecipientEmails();
+
+    @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String recipientsLUTName();
+
+    @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String recipientsLUTKey();
+
+    @JsonProperty(FIELD_LOOKUP_SENDER_EMAIL)
+    public abstract boolean lookupSenderEmail();
+
+    @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String senderLUTName();
+
+    @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String senderLUTKey();
+
+    @JsonProperty(FIELD_LOOKUP_REPLY_TO_EMAIL)
+    public abstract boolean lookupReplyToEmail();
+
+    @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_NAME)
+    @Nullable
+    public abstract String replyToLUTName();
+
+    @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
+    @Nullable
+    public abstract String replyToLUTKey();
+
     @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -128,8 +172,32 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         if (bodyTemplate().isEmpty() && htmlBodyTemplate().isEmpty()) {
             validation.addError("body", "One of Email Notification body template or Email Notification HTML body must not be empty.");
         }
-        if (emailRecipients().isEmpty() && userRecipients().isEmpty()) {
+        if (!lookupRecipientEmails() && emailRecipients().isEmpty() && userRecipients().isEmpty()) {
             validation.addError("recipients", "Email Notification must have email recipients or user recipients.");
+        }
+        if (lookupRecipientEmails()) {
+            if (Strings.isNullOrEmpty(recipientsLUTName())) {
+                validation.addError(FIELD_RECIPIENTS_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(recipientsLUTKey())) {
+                validation.addError(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
+        }
+        if (lookupSenderEmail()) {
+            if (Strings.isNullOrEmpty(senderLUTName())) {
+                validation.addError(FIELD_SENDER_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(senderLUTKey())) {
+                validation.addError(FIELD_SENDER_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
+        }
+        if (lookupReplyToEmail()) {
+            if (Strings.isNullOrEmpty(replyToLUTName())) {
+                validation.addError(FIELD_REPLY_TO_LOOKUP_TABLE_NAME, "Lookup table name must not be empty");
+            }
+            if (Strings.isNullOrEmpty(replyToLUTKey())) {
+                validation.addError(FIELD_REPLY_TO_LOOKUP_TABLE_KEY, "Lookup table key must not be empty");
+            }
         }
 
         return validation;
@@ -148,7 +216,10 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .userRecipients(ImmutableSet.of())
                     .bodyTemplate(DEFAULT_BODY_TEMPLATE)
                     .timeZone(DateTimeZone.UTC)
-                    .htmlBodyTemplate("");
+                    .htmlBodyTemplate("")
+                    .lookupRecipientEmails(false)
+                    .lookupSenderEmail(false)
+                    .lookupReplyToEmail(false);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -175,12 +246,39 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_TIME_ZONE)
         public abstract Builder timeZone(DateTimeZone timeZone);
 
+        @JsonProperty(FIELD_LOOKUP_RECIPIENT_EMAILS)
+        public abstract Builder lookupRecipientEmails(boolean lookupRecipientEmails);
+
+        @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_NAME)
+        public abstract Builder recipientsLUTName(String recipientsLUTName);
+
+        @JsonProperty(FIELD_RECIPIENTS_LOOKUP_TABLE_KEY)
+        public abstract Builder recipientsLUTKey(String recipientsLUTKey);
+
+        @JsonProperty(FIELD_LOOKUP_SENDER_EMAIL)
+        public abstract Builder lookupSenderEmail(boolean lookupSenderEmail);
+
+        @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_NAME)
+        public abstract Builder senderLUTName(String senderLUTName);
+
+        @JsonProperty(FIELD_SENDER_LOOKUP_TABLE_KEY)
+        public abstract Builder senderLUTKey(String senderLUTKey);
+
+        @JsonProperty(FIELD_LOOKUP_REPLY_TO_EMAIL)
+        public abstract Builder lookupReplyToEmail(boolean lookupReplyToEmail);
+
+        @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_NAME)
+        public abstract Builder replyToLUTName(String replyToLUTName);
+
+        @JsonProperty(FIELD_REPLY_TO_LOOKUP_TABLE_KEY)
+        public abstract Builder replyToLUTKey(String replyToLUTKey);
+
         public abstract EmailEventNotificationConfig build();
     }
 
     @Override
     public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        return EmailEventNotificationConfigEntity.builder()
+        EmailEventNotificationConfigEntity.Builder builder = EmailEventNotificationConfigEntity.builder()
                 .sender(ValueReference.of(sender()))
                 .replyTo(ValueReference.of(replyTo()))
                 .subject(ValueReference.of(subject()))
@@ -189,6 +287,31 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .emailRecipients(emailRecipients())
                 .userRecipients(userRecipients())
                 .timeZone(ValueReference.of(timeZone().getID()))
-            .build();
+                .lookupRecipientEmails(ValueReference.of(lookupRecipientEmails()))
+                .lookupSenderEmail(ValueReference.of(lookupSenderEmail()))
+                .lookupReplyToEmail(ValueReference.of(lookupReplyToEmail()));
+        if (lookupRecipientEmails()) {
+            builder.recipientsLUTName(ValueReference.ofNullable(recipientsLUTName()))
+                    .recipientsLUTKey(ValueReference.ofNullable(recipientsLUTKey()));
+        } else {
+            builder.recipientsLUTName(ValueReference.of(""))
+                    .recipientsLUTKey(ValueReference.of(""));
+        }
+        if (lookupSenderEmail()) {
+            builder.senderLUTName(ValueReference.ofNullable(senderLUTName()))
+                    .senderLUTKey(ValueReference.ofNullable(senderLUTKey()));
+        } else {
+            builder.senderLUTName(ValueReference.of(""))
+                    .senderLUTKey(ValueReference.of(""));
+        }
+        if (lookupReplyToEmail()) {
+            builder.replyToLUTName(ValueReference.ofNullable(replyToLUTName()))
+                    .replyToLUTKey(ValueReference.ofNullable(replyToLUTKey()));
+        } else {
+            builder.replyToLUTName(ValueReference.of(""))
+                    .replyToLUTKey(ValueReference.of(""));
+        }
+
+        return builder.build();
     }
 }

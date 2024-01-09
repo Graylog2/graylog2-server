@@ -412,6 +412,10 @@
             <version>2.6.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-smile</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -467,6 +471,14 @@
             <testResource>
                 <directory>src/test/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>indices/**</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources/indices</directory>
+                <targetPath>${project.build.testOutputDirectory}/indices</targetPath>
+                <filtering>false</filtering>
             </testResource>
         </testResources>
 
@@ -496,7 +508,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

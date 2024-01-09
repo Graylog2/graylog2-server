@@ -35,6 +35,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
@@ -64,6 +65,7 @@ public class ShiroSecurityContextFilterTest {
     public void setUp() throws Exception {
         when(securityContext.isSecure()).thenReturn(false);
         when(requestContext.getSecurityContext()).thenReturn(securityContext);
+        when(requestContext.getUriInfo()).thenReturn(mock(UriInfo.class));
 
         final DefaultSecurityManager securityManager = new DefaultSecurityManager();
         final Provider<Request> grizzlyRequestProvider = () -> mock(Request.class);

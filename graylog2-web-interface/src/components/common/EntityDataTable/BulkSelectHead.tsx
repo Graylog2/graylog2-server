@@ -21,6 +21,7 @@ import uniq from 'lodash/uniq';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
@@ -60,15 +61,12 @@ const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entit
 
 type Props<Entity extends EntityBase> = {
   data: Readonly<Array<Entity>>,
-  selectedEntities: Array<string>,
-  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>,
 }
 
 const BulkSelectHead = <Entity extends EntityBase>({
   data,
-  setSelectedEntities,
-  selectedEntities,
 }: Props<Entity>) => {
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
   const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
 

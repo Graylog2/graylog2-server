@@ -28,28 +28,28 @@ public class PermittedStreamsTest {
     @Test
     public void findsStreams() {
         final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"));
-        ImmutableSet<String> result = sut.load(id -> true);
+        ImmutableSet<String> result = sut.loadAllMessageStreams(id -> true);
         assertThat(result).containsExactlyInAnyOrder("oans", "zwoa", "gsuffa");
     }
 
     @Test
     public void filtersOutNonPermittedStreams() {
         final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"));
-        ImmutableSet<String> result = sut.load(id -> id.equals("gsuffa"));
+        ImmutableSet<String> result = sut.loadAllMessageStreams(id -> id.equals("gsuffa"));
         assertThat(result).containsExactly("gsuffa");
     }
 
     @Test
     public void returnsEmptyListIfNoStreamsFound() {
         final PermittedStreams sut = new PermittedStreams(() -> java.util.stream.Stream.of("oans", "zwoa", "gsuffa"));
-        ImmutableSet<String> result = sut.load(id -> false);
+        ImmutableSet<String> result = sut.loadAllMessageStreams(id -> false);
         assertThat(result).isEmpty();
     }
 
     @Test
     public void filtersDefaultStreams() {
         final PermittedStreams sut = new PermittedStreams(() -> Streams.concat(NON_MESSAGE_STREAM_IDS.stream(), java.util.stream.Stream.of("i'm ok")));
-        ImmutableSet<String> result = sut.load(id -> true);
+        ImmutableSet<String> result = sut.loadAllMessageStreams(id -> true);
         assertThat(result).containsExactly("i'm ok");
     }
 }

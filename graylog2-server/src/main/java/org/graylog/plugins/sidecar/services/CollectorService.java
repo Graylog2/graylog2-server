@@ -101,8 +101,8 @@ public class CollectorService extends PaginatedDbService<Collector> {
                 request.executablePath(),
                 request.executeParameters(),
                 request.validationParameters(),
-                request.defaultTemplate(),
-                null); // this is only ever written by 20180212165000_AddDefaultCollectors
+                request.defaultTemplate()
+                );
     }
 
     public Collector fromRequest(String id, Collector request) {

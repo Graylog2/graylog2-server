@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
@@ -81,6 +82,7 @@ public class OpenSearchBackendErrorHandlingTest {
                 indexLookup,
                 (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFilters -> Collections.emptySet(),
+                new NoOpStatsCollector<>(),
                 false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 

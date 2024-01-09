@@ -28,23 +28,9 @@ const mockCurrentUser = alice.toBuilder()
 jest.mock('hooks/useCurrentUser', () => () => mockCurrentUser);
 
 describe('DatePicker', () => {
-  describe('should consider user time zone when displaying selected date', () => {
-    it('for beginning of day (date with user tz)', async () => {
-      render(<DatePicker date="2023-10-19T00:00:00.000+02:00" onChange={() => {}} />);
+  it('should highlight selected day', async () => {
+    render(<DatePicker date="2023-10-19" onChange={() => {}} />);
 
-      expect(await screen.findByText('19')).toHaveAttribute('aria-selected', 'true');
-    });
-
-    it('for end of day (date with user tz)', async () => {
-      render(<DatePicker date="2023-10-19T00:00:00.000+02:00" onChange={() => {}} />);
-
-      expect(await screen.findByText('19')).toHaveAttribute('aria-selected', 'true');
-    });
-
-    it('for end of day (date with UTC tz)', async () => {
-      render(<DatePicker date="2023-10-19T23:59:00.000+00:00" onChange={() => {}} />);
-
-      expect(await screen.findByText('20')).toHaveAttribute('aria-selected', 'true');
-    });
+    expect(await screen.findByText('19')).toHaveAttribute('aria-selected', 'true');
   });
 });

@@ -37,6 +37,8 @@ const sizeForMantine = (size: BsSize) => {
 
 export type StyleProps = ColorVariant | 'link';
 
+const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
+
 const styleProps = (style: StyleProps) => {
   switch (style) {
     case 'default': return { color: 'gray' };
@@ -47,6 +49,11 @@ const styleProps = (style: StyleProps) => {
 
 const StyledButton = styled(MantineButton)`
   font-weight: 400;
+  text-decoration: none !important;
+
+  &:hover, &:focus {
+    color: inherit;
+  }
 `;
 
 type Props = React.PropsWithChildren<{
@@ -106,6 +113,7 @@ const disabledStyles = (style: ColorVariant, other: Other) => {
 
   return {
     ':disabled': {
+      pointerEvents: 'all',
       color: colors.color,
       backgroundColor: colors.background,
       opacity: '0.65',
@@ -121,9 +129,11 @@ const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disab
     root: {
       ...sizeStyles,
       ':disabled': disableStyles,
+      color: other.colors.contrast[bsStyle],
     },
     label: {
       gap: '0.25em',
+      overflow: 'visible',
     },
   };
 };
@@ -134,13 +144,14 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
     title, form, target, type, rel, role, name, tabIndex, children,
   }, ref) => {
     const theme = useMantineTheme();
-    const styles = useMemo(() => generateStyles(theme.other, bsStyle, bsSize, disabled), [bsSize, bsStyle, disabled, theme]);
+    const style = mapStyle(bsStyle);
+    const styles = useMemo(() => generateStyles(theme.other, style, bsSize, disabled), [bsSize, disabled, style, theme.other]);
 
     const sharedProps = {
       id,
       'aria-label': ariaLabel,
       className,
-      ...styleProps(bsStyle),
+      ...styleProps(style),
       'data-testid': dataTestId,
       disabled,
       role,
@@ -153,12 +164,12 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
     if (href) {
       return (
-        <StyledButton<'a'> component="a"
-                           href={href}
-                           target={target}
-                           rel={rel}
-                           onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-                           {...sharedProps}>
+        <StyledButton component="a"
+                      href={href}
+                      target={target}
+                      rel={rel}
+                      onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+                      {...sharedProps}>
           {children}
         </StyledButton>
       );

@@ -21,14 +21,18 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -38,6 +42,8 @@ import javax.ws.rs.core.MediaType;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_REMOVE;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_RESET;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_START;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -47,10 +53,25 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class DataNodeManagementResource extends RestResource {
 
     private final DataNodeService dataNodeService;
+    private final NodeService<DataNodeDto> nodeService;
+    private final CertRenewalService certRenewalService;
 
     @Inject
-    protected DataNodeManagementResource(DataNodeService dataNodeService) {
+    protected DataNodeManagementResource(DataNodeService dataNodeService, NodeService<DataNodeDto> nodeService, CertRenewalService certRenewalService) {
         this.dataNodeService = dataNodeService;
+        this.nodeService = nodeService;
+        this.certRenewalService = certRenewalService;
+    }
+
+    @GET
+    @Path("{nodeId}")
+    @ApiOperation("Get data node information")
+    public DataNodeDto getDataNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        try {
+            return certRenewalService.addProvisioningInformation(nodeService.byNodeId(nodeId));
+        } catch (NodeNotFoundException e) {
+            throw new NotFoundException("Node " + nodeId + " not found");
+        }
     }
 
     @DELETE
@@ -58,9 +79,9 @@ public class DataNodeManagementResource extends RestResource {
     @ApiOperation("Remove node from cluster")
     @AuditEvent(type = DATANODE_REMOVE)
     @RequiresPermissions(RestPermissions.DATANODE_REMOVE)
-    public void removeNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+    public DataNodeDto removeNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
-            dataNodeService.removeNode(nodeId);
+            return dataNodeService.removeNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }
@@ -71,9 +92,35 @@ public class DataNodeManagementResource extends RestResource {
     @ApiOperation("Reset a removed node to rejoin the cluster")
     @AuditEvent(type = DATANODE_RESET)
     @RequiresPermissions(RestPermissions.DATANODE_RESET)
-    public void resetNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+    public DataNodeDto resetNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
-            dataNodeService.resetNode(nodeId);
+            return dataNodeService.resetNode(nodeId);
+        } catch (NodeNotFoundException e) {
+            throw new NotFoundException("Node " + nodeId + " not found");
+        }
+    }
+
+    @POST
+    @Path("{nodeId}/stop")
+    @ApiOperation("Stop the OpenSearch process of a data node")
+    @AuditEvent(type = DATANODE_STOP)
+    @RequiresPermissions(RestPermissions.DATANODE_STOP)
+    public DataNodeDto stopNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        try {
+            return dataNodeService.stopNode(nodeId);
+        } catch (NodeNotFoundException e) {
+            throw new NotFoundException("Node " + nodeId + " not found");
+        }
+    }
+
+    @POST
+    @Path("{nodeId}/start")
+    @ApiOperation("Start the OpenSearch process of a data node")
+    @AuditEvent(type = DATANODE_START)
+    @RequiresPermissions(RestPermissions.DATANODE_START)
+    public DataNodeDto startNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        try {
+            return dataNodeService.startNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }

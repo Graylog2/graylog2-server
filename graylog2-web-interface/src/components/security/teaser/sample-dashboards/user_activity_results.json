@@ -1,0 +1,2792 @@
+{
+  "execution": {
+    "done": true,
+    "cancelled": false,
+    "completed_exceptionally": false
+  },
+  "results": {
+    "a118ddfe-2322-456c-8ba2-5d9079676e0c": {
+      "query": {
+        "id": "a118ddfe-2322-456c-8ba2-5d9079676e0c",
+        "timerange": {
+          "from": 300,
+          "type": "relative"
+        },
+        "filter": {
+          "type": "or",
+          "filters": [
+            {
+              "type": "stream",
+              "id": "653972ed4062770d2af9d2c9"
+            },
+            {
+              "type": "stream",
+              "id": "000000000000000000000001"
+            },
+            {
+              "type": "stream",
+              "id": "653972eb4062770d2af9d298"
+            },
+            {
+              "type": "stream",
+              "id": "653972ec4062770d2af9d2b7"
+            },
+            {
+              "type": "stream",
+              "id": "653972fe4062770d2af9d36f"
+            },
+            {
+              "type": "stream",
+              "id": "653972ec4062770d2af9d2ae"
+            },
+            {
+              "type": "stream",
+              "id": "653980454062770d2af9fd86"
+            },
+            {
+              "type": "stream",
+              "id": "655634e28cca23167c7dfdce"
+            },
+            {
+              "type": "stream",
+              "id": "653972ec4062770d2af9d2a5"
+            },
+            {
+              "type": "stream",
+              "id": "653972ed4062770d2af9d2c0"
+            }
+          ]
+        },
+        "filters": [],
+        "query": {
+          "type": "elasticsearch",
+          "query_string": ""
+        },
+        "search_types": [
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
+            },
+            "streams": [],
+            "id": "dd7d662c-80e2-43aa-94f2-80967d8a552a",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "source": "search_type",
+              "id": "dd7d662c-80e2-43aa-94f2-80967d8a552a",
+              "offset": "1i",
+              "type": "offset"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
+            },
+            "streams": [],
+            "id": "0362927a-9421-43d5-94da-9c191125e18b",
+            "name": "trend",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:user_name AND NOT user_name:(_undefined_ OR not-found)"
+            },
+            "streams": [],
+            "id": "4ec800c1-7f5c-46c3-bbb6-73d63af302b7",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "user_name"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "source": "search_type",
+              "id": "a5d2fe76-1ddf-4463-88a5-b81a00b4d13e",
+              "offset": "1i",
+              "type": "offset"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success)"
+            },
+            "streams": [],
+            "id": "9259b90a-eb32-435f-b917-7791982549cc",
+            "name": "trend",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(target_user_name AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+            },
+            "streams": [],
+            "id": "50f93c36-27d0-4597-8a97-c54d2a0afb9e",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "target_user_name"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(user_name AND alert_severity) AND alert_severity:(high OR critical)"
+            },
+            "streams": [],
+            "id": "93f0da96-11e3-4e81-9269-f0e7fd1151d5",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "user_name"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(user_name AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+            },
+            "streams": [],
+            "id": "0599f94e-96a2-48cd-9ebc-2f69e033c656",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "user_name"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_source AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+            },
+            "streams": [],
+            "id": "ba849865-e780-4b8a-befa-45d57e6daf81",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "event_source"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(user_name AND event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
+            },
+            "streams": [],
+            "id": "5c481eb4-22ed-4293-8f76-b7e1dff34463",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": false,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "user_name"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "event_outcome"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(failure)"
+            },
+            "streams": [],
+            "id": "1ca21123-be19-491d-9ffc-158aa1efb039",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_type AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+            },
+            "streams": [],
+            "id": "203d3836-e66a-44d4-afdb-ba84fa42a14c",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "gim_event_type"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "source": "search_type",
+              "id": "1ca21123-be19-491d-9ffc-158aa1efb039",
+              "offset": "1i",
+              "type": "offset"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(failure)"
+            },
+            "streams": [],
+            "id": "9f5b2059-efa0-4390-a679-90d3fadc6dc4",
+            "name": "trend",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source_product AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+            },
+            "streams": [],
+            "id": "92ae66d3-01ee-4212-bafc-64e0556f758c",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "event_source_product"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(source_user_name AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
+            },
+            "streams": [],
+            "id": "365f7227-b00d-4ec8-8ac3-a6ecff90d9a2",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "fields": [
+                  "source_user_name"
+                ],
+                "limit": 15,
+                "skip_empty_values": false
+              }
+            ],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          },
+          {
+            "timerange": {
+              "from": 86400,
+              "type": "relative"
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success)"
+            },
+            "streams": [],
+            "id": "a5d2fe76-1ddf-4463-88a5-b81a00b4d13e",
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": [],
+            "filter": null,
+            "filters": []
+          }
+        ]
+      },
+      "execution_stats": {
+        "duration": 971,
+        "timestamp": "2023-11-30T07:21:45.571Z",
+        "effective_timerange": {
+          "from": "2023-11-30T07:16:46.542Z",
+          "to": "2023-11-30T07:21:46.542Z",
+          "type": "absolute"
+        }
+      },
+      "search_types": {
+        "9259b90a-eb32-435f-b917-7791982549cc": {
+          "name": "trend",
+          "id": "9259b90a-eb32-435f-b917-7791982549cc",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 59976,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            }
+          ],
+          "total": 59976,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-28T07:21:46.542Z",
+            "to": "2023-11-29T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "a5d2fe76-1ddf-4463-88a5-b81a00b4d13e": {
+          "name": "chart",
+          "id": "a5d2fe76-1ddf-4463-88a5-b81a00b4d13e",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 59071,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            }
+          ],
+          "total": 59071,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "4ec800c1-7f5c-46c3-bbb6-73d63af302b7": {
+          "name": "chart",
+          "id": "4ec800c1-7f5c-46c3-bbb6-73d63af302b7",
+          "rows": [
+            {
+              "key": [
+                "lbusby"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9981,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "mgray"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9911,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "abritt"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9836,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "tlott"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9760,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "workstationusers"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9676,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "serverusers"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9654,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "hkline"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9194,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "tfarley"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9097,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "administrators"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 3769,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jgross"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 1832,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "ppadilla"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 1807,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "rferry"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 1802,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "zsims"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 1800,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "ewilkes"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 1794,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cmcknight"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 1786,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 197592,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 197592,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "ba849865-e780-4b8a-befa-45d57e6daf81": {
+          "name": "chart",
+          "id": "ba849865-e780-4b8a-befa-45d57e6daf81",
+          "rows": [
+            {
+              "key": [
+                "DC01.acme.local"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 10449,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "DC02.acme.local"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 10398,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "DC03.acme.local"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 10353,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cmcknight-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 138,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "sheath-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 129,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "zsims-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 123,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "erhodes-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 122,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "ecantrell-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 121,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "ewilkes-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 116,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "hkline-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 115,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "adelarosa-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 114,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jdawson-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 113,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "glynn-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 112,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jford-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 111,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "sfowler-dkstp"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 111,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 34969,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 34969,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "dd7d662c-80e2-43aa-94f2-80967d8a552a": {
+          "name": "chart",
+          "id": "dd7d662c-80e2-43aa-94f2-80967d8a552a",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 61893,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            }
+          ],
+          "total": 61893,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "92ae66d3-01ee-4212-bafc-64e0556f758c": {
+          "name": "chart",
+          "id": "92ae66d3-01ee-4212-bafc-64e0556f758c",
+          "rows": [
+            {
+              "key": [
+                "windows"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 34969,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 34969,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 34969,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "365f7227-b00d-4ec8-8ac3-a6ecff90d9a2": {
+          "name": "chart",
+          "id": "365f7227-b00d-4ec8-8ac3-a6ecff90d9a2",
+          "rows": [
+            {
+              "key": [
+                "administrator"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 6374,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "s_jdawson"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 5764,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "s_dmiranda"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 5762,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "s_jduffield"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 5729,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "s_kpearson"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 5681,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "s_jgross"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 5659,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 34969,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 34969,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "5c481eb4-22ed-4293-8f76-b7e1dff34463": {
+          "name": "chart",
+          "id": "5c481eb4-22ed-4293-8f76-b7e1dff34463",
+          "rows": [
+            {
+              "key": [
+                "lbusby"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 4540,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 121,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "abritt"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 4558,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 101,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "hkline"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 4534,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 107,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "tfarley"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 4527,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 102,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "mgray"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 4514,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 97,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "tlott"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 4408,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 65,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "amcarthur-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 801,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 5,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jford-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 791,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 9,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "lbates-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 790,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 10,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "ecantrell-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 778,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 9,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "kpearson-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 768,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 18,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "asheppard-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 763,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 15,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "zsims-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 772,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 6,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "hguerra-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 763,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 12,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jnorris-dkstp$"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "success",
+                    "count()"
+                  ],
+                  "value": 763,
+                  "rollup": false,
+                  "source": "col-leaf"
+                },
+                {
+                  "key": [
+                    "failure",
+                    "count()"
+                  ],
+                  "value": 12,
+                  "rollup": false,
+                  "source": "col-leaf"
+                }
+              ],
+              "source": "leaf"
+            }
+          ],
+          "total": 61893,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "50f93c36-27d0-4597-8a97-c54d2a0afb9e": {
+          "name": "chart",
+          "id": "50f93c36-27d0-4597-8a97-c54d2a0afb9e",
+          "rows": [
+            {
+              "key": [
+                "cn=tbuckner,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 506,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=dbenitez,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 503,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=amcarthur,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 501,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=jgross,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 495,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=ecantrell,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 486,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=glynn,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 484,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=tlott,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 483,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=lbusby,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 478,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=ppadilla,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 472,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=cmustafa,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 468,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=dmiranda,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 468,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=erhodes,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 468,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=hkline,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 467,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=rwu,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 467,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cn=jduffield,ou=users,ou=group policy ou,dc=acme,dc=internal"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 466,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 17078,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 17078,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "1ca21123-be19-491d-9ffc-158aa1efb039": {
+          "name": "chart",
+          "id": "1ca21123-be19-491d-9ffc-158aa1efb039",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 2822,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            }
+          ],
+          "total": 2822,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "203d3836-e66a-44d4-afdb-ba84fa42a14c": {
+          "name": "chart",
+          "id": "203d3836-e66a-44d4-afdb-ba84fa42a14c",
+          "rows": [
+            {
+              "key": [
+                "group member added"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 8199,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "group member removed"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 8114,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "group properties modified"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 6786,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "administrative password reset"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 3818,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "password change"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 3649,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "account modified"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 3638,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "account renamed"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 765,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 34969,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 34969,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "9f5b2059-efa0-4390-a679-90d3fadc6dc4": {
+          "name": "trend",
+          "id": "9f5b2059-efa0-4390-a679-90d3fadc6dc4",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 2893,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            }
+          ],
+          "total": 2893,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-28T07:21:46.542Z",
+            "to": "2023-11-29T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "0362927a-9421-43d5-94da-9c191125e18b": {
+          "name": "trend",
+          "id": "0362927a-9421-43d5-94da-9c191125e18b",
+          "rows": [
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 62869,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            }
+          ],
+          "total": 62869,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-28T07:21:46.542Z",
+            "to": "2023-11-29T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "93f0da96-11e3-4e81-9269-f0e7fd1151d5": {
+          "name": "chart",
+          "id": "93f0da96-11e3-4e81-9269-f0e7fd1151d5",
+          "rows": [
+            {
+              "key": [
+                "lbusby"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 23,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "hguerra"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 22,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "mcottrell"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 21,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "kpearson"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 19,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "mgray"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 19,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "asheppard"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 18,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jdawson"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 18,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jduffield"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 18,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jgross"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 18,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "dmiranda"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 17,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "gsadler"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 17,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "glynn"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 16,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "abritt"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 15,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "adelarosa"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 15,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cmcknight"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 15,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 532,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 532,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        },
+        "0599f94e-96a2-48cd-9ebc-2f69e033c656": {
+          "name": "chart",
+          "id": "0599f94e-96a2-48cd-9ebc-2f69e033c656",
+          "rows": [
+            {
+              "key": [
+                "workstationusers"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9676,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "serverusers"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 9654,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "administrators"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 3769,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "lbates"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 362,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "tfarley"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 360,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "mgray"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 347,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "lbusby"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 344,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "rferry"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 339,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "tfry"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 337,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "cmcknight"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 335,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "tlott"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 335,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "ecantrell"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 332,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "hkline"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 332,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "jdawson"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 331,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [
+                "adelarosa"
+              ],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 325,
+                  "rollup": true,
+                  "source": "row-leaf"
+                }
+              ],
+              "source": "leaf"
+            },
+            {
+              "key": [],
+              "values": [
+                {
+                  "key": [
+                    "count()"
+                  ],
+                  "value": 34969,
+                  "rollup": true,
+                  "source": "row-inner"
+                }
+              ],
+              "source": "non-leaf"
+            }
+          ],
+          "total": 34969,
+          "type": "pivot",
+          "effective_timerange": {
+            "from": "2023-11-29T07:21:46.542Z",
+            "to": "2023-11-30T07:21:46.542Z",
+            "type": "absolute"
+          }
+        }
+      },
+      "errors": [],
+      "state": "COMPLETED"
+    }
+  },
+  "id": "656838090548c879277ba61e",
+  "owner": "admin",
+  "search_id": "656510c70548c8792779eea9"
+}

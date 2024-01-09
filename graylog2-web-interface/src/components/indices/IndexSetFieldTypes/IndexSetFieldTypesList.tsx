@@ -31,7 +31,7 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import useFiledTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
@@ -72,7 +72,7 @@ const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
-  const { data: { fieldTypes } } = useFiledTypes();
+  const { data: { fieldTypes } } = useFieldTypes();
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -128,10 +128,9 @@ const IndexSetFieldTypesList = () => {
     },
   }), [fieldTypes]);
 
-  const renderActions = useCallback((fieldType: IndexSetFieldType, setSelectedFields: React.Dispatch<React.SetStateAction<Array<string>>>) => (
+  const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
-                      setSelectedFields={setSelectedFields}
                       refetchFieldTypes={refetchFieldTypes} />
   ), [indexSetId, refetchFieldTypes]);
 
@@ -145,15 +144,6 @@ const IndexSetFieldTypesList = () => {
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
-  const renderBulkActions = useCallback((
-    selectedFields: Array<string>,
-    setSelectedFields: (fieldName: Array<string>) => void,
-  ) => (
-    <BulkActions selectedFields={selectedFields}
-                 setSelectedFields={setSelectedFields}
-                 indexSetId={indexSetId} />
-  ), [indexSetId]);
-
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
@@ -166,7 +156,7 @@ const IndexSetFieldTypesList = () => {
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
                     query={query}
-                    placeholder="Enter search query for the filed name...">
+                    placeholder="Enter search query for the field name...">
           <EntityFilters attributes={attributes}
                          urlQueryFilters={urlQueryFilters}
                          setUrlQueryFilters={onChangeFilters}
@@ -192,7 +182,7 @@ const IndexSetFieldTypesList = () => {
                                             columnDefinitions={attributes}
                                             rowActions={renderActions}
                                             bulkSelection={{
-                                              actions: renderBulkActions,
+                                              actions: <BulkActions indexSetId={indexSetId} />,
                                               isEntitySelectable,
                                             }} />
       )}

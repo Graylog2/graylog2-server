@@ -18,6 +18,7 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import UserNotification from 'util/UserNotification';
 import { IfPermitted, ShareButton } from 'components/common';
 import { MenuItem } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
@@ -29,9 +30,16 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import DropdownButton from 'components/bootstrap/DropdownButton';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import type FetchError from 'logic/errors/FetchError';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
+
+const _extractErrorMessage = (error: FetchError) => ((error
+  && error.additional
+  && error.additional.body
+  && error.additional.body.message) ? error.additional.body.message : error);
 
 type Props = {
   dashboard: View,
@@ -43,6 +51,7 @@ const DeleteItem = styled.span(({ theme }) => css`
 `);
 
 const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
+  const { deselectEntity } = useSelectedEntities();
   const [showShareModal, setShowShareModal] = useState(false);
   const paginationQueryParameter = usePaginationQueryParameter();
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
@@ -62,11 +71,16 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
     const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], dashboard);
 
     if (result) {
-      await ViewManagementActions.delete(dashboard);
-      refetchDashboards();
-      paginationQueryParameter.resetPage();
+      ViewManagementActions.delete(dashboard).then(() => {
+        UserNotification.success(`Deleting dashboard "${dashboard.title}" was successful!`, 'Success!');
+        deselectEntity(dashboard.id);
+        refetchDashboards();
+        paginationQueryParameter.resetPage();
+      }).catch((error) => {
+        UserNotification.error(`Deleting dashboard failed: ${_extractErrorMessage(error)}`, 'Error!');
+      });
     }
-  }, [dashboard, refetchDashboards, paginationQueryParameter]);
+  }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
 
   return (
     <>

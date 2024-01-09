@@ -63,7 +63,7 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     public OpenSearch13Instance init() {
         super.init();
         this.restHighLevelClient = buildRestClient();
-        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, false, new ObjectMapperProvider().get());
+        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient, new ObjectMapperProvider().get());
         this.client = new ClientES7(this.elasticsearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
         this.adapters = new AdaptersES7(elasticsearchClient);

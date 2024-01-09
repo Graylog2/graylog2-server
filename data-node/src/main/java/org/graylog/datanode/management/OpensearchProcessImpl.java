@@ -43,6 +43,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -122,6 +123,15 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public String getOpensearchClusterUrl() {
         return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
+    }
+
+    @Override
+    public String getDatanodeRestApiUrl() {
+        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::securityConfigured).orElse(false);
+        String protocol = secured ? "https" : "http";
+        String host = configuration.getHostname();
+        final int port = configuration.getDatanodeHttpPort();
+        return String.format(Locale.ROOT, "%s://%s:%d", protocol, host, port);
     }
 
     public void onEvent(ProcessEvent event) {
@@ -214,6 +224,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public void onReset() {
         onEvent(ProcessEvent.RESET);
+        restart();
     }
 
     @Override

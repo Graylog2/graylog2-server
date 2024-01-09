@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';

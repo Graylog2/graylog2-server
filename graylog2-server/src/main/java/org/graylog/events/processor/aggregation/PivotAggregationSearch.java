@@ -26,7 +26,6 @@ import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Filter;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -38,7 +37,6 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -369,7 +367,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // This adds all streams if none were provided
         // TODO: Once we introduce "EventProcessor owners" this should only load the permitted streams of the
         //       user who created this EventProcessor.
-        search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.load((streamId) -> true));
+        search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.loadAllMessageStreams((streamId) -> true));
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username), Collections.emptySet());
         try {
             Uninterruptibles.getUninterruptibly(

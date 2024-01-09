@@ -35,6 +35,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import DropdownButton from 'components/bootstrap/DropdownButton';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import StreamModal from '../StreamModal';
 
@@ -52,6 +53,7 @@ const StreamActions = ({
   indexSets: Array<IndexSet>,
 }) => {
   const currentUser = useCurrentUser();
+  const { deselectEntity } = useSelectedEntities();
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const [showStreamRuleModal, setShowStreamRuleModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -113,15 +115,14 @@ const StreamActions = ({
         app_action_value: 'stream-item-delete',
       });
 
-      StreamsStore.remove(stream.id, (response) => {
+      StreamsStore.remove(stream.id).then(() => {
+        deselectEntity(stream.id);
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
-
-        return response;
       }).catch((error) => {
         UserNotification.error(`An error occurred while deleting the stream. ${error}`);
       });
     }
-  }, [sendTelemetry, stream.id, stream.title]);
+  }, [deselectEntity, sendTelemetry, stream.id, stream.title]);
 
   const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(stream.id, streamRule, () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_RULE_SAVED, {

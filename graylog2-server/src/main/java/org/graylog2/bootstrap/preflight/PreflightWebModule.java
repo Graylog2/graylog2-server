@@ -40,6 +40,8 @@ import org.graylog2.cluster.lock.LockServiceModule;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.nodes.ServerNodeClusterService;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
@@ -71,6 +73,7 @@ public class PreflightWebModule extends Graylog2Module {
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
+        bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class);

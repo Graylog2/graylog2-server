@@ -226,13 +226,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
 
-        // Don't overwrite CRC of an existing collector. We need the original value to
-        // know that the entry has been modified.
-        Collector existingCollector = collectorService.findByNameAndOs(collector.name(), collector.nodeOperatingSystem());
-        if (existingCollector != null && existingCollector.defaultTemplateCRC() != null) {
-            collector = collector.toBuilder().defaultTemplateCRC(existingCollector.defaultTemplateCRC()).build();
-        }
-
         etagService.invalidateAllCollectors();
         return Response.ok().entity(collectorService.save(collector)).build();
     }

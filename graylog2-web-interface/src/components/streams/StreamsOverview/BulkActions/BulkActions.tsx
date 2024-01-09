@@ -29,32 +29,31 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import AssignIndexSetAction from 'components/streams/StreamsOverview/BulkActions/AssignIndexSetAction';
 import StopStreamsAction from 'components/streams/StreamsOverview/BulkActions/StopStreamsAction';
 import SearchStreamsAction from 'components/streams/StreamsOverview/BulkActions/SearchStreamsAction';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import StartStreamsAction from './StartStreamsAction';
 
 type Props = {
-  selectedStreamIds: Array<string>,
-  setSelectedStreamIds: (streamIds: Array<string>) => void,
   indexSets: Array<IndexSet>
 }
 
-const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Props) => {
+const BulkActions = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
-
-  const selectedItemsAmount = selectedStreamIds?.length;
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const selectedItemsAmount = selectedEntities?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'stream', 'streams');
   const refetchStreams = useCallback(() => queryClient.invalidateQueries(['streams', 'overview']), [queryClient]);
 
   const handleFailures = useCallback((failures: Array<{ entity_id: string }>, actionPastTense: string) => {
     if (failures?.length) {
       const notDeletedStreamIds = failures.map(({ entity_id }) => entity_id);
-      setSelectedStreamIds(notDeletedStreamIds);
+      setSelectedEntities(notDeletedStreamIds);
       UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be ${actionPastTense}.`);
     } else {
-      setSelectedStreamIds([]);
+      setSelectedEntities([]);
       UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionPastTense} successfully.`, 'Success');
     }
-  }, [descriptor, selectedItemsAmount, setSelectedStreamIds]);
+  }, [descriptor, selectedItemsAmount, setSelectedEntities]);
 
   const onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
@@ -62,30 +61,26 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Pro
       fetch(
         'POST',
         qualifyUrl(ApiRoutes.StreamsApiController.bulk_delete().url),
-        { entity_ids: selectedStreamIds },
+        { entity_ids: selectedEntities },
       ).then(({ failures }) => handleFailures(failures, 'deleted')).catch((error) => {
         UserNotification.error(`An error occurred while deleting streams. ${error}`);
       }).finally(() => {
         refetchStreams();
       });
     }
-  }, [descriptor, handleFailures, refetchStreams, selectedItemsAmount, selectedStreamIds]);
+  }, [descriptor, handleFailures, refetchStreams, selectedItemsAmount, selectedEntities]);
 
   return (
-    <BulkActionsDropdown selectedEntities={selectedStreamIds} setSelectedEntities={setSelectedStreamIds} keepMounted>
+    <BulkActionsDropdown keepMounted>
       <AssignIndexSetAction indexSets={indexSets}
-                            selectedStreamIds={selectedStreamIds}
-                            setSelectedStreamIds={setSelectedStreamIds}
                             descriptor={descriptor}
                             refetchStreams={refetchStreams} />
-      <SearchStreamsAction selectedStreamIds={selectedStreamIds} />
+      <SearchStreamsAction />
       <StartStreamsAction handleFailures={handleFailures}
-                          selectedStreamIds={selectedStreamIds}
                           refetchStreams={refetchStreams}
                           descriptor={descriptor} />
 
       <StopStreamsAction handleFailures={handleFailures}
-                         selectedStreamIds={selectedStreamIds}
                          refetchStreams={refetchStreams}
                          descriptor={descriptor} />
 

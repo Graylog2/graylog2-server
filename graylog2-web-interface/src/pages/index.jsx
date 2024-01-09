@@ -31,6 +31,8 @@ const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotific
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const DataNodesPage = loadAsync(() => import('./DataNodesPage'));
+const DataNodesClusterPage = loadAsync(() => import('./DataNodesClusterPage'));
+const DataNodesMigrationPage = loadAsync(() => import('./DataNodesMigrationPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
 const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
@@ -68,7 +70,6 @@ const RoleEditPage = loadAsync(() => import('./RoleEditPage'));
 const RolesOverviewPage = loadAsync(() => import('./RolesOverviewPage'));
 const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
-const SecurityPage = loadAsync(() => import('./SecurityPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
 const ShowEventNotificationPage = loadAsync(() => import('./ShowEventNotificationPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
@@ -117,7 +118,9 @@ export {
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
+  DataNodesClusterPage,
   DataNodesPage,
+  DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
@@ -157,7 +160,6 @@ export {
   RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
-  SecurityPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,

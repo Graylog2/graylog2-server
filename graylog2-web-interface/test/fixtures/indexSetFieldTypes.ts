@@ -17,7 +17,7 @@
 
 import type { Attributes } from 'stores/PaginationTypes';
 
-export const customFiled = {
+export const customField = {
   id: 'field',
   fieldName: 'field',
   type: 'bool',
@@ -25,14 +25,14 @@ export const customFiled = {
   isReserved: false,
 };
 
-export const secondCustomFiled = {
+export const secondCustomField = {
   id: 'field-2',
   fieldName: 'field-2',
   type: 'bool',
   isCustom: true,
   isReserved: false,
 };
-export const reservedFiled = {
+export const reservedField = {
   id: 'field',
   fieldName: 'field',
   type: 'bool',
@@ -40,7 +40,7 @@ export const reservedFiled = {
   isReserved: true,
 };
 
-export const defaultFiled = {
+export const defaultField = {
   id: 'field',
   fieldName: 'field',
   type: 'bool',

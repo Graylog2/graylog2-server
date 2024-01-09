@@ -180,7 +180,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
-        return permittedStreams.load(searchUser);
+        return permittedStreams.loadAllMessageStreams(searchUser);
     }
 
     private SuggestionFieldType getFieldType(Set<String> streams, TimeRange timerange, final String fieldName) {

@@ -43,6 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -74,6 +75,8 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
 
         final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedProxies);
         final String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
+        final Set<Class<?>> matchedResources = requestContext.getUriInfo().getMatchedResources().stream()
+                .map(Object::getClass).collect(Collectors.toSet());
 
         final SecurityContext securityContext;
         if (authHeader != null && authHeader.startsWith("Basic")) {
@@ -92,13 +95,15 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                     host,
                     grizzlyRequest.getRemoteAddr(),
                     headers,
-                    cookies);
+                    cookies,
+                    matchedResources);
 
         } else {
             securityContext = createSecurityContext(null, null, secure, null, host,
                     grizzlyRequest.getRemoteAddr(),
                     headers,
-                    cookies);
+                    cookies,
+                    matchedResources);
         }
 
         requestContext.setSecurityContext(securityContext);
@@ -119,8 +124,10 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                                                   String host,
                                                   String remoteAddr,
                                                   MultivaluedMap<String, String> headers,
-                                                  Map<String, Cookie> cookies) {
-        final AuthenticationToken authToken = createAuthenticationToken(userName, credential, host, remoteAddr, cookies);
+                                                  Map<String, Cookie> cookies,
+                                                  Set<Class<?>> matchedResources) {
+        final AuthenticationToken authToken = createAuthenticationToken(userName, credential, host, remoteAddr, cookies,
+                matchedResources);
 
         final Subject subject = new Subject.Builder(securityManager)
                 .host(host)
@@ -130,7 +137,9 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         return new ShiroSecurityContext(subject, authToken, isSecure, authcScheme, headers);
     }
 
-    private AuthenticationToken createAuthenticationToken(String userName, String credential, String host, String remoteAddr, Map<String, Cookie> cookies) {
+    private AuthenticationToken createAuthenticationToken(String userName, String credential, String host,
+                                                          String remoteAddr, Map<String, Cookie> cookies,
+                                                          Set<Class<?>> matchedResources) {
         if ("session".equalsIgnoreCase(credential)) {
             return new SessionIdToken(userName, host, remoteAddr);
         }
@@ -145,6 +154,6 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
             return new UsernamePasswordToken(userName, credential, host);
         }
 
-        return new PossibleTrustedHeaderToken(host, remoteAddr);
+        return new PossibleTrustedHeaderToken(host, remoteAddr, matchedResources);
     }
 }

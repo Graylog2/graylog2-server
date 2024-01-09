@@ -33,7 +33,6 @@ import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.searches.IndexRangeStats;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
