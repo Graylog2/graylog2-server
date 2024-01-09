@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 @Singleton
 public class DatanodeRestApiProxy implements ProxyRequestAdapter {
@@ -58,13 +59,19 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                 .map(url -> StringUtils.removeEnd(url, "/"))
                 .orElseThrow(() -> new IllegalStateException("No datanode present"));
 
-        final Request builder = new Request.Builder()
+        final Request.Builder builder = new Request.Builder()
                 .url(host + "/" + request.path())
-                .addHeader("Authorization", authTokenProvider.get())
-                .method(request.method(), getBody(request))
-                .build();
+                .addHeader("Authorization", authTokenProvider.get());
 
-        final Response response = httpClient.newCall(builder).execute();
+        switch (request.method().toUpperCase(Locale.ROOT)) {
+            case "GET" -> builder.get();
+            case "DELETE" -> builder.delete();
+            case "POST" -> builder.post(getBody(request));
+            case "PUT" -> builder.put(getBody(request));
+            default -> throw new IllegalArgumentException("Unsupported method " + request.method());
+        }
+
+        final Response response = httpClient.newCall(builder.build()).execute();
         return new ProxyResponse(response.code(), response.body().byteStream());
     }
 

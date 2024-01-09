@@ -32,7 +32,7 @@ import static org.mockito.Mockito.mock;
 class DatanodeAuthFilterTest {
 
     @Test
-    void testValidJwtToken() throws IOException {
+    void testValidToken() throws IOException {
         final ContainerRequestFilter fallbackFilter = Mockito.mock(ContainerRequestFilter.class);
 
         final DatanodeAuthFilter datanodeAuthFilter = new DatanodeAuthFilter(fallbackFilter, tokenValidator("123456789"));

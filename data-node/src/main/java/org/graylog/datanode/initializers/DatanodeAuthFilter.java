@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -36,7 +37,6 @@ import java.util.Optional;
 public class DatanodeAuthFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeAuthFilter.class);
-    private static final String AUTHORIZATION_PROPERTY = "Authorization";
     private static final String AUTHENTICATION_SCHEME = "Bearer";
     private final ContainerRequestFilter fallbackFilter;
     private final AuthTokenValidator tokenVerifier;
@@ -49,7 +49,7 @@ public class DatanodeAuthFilter implements ContainerRequestFilter {
 
     private Optional<String> getBearerHeader(ContainerRequestContext requestContext) {
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
-        return headers.getOrDefault(AUTHORIZATION_PROPERTY, Collections.emptyList())
+        return headers.getOrDefault(HttpHeaders.AUTHORIZATION, Collections.emptyList())
                 .stream()
                 .filter(a -> a.startsWith(AUTHENTICATION_SCHEME))
                 .findFirst();
