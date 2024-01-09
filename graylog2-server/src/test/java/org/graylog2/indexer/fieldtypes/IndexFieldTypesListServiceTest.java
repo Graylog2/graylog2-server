@@ -24,6 +24,7 @@ import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
@@ -54,10 +55,17 @@ class IndexFieldTypesListServiceTest {
     IndexSetService indexSetService;
     @Mock
     MongoIndexSet.Factory indexSetFactory;
+    @Mock
+    IndexFieldTypeProfileService profileService;
 
     @BeforeEach
     void setUp() {
-        toTest = new IndexFieldTypesListService(indexFieldTypesService, indexSetService, indexSetFactory, new FieldTypeDTOsMerger(), new InMemoryFilterExpressionParser());
+        toTest = new IndexFieldTypesListService(indexFieldTypesService,
+                indexSetService,
+                indexSetFactory,
+                new FieldTypeDTOsMerger(),
+                new InMemoryFilterExpressionParser(),
+                profileService);
     }
 
     @Test

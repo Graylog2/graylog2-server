@@ -19,6 +19,7 @@ package org.graylog2.indexer.fieldtypes.utils;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +46,8 @@ class FieldTypeDTOsMergerTest {
                 List.of(
                         FieldTypeDTO.create("changed_field", "text")
                 ),
-                new CustomFieldMappings()
+                new CustomFieldMappings(),
+                new IndexFieldTypeProfile("id", "name", "descr", new CustomFieldMappings())
         );
 
         assertThat(merged)
@@ -65,7 +67,10 @@ class FieldTypeDTOsMergerTest {
                 ),
                 new CustomFieldMappings(
                         List.of(new CustomFieldMapping("changed_field", "ip"))
-                )
+                ),
+                new IndexFieldTypeProfile("id", "name", "descr", new CustomFieldMappings(
+                        List.of(new CustomFieldMapping("changed_field", "double"))
+                ))
         );
 
         assertThat(merged)
@@ -81,7 +86,8 @@ class FieldTypeDTOsMergerTest {
                         FieldTypeDTO.create("unique_in_new", "long"),
                         FieldTypeDTO.create("present_everywhere", "long"),
                         FieldTypeDTO.create("present_new_and_old", "long"),
-                        FieldTypeDTO.create("present_custom_and_new", "long")
+                        FieldTypeDTO.create("present_custom_and_new", "long"),
+                        FieldTypeDTO.create("present_profile_and_new", "long")
                 ),
                 List.of(
                         FieldTypeDTO.create("unique_in_old", "text"),
@@ -94,18 +100,30 @@ class FieldTypeDTOsMergerTest {
                                 new CustomFieldMapping("unique_in_custom", "ip"),
                                 new CustomFieldMapping("present_everywhere", "ip"),
                                 new CustomFieldMapping("present_custom_and_new", "ip"),
-                                new CustomFieldMapping("present_custom_and_old", "ip")
+                                new CustomFieldMapping("present_custom_and_old", "ip"),
+                                new CustomFieldMapping("present_custom_and_profile", "ip")
                         )
-                )
+                ),
+                new IndexFieldTypeProfile("id", "name", "descr", new CustomFieldMappings(
+                        List.of(
+                                new CustomFieldMapping("present_everywhere", "double"),
+                                new CustomFieldMapping("unique_in_profile", "double"),
+                                new CustomFieldMapping("present_custom_and_profile", "double"),
+                                new CustomFieldMapping("present_profile_and_new", "double")
+                        )
+                ))
         );
 
         assertThat(merged)
                 .isNotNull()
-                .hasSize(7)
+                .hasSize(10)
                 .contains(FieldTypeDTO.create("present_everywhere", "ip"))
                 .contains(FieldTypeDTO.create("unique_in_custom", "ip"))
                 .contains(FieldTypeDTO.create("present_custom_and_new", "ip"))
                 .contains(FieldTypeDTO.create("present_custom_and_old", "ip"))
+                .contains(FieldTypeDTO.create("present_custom_and_profile", "ip"))
+                .contains(FieldTypeDTO.create("unique_in_profile", "double"))
+                .contains(FieldTypeDTO.create("present_profile_and_new", "double"))
                 .contains(FieldTypeDTO.create("unique_in_new", "long"))
                 .contains(FieldTypeDTO.create("present_new_and_old", "long"))
                 .contains(FieldTypeDTO.create("unique_in_old", "text"));

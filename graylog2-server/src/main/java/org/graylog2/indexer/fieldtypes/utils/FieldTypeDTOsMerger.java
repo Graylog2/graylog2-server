@@ -18,6 +18,7 @@ package org.graylog2.indexer.fieldtypes.utils;
 
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,13 +28,22 @@ public class FieldTypeDTOsMerger {
 
     public Collection<FieldTypeDTO> merge(final Collection<FieldTypeDTO> fromNewerIndex,
                                           final Collection<FieldTypeDTO> fromOlderIndex,
-                                          final CustomFieldMappings customFieldMappings) {
+                                          final CustomFieldMappings customFieldMappings,
+                                          final IndexFieldTypeProfile profile) {
         Map<String, FieldTypeDTO> result = new HashMap<>();
         if (fromNewerIndex != null) {
             fromNewerIndex.forEach(dto -> result.put(dto.fieldName(), dto));
         }
         if (fromOlderIndex != null) {
             fromOlderIndex.forEach(dto -> result.putIfAbsent(dto.fieldName(), dto));
+        }
+        if (profile != null) {
+            profile.customFieldMappings().forEach(profileMapping ->
+                    result.put(
+                            profileMapping.fieldName(),
+                            profileMapping.toFieldTypeDTO()
+                    )
+            );
         }
         if (customFieldMappings != null) {
             customFieldMappings.forEach(customFieldMapping ->

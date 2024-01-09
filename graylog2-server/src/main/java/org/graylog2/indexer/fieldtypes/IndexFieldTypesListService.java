@@ -25,6 +25,8 @@ import org.graylog2.indexer.fieldtypes.utils.FieldTypeDTOsMerger;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.plugin.Message;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
@@ -46,6 +48,7 @@ public class IndexFieldTypesListService {
     private IndexFieldTypesService indexFieldTypesService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
+    private final IndexFieldTypeProfileService profileService;
 
     private final InMemoryFilterExpressionParser inMemoryFilterExpressionParser;
 
@@ -56,12 +59,14 @@ public class IndexFieldTypesListService {
                                       final IndexSetService indexSetService,
                                       final MongoIndexSet.Factory indexSetFactory,
                                       final FieldTypeDTOsMerger fieldTypeDTOsMerger,
-                                      final InMemoryFilterExpressionParser inMemoryFilterExpressionParser) {
+                                      final InMemoryFilterExpressionParser inMemoryFilterExpressionParser,
+                                      final IndexFieldTypeProfileService profileService) {
         this.indexFieldTypesService = indexFieldTypesService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
         this.fieldTypeDTOsMerger = fieldTypeDTOsMerger;
         this.inMemoryFilterExpressionParser = inMemoryFilterExpressionParser;
+        this.profileService = profileService;
     }
 
     public PageListResponse<IndexSetFieldType> getIndexSetFieldTypesListPage(
@@ -112,6 +117,7 @@ public class IndexFieldTypesListService {
         final Optional<IndexSet> mongoIndexSet = indexSetConfig.map(indexSetFactory::create);
 
         final CustomFieldMappings customFieldMappings = indexSetConfig.map(IndexSetConfig::customFieldMappings).orElse(new CustomFieldMappings());
+        final Optional<IndexFieldTypeProfile> fieldTypeProfile = indexSetConfig.map(IndexSetConfig::fieldTypeProfile).flatMap(profileService::get);
 
         final Set<FieldTypeDTO> deflectorFieldDtos = mongoIndexSet
                 .map(IndexSet::getActiveWriteIndex)
@@ -125,13 +131,17 @@ public class IndexFieldTypesListService {
                 .map(IndexFieldTypesDTO::fields)
                 .orElse(ImmutableSet.of());
 
-        final Collection<FieldTypeDTO> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos, previousFieldDtos, customFieldMappings);
+        final Collection<FieldTypeDTO> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos,
+                previousFieldDtos,
+                customFieldMappings,
+                fieldTypeProfile.orElse(null));
         final List<IndexSetFieldType> filteredFields = allFields
                 .stream()
                 .map(fieldTypeDTO -> new IndexSetFieldType(
                                 fieldTypeDTO.fieldName(),
                                 REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType())),
-                                customFieldMappings.containsCustomMappingForField(fieldTypeDTO.fieldName()),
+                        customFieldMappings.containsCustomMappingForField(fieldTypeDTO.fieldName())
+                                || fieldTypeProfile.map(IndexFieldTypeProfile::customFieldMappings).map(profileMappings -> profileMappings.containsCustomMappingForField(fieldTypeDTO.fieldName())).orElse(false),
                         Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldTypeDTO.fieldName())
                         )
                 )
