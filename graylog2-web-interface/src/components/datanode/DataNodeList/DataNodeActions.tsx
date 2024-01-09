@@ -16,12 +16,13 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 
-import type { DataNode } from 'preflight/types';
 import { ConfirmDialog } from 'components/common';
-import { MenuItem } from 'components/bootstrap';
+import { Button, MenuItem } from 'components/bootstrap';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import type { DataNode } from 'preflight/types';
 
 import {
   rejoinDataNode,
@@ -31,8 +32,13 @@ import {
   startDataNode,
 } from '../hooks/useDataNodes';
 
+const ActionButton = styled(Button)`
+  margin-left: 4px;
+`;
+
 type Props = {
   dataNode: DataNode,
+  displayAs: 'dropdown'|'buttons',
 };
 
 const DIALOG_TYPES = {
@@ -57,7 +63,7 @@ const DIALOG_TEXT = {
   },
 };
 
-const DataNodeActions = ({ dataNode }: Props) => {
+const DataNodeActions = ({ dataNode, displayAs }: Props) => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
 
@@ -120,17 +126,27 @@ const DataNodeActions = ({ dataNode }: Props) => {
 
   return (
     <>
-      <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                             bsSize="xsmall"
-                             buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                             disabled={false}
-                             dropdownZIndex={1000}>
-        <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
-        {!isDatanodeRunning && <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>}
-        {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
-        {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
-        {(!isDatanodeRemoved || isRemovingDatanode) && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>}
-      </OverlayDropdownButton>
+      {displayAs === 'dropdown' && (
+        <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
+                               bsSize="xsmall"
+                               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+                               disabled={false}
+                               dropdownZIndex={1000}>
+          <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
+          {!isDatanodeRunning && <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>}
+          {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
+          {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
+          {(!isDatanodeRemoved || isRemovingDatanode) && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>}
+        </OverlayDropdownButton>
+      )}
+      {displayAs === 'buttons' && (
+        <>
+          {!isDatanodeRunning && <ActionButton onClick={() => startDataNode(dataNode.node_id)} bsSize="small">Start</ActionButton>}
+          {isDatanodeRunning && <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">Stop</ActionButton>}
+          {isDatanodeRemoved && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">Rejoin</ActionButton>}
+          {(!isDatanodeRemoved || isRemovingDatanode) && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">Remove</ActionButton>}
+        </>
+      )}
       {showDialog && (
         <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
                        show

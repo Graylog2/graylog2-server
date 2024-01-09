@@ -15,19 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { DataNode } from 'preflight/types';
 import useParams from 'routing/useParams';
-import { rejoinDataNode, removeDataNode, startDataNode, stopDataNode } from 'components/datanode/hooks/useDataNodes';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import DocsHelper from 'util/DocsHelper';
-import { Row, Col, Label, Button } from 'components/bootstrap';
-import { ConfirmDialog, DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
+import { Row, Col, Label } from 'components/bootstrap';
+import { DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import Icon from 'components/common/Icon';
 import useDataNode from 'components/datanode/hooks/useDataNode';
+import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
 const StyledHorizontalDl = styled.dl(({ theme }) => css`
   margin: ${theme.spacings.md} 0;
@@ -62,35 +61,10 @@ const BooleanValue = ({ value }: { value: boolean }) => (
 const ActionsCol = styled(Col)`
   text-align: right;
 `;
-const ActionButton = styled(Button)`
-  margin-left: 4px;
-`;
-
-const DIALOG_TYPES = {
-  STOP: 'stop',
-  REJOIN: 'rejoin',
-  REMOVE: 'remove',
-};
-
-const DIALOG_TEXT = {
-  [DIALOG_TYPES.REJOIN]: {
-    dialogTitle: 'Rejoin Data Node',
-    dialogBody: (datanode: string) => `Are you sure you want to rejoin Data Node "${datanode}"?`,
-  },
-  [DIALOG_TYPES.REMOVE]: {
-    dialogTitle: 'Remove Data Node',
-    dialogBody: (datanode: string) => `Are you sure you want to remove Data Node "${datanode}"?`,
-  },
-  [DIALOG_TYPES.STOP]: {
-    dialogTitle: 'Stop Data Node',
-    dialogBody: (datanode: string) => `Are you sure you want to stop Data Node "${datanode}"?`,
-  },
-};
 
 const DataNodePage = () => {
   const { dataNodeId } = useParams();
   const { data, isInitialLoading, error } = useDataNode(dataNodeId);
-  const [dialogType, setDialogType] = useState<string|null>(null);
 
   if (isInitialLoading) {
     return <Spinner />;
@@ -102,58 +76,6 @@ const DataNodePage = () => {
 
   const datanode = data as DataNode;
   const datanodeDisabled = datanode.data_node_status !== 'AVAILABLE';
-
-  const handleClearState = () => {
-    setDialogType(null);
-  };
-
-  const handleAction = (action) => {
-    switch (action) {
-      case DIALOG_TYPES.REJOIN:
-        setDialogType(DIALOG_TYPES.REJOIN);
-
-        break;
-      case DIALOG_TYPES.REMOVE:
-        setDialogType(DIALOG_TYPES.REMOVE);
-
-        break;
-      case DIALOG_TYPES.STOP:
-        setDialogType(DIALOG_TYPES.STOP);
-
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleConfirm = () => {
-    switch (dialogType) {
-      case DIALOG_TYPES.REJOIN:
-        rejoinDataNode(datanode.node_id).then(() => {
-          handleClearState();
-        });
-
-        break;
-      case DIALOG_TYPES.REMOVE:
-        removeDataNode(datanode.node_id).then(() => {
-          handleClearState();
-        });
-
-        break;
-      case DIALOG_TYPES.STOP:
-        stopDataNode(datanode.node_id).then(() => {
-          handleClearState();
-        });
-
-        break;
-      default:
-        break;
-    }
-  };
-
-  const isDatanodeRunning = datanode.data_node_status === 'AVAILABLE';
-  const isDatanodeRemoved = datanode.data_node_status === 'REMOVED';
-  const isRemovingDatanode = datanode.data_node_status === 'REMOVING';
 
   return (
     <DocumentTitle title={`Data Nodes: ${datanode.hostname}`}>
@@ -188,21 +110,10 @@ const DataNodePage = () => {
             </StyledHorizontalDl>
           </Col>
           <ActionsCol xs={3}>
-            {!isDatanodeRunning && <ActionButton onClick={() => startDataNode(datanode.node_id)} bsSize="small">Start</ActionButton>}
-            {isDatanodeRunning && <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">Stop</ActionButton>}
-            {isDatanodeRemoved && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">Rejoin</ActionButton>}
-            {(!isDatanodeRemoved || isRemovingDatanode) && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">Remove</ActionButton>}
+            <DataNodeActions dataNode={datanode} displayAs="buttons" />
           </ActionsCol>
         </Col>
       </Row>
-      {!!dialogType && (
-        <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
-                       show
-                       onConfirm={handleConfirm}
-                       onCancel={handleClearState}>
-          {DIALOG_TEXT[dialogType].dialogBody(datanode.hostname)}
-        </ConfirmDialog>
-      )}
     </DocumentTitle>
   );
 };
