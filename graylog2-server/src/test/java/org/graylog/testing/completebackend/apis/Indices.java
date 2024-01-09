@@ -84,6 +84,7 @@ public class Indices implements GraylogRestApi {
                 1,
                 false,
                 Duration.standardSeconds(5L),
+                null,
                 null
         );
 
