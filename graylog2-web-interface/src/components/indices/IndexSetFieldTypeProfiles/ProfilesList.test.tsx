@@ -49,7 +49,7 @@ const renderIndexSetFieldTypeProfilesList = () => render(
 
 jest.mock('routing/useParams', () => jest.fn());
 
-jest.mock('components/indices/IndexSetFiledTypeProfiles/hooks/useProfiles', () => jest.fn());
+jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');

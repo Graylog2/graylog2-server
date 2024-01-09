@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, act } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, act, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -31,7 +31,7 @@ const renderEditProfile = () => render(
   <EditProfile profile={profile1} />,
 );
 
-jest.mock('components/indices/IndexSetFiledTypeProfiles/hooks/useProfileMutations', () => jest.fn());
+jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
@@ -125,6 +125,7 @@ describe('IndexSetFieldTypesList', () => {
     await act(async () => {
       await selectItem(fieldThird, 'date');
       await selectItem(typeThird, 'String type');
+      await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
       fireEvent.click(submitButton);
     });
 
