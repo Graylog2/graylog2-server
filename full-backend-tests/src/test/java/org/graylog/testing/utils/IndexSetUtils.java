@@ -31,7 +31,8 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class IndexSetUtils {
-    private IndexSetUtils() {}
+    private IndexSetUtils() {
+    }
 
     public static String defaultIndexSetId(Supplier<RequestSpecification> spec) {
         return given()
@@ -81,6 +82,7 @@ public class IndexSetUtils {
                 1,
                 false,
                 Duration.standardSeconds(5L),
+                null,
                 null,
                 null,
                 true
