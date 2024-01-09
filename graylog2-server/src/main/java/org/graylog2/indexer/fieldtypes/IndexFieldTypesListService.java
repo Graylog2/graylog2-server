@@ -27,7 +27,6 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
-import org.graylog2.plugin.Message;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
@@ -39,9 +38,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-
-import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
-import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
 
 public class IndexFieldTypesListService {
 
@@ -131,25 +127,16 @@ public class IndexFieldTypesListService {
                 .map(IndexFieldTypesDTO::fields)
                 .orElse(ImmutableSet.of());
 
-        final Collection<FieldTypeDTO> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos,
+        final Collection<IndexSetFieldType> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos,
                 previousFieldDtos,
                 customFieldMappings,
                 fieldTypeProfile.orElse(null));
-        final List<IndexSetFieldType> filteredFields = allFields
+        return allFields
                 .stream()
-                .map(fieldTypeDTO -> new IndexSetFieldType(
-                                fieldTypeDTO.fieldName(),
-                                REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType())),
-                        customFieldMappings.containsCustomMappingForField(fieldTypeDTO.fieldName())
-                                || fieldTypeProfile.map(IndexFieldTypeProfile::customFieldMappings).map(profileMappings -> profileMappings.containsCustomMappingForField(fieldTypeDTO.fieldName())).orElse(false),
-                        Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldTypeDTO.fieldName())
-                        )
-                )
                 .filter(indexSetFieldType -> indexSetFieldType.fieldName().contains(fieldNameQuery))
                 .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parse(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
                 .sorted(IndexSetFieldType.getComparator(sort, order))
                 .toList();
-        return filteredFields;
     }
 
     private String getPreviousActiveIndexSet(final IndexSet indexSet) {

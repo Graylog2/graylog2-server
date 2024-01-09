@@ -77,14 +77,14 @@ public class IndexSetsMappingResource extends RestResource {
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets list of field_name-field_type pairs for given index set, paginated")
     public PageListResponse<IndexSetFieldType> indexSetFieldTypesList(@ApiParam(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
-                                                                      @ApiParam(name = "fieldNameQuery") @QueryParam("query") @DefaultValue("") String fieldNameQuery,
+                                                                      @ApiParam(name = "fieldNameQuery") @QueryParam("fieldNameQuery") @DefaultValue("") String fieldNameQuery,
                                                                       @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                                       @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                       @ApiParam(name = "sort",
                                                                                 value = "The field to sort the result on",
                                                                                 required = true,
-                                                                                allowableValues = "field_name,type,is_custom,is_reserved")
+                                                                                allowableValues = "field_name,type,origin,is_reserved")
                                                                       @DefaultValue(IndexSetFieldType.DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
                                                                       @DefaultValue("asc") @QueryParam("order") String order,
@@ -105,12 +105,12 @@ public class IndexSetsMappingResource extends RestResource {
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets list of all field_name-field_type pairs for given index set")
     public List<IndexSetFieldType> indexSetFieldTypesList(@ApiParam(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
-                                                          @ApiParam(name = "fieldNameQuery") @QueryParam("query") @DefaultValue("") String fieldNameQuery,
+                                                          @ApiParam(name = "fieldNameQuery") @QueryParam("fieldNameQuery") @DefaultValue("") String fieldNameQuery,
                                                           @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                           @ApiParam(name = "sort",
                                                                     value = "The field to sort the result on",
                                                                     required = true,
-                                                                    allowableValues = "field_name,type,is_custom,is_reserved")
+                                                                    allowableValues = "field_name,type,origin,is_reserved")
                                                           @DefaultValue(IndexSetFieldType.DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                           @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
                                                           @DefaultValue("asc") @QueryParam("order") String order,
