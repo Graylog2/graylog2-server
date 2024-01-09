@@ -140,7 +140,7 @@
         <jdot.version>1.0</jdot.version>
         <jersey.version>2.37</jersey.version>
         <jmte.version>5.0.0</jmte.version>
-        <joda-time.version>2.12.5</joda-time.version>
+        <joda-time.version>2.12.6</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-path.version>2.8.0</json-path.version>
         <kafka.version>3.6.1</kafka.version>
@@ -169,7 +169,7 @@
         <snappy-java.version>1.1.10.5</snappy-java.version>
         <oshi.version>6.4.10</oshi.version>
         <siv-mode.version>1.5.0</siv-mode.version>
-        <slf4j.version>2.0.10</slf4j.version>
+        <slf4j.version>2.0.11</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
         <swagger.version>1.6.12</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
@@ -184,7 +184,7 @@
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
-        <assertj-core.version>3.25.0</assertj-core.version>
+        <assertj-core.version>3.25.1</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
         <equalsverifier.version>3.15.5</equalsverifier.version>

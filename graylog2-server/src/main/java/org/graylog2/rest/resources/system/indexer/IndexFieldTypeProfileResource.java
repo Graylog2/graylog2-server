@@ -26,6 +26,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileData;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileWithUsages;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -68,8 +69,8 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @Timed
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets profile by id")
-    public IndexFieldTypeProfile retrieveById(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
-        return profileService.get(profileId)
+    public IndexFieldTypeProfileWithUsages retrieveById(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
+        return profileService.getWithUsages(profileId)
                 .orElseThrow(() -> new NotFoundException("No profile with id : " + profileId));
     }
 
@@ -78,7 +79,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @Timed
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets profile by id")
-    public PageListResponse<IndexFieldTypeProfile> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PageListResponse<IndexFieldTypeProfileWithUsages> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                            @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                            @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
