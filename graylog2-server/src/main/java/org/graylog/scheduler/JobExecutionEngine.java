@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -88,7 +89,7 @@ public class JobExecutionEngine {
         this.jobFactory = jobFactory;
         this.workerPool = workerPool;
         this.refreshingLockServiceFactory = refreshingLockServiceFactory;
-        this.maxConcurrencyMap = schedulerConfig.jobMaxConcurrency();
+        this.maxConcurrencyMap = schedulerConfig != null ? schedulerConfig.jobMaxConcurrency() : Collections.emptyMap();
         this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "successful"));
         this.executionFailed = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed"));
         this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
