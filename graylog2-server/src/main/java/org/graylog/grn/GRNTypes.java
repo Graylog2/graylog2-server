@@ -29,6 +29,7 @@ public class GRNTypes {
     public static final GRNType ROLE = GRNType.create("role", "roles:");
     public static final GRNType SEARCH = GRNType.create("search", "view:");
     public static final GRNType STREAM = GRNType.create("stream", "streams:");
+    public static final GRNType STREAM_TITLE = GRNType.create("stream_title", "streams:");
     public static final GRNType TEAM = GRNType.create("team", "teams:");
     public static final GRNType USER = GRNType.create("user", "users:");
     public static final GRNType SEARCH_FILTER = GRNType.create("search_filter", "search_filters:");
@@ -49,6 +50,7 @@ public class GRNTypes {
             .add(ROLE)
             .add(SEARCH)
             .add(STREAM)
+            .add(STREAM_TITLE)
             .add(TEAM)
             .add(USER)
             .add(SEARCH_FILTER)
