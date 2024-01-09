@@ -250,7 +250,7 @@ const TimeUnitInput = createReactClass({
 
     const checkbox = (
       <InputGroup.Addon>
-        <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} />
+        <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} title="Toggle time" />
       </InputGroup.Addon>
     );
 

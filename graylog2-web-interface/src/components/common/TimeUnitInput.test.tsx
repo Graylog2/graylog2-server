@@ -15,177 +15,175 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import TimeUnitInput from './TimeUnitInput';
 
 describe('<TimeUnitInput />', () => {
-  it('should have right default values from props', () => {
-    const onUpdate = (value, unit, checked) => {
-      expect(value).toBe(1);
-      expect(unit).toBe('SECONDS');
-      expect(checked).toBe(true);
-    };
+  const findCheckbox = () => screen.findByTitle('Toggle time');
+  const queryCheckbox = () => screen.queryByTitle('Toggle time');
+  const findTimeInput = () => screen.findByRole('spinbutton', { name: /time unit input/i });
+  const findUnitDropdown = (unitName = 'seconds') => screen.findByRole('button', { name: new RegExp(unitName, 'i') });
 
-    const wrapper = mount(<TimeUnitInput update={onUpdate} />);
-    const checkbox = wrapper.find('input[type="checkbox"]');
+  it('should have right default values from default props', async () => {
+    const onUpdate = jest.fn();
 
-    expect(checkbox.prop('checked')).toBe(false);
-    expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
-    expect(wrapper.find('li.active a')).toHaveText('seconds');
+    render(<TimeUnitInput update={onUpdate} />);
 
-    checkbox.simulate('click');
+    const checkbox = await findCheckbox();
+
+    expect(checkbox).not.toBeChecked();
+    expect(await findTimeInput()).toHaveValue(1);
+
+    await findUnitDropdown();
+
+    userEvent.click(checkbox);
+
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'SECONDS', true));
   });
 
-  it('should use custom default values', () => {
-    const onUpdate = (value, unit, checked) => {
-      expect(value).toBe(42);
-      expect(unit).toBe('SECONDS');
-      expect(checked).toBe(false);
-    };
+  it('should use custom default values', async () => {
+    const onUpdate = jest.fn();
 
-    const wrapper = mount(<TimeUnitInput update={onUpdate} defaultValue={42} defaultEnabled />);
-    const checkbox = wrapper.find('input[type="checkbox"]');
+    render(<TimeUnitInput update={onUpdate} defaultValue={42} defaultEnabled />);
 
-    expect(checkbox.prop('checked')).toBe(true);
-    expect(wrapper.find('input[type="number"]').prop('value')).toBe(42);
+    const checkbox = await findCheckbox();
 
-    checkbox.simulate('click');
+    expect(checkbox).toBeChecked();
+    expect(await findTimeInput()).toHaveValue(42);
+
+    await findUnitDropdown();
+
+    userEvent.click(checkbox);
+
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', false));
   });
 
-  it('should use custom unit values', () => {
-    const onUpdate = (value, unit, checked) => {
-      expect(value).toBe(42);
-      expect(unit).toBe('DAYS');
-      expect(checked).toBeTruthy();
-    };
+  it('should use custom unit values', async () => {
+    const onUpdate = jest.fn();
 
-    const wrapper = mount(<TimeUnitInput update={onUpdate} unit="DAYS" defaultEnabled />);
-    const checkbox = wrapper.find('input[type="checkbox"]');
+    render(<TimeUnitInput update={onUpdate} unit="DAYS" defaultEnabled />);
 
-    expect(checkbox.prop('checked')).toBe(true);
-    expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
-    expect(wrapper.find('li.active a')).toHaveText('days');
+    const checkbox = await findCheckbox();
 
-    wrapper.find('input[type="number"]').simulate('change', { target: { value: 42, type: 'number' } });
+    expect(checkbox).toBeChecked();
+    expect(await findTimeInput()).toHaveValue(1);
+
+    await findUnitDropdown('days');
+
+    userEvent.click(checkbox);
+
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'DAYS', true));
   });
 
-  it('should use values before default values', () => {
-    const onUpdate = (value, unit, checked) => {
-      expect(value).toBe(124);
-      expect(unit).toBe('SECONDS');
-      expect(checked).toBe(true);
-    };
+  it('should use values before default values', async () => {
+    const onUpdate = jest.fn();
 
-    const wrapper = mount(<TimeUnitInput update={onUpdate} value={124} defaultValue={42} enabled={false} defaultEnabled />);
-    const checkbox = wrapper.find('input[type="checkbox"]');
+    render(<TimeUnitInput update={onUpdate} value={124} defaultValue={42} enabled={false} defaultEnabled />);
 
-    expect(checkbox.prop('checked')).toBe(false);
-    expect(wrapper.find('input[type="number"]').prop('value')).toBe(124);
+    const checkbox = await findCheckbox();
 
-    checkbox.simulate('click');
+    expect(checkbox).not.toBeChecked();
+    expect(await findTimeInput()).toHaveValue(124);
+
+    await findUnitDropdown();
+
+    userEvent.click(checkbox);
+
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(124, 'SECONDS', true));
   });
 
-  it('should use required before enabled and default enabled', () => {
-    const onUpdate = (value, unit, checked) => {
-      expect(value).toBe(42);
-      expect(unit).toBe('SECONDS');
-      expect(checked).toBe(true);
-    };
+  it('should use required before enabled and default enabled', async () => {
+    const onUpdate = jest.fn();
 
-    const wrapper = mount(<TimeUnitInput update={onUpdate} required enabled={false} defaultEnabled={false} />);
+    render(<TimeUnitInput update={onUpdate} required enabled={false} defaultEnabled={false} />);
 
-    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+    expect(queryCheckbox()).not.toBeInTheDocument();
 
-    wrapper.find('input[type="number"]').simulate('change', { target: { value: 42, type: 'number' } });
+    const timeInput = await findTimeInput();
+
+    userEvent.clear(timeInput);
+    userEvent.paste(timeInput, '42');
+
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
 
-  it('should disable all inputs when disabled', () => {
-    const wrapper = mount(<TimeUnitInput update={() => {}} enabled={false} />);
+  it('should disable all inputs when disabled', async () => {
+    render(<TimeUnitInput update={() => {}} enabled={false} />);
 
-    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
-    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
+    expect(await findTimeInput()).toBeDisabled();
+    expect(await findUnitDropdown()).toBeDisabled();
   });
 
-  it('should not display checkbox when hideCheckbox is set', () => {
-    const wrapper = mount(<TimeUnitInput update={() => {}} hideCheckbox />);
+  it('should not display checkbox when hideCheckbox is set', async () => {
+    render(<TimeUnitInput update={() => {}} hideCheckbox />);
 
-    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+    expect(queryCheckbox()).not.toBeInTheDocument();
   });
 
-  it('should use required and enabled when hideCheckbox is set', () => {
-    let wrapper = mount(<TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />);
+  it('should use required and enabled when hideCheckbox is set', async () => {
+    const { rerender } = render(<TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />);
 
-    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
-    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeFalsy();
-    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeFalsy();
+    expect(queryCheckbox()).not.toBeInTheDocument();
+    expect(await findTimeInput()).toBeEnabled();
+    expect(await findUnitDropdown()).toBeEnabled();
 
-    wrapper = mount(<TimeUnitInput update={() => {}} enabled={false} defaultEnabled={false} hideCheckbox />);
+    rerender(<TimeUnitInput update={() => {}} enabled={false} defaultEnabled={false} hideCheckbox />);
 
-    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
-    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
-    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
+    expect(queryCheckbox()).not.toBeInTheDocument();
+    expect(await findTimeInput()).toBeDisabled();
+    expect(await findUnitDropdown()).toBeDisabled();
   });
 
-  it('should use default value when clearing the input', () => {
-    const handleUpdate = (value, unit, checked) => {
-      expect(value).toBe(42);
-      expect(unit).toBe('SECONDS');
-      expect(checked).toBe(true);
-    };
+  it('should use default value when clearing the input', async () => {
+    const onUpdate = jest.fn();
 
-    const wrapper = mount(<TimeUnitInput update={handleUpdate} defaultEnabled value={9} defaultValue={42} />);
+    render(<TimeUnitInput update={onUpdate} defaultEnabled value={9} defaultValue={42} />);
 
-    wrapper.find('input[type="number"]').simulate('change', { target: { value: '', type: 'number' } });
+    userEvent.type(await findTimeInput(), '{backspace}');
+
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
 
-  it('should use default value when input receives some text', () => {
-    const handleUpdate = (value, unit, checked) => {
-      expect(value).toBe(42);
-      expect(unit).toBe('SECONDS');
-      expect(checked).toBe(true);
-    };
+  it('should use default value when input receives some text', async () => {
+    const onUpdate = jest.fn();
+    render(<TimeUnitInput update={onUpdate} defaultEnabled value={9} defaultValue={42} />);
+    const timeInput = await findTimeInput();
+    userEvent.type(timeInput, '{backspace}adsasd');
 
-    const wrapper = mount(<TimeUnitInput update={handleUpdate} defaultEnabled value={9} defaultValue={42} />);
-
-    wrapper.find('input[type="number"]').simulate('change', { target: { value: 'adsasd', type: 'number' } });
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
 
   describe('when clearable is set', () => {
-    it('should use undefined when clearing input', () => {
-      const handleUpdate = (value, unit, checked) => {
-        expect(value).toBe(undefined);
-        expect(unit).toBe('SECONDS');
-        expect(checked).toBe(true);
-      };
+    it('should use undefined when clearing input', async () => {
+      const onUpdate = jest.fn();
 
-      const wrapper = mount(
-        <TimeUnitInput update={handleUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
+      render(
+        <TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
       );
 
-      wrapper.find('input[type="number"]').simulate('change', { target: { value: '', type: 'number' } });
+      userEvent.type(await findTimeInput(), '{backspace}');
+      await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(undefined, 'SECONDS', true));
     });
 
-    it('should use undefined when input receives some text', () => {
-      const handleUpdate = (value, unit, checked) => {
-        expect(value).toBe(undefined);
-        expect(unit).toBe('SECONDS');
-        expect(checked).toBe(true);
-      };
+    it('should use undefined when input receives some text', async () => {
+      const onUpdate = jest.fn();
 
-      const wrapper = mount(
-        <TimeUnitInput update={handleUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
+      render(
+        <TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
       );
 
-      wrapper.find('input[type="number"]').simulate('change', { target: { value: 'adsasd', type: 'number' } });
+      userEvent.type(await findTimeInput(), '{backspace}adasd');
+      await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(undefined, 'SECONDS', true));
     });
 
-    it('should render empty string when value is undefined', () => {
-      const wrapper = mount(
+    it('should render empty string when value is undefined', async () => {
+      render(
         <TimeUnitInput update={() => {}} defaultEnabled clearable value={undefined} defaultValue={42} />,
       );
 
-      expect(wrapper.find('input[type="number"]').prop('value')).toBe('');
+      expect(await findTimeInput()).toHaveValue(null);
     });
   });
 });
