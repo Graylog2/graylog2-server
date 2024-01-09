@@ -38,6 +38,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_PROFILE_ID;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
@@ -69,6 +70,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                          @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
                                          @JsonProperty("index_template_type") @Nullable String templateType,
+                                         @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
                                          @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
                                          @JsonProperty(FIELD_USE_LEGACY_ROTATION) Boolean userLegacyRotation) {
         if (Objects.isNull(creationDate)) {
@@ -78,7 +80,7 @@ public abstract class IndexSetSummary {
                 isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                Optional.ofNullable(templateType), dataTiering, userLegacyRotation);
+                Optional.ofNullable(templateType), fieldTypeProfile, dataTiering, userLegacyRotation);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
@@ -102,6 +104,7 @@ public abstract class IndexSetSummary {
                 indexSet.indexOptimizationDisabled(),
                 indexSet.fieldTypeRefreshInterval(),
                 indexSet.indexTemplateType().orElse(null),
+                indexSet.fieldTypeProfile(),
                 indexSet.dataTiering(),
                 indexSet.dataTiering() == null);
 
@@ -178,6 +181,10 @@ public abstract class IndexSetSummary {
     @JsonProperty("index_template_type")
     public abstract Optional<String> templateType();
 
+    @JsonProperty(FIELD_PROFILE_ID)
+    @Nullable
+    public abstract String fieldTypeProfile();
+
     @Nullable
     @JsonProperty(FIELD_DATA_TIERING)
     public abstract DataTieringConfig dataTiering();
@@ -205,6 +212,7 @@ public abstract class IndexSetSummary {
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
+                .fieldTypeProfile(fieldTypeProfile())
                 .dataTiering(Boolean.FALSE.equals(useLegacyRotation()) ? dataTiering() : null);
 
         final IndexSetConfig.Builder builderWithTemplateType = templateType().map(builder::indexTemplateType).orElse(builder);

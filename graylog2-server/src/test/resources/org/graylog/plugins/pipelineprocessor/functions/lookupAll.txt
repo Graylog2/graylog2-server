@@ -2,6 +2,13 @@ rule "lookup_all"
 when
     true
 then
-    set_field("results", lookup_all("table", ["key1", "key2", "key3"]));
+    let json = parse_json(to_string($message.json_with_arrays));
+            let selectedPath = select_jsonpath(json: json,
+                paths: {strings: "$.strings[*].value"});
+
+    set_field("json_results", lookup_all("table", selectedPath.strings));
+    set_field("results", lookup_all("table", ["one", "two", "three"]));
+    set_field("single_result", lookup_all("table", "one"));
+
     trigger_test();
 end
