@@ -32,6 +32,7 @@ import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -64,6 +65,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     private static final String FIELD_QUERY = "query";
     private static final String FIELD_QUERY_PARAMETERS = "query_parameters";
+    private static final String FIELD_FILTERS = "filters";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_GROUP_BY = "group_by";
     private static final String FIELD_SERIES = "series";
@@ -77,6 +79,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @JsonProperty(FIELD_QUERY_PARAMETERS)
     public abstract ImmutableSet<Parameter> queryParameters();
+
+    @JsonProperty(FIELD_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty(FIELD_STREAMS)
     public abstract ImmutableSet<String> streams();
@@ -147,6 +152,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         public static Builder create() {
             return new AutoValue_AggregationEventProcessorConfig.Builder()
                     .queryParameters(ImmutableSet.of())
+                    .filters(Collections.emptyList())
                     .type(TYPE_NAME)
                     .eventLimit(0);
         }
@@ -156,6 +162,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
         @JsonProperty(FIELD_QUERY_PARAMETERS)
         public abstract Builder queryParameters(Set<Parameter> queryParameters);
+
+        @JsonProperty(FIELD_FILTERS)
+        public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);

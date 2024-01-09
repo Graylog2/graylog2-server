@@ -22,6 +22,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
@@ -135,7 +136,14 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     }
 
     @Override
-    public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
+    public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
+                             int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
+        this.scrollEvents(queryString, timeRange, affectedIndices, streams, Collections.emptyList(), batchSize, resultCallback);
+    }
+
+    @Override
+    public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
+                             List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
         final ChunkCommand chunkCommand = buildScrollCommand(queryString, timeRange, affectedIndices, streams, batchSize);
 
         final ChunkedResult chunkedResult = multiChunkResultRetriever.retrieveChunkedResult(chunkCommand);

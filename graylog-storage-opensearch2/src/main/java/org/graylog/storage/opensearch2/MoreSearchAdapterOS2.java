@@ -22,6 +22,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -136,7 +137,12 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
     @Override
     public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
-        final ChunkCommand chunkCommand = buildScrollCommand(queryString, timeRange, affectedIndices, streams, batchSize);
+        this.scrollEvents(queryString, timeRange, affectedIndices, streams, Collections.emptyList(), batchSize, resultCallback);
+    }
+
+    @Override
+    public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
+        final ChunkCommand chunkCommand = buildScrollCommand(queryString, timeRange, affectedIndices, filters, streams, batchSize);
 
         final ChunkedResult chunkedResult = multiChunkResultRetriever.retrieveChunkedResult(chunkCommand);
 
@@ -171,11 +177,13 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         }
     }
 
-    private ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize) {
+    private ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices,
+                                            List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
                 .query(queryString)
                 .range(timeRange)
                 .indices(affectedIndices)
+                .filters(filters)
                 .batchSize(batchSize)
                 // For correlation need the oldest messages to come in first
                 .sorting(new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.ASC));
