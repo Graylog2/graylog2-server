@@ -23,6 +23,8 @@ import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 
+export type FieldTypeOrigin = 'INDEX' | 'OVERRIDDEN_INDEX' | 'OVERRIDDEN_PROFILE' | 'PROFILE';
+
 const INITIAL_DATA = {
   pagination: { total: 0 },
   list: [],
@@ -31,14 +33,14 @@ const INITIAL_DATA = {
 export type IndexSetFieldTypeJson = {
     field_name: string,
     type: string,
-    is_custom: boolean,
+    origin: FieldTypeOrigin,
     is_reserved: boolean,
 }
 
 export type IndexSetFieldType = {
     id: string,
     fieldName: string,
-    isCustom: boolean,
+    origin: FieldTypeOrigin,
     isReserved: boolean,
     type: string,
 }
@@ -58,7 +60,7 @@ const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchP
         id: fieldType.field_name,
         fieldName: fieldType.field_name,
         type: fieldType.type,
-        isCustom: fieldType.is_custom,
+        origin: fieldType.origin,
         isReserved: fieldType.is_reserved,
       })),
       pagination: { total },

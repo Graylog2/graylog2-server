@@ -17,8 +17,12 @@
 import React, { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
+import keyBy from 'lodash/keyBy';
 
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
+import type {
+  FieldTypeOrigin,
+  IndexSetFieldType,
+} from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
 import {
@@ -37,6 +41,12 @@ import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQuer
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
+import { Badge } from 'components/bootstrap';
+import Routes from 'routing/Routes';
+import { Link } from 'components/common/router';
+import expandedSections from 'components/indices/IndexSetFieldTypes/expandedSections';
+import OverriddenProfileOriginBadge from 'components/indices/IndexSetFieldTypes/OverriddenProfileOriginBadge';
+import hasOverride from 'components/indices/helpers/hasOverride';
 
 import BulkActions from './BulkActions';
 
@@ -44,22 +54,18 @@ export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'field_name', direction: 'asc' } as Sort,
-  displayedColumns: ['field_name', 'type', 'is_custom', 'is_reserved'],
-  columnsOrder: ['field_name', 'type', 'is_custom', 'is_reserved'],
+  displayedColumns: ['field_name', 'type', 'origin', 'is_reserved'],
+  columnsOrder: ['field_name', 'type', 'origin', 'is_reserved'],
 };
+
+// type BadgeStyles = 'default' | 'danger' | 'info' | 'primary' | 'success' | 'warning' | 'gray'
 
 const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }) => css`
   color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
   margin-right: 5px;
 `);
-const isEntitySelectable = (field: IndexSetFieldType) => field.isCustom;
+const isEntitySelectable = (fieldType: IndexSetFieldType) => hasOverride(fieldType);
 const FilterValueRenderers = {
-  is_custom: (value: 'true' | 'false', title: string) => (
-    <>
-      <StyledIcon name={value === 'true' ? 'circle-check' : 'circle-xmark'} $value={value} />
-      {title}
-    </>
-  ),
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
       <StyledIcon name={value === 'true' ? 'circle-check' : 'circle-xmark'} $value={value} />
@@ -112,21 +118,40 @@ const IndexSetFieldTypesList = () => {
     { enabled: !isLoadingLayoutPreferences },
   );
 
+  const normalizedOrigin = useMemo(() => {
+    const originOptions = attributes?.find(({ id }) => id === 'origin')?.filter_options;
+
+    return keyBy(originOptions, 'value');
+  }, [attributes]);
   const customColumnRenderers = useMemo(() => ({
     attributes: {
       type: {
         renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
       },
-      is_custom: {
-        renderCell: (isCustom: boolean) => (isCustom ? <Icon title="Field has custom field type" name="check" /> : null),
-        staticWidth: 120,
+      origin: {
+        renderCell: (origin: FieldTypeOrigin, { id }) => {
+          switch (origin) {
+            case 'PROFILE':
+              return <Link to={Routes.SYSTEM.INDICES.LIST}>Profile name</Link>;
+            case 'OVERRIDDEN_INDEX':
+              return <Badge bsStyle="primary">{normalizedOrigin?.OVERRIDDEN_INDEX?.title}</Badge>;
+            case 'OVERRIDDEN_PROFILE':
+              return (
+                <OverriddenProfileOriginBadge normalizedOrigin={normalizedOrigin} id={id} />
+              );
+            default:
+              return null;
+          }
+        },
+        // staticWidth: 400,
       },
       is_reserved: {
-        renderCell: (isReserved: boolean) => (isReserved ? <Icon title="Field has reserved field type" name="check" /> : null),
+        renderCell: (isReserved: boolean) => (isReserved
+          ? <Icon title="Field has reserved field type" name="check" /> : null),
         staticWidth: 120,
       },
     },
-  }), [fieldTypes]);
+  }), [fieldTypes, normalizedOrigin]);
 
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
@@ -181,6 +206,7 @@ const IndexSetFieldTypesList = () => {
                                             columnRenderers={customColumnRenderers}
                                             columnDefinitions={attributes}
                                             rowActions={renderActions}
+                                            expandedSectionsRenderer={expandedSections}
                                             bulkSelection={{
                                               actions: <BulkActions indexSetId={indexSetId} />,
                                               isEntitySelectable,
