@@ -38,7 +38,7 @@ type Props = {
 }
 
 const NavigationLink = ({ description, path, topLevel, ...rest }: Props) => (
-  <LinkContainer key={path} to={path} {...rest}>
+  <LinkContainer key={path} to={path} relativeActive {...rest}>
     {topLevel ? <NavItem>{description}</NavItem> : <DropdownOption component="a">{description}</DropdownOption>}
   </LinkContainer>
 );
