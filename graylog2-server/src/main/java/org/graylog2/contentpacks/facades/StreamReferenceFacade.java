@@ -157,7 +157,7 @@ public class StreamReferenceFacade extends StreamFacade {
     @Override
     public EntityExcerpt createExcerpt(Stream stream) {
         return EntityExcerpt.builder()
-                .id(ModelId.of(stream.getId()))
+                .id(ModelId.of(stream.getTitle()))
                 .type(ModelTypes.STREAM_REF_V1)
                 .title(stream.getTitle())
                 .build();
