@@ -17,8 +17,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm, IndicesPageNavigation } from 'components/indices';
 import { useStore } from 'stores/connect';
@@ -87,12 +86,7 @@ const IndexSetConfigurationPage = () => {
                     documentationLink={{
                       title: 'Index model documentation',
                       path: DocsHelper.PAGES.INDEX_MODEL,
-                    }}
-                    topActions={(
-                      <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                        <Button bsStyle="info">Index sets overview</Button>
-                      </LinkContainer>
-                    )}>
+                    }}>
           <span>
             Modify the current configuration for this index set, allowing you to customize the retention, sharding,
             and replication of messages coming from one or more streams.

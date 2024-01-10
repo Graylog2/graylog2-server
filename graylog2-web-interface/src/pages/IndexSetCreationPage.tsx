@@ -18,8 +18,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
-import { LinkContainer } from 'components/common/router';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm, IndicesPageNavigation } from 'components/indices';
 import DocsHelper from 'util/DocsHelper';
@@ -106,12 +105,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
                     documentationLink={{
                       title: 'Index model documentation',
                       path: DocsHelper.PAGES.INDEX_MODEL,
-                    }}
-                    topActions={(
-                      <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                        <Button bsStyle="info">Index sets overview</Button>
-                      </LinkContainer>
-                    )}>
+                    }}>
           <span>
             Create a new index set that will let you configure the retention, sharding, and replication of messages
             coming from one or more streams.

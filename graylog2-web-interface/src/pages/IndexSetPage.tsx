@@ -22,7 +22,13 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/common/router';
 import { Alert, Row, Col, Panel, Button, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
-import { IndicesConfigurationDropdown, IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
+import {
+  IndicesConfigurationDropdown,
+  IndicesMaintenanceDropdown,
+  IndicesOverview,
+  IndexSetDetails,
+  IndicesPageNavigation,
+} from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -144,11 +150,6 @@ class IndexSetPage extends React.Component<Props, State> {
 
     const pageHeader = indexSet && (
       <PageHeader title={`Index Set: ${indexSet.title}`}
-                  topActions={(
-                    <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                      <Button bsStyle="info">Index sets overview</Button>
-                    </LinkContainer>
-                  )}
                   documentationLink={{
                     title: 'Index model documentation',
                     path: DocsHelper.PAGES.INDEX_MODEL,
@@ -209,6 +210,7 @@ class IndexSetPage extends React.Component<Props, State> {
 
     return (
       <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
+        <IndicesPageNavigation />
         <div>
           {pageHeader}
 
