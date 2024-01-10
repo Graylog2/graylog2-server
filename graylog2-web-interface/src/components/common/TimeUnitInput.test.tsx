@@ -74,7 +74,7 @@ describe('<TimeUnitInput />', () => {
 
     userEvent.click(checkbox);
 
-    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'DAYS', true));
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'DAYS', false));
   });
 
   it('should use values before default values', async () => {
