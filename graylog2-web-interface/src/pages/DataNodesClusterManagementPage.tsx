@@ -22,10 +22,10 @@ import DocsHelper from 'util/DocsHelper';
 import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 
-const DataNodesClusterPage = () => (
-  <DocumentTitle title="Data Nodes Cluster">
+const DataNodesClusterManagementPage = () => (
+  <DocumentTitle title="Data Nodes Cluster Management">
     <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes Cluster"
+    <PageHeader title="Data Nodes Cluster Management"
                 documentationLink={{
                   title: 'Data Nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
@@ -36,10 +36,10 @@ const DataNodesClusterPage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        <DataNodeConfiguration />
+        TODO
       </Col>
     </Row>
   </DocumentTitle>
 );
 
-export default DataNodesClusterPage;
+export default DataNodesClusterManagementPage;
