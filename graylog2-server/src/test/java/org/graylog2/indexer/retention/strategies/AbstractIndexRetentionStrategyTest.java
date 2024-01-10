@@ -273,7 +273,8 @@ public class AbstractIndexRetentionStrategyTest {
                 null, null, null,
                 1, true,
                 Duration.standardSeconds(5),
-                new CustomFieldMappings());
+                new CustomFieldMappings(),
+                null);
     }
 
     private IndexSetConfig createTimeBased(int minDays, int maxDays) {
@@ -293,6 +294,7 @@ public class AbstractIndexRetentionStrategyTest {
                 null, null, null,
                 1, true,
                 Duration.standardSeconds(5),
-                new CustomFieldMappings());
+                new CustomFieldMappings(),
+                null);
     }
 }

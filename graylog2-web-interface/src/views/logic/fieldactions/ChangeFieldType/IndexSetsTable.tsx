@@ -44,13 +44,6 @@ type Props = {
   initialSelection: Array<string>
 }
 
-const renderBulkActions = (
-  selectedDashboardIds: Array<string>,
-  setSelectedDashboardIds: (streamIds: Array<string>) => void,
-) => (
-  <BulkActionsDropdown selectedEntities={selectedDashboardIds} setSelectedEntities={setSelectedDashboardIds} />
-);
-
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelection }: Props) => {
   const [activePage, setActivePage] = useState(1);
 
@@ -116,26 +109,26 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
                      showPageSizeSelect={false}
                      useQueryParameter={false}>
         {!list?.length && (
-        <NoEntitiesExist>
-          No index sets have been found.
-        </NoEntitiesExist>
+          <NoEntitiesExist>
+            No index sets have been found.
+          </NoEntitiesExist>
         )}
         {list.length && (
-        <EntityDataTable<FieldTypeUsage> activeSort={layoutConfig.sort}
-                                         bulkSelection={{
-                                           onChangeSelection,
-                                           initialSelection,
-                                           actions: renderBulkActions,
-                                         }}
-                                         columnDefinitions={attributes}
-                                         columnRenderers={columnRenderers}
-                                         columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                         data={list}
-                                         onColumnsChange={onColumnsChange}
-                                         onPageSizeChange={onPageSizeChange}
-                                         onSortChange={onSortChange}
-                                         pageSize={layoutConfig.pageSize}
-                                         visibleColumns={layoutConfig.displayedAttributes} />
+          <EntityDataTable<FieldTypeUsage> activeSort={layoutConfig.sort}
+                                           bulkSelection={{
+                                             onChangeSelection,
+                                             initialSelection,
+                                             actions: <BulkActionsDropdown />,
+                                           }}
+                                           columnDefinitions={attributes}
+                                           columnRenderers={columnRenderers}
+                                           columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+                                           data={list}
+                                           onColumnsChange={onColumnsChange}
+                                           onPageSizeChange={onPageSizeChange}
+                                           onSortChange={onSortChange}
+                                           pageSize={layoutConfig.pageSize}
+                                           visibleColumns={layoutConfig.displayedAttributes} />
         )}
       </PaginatedList>
     </Container>

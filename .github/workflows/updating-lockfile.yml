@@ -31,7 +31,7 @@ jobs:
 
       - name: Get headRef and SHA of PR
         id: pr-infos
-        if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
+        if: ${{ steps.pr-create.outputs.pull-request-number && steps.pr-create.outputs.pull-request-operation != 'closed' }}
         run: |
           HEADREF=$(gh pr view ${{ steps.pr-create.outputs.pull-request-number }} --json headRefName --template '{{.headRefName}}')
           echo "sha=$(git rev-parse origin/$HEADREF)" >> $GITHUB_OUTPUT
@@ -40,7 +40,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Request dispatched PR build
-        if: ${{ steps.pr-create.outputs.pull-request-operation != 'closed' }}
+        if: ${{ steps.pr-create.outputs.pull-request-number && steps.pr-create.outputs.pull-request-operation != 'closed' }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo=${{ github.repository }}

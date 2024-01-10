@@ -26,12 +26,11 @@ import type { Map } from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable, { bindings as dataTable } from 'views/components/datatable';
 import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import dataTable from 'views/components/datatable/bindings';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';

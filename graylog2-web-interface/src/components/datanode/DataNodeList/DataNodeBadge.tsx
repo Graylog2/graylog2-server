@@ -21,7 +21,7 @@ import type { DataNodeStatus } from 'preflight/types';
 import { Badge } from 'preflight/components/common';
 import Icon from 'preflight/components/common/Icon';
 
-import Spinner from '../common/Spinner';
+import Spinner from '../../common/Spinner';
 
 const NodeId = styled(Badge)`
   margin-right: 3px;

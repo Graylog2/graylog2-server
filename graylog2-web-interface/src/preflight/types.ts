@@ -28,7 +28,8 @@ export type DataNode = {
   short_node_id: string,
   transport_address: string,
   type: string,
-  status: DataNodeStatus
+  status: DataNodeStatus,
+  data_node_status?: string,
   cert_valid_until: string | null,
   error_msg?: string,
 }

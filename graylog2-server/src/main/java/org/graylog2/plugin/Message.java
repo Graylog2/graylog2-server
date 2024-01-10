@@ -265,6 +265,11 @@ public class Message implements Messages, Indexable {
             .addAll(GRAYLOG_FIELDS)
             .addAll(CORE_MESSAGE_FIELDS)
             .build();
+    public static final ImmutableSet<String> FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS = new ImmutableSet.Builder<String>()
+            .addAll(RESERVED_SETTABLE_FIELDS)
+            .add(FIELD_GL2_MESSAGE_ID)
+            .add(FIELD_STREAMS)
+            .build();
 
     public static final ImmutableSet<String> RESERVED_FIELDS = new ImmutableSet.Builder<String>()
             .addAll(RESERVED_SETTABLE_FIELDS)

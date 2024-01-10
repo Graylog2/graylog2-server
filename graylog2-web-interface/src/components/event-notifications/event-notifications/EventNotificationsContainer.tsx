@@ -124,15 +124,6 @@ const EventNotificationsContainer = () => {
                               onTest={handleTest} />
   ), [handleTest, isLoadingTest, refetchEventNotifications]);
 
-  const renderBulkActions = (
-    selectedNotificationsIds: Array<string>,
-    setSelectedNotificationsIds: (eventDefinitionsId: Array<string>) => void,
-  ) => (
-    <BulkActions selectedNotificationsIds={selectedNotificationsIds}
-                 setSelectedNotificationsIds={setSelectedNotificationsIds}
-                 refetchEventNotifications={refetchEventNotifications} />
-  );
-
   if (isLoadingLayoutPreferences || isLoadingEventNotifications) {
     return <Spinner />;
   }
@@ -157,7 +148,7 @@ const EventNotificationsContainer = () => {
                                               columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                               onColumnsChange={onColumnsChange}
                                               onSortChange={onSortChange}
-                                              bulkSelection={{ actions: renderBulkActions }}
+                                              bulkSelection={{ actions: <BulkActions refetchEventNotifications={refetchEventNotifications} /> }}
                                               activeSort={layoutConfig.sort}
                                               onPageSizeChange={onPageSizeChange}
                                               pageSize={layoutConfig.pageSize}

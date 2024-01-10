@@ -29,13 +29,12 @@ import UserNotification from 'util/UserNotification';
 import { Streams } from '@graylog/server-api';
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type ModalProps = {
   descriptor: string,
   indexSets: Array<IndexSet>,
   refetchStreams: () => void,
-  setSelectedStreamIds: (streamIds: Array<string>) => void
-  selectedStreamIds: Array<string>,
   toggleShowModal: () => void,
 }
 
@@ -44,18 +43,17 @@ type AssignIndexSetFormValues = {
 }
 
 const AssignIndexSetModal = ({
-  selectedStreamIds,
   toggleShowModal,
   indexSets,
   refetchStreams,
-  setSelectedStreamIds,
   descriptor,
 }: ModalProps) => {
-  const modalTitle = `Assign Index Set To ${selectedStreamIds.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
-  const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) => Streams.assignToIndexSet(indexSetId, selectedStreamIds).then(() => {
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const modalTitle = `Assign Index Set To ${selectedEntities.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
+  const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) => Streams.assignToIndexSet(indexSetId, selectedEntities).then(() => {
     refetchStreams();
-    UserNotification.success(`Index set was assigned to ${selectedStreamIds.length} ${descriptor} successfully.`, 'Success');
-    setSelectedStreamIds([]);
+    UserNotification.success(`Index set was assigned to ${selectedEntities.length} ${descriptor} successfully.`, 'Success');
+    setSelectedEntities([]);
     toggleShowModal();
   }).catch((error: FetchError) => {
     UserNotification.error(`Assigning index set failed with status: ${error}`, 'Error');
@@ -106,14 +104,10 @@ type Props = {
   indexSets: Array<IndexSet>,
   onSelect?: () => void,
   refetchStreams: () => void,
-  selectedStreamIds: Array<string>
-  setSelectedStreamIds: (streamIds: Array<string>) => void,
 }
 
 const AssignIndexSetAction = ({
   indexSets,
-  selectedStreamIds,
-  setSelectedStreamIds,
   descriptor,
   refetchStreams,
   onSelect,
@@ -136,9 +130,7 @@ const AssignIndexSetAction = ({
     <>
       <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
       {showIndexSetModal && (
-        <AssignIndexSetModal selectedStreamIds={selectedStreamIds}
-                             setSelectedStreamIds={setSelectedStreamIds}
-                             toggleShowModal={toggleAssignIndexSetModal}
+        <AssignIndexSetModal toggleShowModal={toggleAssignIndexSetModal}
                              indexSets={indexSets}
                              descriptor={descriptor}
                              refetchStreams={refetchStreams} />

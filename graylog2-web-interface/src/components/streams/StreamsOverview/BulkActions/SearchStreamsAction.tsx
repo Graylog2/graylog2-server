@@ -21,6 +21,7 @@ import MenuItem from 'components/bootstrap/MenuItem';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import SearchLink from 'views/logic/search/SearchLink';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 const buildSearchLink = (streamIds: Array<string>) => SearchLink.builder()
   .timerange(DEFAULT_TIMERANGE)
@@ -29,12 +30,9 @@ const buildSearchLink = (streamIds: Array<string>) => SearchLink.builder()
   .build()
   .toURL();
 
-type Props = {
-  selectedStreamIds: Array<string>,
-}
-
-const SearchStreamsAction = ({ selectedStreamIds }: Props) => {
-  const link = buildSearchLink(selectedStreamIds);
+const SearchStreamsAction = () => {
+  const { selectedEntities } = useSelectedEntities();
+  const link = buildSearchLink(selectedEntities);
 
   return (
     <MenuItem href={link} target="_blank">

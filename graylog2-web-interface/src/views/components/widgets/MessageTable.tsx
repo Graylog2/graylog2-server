@@ -31,8 +31,8 @@ import type { BackendMessage, Message } from 'views/components/messagelist/Types
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
-import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import { TableHeaderCell } from 'views/components/datatable';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -90,15 +90,6 @@ const TableHead = styled.thead(({ theme }) => css`
   
   && > tr > th {
     min-width: 50px;
-    height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
-    padding: 0 5px;
-    vertical-align: center;
-    border: 0;
-    font-size: ${theme.fonts.size.small};
-    font-weight: normal;
-    white-space: nowrap;
-    background-color: ${theme.colors.gray[90]};
-    color: ${theme.utils.readableColor(theme.colors.gray[90])};
   }
 `);
 
@@ -155,23 +146,27 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
         <Table className="table table-condensed">
           <TableHead>
             <tr>
-              {selectedFields.toSeq().map((selectedFieldName) => (
-                <th key={selectedFieldName}>
-                  <Field type={_fieldTypeFor(selectedFieldName, fields)}
-                         name={selectedFieldName}
-                         queryId={activeQueryId}>
-                    {selectedFieldName}
-                  </Field>
-                  <InteractiveContext.Consumer>
-                    {(interactive) => (interactive && (
-                      <FieldSortIcon fieldName={selectedFieldName}
-                                     onSortChange={onSortChange}
-                                     setLoadingState={setLoadingState}
-                                     config={config} />
-                    ))}
-                  </InteractiveContext.Consumer>
-                </th>
-              )).toArray()}
+              {selectedFields.toSeq().map((selectedFieldName) => {
+                const type = _fieldTypeFor(selectedFieldName, fields);
+
+                return (
+                  <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
+                    <Field type={type}
+                           name={selectedFieldName}
+                           queryId={activeQueryId}>
+                      {selectedFieldName}
+                    </Field>
+                    <InteractiveContext.Consumer>
+                      {(interactive) => (interactive && (
+                        <FieldSortIcon fieldName={selectedFieldName}
+                                       onSortChange={onSortChange}
+                                       setLoadingState={setLoadingState}
+                                       config={config} />
+                      ))}
+                    </InteractiveContext.Consumer>
+                  </TableHeaderCell>
+                );
+              }).toArray()}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {

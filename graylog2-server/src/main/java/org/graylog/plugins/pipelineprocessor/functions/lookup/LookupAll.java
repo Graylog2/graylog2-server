@@ -16,8 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.lookup;
 
-import com.google.common.base.Functions;
-import com.google.common.collect.Lists;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.common.reflect.TypeToken;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -30,8 +29,11 @@ import org.graylog2.plugin.lookup.LookupResult;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -55,7 +57,7 @@ public class LookupAll extends AbstractFunction<List<Object>> {
                 .build();
         keysParam = object("keys", LIST_RETURN_TYPE)
                 .description("The keys to lookup in the table")
-                .transform(LookupAll::transformValueToList)
+                .transform(this::transformToList)
                 .build();
     }
 
@@ -93,11 +95,20 @@ public class LookupAll extends AbstractFunction<List<Object>> {
                 .build();
     }
 
-    private static List<Object> transformValueToList(Object value) {
-        if (value instanceof List) {
-            return Lists.transform((List) value, Functions.toStringFunction());
-        } else {
-            return Collections.singletonList(value.toString());
+    private List<Object> transformToList(Object value) {
+        if (value instanceof Collection<?>) {
+            return ((Collection<?>) value).stream()
+                    .map(LookupAll::convertValue)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
         }
+        return Collections.singletonList(value.toString());
+    }
+
+    private static String convertValue(Object o) {
+        if (o instanceof ValueNode node) {
+            return node.textValue();
+        }
+        return o.toString();
     }
 }

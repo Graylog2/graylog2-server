@@ -27,8 +27,10 @@ import { indexSets } from 'fixtures/indexSets';
 import { asMock } from 'helpers/mocking';
 import suppressConsole from 'helpers/suppressConsole';
 import ApiRoutes from 'routing/ApiRoutes';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -42,6 +44,13 @@ jest.mock('@graylog/server-api', () => ({
 }));
 
 describe('StreamsOverview BulkActionsRow', () => {
+  const useSelectedEntitiesResponse = {
+    selectedEntities: [],
+    setSelectedEntities: () => {},
+    selectEntity: () => {},
+    deselectEntity: () => {},
+  };
+
   const openActionsDropdown = async () => {
     await screen.findByRole('button', {
       name: /bulk actions/i,
@@ -74,11 +83,18 @@ describe('StreamsOverview BulkActionsRow', () => {
     });
   };
 
+  beforeEach(() => {
+    asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
+  });
+
   describe('assign index set', () => {
     it('should assign index set', async () => {
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={() => {}}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       await openActionsDropdown();
       await assignIndexSet();
@@ -91,9 +107,12 @@ describe('StreamsOverview BulkActionsRow', () => {
     it('should handle errors when assigning index set', async () => {
       asMock(Streams.assignToIndexSet).mockImplementation(() => Promise.reject(new Error('Unexpected error!')));
 
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={() => {}}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       await openActionsDropdown();
       await assignIndexSet();
@@ -113,11 +132,15 @@ describe('StreamsOverview BulkActionsRow', () => {
 
     it('should delete selected streams', async () => {
       asMock(fetch).mockReturnValue(Promise.resolve({ failures: [] }));
-      const setSelectedStreamIds = jest.fn();
+      const setSelectedEntities = jest.fn();
 
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={setSelectedStreamIds}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+        setSelectedEntities: setSelectedEntities,
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       await openActionsDropdown();
       await deleteStreams();
@@ -131,7 +154,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       ));
 
       expect(UserNotification.success).toHaveBeenCalledWith('2 streams were deleted successfully.', 'Success');
-      expect(setSelectedStreamIds).toHaveBeenCalledWith([]);
+      expect(setSelectedEntities).toHaveBeenCalledWith([]);
     });
 
     it('should display warning and not reset streams which could not be deleted', async () => {
@@ -141,11 +164,15 @@ describe('StreamsOverview BulkActionsRow', () => {
         ],
       }));
 
-      const setSelectedStreamIds = jest.fn();
+      const setSelectedEntities = jest.fn();
 
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={setSelectedStreamIds}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+        setSelectedEntities: setSelectedEntities,
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       await deleteStreams();
 
@@ -158,7 +185,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       ));
 
       expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected streams could not be deleted.');
-      expect(setSelectedStreamIds).toHaveBeenCalledWith(['stream-id-1']);
+      expect(setSelectedEntities).toHaveBeenCalledWith(['stream-id-1']);
     });
   });
 
@@ -169,11 +196,15 @@ describe('StreamsOverview BulkActionsRow', () => {
 
     it('should start selected streams', async () => {
       asMock(fetch).mockReturnValue(Promise.resolve({ failures: [] }));
-      const setSelectedStreamIds = jest.fn();
+      const setSelectedEntities = jest.fn();
 
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={setSelectedStreamIds}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+        setSelectedEntities: setSelectedEntities,
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       await openActionsDropdown();
       await startStreams();
@@ -185,7 +216,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       ));
 
       expect(UserNotification.success).toHaveBeenCalledWith('2 streams were started successfully.', 'Success');
-      expect(setSelectedStreamIds).toHaveBeenCalledWith([]);
+      expect(setSelectedEntities).toHaveBeenCalledWith([]);
     });
 
     it('should display warning and not reset streams which could not be started', async () => {
@@ -195,11 +226,15 @@ describe('StreamsOverview BulkActionsRow', () => {
         ],
       }));
 
-      const setSelectedStreamIds = jest.fn();
+      const setSelectedEntities = jest.fn();
 
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={setSelectedStreamIds}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+        setSelectedEntities: setSelectedEntities,
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       await startStreams();
 
@@ -210,7 +245,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       ));
 
       expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected streams could not be started.');
-      expect(setSelectedStreamIds).toHaveBeenCalledWith(['stream-id-1']);
+      expect(setSelectedEntities).toHaveBeenCalledWith(['stream-id-1']);
     });
   });
 
@@ -221,11 +256,15 @@ describe('StreamsOverview BulkActionsRow', () => {
 
     it('should stop selected streams', async () => {
       asMock(fetch).mockReturnValue(Promise.resolve({ failures: [] }));
-      const setSelectedStreamIds = jest.fn();
+      const setSelectedEntities = jest.fn();
 
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={setSelectedStreamIds}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+        setSelectedEntities: setSelectedEntities,
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       await openActionsDropdown();
       await stopStreams();
@@ -237,7 +276,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       ));
 
       expect(UserNotification.success).toHaveBeenCalledWith('2 streams were stopped successfully.', 'Success');
-      expect(setSelectedStreamIds).toHaveBeenCalledWith([]);
+      expect(setSelectedEntities).toHaveBeenCalledWith([]);
     });
 
     it('should display warning and not reset streams which could not be stopped', async () => {
@@ -247,11 +286,15 @@ describe('StreamsOverview BulkActionsRow', () => {
         ],
       }));
 
-      const setSelectedStreamIds = jest.fn();
+      const setSelectedEntities = jest.fn();
 
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={setSelectedStreamIds}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+        setSelectedEntities: setSelectedEntities,
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       await stopStreams();
 
@@ -262,15 +305,19 @@ describe('StreamsOverview BulkActionsRow', () => {
       ));
 
       expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected streams could not be stopped.');
-      expect(setSelectedStreamIds).toHaveBeenCalledWith(['stream-id-1']);
+      expect(setSelectedEntities).toHaveBeenCalledWith(['stream-id-1']);
     });
   });
 
   describe('search in streams action', () => {
     it('should render link', async () => {
-      render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
-                          setSelectedStreamIds={() => {}}
-                          indexSets={indexSets} />);
+      asMock(useSelectedEntities).mockReturnValue({
+        ...useSelectedEntitiesResponse,
+        selectedEntities: ['stream-id-1', 'stream-id-2'],
+        setSelectedEntities: () => {},
+      });
+
+      render(<BulkActions indexSets={indexSets} />);
 
       const link = await screen.findByRole('menuitem', { name: /search in streams/i }) as HTMLAnchorElement;
 

@@ -33,7 +33,7 @@ type CommonFields = keyof typeof COMMON_FIELD_MAP;
 type Props = {
   commonFields?: Array<CommonFields>,
   fieldMap?: { [field: string]: string },
-  example?: string,
+  example?: React.ReactNode,
   entityName?: string,
 };
 

@@ -27,6 +27,8 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.QueryExecutionStats;
+import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -77,6 +79,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
+    private final StatsCollector<QueryExecutionStats> executionStatsCollector;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -84,6 +87,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexLookup indexLookup,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
+                                StatsCollector<QueryExecutionStats> executionStatsCollector,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
@@ -91,6 +95,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
+        this.executionStatsCollector = executionStatsCollector;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -98,6 +103,11 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         return (queryString.isEmpty() || queryString.trim().equals("*"))
                 ? QueryBuilders.matchAllQuery()
                 : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
+    }
+
+    @Override
+    public StatsCollector<QueryExecutionStats> getExecutionStatsCollector() {
+        return this.executionStatsCollector;
     }
 
     @WithSpan

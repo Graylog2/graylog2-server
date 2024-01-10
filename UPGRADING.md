@@ -42,14 +42,46 @@ message parsing for these inputs is expected to be released in an upcoming relea
 ### AWS Security Lake input
 
 Changed fields:
-- `message`: Now contains the full JSON content of the log message. The `vendor_event_description` field now contains the previous `message` field value for backwards-compatibility. 
+- `message`: Now contains the full JSON content of the log message. 
 - The message `timestamp` field is now set to the current Graylog system date/time, instead of the previously used log `time` value. The `event_created` field now contains the previous `time` value for backwards-compatibility.
 
 Added fields:
 - `event_created`: Contains the `time` log value.
 - `event_source_input`: Contains the static value `aws_security_lake`.
-- `vendor_event_description`: Contains the value which was previously present in the `message` log field.
+- `vendor_event_type`: Contains the `type_name` log value (previously in the `event_log_name` field).
+- `vendor_event_severity`: Contains the `severity` log value (previously in the `event_severity` field).
 - `vendor_version`: Contains the `metadata.product.version` log value.
+
+Removed fields:
+- `answers`
+- `api`
+- `class_name` (this value is still available in the `source` field)
+- `cloud`
+- `compliance`
+- `confidence`
+- `connection_info`
+- `destination_ip`
+- `destination_port`
+- `destination_subnet_id`
+- `destination_vpc_id`
+- `event_action,`
+- `event_end`
+- `event_log_name`
+- `event_severity`
+- `event_start`
+- `finding`
+- `http_request`
+- `identity`
+- `malware`
+- `process`
+- `query`
+- `rcode`
+- `source_ip`
+- `source_port`
+- `source_subnet_id`
+- `source_vpc_id`
+- `traffic`
+- `vulnerabilities`
 
 ### Office 365 input
 
@@ -95,14 +127,15 @@ Added fields:
 
 The following Java Code API changes have been made.
 
-| File/method                                       | Description                    |
-|---------------------------------------------------|--------------------------------|
-| `org.graylog2.plugin.Message#addStringFields`     | Deprecated method removed      |
-| `org.graylog2.plugin.Message#addLongFields`       | Deprecated method removed      |
-| `org.graylog2.plugin.Message#addDoubleFields`     | Deprecated method removed      |
-| `org.graylog2.plugin.Message#getValidationErrors` | Deprecated method removed      |
-| `org.graylog2.plugin.SingletonMessages` | Unused class removed     |
-| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException`        | Unused exception class removed |
+| File/method                                                           | Description                    |
+|-----------------------------------------------------------------------|--------------------------------|
+| `org.graylog2.plugin.Message#addStringFields`                         | Deprecated method removed      |
+| `org.graylog2.plugin.Message#addLongFields`                           | Deprecated method removed      |
+| `org.graylog2.plugin.Message#addDoubleFields`                         | Deprecated method removed      |
+| `org.graylog2.plugin.Message#getValidationErrors`                     | Deprecated method removed      |
+| `org.graylog2.plugin.SingletonMessages`                               | Unused class removed           |
+| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException` | Unused exception class removed |
+| `org.graylog2.indexer.IndexMappingTemplate#toTemplate`                | Method parameter list modified |
 
 
 ## REST API Endpoint Changes

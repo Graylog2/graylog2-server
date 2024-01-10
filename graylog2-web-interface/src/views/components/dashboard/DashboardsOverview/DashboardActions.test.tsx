@@ -27,12 +27,14 @@ import DashboardActions from 'views/components/dashboard/DashboardsOverview/Dash
 import { simpleView } from 'views/test/ViewFixtures';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
-    delete: jest.fn(),
+    delete: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -50,6 +52,13 @@ describe('DashboardActions', () => {
     oldWindowConfirm = window.confirm;
     window.confirm = jest.fn();
     asMock(useCurrentUser).mockReturnValue(adminUser);
+
+    asMock(useSelectedEntities).mockReturnValue({
+      selectedEntities: [],
+      setSelectedEntities: () => {},
+      selectEntity: () => {},
+      deselectEntity: () => {},
+    });
   });
 
   afterEach(() => {

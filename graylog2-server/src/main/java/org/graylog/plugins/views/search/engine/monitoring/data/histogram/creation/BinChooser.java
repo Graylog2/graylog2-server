@@ -14,22 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation;
 
-import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
-import { Row } from 'components/bootstrap';
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
-const NAV_ITEMS = [
-  { title: 'Overview', path: Routes.SYSTEM.DATANODES.OVERVIEW, exactPathMatch: true },
-  { title: 'Monitoring & Management', path: Routes.SYSTEM.DATANODES.OVERVIEW },
-  { title: 'Migrations', path: Routes.SYSTEM.DATANODES.OVERVIEW },
-];
+public interface BinChooser<T, S> {
 
-const DataNodesPageNavigation = () => (
-  <Row>
-    <PageNavigation items={NAV_ITEMS} />
-  </Row>
-);
+    Optional<T> chooseBin(final List<T> availableBins, final S singleElement);
 
-export default DataNodesPageNavigation;
+    Optional<Comparator<T>> getBinComparator();
+}

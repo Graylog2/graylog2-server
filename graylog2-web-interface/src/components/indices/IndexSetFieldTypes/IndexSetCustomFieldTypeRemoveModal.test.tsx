@@ -23,12 +23,12 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 const mockOnClosed = jest.fn();
-const mockUpdateSelectedEntities = jest.fn();
 const renderIndexSetCustomFieldTypeRemoveModal = () => render(
   <TestStoreProvider>
-    <IndexSetCustomFieldTypeRemoveModal setSelectedFields={mockUpdateSelectedEntities} fields={['field']} indexSetIds={['111']} show onClose={mockOnClosed} />
+    <IndexSetCustomFieldTypeRemoveModal indexSetIds={['111']} show onClose={mockOnClosed} fields={['field']} />
   </TestStoreProvider>,
 );
 
@@ -44,6 +44,7 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
 }));
 
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation', () => jest.fn());
+jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 describe('IndexSetFieldTypesList', () => {
   const mockedRemoveCustomFieldTypeMutation = jest.fn(() => Promise.resolve());
@@ -53,6 +54,13 @@ describe('IndexSetFieldTypesList', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
+    asMock(useSelectedEntities).mockReturnValue({
+      selectedEntities: ['field'],
+      setSelectedEntities: () => {},
+      selectEntity: () => {},
+      deselectEntity: () => {},
+    });
+
     asMock(useRemoveCustomFieldTypeMutation).mockReturnValue({
       removeCustomFieldTypeMutation: mockedRemoveCustomFieldTypeMutation,
       isLoading: false,

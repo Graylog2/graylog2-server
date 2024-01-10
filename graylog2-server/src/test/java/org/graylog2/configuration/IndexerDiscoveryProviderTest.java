@@ -16,6 +16,7 @@
  */
 package org.graylog2.configuration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import org.assertj.core.api.Assertions;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
@@ -42,6 +43,8 @@ class IndexerDiscoveryProviderTest {
     void testAutomaticDiscovery() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 Collections.emptyList(),
+                1,
+                Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED),
                 nodes("http://localhost:9200", "http://other:9201")
         );
@@ -57,6 +60,8 @@ class IndexerDiscoveryProviderTest {
     void testPreconfiguredIndexers() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 List.of(URI.create("http://my-host:9200")),
+                1,
+                Duration.seconds(1),
                 preflightConfig(null),
                 nodes()
         );
@@ -71,6 +76,8 @@ class IndexerDiscoveryProviderTest {
     void testSkippedConfigWithDefaultIndexer() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 Collections.emptyList(),
+                1,
+                Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.SKIPPED),
                 nodes()
         );
@@ -85,13 +92,15 @@ class IndexerDiscoveryProviderTest {
     void testFailedAutodiscovery() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 Collections.emptyList(), // no configured indexers
+                1,
+                Duration.seconds(1),
                 preflightConfig(PreflightConfigResult.FINISHED), // preflight correctly finished
                 nodes() // but still no nodes discovered
         );
 
         Assertions.assertThatThrownBy(provider::get)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageStartingWith("No Datanode available");
+                .hasMessageStartingWith("Unable to retrieve Datanode connection");
     }
 
     private NodeService<DataNodeDto> nodes(String... transportAddress) {
