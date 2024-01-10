@@ -1,4 +1,4 @@
-# Migration Guide
+# Manual Migration Guide
 
 **Caveat**: preliminary - and only to have a minimal basis to find out which modifications are necessary at the current codebase
 and to research/test possible improvements for a better user experience or find out the limits what we can actually do.
