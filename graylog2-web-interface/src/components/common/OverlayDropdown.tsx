@@ -16,24 +16,27 @@
  */
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import styled, { useTheme } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 import { Menu } from '@mantine/core';
 
 type Placement = 'top' | 'right' | 'bottom' | 'left';
 
-const ToggleDropdown = styled.span`
+const ToggleDropdown = styled.span<{ $alwaysShowCaret: boolean }>(({ $alwaysShowCaret }) => css`
   cursor: pointer;
 
-  .caret {
-    visibility: hidden;
-  }
+  ${$alwaysShowCaret ? '' : css`
+    .caret {
+      visibility: hidden;
+    }
 
-  &:hover .caret {
-    visibility: visible;
-  }
-`;
+    &:hover .caret {
+      visibility: visible;
+    }
+  `}
+`);
 
 type Props = {
+  alwaysShowCaret?: boolean,
   children: React.ReactNode,
   closeOnSelect?: boolean,
   dropdownMinWidth?: number,
@@ -46,6 +49,7 @@ type Props = {
 }
 
 const OverlayDropdown = ({
+  alwaysShowCaret,
   children,
   closeOnSelect,
   dropdownMinWidth,
@@ -81,7 +85,8 @@ const OverlayDropdown = ({
           portalProps={{ target: menuContainer }}
           zIndex={dropdownZIndex}>
       <Menu.Target>
-        <ToggleDropdown onClick={onToggle}
+        <ToggleDropdown $alwaysShowCaret={alwaysShowCaret}
+                        onClick={onToggle}
                         ref={toggleTarget}
                         role="presentation">
           {toggleChild}
@@ -95,6 +100,7 @@ const OverlayDropdown = ({
 };
 
 OverlayDropdown.propTypes = {
+  alwaysShowCaret: PropTypes.bool,
   children: PropTypes.node.isRequired,
   closeOnSelect: PropTypes.bool,
   dropdownZIndex: PropTypes.number,
@@ -106,6 +112,7 @@ OverlayDropdown.propTypes = {
 };
 
 OverlayDropdown.defaultProps = {
+  alwaysShowCaret: false,
   closeOnSelect: true,
   dropdownMinWidth: undefined,
   dropdownZIndex: undefined,

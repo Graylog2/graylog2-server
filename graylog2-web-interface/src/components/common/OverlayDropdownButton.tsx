@@ -20,8 +20,10 @@ import { useState } from 'react';
 import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
 import type { BsSize } from 'components/bootstrap/types';
+import { Icon } from 'components/common/index';
 
 type Props = {
+  alwaysShowCaret?: boolean,
   bsSize?: BsSize,
   buttonTitle?: string,
   children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
@@ -37,6 +39,7 @@ type Props = {
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
 const OverlayDropdownButton = ({
+  alwaysShowCaret,
   bsSize,
   buttonTitle,
   children,
@@ -62,6 +65,7 @@ const OverlayDropdownButton = ({
                      closeOnSelect={closeOnSelect}
                      dropdownZIndex={dropdownZIndex}
                      dropdownMinWidth={dropdownMinWidth}
+                     alwaysShowCaret={alwaysShowCaret}
                      toggleChild={(
                        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
                          <Button bsSize={bsSize}
@@ -69,7 +73,7 @@ const OverlayDropdownButton = ({
                                  aria-label={buttonTitle}
                                  title={buttonTitle}
                                  disabled={disabled}>
-                           {title} <span className="caret" />
+                           {title} <Icon name="caret-down" />
                          </Button>
                        </div>
                      )}
@@ -81,6 +85,7 @@ const OverlayDropdownButton = ({
 };
 
 OverlayDropdownButton.defaultProps = {
+  alwaysShowCaret: false,
   bsSize: undefined,
   buttonTitle: undefined,
   closeOnSelect: true,
