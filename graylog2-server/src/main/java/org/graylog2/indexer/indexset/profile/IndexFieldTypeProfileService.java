@@ -19,7 +19,9 @@ package org.graylog2.indexer.indexset.profile;
 import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -28,6 +30,8 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
@@ -74,9 +78,9 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
             .sort(Sorting.create(IndexFieldTypeProfile.NAME_FIELD_NAME, Sorting.Direction.valueOf("asc".toUpperCase(Locale.ROOT))))
             .build();
 
-    private final MongoCollection<IndexFieldTypeProfile> collection;
+    private final MongoCollection<IndexFieldTypeProfile> profileCollection;
+    private final MongoCollection<IndexSetConfig> indexSetCollection;
     private final DbQueryCreator dbQueryCreator;
-
     private final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService;
 
     @Inject
@@ -86,7 +90,8 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
                                         final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService) {
         super(mongoConnection, mapper, IndexFieldTypeProfile.class, INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME);
         this.db.createIndex(new BasicDBObject(IndexFieldTypeProfile.NAME_FIELD_NAME, 1), new BasicDBObject("unique", false));
-        this.collection = mongoCollections.get(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
+        this.profileCollection = mongoCollections.get(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
+        this.indexSetCollection = mongoCollections.get(MongoIndexSetService.COLLECTION_NAME, IndexSetConfig.class);
         this.dbQueryCreator = new DbQueryCreator(IndexFieldTypeProfile.NAME_FIELD_NAME, ATTRIBUTES);
         this.indexFieldTypeProfileUsagesService = indexFieldTypeProfileUsagesService;
     }
@@ -108,6 +113,16 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         return super.save(indexFieldTypeProfile);
     }
 
+    @Override
+    public int delete(final String id) {
+        int numRemoved = super.delete(id);
+        indexSetCollection.updateMany(
+                Filters.eq(IndexSetConfig.FIELD_PROFILE_ID, id),
+                Updates.unset(IndexSetConfig.FIELD_PROFILE_ID)
+        );
+        return numRemoved;
+    }
+
     public boolean update(final String profileId, final IndexFieldTypeProfile updatedProfile) {
         updatedProfile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
         final WriteResult<IndexFieldTypeProfile, ObjectId> writeResult = db.updateById(new ObjectId(profileId), updatedProfile);
@@ -124,9 +139,9 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final Bson dbSort = "desc".equalsIgnoreCase(order) ? Sorts.descending(sortField) : Sorts.ascending(sortField);
 
-        final long total = collection.countDocuments(dbQuery);
+        final long total = profileCollection.countDocuments(dbQuery);
         List<IndexFieldTypeProfile> singlePageOfProfiles = new ArrayList<>(perPage);
-        collection.find(dbQuery)
+        profileCollection.find(dbQuery)
                 .sort(dbSort)
                 .limit(perPage)
                 .skip(perPage * Math.max(0, page - 1))
