@@ -30,6 +30,8 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -54,6 +56,8 @@ import static org.bouncycastle.asn1.x509.GeneralName.rfc822Name;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CsrSigner {
+    private static final Logger LOG = LoggerFactory.getLogger(CsrSigner.class);
+
     private static final Set<GeneralName> localhostAttributes = Set.of(
             new GeneralName(dNSName, "localhost"),
             new GeneralName(iPAddress, "127.0.0.1"),
@@ -134,6 +138,7 @@ public class CsrSigner {
                 .filter(name -> isValidName(name.getTagNo()))
                 .flatMap(name -> isDNSName(name.getTagNo()) ? resolveDNSName(name) : Stream.of(name))
                 .collect(Collectors.toSet());
+        LOG.error("XXX altnames: {}", altNames);
         if (!altNames.isEmpty()) {
             builder.addExtension(Extension.subjectAlternativeName, false,
                     new GeneralNames(Sets.union(localhostAttributes, altNames).toArray(new GeneralName[0])));
