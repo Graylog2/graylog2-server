@@ -20,6 +20,7 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
+import ClusterManagementOverview from 'components/datanode/ClusterManagement/ClusterManagementOverview';
 
 const DataNodesClusterManagementPage = () => (
   <DocumentTitle title="Data Nodes Cluster Management">
@@ -35,7 +36,7 @@ const DataNodesClusterManagementPage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        TODO
+        <ClusterManagementOverview />
       </Col>
     </Row>
   </DocumentTitle>
