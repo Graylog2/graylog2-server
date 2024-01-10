@@ -27,6 +27,7 @@ import Button from './Button';
 type ButtonProps = Omit<React.ComponentProps<typeof Button>, 'title' | 'children'>;
 type Props = React.PropsWithChildren<ButtonProps & {
   buttonTitle?: string,
+  closeOnItemClick?: boolean,
   dropup?: boolean,
   keepMounted?: boolean,
   noCaret?: boolean,
@@ -43,14 +44,15 @@ const position = (pullRight: boolean, dropup: boolean): 'top' | 'bottom' | 'top-
   return `${orientation}${suffix}`;
 };
 
-const DropdownButton = ({ buttonTitle, children, dropup, title, onMouseDown, onToggle, pullRight, noCaret, keepMounted, ...rest }: Props) => (
-  <Menu position={position(pullRight, dropup)} onChange={onToggle} keepMounted={keepMounted}>
+const DropdownButton = ({ buttonTitle, children, closeOnItemClick, dropup, title, onMouseDown, onToggle, pullRight, noCaret, keepMounted, ...rest }: Props) => (
+  <Menu position={position(pullRight, dropup)} onChange={onToggle} keepMounted={keepMounted} closeOnItemClick={closeOnItemClick}>
     <Menu.Target><Button onClick={onMouseDown} {...rest} title={buttonTitle}>{title}{noCaret ? null : <>{' '}<Icon name="caret-down" /></>}</Button></Menu.Target>
     <Menu.Dropdown>{children}</Menu.Dropdown>
   </Menu>
 );
 
 DropdownButton.defaultProps = {
+  closeOnItemClick: true,
   buttonTitle: undefined,
   dropup: undefined,
   keepMounted: undefined,

@@ -23,11 +23,7 @@ import { DropdownButton } from 'components/bootstrap';
 
 import useSelectedEntities from './hooks/useSelectedEntities';
 
-type Props = PropsWithChildren<{
-  keepMounted?: boolean,
-}>;
-
-const BulkActionsDropdown = ({ children, keepMounted }: Props) => {
+const BulkActionsDropdown = ({ children }: PropsWithChildren) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const cancelEntitySelection = useCallback(() => setSelectedEntities([]), [setSelectedEntities]);
 
@@ -35,18 +31,12 @@ const BulkActionsDropdown = ({ children, keepMounted }: Props) => {
     <DropdownButton bsSize="small"
                     title="Bulk actions"
                     id="bulk-actions-dropdown"
-                    disabled={!selectedEntities?.length}
-                    keepMounted={keepMounted}
-                    closeOnItemClick={false}>
+                    disabled={!selectedEntities?.length}>
       {children}
       {Boolean(React.Children.count(children)) && <MenuItem divider />}
       <MenuItem onClick={cancelEntitySelection}>Cancel selection</MenuItem>
     </DropdownButton>
   );
-};
-
-BulkActionsDropdown.defaultProps = {
-  keepMounted: false,
 };
 
 export default BulkActionsDropdown;
