@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import StringUtils from 'util/StringUtils';
@@ -26,12 +26,12 @@ import UserNotification from 'util/UserNotification';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import MenuItem from 'components/bootstrap/MenuItem';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
-import AssignIndexSetAction from 'components/streams/StreamsOverview/BulkActions/AssignIndexSetAction';
 import StopStreamsAction from 'components/streams/StreamsOverview/BulkActions/StopStreamsAction';
 import SearchStreamsAction from 'components/streams/StreamsOverview/BulkActions/SearchStreamsAction';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import StartStreamsAction from './StartStreamsAction';
+import AssignIndexSetModal from './AssignIndexSetModal';
 
 type Props = {
   indexSets: Array<IndexSet>
@@ -40,9 +40,14 @@ type Props = {
 const BulkActions = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const [showIndexSetModal, setShowIndexSetModal] = useState(false);
   const selectedItemsAmount = selectedEntities?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'stream', 'streams');
   const refetchStreams = useCallback(() => queryClient.invalidateQueries(['streams', 'overview']), [queryClient]);
+
+  const toggleAssignIndexSetModal = useCallback(() => {
+    setShowIndexSetModal((cur) => !cur);
+  }, []);
 
   const handleFailures = useCallback((failures: Array<{ entity_id: string }>, actionPastTense: string) => {
     if (failures?.length) {
@@ -71,21 +76,27 @@ const BulkActions = ({ indexSets }: Props) => {
   }, [descriptor, handleFailures, refetchStreams, selectedItemsAmount, selectedEntities]);
 
   return (
-    <BulkActionsDropdown keepMounted>
-      <AssignIndexSetAction indexSets={indexSets}
-                            descriptor={descriptor}
-                            refetchStreams={refetchStreams} />
-      <SearchStreamsAction />
-      <StartStreamsAction handleFailures={handleFailures}
-                          refetchStreams={refetchStreams}
-                          descriptor={descriptor} />
+    <>
+      {showIndexSetModal && (
+        <AssignIndexSetModal toggleShowModal={toggleAssignIndexSetModal}
+                             indexSets={indexSets}
+                             descriptor={descriptor}
+                             refetchStreams={refetchStreams} />
+      )}
+      <BulkActionsDropdown>
+        <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
+        <SearchStreamsAction />
+        <StartStreamsAction handleFailures={handleFailures}
+                            refetchStreams={refetchStreams}
+                            descriptor={descriptor} />
 
-      <StopStreamsAction handleFailures={handleFailures}
-                         refetchStreams={refetchStreams}
-                         descriptor={descriptor} />
+        <StopStreamsAction handleFailures={handleFailures}
+                           refetchStreams={refetchStreams}
+                           descriptor={descriptor} />
 
-      <MenuItem onSelect={onDelete}>Delete</MenuItem>
-    </BulkActionsDropdown>
+        <MenuItem onSelect={onDelete}>Delete</MenuItem>
+      </BulkActionsDropdown>
+    </>
   );
 };
 

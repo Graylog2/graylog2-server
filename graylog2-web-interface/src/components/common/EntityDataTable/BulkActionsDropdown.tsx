@@ -36,12 +36,17 @@ const BulkActionsDropdown = ({ children, keepMounted }: Props) => {
                     title="Bulk actions"
                     id="bulk-actions-dropdown"
                     disabled={!selectedEntities?.length}
-                    keepMounted={keepMounted}>
+                    keepMounted={keepMounted}
+                    closeOnItemClick={false}>
       {children}
       {Boolean(React.Children.count(children)) && <MenuItem divider />}
       <MenuItem onClick={cancelEntitySelection}>Cancel selection</MenuItem>
     </DropdownButton>
   );
+};
+
+BulkActionsDropdown.defaultProps = {
+  keepMounted: false,
 };
 
 export default BulkActionsDropdown;
