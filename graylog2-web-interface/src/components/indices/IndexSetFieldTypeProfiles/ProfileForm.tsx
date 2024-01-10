@@ -160,9 +160,9 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
             <FieldArray name="customFieldMappings"
                         render={({ remove, push }) => (
                           <>
-                            <StyledLabel>Setup mappings</StyledLabel>
+                            <StyledLabel>Set up mappings</StyledLabel>
                             <HelpBlock>
-                              Here you can setup type mapping to any field.
+                              Here you can set up type mapping to any field.
                             </HelpBlock>
                             <List>
                               {(isLoading || isLoadingFieldTypes) ? <Spinner /> : customFieldMappings.map((_, index) => (
