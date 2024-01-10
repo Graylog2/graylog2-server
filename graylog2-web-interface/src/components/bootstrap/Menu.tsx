@@ -92,7 +92,7 @@ Menu.Divider = StyledMenuDivider;
 Menu.Label = StyledMenuLabel;
 
 Menu.defaultProps = {
-  closeOnItemClick: false,
+  closeOnItemClick: true,
   position: undefined,
   shadow: undefined,
   width: undefined,
