@@ -57,14 +57,16 @@ const Menu = ({ children, shadow, width, withinPortal, position, opened, onChang
 
 const StyledMenuItem = styled(MantineMenu.Item)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
-  font-family: ${theme.fonts.family.navigation};
-  font-size: ${theme.fonts.size.navigation};
-  padding-left: 20px;
-  padding-right: 20px;
+  font-size: ${theme.fonts.size.body};
+
+  a {
+    color: ${theme.colors.global.textDefault};
+    text-decoration: none;
+  }
 `);
 
 const StyledMenuDivider = styled(MantineMenu.Divider)(({ theme }) => css`
-  border-color: ${theme.colors.global.textDefault};
+  border-color: ${theme.colors.variant.lighter.default};
 `);
 
 const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
