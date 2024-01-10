@@ -356,6 +356,7 @@ const AdaptableQueryTabs = ({
                         id="query-tabs-more"
                         aria-label="More Dashboard Pages"
                         noCaret
+                        bsStyle="link"
                         pullRight>
           {currentTabs.menuItems.toArray()}
         </DropdownButton>
