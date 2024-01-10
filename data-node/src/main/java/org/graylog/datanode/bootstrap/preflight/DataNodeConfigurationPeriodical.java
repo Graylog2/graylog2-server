@@ -50,6 +50,7 @@ import java.net.InetAddress;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -148,6 +149,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
             final var node = nodeService.byNodeId(nodeId);
             final var altNames = ImmutableList.<String>builder()
                     .addAll(Optional.ofNullable(cfg.altNames()).orElse(Collections.emptyList()))
+                    .addAll(ipFromHostname(node.getHostname()))
                     .addAll(determineAltNames())
                     .build();
             final var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), altNames, privateKeyEncryptedStorage);
@@ -171,6 +173,14 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                 .map(this::reverseLookup)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
+    }
+
+    private List<String> ipFromHostname(final String host) {
+        try {
+            return List.of(InetAddress.getByName(host).getHostAddress());
+       } catch (Exception e) {
+            return List.of();
+        }
     }
 
     @SuppressForbidden("Deliberate use of InetAddress#getHostName")
