@@ -33,6 +33,7 @@ import javax.security.auth.x500.X500Principal;
 import java.security.KeyPairGenerator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
@@ -50,6 +51,7 @@ public class CsrGenerator {
     public PKCS10CertificationRequest generateCSR(final char[] privateKeyPassword,
                                                   final String principalName,
                                                   final List<String> altNames,
+                                                  final List<String> altIps,
                                                   final PrivateKeyEncryptedStorage privateKeyEncryptedStorage) throws CSRGenerationException {
         try {
             final var keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
@@ -70,9 +72,10 @@ public class CsrGenerator {
             Extension subjectAltNames = new Extension(Extension.subjectAlternativeName, false,
                     new DEROctetString(
                             new GeneralNames(
-                                    names.stream()
-                                            .map(alternativeName -> new GeneralName(GeneralName.dNSName, alternativeName))
-                                            .toArray(GeneralName[]::new)
+                                    Stream.concat(
+                                            names.stream().map(alternativeName -> new GeneralName(GeneralName.dNSName, alternativeName)),
+                                            altIps.stream().map(ip -> new GeneralName(GeneralName.iPAddress, ip))
+                                    ).toArray(GeneralName[]::new)
                             )
                     )
             );

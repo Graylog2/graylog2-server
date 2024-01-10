@@ -77,6 +77,7 @@ public class CertutilCsr implements CliCommand {
                     privKeyPassword,
                     "localhost",
                     List.of("data-node"),
+                    List.of(), // no additional IP for single DataNodes needed
                     privateKeyEncryptedStorage);
             csrStorage.writeCsr(csr);
         } catch (Exception e) {

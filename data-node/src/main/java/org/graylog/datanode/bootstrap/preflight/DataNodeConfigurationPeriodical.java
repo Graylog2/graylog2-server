@@ -149,10 +149,9 @@ public class DataNodeConfigurationPeriodical extends Periodical {
             final var node = nodeService.byNodeId(nodeId);
             final var altNames = ImmutableList.<String>builder()
                     .addAll(Optional.ofNullable(cfg.altNames()).orElse(Collections.emptyList()))
-                    .addAll(ipFromHostname(node.getHostname()))
                     .addAll(determineAltNames())
                     .build();
-            final var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), altNames, privateKeyEncryptedStorage);
+            final var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), altNames, ipFromHostname(node.getHostname()), privateKeyEncryptedStorage);
             csrStorage.writeCsr(csr, nodeId.getNodeId());
             LOG.info("created CSR for this node");
         } catch (CSRGenerationException | IOException | NodeNotFoundException | OperatorException ex) {
@@ -175,6 +174,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                 .collect(Collectors.toSet());
     }
 
+    @SuppressForbidden("Deliberate use of InetAddress#getHostAddress")
     private List<String> ipFromHostname(final String host) {
         try {
             return List.of(InetAddress.getByName(host).getHostAddress());
