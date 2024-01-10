@@ -133,6 +133,12 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
   }
 `);
 
+const QueryTab = styled(NavItem)`
+  &&&&.active > a {
+    padding: 6px 15px 9px 15px;
+  }
+`;
+
 const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
   const tabItems = dashboardTabs.querySelectorAll(':scope > li:not(.dropdown):not(.query-tabs-new)') as NodeListOf<HTMLElement>;
@@ -297,15 +303,15 @@ const AdaptableQueryTabs = ({
       );
 
       navItems = navItems.add(lockedTab === id ? null : (
-        <NavItem eventKey={id}
-                 key={id}
-                 data-tab-id={id}
-                 onClick={() => {
-                   setLockedTab(undefined);
-                   onSelect(id);
-                 }}>
+        <QueryTab eventKey={id}
+                  key={id}
+                  data-tab-id={id}
+                  onClick={() => {
+                    setLockedTab(undefined);
+                    onSelect(id);
+                  }}>
           {tabTitle}
-        </NavItem>
+        </QueryTab>
       ));
 
       menuItems = menuItems.add(lockedTab === id ? null : (
@@ -321,13 +327,13 @@ const AdaptableQueryTabs = ({
       ));
 
       lockedItems = lockedItems.add(lockedTab !== id ? null : (
-        <NavItem eventKey={id}
-                 key={id}
-                 data-tab-id={id}
-                 onClick={() => onSelect(id)}
-                 className={CLASS_LOCKED}>
+        <QueryTab eventKey={id}
+                  key={id}
+                  data-tab-id={id}
+                  onClick={() => onSelect(id)}
+                  className={CLASS_LOCKED}>
           {tabTitle}
-        </NavItem>
+        </QueryTab>
       ));
 
       queriesList = queriesList.add({ id, title });
@@ -356,21 +362,21 @@ const AdaptableQueryTabs = ({
 
         {currentTabs.lockedItems.toArray()}
 
-        <NavItem key="new"
-                 eventKey="new"
-                 title="Create New Page"
-                 onClick={() => {
-                   sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
-                     app_pathname: 'dashboard',
-                     app_section: 'dashboard',
-                     app_action_value: 'dashboard-create-page-button',
-                   });
+        <QueryTab key="new"
+                  eventKey="new"
+                  title="Create New Page"
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
+                      app_pathname: 'dashboard',
+                      app_section: 'dashboard',
+                      app_action_value: 'dashboard-create-page-button',
+                    });
 
-                   onSelect('new');
-                 }}
-                 className="query-tabs-new">
+                    onSelect('new');
+                  }}
+                  className="query-tabs-new">
           <Icon name="plus" />
-        </NavItem>
+        </QueryTab>
       </StyledQueryNav>
       <IconButton title="Open pages configuration"
                   name="cog"
