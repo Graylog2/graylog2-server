@@ -21,7 +21,7 @@ export const customField = {
   id: 'field',
   fieldName: 'field',
   type: 'bool',
-  isCustom: true,
+  origin: 'OVERRIDDEN_INDEX',
   isReserved: false,
 };
 
@@ -29,14 +29,14 @@ export const secondCustomField = {
   id: 'field-2',
   fieldName: 'field-2',
   type: 'bool',
-  isCustom: true,
+  origin: 'OVERRIDDEN_INDEX',
   isReserved: false,
 };
 export const reservedField = {
   id: 'field',
   fieldName: 'field',
   type: 'bool',
-  isCustom: false,
+  origin: 'INDEX',
   isReserved: true,
 };
 
@@ -44,7 +44,7 @@ export const defaultField = {
   id: 'field',
   fieldName: 'field',
   type: 'bool',
-  isCustom: false,
+  origin: 'INDEX',
   isReserved: false,
 };
 

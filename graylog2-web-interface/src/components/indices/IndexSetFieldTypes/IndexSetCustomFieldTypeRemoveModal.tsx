@@ -32,6 +32,8 @@ import type {
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import IndexSetsRemovalErrorAlert from 'components/indices/IndexSetFieldTypes/IndexSetsRemovalErrorAlert';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -72,7 +74,10 @@ const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, r
   return (
     <div>
       <Alert>
-        After removing the custom field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the settings of your search engine will be used
+        After removing the overridden field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the
+        settings of your search engine will be applied for fields with <Badge bsStyle="primary">Overridden index</Badge> and the settings
+        from <Link to={Routes.SYSTEM.INDICES.LIST}>Profile name</Link> for fields
+        with <Badge bsStyle="warning">Overridden profile</Badge>
       </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
       <p>
@@ -134,8 +139,8 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   }, [sendTelemetry, telemetryPathName]);
 
   return (
-    <BootstrapModalForm title={<span>Remove Custom Field Type <BetaBadge /></span>}
-                        submitButtonText="Remove custom field type"
+    <BootstrapModalForm title={<span>Remove Field Type Override<BetaBadge /></span>}
+                        submitButtonText="Remove field type override"
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}
                         show={show}

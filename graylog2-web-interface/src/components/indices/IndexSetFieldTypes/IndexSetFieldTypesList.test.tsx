@@ -85,7 +85,7 @@ describe('IndexSetFieldTypesList', () => {
       data: {
         ...layoutPreferences,
         displayedAttributes: ['field_name',
-          'is_custom',
+          'origin',
           'is_reserved',
           'type'],
       },
