@@ -55,7 +55,7 @@
             <outputDirectory>plugin/</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../graylog-storage-opensearch2/target/graylog-storage-opensearch2-${project.version}.jar</source>
+            <source>${project.basedir}/../graylog-storage-opensearch2/target/graylog-storage-opensearch2-${project.version}-with-dependencies.jar</source>
             <outputDirectory>plugin/</outputDirectory>
         </file>
     </files>
