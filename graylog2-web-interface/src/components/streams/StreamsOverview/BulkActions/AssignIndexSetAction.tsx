@@ -20,7 +20,6 @@ import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
 
 import MenuItem from 'components/bootstrap/MenuItem';
-import { isPermitted } from 'util/PermissionsMixin';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import StringUtils from 'util/StringUtils';
 import type FetchError from 'logic/errors/FetchError';
@@ -30,6 +29,7 @@ import { Streams } from '@graylog/server-api';
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import usePermissions from 'hooks/usePermissions';
 
 type ModalProps = {
   descriptor: string,
@@ -112,6 +112,7 @@ const AssignIndexSetAction = ({
   refetchStreams,
   onSelect,
 }: Props) => {
+  const { isPermitted } = usePermissions();
   const [showIndexSetModal, setShowIndexSetModal] = useState(false);
 
   const toggleAssignIndexSetModal = useCallback(() => {
