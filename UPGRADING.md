@@ -3,6 +3,20 @@ Upgrading to Graylog 6.0.x
 
 ## Breaking Changes
 
+### Changed default number of process-buffer and output-buffer processors
+
+The default values for the configuration settings `processbuffer_processors` and `outputbuffer_processors` have been
+changed. The values will now be calculated based on the number of CPU cores available to the JVM. If you have not
+explicitly set values for these settings in your configuration file, the new defaults apply.
+
+The new defaults should improve performance of your system, however, if you want to continue running your system with
+the previous defaults, please add the following settings to your configuration file:
+
+```
+processbuffer_processors = 5
+outputbuffer_processors = 3
+```
+
 ### Prometheus metrics
 
 The name of the `jvm_classes_loaded` metric [has been changed](https://github.com/prometheus/client_java/pull/681).
@@ -122,6 +136,12 @@ Changed fields:
 Added fields:
 - `event_created`: Contains the `vendorTimestamp`, `eventCreated`, or `timestamp` log value.
 - `event_source_product`: Contains the static value `f5_big-ip`.
+
+Removed fields:
+- `host_name` (this value is still available in the `source` field)
+- `log_level`
+- `service`
+- `vendor_event_description`
 
 ## Java API Changes
 
