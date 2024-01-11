@@ -130,7 +130,7 @@
         <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.15.3</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
-        <java-semver.version>0.9.0</java-semver.version>
+        <java-semver.version>0.10.0</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <javax.inject.version>1</javax.inject.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
