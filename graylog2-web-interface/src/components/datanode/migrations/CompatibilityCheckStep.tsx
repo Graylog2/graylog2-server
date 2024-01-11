@@ -47,13 +47,13 @@ const CompatibilityCheckStep = ({ onStepComplete }: Props) => {
           <>
             <h4>Your existing opensearch data cannot be migrated to Datanode.</h4>
             <br />
-            Error: {data?.compatibility_errors.map((error) => <dd>{error}</dd>)}
+            Error: {data?.compatibility_errors.map((error) => <dd key={error}>{error}</dd>)}
           </>
         )}
       </CompatibilityAlert>
       {isCompatible && <CompatibilityStatus opensearchVersion={data.opensearch_version} nodeInfo={data.info} />}
       <Button bsStyle="success" onClick={() => onStepComplete()} disabled={!isCompatible}>
-        Start Migration
+        Next
       </Button>
     </>
   );

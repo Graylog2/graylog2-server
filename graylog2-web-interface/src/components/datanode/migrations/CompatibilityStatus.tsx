@@ -42,7 +42,7 @@ const StyledSpan = styled.span`
 
 const CompatibilityStatus = ({ opensearchVersion, nodeInfo }: Props) => {
   const { opensearch_data_location: opensearchLocation, nodes } = nodeInfo;
-  const [activeAccordion, setActiveAccordion] = useState<string | undefined>(`Node: 1, Version: ${nodes[0].node_version}`);
+  const [activeAccordion, setActiveAccordion] = useState<string | undefined>(`Node: 1, Version: ${nodes[0].node_version}, ${nodes[0].indices.length} indices`);
 
   const handleSelect = (nextKey: string | undefined) => {
     setActiveAccordion(nextKey ?? activeAccordion);
@@ -55,14 +55,14 @@ const CompatibilityStatus = ({ opensearchVersion, nodeInfo }: Props) => {
         <StyledSpan><strong>OpenSearch data location</strong>: {opensearchLocation}</StyledSpan>
       </div>
       <div>
-        <h4>Details: </h4>
+        <h4><strong>Found</strong>: {nodes.length} <Pluralize singular="node" plural="nodes" value={nodes.length} /> </h4>
         <Accordion defaultActiveKey={activeAccordion}
                    onSelect={handleSelect}
                    id="nodes"
                    data-testid="nodes"
                    activeKey={activeAccordion}>
           {nodes.map((node, index) => (
-            <AccordionItem name={`Node: ${index + 1}, Version: ${node.node_version}`}>
+            <AccordionItem key={`${node.node_version}${node.indices.length}`} name={`Node: ${index + 1}, Version: ${node.node_version}, ${node.indices.length} indices`}>
               <Table striped bordered condensed>
                 <thead>
                   <tr>
@@ -74,7 +74,7 @@ const CompatibilityStatus = ({ opensearchVersion, nodeInfo }: Props) => {
                 </thead>
                 <tbody>
                   {node.indices.map((indice) => (
-                    <tr>
+                    <tr key={indice.index_id}>
                       <td>{indice.index_name}</td>
                       <td><Timestamp dateTime={indice.creation_date} /></td>
                       <td>{indice.index_version_created}</td>
