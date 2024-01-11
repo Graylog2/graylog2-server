@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { DataNodeStatus } from 'preflight/types';
+
 type Shard = {
   documents_count: number,
   name: string,
@@ -40,3 +42,30 @@ export type CompatibilityResponseType = {
   },
   compatibility_errors: Array<string>,
 };
+export type DataNode = {
+  hostname: string,
+  id: string,
+  is_leader: boolean,
+  is_master: boolean,
+  last_seen: string,
+  node_id: string,
+  short_node_id: string,
+  transport_address: string,
+  type: string,
+  status: DataNodeStatus,
+  data_node_status?: string,
+  cert_valid_until: string | null,
+  error_msg?: string,
+}
+
+export type DataNodes = Array<DataNode>;
+
+export type DataNodesCA = {
+  id: string,
+  type: string,
+}
+
+export type RenewalPolicy = {
+  mode: 'AUTOMATIC' | 'MANUAL',
+  certificate_lifetime: string,
+}
