@@ -41,12 +41,14 @@ class DataNodeEntityTest {
         final String nodeId = "2d4cff7a-b9c4-440c-9c62-89ba1fb06211";
         final String transportAddress = "http://127.0.0.1:9200";
         final String clusterAddress = "http://127.0.0.1:9300";
+        final String restApiAddress = "http://127.0.0.1:8999";
         final String hostname = "graylog.local";
         final Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", (int) lastSeen.toEpochSecond());
         fields.put("node_id", nodeId);
         fields.put("is_leader", true);
         fields.put("transport_address", transportAddress);
+        fields.put("rest_api_address", restApiAddress);
         fields.put("hostname", hostname);
         fields.put("datanode_status", DataNodeStatus.AVAILABLE);
         fields.put("cluster_address", clusterAddress);
@@ -56,7 +58,7 @@ class DataNodeEntityTest {
 
         final JsonNode jsonNode = mapper.readTree(mapper.writeValueAsString(node));
 
-        assertThat(jsonNode.size()).isEqualTo(10);
+        assertThat(jsonNode.size()).isEqualTo(11);
 
         assertThat(ZonedDateTime.parse(jsonNode.path("last_seen").asText())).isEqualTo(lastSeen);
         assertThat(jsonNode.path("node_id").asText()).isEqualTo(nodeId);
@@ -77,6 +79,7 @@ class DataNodeEntityTest {
                 .setHostname(hostname)
                 .setDataNodeStatus(DataNodeStatus.AVAILABLE)
                 .setClusterAddress(clusterAddress)
+                .setRestApiAddress(restApiAddress)
                 .setObjectId(id)
                 .build());
     }
