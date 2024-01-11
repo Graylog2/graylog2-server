@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix issue preventing the lookup_all pipeline function from working with json arrays"
+
+issues = ["graylog-plugin-enterprise#6363"]
+pulls = ["17820"]
