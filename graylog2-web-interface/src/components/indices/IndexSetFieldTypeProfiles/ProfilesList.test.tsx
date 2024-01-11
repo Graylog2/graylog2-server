@@ -16,20 +16,20 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
+import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import asMock from 'helpers/mocking/AsMock';
-import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
-import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
-import { customField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
+import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
+import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
+import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 
-const getData = (list = [defaultField]) => (
+const getData = (list = [profile1]) => (
   {
     list,
     pagination: {
@@ -39,23 +39,20 @@ const getData = (list = [defaultField]) => (
   }
 );
 
-const renderIndexSetFieldTypesPage = () => render(
+const renderIndexSetFieldTypeProfilesList = () => render(
   <QueryParamProvider adapter={ReactRouter6Adapter}>
     <TestStoreProvider>
-      <IndexSetFieldTypesPage />
+      <ProfilesList />
     </TestStoreProvider>,
   </QueryParamProvider>,
 );
 
+jest.mock('routing/useParams', () => jest.fn());
+
+jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
-jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
-
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
-  useQueryParam: jest.fn(),
-}));
 
 describe('IndexSetFieldTypesList', () => {
   beforeAll(loadViewsPlugin);
@@ -66,10 +63,10 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['field_name',
-          'is_custom',
-          'is_reserved',
-          'type'],
+        displayedAttributes: ['name',
+          'description',
+          'type',
+          'custom_field_mappings'],
       },
       isInitialLoading: false,
     });
@@ -80,48 +77,54 @@ describe('IndexSetFieldTypesList', () => {
           string: 'String type',
           int: 'Number(int)',
           bool: 'Boolean',
+          ip: 'IP',
         },
       },
       isLoading: false,
     });
-
-    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
   });
 
-  it('Shows modal on edit click', async () => {
-    asMock(useIndexSetFieldTypes).mockReturnValue({
+  it('Shows list of field type profiles with correct data', async () => {
+    asMock(useProfiles).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([customField]),
-
+      data: getData([profile1, profile2]),
     });
 
-    renderIndexSetFieldTypesPage();
-    const tableRow = await screen.findByTestId('table-row-field');
-    const editButton = await within(tableRow).findByText('Edit');
-    fireEvent.click(editButton);
-    await screen.findByText(/change field field type/i);
-    const modal = await screen.findByTestId('modal-form');
-    await within(modal).findByText('Boolean');
+    renderIndexSetFieldTypeProfilesList();
+    const tableRow1 = await screen.findByTestId('table-row-111');
 
-    expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
+    await within(tableRow1).findByText('Profile 1');
+    await within(tableRow1).findByText('Description 1');
+    await within(tableRow1).findByText('2');
+    await within(tableRow1).findByText('Edit');
+
+    const tableRow2 = await screen.findByTestId('table-row-222');
+
+    await within(tableRow2).findByText('Profile 2');
+    await within(tableRow2).findByText('Description 2');
+    await within(tableRow2).findByText('3');
+    await within(tableRow2).findByText('Edit');
   });
 
-  it('Shows modal on Change field type click', async () => {
-    asMock(useIndexSetFieldTypes).mockReturnValue({
+  it('Shows list of Custom Field Mappings for profile', async () => {
+    asMock(useProfiles).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([customField]),
+      data: getData([profile1, profile2]),
     });
 
-    renderIndexSetFieldTypesPage();
-    const editButton = await screen.findByText(/change field type/i);
-    fireEvent.click(editButton);
+    renderIndexSetFieldTypeProfilesList();
 
-    const modal = await screen.findByTestId('modal-form');
-    await within(modal).findByText(/change field type/i);
-    await within(modal).findByText(/select or type the field/i);
+    const tableRow2 = await screen.findByTestId('table-row-222');
 
-    expect(within(modal).queryByText(/select targeted index sets/i)).not.toBeInTheDocument();
+    const customFieldTypeMappingAmount = await within(tableRow2).findByText('3');
+
+    fireEvent.click(customFieldTypeMappingAmount);
+
+    expect(tableRow2.textContent).toContain('Custom Field Mappings');
+    expect(tableRow2.textContent).toContain('user_name:String type');
+    expect(tableRow2.textContent).toContain('logged_in:Boolean');
+    expect(tableRow2.textContent).toContain('sum:Number(int)');
   });
 });

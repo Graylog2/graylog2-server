@@ -20,21 +20,16 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
-import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
-import { SystemFieldTypes } from '@graylog/server-api';
+import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import { profile1JSON, profile1 } from 'fixtures/indexSetFieldTypeProfiles';
 
-const mockFieldType = {
-  string: 'String',
-  int: 'Number(int)',
-};
+const mockData = profile1JSON;
 
-const expectedState = {
-  fieldTypes: {
-    string: 'String',
-    int: 'Number(int)',
-  },
-};
+const expectedState = profile1;
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
+jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('@graylog/server-api', () => ({
   SystemFieldTypes: {
@@ -42,37 +37,37 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-const renderUseFieldTypeHook = () => renderHook(() => useFieldTypesForMappings());
+const renderUseProfilesHook = () => renderHook(() => useProfile('111'));
 
-describe('useFieldType custom hook', () => {
+describe('useProfiles custom hook', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('Test return initial data and take from fetch', async () => {
-    asMock(SystemFieldTypes.getAllFieldTypes).mockImplementation(() => Promise.resolve(mockFieldType));
-    const { result, waitFor } = renderUseFieldTypeHook();
+    asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
+    const { result, waitFor } = renderUseProfilesHook();
 
-    await waitFor(() => result.current.isLoading);
-    await waitFor(() => !result.current.isLoading);
+    await waitFor(() => !result.current.isFetched);
+    await waitFor(() => result.current.isFetched);
 
-    expect(SystemFieldTypes.getAllFieldTypes).toHaveBeenCalledWith();
+    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/index_sets/profiles/111'));
 
     expect(result.current.data).toEqual(expectedState);
   });
 
   it('Test trigger notification on fail', async () => {
-    asMock(SystemFieldTypes.getAllFieldTypes).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderUseFieldTypeHook();
+    const { result, waitFor } = renderUseProfilesHook();
 
     await suppressConsole(async () => {
-      await waitFor(() => result.current.isLoading);
-      await waitFor(() => !result.current.isLoading);
+      await waitFor(() => !result.current.isFetched);
+      await waitFor(() => result.current.isFetched);
     });
 
     expect(UserNotification.error).toHaveBeenCalledWith(
-      'Loading field type options failed with status: Error: Error',
-      'Could not load field type options');
+      'Loading index field type profile failed with status: Error: Error',
+      'Could not load index field type profile');
   });
 });
