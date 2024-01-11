@@ -48,7 +48,7 @@ const migrationStep = (
 };
 
 const useMigrationStep = () => {
-  const { data: dataNodes, isInitialLoading: isLoadingDataNodes, error: dataNodesError } = useDataNodes();
+  const { data: dataNodes, isInitialLoading: isLoadingDataNodes, error: dataNodesError } = useDataNodes(undefined, undefined, false);
   const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus, error: caError } = useDataNodesCA();
   const { data: renewalPolicy, isInitialLoading: isLoadingRenewalPolicy, error: renewalPolicyError } = useRenewalPolicy();
   const { data: compatibilityResult, isInitialLoading: isLoadingCompatibility, error: compatibilityCheckError } = useCompatibilityCheck({ enabled: false });
