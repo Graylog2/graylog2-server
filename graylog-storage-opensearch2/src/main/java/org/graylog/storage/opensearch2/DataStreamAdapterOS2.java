@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateDataStreamRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
@@ -27,6 +28,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.storage.opensearch2.ism.IsmApi;
 import org.graylog.storage.opensearch2.ism.policy.IsmPolicy;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.indices.Template;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public class DataStreamAdapterOS2 implements DataStreamAdapter {
@@ -79,26 +82,39 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
     @Override
     public void createDataStream(@Nonnull String dataStreamName) {
         CreateDataStreamRequest createDataStreamRequest = new CreateDataStreamRequest(dataStreamName);
-        final GetDataStreamResponse dataStream = client.execute((c, requestOptions) ->
-                c.indices().getDataStream(new GetDataStreamRequest(dataStreamName), requestOptions));
-        if (dataStream.getDataStreams().isEmpty()) {
+        final GetDataStreamResponse dataStream;
+        try {
+            client.execute((c, requestOptions) ->
+                    c.indices().getDataStream(new GetDataStreamRequest(dataStreamName), requestOptions));
+        } catch (IndexNotFoundException e) {
             client.execute((c, requestOptions) -> c.indices().createDataStream(createDataStreamRequest, requestOptions));
         }
     }
 
+    public boolean deleteDataStream(@Nonnull String dataStreamName) {
+        return client.execute((c, requestOptions) ->
+                c.indices().deleteDataStream(new DeleteDataStreamRequest(dataStreamName), requestOptions)).isAcknowledged();
+    }
+
+    protected List<org.graylog.shaded.opensearch2.org.opensearch.client.indices.DataStream> getDataStream(@Nonnull String dataStreamName) {
+        final GetDataStreamResponse dataStream = client.execute((c, requestOptions) ->
+                c.indices().getDataStream(new GetDataStreamRequest(dataStreamName), requestOptions));
+        return dataStream.getDataStreams();
+    }
+
     @Override
-    public void applyIsmPolicy(@Nonnull String dataStream, @Nonnull Policy policy) {
+    public void applyIsmPolicy(@Nonnull String dataStreamName, @Nonnull Policy policy) {
         // this might need to be adjusted in the future to using versioning for the ism policy.
         // for the time being, we will just remove and reapply the policy to the data stream.
         IsmPolicy ismPolicy = (IsmPolicy) policy;
         final String id = ismPolicy.id();
         final Optional<IsmPolicy> osPolicy = ismApi.getPolicy(id);
         if (osPolicy.isPresent()) {
-            ismApi.removePolicyFromIndex(dataStream);
+            ismApi.removePolicyFromIndex(dataStreamName);
             ismApi.deletePolicy(id);
         }
         ismApi.createPolicy(ismPolicy.id(), new IsmPolicy(ismPolicy.policy()));
-        ismApi.addPolicyToIndex(id, dataStream);
+        ismApi.addPolicyToIndex(id, dataStreamName);
     }
 
 

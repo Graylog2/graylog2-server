@@ -24,19 +24,18 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-
-/**
- * Model for a ISM Policy as defined in <a href="https://opensearch.org/docs/2.11/im-plugin/ism/policies/">...</a>.
- * This model is not yet complete, but can be adjusted as further actions or parameters become relevant.
- */
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Policy(@Nullable String policyId,
-                     @Nullable String description,
+                     @Nonnull String description,
                      @Nullable String lastUpdatedTime,
                      @Nonnull String defaultState,
                      @Nonnull List<State> states) {
+
+    public Policy(@Nonnull String description, @Nonnull String defaultState, @Nonnull List<State> states) {
+        this(null, description, null, defaultState, states);
+    }
+
 
     public record State(@Nonnull String name, @Nonnull List<Action> actions,
                         @Nonnull List<Transition> transitions) {}

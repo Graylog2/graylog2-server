@@ -20,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public interface WrappedAction {
 
+    // actions need to be registered here as @JsonTypeInfo cannot be used due to the sibling "retry" node.
+    // enum name must match action name as defined in
+    // https://opensearch.org/docs/latest/im-plugin/ism/policies/#ism-supported-operations
     enum Type {
         DELETE(DeleteAction.class),
         ROLLOVER(RolloverAction.class),

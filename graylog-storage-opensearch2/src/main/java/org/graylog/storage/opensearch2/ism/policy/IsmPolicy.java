@@ -21,6 +21,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.annotation.Nullable;
 
+/**
+ * Model for a ISM Policy as defined in <a href="https://opensearch.org/docs/2.11/im-plugin/ism/policies/">...</a>.
+ * This model is not yet complete, but can be adjusted as further actions or parameters become relevant.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record IsmPolicy(@JsonProperty("_id") @Nullable String id,
                         @JsonProperty("_version") @Nullable String version,

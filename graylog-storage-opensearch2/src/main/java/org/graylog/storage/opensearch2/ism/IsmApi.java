@@ -30,6 +30,8 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Optional;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class IsmApi {
 
     private final ObjectMapper objectMapper;
@@ -46,16 +48,16 @@ public class IsmApi {
         return perform(request, new TypeReference<>() {}, "Could not get ism policy");
     }
 
-    public IsmPolicy createPolicy(String policyId, IsmPolicy policy) {
+    public void createPolicy(String policyId, IsmPolicy policy) {
         final Request request = request("PUT", "policies/" + policyId, policy);
-        return perform(request,
+        perform(request,
                 new TypeReference<IsmPolicy>() {},
-                "Unable to create ism policy").get();
+                "Unable to create ism policy");
     }
 
     public void addPolicyToIndex(String policyId, String index) {
         final Request request = request("POST", "add/" + index, null);
-        request.setJsonEntity(String.format("{\"policy_id\":\"%s\"}", policyId));
+        request.setJsonEntity(f("{\"policy_id\":\"%s\"}", policyId));
         perform(request,
                 new TypeReference<JsonNode>() {},
                 "Unable to add policy to index");
