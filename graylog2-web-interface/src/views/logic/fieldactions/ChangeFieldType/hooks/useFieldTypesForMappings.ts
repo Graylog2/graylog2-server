@@ -30,7 +30,7 @@ const fetchFieldTypes = async () => {
   return ({ fieldTypes });
 };
 
-const useFieldTypeOptions = (): {
+const useFieldTypesForMappings = (): {
   data: { fieldTypes: FieldTypes },
   isLoading: boolean,
 } => {
@@ -52,4 +52,4 @@ const useFieldTypeOptions = (): {
   });
 };
 
-export default useFieldTypeOptions;
+export default useFieldTypesForMappings;
