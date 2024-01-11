@@ -22,7 +22,6 @@ import { Wizard } from 'components/common';
 import MigrationHelpStep from 'components/datanode/migrations/MigrationHelpStep';
 import CAStep from 'components/datanode/migrations/CAStep';
 import useMigrationStep, { STEP_KEYS } from 'components/datanode/hooks/useMigrationStep';
-import ManualMigrationStep from 'components/datanode/migrations/ManualMigrationStep';
 
 const MigrationWizard = () => {
   const [activeStep, setActiveStep] = useState(null);
@@ -51,16 +50,6 @@ const MigrationWizard = () => {
       key: 'ca-configuration',
       title: (<>CA Configuration</>),
       component: <CAStep onStepComplete={() => onWizardStepChange(STEP_KEYS[2])} />,
-    },
-    {
-      key: 'manual-migration',
-      title: (<>Migration Steps</>),
-      component: <ManualMigrationStep />,
-    },
-    {
-      key: 'finished',
-      title: (<>Finished</>),
-      component: <>Finised</>,
     },
   ];
 
