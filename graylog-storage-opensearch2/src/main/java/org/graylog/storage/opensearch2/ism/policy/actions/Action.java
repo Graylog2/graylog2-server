@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datastream;
+package org.graylog.storage.opensearch2.ism.policy.actions;
 
-import org.graylog2.indexer.indices.Template;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-public interface DataStreamAdapter {
-
-    boolean ensureDataStreamTemplate(@Nonnull String templateName, @Nonnull Template template, @Nonnull String timestampField);
-
-    void createDataStream(String dataStreamName);
-
-    void applyIsmPolicy(@Nonnull String dataStreamName, @Nonnull Policy policy);
+@JsonSerialize(using = ActionSerializer.class)
+@JsonDeserialize(using = ActionDeserializer.class)
+public record Action(@Nullable Retry retry, @Nonnull WrappedAction action) {
+    public Action(@Nonnull WrappedAction action) {
+        this(null, action);
+    }
 
 }

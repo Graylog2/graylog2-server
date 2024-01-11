@@ -16,16 +16,5 @@
  */
 package org.graylog2.indexer.datastream;
 
-import org.graylog2.indexer.indices.Template;
-
-import javax.annotation.Nonnull;
-
-public interface DataStreamAdapter {
-
-    boolean ensureDataStreamTemplate(@Nonnull String templateName, @Nonnull Template template, @Nonnull String timestampField);
-
-    void createDataStream(String dataStreamName);
-
-    void applyIsmPolicy(@Nonnull String dataStreamName, @Nonnull Policy policy);
-
+public interface Policy {
 }

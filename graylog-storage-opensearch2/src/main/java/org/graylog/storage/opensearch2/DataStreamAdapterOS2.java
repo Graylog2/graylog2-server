@@ -25,7 +25,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposabl
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream;
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
+import org.graylog.storage.opensearch2.ism.IsmApi;
+import org.graylog.storage.opensearch2.ism.policy.IsmPolicy;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
+import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.indices.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,17 +36,20 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Optional;
 
 public class DataStreamAdapterOS2 implements DataStreamAdapter {
 
     private final Logger log = LoggerFactory.getLogger(DataStreamAdapterOS2.class);
     private final OpenSearchClient client;
     private final ObjectMapper objectMapper;
+    private final IsmApi ismApi;
 
     @Inject
-    public DataStreamAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper) {
+    public DataStreamAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi) {
         this.client = client;
         this.objectMapper = objectMapper;
+        this.ismApi = ismApi;
     }
 
     @Override
@@ -79,4 +85,21 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
             client.execute((c, requestOptions) -> c.indices().createDataStream(createDataStreamRequest, requestOptions));
         }
     }
+
+    @Override
+    public void applyIsmPolicy(@Nonnull String dataStream, @Nonnull Policy policy) {
+        // this might need to be adjusted in the future to using versioning for the ism policy.
+        // for the time being, we will just remove and reapply the policy to the data stream.
+        IsmPolicy ismPolicy = (IsmPolicy) policy;
+        final String id = ismPolicy.id();
+        final Optional<IsmPolicy> osPolicy = ismApi.getPolicy(id);
+        if (osPolicy.isPresent()) {
+            ismApi.removePolicyFromIndex(dataStream);
+            ismApi.deletePolicy(id);
+        }
+        ismApi.createPolicy(ismPolicy.id(), new IsmPolicy(ismPolicy.policy()));
+        ismApi.addPolicyToIndex(id, dataStream);
+    }
+
+
 }

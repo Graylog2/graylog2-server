@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7;
 
 import org.graylog2.indexer.datastream.DataStreamAdapter;
+import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.indices.Template;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +31,11 @@ public class DataStreamAdapterES7 implements DataStreamAdapter {
 
     @Override
     public void createDataStream(String dataStreamName) {
+        throw new UnsupportedOperationException(ERROR_MESSAGE);
+    }
+
+    @Override
+    public void applyIsmPolicy(@NotNull String dataStreamName, @NotNull Policy policy) {
         throw new UnsupportedOperationException(ERROR_MESSAGE);
     }
 }

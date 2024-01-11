@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datastream;
-
-import org.graylog2.indexer.indices.Template;
+package org.graylog.storage.opensearch2.ism.policy.actions;
 
 import javax.annotation.Nonnull;
 
-public interface DataStreamAdapter {
+public record RolloverAction(@Nonnull String minIndexAge, boolean copyAlias) implements WrappedAction {
 
-    boolean ensureDataStreamTemplate(@Nonnull String templateName, @Nonnull Template template, @Nonnull String timestampField);
+    public RolloverAction(@Nonnull String minIndexAge) {
+        this(minIndexAge, false);
+    }
 
-    void createDataStream(String dataStreamName);
-
-    void applyIsmPolicy(@Nonnull String dataStreamName, @Nonnull Policy policy);
-
+    @Override
+    public Type getType() {
+        return Type.ROLLOVER;
+    }
 }

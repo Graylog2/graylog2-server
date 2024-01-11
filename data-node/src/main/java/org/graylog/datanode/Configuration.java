@@ -227,6 +227,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "metrics_daily_retention")
     private String metricsDailyRetention = "365d";
 
+    @Parameter(value = "metrics_daily_index")
+    private String metricsDailyIndex = "gl-datanode-metrics-daily";
+
+    @Parameter(value = "metrics_policy")
+    private String metricsPolicy = "gl-datanode-metrics-ism";
+
     public boolean isInsecureStartup() {
         return insecureStartup;
     }
@@ -394,6 +400,14 @@ public class Configuration extends BaseConfiguration {
 
     public String getMetricsDailyRetention() {
         return metricsDailyRetention;
+    }
+
+    public String getMetricsDailyIndex() {
+        return metricsDailyIndex;
+    }
+
+    public String getMetricsPolicy() {
+        return metricsPolicy;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

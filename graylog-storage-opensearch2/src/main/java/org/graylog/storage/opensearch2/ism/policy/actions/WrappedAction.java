@@ -14,18 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datastream;
+package org.graylog.storage.opensearch2.ism.policy.actions;
 
-import org.graylog2.indexer.indices.Template;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.annotation.Nonnull;
+public interface WrappedAction {
 
-public interface DataStreamAdapter {
+    enum Type {
+        DELETE(DeleteAction.class),
+        ROLLOVER(RolloverAction.class),
+        ROLLUP(RollupAction.class);
 
-    boolean ensureDataStreamTemplate(@Nonnull String templateName, @Nonnull Template template, @Nonnull String timestampField);
+        public final Class<? extends WrappedAction> implementingClass;
 
-    void createDataStream(String dataStreamName);
+        Type(Class<? extends WrappedAction> implementingClass) {
+            this.implementingClass = implementingClass;
+        }
+    }
 
-    void applyIsmPolicy(@Nonnull String dataStreamName, @Nonnull Policy policy);
+    @JsonIgnore
+    Type getType();
 
 }

@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datastream;
+package org.graylog.storage.opensearch2.ism.policy.actions;
 
-import org.graylog2.indexer.indices.Template;
+public record DeleteAction() implements WrappedAction {
 
-import javax.annotation.Nonnull;
-
-public interface DataStreamAdapter {
-
-    boolean ensureDataStreamTemplate(@Nonnull String templateName, @Nonnull Template template, @Nonnull String timestampField);
-
-    void createDataStream(String dataStreamName);
-
-    void applyIsmPolicy(@Nonnull String dataStreamName, @Nonnull Policy policy);
-
+    @Override
+    public Type getType() {
+        return Type.DELETE;
+    }
 }
