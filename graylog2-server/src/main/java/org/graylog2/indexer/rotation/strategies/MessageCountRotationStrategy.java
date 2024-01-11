@@ -30,7 +30,7 @@ import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Locale;
 
-import static org.graylog2.indexer.rotation.common.IndexRotator.*;
+import static org.graylog2.indexer.rotation.common.IndexRotator.Result;
 import static org.graylog2.indexer.rotation.common.IndexRotator.createResult;
 
 public class MessageCountRotationStrategy implements RotationStrategy {
@@ -47,9 +47,10 @@ public class MessageCountRotationStrategy implements RotationStrategy {
         this.indexRotator = indexRotator;
 
     }
+
     @Override
     public void rotate(IndexSet indexSet) {
-        indexRotator.rotate(indexSet,this::shouldRotate);
+        indexRotator.rotate(indexSet, this::shouldRotate);
     }
 
     @Override
@@ -76,13 +77,13 @@ public class MessageCountRotationStrategy implements RotationStrategy {
             final boolean shouldRotate = numberOfMessages > config.maxDocsPerIndex();
             final MessageFormat format = shouldRotate ?
                     new MessageFormat(
-                    "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",
-                    Locale.ENGLISH) :
+                            "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",
+                            Locale.ENGLISH) :
                     new MessageFormat(
-                    "Number of messages in <{0}> ({1}) is lower than the limit ({2}). Not doing anything.",
-                    Locale.ENGLISH);
+                            "Number of messages in <{0}> ({1}) is lower than the limit ({2}). Not doing anything.",
+                            Locale.ENGLISH);
             String message = format.format(new Object[]{index, numberOfMessages, config.maxDocsPerIndex()});
-            return createResult(shouldRotate, message);
+            return createResult(shouldRotate, message, this.getClass().getCanonicalName());
         } catch (IndexNotFoundException e) {
             log.error("Unknown index, cannot perform rotation", e);
             return null;

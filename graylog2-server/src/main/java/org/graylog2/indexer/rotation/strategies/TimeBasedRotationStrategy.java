@@ -48,8 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.indexer.rotation.common.IndexRotator.*;
-import static org.graylog2.indexer.rotation.common.IndexRotator.createResult;
+import static org.graylog2.indexer.rotation.common.IndexRotator.Result;
 import static org.joda.time.DateTimeFieldType.dayOfMonth;
 import static org.joda.time.DateTimeFieldType.hourOfDay;
 import static org.joda.time.DateTimeFieldType.minuteOfHour;
@@ -188,6 +187,10 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
      */
     public void reset() {
         this.anchor.clear();
+    }
+
+    private IndexRotator.Result createResult(boolean shouldRotate, String message) {
+        return IndexRotator.createResult(shouldRotate, message, this.getClass().getCanonicalName());
     }
 
     @Nullable
