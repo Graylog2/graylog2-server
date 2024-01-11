@@ -71,7 +71,8 @@ public class IndexFieldTypeProfileServiceTest {
         toTest = new IndexFieldTypeProfileService(mongoConnection,
                 objectMapperProvider,
                 new MongoCollections(new CommonMongoJackObjectMapperProvider(objectMapperProvider), mongoConnection),
-                indexFieldTypeProfileUsagesService);
+                indexFieldTypeProfileUsagesService,
+                mongoIndexSetService);
     }
 
     @Test
