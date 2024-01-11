@@ -173,10 +173,6 @@ public class MongoIndexRangeService implements IndexRangeService {
     @AllowConcurrentEvents
     public void handleIndexDeletion(IndicesDeletedEvent event) {
         for (String index : event.indices()) {
-            if (!indexSetRegistry.isManagedIndex(index)) {
-                LOG.debug("Not handling deleted index <{}> because it's not managed by any index set.", index);
-                continue;
-            }
             LOG.debug("Index \"{}\" has been deleted. Removing index range.", index);
             if (remove(index)) {
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));

@@ -17,15 +17,16 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import type { DataNode } from 'preflight/types';
 import useParams from 'routing/useParams';
-import useDataNodes from 'components/datanode/hooks/useDataNodes';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import { Row, Col, Label } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, RelativeTime, Spinner } from 'components/common';
-import type { SearchParams } from 'stores/PaginationTypes';
+import { DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import Icon from 'components/common/Icon';
+import useDataNode from 'components/datanode/hooks/useDataNode';
+import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
 const StyledHorizontalDl = styled.dl(({ theme }) => css`
   margin: ${theme.spacings.md} 0;
@@ -57,19 +58,23 @@ const BooleanValue = ({ value }: { value: boolean }) => (
   <><BooleanIcon name={value ? 'check-circle' : 'times-circle'} value={value} /> {value ? 'yes' : 'no'}</>
 );
 
+const ActionsCol = styled(Col)`
+  text-align: right;
+`;
+
 const DataNodePage = () => {
   const { dataNodeId } = useParams();
-  const { data: { elements }, isInitialLoading } = useDataNodes({
-    query: '',
-    page: 1,
-    pageSize: 0,
-  } as SearchParams);
+  const { data, isInitialLoading, error } = useDataNode(dataNodeId);
 
   if (isInitialLoading) {
     return <Spinner />;
   }
 
-  const datanode = elements.find((node) => node.node_id === dataNodeId);
+  if (!isInitialLoading && (!data || error)) {
+    return <NoSearchResult>Error: {error?.message}</NoSearchResult>;
+  }
+
+  const datanode = data as DataNode;
   const datanodeDisabled = datanode.data_node_status !== 'AVAILABLE';
 
   return (
@@ -81,8 +86,8 @@ const DataNodePage = () => {
                     path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
                   }} />
       <Row className="content">
-        <Col md={12}>
-          <Col md={5}>
+        <Col xs={12}>
+          <Col xs={9}>
             <h2>Details:</h2>
             <StyledHorizontalDl>
               <dt>Hostname:</dt>
@@ -104,6 +109,9 @@ const DataNodePage = () => {
               <dd><RelativeTime dateTime={datanode.cert_valid_until} /> <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} /></dd>
             </StyledHorizontalDl>
           </Col>
+          <ActionsCol xs={3}>
+            <DataNodeActions dataNode={datanode} displayAs="buttons" />
+          </ActionsCol>
         </Col>
       </Row>
     </DocumentTitle>

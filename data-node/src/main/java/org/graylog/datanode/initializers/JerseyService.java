@@ -51,12 +51,14 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -229,8 +231,9 @@ public class JerseyService extends AbstractIdleService {
         final boolean isSecuredInstance = sslEngineConfigurator != null;
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
 
-        if(isSecuredInstance) {
-            resourceConfig.register(new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode"));
+        if (isSecuredInstance) {
+            resourceConfig.register(createAuthFilter(configuration));
+
         }
         resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));
 
@@ -262,6 +265,13 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return httpServer;
+    }
+
+    @NotNull
+    private ContainerRequestFilter createAuthFilter(Configuration configuration) {
+        final ContainerRequestFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
+        final AuthTokenValidator tokenVerifier = new JwtTokenValidator(configuration.getPasswordSecret());
+        return new DatanodeAuthFilter(basicAuthFilter, tokenVerifier);
     }
 
     private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation)
