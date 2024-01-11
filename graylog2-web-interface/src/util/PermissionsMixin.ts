@@ -14,9 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const _isWildCard = (permissionSet) => (permissionSet.indexOf('*') > -1);
+import type * as Immutable from 'immutable';
 
-const _permissionPredicate = (permissionSet, p) => {
+type Permission = string;
+type Permissions = Array<Permission>;
+type UserPermissions = Immutable.List<Permission>;
+
+const _isWildCard = (permissionSet: UserPermissions | Permissions) => (permissionSet.indexOf('*') > -1);
+
+const _permissionPredicate = (permissionSet: UserPermissions | Permissions, p: Permission) => {
   if ((permissionSet.indexOf(p) > -1) || (permissionSet.indexOf('*') > -1)) {
     return true;
   }
@@ -36,7 +42,7 @@ const _permissionPredicate = (permissionSet, p) => {
   return (permissionSet.indexOf(`${p}:*`) > -1);
 };
 
-export const isPermitted = (possessedPermissions, requiredPermissions) => {
+export const isPermitted = (possessedPermissions: UserPermissions | Permissions, requiredPermissions: Permissions | Permission) => {
   if (!requiredPermissions || requiredPermissions.length === 0) {
     return true;
   }
@@ -49,14 +55,14 @@ export const isPermitted = (possessedPermissions, requiredPermissions) => {
     return true;
   }
 
-  if (requiredPermissions.every) {
+  if (typeof requiredPermissions === 'object') {
     return requiredPermissions.every((p) => _permissionPredicate(possessedPermissions, p));
   }
 
   return _permissionPredicate(possessedPermissions, requiredPermissions);
 };
 
-export const isAnyPermitted = (possessedPermissions, requiredPermissions) => {
+export const isAnyPermitted = (possessedPermissions: UserPermissions, requiredPermissions: Permissions) => {
   if (!requiredPermissions || requiredPermissions.length === 0) {
     return true;
   }
