@@ -123,18 +123,25 @@ Added fields:
 - `event_created`: Contains the `vendorTimestamp`, `eventCreated`, or `timestamp` log value.
 - `event_source_product`: Contains the static value `f5_big-ip`.
 
+Removed fields:
+- `host_name` (this value is still available in the `source` field)
+- `log_level`
+- `service`
+- `vendor_event_description`
+
 ## Java API Changes
 
 The following Java Code API changes have been made.
 
-| File/method                                       | Description                    |
-|---------------------------------------------------|--------------------------------|
-| `org.graylog2.plugin.Message#addStringFields`     | Deprecated method removed      |
-| `org.graylog2.plugin.Message#addLongFields`       | Deprecated method removed      |
-| `org.graylog2.plugin.Message#addDoubleFields`     | Deprecated method removed      |
-| `org.graylog2.plugin.Message#getValidationErrors` | Deprecated method removed      |
-| `org.graylog2.plugin.SingletonMessages` | Unused class removed     |
-| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException`        | Unused exception class removed |
+| File/method                                                           | Description                    |
+|-----------------------------------------------------------------------|--------------------------------|
+| `org.graylog2.plugin.Message#addStringFields`                         | Deprecated method removed      |
+| `org.graylog2.plugin.Message#addLongFields`                           | Deprecated method removed      |
+| `org.graylog2.plugin.Message#addDoubleFields`                         | Deprecated method removed      |
+| `org.graylog2.plugin.Message#getValidationErrors`                     | Deprecated method removed      |
+| `org.graylog2.plugin.SingletonMessages`                               | Unused class removed           |
+| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException` | Unused exception class removed |
+| `org.graylog2.indexer.IndexMappingTemplate#toTemplate`                | Method parameter list modified |
 
 
 ## REST API Endpoint Changes

@@ -16,23 +16,33 @@
  */
 package org.graylog2.indexer.indexset.profile;
 
+import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Sorts;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
-import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.CUSTOM_MAPPINGS_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.DESCRIPTION_FIELD_NAME;
@@ -47,8 +57,16 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(ID_FIELD_NAME).title("Profile Id").hidden(true).sortable(true).build(),
-            EntityAttribute.builder().id(NAME_FIELD_NAME).title("Profile Name").sortable(true).build(),
-            EntityAttribute.builder().id(DESCRIPTION_FIELD_NAME).title("Profile Description").sortable(false).build(),
+            EntityAttribute.builder().id(NAME_FIELD_NAME).title("Profile Name")
+                    .sortable(true)
+                    .filterable(true)
+                    .searchable(true)
+                    .build(),
+            EntityAttribute.builder().id(DESCRIPTION_FIELD_NAME).title("Profile Description")
+                    .sortable(false)
+                    .filterable(true)
+                    .searchable(true)
+                    .build(),
             EntityAttribute.builder().id(CUSTOM_MAPPINGS_FIELD_NAME).title("Custom Field Mappings").sortable(false).build()
     );
 
@@ -56,11 +74,32 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
             .sort(Sorting.create(IndexFieldTypeProfile.NAME_FIELD_NAME, Sorting.Direction.valueOf("asc".toUpperCase(Locale.ROOT))))
             .build();
 
+    private final MongoCollection<IndexFieldTypeProfile> collection;
+    private final DbQueryCreator dbQueryCreator;
+
+    private final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService;
+
     @Inject
     public IndexFieldTypeProfileService(final MongoConnection mongoConnection,
-                                        final MongoJackObjectMapperProvider mapper) {
+                                        final MongoJackObjectMapperProvider mapper,
+                                        final MongoCollections mongoCollections,
+                                        final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService) {
         super(mongoConnection, mapper, IndexFieldTypeProfile.class, INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME);
         this.db.createIndex(new BasicDBObject(IndexFieldTypeProfile.NAME_FIELD_NAME, 1), new BasicDBObject("unique", false));
+        this.collection = mongoCollections.get(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
+        this.dbQueryCreator = new DbQueryCreator(IndexFieldTypeProfile.NAME_FIELD_NAME, ATTRIBUTES);
+        this.indexFieldTypeProfileUsagesService = indexFieldTypeProfileUsagesService;
+    }
+
+    public Optional<IndexFieldTypeProfileWithUsages> getWithUsages(final String profileId) {
+        final Optional<IndexFieldTypeProfile> indexFieldTypeProfile = this.get(profileId);
+
+        return indexFieldTypeProfile.map(profile ->
+                new IndexFieldTypeProfileWithUsages(
+                        profile,
+                        indexFieldTypeProfileUsagesService.usagesOfProfile(profile.id())
+                )
+        );
     }
 
     @Override
@@ -75,17 +114,35 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         return writeResult.getN() > 0;
     }
 
-    public PageListResponse<IndexFieldTypeProfile> getPaginated(final int page,
+    public PageListResponse<IndexFieldTypeProfileWithUsages> getPaginated(final String query,
+                                                                final List<String> filters,
+                                                                final int page,
                                                                 final int perPage,
                                                                 final String sortField,
                                                                 final String order) {
 
-        final PaginatedList<IndexFieldTypeProfile> paginated = findPaginatedWithQueryAndSort(
-                DBQuery.empty(),
-                getSortBuilder(order, sortField),
+        final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
+        final Bson dbSort = "desc".equalsIgnoreCase(order) ? Sorts.descending(sortField) : Sorts.ascending(sortField);
+
+        final long total = collection.countDocuments(dbQuery);
+        List<IndexFieldTypeProfile> singlePageOfProfiles = new ArrayList<>(perPage);
+        collection.find(dbQuery)
+                .sort(dbSort)
+                .limit(perPage)
+                .skip(perPage * Math.max(0, page - 1))
+                .into(singlePageOfProfiles);
+
+        final Map<String, Set<String>> profileUsagesInIndexSets = indexFieldTypeProfileUsagesService.usagesOfProfiles(singlePageOfProfiles.stream().map(IndexFieldTypeProfile::id).collect(Collectors.toSet()));
+
+        final PaginatedList<IndexFieldTypeProfileWithUsages> paginated = new PaginatedList<>(
+                singlePageOfProfiles.stream()
+                        .map(profile -> new IndexFieldTypeProfileWithUsages(profile, profileUsagesInIndexSets.get(profile.id())))
+                        .collect(Collectors.toList()),
+                Ints.saturatedCast(total),
                 page,
                 perPage);
-        return PageListResponse.create("",
+
+        return PageListResponse.create(query,
                 paginated,
                 sortField,
                 order,

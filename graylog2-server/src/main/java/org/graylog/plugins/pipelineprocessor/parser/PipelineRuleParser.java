@@ -294,11 +294,13 @@ public class PipelineRuleParser {
 
         @Override
         public void exitVarAssignStmt(RuleLangParser.VarAssignStmtContext ctx) {
-            final String name = unquote(ctx.varName.getText(), '`');
-            final Expression expr = exprs.get(ctx.expression());
-            parseContext.defineVar(name, expr);
-            definedVars.add(name);
-            parseContext.statements.add(new VarAssignStatement(name, expr));
+            if (ctx.varName != null) {
+                final String name = unquote(ctx.varName.getText(), '`');
+                final Expression expr = exprs.get(ctx.expression());
+                parseContext.defineVar(name, expr);
+                definedVars.add(name);
+                parseContext.statements.add(new VarAssignStatement(name, expr));
+            }
         }
 
         @Override

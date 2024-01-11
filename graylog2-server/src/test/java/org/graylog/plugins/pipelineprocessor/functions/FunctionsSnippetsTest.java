@@ -1398,20 +1398,30 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupAll() {
-        doReturn(LookupResult.single("val1")).when(lookupTable).lookup("key1");
-        doReturn(LookupResult.single("val2")).when(lookupTable).lookup("key2");
-        doReturn(LookupResult.single("val3")).when(lookupTable).lookup("key3");
+    public void lookupAll() throws IOException {
+        doReturn(LookupResult.single("val1")).when(lookupTable).lookup("one");
+        doReturn(LookupResult.single("val2")).when(lookupTable).lookup("two");
+        doReturn(LookupResult.single("val3")).when(lookupTable).lookup("three");
 
         final Rule rule = parser.parseRule(ruleForTest(), false);
-        final Message message = evaluateRule(rule);
+        final Message message = new Message("message", "source", DateTime.now(DateTimeZone.UTC));
 
-        verify(lookupTable).lookup("key1");
-        verify(lookupTable).lookup("key2");
-        verify(lookupTable).lookup("key3");
+        try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
+            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+            message.addField("json_with_arrays", jsonString);
+            evaluateRule(rule, message);
+            assertThat(actionsTriggered.get()).isTrue();
+        }
+
+        verify(lookupTable, times(3)).lookup("one");
+        verify(lookupTable, times(2)).lookup("two");
+        verify(lookupTable, times(2)).lookup("three");
+
         verifyNoMoreInteractions(lookupTable);
 
+        assertThat(message.getField("json_results")).isEqualTo(Arrays.asList("val1", "val2", "val3"));
         assertThat(message.getField("results")).isEqualTo(Arrays.asList("val1", "val2", "val3"));
+        assertThat(message.getField("single_result")).isEqualTo(Arrays.asList("val1"));
     }
 
     @Test
