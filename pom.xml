@@ -160,7 +160,7 @@
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
-        <protobuf.version>3.25.1</protobuf.version>
+        <protobuf.version>3.25.2</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -524,12 +524,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
