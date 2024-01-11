@@ -27,7 +27,7 @@ abstract public class AbstractArrayFunction<T> extends AbstractFunction<T> {
     @SuppressWarnings("rawtypes")
     static List toList(Object obj) {
         if (obj == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         else if (obj instanceof Collection) {
             return ImmutableList.copyOf((Collection) obj);
