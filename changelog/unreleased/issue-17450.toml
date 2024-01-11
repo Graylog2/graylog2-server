@@ -1,5 +1,5 @@
 type = "changed"
-message = "Dynamically choose default number of process-buffer and output-buffer processors."
+message = "Automatically choose default number of process-buffer and output-buffer processors based on available CPU cores."
 
 issues = ["17450"]
 pulls = ["17737"]
