@@ -15,16 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 import { Wizard } from 'components/common';
 import MigrationHelpStep from 'components/datanode/migrations/MigrationHelpStep';
-
-const STEP_KEYS = ['welcome', 'compatibility-check'];
+import CAStep from 'components/datanode/migrations/CAStep';
+import useMigrationStep, { STEP_KEYS } from 'components/datanode/hooks/useMigrationStep';
+import ManualMigrationStep from 'components/datanode/migrations/ManualMigrationStep';
 
 const MigrationWizard = () => {
-  const [activeStep, setActiveStep] = useState(STEP_KEYS[1]);
+  const [activeStep, setActiveStep] = useState(null);
+  const { wizardStep } = useMigrationStep();
+
+  useEffect(() => {
+    setActiveStep(wizardStep);
+  }, [wizardStep]);
 
   const onWizardStepChange = (step: string) => {
     setActiveStep(step);
@@ -40,6 +46,21 @@ const MigrationWizard = () => {
       key: 'compatibility-check',
       title: (<>Compatibitlity Check</>),
       component: <CompatibilityCheckStep onStepComplete={() => onWizardStepChange(STEP_KEYS[2])} />,
+    },
+    {
+      key: 'ca-configuration',
+      title: (<>CA Configuration</>),
+      component: <CAStep onStepComplete={() => onWizardStepChange(STEP_KEYS[2])} />,
+    },
+    {
+      key: 'manual-migration',
+      title: (<>Migration Steps</>),
+      component: <ManualMigrationStep />,
+    },
+    {
+      key: 'finished',
+      title: (<>Finished</>),
+      component: <>Finised</>,
     },
   ];
 
