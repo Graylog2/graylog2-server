@@ -26,24 +26,22 @@ import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexSetFieldTypesList';
-import useCurrentUser from 'hooks/useCurrentUser';
 import ChangeFieldTypeButton from 'components/indices/IndexSetFieldTypes/ChangeFieldTypeButton';
+import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
   const navigate = useNavigate();
   const { indexSet } = useStore(IndexSetsStore);
-  const currentUser = useCurrentUser();
+  const hasMappingPermission = useHasTypeMappingPermission();
 
   useEffect(() => {
-    const hasMappingPermission = currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
-
     if (!hasMappingPermission) {
       navigate(Routes.NOTFOUND);
     } else {
       IndexSetsActions.get(indexSetId);
     }
-  }, [currentUser.permissions, indexSetId, navigate]);
+  }, [hasMappingPermission, indexSetId, navigate]);
 
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
