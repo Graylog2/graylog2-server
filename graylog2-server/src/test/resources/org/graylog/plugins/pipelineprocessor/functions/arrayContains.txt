@@ -25,6 +25,7 @@ then
     set_field(field: "path_array_not_numbers_contains", value: array_contains(elements: selectedPath.numbers, value: 10));
     set_field(field: "path_array_not_decimals_contains", value: array_contains(elements: selectedPath.decimals, value: 10.1));
     set_field(field: "path_array_not_booleans_contains", value: array_contains(elements: selectedPath.booleans, value: false));
+    set_field("contains_null_array", array_contains(selectedPath.null, "test"));
 
     trigger_test();
 end
