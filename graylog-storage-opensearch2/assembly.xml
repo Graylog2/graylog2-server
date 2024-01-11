@@ -25,8 +25,6 @@
                 <include>org.apache.httpcomponents:httpclient</include>
                 <include>org.apache.httpcomponents:httpcore</include>
                 <include>org.apache.httpcomponents:httpcore-nio</include>
-                <include>jakarta.json.bind:jakarta.json.bind-api</include>
-                <include>jakarta.json:jakarta.json-api</include>
             </includes>
         </dependencySet>
     </dependencySets>
