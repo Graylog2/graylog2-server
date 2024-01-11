@@ -47,6 +47,9 @@ import { Link } from 'components/common/router';
 import expandedSections from 'components/indices/IndexSetFieldTypes/expandedSections';
 import OverriddenProfileOriginBadge from 'components/indices/IndexSetFieldTypes/OverriddenProfileOriginBadge';
 import hasOverride from 'components/indices/helpers/hasOverride';
+import { useStore } from 'stores/connect';
+import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 
 import BulkActions from './BulkActions';
 
@@ -76,9 +79,12 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
+  const { indexSet } = useStore(IndexSetsStore);
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { data: { fieldTypes } } = useFieldTypesForMappings();
+  const { data: { name: profileName } } = useProfile(indexSet?.field_type_profile);
+
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -132,7 +138,7 @@ const IndexSetFieldTypesList = () => {
         renderCell: (origin: FieldTypeOrigin, { id }) => {
           switch (origin) {
             case 'PROFILE':
-              return <Link to={Routes.SYSTEM.INDICES.LIST}>Profile name</Link>;
+              return <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(indexSet.field_type_profile)}>{profileName}</Link>;
             case 'OVERRIDDEN_INDEX':
               return <Badge bsStyle="primary">{normalizedOrigin?.OVERRIDDEN_INDEX?.title}</Badge>;
             case 'OVERRIDDEN_PROFILE':
@@ -151,7 +157,7 @@ const IndexSetFieldTypesList = () => {
         staticWidth: 120,
       },
     },
-  }), [fieldTypes, normalizedOrigin]);
+  }), [fieldTypes, indexSet.field_type_profile, normalizedOrigin, profileName]);
 
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}

@@ -18,9 +18,10 @@ import React from 'react';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { useStore } from 'stores/connect';
 import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useProfileWithMappingsByField';
 
 type Props = {
   type: string,
@@ -28,10 +29,10 @@ type Props = {
 }
 
 const OverriddenProfileExpandedSection = ({ type, fieldName }: Props) => {
-  const { indexSet: { title: indexSetTitle, id } } = useStore(IndexSetsStore);
-  const { data: { fieldTypes } } = useFieldTypes();
-  const profileFieldType = 'String (aggregatable)';
-  const profileName = 'My Profile Name';
+  const { indexSet: { title: indexSetTitle, id, field_type_profile } } = useStore(IndexSetsStore);
+  const { data: { fieldTypes } } = useFieldTypesForMappings();
+  const { customFieldMappingsByField, name: profileName } = useProfileWithMappingsByField(field_type_profile);
+  const profileFieldType = customFieldMappingsByField?.[fieldName];
 
   return (
     <div>
