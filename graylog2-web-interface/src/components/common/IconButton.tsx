@@ -57,17 +57,17 @@ const handleClick = (onClick) => {
   }
 };
 
-const IconButton = React.forwardRef<HTMLButtonElement, Props>(({ title, onClick, focusable, className, disabled, ...rest }: Props, ref) => (
-  <Wrapper ref={ref} tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button" disabled={disabled}>
+const IconButton = ({ title, onClick, focusable, className, disabled, ...rest }: Props) => (
+  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button" disabled={disabled}>
     <Icon {...rest} />
   </Wrapper>
-));
+);
 
 IconButton.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string,
   onClick: PropTypes.func,
-  name: PropTypes.any,
+  name: PropTypes.string,
 };
 
 IconButton.defaultProps = {

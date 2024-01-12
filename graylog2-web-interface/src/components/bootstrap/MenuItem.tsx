@@ -67,7 +67,7 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
     id,
     onClick: _onClick,
     title,
-  } as const;
+  };
 
   if (href) {
     return (
