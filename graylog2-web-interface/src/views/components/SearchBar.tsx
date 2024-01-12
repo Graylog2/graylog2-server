@@ -85,6 +85,8 @@ const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValue
 
   const queryWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, currentQuery);
 
+  console.log('queryWithPluginData', queryWithPluginData);
+
   const newQuery = queryWithPluginData.toBuilder()
     .timerange(timerange)
     .filter(filtersForQuery(streams))

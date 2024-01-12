@@ -65,6 +65,7 @@ const executeSubmitHandler = async <T>(dispatch: AppDispatch, values: CombinedSe
 
   // eslint-disable-next-line no-restricted-syntax
   for (const submitHandler of submitHandlers) {
+    console.log('submitHandler', submitHandler);
     // eslint-disable-next-line no-await-in-loop,no-loop-func
     const entityWithPluginData = await submitHandler(values, dispatch, updatedEntity).catch((e) => {
       const errorMessage = `An error occurred when executing a submit handler from a plugin: ${e}`;
