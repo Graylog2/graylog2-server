@@ -34,6 +34,11 @@ type Props = React.ComponentProps<typeof BootstrapMenuItem> & {
   icon?: React.ComponentProps<typeof Icon>['name'],
 }
 
+/*
+ * PLEASE NOTE: This component will be removed soon. please use the new `MenuItem` component which is based on mantine.
+ * This component is only implemented by the `AdaptableQueryTabs`, which breaks with the new `MenuItem` component.
+ */
+
 const CustomMenuItem = ({ className, children, icon, ...props } : Props) => (
   <BootstrapMenuItem bsClass={className} {...props}>
     {children && (
