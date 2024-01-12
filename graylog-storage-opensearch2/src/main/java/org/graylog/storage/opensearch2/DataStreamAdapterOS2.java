@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateDataStreamRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamResponse;
@@ -77,6 +78,13 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
         final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
                 "Unable to create data stream template " + templateName);
 
+        return result.isAcknowledged();
+    }
+
+    protected boolean deleteDataStreamTemplate(@Nonnull String templateName) {
+        final DeleteComposableIndexTemplateRequest request = new DeleteComposableIndexTemplateRequest(templateName);
+        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteIndexTemplate(request, requestOptions),
+                "Unable to delete data stream template " + templateName);
         return result.isAcknowledged();
     }
 

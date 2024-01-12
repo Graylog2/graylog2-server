@@ -50,8 +50,8 @@ public class DataStreamAdapterOS2IT {
         // create template for data stream
         Template template = new Template(List.of(stream + "*"), new Template.Mappings(Map.of()), 1L,
                 new Template.Settings(Map.of()));
-        boolean ack = dataStreamAdapter.ensureDataStreamTemplate("testtemplate",
-                template, "timestamp");
+        String templateName = "datastream-test-template";
+        boolean ack = dataStreamAdapter.ensureDataStreamTemplate(templateName, template, "timestamp");
         assertThat(ack).isTrue();
 
         // create data stream and backing index
@@ -75,6 +75,10 @@ public class DataStreamAdapterOS2IT {
 
         assert simpleTestPolicy.id() != null;
         dataStreamAdapter.deleteIsmPolicy(simpleTestPolicy.id());
+
+        ack = dataStreamAdapter.deleteDataStreamTemplate(templateName);
+        assertThat(ack).isTrue();
+
     }
 
 
