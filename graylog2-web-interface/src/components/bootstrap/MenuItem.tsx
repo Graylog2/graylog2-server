@@ -63,12 +63,11 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
   const sharedProps = {
     className,
     disabled,
+    icon: icon ? <IconWrapper><Icon name={icon} /></IconWrapper> : null,
     id,
     onClick: _onClick,
     title,
   } as const;
-
-  const iconComponent = icon ? <IconWrapper><Icon name={icon} /></IconWrapper> : null;
 
   if (href) {
     return (
@@ -77,7 +76,6 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
                  target={target}
                  rel={rel}
                  {...sharedProps}>
-        {iconComponent}
         {children}
       </Menu.Item>
     );
@@ -85,7 +83,6 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
 
   return (
     <Menu.Item {...sharedProps}>
-      {iconComponent}
       {children}
     </Menu.Item>
   );
