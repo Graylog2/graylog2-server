@@ -29,6 +29,7 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import StopStreamsAction from 'components/streams/StreamsOverview/BulkActions/StopStreamsAction';
 import SearchStreamsAction from 'components/streams/StreamsOverview/BulkActions/SearchStreamsAction';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { IfPermitted } from 'components/common';
 
 import StartStreamsAction from './StartStreamsAction';
 import AssignIndexSetModal from './AssignIndexSetModal';
@@ -84,7 +85,9 @@ const BulkActions = ({ indexSets }: Props) => {
                              refetchStreams={refetchStreams} />
       )}
       <BulkActionsDropdown>
-        <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
+        <IfPermitted permissions="indexsets:read">
+          <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
+        </IfPermitted>
         <SearchStreamsAction />
         <StartStreamsAction handleFailures={handleFailures}
                             refetchStreams={refetchStreams}
