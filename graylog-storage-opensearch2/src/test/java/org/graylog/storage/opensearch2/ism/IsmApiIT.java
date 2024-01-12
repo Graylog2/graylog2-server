@@ -43,11 +43,12 @@ public class IsmApiIT {
     @Test
     public void testCreatePolicyAndGet() {
         IsmPolicy policy = IsmPolicyTest.createSimpleTestPolicy();
-        final String testPolicy = "testPolicy";
+        final String testPolicy = policy.id();
         ismApi.createPolicy(testPolicy, policy);
         Optional<IsmPolicy> storedPolicy = ismApi.getPolicy(testPolicy);
         assertThat(storedPolicy).isPresent();
         assertThat(storedPolicy.get().id()).isEqualTo(testPolicy);
+        ismApi.deletePolicy(testPolicy);
     }
 
 }

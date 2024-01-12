@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DataStream;
 import org.graylog.storage.opensearch2.ism.IsmApi;
+import org.graylog.storage.opensearch2.ism.policy.IsmPolicy;
 import org.graylog.storage.opensearch2.ism.policy.IsmPolicyTest;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog2.indexer.indices.Template;
@@ -65,11 +66,15 @@ public class DataStreamAdapterOS2IT {
         assertThat(dataStreams.get(0)).isEqualTo(dataStreams2.get(0));
 
         // apply ism policy
-        dataStreamAdapter.applyIsmPolicy(stream, IsmPolicyTest.createSimpleTestPolicy());
+        IsmPolicy simpleTestPolicy = IsmPolicyTest.createSimpleTestPolicy();
+        dataStreamAdapter.applyIsmPolicy(stream, simpleTestPolicy);
 
         // clean up to avoid exception when deleting indices
         ack = dataStreamAdapter.deleteDataStream(stream);
         assertThat(ack).isTrue();
+
+        assert simpleTestPolicy.id() != null;
+        dataStreamAdapter.deleteIsmPolicy(simpleTestPolicy.id());
     }
 
 

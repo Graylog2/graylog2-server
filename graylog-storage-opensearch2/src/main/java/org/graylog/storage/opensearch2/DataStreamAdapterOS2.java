@@ -39,6 +39,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class DataStreamAdapterOS2 implements DataStreamAdapter {
@@ -108,6 +109,9 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
         // for the time being, we will just remove and reapply the policy to the data stream.
         IsmPolicy ismPolicy = (IsmPolicy) policy;
         final String id = ismPolicy.id();
+        if (Objects.isNull(id)) {
+            throw new IllegalArgumentException("Policy Id may not be null");
+        }
         final Optional<IsmPolicy> osPolicy = ismApi.getPolicy(id);
         if (osPolicy.isPresent()) {
             ismApi.removePolicyFromIndex(dataStreamName);
@@ -115,6 +119,10 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
         }
         ismApi.createPolicy(ismPolicy.id(), new IsmPolicy(ismPolicy.policy()));
         ismApi.addPolicyToIndex(id, dataStreamName);
+    }
+
+    public void deleteIsmPolicy(@Nonnull String policyId) {
+        ismApi.deletePolicy(policyId);
     }
 
 

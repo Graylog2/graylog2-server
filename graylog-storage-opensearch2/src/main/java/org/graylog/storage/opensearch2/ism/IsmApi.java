@@ -28,6 +28,7 @@ import org.graylog.storage.opensearch2.ism.policy.IsmPolicy;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -49,6 +50,13 @@ public class IsmApi {
     }
 
     public void createPolicy(String policyId, IsmPolicy policy) {
+        // remove id from policy since it is not allowed on creation
+        if (!Objects.isNull(policy.id())) {
+            if (!policyId.equals(policy.id())) {
+                throw new IllegalArgumentException("Policy id present in policy does not match provided id.");
+            }
+            policy = new IsmPolicy(policy.policy());
+        }
         final Request request = request("PUT", "policies/" + policyId, policy);
         perform(request,
                 new TypeReference<IsmPolicy>() {},

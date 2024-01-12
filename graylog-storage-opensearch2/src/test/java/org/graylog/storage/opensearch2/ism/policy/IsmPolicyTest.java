@@ -36,7 +36,7 @@ public class IsmPolicyTest {
         Policy.State deleteState = deleteState();
         Policy.State initialState = transitionState(deleteState.name());
         Policy policy = new Policy("Test Policy", initialState.name(), ImmutableList.of(initialState, deleteState));
-        return new IsmPolicy(policy);
+        return new IsmPolicy("graylog-ism-test-policy", policy);
     }
 
     private static Policy.State transitionState(String nextState) {
@@ -55,6 +55,7 @@ public class IsmPolicyTest {
 
     String simpleTestPolicyJson = """
             {
+              "_id" : "graylog-ism-test-policy",
               "policy" : {
                 "description" : "Test Policy",
                 "default_state" : "transition",
