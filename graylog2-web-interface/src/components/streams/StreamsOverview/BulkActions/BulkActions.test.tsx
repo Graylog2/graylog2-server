@@ -324,7 +324,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       render(<BulkActions indexSets={indexSets} />);
 
       await openActionsDropdown();
-      const link = await screen.findByRole('link', { name: /search in streams/i }) as HTMLAnchorElement;
+      const link = await screen.findByRole('menuitem', { name: /search in streams/i }) as HTMLAnchorElement;
 
       expect(link.href).toContain('/search?rangetype=relative&from=300&streams=stream-id-1%2Cstream-id-2');
     });
