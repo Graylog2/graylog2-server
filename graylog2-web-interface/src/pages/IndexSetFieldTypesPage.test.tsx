@@ -26,7 +26,7 @@ import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { customField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
 
 const getData = (list = [defaultField]) => (
@@ -47,7 +47,7 @@ const renderIndexSetFieldTypesPage = () => render(
   </QueryParamProvider>,
 );
 
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
@@ -74,7 +74,7 @@ describe('IndexSetFieldTypesList', () => {
       isInitialLoading: false,
     });
 
-    asMock(useFieldTypes).mockReturnValue({
+    asMock(useFieldTypesForMappings).mockReturnValue({
       data: {
         fieldTypes: {
           string: 'String type',

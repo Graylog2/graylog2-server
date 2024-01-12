@@ -17,7 +17,6 @@
 package org.graylog.testing.utils;
 
 import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -82,6 +81,7 @@ public class IndexSetUtils {
                 1,
                 false,
                 Duration.standardSeconds(5L),
+                null,
                 null
         );
 
