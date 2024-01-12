@@ -18,6 +18,7 @@ package org.graylog2.indexer.indexset;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -177,6 +178,16 @@ public class MongoIndexSetService implements IndexSetService {
         clusterEventBus.post(createdEvent);
 
         return savedObject;
+    }
+
+    @Override
+    public void removeReferencesToProfile(final String profileId) {
+        collection.update(
+                new BasicDBObject(IndexSetConfig.FIELD_PROFILE_ID, profileId),
+                new BasicDBObject("$unset", new BasicDBObject(IndexSetConfig.FIELD_PROFILE_ID, "1")),
+                false,
+                true
+        );
     }
 
     /**

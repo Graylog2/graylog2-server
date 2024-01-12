@@ -101,4 +101,11 @@ public interface IndexSetService {
      * @see #delete(ObjectId)
      */
     int delete(String id);
+
+    /**
+     * Remove references to given profile in each index set that references it.
+     *
+     * @param profileId Id of the profile.
+     */
+    void removeReferencesToProfile(String profileId);
 }
