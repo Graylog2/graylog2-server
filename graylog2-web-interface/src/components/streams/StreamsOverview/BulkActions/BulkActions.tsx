@@ -29,7 +29,7 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import StopStreamsAction from 'components/streams/StreamsOverview/BulkActions/StopStreamsAction';
 import SearchStreamsAction from 'components/streams/StreamsOverview/BulkActions/SearchStreamsAction';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { IfPermitted } from 'components/common';
+import IfPermitted from 'components/common/IfPermitted';
 
 import StartStreamsAction from './StartStreamsAction';
 import AssignIndexSetModal from './AssignIndexSetModal';
