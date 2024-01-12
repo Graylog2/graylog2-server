@@ -92,7 +92,7 @@ class FilterForm extends React.Component {
     (streamIds) => streamIds.join('-'),
   );
 
-  _parseQuery = debounce((queryString) => {
+  _parseQuery = debounce((queryString, searchFilters = new OrderedMap()) => {
     if (!this._userCanViewLookupTables()) {
       return;
     }
@@ -103,6 +103,7 @@ class FilterForm extends React.Component {
       .id(queryId)
       .query({ type: 'elasticsearch', query_string: queryString })
       .timerange({ type: 'relative', range: 1000 })
+      .filters(searchFilters.toList())
       .searchTypes([{
         id: searchTypeId,
         type: 'messages',
@@ -209,20 +210,21 @@ class FilterForm extends React.Component {
   };
 
   handleSearchFiltersChange = (searchFilters) => {
-    const payload = searchFilters.map((searchFilter) => ({
-      id: searchFilter.id,
-      type: searchFilter.type,
-      title: searchFilter.title,
-      queryString: searchFilter.queryString,
-      disabled: !!searchFilter.disabled,
-      negation: !!searchFilter.negation,
-    }));
+    // eslint-disable-next-line no-unused-vars
+    const payload = searchFilters.map(({ frontendId, ...filter }) => filter);
 
-    this.propagateChange('filters', payload);
+    const { query } = this.props.eventDefinition.config;
+
+    this._parseQuery(query, payload);
+
+    this.propagateChange('filters', payload.toArray());
   };
 
   getInitialSearchFilters = () => {
     const { filters } = this.props.eventDefinition.config;
+
+    if (!filters) return new OrderedMap();
+
     const searchFilters = new OrderedMap(filters.map((filter) => ([
       filter.id || uuidv4(),
       { frontendId: filter.id || uuidv4(), ...filter },
@@ -351,7 +353,7 @@ class FilterForm extends React.Component {
 
     const searchBarControls = PluginStore.exports('views.components.searchBar') ?? [];
     const existingControls = searchBarControls.map((controlFn) => controlFn()).filter((control) => !!control);
-    const leftControls = existingControls.filter(({ placement }) => placement === 'left');
+    const searchFiltersPlugin = existingControls.filter(({ id }) => id === 'search-filters');
 
     return (
       <fieldset>
@@ -375,9 +377,9 @@ class FilterForm extends React.Component {
         <FormGroup controlId="search-filters">
           <ControlLabel>Search Filters <small className="text-muted">(Optional)</small></ControlLabel>
           <div style={{ maring: '8px 0' }}>
-            <Formik onSubmit={({ searchFilters }) => this.handleSearchFiltersChange(searchFilters.toArray())}
+            <Formik onSubmit={({ searchFilters }) => this.handleSearchFiltersChange(searchFilters)}
                     initialValues={{ searchFilters: this.getInitialSearchFilters() }}>
-              {() => renderControls(leftControls)}
+              {() => renderControls(searchFiltersPlugin)}
             </Formik>
           </div>
         </FormGroup>
