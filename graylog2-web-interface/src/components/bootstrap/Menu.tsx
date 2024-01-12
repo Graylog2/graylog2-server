@@ -74,6 +74,10 @@ const StyledMenuItem = styled(MantineMenu.Item)(({ theme }) => css`
   a {
     color: ${theme.colors.global.textDefault};
     text-decoration: none;
+
+    &:hover, &:focus {
+      color: inherit;
+    }
   }
 `);
 
