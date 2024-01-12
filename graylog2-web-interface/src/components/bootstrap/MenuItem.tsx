@@ -60,10 +60,33 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
     return <Menu.Label role="heading" className={className} id={id}>{children}</Menu.Label>;
   }
 
+  const sharedProps = {
+    className,
+    disabled,
+    id,
+    onClick: _onClick,
+    title,
+  } as const;
+
+  const iconComponent = icon ? <IconWrapper><Icon name={icon} /></IconWrapper> : null;
+
+  if (href) {
+    return (
+      <Menu.Item component="a"
+                 href={href}
+                 target={target}
+                 rel={rel}
+                 {...sharedProps}>
+        {iconComponent}
+        {children}
+      </Menu.Item>
+    );
+  }
+
   return (
-    <Menu.Item className={className} disabled={disabled} id={id} onClick={_onClick} title={title}>
-      {icon && <IconWrapper><Icon name={icon} /></IconWrapper>}
-      {href ? <a href={href} target={target} rel={rel}>{children}</a> : children}
+    <Menu.Item {...sharedProps}>
+      {iconComponent}
+      {children}
     </Menu.Item>
   );
 };

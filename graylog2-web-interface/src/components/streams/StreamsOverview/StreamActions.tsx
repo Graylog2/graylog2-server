@@ -21,7 +21,6 @@ import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
 import { ButtonToolbar, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { StartpageStore } from 'stores/users/StartpageStore';
@@ -190,27 +189,21 @@ const StreamActions = ({
         </IfPermitted>
 
         <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
-          <LinkContainer to={Routes.stream_edit(stream.id)}>
-            <MenuItem disabled={isDefaultStream || isNotEditable}>
-              Manage Rules {isDefaultStream && <DefaultStreamHelp />}
-            </MenuItem>
-          </LinkContainer>
+          <MenuItem disabled={isDefaultStream || isNotEditable} href={Routes.stream_edit(stream.id)}>
+            Manage Rules {isDefaultStream && <DefaultStreamHelp />}
+          </MenuItem>
         </IfPermitted>
         <HideOnCloud>
           <IfPermitted permissions="stream_outputs:read">
-            <LinkContainer to={Routes.stream_outputs(stream.id)}>
-              <MenuItem>
-                Manage Outputs
-              </MenuItem>
-            </LinkContainer>
+            <MenuItem href={Routes.stream_outputs(stream.id)}>
+              Manage Outputs
+            </MenuItem>
           </IfPermitted>
         </HideOnCloud>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <LinkContainer to={Routes.stream_alerts(stream.id)}>
-            <MenuItem>
-              Manage Alerts
-            </MenuItem>
-          </LinkContainer>
+          <MenuItem href={Routes.stream_alerts(stream.id)}>
+            Manage Alerts
+          </MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
