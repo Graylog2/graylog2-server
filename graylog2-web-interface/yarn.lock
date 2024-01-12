@@ -3422,9 +3422,9 @@
     "@types/react" "*"
 
 "@types/react-sticky-el@^1.0.3":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@types/react-sticky-el/-/react-sticky-el-1.0.6.tgz#36ffec271872dcd53de3782f8199fe9c2ec44659"
-  integrity sha512-ermllRAXMOLxrIcIxMZWssz3hcod+Jbr30+jTfPUf5ORmDwR845vjX4qJU4suf4YXHFxZg56PijUg7qhaT6bNg==
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@types/react-sticky-el/-/react-sticky-el-1.0.7.tgz#b3cad755c1aaa319dc13ecf5b2a901d8fc598ff6"
+  integrity sha512-JLWVi2WvSJQ7T3USa18ywQjAnVfPDixwdJx4NhxEXcAnEaiwmCg6TV1uyABTB6hdlxoXUiPTo7sA7DxBSWEfzA==
   dependencies:
     "@types/react" "*"
 
