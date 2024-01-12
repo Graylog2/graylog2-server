@@ -67,7 +67,7 @@ IconButton.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string,
   onClick: PropTypes.func,
-  name: PropTypes.string,
+  name: PropTypes.any,
 };
 
 IconButton.defaultProps = {
