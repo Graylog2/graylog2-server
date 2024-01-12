@@ -42,13 +42,13 @@ describe('DashboardActions', () => {
   let oldWindowConfirm;
 
   const simpleDashboard = simpleView();
+  const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
   const clickDashboardAction = async (action: string) => {
     userEvent.click(await screen.findByText('More'));
     userEvent.click(await screen.findByRole('button', { name: action }));
+    await waitFor(() => menuIsHidden());
   };
-
-  const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
   beforeEach(() => {
     oldWindowConfirm = window.confirm;
@@ -77,8 +77,6 @@ describe('DashboardActions', () => {
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
     expect(ViewManagementActions.delete).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
-
-    await waitFor(() => menuIsHidden());
   });
 
   it('deletes dashboard when user confirms deletion', async () => {
@@ -91,8 +89,6 @@ describe('DashboardActions', () => {
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
     expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
-
-    await waitFor(() => menuIsHidden());
   });
 
   it('does not offer deletion when user has only read permissions', async () => {
@@ -135,8 +131,6 @@ describe('DashboardActions', () => {
       await waitFor(() => expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
 
       expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard);
-
-      await waitFor(() => menuIsHidden());
     });
 
     it('does not delete dashboard when hook returns false', async () => {
@@ -149,8 +143,6 @@ describe('DashboardActions', () => {
       await waitFor(() => expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard));
 
       expect(ViewManagementActions.delete).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
-
-      await waitFor(() => menuIsHidden());
     });
 
     it('resorts to default behavior when hook returns `null`', async () => {
@@ -166,8 +158,6 @@ describe('DashboardActions', () => {
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?');
 
       expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
-
-      await waitFor(() => menuIsHidden());
     });
 
     it('resorts to default behavior when hook throws error', async () => {
@@ -192,8 +182,6 @@ describe('DashboardActions', () => {
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?');
 
       expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
-
-      await waitFor(() => menuIsHidden());
     });
   });
 });
