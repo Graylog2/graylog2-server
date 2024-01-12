@@ -23,6 +23,8 @@ import com.github.rholder.retry.WaitStrategies;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.graylog.plugins.views.storage.migration.ReindexResult;
+import org.graylog.plugins.views.storage.migration.RemoteReindexResult;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
 import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
@@ -30,6 +32,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuild
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
@@ -46,6 +49,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,7 +89,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     @Override
-    public void start(final URI uri, final String username, final String password, final List<String> indices) {
+    public RemoteReindexResult start(final URI uri, final String username, final String password, final List<String> indices) {
         try {
             final var toReindex = isAllIndices(indices) ? getAllIndicesFrom(uri, username, password) : indices;
 
@@ -95,7 +99,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
             waitForClusterRestart(activeNodes);
 
-            reindex(uri, username, password, toReindex);
+            return reindex(uri, username, password, toReindex);
 //            removeAllowlist(uri.getHost() + ":" + uri.getPort());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
@@ -104,14 +108,17 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     @Override
     public Status status() {
+        // TODO: return real migration status
         return Status.STARTING;
     }
 
     Set<String> getActiveNodes() {
-        return nodeService.allActive().values().stream().map(NodeDto::getNodeId).collect(Collectors.toSet());
+        return nodeService.allActive().values().stream()
+                .filter(dn -> dn.getDataNodeStatus() == DataNodeStatus.AVAILABLE) // we have to wait till the datanode is not just alive but all started properly and the indexer accepts connections
+                .map(NodeDto::getNodeId).collect(Collectors.toSet());
     }
 
-    void waitForClusterRestart(final Set<String> activeNodes) {
+    void waitForClusterRestart(final Set<String> expectedNodes) {
         // sleeping for some time to let the cluster stop so we can wait for the restart
         try {
             Thread.sleep(10 * 1000);
@@ -126,7 +133,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 .retryIfException()
                 .build();
 
-        final Callable<Boolean> callable = () -> activeNodes.containsAll(getActiveNodes());
+        final Callable<Boolean> callable = () -> getActiveNodes().containsAll(expectedNodes);
 
         try {
             var successful = retryer.call(callable);
@@ -165,11 +172,16 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         return indices == null || indices.isEmpty() || (indices.size() == 1 && "*".equals(indices.get(0)));
     }
 
-    void reindex(final URI uri, final String username, final String password, final List<String> indices) {
+    RemoteReindexResult reindex(final URI uri, final String username, final String password, final List<String> indices) {
+        List<ReindexResult> results = new ArrayList<>();
         try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
             BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
 
+
             for (var index : indices) {
+                if(this.indices.exists(index)) {
+                    throw new IllegalArgumentException("Can't migrate index " + index + ", as it already exists in the target indexer");
+                }
                 this.indices.create(index, indexSetRegistry.getForIndex(index).orElse(indexSetRegistry.getDefault()));
 
                 final ReindexRequest reindexRequest = new ReindexRequest();
@@ -178,9 +190,12 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                         .setSourceIndices(index).setDestIndex(index);
 
                 var reindexResult = client.execute((c, requestOptions) -> c.reindex(reindexRequest, requestOptions));
+                results.add(new ReindexResult(index, reindexResult.getTook().timeUnit(), reindexResult.getCreated(), reindexResult.getBatches()));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        return new RemoteReindexResult(results);
     }
 }

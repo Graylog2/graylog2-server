@@ -14,19 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+package org.graylog.plugins.views.storage.migration;
 
-import org.graylog.plugins.views.storage.migration.RemoteReindexResult;
-
-import java.net.URI;
 import java.util.List;
 
-public interface RemoteReindexingMigrationAdapter {
-    enum Status {
-        STARTING, RUNNING, ERROR, FINISHED
-    }
-
-    RemoteReindexResult start(URI uri, String username, String password, List<String> indices);
-
-    Status status();
+public record RemoteReindexResult(List<ReindexResult> results) {
 }

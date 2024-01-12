@@ -53,8 +53,8 @@ public class RemoteReindexResource {
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "by remote reindexing", notes = "configure the host/credentials you want to use to migrate data from")
-    public void migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexRequest request) {
-        migrationService.start(request.hostname(), request.user(), request.password(), request.indices());
+    public RemoteReindexResult migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexRequest request) {
+        return migrationService.start(request.hostname(), request.user(), request.password(), request.indices());
     }
 
     @GET
