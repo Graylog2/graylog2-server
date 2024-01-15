@@ -26,7 +26,7 @@ import UserNotification from 'util/UserNotification';
 import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, MenuItem } from 'components/bootstrap';
+import { Nav, NavItem, BootstrapMenuItem as MenuItem } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';

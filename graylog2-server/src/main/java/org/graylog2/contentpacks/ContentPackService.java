@@ -267,6 +267,7 @@ public class ContentPackService {
         final Iterable<Entity> entitiesInOrder = entityTraverser.breadthFirst(rootEntity);
 
         final Set<NativeEntityDescriptor> removedEntities = new HashSet<>();
+        final Map<ModelId, Object> removedEntityObjects = new HashMap<>();
         final Set<NativeEntityDescriptor> failedEntities = new HashSet<>();
         final Set<NativeEntityDescriptor> skippedEntities = new HashSet<>();
 
@@ -303,6 +304,7 @@ public class ContentPackService {
                             //noinspection unchecked
                             facade.delete(((NativeEntity) nativeEntity).entity());
                             removedEntities.add(nativeEntityDescriptor);
+                            removedEntityObjects.put(nativeEntityDescriptor.contentPackEntityId(), ((NativeEntity) nativeEntity).entity());
                         } catch (Exception e) {
                             LOG.warn("Couldn't remove native entity {}", nativeEntity);
                             failedEntities.add(nativeEntityDescriptor);
@@ -321,6 +323,7 @@ public class ContentPackService {
 
         return ContentPackUninstallation.builder()
                 .entities(ImmutableSet.copyOf(removedEntities))
+                .entityObjects(ImmutableMap.copyOf(removedEntityObjects))
                 .skippedEntities(ImmutableSet.copyOf(skippedEntities))
                 .failedEntities(ImmutableSet.copyOf(failedEntities))
                 .build();

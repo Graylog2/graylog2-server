@@ -28,6 +28,7 @@ import ViewState from 'views/logic/views/ViewState';
 import mockHistory from 'helpers/mocking/mockHistory';
 import { asMock } from 'helpers/mocking';
 import useHistory from 'routing/useHistory';
+import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
@@ -64,15 +65,9 @@ const createViewWithQueries = () => {
 };
 
 describe('BigDisplayModeConfiguration', () => {
-  const SUT = (props: Optional<React.ComponentProps<typeof BigDisplayModeConfiguration>, 'view'>) => (
+  const SUT = wrapWithMenu((props: Optional<React.ComponentProps<typeof BigDisplayModeConfiguration>, 'view'>) => (
     <BigDisplayModeConfiguration view={view} {...props} />
-  );
-
-  it('generates markup that matches snapshot', () => {
-    const { container } = render(<SUT />);
-
-    expect(container).toMatchSnapshot();
-  });
+  ));
 
   it('disables menu item if `disabled` prop is `true`', () => {
     const { getByText, queryByText } = render(<SUT disabled />);

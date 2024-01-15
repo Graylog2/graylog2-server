@@ -16,18 +16,21 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
 import { LinkContainer } from 'components/common/router';
 import { NavItem } from 'components/bootstrap';
 
-const DropdownOption = styled(Menu.Item)`
+const DropdownOption = styled(Menu.Item)(({ theme }) => css`
+  font-family: ${theme.fonts.family.navigation};
+  font-size: ${theme.fonts.size.navigation};
+
   &:hover, &:focus {
     color: inherit;
     text-decoration: none;
   }
-`;
+`);
 
 // We render a NavItem if topLevel is set to avoid errors when the NavigationLink is place in the navigation
 // bar instead of a navigation drop-down menu.
@@ -38,7 +41,7 @@ type Props = {
 }
 
 const NavigationLink = ({ description, path, topLevel, ...rest }: Props) => (
-  <LinkContainer key={path} to={path} {...rest}>
+  <LinkContainer key={path} to={path} relativeActive {...rest}>
     {topLevel ? <NavItem>{description}</NavItem> : <DropdownOption component="a">{description}</DropdownOption>}
   </LinkContainer>
 );
