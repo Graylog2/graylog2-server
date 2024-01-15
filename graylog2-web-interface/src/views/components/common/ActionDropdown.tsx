@@ -19,16 +19,15 @@ import PropTypes from 'prop-types';
 
 import { MenuItem } from 'components/bootstrap';
 import Menu from 'components/bootstrap/Menu';
+import StopPropagation from 'views/components/common/StopPropagation';
 
 type Props = {
   children: React.ReactNode,
   element: React.ReactNode,
 };
 
-const stopEvent = (e: React.BaseSyntheticEvent) => e.stopPropagation();
-
 const ActionDropdown = ({ children, element }: Props) => (
-  <span onClick={stopEvent}>
+  <StopPropagation>
     <Menu position="bottom" withinPortal>
       <Menu.Target>
         {element}
@@ -38,7 +37,7 @@ const ActionDropdown = ({ children, element }: Props) => (
         {children}
       </Menu.Dropdown>
     </Menu>
-  </span>
+  </StopPropagation>
 );
 
 ActionDropdown.propTypes = {
