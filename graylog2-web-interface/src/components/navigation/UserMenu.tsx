@@ -44,6 +44,8 @@ const UserMenu = () => {
     : 'Edit profile';
 
   const onLogoutClicked = () => {
+    localStorage.removeItem('currentInvestigationId');
+
     SessionActions.logout().then(() => {
       /* In some cases, when the authentication info is set externally (e.g. trusted headers), we need to retrigger a
          session validation, so we are not stuck at the login screen. */
