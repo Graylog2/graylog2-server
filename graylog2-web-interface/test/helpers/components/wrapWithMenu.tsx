@@ -16,17 +16,14 @@
  */
 import * as React from 'react';
 
-import ActionDropdown from 'views/components/common/ActionDropdown';
-import { IconButton } from 'components/common';
+import Menu from 'components/bootstrap/Menu';
 
-const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton data-testid="widgetActionDropDown" name="chevron-down" title="Open actions dropdown" />;
+const wrapWithMenu = <Props, >(Component: React.ComponentType<Props>): React.ComponentType<Props> => (props: Props) => (
+  <Menu opened>
+    <Menu.Dropdown>
+      <Component {...props} />
+    </Menu.Dropdown>
+  </Menu>
+);
 
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret}>
-      {children}
-    </ActionDropdown>
-  );
-};
-
-export default WidgetActionDropdown;
+export default wrapWithMenu;

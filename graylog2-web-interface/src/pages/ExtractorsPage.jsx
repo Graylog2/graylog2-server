@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
-import { LinkContainer } from 'components/common/router';
 import { DocumentTitle, Spinner } from 'components/common';
 import PageHeader from 'components/common/PageHeader';
 import ExtractorsList from 'components/extractors/ExtractorsList';
@@ -86,12 +85,8 @@ const ExtractorsPage = createReactClass({
           <PageHeader title={<span>Extractors of <em>{input.title}</em></span>}
                       actions={(
                         <DropdownButton bsStyle="info" id="extractor-actions-dropdown" title="Actions" pullRight>
-                          <LinkContainer to={Routes.import_extractors(node.node_id, input.id)}>
-                            <MenuItem>Import extractors</MenuItem>
-                          </LinkContainer>
-                          <LinkContainer to={Routes.export_extractors(node.node_id, input.id)}>
-                            <MenuItem>Export extractors</MenuItem>
-                          </LinkContainer>
+                          <MenuItem href={Routes.import_extractors(node.node_id, input.id)}>Import extractors</MenuItem>
+                          <MenuItem href={Routes.export_extractors(node.node_id, input.id)}>Export extractors</MenuItem>
                         </DropdownButton>
                       )}
                       documentationLink={{
