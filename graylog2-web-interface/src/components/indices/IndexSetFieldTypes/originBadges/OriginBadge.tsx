@@ -16,11 +16,23 @@
  */
 import React from 'react';
 
-import type { OriginBadgeProps } from 'components/indices/IndexSetFieldTypes/types';
 import { Badge } from 'components/bootstrap';
+import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
 
-const IndexBadge = ({ title }: OriginBadgeProps) => (
-  <Badge bsStyle="gray">{title}</Badge>
+type Props = {
+  origin: FieldTypeOrigin,
+  title: string,
+}
+
+type BadgeBsStyle = 'default' | 'danger' | 'info' | 'primary' | 'success' | 'warning' | 'gray'
+const originBsStyles: Record<FieldTypeOrigin, BadgeBsStyle> = {
+  INDEX: 'gray',
+  OVERRIDDEN_INDEX: 'primary',
+  OVERRIDDEN_PROFILE: 'warning',
+  PROFILE: 'default',
+};
+const OriginBadge = ({ title, origin }: Props) => (
+  <Badge bsStyle={originBsStyles[origin]}>{title}</Badge>
 );
 
-export default IndexBadge;
+export default OriginBadge;

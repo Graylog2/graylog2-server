@@ -15,9 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type OriginBadgeProps = {
-  title: string
-}
 export type FieldTypeOrigin = 'INDEX' | 'OVERRIDDEN_INDEX' | 'OVERRIDDEN_PROFILE' | 'PROFILE';
 export type IndexSetFieldTypeJson = {
   field_name: string,

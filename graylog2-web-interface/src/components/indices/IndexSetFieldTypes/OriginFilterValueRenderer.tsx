@@ -18,29 +18,14 @@ import React from 'react';
 
 import type {
   FieldTypeOrigin,
-  OriginBadgeProps,
 } from 'components/indices/IndexSetFieldTypes/types';
-import OverriddenIndexBadge from 'components/indices/IndexSetFieldTypes/originBadges/OverriddenIndexBadge';
-import OverriddenProfileBadge from 'components/indices/IndexSetFieldTypes/originBadges/OverriddenProfileBadge';
-import ProfileBadge from 'components/indices/IndexSetFieldTypes/originBadges/ProfileBadge';
-import IndexBadge from 'components/indices/IndexSetFieldTypes/originBadges/IndexBadge';
+import OriginBadge from 'components/indices/IndexSetFieldTypes/originBadges/OriginBadge';
 
 type Props = {
   title: string,
   origin: FieldTypeOrigin,
 }
 
-const components: Record<FieldTypeOrigin, React.FC<OriginBadgeProps>> = {
-  OVERRIDDEN_INDEX: OverriddenIndexBadge,
-  OVERRIDDEN_PROFILE: OverriddenProfileBadge,
-  PROFILE: ProfileBadge,
-  INDEX: IndexBadge,
-};
-
-const OriginFilterValueRenderer = ({ origin, title }: Props) => {
-  const Component = components[origin];
-
-  return <Component title={title} />;
-};
+const OriginFilterValueRenderer = ({ origin, title }: Props) => <OriginBadge origin={origin} title={title} />;
 
 export default OriginFilterValueRenderer;
