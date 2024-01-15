@@ -19,7 +19,6 @@ import { useMemo } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import type { MantineTheme } from '@graylog/sawmill/mantine';
 import { Button as MantineButton, useMantineTheme } from '@mantine/core';
-import styled from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
