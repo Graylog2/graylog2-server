@@ -16,40 +16,38 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { qualifyUrl } from 'util/URLUtils';
+import type { DataNode } from 'preflight/types';
 import UserNotification from 'util/UserNotification';
-import type { FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { SystemFieldTypes } from '@graylog/server-api';
+import fetch from 'logic/rest/FetchProvider';
 
-const INITIAL_DATA = {
-  fieldTypes: {},
-};
+const fetchDataNode = async (datanodeId: string) => fetch('GET', qualifyUrl(`/datanode/${datanodeId}`));
 
-const fetchFieldTypes = async () => {
-  const fieldTypes = await SystemFieldTypes.getAllFieldTypes();
-
-  return ({ fieldTypes });
-};
-
-const useFieldTypeOptions = (): {
-  data: { fieldTypes: FieldTypes },
-  isLoading: boolean,
+const useDataNode = (datanodeId: string) : {
+  data: DataNode,
+  refetch: () => void,
+  isInitialLoading: boolean,
+  error: any,
 } => {
-  const { data, isLoading } = useQuery(
-    ['fieldTypeOptions'],
-    fetchFieldTypes,
+  const { data, refetch, isInitialLoading, error } = useQuery(
+    ['datanode'],
+    () => fetchDataNode(datanodeId),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading field type options failed with status: ${errorThrown}`,
-          'Could not load field type options');
+        UserNotification.error(`Loading Data Node failed with status: ${errorThrown}`,
+          'Could not load Data Node');
       },
-      keepPreviousData: true,
+      notifyOnChangeProps: ['data', 'error'],
+      refetchInterval: 5000,
     },
   );
 
   return ({
-    data: data ?? INITIAL_DATA,
-    isLoading,
+    data,
+    refetch,
+    isInitialLoading,
+    error,
   });
 };
 
-export default useFieldTypeOptions;
+export default useDataNode;

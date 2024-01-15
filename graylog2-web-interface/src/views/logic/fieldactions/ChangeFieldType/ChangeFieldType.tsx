@@ -23,6 +23,7 @@ import type User from 'logic/users/User';
 import AppConfig from 'util/AppConfig';
 import isReservedField from 'views/logic/IsReservedField';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
+import { isPermitted } from 'util/PermissionsMixin';
 
 const ChangeFieldType = ({
   field,
@@ -44,7 +45,7 @@ const ChangeFieldType = ({
   ) : null;
 };
 
-const hasMappingPermission = (currentUser: User) => currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
+const hasMappingPermission = (currentUser: User) => isPermitted(currentUser?.permissions, 'typemappings:edit');
 
 export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => {
   const { currentUser } = contexts;

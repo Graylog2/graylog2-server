@@ -16,13 +16,9 @@
  */
 
 import * as React from 'react';
-import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
 
-import MenuItem from 'components/bootstrap/MenuItem';
-import { isPermitted } from 'util/PermissionsMixin';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import StringUtils from 'util/StringUtils';
 import type FetchError from 'logic/errors/FetchError';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import UserNotification from 'util/UserNotification';
@@ -30,6 +26,7 @@ import { Streams } from '@graylog/server-api';
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import StringUtils from 'util/StringUtils';
 
 type ModalProps = {
   descriptor: string,
@@ -99,48 +96,4 @@ const AssignIndexSetModal = ({
   );
 };
 
-type Props = {
-  descriptor: string,
-  indexSets: Array<IndexSet>,
-  onSelect?: () => void,
-  refetchStreams: () => void,
-}
-
-const AssignIndexSetAction = ({
-  indexSets,
-  descriptor,
-  refetchStreams,
-  onSelect,
-}: Props) => {
-  const [showIndexSetModal, setShowIndexSetModal] = useState(false);
-
-  const toggleAssignIndexSetModal = useCallback(() => {
-    if (!showIndexSetModal && typeof onSelect === 'function') {
-      onSelect();
-    }
-
-    setShowIndexSetModal((cur) => !cur);
-  }, [onSelect, showIndexSetModal]);
-
-  if (!isPermitted('indexsets:read')) {
-    return null;
-  }
-
-  return (
-    <>
-      <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
-      {showIndexSetModal && (
-        <AssignIndexSetModal toggleShowModal={toggleAssignIndexSetModal}
-                             indexSets={indexSets}
-                             descriptor={descriptor}
-                             refetchStreams={refetchStreams} />
-      )}
-    </>
-  );
-};
-
-AssignIndexSetAction.defaultProps = {
-  onSelect: undefined,
-};
-
-export default AssignIndexSetAction;
+export default AssignIndexSetModal;

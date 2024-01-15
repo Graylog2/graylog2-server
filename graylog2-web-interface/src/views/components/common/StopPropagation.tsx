@@ -16,16 +16,12 @@
  */
 import * as React from 'react';
 
-type Props = {
-  children: React.ReactElement[],
-};
-
-const stopPropagation = (evt) => {
+const stopPropagation = (evt: React.SyntheticEvent) => {
   evt.stopPropagation();
   evt.preventDefault();
 };
 
-const StopPropagation = ({ children }: Props) => (
+const StopPropagation = ({ children }: React.PropsWithChildren) => (
   <span role="presentation" onClick={stopPropagation} onMouseDown={stopPropagation}>
     {children}
   </span>

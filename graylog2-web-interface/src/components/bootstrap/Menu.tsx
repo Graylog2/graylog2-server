@@ -20,14 +20,27 @@ import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
 type Props = PropsWithChildren<{
+  closeOnItemClick?: boolean,
+  onChange?: (isOpen: boolean) => void,
+  opened?: boolean,
+  keepMounted?: boolean,
   position?: MenuProps['position'],
   shadow?: MenuProps['shadow'],
   width?: number,
   withinPortal?: boolean,
-  opened?: boolean,
 }>
 
-const Menu = ({ children, shadow, width, withinPortal, position, opened }: Props) => {
+const Menu = ({
+  children,
+  shadow,
+  width,
+  withinPortal,
+  position,
+  opened,
+  onChange,
+  keepMounted,
+  closeOnItemClick,
+}: Props) => {
   const theme = useTheme();
 
   const styles = () => ({
@@ -40,12 +53,15 @@ const Menu = ({ children, shadow, width, withinPortal, position, opened }: Props
   });
 
   return (
-    <MantineMenu shadow={shadow}
+    <MantineMenu closeOnItemClick={closeOnItemClick}
+                 shadow={shadow}
                  opened={opened}
+                 onChange={onChange}
                  width={width}
                  position={position}
                  withinPortal={withinPortal}
-                 styles={styles}>
+                 styles={styles}
+                 keepMounted={keepMounted}>
       {children}
     </MantineMenu>
   );
@@ -53,14 +69,17 @@ const Menu = ({ children, shadow, width, withinPortal, position, opened }: Props
 
 const StyledMenuItem = styled(MantineMenu.Item)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
-  font-family: ${theme.fonts.family.navigation};
-  font-size: ${theme.fonts.size.navigation};
-  padding-left: 20px;
-  padding-right: 20px;
+  font-size: ${theme.fonts.size.body};
+  white-space: nowrap;
+  
+  &:hover, &:focus {
+    text-decoration: none;  
+    color: inherit;
+  }
 `);
 
 const StyledMenuDivider = styled(MantineMenu.Divider)(({ theme }) => css`
-  border-color: ${theme.colors.global.textDefault};
+  border-color: ${theme.colors.variant.lighter.default};
 `);
 
 const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
@@ -74,11 +93,14 @@ Menu.Divider = StyledMenuDivider;
 Menu.Label = StyledMenuLabel;
 
 Menu.defaultProps = {
+  closeOnItemClick: true,
   position: undefined,
   shadow: undefined,
   width: undefined,
   withinPortal: false,
   opened: undefined,
+  onChange: undefined,
+  keepMounted: undefined,
 };
 
 export default Menu;
