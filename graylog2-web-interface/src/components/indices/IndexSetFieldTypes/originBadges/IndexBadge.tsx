@@ -15,27 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { styled } from 'styled-components';
 
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import type { OriginBadgeProps } from 'components/indices/IndexSetFieldTypes/types';
 import { Badge } from 'components/bootstrap';
 
-const StyledBadge = styled(Badge)`
-  cursor: pointer;
-`;
+const IndexBadge = ({ title }: OriginBadgeProps) => (
+  <Badge bsStyle="gray">{title}</Badge>
+);
 
-type Props = {
-  normalizedOrigin: Record<string, {value: string, title: string}>,
-  id: string,
-}
-
-const OverriddenProfileOriginBadge = ({ normalizedOrigin, id }: Props) => {
-  const { toggleSection } = useExpandedSections();
-  const _toggleSection = () => toggleSection(id, 'overriddenProfile');
-
-  return (
-    <StyledBadge onClick={_toggleSection} bsStyle="warning">{normalizedOrigin?.OVERRIDDEN_PROFILE?.title}</StyledBadge>
-  );
-};
-
-export default OverriddenProfileOriginBadge;
+export default IndexBadge;

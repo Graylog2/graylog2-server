@@ -19,10 +19,10 @@ import React, { useState } from 'react';
 
 import { Button } from 'components/bootstrap';
 import { HoverForHelp } from 'components/common';
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import hasOverride from 'components/indices/helpers/hasOverride';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 
 type Props = {
   fieldType: IndexSetFieldType,

@@ -16,13 +16,13 @@
  */
 import React from 'react';
 
-import OverriddenProfileExpandedSection from 'components/indices/IndexSetFieldTypes/OverriddenProfileExpandedSection';
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
+import OriginExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OriginExpandedSection';
 
 const expandedSections = ({
   overriddenProfile: {
-    title: 'Origin',
-    content: ({ type, origin, fieldName }: IndexSetFieldType) => origin === 'OVERRIDDEN_PROFILE' && <OverriddenProfileExpandedSection type={type} fieldName={fieldName} />,
+    title: 'Origin explanation',
+    content: ({ type, origin, fieldName }: IndexSetFieldType) => <OriginExpandedSection origin={origin} type={type} fieldName={fieldName} />,
   },
 });
 

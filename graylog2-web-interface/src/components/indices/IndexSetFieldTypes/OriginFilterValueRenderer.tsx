@@ -1,0 +1,46 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React from 'react';
+
+import type {
+  FieldTypeOrigin,
+  OriginBadgeProps,
+} from 'components/indices/IndexSetFieldTypes/types';
+import OverriddenIndexBadge from 'components/indices/IndexSetFieldTypes/originBadges/OverriddenIndexBadge';
+import OverriddenProfileBadge from 'components/indices/IndexSetFieldTypes/originBadges/OverriddenProfileBadge';
+import ProfileBadge from 'components/indices/IndexSetFieldTypes/originBadges/ProfileBadge';
+import IndexBadge from 'components/indices/IndexSetFieldTypes/originBadges/IndexBadge';
+
+type Props = {
+  title: string,
+  origin: FieldTypeOrigin,
+}
+
+const components: Record<FieldTypeOrigin, React.FC<OriginBadgeProps>> = {
+  OVERRIDDEN_INDEX: OverriddenIndexBadge,
+  OVERRIDDEN_PROFILE: OverriddenProfileBadge,
+  PROFILE: ProfileBadge,
+  INDEX: IndexBadge,
+};
+
+const OriginFilterValueRenderer = ({ origin, title }: Props) => {
+  const Component = components[origin];
+
+  return <Component title={title} />;
+};
+
+export default OriginFilterValueRenderer;

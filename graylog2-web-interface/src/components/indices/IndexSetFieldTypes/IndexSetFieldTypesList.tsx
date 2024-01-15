@@ -17,12 +17,7 @@
 import React, { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
-import keyBy from 'lodash/keyBy';
 
-import type {
-  FieldTypeOrigin,
-  IndexSetFieldType,
-} from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
 import {
@@ -35,21 +30,16 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
-import { Badge } from 'components/bootstrap';
-import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
-import expandedSections from 'components/indices/IndexSetFieldTypes/expandedSections';
-import OverriddenProfileOriginBadge from 'components/indices/IndexSetFieldTypes/OverriddenProfileOriginBadge';
+import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
 import hasOverride from 'components/indices/helpers/hasOverride';
-import { useStore } from 'stores/connect';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
+import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
+import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/OriginFilterValueRenderer';
+import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 
 import BulkActions from './BulkActions';
 
@@ -60,8 +50,6 @@ export const DEFAULT_LAYOUT = {
   displayedColumns: ['field_name', 'type', 'origin', 'is_reserved'],
   columnsOrder: ['field_name', 'type', 'origin', 'is_reserved'],
 };
-
-// type BadgeStyles = 'default' | 'danger' | 'info' | 'primary' | 'success' | 'warning' | 'gray'
 
 const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }) => css`
   color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
@@ -75,15 +63,13 @@ const FilterValueRenderers = {
       {title}
     </>
   ),
+  origin: (value: FieldTypeOrigin, title: string) => <OriginFilterValueRenderer title={title} origin={value} />,
 };
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
-  const { indexSet } = useStore(IndexSetsStore);
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
-  const { data: { fieldTypes } } = useFieldTypesForMappings();
-  const { data: { name: profileName } } = useProfile(indexSet?.field_type_profile);
 
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -124,40 +110,7 @@ const IndexSetFieldTypesList = () => {
     { enabled: !isLoadingLayoutPreferences },
   );
 
-  const normalizedOrigin = useMemo(() => {
-    const originOptions = attributes?.find(({ id }) => id === 'origin')?.filter_options;
-
-    return keyBy(originOptions, 'value');
-  }, [attributes]);
-  const customColumnRenderers = useMemo(() => ({
-    attributes: {
-      type: {
-        renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
-      },
-      origin: {
-        renderCell: (origin: FieldTypeOrigin, { id }) => {
-          switch (origin) {
-            case 'PROFILE':
-              return <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(indexSet.field_type_profile)}>{profileName}</Link>;
-            case 'OVERRIDDEN_INDEX':
-              return <Badge bsStyle="primary">{normalizedOrigin?.OVERRIDDEN_INDEX?.title}</Badge>;
-            case 'OVERRIDDEN_PROFILE':
-              return (
-                <OverriddenProfileOriginBadge normalizedOrigin={normalizedOrigin} id={id} />
-              );
-            default:
-              return null;
-          }
-        },
-        // staticWidth: 400,
-      },
-      is_reserved: {
-        renderCell: (isReserved: boolean) => (isReserved
-          ? <Icon title="Field has reserved field type" name="check" /> : null),
-        staticWidth: 120,
-      },
-    },
-  }), [fieldTypes, indexSet.field_type_profile, normalizedOrigin, profileName]);
+  const customColumnRenderers = useCustomColumnRenderers(attributes);
 
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}

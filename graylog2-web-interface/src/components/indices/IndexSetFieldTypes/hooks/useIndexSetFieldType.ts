@@ -22,28 +22,13 @@ import { qualifyUrl } from 'util/URLUtils';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
-
-export type FieldTypeOrigin = 'INDEX' | 'OVERRIDDEN_INDEX' | 'OVERRIDDEN_PROFILE' | 'PROFILE';
+import type { IndexSetFieldType, IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
   list: [],
   attributes: [],
 };
-export type IndexSetFieldTypeJson = {
-    field_name: string,
-    type: string,
-    origin: FieldTypeOrigin,
-    is_reserved: boolean,
-}
-
-export type IndexSetFieldType = {
-    id: string,
-    fieldName: string,
-    origin: FieldTypeOrigin,
-    isReserved: boolean,
-    type: string,
-}
 
 const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams) => {
   const indexSetFieldTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);

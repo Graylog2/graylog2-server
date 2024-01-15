@@ -34,6 +34,7 @@ import IndexSetsRemovalErrorAlert from 'components/indices/IndexSetFieldTypes/In
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -70,14 +71,51 @@ const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string
 const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, rotated, indexSetIds }: ContentProps) => {
   const fieldsStr = fields.join(', ');
   const indexSetsStr = indexSetIds.map((id) => indexSets[id].title).join(', ');
+  const { customFieldMappingsByField, name: profileName, id: profileId } = useIndexProfileWithMappingsByField();
+  const { overriddenIndexFieldsStr, overriddenProfilesFieldsWithType } = useMemo<{ overriddenIndexFieldsStr: string, overriddenProfilesFieldsWithType: Array<{ field: string, type: string }> }>(() => {
+    const { overriddenIndexFields, overriddenProfilesFields } = fields.reduce((acc, cur) => {
+      if (customFieldMappingsByField[cur]) {
+        acc.overriddenProfilesFields.push({ field: cur, type: customFieldMappingsByField[cur] });
+      } else {
+        acc.overriddenIndexFields.push(cur);
+      }
+
+      return acc;
+    }, { overriddenIndexFields: [], overriddenProfilesFields: [] });
+
+    return ({
+      overriddenIndexFieldsStr: overriddenIndexFields.join(', '),
+      overriddenProfilesFieldsWithType: overriddenProfilesFields,
+    });
+  }, [customFieldMappingsByField, fields]);
 
   return (
     <div>
       <Alert>
-        After removing the overridden field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the
-        settings of your search engine will be applied for fields with <Badge bsStyle="primary">Overridden index</Badge> and the settings
-        from <Link to={Routes.SYSTEM.INDICES.LIST}>Profile name</Link> for fields
-        with <Badge bsStyle="warning">Overridden profile</Badge>
+        After removing the overridden field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b>
+        {overriddenIndexFieldsStr && (
+        <> the
+          settings of your <i>search engine</i> will be applied for
+          fields: <b>{overriddenIndexFieldsStr}</b>.
+        </>
+        )}
+        {!!overriddenProfilesFieldsWithType.length && (
+        <> The settings
+          from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>{profileName}</Link> (
+          namely {overriddenProfilesFieldsWithType.map(({ field, type }, index) => {
+          const isLast = index === overriddenProfilesFieldsWithType.length - 1;
+
+          return (
+            <span key={`${field}-${type}`}>
+              <b>{field}:</b> <i>{type}</i>{isLast ? '' : ', '}
+            </span>
+          );
+        })}
+          )
+          {' '}
+          will be applied.
+        </>
+        )}
       </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
       <p>
@@ -139,8 +177,8 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   }, [sendTelemetry, telemetryPathName]);
 
   return (
-    <BootstrapModalForm title={<span>Remove Field Type Override<BetaBadge /></span>}
-                        submitButtonText="Remove field type override"
+    <BootstrapModalForm title={<span>Remove Field Type Overrides <BetaBadge /></span>}
+                        submitButtonText="Remove field type overrides"
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}
                         show={show}

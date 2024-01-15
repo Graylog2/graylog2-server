@@ -21,27 +21,24 @@ import mapValues from 'lodash/mapValues';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import { useStore } from 'stores/connect';
+import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import type { ProfileWithMappingsByField } from 'components/indices/IndexSetFieldTypes/types';
 
-export type ProfileWithMappingsByField = {
-  name: string,
-  description?: string,
-  id: string,
-  customFieldMappingsByField: Record<string, string>
-}
-
-const useProfileWithMappingsByField = (profileId: string) => {
+const useIndexProfileWithMappingsByField = () => {
+  const { indexSet: { field_type_profile: profileId } } = useStore(IndexSetsStore);
   const { data: { customFieldMappings, name, description }, isFetched } = useProfile(profileId);
   const { data: { fieldTypes }, isLoading } = useFieldTypesForMappings();
 
   const customFieldMappingsByField = useMemo(() => {
-    if (isFetched && !isLoading) {
+    if (isFetched && !isLoading && profileId) {
       return mapValues(
         keyBy(customFieldMappings, 'field'), (mapping: CustomFieldMapping) => fieldTypes[mapping.type],
       );
     }
 
     return {};
-  }, [customFieldMappings, fieldTypes, isFetched, isLoading]);
+  }, [customFieldMappings, fieldTypes, isFetched, isLoading, profileId]);
 
   return useMemo<ProfileWithMappingsByField>(() => ({
     customFieldMappingsByField,
@@ -51,4 +48,4 @@ const useProfileWithMappingsByField = (profileId: string) => {
   }), [customFieldMappingsByField, description, name, profileId]);
 };
 
-export default useProfileWithMappingsByField;
+export default useIndexProfileWithMappingsByField;
