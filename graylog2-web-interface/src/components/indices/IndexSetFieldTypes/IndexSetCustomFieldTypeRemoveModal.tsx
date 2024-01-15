@@ -68,6 +68,20 @@ const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string
   return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
 };
 
+const OverriddenProfilesFieldsWithTypeList = ({ overriddenProfilesFieldsWithType }: {overriddenProfilesFieldsWithType: Array<{ field: string, type: string }>}) => (
+  <>
+    {overriddenProfilesFieldsWithType.map(({ field, type }, index) => {
+      const isLast = index === overriddenProfilesFieldsWithType.length - 1;
+
+      return (
+        <span key={`${field}-${type}`}>
+          <b>{field}:</b> <i>{type}</i>{isLast ? '' : ', '}
+        </span>
+      );
+    })}
+  </>
+);
+
 const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, rotated, indexSetIds }: ContentProps) => {
   const fieldsStr = fields.join(', ');
   const indexSetsStr = indexSetIds.map((id) => indexSets[id].title).join(', ');
@@ -94,27 +108,19 @@ const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, r
       <Alert>
         After removing the overridden field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b>
         {overriddenIndexFieldsStr && (
-        <> the
-          settings of your <i>search engine</i> will be applied for
-          fields: <b>{overriddenIndexFieldsStr}</b>.
-        </>
+          <> the
+            settings of your <i>search engine</i> will be applied for
+            fields: <b>{overriddenIndexFieldsStr}</b>.
+          </>
         )}
         {!!overriddenProfilesFieldsWithType.length && (
-        <> The settings
-          from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>{profileName}</Link> (
-          namely {overriddenProfilesFieldsWithType.map(({ field, type }, index) => {
-          const isLast = index === overriddenProfilesFieldsWithType.length - 1;
-
-          return (
-            <span key={`${field}-${type}`}>
-              <b>{field}:</b> <i>{type}</i>{isLast ? '' : ', '}
-            </span>
-          );
-        })}
-          )
-          {' '}
-          will be applied.
-        </>
+          <>
+            The settings from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>{profileName}</Link> (
+            namely <OverriddenProfilesFieldsWithTypeList overriddenProfilesFieldsWithType={overriddenProfilesFieldsWithType} />
+            )
+            {' '}
+            will be applied.
+          </>
         )}
       </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
@@ -158,10 +164,10 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_REMOVED, {
           app_pathname: telemetryPathName,
           app_action_value:
-                        {
-                          value: 'removed-custom-field-type',
-                          rotated,
-                        },
+            {
+              value: 'removed-custom-field-type',
+              rotated,
+            },
         });
       });
   }, [fields, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
