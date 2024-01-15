@@ -17,11 +17,13 @@
 package org.graylog.datanode.bindings;
 
 import com.google.common.util.concurrent.ServiceManager;
+import org.graylog.datanode.metrics.NoopStreamService;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
+import org.graylog2.streams.StreamService;
 
 import javax.net.ssl.X509TrustManager;
 
@@ -37,6 +39,8 @@ public class GenericBindings extends Graylog2Module {
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(X509TrustManager.class).to(CustomCAX509TrustManager.class).asEagerSingleton();
         bind(CaService.class).to(CaServiceImpl.class);
+
+        bind(StreamService.class).to(NoopStreamService.class);
     }
 
 }

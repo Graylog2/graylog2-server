@@ -25,6 +25,7 @@ import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
 import org.graylog.storage.opensearch2.ism.IsmApi;
 import org.graylog.storage.opensearch2.ism.policy.IsmPolicy;
@@ -34,6 +35,9 @@ import org.graylog.storage.opensearch2.ism.policy.actions.DeleteAction;
 import org.graylog.storage.opensearch2.ism.policy.actions.RolloverAction;
 import org.graylog.storage.opensearch2.ism.policy.actions.RollupAction;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
+import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indices.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +45,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
@@ -48,12 +54,15 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
     private final OpensearchProcess process;
     private final Configuration configuration;
+    private final IndexFieldTypesService indexFieldTypesService;
     private final ObjectMapper objectMapper;
     private DataStreamAdapter dataStreamAdapter;
 
-    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper) {
+    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper) {
         this.process = process;
         this.configuration = configuration;
+        this.objectMapper = objectMapper;
+        this.indexFieldTypesService = indexFieldTypesService;
         this.objectMapper = objectMapper;
     }
 
@@ -79,15 +88,27 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     }
 
     private void updateDataStreamTemplate() {
-        Map<String, Object> mappings = new HashMap<>();
+        Map<String, Map<String, String>> mappings = new HashMap<>();
         mappings.put(configuration.getMetricsTimestamp(), ImmutableMap.of(
                 "type", "date",
                 "format", "yyyy-MM-dd HH:mm:ss.SSS||strict_date_optional_time||epoch_millis")
         );
         mappings.put("node", ImmutableMap.of("type", "keyword"));
+        createFieldTypes(configuration.getMetricsStream(), mappings);
         Template template = new Template(List.of(configuration.getMetricsStream() + "*"),
                 new Template.Mappings(ImmutableMap.of("properties", mappings)), 99999L, new Template.Settings(Map.of()));
         dataStreamAdapter.ensureDataStreamTemplate(configuration.getMetricsTemplate(), template, configuration.getMetricsTimestamp());
+    }
+
+    private void createFieldTypes(String metricsStream, Map<String, Map<String, String>> mappings) {
+        final Set<FieldTypeDTO> fields = mappings.entrySet().stream()
+                .map(mapping -> FieldTypeDTO.builder()
+                        .fieldName(mapping.getKey())
+                        .physicalType(mapping.getValue().get("type"))
+                        .build())
+                .collect(Collectors.toSet());
+        IndexFieldTypesDTO dto = IndexFieldTypesDTO.create(IndexLookup.DATASTREAM_PREFIX + metricsStream, IndexLookup.DATASTREAM_PREFIX + metricsStream, fields);
+        indexFieldTypesService.save(dto);
     }
 
     private void configureMetricsIsm(Configuration configuration) {
