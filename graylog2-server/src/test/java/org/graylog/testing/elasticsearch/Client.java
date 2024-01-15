@@ -19,8 +19,12 @@ package org.graylog.testing.elasticsearch;
 import org.graylog2.indexer.indices.Template;
 
 import java.util.Map;
+import java.util.Optional;
 
 public interface Client {
+
+    Optional<Map<String, Object>> findMessage(String index, String query);
+
     default void createIndex(String index) {
         createIndex(index, 1, 0);
     }
