@@ -31,6 +31,7 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.plugin.rest.ApiError;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -55,7 +56,7 @@ public class CAResource {
     private final String passwordSecret;
 
     @Inject
-    public CAResource(CaService caService, String passwordSecret) {
+    public CAResource(CaService caService, final @Named("password_secret") String passwordSecret) {
         this.caService = caService;
         this.passwordSecret = passwordSecret;
     }

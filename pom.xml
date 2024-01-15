@@ -140,7 +140,7 @@
         <jdot.version>1.0</jdot.version>
         <jersey.version>2.37</jersey.version>
         <jmte.version>5.0.0</jmte.version>
-        <joda-time.version>2.12.5</joda-time.version>
+        <joda-time.version>2.12.6</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-path.version>2.8.0</json-path.version>
         <kafka.version>3.6.1</kafka.version>
@@ -160,16 +160,16 @@
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
-        <protobuf.version>3.25.1</protobuf.version>
+        <protobuf.version>3.25.2</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.13.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.4.10</oshi.version>
+        <oshi.version>6.4.11</oshi.version>
         <siv-mode.version>1.5.0</siv-mode.version>
-        <slf4j.version>2.0.10</slf4j.version>
+        <slf4j.version>2.0.11</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
         <swagger.version>1.6.12</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
@@ -187,7 +187,7 @@
         <assertj-core.version>3.25.1</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <equalsverifier.version>3.15.5</equalsverifier.version>
+        <equalsverifier.version>3.15.6</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
@@ -524,12 +524,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

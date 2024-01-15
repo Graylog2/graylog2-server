@@ -35,6 +35,7 @@ class NodePingPeriodicalTest {
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
         final String cluster = "localhost:9300";
+        final String datanodeRestApi = "http://localhost:8999";
         @SuppressWarnings("unchecked")
         final NodeService<DataNodeDto> nodeService = (NodeService<DataNodeDto>) Mockito.mock(NodeService.class);
 
@@ -47,6 +48,7 @@ class NodePingPeriodicalTest {
                 configuration,
                 () -> uri,
                 () -> cluster,
+                () -> datanodeRestApi,
                 () -> true,
                 () -> ProcessState.AVAILABLE
         );
@@ -58,10 +60,11 @@ class NodePingPeriodicalTest {
                 .setLeader(true)
                 .setTransportAddress(uri.toString())
                 .setClusterAddress(cluster)
+                .setRestApiAddress(datanodeRestApi)
                 .setDataNodeStatus(ProcessState.AVAILABLE.getDataNodeStatus())
                 .setHostname("localhost")
                 .build()
         ));
     }
-    
+
 }

@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed bug causing null response from `array_contains` pipeline function when passed null array."
+
+pulls = ["17909"]

@@ -28,6 +28,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
@@ -39,6 +40,10 @@ import javax.ws.rs.BadRequestException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.CUSTOM_MAPPINGS_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.DESCRIPTION_FIELD_NAME;
@@ -70,17 +75,34 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
             .sort(Sorting.create(IndexFieldTypeProfile.NAME_FIELD_NAME, Sorting.Direction.valueOf("asc".toUpperCase(Locale.ROOT))))
             .build();
 
-    private final MongoCollection<IndexFieldTypeProfile> collection;
+    private final MongoCollection<IndexFieldTypeProfile> profileCollection;
     private final DbQueryCreator dbQueryCreator;
+    private final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService;
+    private final IndexSetService indexSetService;
 
     @Inject
     public IndexFieldTypeProfileService(final MongoConnection mongoConnection,
                                         final MongoJackObjectMapperProvider mapper,
-                                        final MongoCollections mongoCollections) {
+                                        final MongoCollections mongoCollections,
+                                        final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService,
+                                        final IndexSetService indexSetService) {
         super(mongoConnection, mapper, IndexFieldTypeProfile.class, INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME);
         this.db.createIndex(new BasicDBObject(IndexFieldTypeProfile.NAME_FIELD_NAME, 1), new BasicDBObject("unique", false));
-        this.collection = mongoCollections.get(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
+        this.profileCollection = mongoCollections.get(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
+        this.indexSetService = indexSetService;
         this.dbQueryCreator = new DbQueryCreator(IndexFieldTypeProfile.NAME_FIELD_NAME, ATTRIBUTES);
+        this.indexFieldTypeProfileUsagesService = indexFieldTypeProfileUsagesService;
+    }
+
+    public Optional<IndexFieldTypeProfileWithUsages> getWithUsages(final String profileId) {
+        final Optional<IndexFieldTypeProfile> indexFieldTypeProfile = this.get(profileId);
+
+        return indexFieldTypeProfile.map(profile ->
+                new IndexFieldTypeProfileWithUsages(
+                        profile,
+                        indexFieldTypeProfileUsagesService.usagesOfProfile(profile.id())
+                )
+        );
     }
 
     @Override
@@ -89,13 +111,20 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         return super.save(indexFieldTypeProfile);
     }
 
+    @Override
+    public int delete(final String id) {
+        int numRemoved = super.delete(id);
+        indexSetService.removeReferencesToProfile(id);
+        return numRemoved;
+    }
+
     public boolean update(final String profileId, final IndexFieldTypeProfile updatedProfile) {
         updatedProfile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
         final WriteResult<IndexFieldTypeProfile, ObjectId> writeResult = db.updateById(new ObjectId(profileId), updatedProfile);
         return writeResult.getN() > 0;
     }
 
-    public PageListResponse<IndexFieldTypeProfile> getPaginated(final String query,
+    public PageListResponse<IndexFieldTypeProfileWithUsages> getPaginated(final String query,
                                                                 final List<String> filters,
                                                                 final int page,
                                                                 final int perPage,
@@ -105,14 +134,23 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final Bson dbSort = "desc".equalsIgnoreCase(order) ? Sorts.descending(sortField) : Sorts.ascending(sortField);
 
-        final long total = collection.countDocuments(dbQuery);
-        List<IndexFieldTypeProfile> pageResults = new ArrayList<>(perPage);
-        collection.find(dbQuery)
+        final long total = profileCollection.countDocuments(dbQuery);
+        List<IndexFieldTypeProfile> singlePageOfProfiles = new ArrayList<>(perPage);
+        profileCollection.find(dbQuery)
                 .sort(dbSort)
                 .limit(perPage)
                 .skip(perPage * Math.max(0, page - 1))
-                .into(pageResults);
-        PaginatedList<IndexFieldTypeProfile> paginated = new PaginatedList<>(pageResults, Ints.saturatedCast(total), page, perPage);
+                .into(singlePageOfProfiles);
+
+        final Map<String, Set<String>> profileUsagesInIndexSets = indexFieldTypeProfileUsagesService.usagesOfProfiles(singlePageOfProfiles.stream().map(IndexFieldTypeProfile::id).collect(Collectors.toSet()));
+
+        final PaginatedList<IndexFieldTypeProfileWithUsages> paginated = new PaginatedList<>(
+                singlePageOfProfiles.stream()
+                        .map(profile -> new IndexFieldTypeProfileWithUsages(profile, profileUsagesInIndexSets.get(profile.id())))
+                        .collect(Collectors.toList()),
+                Ints.saturatedCast(total),
+                page,
+                perPage);
 
         return PageListResponse.create(query,
                 paginated,
