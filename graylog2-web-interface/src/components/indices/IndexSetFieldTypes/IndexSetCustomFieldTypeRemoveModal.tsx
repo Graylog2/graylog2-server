@@ -115,6 +115,7 @@ const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, r
         )}
         {!!overriddenProfilesFieldsWithType.length && (
           <>
+            {' '}
             The settings from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>{profileName}</Link> (
             namely <OverriddenProfilesFieldsWithTypeList overriddenProfilesFieldsWithType={overriddenProfilesFieldsWithType} />
             )
