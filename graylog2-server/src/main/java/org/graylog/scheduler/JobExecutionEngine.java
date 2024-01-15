@@ -134,6 +134,7 @@ public class JobExecutionEngine {
                 final JobTriggerDto trigger = triggerOptional.get();
 
                 if (!workerPool.execute(() -> handleTriggerWithConcurrencyLimit(trigger))) {
+                    // The job couldn't be executed so we have to release the trigger again with the same nextTime
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
                     return false;
                 }
