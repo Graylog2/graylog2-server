@@ -41,11 +41,12 @@ public interface LockService {
     Optional<Lock> lock(@Nonnull String resource);
 
     /**
-     * Request a lock. If a lock already exists, the lock expiry time will be extended.
+     * Request a concurrency lock. Fails if the lock already exists.
      *
      * @param resource       Unique identifier for the resource that should be guarded by this lock.
      * @param maxConcurrency Limit number of locks for this resource by appending a counter (1 .. maxConcurrency).
-     * @return A {@link Lock} object, if a lock was obtained. An empty {@link Optional}, if no lock could be acquired.
+     * @return A {@link Lock} object, if a lock was obtained. An empty {@link Optional}, if no lock could be acquired
+     * or the lock already existed.
      */
     Optional<Lock> lock(@Nonnull String resource, int maxConcurrency);
 

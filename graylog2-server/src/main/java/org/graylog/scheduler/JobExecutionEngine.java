@@ -132,41 +132,16 @@ public class JobExecutionEngine {
 
             if (triggerOptional.isPresent()) {
                 final JobTriggerDto trigger = triggerOptional.get();
-                if (hasConcurrencyLimit(trigger)) {
-                    return executeJobWithConcurrencyLimit(trigger);
-                } else {
-                    if (!workerPool.execute(() -> handleTrigger(trigger))) {
-                        rescheduleTrigger(trigger);
-                        return false;
-                    }
-                    return true;
+
+                if (!workerPool.execute(() -> handleTriggerWithConcurrencyLimit(trigger))) {
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
+                    return false;
                 }
+
+                return true;
             }
         }
         return false;
-    }
-
-    private boolean executeJobWithConcurrencyLimit(JobTriggerDto trigger) {
-        try (RefreshingLockService refreshingLockService = refreshingLockServiceFactory.create()) {
-            try {
-                refreshingLockService.acquireAndKeepLock(trigger.jobDefinitionType(), maxConcurrencyMap.get(trigger.jobDefinitionType()));
-                if (!workerPool.execute(() -> handleTrigger(trigger))) {
-                    rescheduleTrigger(trigger);
-                    return false;
-                }
-            } catch (AlreadyLockedException e) {
-                rescheduleTrigger(trigger);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /*
-     * The job couldn't be executed so we have to release the trigger again with the same nextTime
-     */
-    private void rescheduleTrigger(JobTriggerDto trigger) {
-        jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
     }
 
     private boolean hasConcurrencyLimit(JobTriggerDto trigger) {
@@ -176,6 +151,22 @@ public class JobExecutionEngine {
     public void updateLockedJobs() {
         if (workerPool.anySlotsUsed()) {
             jobTriggerService.updateLockedJobTriggers();
+        }
+    }
+
+    private void handleTriggerWithConcurrencyLimit(JobTriggerDto trigger) {
+        if (hasConcurrencyLimit(trigger)) {
+            try (RefreshingLockService refreshingLockService = refreshingLockServiceFactory.create()) {
+                try {
+                    refreshingLockService.acquireAndKeepLock(
+                            trigger.jobDefinitionType(), maxConcurrencyMap.get(trigger.jobDefinitionType()));
+                    handleTrigger(trigger);
+                } catch (AlreadyLockedException e) {
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
+                }
+            }
+        } else {
+            handleTrigger(trigger);
         }
     }
 

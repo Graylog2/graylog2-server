@@ -16,6 +16,7 @@
  */
 package org.graylog2.cluster.lock;
 
+import com.eaio.uuid.UUID;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.mongodb.MongoCommandException;
@@ -28,6 +29,8 @@ import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -58,6 +61,7 @@ import static org.graylog2.database.indices.MongoDbIndexTools.ensureTTLIndex;
  */
 @Singleton
 public class MongoLockService implements LockService {
+    private static final Logger LOG = LoggerFactory.getLogger(MongoLockService.class);
 
     public static final String COLLECTION_NAME = "cluster_locks";
     public static final java.time.Duration MIN_LOCK_TTL = Duration.ofSeconds(60);
@@ -88,14 +92,14 @@ public class MongoLockService implements LockService {
 
     @Override
     public Optional<Lock> lock(@Nonnull String resource, int maxConcurrency) {
-        Optional<Lock> optLock = Optional.empty();
-        for (int i = 0; i < maxConcurrency; i++) {
-            optLock = doLock(resource, resource + "-" + i);
-            if (optLock.isPresent()) {
-                return optLock;
-            }
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(resource));
+        final long l = collection.countDocuments(eq(FIELD_RESOURCE, resource));
+        if (l < maxConcurrency) {
+            LOG.trace("{} {}", resource, l);
+            return doLock(resource, new UUID().toString());
         }
-        return optLock;
+        LOG.trace("{} exceeded max", resource);
+        return Optional.empty();
     }
 
     @Override
