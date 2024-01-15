@@ -41,3 +41,5 @@ export const MIGRATION_STEP = {
     description: 'Migration finished',
   },
 } as const;
+
+export default MIGRATION_STEP;

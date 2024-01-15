@@ -21,10 +21,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Formik, Form, Field } from 'formik';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
-import UserNotification from 'preflight/util/UserNotification';
-import { Input, Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
+import UserNotification from 'util/UserNotification';
+import { FormikInput, Icon } from 'components/common';
+import { Input, Button, Label } from 'components/bootstrap';
+import { Dropzone } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
-import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
+import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 
 type FormValues = {
@@ -121,7 +123,7 @@ const CAUpload = () => {
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
-                <Input.Label required htmlFor="ca-dropzone">Certificate Authority</Input.Label>
+                <Label required htmlFor="ca-dropzone">Certificate Authority</Label>
                 <CADropzone onDrop={(files) => onChange({ target: { name, value: files } })}
                             onReject={onRejectUpload}
                             data-testid="upload-dropzone"
@@ -157,11 +159,12 @@ const CAUpload = () => {
             )}
           </Field>
 
-          <FormikInput placeholder="Password"
+          <FormikInput id="password"
+                       placeholder="Password"
                        name="password"
                        type="password"
                        label="Password" />
-          <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
+          <UnsecureConnectionAlert renderIfSecure={<br />} />
           <Button disabled={!isValid} type="submit">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
           </Button>
