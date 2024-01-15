@@ -42,9 +42,9 @@ describe('DashboardsOverview BulkActionsRow', () => {
   };
 
   const openActionsDropdown = async () => {
-    await screen.findByRole('button', {
+    userEvent.click(await screen.findByRole('button', {
       name: /bulk actions/i,
-    });
+    }));
   };
 
   const deleteDashboards = async () => {

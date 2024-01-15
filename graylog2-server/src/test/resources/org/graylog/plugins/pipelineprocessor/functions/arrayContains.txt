@@ -14,7 +14,8 @@ then
                          number: "$.numbers[0].value",
                          decimals: "$.decimals[*].value",
                          booleans: "$.booleans[*].value",
-                         strings: "$.strings[*].value"});
+                         strings: "$.strings[*].value",
+                         has_null_value: "$.has_null_value[*].value"});
 
     set_field(field: "path_array_strings_contains", value: array_contains(elements: selectedPath.strings, value: "two"));
     set_field(field: "path_array_numbers_contains", value: array_contains(elements: selectedPath.numbers, value: 2));
@@ -25,6 +26,10 @@ then
     set_field(field: "path_array_not_numbers_contains", value: array_contains(elements: selectedPath.numbers, value: 10));
     set_field(field: "path_array_not_decimals_contains", value: array_contains(elements: selectedPath.decimals, value: 10.1));
     set_field(field: "path_array_not_booleans_contains", value: array_contains(elements: selectedPath.booleans, value: false));
+    set_field("contains_null_array", array_contains(selectedPath.nullPath, "test"));
+    set_field("contains_null_value", array_contains(selectedPath.strings, selectedPath.nullPath));
+    set_field("contains_null_json_value_in_array_string", array_contains(selectedPath.has_null_value, "two"));
+    set_field("contains_null_json_value_in_array_int", array_contains(selectedPath.has_null_value, 3));
 
     trigger_test();
 end

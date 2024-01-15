@@ -45,7 +45,7 @@ const ChangeFieldType = ({
   ) : null;
 };
 
-const hasMappingPermission = (currentUser: User) => isPermitted(currentUser, 'typemappings:edit');
+const hasMappingPermission = (currentUser: User) => isPermitted(currentUser?.permissions, 'typemappings:edit');
 
 export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => {
   const { currentUser } = contexts;
