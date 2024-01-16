@@ -31,8 +31,8 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import static org.graylog2.plugin.IOState.Type.FAILING;
 import static org.graylog2.shared.utilities.StringUtils.f;

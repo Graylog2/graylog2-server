@@ -26,7 +26,8 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;

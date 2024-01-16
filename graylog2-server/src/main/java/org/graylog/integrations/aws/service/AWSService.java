@@ -47,9 +47,11 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.RegionMetadata;
 
-import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.InternalServerErrorException;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.InternalServerErrorException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -94,16 +96,16 @@ public class AWSService {
 
         List<AWSRegion> regions =
                 Region.regions().stream()
-                      // Ignore the global region. CloudWatch and Kinesis cannot be used with global regions.
-                      .filter(r -> !r.isGlobalRegion())
-                      .map(r -> {
-                          // Build a single AWSRegionResponse with id, description, and displayValue.
-                          RegionMetadata regionMetadata = r.metadata();
-                          String label = String.format(Locale.ROOT, "%s: %s", regionMetadata.description(), regionMetadata.id());
-                          return AWSRegion.create(regionMetadata.id(), label);
-                      })
-                      .sorted(Comparator.comparing(AWSRegion::regionId))
-                      .collect(Collectors.toList());
+                        // Ignore the global region. CloudWatch and Kinesis cannot be used with global regions.
+                        .filter(r -> !r.isGlobalRegion())
+                        .map(r -> {
+                            // Build a single AWSRegionResponse with id, description, and displayValue.
+                            RegionMetadata regionMetadata = r.metadata();
+                            String label = String.format(Locale.ROOT, "%s: %s", regionMetadata.description(), regionMetadata.id());
+                            return AWSRegion.create(regionMetadata.id(), label);
+                        })
+                        .sorted(Comparator.comparing(AWSRegion::regionId))
+                        .collect(Collectors.toList());
 
         return RegionsResponse.create(regions, regions.size());
     }
@@ -148,13 +150,13 @@ public class AWSService {
         }
         AvailableService cloudWatchService =
                 AvailableService.create("CloudWatch",
-                                        "Retrieve CloudWatch logs via Kinesis. Kinesis allows streaming of the logs " +
-                                        "in real time. AWS CloudWatch is a monitoring and management service built " +
-                                        "for developers, system operators, site reliability engineers (SRE), " +
-                                        "and IT managers.",
-                                        policy,
-                                        "Requires Kinesis",
-                                        "https://aws.amazon.com/cloudwatch/");
+                        "Retrieve CloudWatch logs via Kinesis. Kinesis allows streaming of the logs " +
+                                "in real time. AWS CloudWatch is a monitoring and management service built " +
+                                "for developers, system operators, site reliability engineers (SRE), " +
+                                "and IT managers.",
+                        policy,
+                        "Requires Kinesis",
+                        "https://aws.amazon.com/cloudwatch/");
         services.add(cloudWatchService);
         return AvailableServiceResponse.create(services, services.size());
     }
@@ -189,34 +191,34 @@ public class AWSService {
      */
     private AWSPolicy buildAwsSetupPolicy() {
         List<String> actions = Arrays.asList("cloudwatch:PutMetricData",
-                                             "dynamodb:CreateTable",
-                                             "dynamodb:DescribeTable",
-                                             "dynamodb:GetItem",
-                                             "dynamodb:PutItem",
-                                             "dynamodb:Scan",
-                                             "dynamodb:UpdateItem",
-                                             "ec2:DescribeInstances",
-                                             "ec2:DescribeNetworkInterfaceAttribute",
-                                             "ec2:DescribeNetworkInterfaces",
-                                             "elasticloadbalancing:DescribeLoadBalancerAttributes",
-                                             "elasticloadbalancing:DescribeLoadBalancers",
-                                             "iam:CreateRole",
-                                             "iam:GetRole",
-                                             "iam:PassRole",
-                                             "iam:PutRolePolicy",
-                                             "kinesis:CreateStream",
-                                             "kinesis:DescribeStream",
-                                             "kinesis:GetRecords",
-                                             "kinesis:GetShardIterator",
-                                             "kinesis:ListShards",
-                                             "kinesis:ListStreams",
-                                             "logs:DescribeLogGroups",
-                                             "logs:PutSubscriptionFilter");
+                "dynamodb:CreateTable",
+                "dynamodb:DescribeTable",
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem",
+                "ec2:DescribeInstances",
+                "ec2:DescribeNetworkInterfaceAttribute",
+                "ec2:DescribeNetworkInterfaces",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "iam:CreateRole",
+                "iam:GetRole",
+                "iam:PassRole",
+                "iam:PutRolePolicy",
+                "kinesis:CreateStream",
+                "kinesis:DescribeStream",
+                "kinesis:GetRecords",
+                "kinesis:GetShardIterator",
+                "kinesis:ListShards",
+                "kinesis:ListStreams",
+                "logs:DescribeLogGroups",
+                "logs:PutSubscriptionFilter");
 
         AWSPolicyStatement statement = AWSPolicyStatement.create("GraylogKinesisSetup",
-                                                                 "Allow",
-                                                                 actions,
-                                                                 "*");
+                "Allow",
+                actions,
+                "*");
         return AWSPolicy.create(AWS_POLICY_VERSION, Collections.singletonList(statement));
     }
 
@@ -225,17 +227,17 @@ public class AWSService {
      */
     private AWSPolicy buildAwsAutoSetupPolicy() {
         List<String> actions = Arrays.asList("iam:PassRole",
-                                             "logs:DescribeSubscriptionFilters",
-                                             "logs:PutLogEvents",
-                                             "kinesis:CreateStream",
-                                             "kinesis:DescribeStreamConsumer",
-                                             "kinesis:PutRecord",
-                                             "kinesis:RegisterStreamConsumer");
+                "logs:DescribeSubscriptionFilters",
+                "logs:PutLogEvents",
+                "kinesis:CreateStream",
+                "kinesis:DescribeStreamConsumer",
+                "kinesis:PutRecord",
+                "kinesis:RegisterStreamConsumer");
 
         AWSPolicyStatement statement = AWSPolicyStatement.create("GraylogKinesisAutoSetup",
-                                                                 "Allow",
-                                                                 actions,
-                                                                 "*");
+                "Allow",
+                actions,
+                "*");
         return AWSPolicy.create(AWS_POLICY_VERSION, Collections.singletonList(statement));
     }
 

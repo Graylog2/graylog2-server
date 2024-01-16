@@ -52,12 +52,15 @@ import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -135,6 +138,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .size(0)
                 .trackTotalHits(true);
 
+        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
+
         final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
@@ -156,7 +161,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .must(
                                     Objects.requireNonNull(
                                             TimeRangeQueryFactory.create(
-                                                    query.effectiveTimeRange(searchType)
+                                                    query.effectiveTimeRange(searchType, nowUTCSharedBetweenSearchTypes)
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                                     )

@@ -22,7 +22,8 @@ import com.codahale.metrics.jvm.ClassLoadingGaugeSet;
 import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.lang.management.ManagementFactory;
 
 @Singleton

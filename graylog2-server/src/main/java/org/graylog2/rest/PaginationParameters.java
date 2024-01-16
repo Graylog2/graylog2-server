@@ -19,8 +19,8 @@ package org.graylog2.rest;
 import com.google.common.base.MoreObjects;
 import io.swagger.annotations.ApiParam;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.QueryParam;
 
 /**
  * Shareable pagination parameters to be used with {@link org.graylog2.database.PaginatedDbService}.

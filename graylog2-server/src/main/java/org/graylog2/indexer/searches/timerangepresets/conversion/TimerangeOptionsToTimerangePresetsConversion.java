@@ -21,7 +21,8 @@ import org.graylog2.indexer.searches.timerangepresets.TimerangePreset;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.Period;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;

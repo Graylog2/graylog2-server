@@ -19,7 +19,8 @@ package org.graylog2.plugin.certificates;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Locale;
 
 public record RenewalPolicy(@JsonProperty("mode") @NotNull Mode mode,

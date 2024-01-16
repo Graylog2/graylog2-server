@@ -17,14 +17,14 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

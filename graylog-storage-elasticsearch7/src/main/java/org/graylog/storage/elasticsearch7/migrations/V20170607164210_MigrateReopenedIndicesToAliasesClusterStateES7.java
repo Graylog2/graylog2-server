@@ -21,7 +21,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.storage.elasticsearch7.PlainJsonApi;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 
 public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7 implements V20170607164210_MigrateReopenedIndicesToAliases.ClusterState {

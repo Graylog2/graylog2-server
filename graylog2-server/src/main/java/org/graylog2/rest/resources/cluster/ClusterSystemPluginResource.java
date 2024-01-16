@@ -32,20 +32,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
-import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
+import static jakarta.ws.rs.core.Response.Status.BAD_GATEWAY;
 
 @RequiresAuthentication
 @Api(value = "Cluster/Plugins", description = "Plugin information for any node in the cluster")

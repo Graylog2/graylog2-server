@@ -18,7 +18,8 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.auto.value.AutoValue;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Collections;
 import java.util.List;
 

@@ -20,7 +20,8 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.validators.PathReadableValidator;
 import org.graylog2.configuration.PathConfiguration;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.nio.file.Path;
 
 @Singleton

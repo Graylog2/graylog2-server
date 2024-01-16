@@ -24,7 +24,8 @@ import com.github.rvesse.airline.annotations.restrictions.NotBlank;
 import org.apache.commons.lang.StringUtils;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;

@@ -17,6 +17,15 @@
 package org.graylog2.shared.security;
 
 import com.google.common.base.Strings;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.SecurityContext;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -26,18 +35,10 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.rest.RestTools;
 import org.graylog2.utilities.IpSubnet;
 
-import javax.annotation.Priority;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
