@@ -38,8 +38,10 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -180,11 +182,11 @@ public class Searches {
 
     private Set<String> indicesContainingField(Set<String> strings, String field) {
         return indices.getAllMessageFieldsForIndices(strings.toArray(new String[0]))
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue().contains(field))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toSet());
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().contains(field))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 
     private void recordEsMetrics(long tookMs, TimeRange range) {

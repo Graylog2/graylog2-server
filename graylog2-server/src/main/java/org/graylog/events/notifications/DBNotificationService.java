@@ -24,7 +24,8 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.function.Predicate;
 
 public class DBNotificationService extends PaginatedDbService<NotificationDto> {

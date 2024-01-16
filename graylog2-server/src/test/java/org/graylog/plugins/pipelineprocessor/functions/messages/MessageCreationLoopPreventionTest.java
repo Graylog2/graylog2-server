@@ -48,7 +48,8 @@ import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;

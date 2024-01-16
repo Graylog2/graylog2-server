@@ -22,7 +22,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexT
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog2.indexer.indices.Template;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class LegacyIndexTemplateAdapter implements IndexTemplateAdapter {

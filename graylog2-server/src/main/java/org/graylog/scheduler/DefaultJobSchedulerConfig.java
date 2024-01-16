@@ -18,8 +18,8 @@ package org.graylog.scheduler;
 
 import org.graylog2.cluster.leader.LeaderElectionService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /**
  * This is the default {@link JobSchedulerConfig}.

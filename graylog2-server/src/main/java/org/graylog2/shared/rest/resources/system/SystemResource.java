@@ -39,12 +39,14 @@ import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.StreamingOutput;
+
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
@@ -130,7 +132,7 @@ public class SystemResource extends RestResource {
     @ApiOperation(value = "Get a process buffer dump")
     public SystemProcessBufferDumpResponse processBufferDump() {
         checkPermission(RestPermissions.PROCESSBUFFER_DUMP, serverStatus.getNodeId().toString());
-       return SystemProcessBufferDumpResponse.create(processBuffer.getDump());
+        return SystemProcessBufferDumpResponse.create(processBuffer.getDump());
     }
 
     @GET

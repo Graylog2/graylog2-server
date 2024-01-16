@@ -157,6 +157,19 @@ The following Java Code API changes have been made.
 | `org.graylog.plugins.views.search.engine.LuceneQueryParsingException` | Unused exception class removed |
 | `org.graylog2.indexer.IndexMappingTemplate#toTemplate`                | Method parameter list modified |
 
+### Transition from the `javax` to the `jakarta` namespace
+
+Graylog was using various annotations from the `javax.*` packages, e.g. to annotate REST
+resources or to facilitate dependency injection. The package name for some of these
+annotations has been changed to `jakarta.*`. For a plugin to keep working as expected,
+its code needs to be adjusted to also use the new package names.
+
+| previous name               | new name                      |
+|-----------------------------|-------------------------------|
+| `javax.annotation.Priority` | `jakarta.annotation.Priority` |
+| `javax.inject.*`            | `jakarta.inject.*`            |
+| `javax.validation.*`        | `jakarta.validation.*`        |
+| `javax.ws.rs.*`             | `jakarta.ws.rs.*`             |
 
 ## REST API Endpoint Changes
 

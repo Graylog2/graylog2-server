@@ -70,7 +70,8 @@ import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.graylog2.web.PluginUISettingsProvider;
 
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.ExceptionMapper;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;

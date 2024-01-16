@@ -28,7 +28,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class TrafficCounterCalculator extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(TrafficCounterCalculator.class);

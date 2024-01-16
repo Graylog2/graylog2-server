@@ -20,6 +20,7 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import jakarta.inject.Inject;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,7 +44,6 @@ import org.graylog2.indexer.indices.Indices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -179,7 +179,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
 
             for (var index : indices) {
-                if(this.indices.exists(index)) {
+                if (this.indices.exists(index)) {
                     throw new IllegalArgumentException("Can't migrate index " + index + ", as it already exists in the target indexer");
                 }
                 this.indices.create(index, indexSetRegistry.getForIndex(index).orElse(indexSetRegistry.getDefault()));

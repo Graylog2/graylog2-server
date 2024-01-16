@@ -21,7 +21,7 @@ import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.plugins.views.search.views.ViewService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class ViewGRNDescriptorProvider implements GRNDescriptorProvider {
     private final ViewService viewService;

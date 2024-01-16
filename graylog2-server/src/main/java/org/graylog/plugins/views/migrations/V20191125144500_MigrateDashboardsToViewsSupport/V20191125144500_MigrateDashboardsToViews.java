@@ -24,7 +24,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -123,8 +124,8 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
     }
 
     private Map.Entry<View, Search> migrateDashboard(Dashboard dashboard,
-                                  Consumer<String> recordMigratedDashboardIds,
-                                  Consumer<Map<String, Set<String>>> recordMigratedWidgetMap) {
+                                                     Consumer<String> recordMigratedDashboardIds,
+                                                     Consumer<Map<String, Set<String>>> recordMigratedWidgetMap) {
         final Map<String, Set<String>> migratedWidgetIds = new HashMap<>(dashboard.widgets().size());
         final BiConsumer<String, String> recordMigratedWidgetIds = (String before, String after) -> migratedWidgetIds
                 .merge(before, Collections.singleton(after), Sets::union);
@@ -153,7 +154,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final Set<SearchType> newSearchTypes = newViewWidgets.stream()
                 .flatMap(viewWidget -> createSearchType(viewWidget, recordWidgetMapping).stream())
                 .collect(Collectors.toSet());
-        final Query newQuery = Query.create(randomUUIDProvider.get(), RelativeRange.create(300),"", newSearchTypes);
+        final Query newQuery = Query.create(randomUUIDProvider.get(), RelativeRange.create(300), "", newSearchTypes);
         final Set<Query> newQueries = Collections.singleton(newQuery);
         final Search newSearch = Search.create(randomObjectIdProvider.get(), newQueries, dashboard.creatorUserId(), createdAt);
 
@@ -189,8 +190,8 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
     }
 
     private Set<ViewWidget> migrateWidget(Widget widget,
-                                     BiConsumer<String, String> recordMigratedWidgetIds,
-                                     BiConsumer<String, String> recordWidgetTitle) {
+                                          BiConsumer<String, String> recordMigratedWidgetIds,
+                                          BiConsumer<String, String> recordWidgetTitle) {
         final Set<ViewWidget> viewWidgets = widget.toViewWidgets(this.randomUUIDProvider);
 
         viewWidgets.forEach(viewWidget -> {
@@ -211,9 +212,9 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                     }
                     final Set<ViewWidget> newViewWidgets = viewWidgetIds.stream()
                             .map(viewWidgetId -> viewWidgets
-                                .stream()
-                                .filter(viewWidget -> viewWidget.id().equals(viewWidgetId))
-                                .findFirst()
+                                    .stream()
+                                    .filter(viewWidget -> viewWidget.id().equals(viewWidgetId))
+                                    .findFirst()
                                     .orElse(null)
                             ).filter(Objects::nonNull)
                             .collect(Collectors.toSet());
@@ -221,8 +222,8 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                             .filter(widget -> widget.id().equals(entry.getKey()))
                             .findFirst();
                     return dashboardWidget.map(widget -> widget.config().toViewWidgetPositions(newViewWidgets, widgetPosition)
-                            .entrySet()
-                            .stream())
+                                    .entrySet()
+                                    .stream())
                             .orElse(Stream.empty());
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
