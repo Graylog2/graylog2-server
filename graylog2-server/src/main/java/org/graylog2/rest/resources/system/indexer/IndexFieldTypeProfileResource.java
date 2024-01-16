@@ -39,8 +39,11 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileData;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileWithUsages;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.rest.resources.RestResource;
+
+import java.util.List;
 
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_DELETE;
@@ -57,7 +60,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     private final IndexFieldTypeProfileService profileService;
 
     @Inject
-    public IndexFieldTypeProfileResource(IndexFieldTypeProfileService profileService) {
+    public IndexFieldTypeProfileResource(final IndexFieldTypeProfileService profileService) {
         this.profileService = profileService;
     }
 
@@ -66,8 +69,8 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @Timed
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets profile by id")
-    public IndexFieldTypeProfile retrieveById(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
-        return profileService.get(profileId)
+    public IndexFieldTypeProfileWithUsages retrieveById(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
+        return profileService.getWithUsages(profileId)
                 .orElseThrow(() -> new NotFoundException("No profile with id : " + profileId));
     }
 
@@ -76,16 +79,18 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @Timed
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets profile by id")
-    public PageListResponse<IndexFieldTypeProfile> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                           @ApiParam(name = "sort",
-                                                                     value = "The field to sort the result on",
-                                                                     required = true,
-                                                                     allowableValues = "name")
-                                                           @DefaultValue(IndexFieldTypeProfile.NAME_FIELD_NAME) @QueryParam("sort") String sort,
-                                                           @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                           @DefaultValue("asc") @QueryParam("order") String order) {
-        return profileService.getPaginated(page, perPage, sort, order);
+    public PageListResponse<IndexFieldTypeProfileWithUsages> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                                     @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                                     @ApiParam(name = "sort",
+                                                                               value = "The field to sort the result on",
+                                                                               required = true,
+                                                                               allowableValues = "name")
+                                                                     @DefaultValue(IndexFieldTypeProfile.NAME_FIELD_NAME) @QueryParam("sort") String sort,
+                                                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                                     @DefaultValue("asc") @QueryParam("order") String order) {
+        return profileService.getPaginated(query, filters, page, perPage, sort, order);
     }
 
     @POST

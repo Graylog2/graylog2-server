@@ -164,7 +164,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         final String urlString = templateEngine.transform(config.url(), ImmutableMap.of("key", encodedKey));
 
         if (!urlWhitelistService.isWhitelisted(urlString)) {
-            LOG.error("URL <{}> is not whitelisted. Aborting lookup request.", urlString);
+            LOG.error("Data adapter <{}>: URL <{}> is not whitelisted. Aborting lookup request.", name(), urlString);
             publishSystemNotificationForWhitelistFailure();
             setError(UrlNotWhitelistedException.forUrl(urlString));
             return getErrorResult();
@@ -177,7 +177,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         final HttpUrl url = HttpUrl.parse(urlString);
 
         if (url == null) {
-            LOG.error("Couldn't parse URL <{}> - returning empty result", urlString);
+            LOG.error("Data adapter <{}>: Couldn't parse URL <{}> - returning empty result", name(), urlString);
             httpURLErrors.mark();
             return getErrorResult();
         }
@@ -202,7 +202,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
             }
             return result;
         } catch (IOException e) {
-            LOG.error("HTTP request error for key <{}>", key, e);
+            LOG.error("Data adapter <{}>: HTTP request error for key <{}> from URL <{}>", name(), key, urlString, e);
             httpRequestErrors.mark();
             return getErrorResult();
         } finally {

@@ -28,6 +28,11 @@ import { duplicateQuery } from 'views/logic/slices/viewSlice';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const TitleWrap = styled.span<{ $active?: boolean }>(({ $active }) => css`
   padding-right: ${$active ? '6px' : '0'};
 `);
@@ -55,7 +60,7 @@ const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCo
     .then((queryId) => setDashboardPage(queryId)), [dispatch, id, setDashboardPage]);
 
   return (
-    <>
+    <Container>
       <TitleWrap aria-label={titleValue} $active={active} data-testid="query-tab" data-active-query-tab={active}>
         {titleValue}
       </TitleWrap>
@@ -71,7 +76,7 @@ const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCo
           <MenuItem onSelect={onRemove} disabled={!allowsClosing}>Delete</MenuItem>
         </QueryActionDropdown>
       )}
-    </>
+    </Container>
   );
 };
 

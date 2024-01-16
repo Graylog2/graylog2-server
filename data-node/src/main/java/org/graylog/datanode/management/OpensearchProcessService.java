@@ -19,6 +19,9 @@ package org.graylog.datanode.management;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
@@ -26,14 +29,14 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
@@ -72,6 +75,16 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Subscribe
     @SuppressWarnings("unused")
+    public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
+        switch (event.action()) {
+            case ADD ->
+                    startWithConfig(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
+            case REMOVE -> startWithConfig();
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
             case STORED -> startWithConfig();
@@ -97,7 +110,30 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     }
 
     private void startWithConfig() {
-        final OpensearchConfiguration config = configurationProvider.get();
+        this.startWithConfig(Map.of());
+    }
+
+    private void startWithConfig(Map<String, String> additionalConfig) {
+        final OpensearchConfiguration original = configurationProvider.get();
+
+        final var finalAdditionalConfig = new HashMap<String, String>();
+        finalAdditionalConfig.putAll(original.additionalConfiguration());
+        finalAdditionalConfig.putAll(additionalConfig);
+
+        final var config = new OpensearchConfiguration(
+                original.opensearchDistribution(),
+                original.datanodeDirectories(),
+                original.bindAddress(),
+                original.hostname(),
+                original.httpPort(),
+                original.transportPort(),
+                original.clusterName(),
+                original.nodeName(),
+                original.nodeRoles(),
+                original.discoverySeedHosts(),
+                original.opensearchSecurityConfiguration(),
+                finalAdditionalConfig);
+
         if (config.securityConfigured()) {
             this.process.startWithConfig(config);
         } else {

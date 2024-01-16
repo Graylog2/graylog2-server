@@ -85,9 +85,6 @@ public class ProcessBuffer extends Buffer {
         );
         disruptor.setDefaultExceptionHandler(new LoggingExceptionHandler(LOG));
 
-        LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>.",
-                ringBufferSize, waitStrategy.getClass().getSimpleName());
-
         processors = new ProcessBufferProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
             processors[i] = bufferProcessorFactory.create(decodingProcessorFactory.create(decodeTime, parseTime));
@@ -95,6 +92,11 @@ public class ProcessBuffer extends Buffer {
         disruptor.handleEventsWithWorkerPool(processors);
 
         ringBuffer = disruptor.start();
+
+        LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>, " +
+                        "running {} parallel buffer processors.",
+                ringBufferSize, waitStrategy.getClass().getSimpleName(), processorCount);
+
     }
 
     private ThreadFactory threadFactory(MetricRegistry metricRegistry) {

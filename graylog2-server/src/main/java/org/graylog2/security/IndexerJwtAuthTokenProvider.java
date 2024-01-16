@@ -40,6 +40,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+/**
+ * Caution, this provider returns not just the token itself but also the "Bearer " prefix, so the value can be directly
+ * used as an HTTP header content.
+ */
 @Singleton
 public class IndexerJwtAuthTokenProvider implements Provider<String> {
     private final Supplier<String> authHeaderBearerString;

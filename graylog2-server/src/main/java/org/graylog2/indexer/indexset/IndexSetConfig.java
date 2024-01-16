@@ -55,6 +55,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_CREATION_DATE = "creation_date";
     public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
     public static final String FIELD_REGULAR = "regular";
+    public static final String FIELD_PROFILE_ID = "field_type_profile";
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
@@ -152,7 +153,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("custom_field_mappings")
     public abstract CustomFieldMappings customFieldMappings();
 
-    @JsonProperty("field_type_profile")
+    @JsonProperty(FIELD_PROFILE_ID)
     @Nullable
     public abstract String fieldTypeProfile();
 
