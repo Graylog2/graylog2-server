@@ -24,6 +24,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.PushOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -31,7 +32,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.users.events.UserDeletedEvent;
 
-import javax.inject.Inject;
 import java.time.Clock;
 import java.util.Date;
 import java.util.List;
