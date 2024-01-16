@@ -29,6 +29,14 @@
                 <include>jakarta.json.bind:jakarta.json.bind-api</include>
                 <include>jakarta.json:jakarta.json-api</include>
             </includes>
+            <unpackOptions>
+                <excludes>
+                    <!-- Including module-info.class files would turn the
+                         artifact into a Java module and we would run into
+                         class loader issues. -->
+                    <exclude>module-info.class</exclude>
+                </excludes>
+            </unpackOptions>
         </dependencySet>
     </dependencySets>
 </assembly>
