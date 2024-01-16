@@ -86,37 +86,23 @@ const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, r
   const fieldsStr = fields.join(', ');
   const indexSetsStr = indexSetIds.map((id) => indexSets[id].title).join(', ');
   const { customFieldMappingsByField, name: profileName, id: profileId } = useIndexProfileWithMappingsByField();
-  const { overriddenIndexFieldsStr, overriddenProfilesFieldsWithType } = useMemo<{ overriddenIndexFieldsStr: string, overriddenProfilesFieldsWithType: Array<{ field: string, type: string }> }>(() => {
-    const { overriddenIndexFields, overriddenProfilesFields } = fields.reduce((acc, cur) => {
-      if (customFieldMappingsByField[cur]) {
-        acc.overriddenProfilesFields.push({ field: cur, type: customFieldMappingsByField[cur] });
-      } else {
-        acc.overriddenIndexFields.push(cur);
-      }
-
-      return acc;
-    }, { overriddenIndexFields: [], overriddenProfilesFields: [] });
-
-    return ({
-      overriddenIndexFieldsStr: overriddenIndexFields.join(', '),
-      overriddenProfilesFieldsWithType: overriddenProfilesFields,
-    });
-  }, [customFieldMappingsByField, fields]);
+  const overriddenIndexFieldsStr = useMemo(() => fields.filter((field) => !customFieldMappingsByField[field]).join(', '), [customFieldMappingsByField, fields]);
+  const overriddenProfilesFieldsWithType = useMemo(() => fields.filter((field) => customFieldMappingsByField[field])
+    .map((field) => ({ field, type: customFieldMappingsByField[field] })), [customFieldMappingsByField, fields]);
 
   return (
     <div>
       <Alert>
         After removing the overridden field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b>
         {overriddenIndexFieldsStr && (
-          <> the
-            settings of your <i>search engine</i> will be applied for
-            fields: <b>{overriddenIndexFieldsStr}</b>.
+          <>, the settings of your <i>search engine</i> will be applied for
+            fields: <b>{overriddenIndexFieldsStr}</b>
           </>
         )}
         {!!overriddenProfilesFieldsWithType.length && (
           <>
-            {' '}
-            The settings from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>{profileName}</Link> (
+            {', '}
+            the settings from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>{profileName}</Link> (
             namely <OverriddenProfilesFieldsWithTypeList overriddenProfilesFieldsWithType={overriddenProfilesFieldsWithType} />
             )
             {' '}

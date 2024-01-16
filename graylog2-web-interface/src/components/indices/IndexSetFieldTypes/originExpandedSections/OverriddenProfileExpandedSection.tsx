@@ -27,7 +27,7 @@ const OverriddenProfileExpandedSection = ({ type, fieldName }: ExpandedSectionPr
 
   return (
     <div>
-      Field type mapping <b>{fieldName}: </b><i>{type}</i> comes from the individual, custom field type mapping.
+      Field type <i>{type}</i> comes from the individual, custom field type mapping.
       It overrides not only possible mappings from the search engine index mapping,
       but also mapping <b>{fieldName}: </b><i>{profileFieldType}</i> present in
       profile <Link to={Routes.SYSTEM.INDICES.LIST}>{profileName}</Link>

@@ -22,12 +22,12 @@ import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
 import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
 
-const IndexExpandedSection = ({ type, fieldName }: ExpandedSectionProps) => {
+const IndexExpandedSection = ({ type }: ExpandedSectionProps) => {
   const { id, name: profileName } = useIndexProfileWithMappingsByField();
 
   return (
     <p>
-      Field type mapping <b>{fieldName}: </b><i>{type}</i> comes from
+      Field type <i>{type}</i> comes from
       profile <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(id)}>{profileName}</Link>.
       It overrides possible mappings from the search engine index mapping,
       either immediately (if index was rotated) or during the next rotation.

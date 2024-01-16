@@ -32,7 +32,7 @@ export type IndexSetFieldType = {
 
 export type ExpandedSectionProps = {
   type: string,
-  fieldName: string,
+  fieldName?: string,
 }
 export type ProfileWithMappingsByField = {
   name: string,
