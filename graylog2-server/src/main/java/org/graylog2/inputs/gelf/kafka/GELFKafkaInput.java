@@ -28,7 +28,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class GELFKafkaInput extends MessageInput {
     private static final String NAME = "GELF Kafka";

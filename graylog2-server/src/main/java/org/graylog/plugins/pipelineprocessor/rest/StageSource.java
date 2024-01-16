@@ -23,7 +23,9 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
+
+import jakarta.validation.constraints.Min;
+
 import java.util.List;
 
 @AutoValue

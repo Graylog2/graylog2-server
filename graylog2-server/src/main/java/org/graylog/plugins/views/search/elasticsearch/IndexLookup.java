@@ -23,7 +23,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;

@@ -29,8 +29,9 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.Response;
+
 import java.util.Collections;
 import java.util.Optional;
 

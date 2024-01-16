@@ -37,11 +37,12 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 @RequiresAuthentication
 @Api(value = "System/Journal", description = "Message journal information of this node.")
@@ -81,11 +82,11 @@ public class JournalResource extends RestResource {
             return JournalSummaryResponse.createEnabled(throttleState.appendEventsPerSec,
                     throttleState.readEventsPerSec,
                     throttleState.uncommittedJournalEntries,
-                                                        Size.bytes(throttleState.journalSize),
-                                                        Size.bytes(throttleState.journalSizeLimit),
-                                                        kafkaJournal.numberOfSegments(),
-                                                        new DateTime(oldestSegment, DateTimeZone.UTC),
-                                                        KafkaJournalConfigurationSummary.of(kafkaJournalConfiguration)
+                    Size.bytes(throttleState.journalSize),
+                    Size.bytes(throttleState.journalSizeLimit),
+                    kafkaJournal.numberOfSegments(),
+                    new DateTime(oldestSegment, DateTimeZone.UTC),
+                    KafkaJournalConfigurationSummary.of(kafkaJournalConfiguration)
             );
 
         }

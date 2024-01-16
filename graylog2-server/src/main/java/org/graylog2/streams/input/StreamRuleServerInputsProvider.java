@@ -21,7 +21,8 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;

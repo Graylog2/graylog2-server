@@ -25,7 +25,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 
 public class ExportClient {

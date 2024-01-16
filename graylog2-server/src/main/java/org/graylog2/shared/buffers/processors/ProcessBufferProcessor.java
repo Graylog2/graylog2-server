@@ -39,7 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Provider;
+
+import jakarta.inject.Provider;
+
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
@@ -181,7 +183,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             message.setProcessingTime(Tools.nowUTC());
             processingStatusRecorder.updatePostProcessingReceiveTime(message.getReceiveTime());
 
-            if(failureSubmissionService.submitProcessingErrors(message)) {
+            if (failureSubmissionService.submitProcessingErrors(message)) {
                 outputBuffer.insertBlocking(message);
             }
         }

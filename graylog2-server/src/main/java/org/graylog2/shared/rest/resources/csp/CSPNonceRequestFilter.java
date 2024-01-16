@@ -16,8 +16,9 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+
 import java.io.IOException;
 import java.util.UUID;
 

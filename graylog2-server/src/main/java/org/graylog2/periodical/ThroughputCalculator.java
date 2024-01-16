@@ -28,7 +28,8 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentMap;
@@ -113,8 +114,8 @@ public class ThroughputCalculator extends Periodical {
         final SortedMap<String, ? extends Counting> streamMeters = metricRegistry.getMeters(streamMetricFilter);
 
         final Iterable<Map.Entry<String, ? extends Counting>> entries = Iterables.concat(counters.entrySet(),
-                                                                                         inputCounters.entrySet(),
-                                                                                         streamMeters.entrySet());
+                inputCounters.entrySet(),
+                streamMeters.entrySet());
 
         // calculate rates
         for (Map.Entry<String, ? extends Counting> countingEntry : entries) {

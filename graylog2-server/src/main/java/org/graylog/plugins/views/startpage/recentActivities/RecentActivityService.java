@@ -32,7 +32,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
     public static final String COLLECTION_NAME = "recent_activity";
@@ -66,7 +66,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
                         .add("size", maximum * 1024)
                         .add("max", maximum)
                         .get(),
-                null );
+                null);
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.eventBus = eventBus;
@@ -106,7 +106,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         // show the most recent activities first
         var sort = getSortBuilder("desc", RecentActivityDTO.FIELD_TIMESTAMP);
         // no permission check for local admin
-        if(user.getUser().isLocalAdmin()) {
+        if (user.getUser().isLocalAdmin()) {
             return findPaginatedWithQueryAndSort(DBQuery.empty(), sort, page, perPage);
         }
 

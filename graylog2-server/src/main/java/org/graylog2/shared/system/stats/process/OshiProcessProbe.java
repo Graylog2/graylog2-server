@@ -21,7 +21,7 @@ import oshi.software.os.FileSystem;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class OshiProcessProbe implements ProcessProbe {
 
