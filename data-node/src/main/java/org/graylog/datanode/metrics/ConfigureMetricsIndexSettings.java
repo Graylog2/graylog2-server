@@ -35,7 +35,6 @@ import org.graylog.storage.opensearch2.ism.policy.actions.RolloverAction;
 import org.graylog.storage.opensearch2.ism.policy.actions.RollupAction;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.indices.Template;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +51,10 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     private final ObjectMapper objectMapper;
     private DataStreamAdapter dataStreamAdapter;
 
-    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration) {
+    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper) {
         this.process = process;
         this.configuration = configuration;
-        this.objectMapper = new ObjectMapperProvider().get();
+        this.objectMapper = objectMapper;
     }
 
     @Override

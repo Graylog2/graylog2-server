@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.management;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -49,6 +50,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final EventBus eventBus;
     private final NodeId nodeId;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
@@ -57,21 +59,23 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final CustomCAX509TrustManager trustManager,
                                     final NodeService<DataNodeDto> nodeService,
                                     final Configuration configuration,
-                                    final NodeId nodeId) {
+                                    final NodeId nodeId, ObjectMapper objectMapper) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
         this.nodeId = nodeId;
-        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
+        this.objectMapper = objectMapper;
+        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper);
         eventBus.register(this);
     }
 
-    private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService<DataNodeDto> nodeService) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService);
+    private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration,
+                                                      final NodeService<DataNodeDto> nodeService, final ObjectMapper objectMapper) {
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService, objectMapper);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
         process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName()));
-        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration));
+        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, objectMapper));
         return process;
     }
 
