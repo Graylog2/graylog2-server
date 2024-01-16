@@ -18,9 +18,9 @@ package org.graylog2.datatiering;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.autovalue.WithBeanGetter;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 

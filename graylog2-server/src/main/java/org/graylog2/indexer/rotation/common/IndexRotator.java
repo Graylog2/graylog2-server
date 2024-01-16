@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation.common;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexSet;
@@ -25,8 +26,6 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_ROTATION_COMPLETE;
@@ -83,7 +82,7 @@ public class IndexRotator {
         }
     }
 
-    public interface RotationChecker{
+    public interface RotationChecker {
         Result shouldRotate(String indexName, IndexSet indexSet);
     }
 

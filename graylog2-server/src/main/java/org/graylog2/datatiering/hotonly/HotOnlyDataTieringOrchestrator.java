@@ -17,6 +17,8 @@
 package org.graylog2.datatiering.hotonly;
 
 import com.google.common.base.Preconditions;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
@@ -30,8 +32,6 @@ import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {

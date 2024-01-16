@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.retention.executors;
 
+import jakarta.inject.Inject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.shared.system.activities.Activity;
@@ -24,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,7 +53,7 @@ public class CountBasedRetentionExecutor {
 
 
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
-        final int indexCount = (int)deflectorIndices.keySet()
+        final int indexCount = (int) deflectorIndices.keySet()
                 .stream()
                 .filter(indexName -> !indices.isReopened(indexName))
                 .count();

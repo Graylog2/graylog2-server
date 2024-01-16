@@ -16,10 +16,10 @@
  */
 package org.graylog2.datatiering;
 
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetValidator;
 
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 public interface DataTieringOrchestrator {

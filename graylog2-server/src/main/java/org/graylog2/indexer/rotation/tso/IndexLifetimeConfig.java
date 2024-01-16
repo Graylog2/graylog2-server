@@ -19,9 +19,9 @@ package org.graylog2.indexer.rotation.tso;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.Period;
 
-import javax.validation.constraints.NotNull;
 
 @AutoValue
 public abstract class IndexLifetimeConfig {

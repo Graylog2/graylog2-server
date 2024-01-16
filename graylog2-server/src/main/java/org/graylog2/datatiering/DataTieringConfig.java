@@ -18,10 +18,9 @@ package org.graylog2.datatiering;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.datatiering.fallback.FallbackDataTieringConfig;
 import org.joda.time.Period;
-
-import javax.validation.constraints.NotNull;
 
 import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MAX;
 import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_LIFETIME_MIN;

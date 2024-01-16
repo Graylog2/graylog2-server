@@ -17,6 +17,7 @@
 package org.graylog2.indexer.retention.executors;
 
 import com.google.common.base.Joiner;
+import jakarta.inject.Inject;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
@@ -27,7 +28,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
