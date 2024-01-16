@@ -21,16 +21,18 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.WriteModel;
+import jakarta.inject.Inject;
 import org.bson.Document;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -42,12 +44,16 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
     private static final String SERIES_PATH_STRING = "config.series";
     private final ClusterConfigService clusterConfigService;
     private final MongoCollection<Document> collection;
+    private final NotificationService notificationService;
+
 
     @Inject
     public V20230629140000_RenameFieldTypeOfEventDefinitionSeries(ClusterConfigService clusterConfigService,
-                                                                  MongoConnection mongoConnection) {
+                                                                  MongoConnection mongoConnection,
+                                                                  NotificationService notificationService) {
         this.clusterConfigService = clusterConfigService;
         this.collection = mongoConnection.getMongoDatabase().getCollection("event_definitions");
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -110,6 +116,8 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
             newConditions.put("expression", null);
             config.put("conditions", newConditions);
             doc.put(EventDefinitionDto.FIELD_STATE, EventDefinition.State.DISABLED);
+            raiseNotification(StringUtils.f("Disabled invalid event definition %s", doc.get("title", String.class)),
+                    "Definition is missing the required field name - please review and update the definition.");
         }
         if (needsUpdate) {
             config.put("series", newSeries);
@@ -120,4 +128,12 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
 
     public record MigrationCompleted() {}
 
+    private void raiseNotification(String title, String details) {
+        final Notification systemNotification = notificationService.buildNow()
+                .addType(Notification.Type.GENERIC)
+                .addSeverity(Notification.Severity.URGENT)
+                .addDetail("title", title)
+                .addDetail("description", details);
+        notificationService.publishIfFirst(systemNotification);
+    }
 }

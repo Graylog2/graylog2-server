@@ -21,12 +21,14 @@ import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.migrations.Migration;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -59,6 +61,8 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
 
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private NotificationService notificationService;
 
     private MongoCollection<Document> eventDefinitionsCollection;
 
@@ -68,7 +72,8 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
     public void setUp() {
         this.migration = new V20230629140000_RenameFieldTypeOfEventDefinitionSeries(
                 clusterConfigService,
-                mongodb.mongoConnection()
+                mongodb.mongoConnection(),
+                notificationService
         );
         this.eventDefinitionsCollection = mongodb.mongoConnection().getMongoDatabase().getCollection("event_definitions");
     }
