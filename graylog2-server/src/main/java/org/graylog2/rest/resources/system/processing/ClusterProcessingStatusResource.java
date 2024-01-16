@@ -25,14 +25,16 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.processing.ProcessingStatusSummary;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;

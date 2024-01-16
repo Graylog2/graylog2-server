@@ -69,7 +69,7 @@ const useShowRouteForEntity = (id: string, type: string) => {
     case 'search_filter':
       return Routes.getPluginRoute('MY-FILTERS_DETAILS_FILTERID')(id);
     case 'report':
-      return Routes.getPluginRoute('REPORTS_REPORTID_CONFIGURATION')(id);
+      return Routes.getPluginRoute('REPORTS_REPORTID_CONFIGURATION')?.(id);
     case 'role':
       return Routes.SYSTEM.AUTHZROLES.show(id);
     case 'output':

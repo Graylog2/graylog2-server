@@ -36,9 +36,10 @@ import org.graylog2.rest.resources.system.GeoIpResolverConfigValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;

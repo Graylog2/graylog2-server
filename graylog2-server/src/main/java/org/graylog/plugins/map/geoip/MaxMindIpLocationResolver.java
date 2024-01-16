@@ -27,7 +27,8 @@ import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Optional;

@@ -46,19 +46,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -188,7 +192,7 @@ public class MessageResource extends RestResource {
     @Path("/{index}/analyze")
     @Timed
     @ApiOperation(value = "Analyze a message string",
-            notes = "Returns what tokens/terms a message string (message or full_message) is split to.")
+                  notes = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Specified index does not exist."),

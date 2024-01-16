@@ -30,6 +30,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.jayway.jsonpath.JsonPath;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -47,7 +48,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -176,6 +176,7 @@ public class JsonPathCodec extends AbstractCodec {
             throw new JsonFlattenException("Warning: JSON contains type not supported by the flatten method. JsonNode: " + jsonNode);
         }
     }
+
     public static class JsonFlattenException extends Exception {
         public JsonFlattenException(String errorMessage) {
             super(errorMessage);
@@ -229,7 +230,8 @@ public class JsonPathCodec extends AbstractCodec {
                     "If set, the whole JSON will be flattened and returned as message fields."
             ));
 
-            return r;        }
+            return r;
+        }
 
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {

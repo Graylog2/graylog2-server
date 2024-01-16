@@ -27,8 +27,9 @@ import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -72,7 +73,7 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
             if (availableOnFS > 0) {
                 final long usedByJournal = FileUtils.sizeOfDirectory(journalDirectory.toFile());
                 if (availableOnFS + usedByJournal < journalMaxSize.toBytes()) {
-                       throw new PreflightCheckException(StringUtils.f(
+                    throw new PreflightCheckException(StringUtils.f(
                             "Journal directory <%s> has not enough free space (%d MB) available. You need to provide additional %d MB to contain 'message_journal_max_size = %d MB' ",
                             journalDirectory.toAbsolutePath(),
                             Size.bytes(availableOnFS).toMegabytes(),
@@ -115,7 +116,7 @@ public class DiskJournalPreflightCheck implements PreflightCheck {
             if (!fileLock.tryLock()) {
                 throw new PreflightCheckException(
                         StringUtils.f("The journal is already locked by another process. Try running fuser \"%s\" to find the PID.",
-                        file.getAbsolutePath()));
+                                file.getAbsolutePath()));
             }
         } finally {
             if (fileLock != null) {

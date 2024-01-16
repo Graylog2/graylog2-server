@@ -82,6 +82,8 @@ describe('<EntityFilters />', () => {
     },
   ] as Attributes;
 
+  const dropdownIsHidden = (dropdownTitle: string) => expect(screen.queryByRole('heading', { name: new RegExp(dropdownTitle, 'i') })).not.toBeInTheDocument();
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -125,6 +127,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ disabled: ['false'] })));
+      await waitFor(() => dropdownIsHidden('create filter'));
     });
 
     it('should update active filter on click', async () => {
@@ -177,8 +180,9 @@ describe('<EntityFilters />', () => {
         name: /create filter/i,
       }));
 
-      // eslint-disable-next-line testing-library/no-node-access
-      expect(screen.getByRole('menuitem', { name: /status/i }).closest('li')).toHaveClass('disabled');
+      const statusElement = await screen.findByRole('menuitem', { name: /status/i });
+
+      await waitFor(() => expect(statusElement).toBeDisabled());
     });
   });
 
@@ -223,6 +227,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ index_set_id: ['index-set-1'] })));
+      await waitFor(() => dropdownIsHidden('create filter'));
     });
 
     it('should update active filter', async () => {
@@ -262,6 +267,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ index_set_id: ['index-set-2'] })));
+      await waitFor(() => dropdownIsHidden('edit index set filter'));
     });
   });
 
@@ -284,6 +290,11 @@ describe('<EntityFilters />', () => {
       }));
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
+
+      const fromInput = within(timeRangeForm).getByRole('textbox', { name: /from/i });
+      userEvent.clear(fromInput);
+      userEvent.paste(fromInput, '2020-01-01 00:55:00.000');
+
       const submitButton = within(timeRangeForm).getByRole('button', {
         name: /create filter/i,
       });
@@ -300,6 +311,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] })));
+      await waitFor(() => dropdownIsHidden('create created filter'));
     });
 
     it('should update active filter', async () => {
@@ -348,6 +360,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['2019-12-31T23:55:00.001+00:00><'] })));
+      await waitFor(() => dropdownIsHidden('edit created filter'));
     });
   });
 
@@ -377,8 +390,7 @@ describe('<EntityFilters />', () => {
         name: /type/i,
       }));
 
-      // eslint-disable-next-line testing-library/no-node-access
-      expect(screen.getByRole('menuitem', { name: /string/i }).closest('li')).toHaveClass('disabled');
+      expect(screen.getByRole('menuitem', { name: /string/i })).toBeDisabled();
     });
   });
 
