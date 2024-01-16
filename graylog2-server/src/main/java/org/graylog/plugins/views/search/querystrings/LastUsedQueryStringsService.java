@@ -21,7 +21,13 @@ import org.graylog2.plugin.database.users.User;
 import java.util.List;
 
 public interface LastUsedQueryStringsService {
-    List<QueryString> get(User user);
+    int DEFAULT_LIMIT = 10;
+
+    default List<QueryString> get(User user) {
+        return get(user, DEFAULT_LIMIT);
+    }
+
+    List<QueryString> get(User user, int limit);
 
     void save(User user, String queryString);
 }

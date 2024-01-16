@@ -68,8 +68,11 @@ public class MongoLastUsedQueryStringsService implements LastUsedQueryStringsSer
     }
 
     @Override
-    public List<QueryString> get(User user) {
-        return findForUser(user.getId()).map(QueryStringForUser::items).orElse(List.of());
+    public List<QueryString> get(User user, int limit) {
+        return findForUser(user.getId())
+                .map(QueryStringForUser::items)
+                .map(items -> items.stream().limit(limit).toList())
+                .orElse(List.of());
     }
 
     private Optional<QueryStringForUser> findForUser(final String userId) {
