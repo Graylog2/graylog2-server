@@ -27,7 +27,8 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -76,10 +77,11 @@ public class UserContext implements HasUser {
 
     /**
      * Build a temporary Shiro Subject and run the callable within that context
-     * @param username  The username of the subject
-     * @param callable  The callable to be executed
-     * @param <T>       The return type of the callable.
-     * @return          whatever the callable returns.
+     *
+     * @param username The username of the subject
+     * @param callable The callable to be executed
+     * @param <T>      The return type of the callable.
+     * @return whatever the callable returns.
      */
     public static <T> T runAs(String username, Callable<T> callable) {
         final Subject subject = new Subject.Builder()
@@ -93,8 +95,9 @@ public class UserContext implements HasUser {
 
     /**
      * Build a temporary Shiro Subject and run the callable within that context
-     * @param username  The username of the subject
-     * @param runnable  The runnable to be executed
+     *
+     * @param username The username of the subject
+     * @param runnable The runnable to be executed
      */
     public static void runAs(String username, Runnable runnable) {
         final Subject subject = new Subject.Builder()
@@ -127,6 +130,7 @@ public class UserContext implements HasUser {
 
     /**
      * Checks if the user is permitted to do everything
+     *
      * @return The check result
      */
     public boolean hasAllPermission() {

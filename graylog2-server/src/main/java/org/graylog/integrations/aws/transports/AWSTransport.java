@@ -36,7 +36,8 @@ import org.graylog2.plugin.inputs.transports.Transport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Locale;
 import java.util.Map;
 

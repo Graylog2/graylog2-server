@@ -19,7 +19,7 @@ package org.graylog.plugins.sidecar.filter;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class OsAdministrationFilter implements AdministrationFilter {
     private final String os;

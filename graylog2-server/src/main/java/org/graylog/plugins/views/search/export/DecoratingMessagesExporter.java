@@ -16,7 +16,8 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.function.Consumer;
 
 public class DecoratingMessagesExporter implements MessagesExporter {

@@ -45,9 +45,11 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.validation.constraints.NotNull;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -322,8 +324,8 @@ public class Indices {
 
     public Set<String> getReopenedIndices(final Collection<String> indices) {
         return indices.stream()
-            .filter(this::isReopened)
-            .collect(Collectors.toSet());
+                .filter(this::isReopened)
+                .collect(Collectors.toSet());
     }
 
     public Set<String> getReopenedIndices(final IndexSet indexSet) {
@@ -387,7 +389,7 @@ public class Indices {
     }
 
     public Optional<DateTime> indexClosingDate(String index) {
-       return indicesAdapter.indexClosingDate(index);
+        return indicesAdapter.indexClosingDate(index);
     }
 
     public IndexRangeStats indexRangeStatsOfIndex(String index) {

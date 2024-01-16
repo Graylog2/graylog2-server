@@ -66,7 +66,8 @@ import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -311,7 +312,7 @@ public class KafkaTransport extends ThrottleableTransport {
                 final Optional<ConsumerRecords<byte[], byte[]>> consumerRecords;
                 try {
                     consumerRecords = tryPoll();
-                    if (! consumerRecords.isPresent()) {
+                    if (!consumerRecords.isPresent()) {
                         LOG.error("Caught recoverable exception. Retrying");
                         Thread.sleep(2000);
                         continue;

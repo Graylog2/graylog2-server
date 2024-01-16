@@ -19,7 +19,8 @@ package org.graylog2.migrations;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 public class V20190730100900_AddAlertsManagerRole extends Migration {
@@ -29,6 +30,7 @@ public class V20190730100900_AddAlertsManagerRole extends Migration {
     public V20190730100900_AddAlertsManagerRole(MigrationHelpers helpers) {
         this.helpers = helpers;
     }
+
     @Override
     public ZonedDateTime createdAt() {
         return ZonedDateTime.parse("2019-07-30T10:09:00Z");

@@ -26,8 +26,9 @@ import org.graylog.plugins.views.search.views.Titles;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,15 +49,15 @@ public abstract class DashboardEntity {
     @NotNull
     public abstract List<DashboardWidgetEntity> widgets();
 
-    public static Map<String, WidgetPositionDTO>  positionMap(
+    public static Map<String, WidgetPositionDTO> positionMap(
             Map<String, ValueReference> parameters,
             Map<DashboardWidgetEntity, List<WidgetEntity>> widgetMap) {
         final Map<String, WidgetPositionDTO> widgetPositionMap = new HashMap<>();
-        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgetMap.entrySet()) {
+        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry : widgetMap.entrySet()) {
             final DashboardWidgetEntity dashboardWidgetEntity = widgetEntityListEntry.getKey();
             Optional<DashboardWidgetEntity.Position> position = dashboardWidgetEntity.position();
             widgetEntityListEntry.getValue().forEach(widgetEntity ->
-                position.ifPresent(value -> widgetPositionMap.put(widgetEntity.id(), value.convert(parameters))));
+                    position.ifPresent(value -> widgetPositionMap.put(widgetEntity.id(), value.convert(parameters))));
         }
         return ImmutableMap.copyOf(widgetPositionMap);
     }
@@ -67,7 +68,7 @@ public abstract class DashboardEntity {
 
         final Map<String, String> widgetTitleMap = new HashMap<>();
 
-        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgetMap.entrySet()) {
+        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry : widgetMap.entrySet()) {
             widgetEntityListEntry.getValue().forEach(widgetEntity -> {
                 widgetTitleMap.put(widgetEntity.id(), widgetEntityListEntry.getKey().description().asString(parameters));
             });

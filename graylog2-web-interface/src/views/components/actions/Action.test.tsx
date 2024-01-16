@@ -142,7 +142,7 @@ describe('Action', () => {
 
     await openDropdown();
 
-    const actionMenuItem = await screen.findByText('External value action') as HTMLAnchorElement;
+    const actionMenuItem = await screen.findByRole('menuitem', { name: /external value action/i }) as HTMLAnchorElement;
 
     expect(actionMenuItem.href).toContain('the-link-to-field1');
   });
