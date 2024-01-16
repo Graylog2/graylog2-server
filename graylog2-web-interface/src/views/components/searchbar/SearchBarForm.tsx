@@ -21,6 +21,7 @@ import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import isFunction from 'lodash/isFunction';
 
+import { SearchQueryStrings } from '@graylog/server-api';
 import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 import type { SearchBarFormValues } from 'views/Constants';
@@ -46,16 +47,26 @@ const _isFunction = (children: Props['children']): children is FormRenderer => i
 
 export const normalizeSearchBarFormValues = ({ timerange, ...rest }: SearchBarFormValues, userTimezone: string) => ({ timerange: normalizeFromSearchBarForBackend(timerange, userTimezone), ...rest });
 
+const executeWithQueryStringRecording = async <R, >(isDirty: boolean, query: string, callback: () => R) => {
+  const trimmedQuery = query.trim();
+
+  try {
+    if (isDirty && !!trimmedQuery) {
+      await SearchQueryStrings.queryStringUsed({ query_string: trimmedQuery });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Unable to record last used query string: ', error);
+  }
+
+  return callback();
+};
+
 const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
   const [enableReinitialize, setEnableReinitialize] = useState(true);
   const { formatTime, userTimezone } = useUserDateTime();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
-  const _onSubmit = useCallback((values: SearchBarFormValues) => {
-    setEnableReinitialize(false);
-
-    return onSubmit(normalizeSearchBarFormValues(values, userTimezone)).finally(() => setEnableReinitialize(true));
-  }, [onSubmit, userTimezone]);
   const _initialValues = useMemo(() => {
     const { timerange, ...rest } = initialValues;
 
@@ -64,6 +75,17 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
       timerange: onInitializingTimerange(timerange, formatTime),
     });
   }, [formatTime, initialValues]);
+
+  const _onSubmit = useCallback((values: SearchBarFormValues) => {
+    setEnableReinitialize(false);
+    const queryString = values?.queryString;
+
+    return executeWithQueryStringRecording(
+      queryString !== _initialValues?.queryString,
+      queryString,
+      () => onSubmit(normalizeSearchBarFormValues(values, userTimezone)).finally(() => setEnableReinitialize(true)),
+    );
+  }, [_initialValues.queryString, onSubmit, userTimezone]);
 
   const handlerContext = useHandlerContext();
   const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext),
