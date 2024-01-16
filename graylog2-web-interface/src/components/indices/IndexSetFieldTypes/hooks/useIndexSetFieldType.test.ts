@@ -46,7 +46,7 @@ const mockData = {
   elements: [{
     field_name: 'field',
     type: 'bool',
-    is_custom: false,
+    origin: 'INDEX',
     is_reserved: false,
   }],
 };
