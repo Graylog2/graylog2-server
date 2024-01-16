@@ -21,7 +21,8 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

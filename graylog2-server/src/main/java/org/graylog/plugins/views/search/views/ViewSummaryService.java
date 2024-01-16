@@ -27,7 +27,8 @@ import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.function.Predicate;
 

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
@@ -48,6 +48,10 @@ describe('TimeRangePresetDropdown', () => {
     userEvent.click(rangePresetOption);
 
     expect(onSelectOption).not.toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: /configure preset/i })).not.toBeInTheDocument();
+    });
   });
 
   it('filtrate options by limit', async () => {

@@ -36,9 +36,9 @@ jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 describe('SavedSearches BulkActions', () => {
   const openActionsDropdown = async () => {
-    await screen.findByRole('button', {
+    await userEvent.click(await screen.findByRole('button', {
       name: /bulk actions/i,
-    });
+    }));
   };
 
   const deleteSavedSearch = async () => {

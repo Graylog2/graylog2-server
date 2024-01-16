@@ -165,6 +165,7 @@ public class ContentPackServiceTest {
     private ContentPackInstallation contentPackInstallation;
     private GrokPattern grokPattern;
     private ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors;
+    private ImmutableMap<ModelId, Object> entityObjectMap;
 
     @Before
     public void setUp() throws Exception {
@@ -202,6 +203,7 @@ public class ContentPackServiceTest {
         NativeEntityDescriptor nativeEntityDescriptor = NativeEntityDescriptor
                 .create(ModelId.of("12345"), "dead-beef1", ModelTypes.GROK_PATTERN_V1, "NAME");
         nativeEntityDescriptors = ImmutableSet.of(nativeEntityDescriptor);
+        entityObjectMap = ImmutableMap.of(nativeEntityDescriptor.contentPackEntityId(), grokPattern);
         contentPack = ContentPackV1.builder()
                 .description("test")
                 .entities(entities)
@@ -313,6 +315,7 @@ public class ContentPackServiceTest {
                 .skippedEntities(ImmutableSet.of())
                 .failedEntities(ImmutableSet.of())
                 .entities(nativeEntityDescriptors)
+                .entityObjects(entityObjectMap)
                 .build();
 
         ContentPackUninstallation resultSuccess = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
@@ -324,6 +327,7 @@ public class ContentPackServiceTest {
                 .skippedEntities(nativeEntityDescriptors)
                 .failedEntities(ImmutableSet.of())
                 .entities(ImmutableSet.of())
+                .entityObjects(ImmutableMap.of())
                 .build();
         ContentPackUninstallation resultSkip = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultSkip).isEqualTo(expectSkip);
@@ -335,6 +339,7 @@ public class ContentPackServiceTest {
                 .skippedEntities(nativeEntityDescriptors)
                 .failedEntities(ImmutableSet.of())
                 .entities(ImmutableSet.of())
+                .entityObjects(ImmutableMap.of())
                 .build();
         ContentPackUninstallation resultSkip2 = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultSkip2).isEqualTo(expectSkip2);
@@ -347,6 +352,7 @@ public class ContentPackServiceTest {
                 .skippedEntities(ImmutableSet.of())
                 .failedEntities(ImmutableSet.of())
                 .entities(ImmutableSet.of())
+                .entityObjects(ImmutableMap.of())
                 .build();
 
         ContentPackUninstallation resultFailure = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);

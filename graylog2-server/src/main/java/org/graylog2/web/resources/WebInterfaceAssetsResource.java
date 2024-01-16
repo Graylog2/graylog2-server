@@ -31,19 +31,22 @@ import org.graylog2.web.PluginAssets;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;

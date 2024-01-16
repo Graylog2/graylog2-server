@@ -21,7 +21,6 @@ import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
 import { ButtonToolbar, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { StartpageStore } from 'stores/users/StartpageStore';
@@ -31,10 +30,10 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import DropdownButton from 'components/bootstrap/DropdownButton';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import StreamModal from '../StreamModal';
@@ -161,11 +160,10 @@ const StreamActions = ({
                    entityType="stream"
                    onClick={toggleEntityShareModal}
                    bsSize="xsmall" />
-      <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                             bsSize="xsmall"
-                             buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                             disabled={isNotEditable}
-                             dropdownZIndex={1000}>
+      <DropdownButton title={MORE_ACTIONS_TITLE}
+                      bsSize="xsmall"
+                      buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+                      disabled={isNotEditable}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
           <MenuItem onSelect={onToggleStreamStatus}
                     disabled={isDefaultStream || isNotEditable}>
@@ -191,27 +189,21 @@ const StreamActions = ({
         </IfPermitted>
 
         <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
-          <LinkContainer to={Routes.stream_edit(stream.id)}>
-            <MenuItem disabled={isDefaultStream || isNotEditable}>
-              Manage Rules {isDefaultStream && <DefaultStreamHelp />}
-            </MenuItem>
-          </LinkContainer>
+          <MenuItem disabled={isDefaultStream || isNotEditable} href={Routes.stream_edit(stream.id)}>
+            Manage Rules {isDefaultStream && <DefaultStreamHelp />}
+          </MenuItem>
         </IfPermitted>
         <HideOnCloud>
           <IfPermitted permissions="stream_outputs:read">
-            <LinkContainer to={Routes.stream_outputs(stream.id)}>
-              <MenuItem>
-                Manage Outputs
-              </MenuItem>
-            </LinkContainer>
+            <MenuItem href={Routes.stream_outputs(stream.id)}>
+              Manage Outputs
+            </MenuItem>
           </IfPermitted>
         </HideOnCloud>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <LinkContainer to={Routes.stream_alerts(stream.id)}>
-            <MenuItem>
-              Manage Alerts
-            </MenuItem>
-          </LinkContainer>
+          <MenuItem href={Routes.stream_alerts(stream.id)}>
+            Manage Alerts
+          </MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
@@ -233,7 +225,7 @@ const StreamActions = ({
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
-      </OverlayDropdownButton>
+      </DropdownButton>
       {showUpdateModal && (
         <StreamModal title="Editing Stream"
                      onSubmit={onUpdate}

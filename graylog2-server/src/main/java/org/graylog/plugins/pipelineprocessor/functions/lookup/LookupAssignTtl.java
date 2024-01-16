@@ -24,7 +24,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;

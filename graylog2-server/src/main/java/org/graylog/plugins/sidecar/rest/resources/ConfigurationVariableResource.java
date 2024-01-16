@@ -34,20 +34,23 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -103,7 +106,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @ApiOperation(value = "Create new configuration variable")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_VARIABLE_CREATE)
     public Response createConfigurationVariable(@ApiParam(name = "JSON body", required = true)
-                                             @Valid @NotNull ConfigurationVariable request) {
+                                                @Valid @NotNull ConfigurationVariable request) {
         ValidationResult validationResult = validateConfigurationVariableHelper(request);
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
@@ -119,9 +122,9 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @ApiOperation(value = "Update a configuration variable")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_VARIABLE_UPDATE)
     public Response updateConfigurationVariable(@ApiParam(name = "id", required = true)
-                                             @PathParam("id") String id,
+                                                @PathParam("id") String id,
                                                 @ApiParam(name = "JSON body", required = true)
-                                             @Valid @NotNull ConfigurationVariable request) {
+                                                @Valid @NotNull ConfigurationVariable request) {
         final ConfigurationVariable previousConfigurationVariable = findVariableOrFail(id);
 
         ValidationResult validationResult = validateConfigurationVariableHelper(request);
@@ -143,7 +146,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @ApiOperation(value = "Validate a configuration variable")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     public ValidationResult validateConfigurationVariable(@ApiParam(name = "JSON body", required = true)
-                                                     @Valid @NotNull ConfigurationVariable toValidate) {
+                                                          @Valid @NotNull ConfigurationVariable toValidate) {
         return validateConfigurationVariableHelper(toValidate);
     }
 
@@ -154,7 +157,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @ApiOperation(value = "Delete a configuration variable")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_VARIABLE_DELETE)
     public Response deleteConfigurationVariable(@ApiParam(name = "id", required = true)
-                                                   @PathParam("id") String id) {
+                                                @PathParam("id") String id) {
         final ConfigurationVariable configurationVariable = findVariableOrFail(id);
         final List<Configuration> configurations = this.configurationService.findByConfigurationVariable(configurationVariable);
         if (!configurations.isEmpty()) {

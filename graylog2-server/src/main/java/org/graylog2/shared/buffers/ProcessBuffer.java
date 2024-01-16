@@ -37,9 +37,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -83,9 +85,6 @@ public class ProcessBuffer extends Buffer {
         );
         disruptor.setDefaultExceptionHandler(new LoggingExceptionHandler(LOG));
 
-        LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>.",
-                ringBufferSize, waitStrategy.getClass().getSimpleName());
-
         processors = new ProcessBufferProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
             processors[i] = bufferProcessorFactory.create(decodingProcessorFactory.create(decodeTime, parseTime));
@@ -93,6 +92,11 @@ public class ProcessBuffer extends Buffer {
         disruptor.handleEventsWithWorkerPool(processors);
 
         ringBuffer = disruptor.start();
+
+        LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>, " +
+                        "running {} parallel buffer processors.",
+                ringBufferSize, waitStrategy.getClass().getSimpleName(), processorCount);
+
     }
 
     private ThreadFactory threadFactory(MetricRegistry metricRegistry) {
@@ -116,7 +120,7 @@ public class ProcessBuffer extends Buffer {
         incomingMessages.mark(n);
     }
 
-    public ImmutableMap<String,String> getDump() {
+    public ImmutableMap<String, String> getDump() {
         final ImmutableMap.Builder<String, String> processBufferDump = ImmutableMap.builder();
         for (int i = 0, processorsLength = processors.length; i < processorsLength; i++) {
             final ProcessBufferProcessor proc = processors[i];

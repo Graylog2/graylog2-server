@@ -32,7 +32,8 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.List;
 

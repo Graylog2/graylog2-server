@@ -50,8 +50,9 @@ import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;

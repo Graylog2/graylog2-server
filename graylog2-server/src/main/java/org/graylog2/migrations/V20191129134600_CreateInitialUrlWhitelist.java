@@ -42,7 +42,8 @@ import org.graylog2.system.urlwhitelist.WhitelistEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -68,8 +69,8 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
 
     @Inject
     public V20191129134600_CreateInitialUrlWhitelist(final ClusterConfigService clusterConfigService,
-            UrlWhitelistService whitelistService, DBDataAdapterService dataAdapterService,
-            DBNotificationService notificationService, RegexHelper regexHelper) {
+                                                     UrlWhitelistService whitelistService, DBDataAdapterService dataAdapterService,
+                                                     DBNotificationService notificationService, RegexHelper regexHelper) {
         this.configService = clusterConfigService;
         this.whitelistService = whitelistService;
         this.dataAdapterService = dataAdapterService;

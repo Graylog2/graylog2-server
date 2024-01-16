@@ -19,8 +19,9 @@ package org.graylog2.shared.plugins;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.Map;
 import java.util.Set;
 

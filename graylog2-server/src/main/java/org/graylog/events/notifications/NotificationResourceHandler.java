@@ -25,9 +25,11 @@ import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -120,7 +122,7 @@ public class NotificationResourceHandler {
         try {
             // Grab the old record so we can revert to it if something goes wrong
             final JobDefinitionDto oldJobDefinition = jobDefinitionService.getByConfigField(
-                    EventNotificationConfig.FIELD_NOTIFICATION_ID, updatedDto.id())
+                            EventNotificationConfig.FIELD_NOTIFICATION_ID, updatedDto.id())
                     .orElseThrow(() -> new IllegalStateException("Couldn't find job definition for notification definition <" + updatedDto.id() + ">"));
 
             // Update the existing object to make sure we keep the ID
@@ -167,19 +169,19 @@ public class NotificationResourceHandler {
 
         // Delete notification from existing events
         eventDefinitionService.getByNotificationId(dtoId)
-            .forEach(eventDefinition -> {
-                LOG.debug("Removing notification <{}/{}> from event definition <{}/{}>",
-                    dto.get().id(), dto.get().title(),
-                    eventDefinition.id(), eventDefinition.title());
-                final ImmutableList<EventNotificationHandler.Config> notifications = eventDefinition.notifications().stream()
-                    .filter(entry -> !entry.notificationId().equals(dtoId))
-                    .collect(ImmutableList.toImmutableList());
-                EventDefinitionDto updatedEventDto = eventDefinition.toBuilder()
-                    .notifications(notifications)
-                    .build();
-                eventDefinitionService.save(updatedEventDto);
+                .forEach(eventDefinition -> {
+                    LOG.debug("Removing notification <{}/{}> from event definition <{}/{}>",
+                            dto.get().id(), dto.get().title(),
+                            eventDefinition.id(), eventDefinition.title());
+                    final ImmutableList<EventNotificationHandler.Config> notifications = eventDefinition.notifications().stream()
+                            .filter(entry -> !entry.notificationId().equals(dtoId))
+                            .collect(ImmutableList.toImmutableList());
+                    EventDefinitionDto updatedEventDto = eventDefinition.toBuilder()
+                            .notifications(notifications)
+                            .build();
+                    eventDefinitionService.save(updatedEventDto);
 
-            });
+                });
         LOG.debug("Deleting notification definition <{}/{}>", dto.get().id(), dto.get().title());
         return notificationService.delete(dtoId) > 0;
     }
@@ -188,8 +190,8 @@ public class NotificationResourceHandler {
      * Tests a notification definition by executing it with a dummy event.
      *
      * @param notificationDto the notification definition to test
-     * @param userName the name of the user that triggered the test
-     * @throws NotFoundException if the notification definition or the notification factory cannot be found
+     * @param userName        the name of the user that triggered the test
+     * @throws NotFoundException            if the notification definition or the notification factory cannot be found
      * @throws InternalServerErrorException if the notification definition failed to be executed
      */
     public void test(NotificationDto notificationDto, String userName) throws NotFoundException, InternalServerErrorException {

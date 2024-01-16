@@ -19,7 +19,7 @@ package org.graylog2.indexer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.Message;
 
@@ -36,9 +36,12 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     public static final String TYPE_MESSAGE = "message";
 
     @Override
-    public Template toTemplate(IndexSetConfig indexSetConfig, String indexPattern, Long order) {
-        //TODO: in next step, combine profile with customFieldMappings
-        return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order, indexSetConfig.customFieldMappings());
+    public Template toTemplate(final TemplateIndexSetConfig indexSetConfig,
+                               final Long order) {
+        return messageTemplate(indexSetConfig.indexWildcard(),
+                indexSetConfig.indexAnalyzer(),
+                order,
+                indexSetConfig.customFieldMappings());
     }
 
     protected Map<String, Object> analyzerKeyword() {

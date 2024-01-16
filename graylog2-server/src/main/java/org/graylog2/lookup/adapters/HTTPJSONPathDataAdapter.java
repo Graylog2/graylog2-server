@@ -55,10 +55,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -91,7 +95,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
 
     @Inject
     protected HTTPJSONPathDataAdapter(@Assisted("dto") DataAdapterDto dto, Engine templateEngine, OkHttpClient httpClient, UrlWhitelistService urlWhitelistService,
-            UrlWhitelistNotificationService urlWhitelistNotificationService, MetricRegistry metricRegistry) {
+                                      UrlWhitelistNotificationService urlWhitelistNotificationService, MetricRegistry metricRegistry) {
         super(dto, metricRegistry);
         this.config = (Config) dto.config();
         this.templateEngine = templateEngine;

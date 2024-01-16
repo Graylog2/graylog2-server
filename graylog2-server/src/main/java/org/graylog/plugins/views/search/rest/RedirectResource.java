@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 public class RedirectResource {
     protected static String pathForClass(Class<?> resourceClass) {
