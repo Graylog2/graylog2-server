@@ -49,7 +49,7 @@ public class DataStreamAdapterOS2IT {
 
         // create template for data stream
         Template template = new Template(List.of(stream + "*"), new Template.Mappings(Map.of()), 1L,
-                new Template.Settings(Map.of()));
+                new Template.Settings(Map.of("number_of_replicas", 0)));
         String templateName = "datastream-test-template";
         boolean ack = dataStreamAdapter.ensureDataStreamTemplate(templateName, template, "timestamp");
         assertThat(ack).isTrue();
