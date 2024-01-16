@@ -36,6 +36,7 @@ import type {
 } from 'components/indices/Types';
 import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import useHistory from 'routing/useHistory';
+import IndexSetProfileInput from 'components/indices/IndexSetProfileInput';
 
 type Props = {
   cancelLink: string,
@@ -258,6 +259,10 @@ const IndexSetConfigurationForm = ({
                 </Row>
                 {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
                 {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                <IndexSetProfileInput value={null}
+                                      onChange={(val) => {
+                                        setFieldValue('field_type_profile', val);
+                                      }} />
                 <Row>
                   <Col md={9} mdOffset={3}>
                     <StyledFormSubmit disabledSubmit={!isValid}
@@ -269,7 +274,6 @@ const IndexSetConfigurationForm = ({
                                       onCancel={onCancel} />
                   </Col>
                 </Row>
-
               </Form>
             </IndexRetentionProvider>
 
