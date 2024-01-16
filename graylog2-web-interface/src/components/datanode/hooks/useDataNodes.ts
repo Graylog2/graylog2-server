@@ -82,7 +82,7 @@ const fetchDataNodes = async (params?: Partial<SearchParams>) => {
   return fetch('GET', qualifyUrl(url));
 };
 
-type DataNodeResponse = {
+export type DataNodeResponse = {
   elements: DataNodes,
   pagination: PaginatedResponseType,
   attributes: Array<Attribute>

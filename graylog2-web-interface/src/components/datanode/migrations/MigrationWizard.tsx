@@ -39,7 +39,8 @@ const MigrationWizard = () => {
     {
       key: 'welcome',
       title: (<>Welcome</>),
-      component: <MigrationHelpStep onStepComplete={() => onWizardStepChange(STEP_KEYS[1])} />,
+      component: <MigrationHelpStep onStepComplete={() => onWizardStepChange(STEP_KEYS[1])}
+                                    onSkipCompatibilityCheck={() => onWizardStepChange(STEP_KEYS[2])} />,
     },
     {
       key: 'compatibility-check',
