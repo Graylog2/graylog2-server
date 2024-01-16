@@ -24,6 +24,8 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
@@ -48,6 +50,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final EventBus eventBus;
     private final NodeId nodeId;
+    private final DataNodeProvisioningService dataNodeProvisioningService;
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
@@ -56,10 +59,12 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final CustomCAX509TrustManager trustManager,
                                     final NodeService<DataNodeDto> nodeService,
                                     final Configuration configuration,
+                                    final DataNodeProvisioningService dataNodeProvisioningService,
                                     final NodeId nodeId) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
         this.nodeId = nodeId;
+        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
         eventBus.register(this);
     }
@@ -77,9 +82,16 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
-            case ADD ->
-                    startWithConfig(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
-            case REMOVE -> startWithConfig();
+            case ADD -> {
+                shutDown();
+                configure(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
+                startUp();
+            }
+            case REMOVE -> {
+                shutDown();
+                configure();
+                startUp();
+            }
         }
     }
 
@@ -87,7 +99,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STORED -> startWithConfig();
+            case STARTUP_REQUESTED -> startUp();
+            case STORED -> {
+                configure();
+                dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
+            }
         }
     }
 
@@ -106,14 +122,18 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Override
     protected void startUp() {
-        startWithConfig();
+        try {
+            this.process.start();
+        } catch (IllegalArgumentException illegalArgumentException) {
+            LOG.info("If this is the first start, ignore this.");
+        }
     }
 
-    private void startWithConfig() {
-        this.startWithConfig(Map.of());
+    protected void configure() {
+        this.configure(Map.of());
     }
 
-    private void startWithConfig(Map<String, String> additionalConfig) {
+    private void configure(Map<String, String> additionalConfig) {
         final OpensearchConfiguration original = configurationProvider.get();
 
         final var finalAdditionalConfig = new HashMap<String, String>();
@@ -135,9 +155,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 finalAdditionalConfig);
 
         if (config.securityConfigured()) {
-            this.process.startWithConfig(config);
+            this.process.configure(config);
         } else {
-
             String noConfigMessage = """
                     \n
                     ========================================================================================================

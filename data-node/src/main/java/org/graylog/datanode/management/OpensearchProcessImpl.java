@@ -158,9 +158,23 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     @Override
-    public void startWithConfig(OpensearchConfiguration configuration) {
+    public void configure(OpensearchConfiguration configuration) {
         this.opensearchConfiguration = Optional.of(configuration);
-        restart();
+        configure();
+    }
+
+    private void configure() {
+        opensearchConfiguration.ifPresentOrElse(
+                (config -> {
+                    // refresh TM if the SSL certs changed
+                    trustManager.refresh();
+                    // refresh the seed hosts
+                    writeSeedHostsList();
+                    commandLineProcess = new OpensearchCommandLineProcess(config, this);
+                    restClient = Optional.of(createRestClient(config));
+                }),
+                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+        );
     }
 
     private void writeSeedHostsList() {
@@ -174,17 +188,10 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     }
     @Override
-    public synchronized void restart() {
+    public synchronized void start() {
         opensearchConfiguration.ifPresentOrElse(
                 (config -> {
-                    stopProcess();
-                    // refresh TM if the SSL certs changed
-                    trustManager.refresh();
-                    // refresh the seed hosts
-                    writeSeedHostsList();
-                    commandLineProcess = new OpensearchCommandLineProcess(config, this);
                     commandLineProcess.start();
-                    restClient = Optional.of(createRestClient(config));
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );
@@ -224,7 +231,9 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public void onReset() {
         onEvent(ProcessEvent.RESET);
-        restart();
+        stop();
+        configure();
+        start();
     }
 
     @Override

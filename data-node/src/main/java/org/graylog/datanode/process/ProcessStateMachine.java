@@ -38,6 +38,10 @@ public class ProcessStateMachine {
 
         // Freshly created process, it hasn't started yet and doesn't have any pid.
         config.configure(ProcessState.WAITING_FOR_CONFIGURATION)
+                .permit(ProcessEvent.PROCESS_PREPARED, ProcessState.PREPARED)
+                .ignore(ProcessEvent.HEALTH_CHECK_FAILED);
+
+        config.configure(ProcessState.PREPARED)
                 .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
