@@ -65,6 +65,7 @@ export type IndexSet = {
   index_optimization_max_num_segments: number,
   index_optimization_disabled: boolean,
   field_type_refresh_interval: number,
+  field_type_profile?: string | null,
   index_template_type?: string,
   writable: boolean,
   default?: boolean,
