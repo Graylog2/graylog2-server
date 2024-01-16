@@ -20,6 +20,8 @@ import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Sorts;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -35,8 +37,6 @@ import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -125,11 +125,11 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
     }
 
     public PageListResponse<IndexFieldTypeProfileWithUsages> getPaginated(final String query,
-                                                                final List<String> filters,
-                                                                final int page,
-                                                                final int perPage,
-                                                                final String sortField,
-                                                                final String order) {
+                                                                          final List<String> filters,
+                                                                          final int page,
+                                                                          final int perPage,
+                                                                          final String sortField,
+                                                                          final String order) {
 
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final Bson dbSort = "desc".equalsIgnoreCase(order) ? Sorts.descending(sortField) : Sorts.ascending(sortField);

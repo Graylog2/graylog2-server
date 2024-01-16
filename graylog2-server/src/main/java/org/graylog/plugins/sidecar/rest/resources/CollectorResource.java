@@ -47,27 +47,30 @@ import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -181,12 +184,12 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                 @ApiParam(name = "sort",
-                                                               value = "The field to sort the result on",
-                                                               required = true,
-                                                               allowableValues = "name,id,collector_id")
-                                                           @DefaultValue(Collector.FIELD_NAME) @QueryParam("sort") String sort,
+                                                          value = "The field to sort the result on",
+                                                          required = true,
+                                                          allowableValues = "name,id,collector_id")
+                                                @DefaultValue(Collector.FIELD_NAME) @QueryParam("sort") String sort,
                                                 @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                           @DefaultValue("asc") @QueryParam("order") String order) {
+                                                @DefaultValue("asc") @QueryParam("order") String order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Collector> collectors = this.collectorService.findPaginated(searchQuery, page, perPage, sort, order);
         final long total = this.collectorService.count();
@@ -203,7 +206,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @ApiOperation(value = "Create a new collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CREATE)
     public Response createCollector(@ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull Collector request) throws BadRequestException {
+                                    @Valid @NotNull Collector request) throws BadRequestException {
         return saveCollector(collectorService.fromRequest(request));
     }
 
@@ -214,9 +217,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @ApiOperation(value = "Update a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_UPDATE)
     public Response updateCollector(@ApiParam(name = "id", required = true)
-                                     @PathParam("id") String id,
-                                     @ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull Collector request) throws BadRequestException {
+                                    @PathParam("id") String id,
+                                    @ApiParam(name = "JSON body", required = true)
+                                    @Valid @NotNull Collector request) throws BadRequestException {
         return saveCollector(collectorService.fromRequest(id, request));
     }
 
@@ -291,13 +294,13 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         if (toValidate.name().isEmpty()) {
             validation.addError("name", "Collector name cannot be empty.");
         } else if (!validateCollectorName(toValidate.name())) {
-                validation.addError("name", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
+            validation.addError("name", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
         }
 
         if (toValidate.executablePath().isEmpty()) {
             validation.addError("executable_path", "Collector binary path cannot be empty.");
         } else if (!validatePath(toValidate.executablePath())) {
-                validation.addError("executable_path", "Collector binary path cannot contain the following characters: ; * ? \" < > | &");
+            validation.addError("executable_path", "Collector binary path cannot contain the following characters: ; * ? \" < > | &");
         }
 
         if (toValidate.nodeOperatingSystem() != null) {
@@ -326,7 +329,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     }
 
     private boolean validateServiceType(String type, String operatingSystem) {
-        switch(operatingSystem) {
+        switch (operatingSystem) {
             case "linux":
                 return VALID_LINUX_SERVICE_TYPES.contains(type);
             case "windows":

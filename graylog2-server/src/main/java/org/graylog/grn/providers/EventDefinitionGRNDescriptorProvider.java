@@ -22,7 +22,8 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorProvider;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class EventDefinitionGRNDescriptorProvider implements GRNDescriptorProvider {

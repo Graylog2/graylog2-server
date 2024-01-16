@@ -41,7 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
@@ -131,13 +133,13 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 BEATS_PREAMBEL));
 
         String apacheConfigType = """
-                    - type: filestream
-                      id: apache-filestream
-                      enabled: true
-                      %s
-                      fields_under_root: true
-                      fields:
-                          event_source_product: apache_httpd""";
+                - type: filestream
+                  id: apache-filestream
+                  enabled: true
+                  %s
+                  fields_under_root: true
+                  fields:
+                      event_source_product: apache_httpd""";
 
         ensureFilebeatCollector(OS_LINUX, "/usr/lib/graylog-sidecar/filebeat", filebeatConfigBuilder
                 .append("""
@@ -671,6 +673,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
             merged.add(checksum(collectorName, platform, template));
             return create(merged);
         }
+
         @JsonCreator
         public static MigrationState create(@JsonProperty("knownChecksums") Set<CollectorChecksum> knownChecksums) {
             var merged = new HashSet<>(knownChecksums);

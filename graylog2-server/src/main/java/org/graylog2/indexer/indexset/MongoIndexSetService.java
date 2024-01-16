@@ -32,7 +32,8 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -59,10 +60,10 @@ public class MongoIndexSetService implements IndexSetService {
                                 ClusterConfigService clusterConfigService,
                                 ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                IndexSetConfig.class,
-                ObjectId.class,
-                objectMapperProvider.get()),
+                        mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
+                        IndexSetConfig.class,
+                        ObjectId.class,
+                        objectMapperProvider.get()),
                 streamService,
                 clusterConfigService,
                 clusterEventBus);

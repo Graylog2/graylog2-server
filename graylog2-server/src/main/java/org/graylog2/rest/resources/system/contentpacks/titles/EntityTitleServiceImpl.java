@@ -32,7 +32,8 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdenti
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
