@@ -341,7 +341,7 @@ const AdaptableQueryTabs = ({
                   key={id}
                   component="a"
                   className={`${TAB_MENU_ITEM_CLASS} ${activeQueryId === id ? CLASS_ACTIVE : ''}`}
-                  dataTabId={id}
+                  data-tab-id={id}
                   onClick={() => {
                     setLockedTab(id);
                     onSelect(id);

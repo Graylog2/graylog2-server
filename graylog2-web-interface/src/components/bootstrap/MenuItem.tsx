@@ -35,6 +35,7 @@ type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void
 type Props<T = undefined> = React.PropsWithChildren<{
   className?: string,
   component?: 'a',
+  'data-tab-id'?: string,
   disabled?: boolean,
   divider?: boolean,
   eventKey?: T,
@@ -47,10 +48,9 @@ type Props<T = undefined> = React.PropsWithChildren<{
   rel?: 'noopener noreferrer',
   target?: '_blank',
   title?: string,
-  dataTabId?: string
 }>;
 
-const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title, dataTabId, component }: Props<T>) => {
+const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component }: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
@@ -94,7 +94,7 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
 CustomMenuItem.defaultProps = {
   className: undefined,
   component: undefined,
-  dataTabId: undefined,
+  'data-tab-id': undefined,
   disabled: false,
   divider: false,
   eventKey: undefined,
