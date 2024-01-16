@@ -19,7 +19,7 @@ import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-// import Immutable from 'immutable';
+import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -91,18 +91,19 @@ describe('DashboardActions', () => {
     expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
   });
 
-  // it('does not offer deletion when user has only read permissions', async () => {
-  //   const currentUser = adminUser.toBuilder().permissions(Immutable.List([`view:read:${simpleDashboard.id}`])).build();
-  //   asMock(useCurrentUser).mockReturnValue(currentUser);
-  //
-  //   render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
-  //
-  //   userEvent.click(await screen.findByText('More'));
-  //
-  //   await screen.findByRole('menu');
-  //
-  //   expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
-  // });
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip('does not offer deletion when user has only read permissions', async () => {
+    const currentUser = adminUser.toBuilder().permissions(Immutable.List([`view:read:${simpleDashboard.id}`])).build();
+    asMock(useCurrentUser).mockReturnValue(currentUser);
+
+    render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
+
+    userEvent.click(await screen.findByText('More'));
+
+    await screen.findByRole('menu');
+
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+  });
 
   describe('supports dashboard deletion hook', () => {
     const deletingDashboard = jest.fn(() => Promise.resolve(true));
