@@ -115,7 +115,7 @@
         <commons-validator.version>1.8.0</commons-validator.version>
         <commons-io.version>2.15.1</commons-io.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <error-prone.version>2.23.0</error-prone.version>
+        <error-prone.version>2.24.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
