@@ -16,10 +16,10 @@
  */
 package org.graylog.scheduler;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.cluster.lock.LockService;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
 
