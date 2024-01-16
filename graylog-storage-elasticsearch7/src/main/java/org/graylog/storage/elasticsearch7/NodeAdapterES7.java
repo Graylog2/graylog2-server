@@ -23,7 +23,8 @@ import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class NodeAdapterES7 implements NodeAdapter {

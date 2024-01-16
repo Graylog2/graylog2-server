@@ -20,9 +20,10 @@ import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.Renderer;
 import com.google.common.html.HtmlEscapers;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.util.Locale;
 import java.util.Map;
 
@@ -33,19 +34,19 @@ public class HtmlSafeJmteEngineProvider implements Provider<Engine> {
 
     @Inject
     public HtmlSafeJmteEngineProvider() {
-      engine = Engine.createEngine();
-      engine.registerRenderer(String.class, new HtmlSafeRenderer());
+        engine = Engine.createEngine();
+        engine.registerRenderer(String.class, new HtmlSafeRenderer());
     }
 
     @Override
     public Engine get() {
-      return engine;
+        return engine;
     }
 
     private static class HtmlSafeRenderer implements Renderer<String> {
-      @Override
-      public String render(String value, Locale locale, Map<String,Object> model) {
-          return HtmlEscapers.htmlEscaper().escape(value);
-      }
+        @Override
+        public String render(String value, Locale locale, Map<String, Object> model) {
+            return HtmlEscapers.htmlEscaper().escape(value);
+        }
     }
 }

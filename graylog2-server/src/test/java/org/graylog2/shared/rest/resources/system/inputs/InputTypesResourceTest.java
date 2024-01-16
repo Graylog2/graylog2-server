@@ -29,7 +29,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
+
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;

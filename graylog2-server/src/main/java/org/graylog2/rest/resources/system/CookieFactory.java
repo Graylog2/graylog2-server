@@ -20,9 +20,10 @@ import com.google.common.base.Strings;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.NewCookie;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.NewCookie;
+
 import java.net.URI;
 import java.util.Date;
 import java.util.Optional;

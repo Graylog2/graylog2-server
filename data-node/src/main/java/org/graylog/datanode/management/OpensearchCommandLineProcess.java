@@ -24,7 +24,8 @@ import org.graylog.datanode.process.ProcessInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -47,6 +48,7 @@ public class OpensearchCommandLineProcess implements Closeable {
     /**
      * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
      * start the DataNode inside IntelliJ.
+     *
      * @param config
      */
     private void fixJdkOnMac(final OpensearchConfiguration config) {
@@ -61,7 +63,7 @@ public class OpensearchCommandLineProcess implements Closeable {
                 final Process process = builder.start();
                 final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()));
                 var line = reader.readLine();
-                if(line != null && Files.exists(Path.of(line))) {
+                if (line != null && Files.exists(Path.of(line))) {
                     final var target = Path.of(line);
                     final var src = Files.createDirectories(jdk.resolve("Contents"));
                     Files.createSymbolicLink(src.resolve("Home"), target);

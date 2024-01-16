@@ -46,20 +46,22 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -152,7 +154,7 @@ public class LoggersResource extends RestResource {
         final LoggerContext context = (LoggerContext) LogManager.getContext(false);
         final Configuration config = context.getConfiguration();
         final LoggerConfig loggerConfig = config.getLoggerConfig(loggerName);
-        if(loggerName.equals(loggerConfig.getName())) {
+        if (loggerName.equals(loggerConfig.getName())) {
             loggerConfig.setLevel(level);
         } else {
             final LoggerConfig newLoggerConfig = new LoggerConfig(loggerName, level, true);
@@ -165,15 +167,15 @@ public class LoggersResource extends RestResource {
     @PUT
     @Timed
     @ApiOperation(value = "Set the loglevel of a whole subsystem",
-            notes = "Provided level is falling back to DEBUG if it does not exist")
+                  notes = "Provided level is falling back to DEBUG if it does not exist")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such subsystem.")
     })
     @Path("/subsystems/{subsystem}/level/{level}")
     @AuditEvent(type = AuditEventTypes.LOG_LEVEL_UPDATE)
     public void setSubsystemLoggerLevel(
-        @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
-        @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
+            @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
+            @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
         if (!SUBSYSTEMS.containsKey(subsystemTitle)) {
             final String msg = "No such logging subsystem: [" + subsystemTitle + "]";
             LOG.warn(msg);
@@ -183,7 +185,7 @@ public class LoggersResource extends RestResource {
 
         final Subsystem subsystem = SUBSYSTEMS.get(subsystemTitle);
         final Level newLevel = Level.toLevel(level.toUpperCase(Locale.ENGLISH));
-        for (String category: subsystem.getCategories()) {
+        for (String category : subsystem.getCategories()) {
             setLoggerLevel(category, newLevel);
         }
 
@@ -193,12 +195,12 @@ public class LoggersResource extends RestResource {
     @PUT
     @Timed
     @ApiOperation(value = "Set the loglevel of a single logger",
-            notes = "Provided level is falling back to DEBUG if it does not exist")
+                  notes = "Provided level is falling back to DEBUG if it does not exist")
     @Path("/{loggerName}/level/{level}")
     @AuditEvent(type = AuditEventTypes.LOG_LEVEL_UPDATE)
     public void setSingleLoggerLevel(
-        @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
-        @ApiParam(name = "level", required = true) @NotEmpty @PathParam("level") String level) {
+            @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
+            @ApiParam(name = "level", required = true) @NotEmpty @PathParam("level") String level) {
         checkPermission(RestPermissions.LOGGERS_EDIT, loggerName);
         final Level newLevel = Level.toLevel(level.toUpperCase(Locale.ENGLISH));
         setLoggerLevel(loggerName, newLevel);
@@ -218,9 +220,9 @@ public class LoggersResource extends RestResource {
     @RequiresPermissions(RestPermissions.LOGGERSMESSAGES_READ)
     @HideOnCloud
     public Response messages(@ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages." +
-                                       "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",
+            "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",
                                        defaultValue = "1000", allowableValues = "range[0, infinity]")
-                                       @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) {
+                             @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) {
         final Appender appender = getAppender(MEMORY_APPENDER_NAME);
         if (appender == null) {
             throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
