@@ -69,7 +69,9 @@ describe('CurrentUserPreferencesProvider', () => {
   });
 
   it('provides default user preferences if the user has none', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: adminUser.toBuilder().preferences(undefined as PreferencesMap).build().toJSON() });
+    asMock(CurrentUserStore.getInitialState).mockReturnValue({
+      currentUser: adminUser.toBuilder().preferences(undefined as PreferencesMap).build().toJSON(),
+    });
 
     const consume = renderSUT();
 
@@ -77,7 +79,9 @@ describe('CurrentUserPreferencesProvider', () => {
   });
 
   it('provides empty user preferences of current user', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: adminUser.toBuilder().preferences({} as PreferencesMap).build().toJSON() });
+    asMock(CurrentUserStore.getInitialState).mockReturnValue({
+      currentUser: adminUser.toBuilder().preferences({} as PreferencesMap).build().toJSON(),
+    });
 
     const consume = renderSUT();
 
