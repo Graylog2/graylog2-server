@@ -25,7 +25,7 @@ import java.util.Date;
 public record QueryString(@JsonProperty(FIELD_QUERY) @NotNull @NotEmpty String query,
                           @JsonProperty(FIELD_LAST_USED) @NotNull Date lastUsed) {
     public static final String FIELD_QUERY = "query";
-    public static final String FIELD_LAST_USED = "last_user";
+    public static final String FIELD_LAST_USED = "last_used";
 
     public static QueryString create(@NotNull @NotEmpty String query, @NotNull Date lastUsed) {
         return new QueryString(query, lastUsed);
