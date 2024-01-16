@@ -30,7 +30,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -91,8 +93,10 @@ public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builde
 
     public ViewDTO.Type dtoType() {
         switch (type()) {
-            case SEARCH: return ViewDTO.Type.SEARCH;
-            case DASHBOARD: return ViewDTO.Type.DASHBOARD;
+            case SEARCH:
+                return ViewDTO.Type.SEARCH;
+            case DASHBOARD:
+                return ViewDTO.Type.DASHBOARD;
             default:
                 throw new IllegalArgumentException("Unsupported view type:" + type());
         }

@@ -18,7 +18,8 @@ package org.graylog.datanode.process;
 
 import org.apache.commons.exec.ExecuteWatchdog;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Optional;
 
 public class WatchdogWithProcessInfo extends ExecuteWatchdog {

@@ -35,7 +35,8 @@ import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +96,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
                                              @Assisted Decorator decorator) {
         this.pipelineInterpreter = pipelineInterpreter;
         this.pipelineStateUpdater = pipelineStateUpdater;
-        final String pipelineId = (String)decorator.config().get(CONFIG_FIELD_PIPELINE);
+        final String pipelineId = (String) decorator.config().get(CONFIG_FIELD_PIPELINE);
         if (Strings.isNullOrEmpty(pipelineId)) {
             this.pipelines = ImmutableSet.of();
         } else {

@@ -35,17 +35,19 @@ import org.graylog2.system.urlwhitelist.RegexHelper;
 import org.graylog2.system.urlwhitelist.UrlWhitelist;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -92,7 +94,7 @@ public class UrlWhitelistResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     // Checking can be done without any special permission.
     public WhitelistCheckResponse check(@ApiParam(name = "JSON body", required = true)
-                             @Valid @NotNull final WhitelistCheckRequest checkRequest) {
+                                        @Valid @NotNull final WhitelistCheckRequest checkRequest) {
         final boolean isWhitelisted = urlWhitelistService.isWhitelisted(checkRequest.url());
         return WhitelistCheckResponse.create(checkRequest.url(), isWhitelisted);
     }
@@ -104,7 +106,7 @@ public class UrlWhitelistResource extends RestResource {
     @NoAuditEvent("Utility function only.")
     @Consumes(MediaType.APPLICATION_JSON)
     public WhitelistRegexGenerationResponse generateRegex(@ApiParam(name = "JSON body", required = true)
-    @Valid @NotNull final WhitelistRegexGenerationRequest generationRequest) {
+                                                          @Valid @NotNull final WhitelistRegexGenerationRequest generationRequest) {
         final String regex;
         if (generationRequest.placeholder() == null) {
             regex = regexHelper.createRegexForUrl(generationRequest.urlTemplate());

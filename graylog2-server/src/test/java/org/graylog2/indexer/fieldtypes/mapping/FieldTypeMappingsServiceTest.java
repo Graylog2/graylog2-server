@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.fieldtypes.mapping;
 
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
@@ -33,8 +35,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
 import java.time.ZonedDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;

@@ -24,7 +24,8 @@ import org.graylog.security.Capability;
 import org.graylog.security.CapabilityDescriptor;
 import org.graylog.security.GranteeAuthorizer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;

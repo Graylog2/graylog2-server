@@ -16,7 +16,7 @@
  */
 package org.graylog2.web;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 /**
  * Implementations provide HTML content for an "index.html" file. This file will be served to browser clients.

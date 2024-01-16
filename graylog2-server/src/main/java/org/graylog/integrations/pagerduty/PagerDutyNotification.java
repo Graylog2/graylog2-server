@@ -29,7 +29,8 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -38,10 +39,8 @@ import java.util.Locale;
  * Main class that focuses on event notifications that should be sent to PagerDuty.
  *
  * @author Edgar Molina
- *
  */
-public class PagerDutyNotification implements EventNotification
-{
+public class PagerDutyNotification implements EventNotification {
     private final PagerDutyClient pagerDutyClient;
     private final MessageFactory messageFactory;
     private final ObjectMapper objectMapper;
@@ -93,7 +92,7 @@ public class PagerDutyNotification implements EventNotification
                     errorMessage,
                     null != e.getCause() ? e.getCause() : e);
         } catch (Throwable t) {
-            throw new EventNotificationException ("There was an exception triggering the PagerDuty event.", t);
+            throw new EventNotificationException("There was an exception triggering the PagerDuty event.", t);
         }
     }
 
