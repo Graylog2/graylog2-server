@@ -23,6 +23,7 @@ import { Select } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
+import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const StyledAlert = styled(Alert)`
   overflow: auto;
@@ -36,10 +37,10 @@ const StyledH3 = styled.h3`
   margin-bottom: 10px;
 `;
 
-const IndexSetProfileInput = ({ value, onChange }: { value: string, onChange: (value: string) => void }) => {
-  const { isLoading, data: { list } } = useProfiles({ pageSize: 9999999999, page: 1, sort: { attributeId: 'name', direction: 'asc' } as Sort, query: '' }, { enabled: true });
-
-  const options = list.map(({ name, id }) => ({ value: id, label: name }));
+const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string, value: string, onChange: (value: string) => void }) => {
+  const { isLoading, data: { list } } = useProfiles({ pageSize: 100, page: 1, sort: { attributeId: 'name', direction: 'asc' } as Sort, query: '' }, { enabled: true });
+  const hasPermission = useHasTypeMappingPermission();
+  const options = list.map(({ name: profileName, id }) => ({ value: id, label: profileName }));
 
   return (
     <div>
@@ -50,15 +51,14 @@ const IndexSetProfileInput = ({ value, onChange }: { value: string, onChange: (v
       </StyledAlert>
       <Row>
         <Col md={12}>
-          <Input id="field_type_profile"
+          <Input id={name}
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9"
-                 label="Index field type mapping profile"
-                 name="field_type_profile">
+                 label="Index field type mapping profile">
             <StyledSelect placeholder="Select index field type profile"
                           options={options}
                           value={value}
-                          disabled={isLoading}
+                          disabled={isLoading || !hasPermission}
                           onChange={onChange}
                           clearable={false} />
           </Input>
@@ -68,4 +68,4 @@ const IndexSetProfileInput = ({ value, onChange }: { value: string, onChange: (v
   );
 };
 
-export default IndexSetProfileInput;
+export default IndexSetProfileConfiguration;

@@ -36,7 +36,7 @@ import type {
 } from 'components/indices/Types';
 import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import useHistory from 'routing/useHistory';
-import IndexSetProfileInput from 'components/indices/IndexSetProfileInput';
+import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
 
 type Props = {
   cancelLink: string,
@@ -187,7 +187,6 @@ const IndexSetConfigurationForm = ({
                 initialValues={indexSetState}>
           {({ isValid, setFieldValue, isSubmitting }) => (
             <IndexRetentionProvider>
-
               <Form>
                 <Row>
                   <Col md={12}>
@@ -259,10 +258,13 @@ const IndexSetConfigurationForm = ({
                 </Row>
                 {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
                 {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
-                <IndexSetProfileInput value={null}
-                      onChange={(val) => {
-                        setFieldValue('field_type_profile', val);
-                      }} />
+                <Field name="field_type_profile">
+                  {({ field: { name, value, onChange } }) => (
+                    <IndexSetProfileConfiguration value={value}
+                                                  onChange={onChange}
+                                                  name={name} />
+                  )}
+                </Field>
                 <Row>
                   <Col md={9} mdOffset={3}>
                     <StyledFormSubmit disabledSubmit={!isValid}
@@ -283,6 +285,7 @@ const IndexSetConfigurationForm = ({
     </Row>
   );
 };
+
 IndexSetConfigurationForm.propTypes = {
   indexSet: IndexSetPropType.isRequired,
   rotationStrategies: PropTypes.array.isRequired,
