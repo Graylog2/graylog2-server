@@ -72,6 +72,10 @@ const CLASS_HIDDEN = 'hidden';
 const CLASS_LOCKED = 'locked';
 const CLASS_ACTIVE = 'active';
 const NAV_PADDING = 15;
+const TAB_MENU_ITEM_CLASS = 'tab-menu-item';
+const MORE_TABS_BUTTON_CLASS = 'query-tabs-more';
+const MORE_TABS_LI_CLASS = 'query-tabs-more-li';
+const NEW_TAB_BUTTON_CLASS = 'query-tab-create';
 
 const Container = styled.div`
   display: flex;
@@ -125,8 +129,8 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
       }
     }
 
-    > li.query-tabs-more,
-    > li.query-tabs-more a {
+    > li.${MORE_TABS_BUTTON_CLASS},
+    > li.${MORE_TABS_BUTTON_CLASS} a {
       cursor: pointer;
     }
   }
@@ -145,14 +149,13 @@ const adjustTabsVisibility = (
   queriesConfigBtn: HTMLElement | null,
 ) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
-  const tabItems = dashboardTabs.querySelectorAll(':scope > li:not(.dropdown):not(.query-tabs-new)') as NodeListOf<HTMLElement>;
-  const moreItems = dashboardTabs.querySelectorAll('.mantine-Menu-dropdown button.tab-menu-item') as NodeListOf<HTMLElement>;
-  const moreBtn = dashboardTabs.querySelector('.query-tabs-more') as HTMLElement;
-  const newBtn = dashboardTabs.querySelector('.query-tabs-new') as HTMLElement;
+  const tabItems = dashboardTabs.querySelectorAll(`:scope > li:not(.${MORE_TABS_LI_CLASS}):not(.${NEW_TAB_BUTTON_CLASS})`) as NodeListOf<HTMLElement>;
+  const moreItems = dashboardTabs.querySelectorAll(`li.${MORE_TABS_LI_CLASS} [role="menu"] button.${TAB_MENU_ITEM_CLASS}`) as NodeListOf<HTMLElement>;
+  const moreBtn = dashboardTabs.querySelector(`.${MORE_TABS_BUTTON_CLASS}`) as HTMLElement;
+  const newBtn = dashboardTabs.querySelector(`.${NEW_TAB_BUTTON_CLASS}`) as HTMLElement;
   const hiddenItems = [];
 
-  console.log({ lockedTab });
-  let buttonsWidth = moreBtn.offsetWidth + newBtn.offsetWidth + NAV_PADDING + (queriesConfigBtn?.offsetWidth ?? 0);
+  let buttonsWidth = moreBtn.offsetWidth + newBtn.offsetWidth + (queriesConfigBtn?.offsetWidth ?? 0) + NAV_PADDING;
   let topTabsWidth = 0;
 
   tabItems.forEach((tabItem) => {
@@ -187,14 +190,12 @@ const adjustTabsVisibility = (
   moreItems.forEach((tabItem: HTMLElement, idx) => {
     tabItem.classList.remove(CLASS_HIDDEN);
     tabItem.setAttribute('aria-hidden', 'false');
-    console.log(tabItem.classList, { hiddenItems });
 
     if (!hiddenItems.includes(idx)) {
       tabItem.classList.add(CLASS_HIDDEN);
       tabItem.setAttribute('aria-hidden', 'true');
     } else if (tabItem.classList.contains(CLASS_ACTIVE)) {
       const { tabId } = tabItem.dataset;
-      console.log({ tabId });
       setLockedTab(tabId);
     }
   });
@@ -323,7 +324,7 @@ const AdaptableQueryTabs = ({
       menuItems = menuItems.add(lockedTab === id ? null : (
         <MenuItem eventKey={id}
                   key={id}
-                  className={`tab-menu-item ${activeQueryId === id ? CLASS_ACTIVE : ''}`}
+                  className={`${TAB_MENU_ITEM_CLASS} ${activeQueryId === id ? CLASS_ACTIVE : ''}`}
                   dataTabId={id}
                   onClick={() => {
                     setLockedTab(id);
@@ -358,7 +359,7 @@ const AdaptableQueryTabs = ({
       <StyledQueryNav bsStyle="tabs" activeKey={activeQueryId} id="dashboard-tabs">
         {currentTabs.navItems.toArray()}
 
-        <li className="dropdown">
+        <li className={MORE_TABS_LI_CLASS}>
           <DropdownButton title={<Icon name="ellipsis-h" />}
                           className="query-tabs-more"
                           id="query-tabs-more"
@@ -385,7 +386,7 @@ const AdaptableQueryTabs = ({
 
                     onSelect('new');
                   }}
-                  className="query-tabs-new">
+                  className={NEW_TAB_BUTTON_CLASS}>
           <Icon name="plus" />
         </QueryTab>
       </StyledQueryNav>
