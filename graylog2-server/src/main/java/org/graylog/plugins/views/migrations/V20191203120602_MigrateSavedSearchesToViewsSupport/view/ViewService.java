@@ -21,7 +21,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.mongojack.JacksonDBCollection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class ViewService {
     protected final JacksonDBCollection<View, ObjectId> db;

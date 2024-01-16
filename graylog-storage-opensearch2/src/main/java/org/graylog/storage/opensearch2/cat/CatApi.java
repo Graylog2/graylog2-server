@@ -24,7 +24,8 @@ import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;

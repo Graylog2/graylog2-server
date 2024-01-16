@@ -20,10 +20,10 @@ import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Optional;

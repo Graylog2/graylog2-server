@@ -21,7 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
 import com.google.common.util.concurrent.Service;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -29,7 +29,7 @@ public interface MessageQueueReader extends Service {
 
     @AutoValue
     abstract class Metrics {
-        public static class Provider implements javax.inject.Provider<Metrics> {
+        public static class Provider implements jakarta.inject.Provider<Metrics> {
             private final MetricRegistry metricRegistry;
 
             @Inject

@@ -34,10 +34,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -84,7 +86,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     maxTotalConnectionsPerRoute,
                     useExpectContinue,
                     muteOpenSearchDeprecationWarnings,
-                credentialsProvider,
+                    credentialsProvider,
                     runsWithDataNode || indexerUseJwtAuthentication,
                     indexerJwtAuthTokenProvider);
 
@@ -98,7 +100,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             if (discoveryEnabled) {
                 sniffer.add(FilteredOpenSearchNodesSniffer.create(discoveryFilter));
             }
-            if(nodeActivity) {
+            if (nodeActivity) {
                 sniffer.add(NodeListSniffer.create());
             }
 
@@ -110,9 +112,12 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
 
     private OpenSearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
         switch (defaultSchemeForDiscoveredNodes.toUpperCase(Locale.ENGLISH)) {
-            case "HTTP": return OpenSearchNodesSniffer.Scheme.HTTP;
-            case "HTTPS": return OpenSearchNodesSniffer.Scheme.HTTPS;
-            default: throw new IllegalArgumentException("Invalid default scheme for discovered OS nodes: " + defaultSchemeForDiscoveredNodes);
+            case "HTTP":
+                return OpenSearchNodesSniffer.Scheme.HTTP;
+            case "HTTPS":
+                return OpenSearchNodesSniffer.Scheme.HTTPS;
+            default:
+                throw new IllegalArgumentException("Invalid default scheme for discovered OS nodes: " + defaultSchemeForDiscoveredNodes);
         }
     }
 
@@ -148,20 +153,20 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 )
                 .setHttpClientConfigCallback(httpClientConfig -> {
                     httpClientConfig
-                        .setMaxConnTotal(maxTotalConnections)
-                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
+                            .setMaxConnTotal(maxTotalConnections)
+                            .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
 
-                    if(isJwtAuthentication) {
+                    if (isJwtAuthentication) {
                         httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", indexerJwtAuthTokenProvider.get()));
                     } else {
                         httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
                     }
 
-                    if(muteElasticsearchDeprecationWarnings) {
+                    if (muteElasticsearchDeprecationWarnings) {
                         httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
                     }
 
-                    if(hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
+                    if (hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
                         httpClientConfig.setSSLContext(trustManagerAndSocketFactoryProvider.getSslContext());
                     }
 

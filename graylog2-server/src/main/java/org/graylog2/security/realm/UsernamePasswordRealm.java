@@ -34,8 +34,8 @@ import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -51,8 +51,8 @@ public class UsernamePasswordRealm extends AuthenticatingRealm {
 
     @Inject
     public UsernamePasswordRealm(AuthServiceAuthenticator authenticator,
-                            EncryptedValueService encryptedValueService,
-                            @Named("root_username") String rootUsername) {
+                                 EncryptedValueService encryptedValueService,
+                                 @Named("root_username") String rootUsername) {
         checkArgument(!isBlank(rootUsername), "root_username cannot be null or blank");
 
         this.authenticator = authenticator;

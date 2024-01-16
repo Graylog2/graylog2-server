@@ -38,7 +38,8 @@ import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +90,7 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
         final ParsedDateHistogram dateHistogram = filterAggregation.getAggregations().get(AGG_DATE_HISTOGRAM);
 
 
-        final List<ParsedDateHistogram.ParsedBucket> histogramBuckets = (List<ParsedDateHistogram.ParsedBucket>)dateHistogram.getBuckets();
+        final List<ParsedDateHistogram.ParsedBucket> histogramBuckets = (List<ParsedDateHistogram.ParsedBucket>) dateHistogram.getBuckets();
         final Map<DateTime, Map<String, Long>> result = Maps.newHashMapWithExpectedSize(histogramBuckets.size());
 
         for (ParsedDateHistogram.ParsedBucket bucket : histogramBuckets) {

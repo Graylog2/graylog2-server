@@ -35,7 +35,8 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -143,6 +144,7 @@ public class SearchDbService {
      * Searches should only be deleted directly by {@link SearchesCleanUpJob} if they are no longer referenced
      * by any views. Do not directly delete searches when deleting views. The searches might still be referenced by
      * other view copies (until those copies are modified, at which time a new search would be created).
+     *
      * @param id A Search ID.
      */
     void delete(String id) {

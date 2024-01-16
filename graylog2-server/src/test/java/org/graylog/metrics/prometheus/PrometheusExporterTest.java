@@ -31,7 +31,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
+
 import java.util.Collections;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -50,7 +51,7 @@ class PrometheusExporterTest {
     @Mock
     private ScheduledExecutorService scheduledExecutorService;
     @Mock
-    private  PrometheusExporterHTTPServer.Factory factory;
+    private PrometheusExporterHTTPServer.Factory factory;
 
     private PrometheusExporter classUnderTest;
 
