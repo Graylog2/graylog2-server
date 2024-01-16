@@ -42,10 +42,12 @@ describe('DashboardActions', () => {
   let oldWindowConfirm;
 
   const simpleDashboard = simpleView();
+  const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
   const clickDashboardAction = async (action: string) => {
     userEvent.click(await screen.findByText('More'));
     userEvent.click(await screen.findByRole('button', { name: action }));
+    await waitFor(() => menuIsHidden());
   };
 
   beforeEach(() => {
@@ -96,6 +98,8 @@ describe('DashboardActions', () => {
     render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
     userEvent.click(await screen.findByText('More'));
+
+    await screen.findByRole('menu');
 
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
   });

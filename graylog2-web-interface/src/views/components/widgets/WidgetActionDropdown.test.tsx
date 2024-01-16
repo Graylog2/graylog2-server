@@ -15,44 +15,48 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { MenuItem } from 'components/bootstrap';
 
 import WidgetActionDropdown from './WidgetActionDropdown';
 
 describe('WidgetActionDropdown', () => {
-  it('opens menu when trigger element is clicked', () => {
-    const wrapper = mount((
+  it('opens menu when trigger element is clicked', async () => {
+    render((
       <WidgetActionDropdown>
         <MenuItem>Foo</MenuItem>
       </WidgetActionDropdown>
     ));
 
-    expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
+    const menuButton = await screen.findByRole('button', { name: /open actions dropdown/i });
 
-    const trigger = wrapper.find('ActionToggle');
+    expect(screen.queryByText('Foo')).not.toBeInTheDocument();
 
-    trigger.simulate('click');
+    menuButton.click();
 
-    expect(wrapper).toContainMatchingElement('ul.dropdown-menu');
+    await screen.findByRole('menuitem', { name: 'Foo' });
   });
 
-  it('closes menu when MenuItem is clicked', () => {
+  it('closes menu when MenuItem is clicked', async () => {
     const onSelect = jest.fn();
-    const wrapper = mount((
+
+    render((
       <WidgetActionDropdown>
         <MenuItem onSelect={onSelect}>Foo</MenuItem>
       </WidgetActionDropdown>
     ));
-    const trigger = wrapper.find('ActionToggle');
 
-    trigger.simulate('click');
+    const menuButton = await screen.findByRole('button', { name: /open actions dropdown/i });
+    menuButton.click();
 
-    const menuItem = wrapper.findWhere((node) => node.type() === 'a' && node.text() === 'Foo');
-    menuItem.simulate('click');
+    const fooAction = await screen.findByRole('menuitem', { name: 'Foo' });
+    fooAction.click();
+
+    await waitFor(() => {
+      expect(screen.queryByText('Foo')).not.toBeInTheDocument();
+    });
 
     expect(onSelect).toHaveBeenCalled();
-    expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
   });
 });
