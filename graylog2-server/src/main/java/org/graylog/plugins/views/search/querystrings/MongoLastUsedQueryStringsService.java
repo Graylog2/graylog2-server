@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.querystrings;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -28,6 +29,7 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.users.events.UserDeletedEvent;
 
 import javax.inject.Inject;
 import java.time.Clock;
@@ -88,5 +90,10 @@ public class MongoLastUsedQueryStringsService implements LastUsedQueryStringsSer
         this.collection.updateOne(Filters.eq(FIELD_USER_ID, user.getId()),
                 Updates.pushEach(FIELD_ITEMS, List.of(newItem), new PushOptions().position(0).slice(maxLength)),
                 new UpdateOptions().upsert(true));
+    }
+
+    @Subscribe
+    public void removeQueryStringsUponUserDeletion(final UserDeletedEvent userDeletedEvent) {
+        this.collection.deleteOne(Filters.eq(FIELD_USER_ID, userDeletedEvent.userId()));
     }
 }

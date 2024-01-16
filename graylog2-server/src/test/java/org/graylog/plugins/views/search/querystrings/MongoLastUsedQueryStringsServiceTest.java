@@ -23,6 +23,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.users.events.UserDeletedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +38,7 @@ class MongoLastUsedQueryStringsServiceTest {
     private User user;
     private User admin;
 
-    private LastUsedQueryStringsService service;
+    private MongoLastUsedQueryStringsService service;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
@@ -97,6 +98,20 @@ class MongoLastUsedQueryStringsServiceTest {
                 "query string 1",
                 "query string 2"
         );
+    }
+
+    @Test
+    void removeDataWhenUserIsDeleted() {
+        service.save(admin, "query string 1");
+        service.save(user, "query string 2");
+
+        assertThat(queryStrings(service.get(admin))).containsExactly("query string 1");
+        assertThat(queryStrings(service.get(user))).containsExactly("query string 2");
+
+        service.removeQueryStringsUponUserDeletion(UserDeletedEvent.create(user.getId(), user.getName()));
+
+        assertThat(queryStrings(service.get(admin))).containsExactly("query string 1");
+        assertThat(queryStrings(service.get(user))).isEmpty();
     }
 
     private List<String> queryStrings(List<QueryString> queryStrings) {
