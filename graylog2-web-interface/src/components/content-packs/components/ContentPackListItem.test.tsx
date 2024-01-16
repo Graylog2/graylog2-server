@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import ContentPackListItem from './ContentPackListItem';
@@ -58,7 +58,12 @@ describe('<ContentPackListItem />', () => {
                            onDeletePack={deleteFn}
                            onInstall={() => {}} />);
 
+    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: /delete all versions/i })).not.toBeInTheDocument();
+    });
 
     expect(deleteFn).toHaveBeenCalledTimes(1);
   });
@@ -72,7 +77,12 @@ describe('<ContentPackListItem />', () => {
                            onDeletePack={deleteFn}
                            onInstall={() => {}} />);
 
+    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: /delete all versions/i })).not.toBeInTheDocument();
+    });
 
     expect(deleteFn).toHaveBeenCalledTimes(1);
   });

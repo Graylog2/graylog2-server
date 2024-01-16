@@ -19,16 +19,12 @@ import * as React from 'react';
 import ActionDropdown from 'views/components/common/ActionDropdown';
 import { IconButton } from 'components/common';
 
-type Props = {
-  children: React.ReactNode,
-};
-
-const WidgetActionDropdown = ({ children }: Props) => {
+const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
   const widgetActionDropdownCaret = <IconButton data-testid="widgetActionDropDown" name="chevron-down" title="Open actions dropdown" />;
 
   return (
     <ActionDropdown element={widgetActionDropdownCaret}>
-      {children as React.ReactElement}
+      {children}
     </ActionDropdown>
   );
 };
