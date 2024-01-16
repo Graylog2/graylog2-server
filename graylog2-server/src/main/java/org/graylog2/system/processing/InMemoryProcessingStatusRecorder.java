@@ -21,7 +21,8 @@ import com.google.common.util.concurrent.AtomicDouble;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 

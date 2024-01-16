@@ -19,9 +19,9 @@ package org.graylog2.rest;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.rest.ApiError;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {

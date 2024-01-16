@@ -65,7 +65,7 @@ public class Configuration extends CaConfiguration {
 
     /**
      * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
-     * use @{@link javax.inject.Named} injection but the getter isLeader() instead.
+     * use @{@link jakarta.inject.Named} injection but the getter isLeader() instead.
      **/
     @Parameter(value = "is_leader")
     private Boolean isLeader;
@@ -135,7 +135,7 @@ public class Configuration extends CaConfiguration {
     private int staleMasterTimeout = 2000;
 
     /**
-     * Don't use @{@link javax.inject.Named} injection but the getter getStaleLeaderTimeout() instead.
+     * Don't use @{@link jakarta.inject.Named} injection but the getter getStaleLeaderTimeout() instead.
      **/
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout;

@@ -62,8 +62,9 @@ import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -106,9 +107,9 @@ public class ContentPackService {
     }
 
     private ContentPackInstallation installContentPack(ContentPackV1 contentPack,
-                                                      Map<String, ValueReference> parameters,
-                                                      String comment,
-                                                      String user) {
+                                                       Map<String, ValueReference> parameters,
+                                                       String comment,
+                                                       String user) {
         ensureConstraints(contentPack.constraints());
 
         final Entity rootEntity = EntityV1.createRoot(contentPack);
@@ -131,17 +132,18 @@ public class ContentPackService {
 
                 final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
                 final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
-                @SuppressWarnings({"rawtypes", "unchecked"}) final Optional<NativeEntity> existingEntity = facade.findExisting(entity, parameters);
+                @SuppressWarnings({"rawtypes", "unchecked"})
+                final Optional<NativeEntity> existingEntity = facade.findExisting(entity, parameters);
                 if (existingEntity.isPresent()) {
                     LOG.trace("Found existing entity for {}", entityDescriptor);
                     final NativeEntity<?> nativeEntity = existingEntity.get();
                     final NativeEntityDescriptor nativeEntityDescriptor = nativeEntity.descriptor();
                     /* Found entity on the system or we found a other installation which stated that */
                     if (contentPackInstallationPersistenceService.countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 0 ||
-                        contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
-                          final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
-                                  .foundOnSystem(true)
-                                  .build();
+                            contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
+                        final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
+                                .foundOnSystem(true)
+                                .build();
                         allEntityDescriptors.add(serverDescriptor);
                     } else {
                         allEntityDescriptors.add(nativeEntity.descriptor());
@@ -293,9 +295,9 @@ public class ContentPackService {
                             countInstallationOfEntityByIdAndFoundOnSystem(entityId);
 
                     if (installCount > 1 || (installCount == 1 && systemFoundCount >= 1)) {
-                       skippedEntities.add(nativeEntityDescriptor);
-                       LOG.debug("Did not remove entity since other content pack installations still use them: {}",
-                               nativeEntityDescriptor);
+                        skippedEntities.add(nativeEntityDescriptor);
+                        LOG.debug("Did not remove entity since other content pack installations still use them: {}",
+                                nativeEntityDescriptor);
                     } else if (nativeEntityOptional.isPresent()) {
                         final Object nativeEntity = nativeEntityOptional.get();
                         LOG.trace("Removing existing native entity for {} ({})", nativeEntityDescriptor);

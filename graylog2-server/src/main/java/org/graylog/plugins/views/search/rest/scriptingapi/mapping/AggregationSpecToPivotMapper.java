@@ -25,7 +25,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;

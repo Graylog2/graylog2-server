@@ -40,8 +40,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
@@ -161,7 +162,7 @@ public class VersionProbe {
     private OkHttpClient addAuthenticationIfPresent(URI host, OkHttpClient okHttpClient) {
         final Optional<String> authToken = getAuthToken(host);
 
-        if(isJwtAuthentication || authToken.isPresent()) {
+        if (isJwtAuthentication || authToken.isPresent()) {
             return okHttpClient.newBuilder()
                     .addInterceptor(chain -> {
                         final Request originalRequest = chain.request();

@@ -26,7 +26,8 @@ import org.graylog2.inputs.jackson.InputConfigurationDeserializer;
 import org.graylog2.inputs.jackson.InputConfigurationDeserializer.InputFieldConfigProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class InputConfigurationBeanDeserializerModifier extends BeanDeserializerModifier {

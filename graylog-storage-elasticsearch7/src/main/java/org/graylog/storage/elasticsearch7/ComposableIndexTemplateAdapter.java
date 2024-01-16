@@ -28,7 +28,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Setti
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
 import org.graylog2.indexer.indices.Template;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 
 public class ComposableIndexTemplateAdapter implements IndexTemplateAdapter {

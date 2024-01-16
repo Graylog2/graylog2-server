@@ -55,9 +55,10 @@ import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

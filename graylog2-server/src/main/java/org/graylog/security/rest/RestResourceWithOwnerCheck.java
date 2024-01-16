@@ -24,7 +24,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.ForbiddenException;
+import jakarta.ws.rs.ForbiddenException;
 
 // TODO: Move contents of this to RestResource in server
 public abstract class RestResourceWithOwnerCheck extends RestResource implements PluginRestResource {

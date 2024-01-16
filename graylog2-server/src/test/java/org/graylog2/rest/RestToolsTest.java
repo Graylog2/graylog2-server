@@ -22,8 +22,9 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.utilities.IpSubnet;
 import org.junit.Test;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+
 import java.net.URI;
 import java.util.Collections;
 

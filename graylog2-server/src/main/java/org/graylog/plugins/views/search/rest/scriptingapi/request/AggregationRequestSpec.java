@@ -22,8 +22,9 @@ import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
