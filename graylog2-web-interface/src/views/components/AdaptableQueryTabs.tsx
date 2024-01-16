@@ -142,6 +142,21 @@ const QueryTab = styled(NavItem)`
   }
 `;
 
+const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
+  <li className={MORE_TABS_LI_CLASS}>
+    <DropdownButton title={<Icon name="ellipsis-h" />}
+                    className={MORE_TABS_BUTTON_CLASS}
+                    id="query-tabs-more"
+                    aria-label="More Dashboard Pages"
+                    noCaret
+                    bsStyle="link"
+                    keepMounted
+                    pullRight>
+      {menuItems.toArray()}
+    </DropdownButton>
+  </li>
+);
+
 const adjustTabsVisibility = (
   maxWidth: number,
   lockedTab: string | undefined,
@@ -150,7 +165,7 @@ const adjustTabsVisibility = (
 ) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
   const tabItems = dashboardTabs.querySelectorAll(`:scope > li:not(.${MORE_TABS_LI_CLASS}):not(.${NEW_TAB_BUTTON_CLASS})`) as NodeListOf<HTMLElement>;
-  const moreItems = dashboardTabs.querySelectorAll(`li.${MORE_TABS_LI_CLASS} [role="menu"] button.${TAB_MENU_ITEM_CLASS}`) as NodeListOf<HTMLElement>;
+  const moreItems = dashboardTabs.querySelectorAll(`li.${MORE_TABS_LI_CLASS} [role="menu"] a.${TAB_MENU_ITEM_CLASS}`) as NodeListOf<HTMLElement>;
   const moreBtn = dashboardTabs.querySelector(`.${MORE_TABS_BUTTON_CLASS}`) as HTMLElement;
   const newBtn = dashboardTabs.querySelector(`.${NEW_TAB_BUTTON_CLASS}`) as HTMLElement;
   const hiddenItems = [];
@@ -324,6 +339,7 @@ const AdaptableQueryTabs = ({
       menuItems = menuItems.add(lockedTab === id ? null : (
         <MenuItem eventKey={id}
                   key={id}
+                  component="a"
                   className={`${TAB_MENU_ITEM_CLASS} ${activeQueryId === id ? CLASS_ACTIVE : ''}`}
                   dataTabId={id}
                   onClick={() => {
@@ -359,18 +375,7 @@ const AdaptableQueryTabs = ({
       <StyledQueryNav bsStyle="tabs" activeKey={activeQueryId} id="dashboard-tabs">
         {currentTabs.navItems.toArray()}
 
-        <li className={MORE_TABS_LI_CLASS}>
-          <DropdownButton title={<Icon name="ellipsis-h" />}
-                          className="query-tabs-more"
-                          id="query-tabs-more"
-                          aria-label="More Dashboard Pages"
-                          noCaret
-                          bsStyle="link"
-                          keepMounted
-                          pullRight>
-            {currentTabs.menuItems.toArray()}
-          </DropdownButton>
-        </li>
+        <MoreTabsLi menuItems={currentTabs.menuItems} />
 
         {currentTabs.lockedItems.toArray()}
 
