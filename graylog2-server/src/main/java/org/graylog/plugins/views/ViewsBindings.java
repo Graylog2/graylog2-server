@@ -63,6 +63,7 @@ import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
+import org.graylog.plugins.views.search.rest.QueryStringsResource;
 import org.graylog.plugins.views.search.rest.QueryValidationResource;
 import org.graylog.plugins.views.search.rest.SavedSearchesResource;
 import org.graylog.plugins.views.search.rest.SearchMetadataResource;
@@ -265,6 +266,7 @@ public class ViewsBindings extends ViewsModule {
         install(new EngineBindings());
 
         bind(LastUsedQueryStringsService.class).to(MongoLastUsedQueryStringsService.class);
+        addSystemRestResource(QueryStringsResource.class);
     }
 
     private void registerExportBackendProvider() {
