@@ -29,10 +29,11 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
 
 @RequiresAuthentication
 @Api(value = "System/Processing", description = "System processing status control.")
@@ -51,8 +52,8 @@ public class SystemProcessingResource extends RestResource {
     @PUT
     @Timed
     @ApiOperation(value = "Pauses message processing",
-            notes = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
-                    "you might lose messages from inputs which cannot buffer themselves, like AMQP or Kafka-based inputs.")
+                  notes = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
+                          "you might lose messages from inputs which cannot buffer themselves, like AMQP or Kafka-based inputs.")
     @Path("pause")
     @AuditEvent(type = AuditEventTypes.MESSAGE_PROCESSING_STOP)
     public void pauseProcessing() {

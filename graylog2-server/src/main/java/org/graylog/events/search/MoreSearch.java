@@ -35,7 +35,8 @@ import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -167,6 +168,7 @@ public class MoreSearch {
 
     /**
      * Helper to perform basic Lucene escaping of query string values
+     *
      * @param searchString search string which may contain unescaped reserved characters
      * @return String where those characters that Lucene expects to be escaped are escaped by a
      * preceding <code>\</code>

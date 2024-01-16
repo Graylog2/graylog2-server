@@ -63,9 +63,10 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -192,7 +193,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                              ServerStatus serverStatus) {
 
         this(journalDirectory, scheduler, segmentSize, segmentAge, retentionSize, retentionAge, flushInterval, flushAge,
-             throttleThresholdPercentage, metricRegistry, serverStatus, LocalKafkaJournal.class.getName());
+                throttleThresholdPercentage, metricRegistry, serverStatus, LocalKafkaJournal.class.getName());
     }
 
     /**
@@ -406,8 +407,8 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * @param min The minimum value to return.
      * @param max The maximum value to return.
      * @return {@code i} if the number is between {@code min} and {@code max},
-     *         {@code min} if {@code i} is less than the minimum,
-     *         {@code max} if {@code i} is greater than the maximum.
+     * {@code min} if {@code i} is less than the minimum,
+     * {@code max} if {@code i} is greater than the maximum.
      */
     private static int intRange(int i, int min, int max) {
         return Integer.min(Integer.max(min, i), max);
@@ -606,7 +607,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * returns an empty list of entries, but we know there are more entries in the journal, we'll try to skip the
      * problematic offset(s) until we find entries again.
      *
-     * @param startOffset Offset to start reading at
+     * @param startOffset           Offset to start reading at
      * @param requestedMaximumCount Maximum number of entries to return.
      * @return A list of entries
      */
@@ -648,7 +649,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * Read from the journal, starting at the given offset. If the underlying journal implementation returns an empty
      * list of entries, it will be returned even if we know there are more entries in the journal.
      *
-     * @param readOffset Offset to start reading at
+     * @param readOffset            Offset to start reading at
      * @param requestedMaximumCount Maximum number of entries to return.
      * @return A list of entries
      */
@@ -1031,13 +1032,13 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
             if (currentStatus == LoadBalancerStatus.THROTTLED && utilizationPercentage < throttleThresholdPercentage) {
                 serverStatus.running();
                 LOG.info(String.format(Locale.ENGLISH,
-                    "Journal usage is %.2f%% (threshold %d%%), changing load balancer status from THROTTLED to ALIVE",
-                    utilizationPercentage, throttleThresholdPercentage));
+                        "Journal usage is %.2f%% (threshold %d%%), changing load balancer status from THROTTLED to ALIVE",
+                        utilizationPercentage, throttleThresholdPercentage));
             } else if (currentStatus == LoadBalancerStatus.ALIVE && utilizationPercentage >= throttleThresholdPercentage) {
                 serverStatus.throttle();
                 LOG.info(String.format(Locale.ENGLISH,
-                    "Journal usage is %.2f%% (threshold %d%%), changing load balancer status from ALIVE to THROTTLED",
-                    utilizationPercentage, throttleThresholdPercentage));
+                        "Journal usage is %.2f%% (threshold %d%%), changing load balancer status from ALIVE to THROTTLED",
+                        utilizationPercentage, throttleThresholdPercentage));
             }
         }
 

@@ -16,6 +16,8 @@
  */
 package org.graylog2.rest.resources.datanodes;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,8 +31,6 @@ import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.jetbrains.annotations.NotNull;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;

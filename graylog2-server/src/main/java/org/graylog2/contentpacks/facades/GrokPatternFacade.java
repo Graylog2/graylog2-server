@@ -43,7 +43,8 @@ import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -130,7 +131,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         final Optional<GrokPattern> grokPattern = grokPatternService.loadByName(name);
         grokPattern.ifPresent(existingPattern -> compareGrokPatterns(name, pattern, existingPattern.pattern()));
 
-        return grokPattern.map(gp -> NativeEntity.create(entity.id(), gp.id(), TYPE_V1,gp.name(), gp));
+        return grokPattern.map(gp -> NativeEntity.create(entity.id(), gp.id(), TYPE_V1, gp.name(), gp));
     }
 
     private void compareGrokPatterns(String name, String expectedPattern, String actualPattern) {

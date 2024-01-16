@@ -25,7 +25,8 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
@@ -71,7 +72,8 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             try {
                 trustManager.checkClientTrusted(chain, authType);
                 return;
-            } catch (CertificateException e) {}
+            } catch (CertificateException e) {
+            }
         }
         throw new CertificateException("None of the TrustManagers trust this certificate chain.");
     }
@@ -82,7 +84,8 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             try {
                 trustManager.checkServerTrusted(chain, authType);
                 return;
-            } catch (CertificateException e) {}
+            } catch (CertificateException e) {
+            }
         }
         throw new CertificateException("None of the TrustManagers trust this certificate chain.");
     }
@@ -107,5 +110,5 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             LOG.error("Could not create TrustManager: {}", e.getMessage(), e);
         }
         return null;
-     }
+    }
 }

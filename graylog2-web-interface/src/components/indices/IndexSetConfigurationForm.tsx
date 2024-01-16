@@ -260,9 +260,9 @@ const IndexSetConfigurationForm = ({
                 {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
                 {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
                 <IndexSetProfileInput value={null}
-                                      onChange={(val) => {
-                                        setFieldValue('field_type_profile', val);
-                                      }} />
+                      onChange={(val) => {
+                        setFieldValue('field_type_profile', val);
+                      }} />
                 <Row>
                   <Col md={9} mdOffset={3}>
                     <StyledFormSubmit disabledSubmit={!isValid}
@@ -283,7 +283,6 @@ const IndexSetConfigurationForm = ({
     </Row>
   );
 };
-
 IndexSetConfigurationForm.propTypes = {
   indexSet: IndexSetPropType.isRequired,
   rotationStrategies: PropTypes.array.isRequired,

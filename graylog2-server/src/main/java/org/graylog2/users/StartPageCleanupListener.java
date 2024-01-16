@@ -26,7 +26,7 @@ import org.graylog2.streams.events.StreamDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class StartPageCleanupListener {
     private static final Logger LOG = LoggerFactory.getLogger(StartPageCleanupListener.class);
@@ -56,15 +56,15 @@ public class StartPageCleanupListener {
 
     private void resetReferencesToStartpage(Startpage deletedStartpage) {
         this.userService.loadAll()
-            .stream()
-            .filter(user -> user.getStartpage() != null && user.getStartpage().equals(deletedStartpage))
-            .forEach(user -> {
-                user.setStartpage(null);
-                try {
-                    this.userService.save(user);
-                } catch (ValidationException e) {
-                    LOG.error("Unable to reset start page for user which references deleted start page: ", e);
-                }
-            });
+                .stream()
+                .filter(user -> user.getStartpage() != null && user.getStartpage().equals(deletedStartpage))
+                .forEach(user -> {
+                    user.setStartpage(null);
+                    try {
+                        this.userService.save(user);
+                    } catch (ValidationException e) {
+                        LOG.error("Unable to reset start page for user which references deleted start page: ", e);
+                    }
+                });
     }
 }

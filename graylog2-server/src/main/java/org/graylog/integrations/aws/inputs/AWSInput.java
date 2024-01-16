@@ -35,7 +35,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import software.amazon.awssdk.regions.Region;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * General AWS input for all types of supported AWS logs.
@@ -64,13 +64,13 @@ public class AWSInput extends MessageInput {
                     Descriptor descriptor,
                     ServerStatus serverStatus) {
         super(metricRegistry,
-              configuration,
-              transport.create(configuration),
-              localRegistry,
-              codec.create(configuration),
-              config,
-              descriptor,
-              serverStatus);
+                configuration,
+                transport.create(configuration),
+                localRegistry,
+                codec.create(configuration),
+                config,
+                descriptor,
+                serverStatus);
     }
 
     @FactoryClass

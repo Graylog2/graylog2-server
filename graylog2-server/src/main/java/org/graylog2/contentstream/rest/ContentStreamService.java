@@ -24,7 +24,8 @@ import org.graylog2.contentstream.db.DBContentStreamUserSettingsService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.users.events.UserDeletedEvent;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -19,12 +19,12 @@ package org.graylog2.indexer.indexset.profile;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
+import jakarta.inject.Inject;
 import org.bson.Document;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
