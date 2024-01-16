@@ -24,8 +24,9 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -116,7 +117,7 @@ public class UrlWhitelistService extends AbstractIdleService {
         final LinkedHashMap<String, WhitelistEntry> entriesMap = whitelist.entries()
                 .stream()
                 .collect(Collectors.toMap(WhitelistEntry::id, Function.identity(),
-                        (a, b) -> { throw new IllegalStateException("Duplicate key '" + a + "'."); },
+                        (a, b) -> {throw new IllegalStateException("Duplicate key '" + a + "'.");},
                         LinkedHashMap::new));
         entriesMap.put(entry.id(), entry);
         return whitelist.toBuilder()

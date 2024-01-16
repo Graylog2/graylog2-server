@@ -39,18 +39,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,6 +70,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
 
     private final JobResourceHandlerService jobResourceHandlerService;
     private final ServerStatus serverStatus;
+
     @Inject
     public ClusterSystemJobResource(NodeService nodeService,
                                     RemoteInterfaceProvider remoteInterfaceProvider,

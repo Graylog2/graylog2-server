@@ -21,7 +21,8 @@ import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

@@ -24,7 +24,8 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashMap;
 import java.util.Map;
 

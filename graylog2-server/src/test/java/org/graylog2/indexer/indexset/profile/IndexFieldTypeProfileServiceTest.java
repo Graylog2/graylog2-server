@@ -22,6 +22,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
@@ -29,17 +30,19 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
 import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -67,12 +70,122 @@ public class IndexFieldTypeProfileServiceTest {
                 mock(ClusterConfigService.class),
                 mock(ClusterEventBus.class)
         );
-        indexFieldTypeProfileUsagesService = Mockito.mock(IndexFieldTypeProfileUsagesService.class);
+        indexFieldTypeProfileUsagesService = new IndexFieldTypeProfileUsagesService(mongoConnection);
         toTest = new IndexFieldTypeProfileService(mongoConnection,
                 objectMapperProvider,
                 new MongoCollections(new CommonMongoJackObjectMapperProvider(objectMapperProvider), mongoConnection),
                 indexFieldTypeProfileUsagesService,
                 mongoIndexSetService);
+    }
+
+    @Test
+    public void testRetrievalWithUsages() {
+        final IndexFieldTypeProfile profile1 = new IndexFieldTypeProfile("123400000000000000000001", "profile1", "profile1", new CustomFieldMappings());
+        toTest.save(profile1);
+        final IndexFieldTypeProfile profile2 = new IndexFieldTypeProfile("123400000000000000000002", "profile2", "profile2", new CustomFieldMappings());
+        toTest.save(profile2);
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000001",
+                "Index set using profile 1",
+                "123400000000000000000001"));
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000011",
+                "Another Index set using profile 1",
+                "123400000000000000000001"));
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000002",
+                "Index set using profile 2",
+                "123400000000000000000002"));
+
+
+        final Optional<IndexFieldTypeProfileWithUsages> profile1WithUsages = toTest.getWithUsages("123400000000000000000001");
+        assertTrue(profile1WithUsages.isPresent());
+        assertEquals(
+                new IndexFieldTypeProfileWithUsages(profile1, Set.of("000000000000000000000001", "000000000000000000000011")),
+                profile1WithUsages.get()
+        );
+        final Optional<IndexFieldTypeProfileWithUsages> profile2WithUsages = toTest.getWithUsages("123400000000000000000002");
+        assertTrue(profile2WithUsages.isPresent());
+        assertEquals(
+                new IndexFieldTypeProfileWithUsages(profile2, Set.of("000000000000000000000002")),
+                profile2WithUsages.get()
+        );
+    }
+
+    @Test
+    public void testUpdate() {
+        final IndexFieldTypeProfile profile = new IndexFieldTypeProfile("123400000000000000000001", "profile", "profile", new CustomFieldMappings());
+        toTest.save(profile);
+
+        final IndexFieldTypeProfile updatedProfile = new IndexFieldTypeProfile(profile.id(), "Changed!", "Changed!",
+                new CustomFieldMappings(List.of(new CustomFieldMapping("field", "date"))));
+        toTest.update(profile.id(), updatedProfile);
+
+        assertEquals(updatedProfile, toTest.get(profile.id()).get());
+    }
+
+
+    @Test
+    public void testPagination() {
+        final IndexFieldTypeProfile profile1 = new IndexFieldTypeProfile("123400000000000000000001", "a", "aa", new CustomFieldMappings());
+        toTest.save(profile1);
+        final IndexFieldTypeProfile profile2 = new IndexFieldTypeProfile("123400000000000000000002", "b", "ab", new CustomFieldMappings());
+        toTest.save(profile2);
+        final IndexFieldTypeProfile profile3 = new IndexFieldTypeProfile("123400000000000000000003", "c", "c", new CustomFieldMappings());
+        toTest.save(profile3);
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000001",
+                "Index set using profile 1",
+                profile1.id()));
+
+
+        PageListResponse<IndexFieldTypeProfileWithUsages> paginatedResponse = toTest.getPaginated("", List.of(), 1, 2, "name", "asc");
+
+        verifyPaginationResponse(
+                paginatedResponse,
+                List.of(
+                        new IndexFieldTypeProfileWithUsages(profile1, Set.of("000000000000000000000001")),
+                        new IndexFieldTypeProfileWithUsages(profile2, Set.of())
+                ),
+                3
+        );
+
+        paginatedResponse = toTest.getPaginated("", List.of(), 2, 2, "name", "asc");
+
+        verifyPaginationResponse(
+                paginatedResponse,
+                List.of(
+                        new IndexFieldTypeProfileWithUsages(profile3, Set.of())
+                ),
+                3
+        );
+
+        paginatedResponse = toTest.getPaginated("description:a", List.of(), 1, 2, "description", "desc");
+
+        verifyPaginationResponse(
+                paginatedResponse,
+                List.of(
+                        new IndexFieldTypeProfileWithUsages(profile2, Set.of()),
+                        new IndexFieldTypeProfileWithUsages(profile1, Set.of("000000000000000000000001"))
+                ),
+                2
+        );
+
+        paginatedResponse = toTest.getPaginated("description:a", List.of("name:a"), 1, 2, "description", "desc");
+
+        verifyPaginationResponse(
+                paginatedResponse,
+                List.of(
+                        new IndexFieldTypeProfileWithUsages(profile1, Set.of("000000000000000000000001"))
+                ),
+                1
+        );
+
+    }
+
+    private void verifyPaginationResponse(final PageListResponse<IndexFieldTypeProfileWithUsages> paginatedResponse,
+                                          final List<IndexFieldTypeProfileWithUsages> expectedProfiles,
+                                          final long total
+    ) {
+        assertEquals(expectedProfiles.size(), paginatedResponse.elements().size());
+        assertEquals(expectedProfiles, paginatedResponse.elements());
+        assertEquals(total, paginatedResponse.total());
     }
 
     @Test
@@ -93,6 +206,7 @@ public class IndexFieldTypeProfileServiceTest {
                 null));
 
         toTest.delete("123400000000000000000001");
+        assertTrue(toTest.get("123400000000000000000001").isEmpty());
 
         verifyHasNoProfile("000000000000000000000001");//check if profile removed
         verifyHasNoProfile("000000000000000000000011");//check if profile removed

@@ -19,7 +19,7 @@ package org.graylog2.database.entities;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class TestScopedEntityDBService extends ScopedDbService<TestScopedEntity> {
 

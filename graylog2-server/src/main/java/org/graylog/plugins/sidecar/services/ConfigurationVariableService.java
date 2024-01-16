@@ -23,8 +23,9 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -73,19 +74,19 @@ public class ConfigurationVariableService extends PaginatedDbService<Configurati
     }
 
     public boolean hasConflict(ConfigurationVariable variable) {
-       final DBQuery.Query query;
+        final DBQuery.Query query;
 
-       if (isNullOrEmpty(variable.id())) {
-           query = DBQuery.is(ConfigurationVariable.FIELD_NAME, variable.name());
-       } else {
-           // updating an existing variable, don't match against itself
-           query = DBQuery.and(
-                           DBQuery.is(ConfigurationVariable.FIELD_NAME, variable.name()),
-                           DBQuery.notEquals("_id", variable.id()
-                           )
-           );
-       }
-       return db.getCount(query) > 0;
+        if (isNullOrEmpty(variable.id())) {
+            query = DBQuery.is(ConfigurationVariable.FIELD_NAME, variable.name());
+        } else {
+            // updating an existing variable, don't match against itself
+            query = DBQuery.and(
+                    DBQuery.is(ConfigurationVariable.FIELD_NAME, variable.name()),
+                    DBQuery.notEquals("_id", variable.id()
+                    )
+            );
+        }
+        return db.getCount(query) > 0;
     }
 
     @Override

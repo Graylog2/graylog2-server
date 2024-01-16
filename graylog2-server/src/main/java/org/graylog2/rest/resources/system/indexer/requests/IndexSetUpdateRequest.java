@@ -26,8 +26,10 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_PROFILE_ID;
@@ -55,7 +57,8 @@ public record IndexSetUpdateRequest(@JsonProperty("title") @NotBlank String titl
                                     @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
                                     @JsonProperty(FIELD_USE_LEGACY_ROTATION) Boolean useLegacyRotation) {
 
-    public static IndexSetUpdateRequest fromIndexSetConfig(IndexSetConfig indexSet) {
+
+    public static IndexSetUpdateRequest fromIndexSetConfig(final IndexSetConfig indexSet) {
         return new IndexSetUpdateRequest(
                 indexSet.title(),
                 indexSet.description(),
@@ -75,7 +78,7 @@ public record IndexSetUpdateRequest(@JsonProperty("title") @NotBlank String titl
 
     }
 
-    public IndexSetConfig toIndexSetConfig(String id, IndexSetConfig oldConfig) {
+    public IndexSetConfig toIndexSetConfig(final String id, final IndexSetConfig oldConfig) {
         return IndexSetConfig.builder()
                 .id(id)
                 .title(title())

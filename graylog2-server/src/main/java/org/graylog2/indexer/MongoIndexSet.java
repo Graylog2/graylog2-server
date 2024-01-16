@@ -21,6 +21,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -40,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

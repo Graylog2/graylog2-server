@@ -41,17 +41,20 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -74,7 +77,7 @@ public class KeywordSearchResource extends SearchResource {
     @GET
     @Timed
     @ApiOperation(value = "Message search with keyword as timerange.",
-            notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
+                  notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid keyword provided.")
@@ -136,7 +139,7 @@ public class KeywordSearchResource extends SearchResource {
     @Path("/export")
     @Timed
     @ApiOperation(value = "Export message search with keyword as timerange.",
-            notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
+                  notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid keyword provided.")
@@ -157,8 +160,8 @@ public class KeywordSearchResource extends SearchResource {
         final String filename = "graylog-search-result-keyword-" + keyword + ".csv";
         return Response
                 .ok(searchKeywordChunked(query, keyword, timezone, limit, offset, batchSize, filter, fields))
-            .header("Content-Disposition", "attachment; filename=" + filename)
-            .build();
+                .header("Content-Disposition", "attachment; filename=" + filename)
+                .build();
     }
 
     private TimeRange buildKeywordTimeRange(String keyword, String timezone) {

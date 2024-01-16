@@ -24,7 +24,8 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.stream.Collectors;
 
 public class DecorateQueryStringsNormalizer implements SearchNormalizer {

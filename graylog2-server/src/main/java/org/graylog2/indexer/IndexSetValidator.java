@@ -18,6 +18,8 @@ package org.graylog2.indexer;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
@@ -35,8 +37,6 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Optional;
 
 import static org.graylog2.indexer.MongoIndexSet.WARM_INDEX_INFIX;
@@ -65,7 +65,6 @@ public class IndexSetValidator {
     }
 
     public Optional<Violation> validate(IndexSetConfig newConfig) {
-
 
         // Don't validate prefix conflicts in case of an update
         if (Strings.isNullOrEmpty(newConfig.id())) {

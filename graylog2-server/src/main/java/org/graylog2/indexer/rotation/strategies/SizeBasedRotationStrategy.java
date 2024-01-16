@@ -23,7 +23,9 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
@@ -77,7 +79,7 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
         final MessageFormat format = shouldRotate ?
                 new MessageFormat("Storage size for index <{0}> is {1} bytes, exceeding the maximum of {2} bytes. Rotating index.", Locale.ENGLISH) :
                 new MessageFormat("Storage size for index <{0}> is {1} bytes, below the maximum of {2} bytes. Not doing anything.", Locale.ENGLISH);
-        final String message = format.format(new Object[] { index, sizeInBytes, config.maxSize() });
+        final String message = format.format(new Object[]{index, sizeInBytes, config.maxSize()});
 
         return createResult(shouldRotate, message);
     }

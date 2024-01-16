@@ -17,7 +17,8 @@
 
 package org.graylog2.plugin.validate;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class ClusterConfigValidatorService {

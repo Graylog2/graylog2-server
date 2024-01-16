@@ -33,7 +33,8 @@ import software.amazon.awssdk.services.iam.IamClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.util.Optional;
 

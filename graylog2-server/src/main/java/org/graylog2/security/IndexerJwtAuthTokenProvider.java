@@ -22,12 +22,15 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+
 import com.github.joschi.jadconfig.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +60,7 @@ public class IndexerJwtAuthTokenProvider implements Provider<String> {
         }, cachingDuration.toSeconds(), TimeUnit.SECONDS);
     }
 
-   public static String createToken(final byte[] apiKeySecretBytes, final Duration tokenExpirationDuration) {
+    public static String createToken(final byte[] apiKeySecretBytes, final Duration tokenExpirationDuration) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
         long nowMillis = System.currentTimeMillis();
@@ -74,7 +77,7 @@ public class IndexerJwtAuthTokenProvider implements Provider<String> {
                 .setExpiration(new Date(nowMillis + tokenExpirationDuration.toMilliseconds()))
                 .signWith(signingKey, signatureAlgorithm);
 
-        final var token =  builder.compact();
+        final var token = builder.compact();
         return token;
     }
 

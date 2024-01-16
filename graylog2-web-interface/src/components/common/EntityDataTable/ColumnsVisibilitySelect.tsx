@@ -48,9 +48,7 @@ const ColumnCheckbox = styled(Checkbox)`
   }
 `;
 
-const ListItem: React.ComponentType<Pick<React.ComponentProps<typeof MenuItem>, 'children' | 'title' | 'onSelect'>> = styled(MenuItem)`
-  padding: 3px 0;
-  cursor: pointer;
+const ListItemInner = styled.div`
   display: flex;
 `;
 
@@ -86,10 +84,12 @@ const ColumnListItem = ({
   };
 
   return (
-    <ListItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${column.title}`}>
-      <ColumnCheckbox checked={isSelected} onChange={toggleVisibility} />
-      <ColumnTitle>{column.title}</ColumnTitle>
-    </ListItem>
+    <MenuItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${column.title}`}>
+      <ListItemInner>
+        <ColumnCheckbox checked={isSelected} onChange={toggleVisibility} />
+        <ColumnTitle>{column.title}</ColumnTitle>
+      </ListItemInner>
+    </MenuItem>
   );
 };
 
@@ -111,7 +111,8 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
                           pullRight
                           aria-label="Configure visible columns"
                           id="columns-visibility-select"
-                          bsStyle="default">
+                          bsStyle="default"
+                          closeOnItemClick={false}>
       {sortedColumns.map((column) => (
         <ColumnListItem column={column}
                         onClick={onChange}
