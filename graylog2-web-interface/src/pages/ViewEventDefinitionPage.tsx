@@ -102,19 +102,17 @@ const ViewEventDefinitionPage = () => {
         <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
                     actions={(
                       <ButtonToolbar>
-                        {isMutable && (
                         <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                           <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
                             <Button bsStyle="success">Edit Event Definition</Button>
                           </LinkContainer>
                         </IfPermitted>
-                        )}
                         {!isSystemEventDefinition() && (
-                        <IfPermitted permissions="eventdefinitions:create">
-                          <Button onClick={() => setShowDialog(true)} bsStyle="success">Duplicate Event
-                            Definition
-                          </Button>
-                        </IfPermitted>
+                          <IfPermitted permissions="eventdefinitions:create">
+                            <Button onClick={() => setShowDialog(true)} bsStyle="success">Duplicate Event
+                              Definition
+                            </Button>
+                          </IfPermitted>
                         )}
                       </ButtonToolbar>
                   )}

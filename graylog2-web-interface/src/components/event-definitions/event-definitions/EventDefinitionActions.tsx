@@ -215,15 +215,13 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                                buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                bsSize="xsmall"
                                dropdownZIndex={1000}>
-          {showActions() && (
-            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-                <MenuItem data-testid="edit-button">
-                  Edit
-                </MenuItem>
-              </LinkContainer>
-            </IfPermitted>
-          )}
+          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
+              <MenuItem data-testid="edit-button">
+                Edit
+              </MenuItem>
+            </LinkContainer>
+          </IfPermitted>
           {!isSystemEventDefinition() && (
             <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
           )}
