@@ -62,8 +62,9 @@ import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -106,9 +107,9 @@ public class ContentPackService {
     }
 
     private ContentPackInstallation installContentPack(ContentPackV1 contentPack,
-                                                      Map<String, ValueReference> parameters,
-                                                      String comment,
-                                                      String user) {
+                                                       Map<String, ValueReference> parameters,
+                                                       String comment,
+                                                       String user) {
         ensureConstraints(contentPack.constraints());
 
         final Entity rootEntity = EntityV1.createRoot(contentPack);
@@ -131,17 +132,18 @@ public class ContentPackService {
 
                 final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
                 final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
-                @SuppressWarnings({"rawtypes", "unchecked"}) final Optional<NativeEntity> existingEntity = facade.findExisting(entity, parameters);
+                @SuppressWarnings({"rawtypes", "unchecked"})
+                final Optional<NativeEntity> existingEntity = facade.findExisting(entity, parameters);
                 if (existingEntity.isPresent()) {
                     LOG.trace("Found existing entity for {}", entityDescriptor);
                     final NativeEntity<?> nativeEntity = existingEntity.get();
                     final NativeEntityDescriptor nativeEntityDescriptor = nativeEntity.descriptor();
                     /* Found entity on the system or we found a other installation which stated that */
                     if (contentPackInstallationPersistenceService.countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 0 ||
-                        contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
-                          final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
-                                  .foundOnSystem(true)
-                                  .build();
+                            contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
+                        final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
+                                .foundOnSystem(true)
+                                .build();
                         allEntityDescriptors.add(serverDescriptor);
                     } else {
                         allEntityDescriptors.add(nativeEntity.descriptor());
@@ -267,6 +269,7 @@ public class ContentPackService {
         final Iterable<Entity> entitiesInOrder = entityTraverser.breadthFirst(rootEntity);
 
         final Set<NativeEntityDescriptor> removedEntities = new HashSet<>();
+        final Map<ModelId, Object> removedEntityObjects = new HashMap<>();
         final Set<NativeEntityDescriptor> failedEntities = new HashSet<>();
         final Set<NativeEntityDescriptor> skippedEntities = new HashSet<>();
 
@@ -292,9 +295,9 @@ public class ContentPackService {
                             countInstallationOfEntityByIdAndFoundOnSystem(entityId);
 
                     if (installCount > 1 || (installCount == 1 && systemFoundCount >= 1)) {
-                       skippedEntities.add(nativeEntityDescriptor);
-                       LOG.debug("Did not remove entity since other content pack installations still use them: {}",
-                               nativeEntityDescriptor);
+                        skippedEntities.add(nativeEntityDescriptor);
+                        LOG.debug("Did not remove entity since other content pack installations still use them: {}",
+                                nativeEntityDescriptor);
                     } else if (nativeEntityOptional.isPresent()) {
                         final Object nativeEntity = nativeEntityOptional.get();
                         LOG.trace("Removing existing native entity for {} ({})", nativeEntityDescriptor);
@@ -303,6 +306,7 @@ public class ContentPackService {
                             //noinspection unchecked
                             facade.delete(((NativeEntity) nativeEntity).entity());
                             removedEntities.add(nativeEntityDescriptor);
+                            removedEntityObjects.put(nativeEntityDescriptor.contentPackEntityId(), ((NativeEntity) nativeEntity).entity());
                         } catch (Exception e) {
                             LOG.warn("Couldn't remove native entity {}", nativeEntity);
                             failedEntities.add(nativeEntityDescriptor);
@@ -321,6 +325,7 @@ public class ContentPackService {
 
         return ContentPackUninstallation.builder()
                 .entities(ImmutableSet.copyOf(removedEntities))
+                .entityObjects(ImmutableMap.copyOf(removedEntityObjects))
                 .skippedEntities(ImmutableSet.copyOf(skippedEntities))
                 .failedEntities(ImmutableSet.copyOf(failedEntities))
                 .build();

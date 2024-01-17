@@ -100,7 +100,7 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
     href: action.linkTarget(handlerArgs),
     target: '_blank',
     rel: 'noopener noreferrer',
-  };
+  } as const;
 
   const onSelect = useCallback(() => {
     const { resetFocus = false } = action;

@@ -34,7 +34,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.function.Function;
 
 public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
@@ -59,7 +60,7 @@ public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
             case Min.NAME -> Min.builder().field(metric.fieldName()).build();
             case Percentage.NAME -> Percentage.builder()
                     .field(metric.fieldName())
-                    .strategy(metric.configuration() != null ? ((PercentageConfiguration)metric.configuration()).strategy() : null)
+                    .strategy(metric.configuration() != null ? ((PercentageConfiguration) metric.configuration()).strategy() : null)
                     .build();
             case Percentile.NAME -> Percentile.builder()
                     .field(metric.fieldName())

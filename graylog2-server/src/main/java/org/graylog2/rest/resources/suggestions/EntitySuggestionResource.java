@@ -25,13 +25,14 @@ import org.graylog2.database.suggestions.EntitySuggestionResponse;
 import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -52,15 +53,15 @@ public class EntitySuggestionResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a paginated list of suggested entities")
     public EntitySuggestionResponse getPage(@ApiParam(name = "collection")
-                                                @QueryParam("collection") String collection,
+                                            @QueryParam("collection") String collection,
                                             @ApiParam(name = "column")
-                                                @QueryParam("column") @DefaultValue("title") String column,
+                                            @QueryParam("column") @DefaultValue("title") String column,
                                             @ApiParam(name = "page")
-                                                @QueryParam("page") @DefaultValue("1") int page,
+                                            @QueryParam("page") @DefaultValue("1") int page,
                                             @ApiParam(name = "per_page")
-                                                @QueryParam("per_page") @DefaultValue("10") int perPage,
+                                            @QueryParam("per_page") @DefaultValue("10") int perPage,
                                             @ApiParam(name = "query")
-                                                @QueryParam("query") @DefaultValue("") String query) {
+                                            @QueryParam("query") @DefaultValue("") String query) {
 
         return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject());
     }

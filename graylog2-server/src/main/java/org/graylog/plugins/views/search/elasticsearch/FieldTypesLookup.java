@@ -20,7 +20,8 @@ import com.google.common.collect.Sets;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

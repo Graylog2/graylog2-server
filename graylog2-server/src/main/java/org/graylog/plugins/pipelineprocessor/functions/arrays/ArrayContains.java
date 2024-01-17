@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.LongNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -28,7 +29,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -74,7 +76,7 @@ public class ArrayContains extends AbstractArrayFunction<Boolean> {
     }
 
     private boolean arrayContains(List<Object> elements, Object value) {
-        for (Object element : elements) {
+        for (Object element : elements.stream().filter(e -> !(e instanceof NullNode)).toList()) {
             if (element instanceof IntNode || element instanceof LongNode) {
                 /* Allow ints and longs to be compared. Sometimes the array will contain ints,
                  * but a single number passed as the value will be typed as a long.
@@ -82,8 +84,7 @@ public class ArrayContains extends AbstractArrayFunction<Boolean> {
                 final Number number = ((NumericNode) element).numberValue();
                 if (value.equals(number.intValue())) {
                     return true;
-                }
-                else if (value.equals(number.longValue())) {
+                } else if (value.equals(number.longValue())) {
                     return true;
                 }
             } else if (element instanceof JsonNode) {

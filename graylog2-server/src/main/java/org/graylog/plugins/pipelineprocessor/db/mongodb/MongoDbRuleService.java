@@ -33,7 +33,8 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -94,7 +95,7 @@ public class MongoDbRuleService implements RuleService {
 
     @Override
     public Collection<RuleDao> loadAll() {
-        try(DBCursor<RuleDao> ruleDaos = dbCollection.find().sort(DBSort.asc("title"))) {
+        try (DBCursor<RuleDao> ruleDaos = dbCollection.find().sort(DBSort.asc("title"))) {
             return ImmutableSet.copyOf((Iterable<RuleDao>) ruleDaos);
         } catch (MongoException e) {
             log.error("Unable to load processing rules", e);

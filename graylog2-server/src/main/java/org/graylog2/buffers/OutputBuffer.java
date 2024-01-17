@@ -33,10 +33,11 @@ import org.graylog2.shared.buffers.LoggingExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -77,9 +78,6 @@ public class OutputBuffer extends Buffer {
         );
         disruptor.setDefaultExceptionHandler(new LoggingExceptionHandler(LOG));
 
-        LOG.info("Initialized OutputBuffer with ring size <{}> and wait strategy <{}>.",
-                ringBufferSize, waitStrategy.getClass().getSimpleName());
-
         final OutputBufferProcessor[] processors = new OutputBufferProcessor[processorCount];
 
         for (int i = 0; i < processorCount; i++) {
@@ -89,6 +87,10 @@ public class OutputBuffer extends Buffer {
         disruptor.handleEventsWithWorkerPool(processors);
 
         ringBuffer = disruptor.start();
+
+        LOG.info("Initialized OutputBuffer with ring size <{}> and wait strategy <{}>, " +
+                        "running {} parallel buffer processors.",
+                ringBufferSize, waitStrategy.getClass().getSimpleName(), processorCount);
     }
 
     private ThreadFactory threadFactory(final MetricRegistry metricRegistry) {
