@@ -50,3 +50,11 @@ export type RemoveFieldTypeBodyJson = {
   fields: Array<string>,
   rotate: boolean,
 }
+
+export type SetIndexSetFieldTypeProfileBodyJson = {
+  index_sets: Array<string>,
+  rotate: boolean,
+  profile_id: string,
+}
+
+export type SetIndexSetFieldTypeProfileBody = { indexSetId: string, rotated: boolean, profileId: string}
