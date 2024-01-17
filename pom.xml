@@ -99,7 +99,7 @@
         <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.21.40</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.23.4</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.2</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
@@ -152,7 +152,7 @@
         <mongojack.version>2.10.1.4</mongojack.version>
         <mongojack4.version>4.8.1-1</mongojack4.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.104.Final</netty.version>
+        <netty.version>4.1.105.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
