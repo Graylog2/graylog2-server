@@ -45,14 +45,13 @@ public class IndexRotator {
         this.nodeId = nodeId;
     }
 
-    public static Result createResult(boolean shouldRotate, String message) {
-        return new Result(shouldRotate, message);
+    public static Result createResult(boolean shouldRotate, String message, String rotatorClass) {
+        return new Result(shouldRotate, message, rotatorClass);
     }
 
     public void rotate(IndexSet indexSet, RotationChecker rotationChecker) {
         requireNonNull(indexSet, "indexSet must not be null");
         final String indexSetTitle = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null").title();
-        final String strategyName = this.getClass().getCanonicalName();
         final String indexName;
         try {
             indexName = indexSet.getNewestIndex();
@@ -66,7 +65,7 @@ public class IndexRotator {
 
         final Result rotate = rotationChecker.shouldRotate(indexName, indexSet);
         if (rotate == null) {
-            LOG.error("Cannot perform rotation of index <{}> in index set <{}> with strategy <{}> at this moment", indexName, indexSetTitle, strategyName);
+            LOG.error("Cannot perform rotation of index <{}> in index set <{}> at this moment", indexName, indexSetTitle);
             return;
         }
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
@@ -75,7 +74,7 @@ public class IndexRotator {
             indexSet.cycle();
             auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_ROTATION_COMPLETE, ImmutableMap.of(
                     "index_name", indexName,
-                    "rotation_strategy", strategyName
+                    "rotation_strategy", rotate.getRotatorClass()
             ));
         } else {
             LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", indexName);
@@ -89,10 +88,12 @@ public class IndexRotator {
     public static class Result {
         private final boolean shouldRotate;
         private final String message;
+        private final String rotatorClass;
 
-        public Result(boolean shouldRotate, String message) {
+        public Result(boolean shouldRotate, String message, String rotatorClass) {
             this.shouldRotate = shouldRotate;
             this.message = message;
+            this.rotatorClass = rotatorClass;
             LOG.debug("{} because of: {}", shouldRotate ? "Rotating" : "Not rotating", message);
         }
 
@@ -102,6 +103,10 @@ public class IndexRotator {
 
         public boolean shouldRotate() {
             return shouldRotate;
+        }
+
+        public String getRotatorClass() {
+            return rotatorClass;
         }
     }
 

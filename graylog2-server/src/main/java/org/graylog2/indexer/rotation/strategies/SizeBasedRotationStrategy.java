@@ -47,7 +47,7 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
 
     @Override
     public void rotate(IndexSet indexSet) {
-        indexRotator.rotate(indexSet,this::shouldRotate);
+        indexRotator.rotate(indexSet, this::shouldRotate);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
                 new MessageFormat("Storage size for index <{0}> is {1} bytes, below the maximum of {2} bytes. Not doing anything.", Locale.ENGLISH);
         final String message = format.format(new Object[]{index, sizeInBytes, config.maxSize()});
 
-        return createResult(shouldRotate, message);
+        return createResult(shouldRotate, message, this.getClass().getCanonicalName());
     }
 
     @Override

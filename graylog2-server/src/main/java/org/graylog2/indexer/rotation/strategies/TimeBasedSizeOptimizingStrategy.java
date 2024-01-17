@@ -38,7 +38,6 @@ import jakarta.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 
-import static org.graylog2.indexer.rotation.common.IndexRotator.createResult;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.humanReadableByteCount;
 
@@ -70,7 +69,7 @@ public class TimeBasedSizeOptimizingStrategy implements RotationStrategy {
 
     @Override
     public void rotate(IndexSet indexSet) {
-        indexRotator.rotate(indexSet,this::shouldRotate);
+        indexRotator.rotate(indexSet, this::shouldRotate);
     }
 
     @Override
@@ -86,6 +85,9 @@ public class TimeBasedSizeOptimizingStrategy implements RotationStrategy {
                 .build();
     }
 
+    private IndexRotator.Result createResult(boolean shouldRotate, String message) {
+        return IndexRotator.createResult(shouldRotate, message, this.getClass().getCanonicalName());
+    }
 
     @Nonnull
     protected Result shouldRotate(final String index, IndexSet indexSet) {
