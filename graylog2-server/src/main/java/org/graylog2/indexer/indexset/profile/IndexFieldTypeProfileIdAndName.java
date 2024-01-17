@@ -17,10 +17,6 @@
 package org.graylog2.indexer.indexset.profile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
-
-import javax.annotation.Nullable;
 
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.ID_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.NAME_FIELD_NAME;
@@ -28,6 +24,6 @@ import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.NAME_F
 /**
  * Mainly to be used with "all" endpoint, where returning as little info about profile as possible is important.
  */
-public record IndexFieldTypeProfileIdAndName(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @ObjectId String id,
+public record IndexFieldTypeProfileIdAndName(@JsonProperty(ID_FIELD_NAME) String id,
                                              @JsonProperty(NAME_FIELD_NAME) String name) {
 }
