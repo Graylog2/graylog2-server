@@ -144,13 +144,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.graylog.repackaged.mongojack</groupId>
+            <groupId>org.mongojack</groupId>
             <artifactId>mongojack</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>mongojack4</artifactId>
         </dependency>
 
         <dependency>

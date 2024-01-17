@@ -149,8 +149,7 @@
         <lucene.version>9.9.1</lucene.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
-        <mongojack.version>2.10.1.4</mongojack.version>
-        <mongojack4.version>4.8.1-1</mongojack4.version>
+        <mongojack.version>4.8.1</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.104.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
@@ -398,6 +397,23 @@
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
+            </dependency>
+
+            <!-- Always check mongojack dependencies to see if we need to adjust our mongodb-driver dependencies -->
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-sync</artifactId>
+                <version>${mongodb-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-legacy</artifactId>
+                <version>${mongodb-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongojack</groupId>
+                <artifactId>mongojack</artifactId>
+                <version>${mongojack.version}</version>
             </dependency>
 
             <!-- test -->

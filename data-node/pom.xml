@@ -115,7 +115,7 @@
             <artifactId>mongodb-driver-legacy</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog.repackaged.mongojack</groupId>
+            <groupId>org.mongojack</groupId>
             <artifactId>mongojack</artifactId>
         </dependency>
         <dependency>
