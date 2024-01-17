@@ -27,6 +27,8 @@ type FormValues = {
   timerange: TimeRange,
 }
 
+const _trim = (s: string | undefined) => (s === undefined ? undefined : s.trim());
+
 const useSearchBarSubmit = (initialValues: FormValues, onSubmit: (v: FormValues) => Promise<unknown>) => {
   const { userTimezone } = useUserDateTime();
   const [enableReinitialize, setEnableReinitialize] = useState(true);
@@ -35,7 +37,7 @@ const useSearchBarSubmit = (initialValues: FormValues, onSubmit: (v: FormValues)
     const { queryString, timerange, ...rest } = values;
 
     return executeWithQueryStringRecording(
-      queryString !== initialValues?.queryString,
+      _trim(queryString) !== _trim(initialValues?.queryString),
       queryString,
       () => onSubmit({
         queryString,
