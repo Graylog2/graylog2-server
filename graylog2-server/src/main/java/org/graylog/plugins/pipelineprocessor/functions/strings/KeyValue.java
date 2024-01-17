@@ -48,13 +48,13 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
     private final ParameterDescriptor<String, CharMatcher> trimValueCharactersParam;
 
     public KeyValue() {
-        valueParam = string("value").description("The string to extract key/value pairs from").build();
+        valueParam = string("value").ruleBuilderVariable().description("The string to extract key/value pairs from").build();
         splitParam = string("delimiters", CharMatcher.class).transform(CharMatcher::anyOf).optional().description("The characters used to separate pairs, defaults to whitespace").build();
         valueSplitParam = string("kv_delimiters", CharMatcher.class).transform(CharMatcher::anyOf).optional().description("The characters used to separate keys from values, defaults to '='").build();
 
         ignoreEmptyValuesParam = bool("ignore_empty_values").optional().description("Whether to ignore keys with empty values, defaults to true").build();
         allowDupeKeysParam = bool("allow_dup_keys").optional().description("Whether to allow duplicate keys, defaults to true").build();
-        duplicateHandlingParam = string("handle_dup_keys").optional().description("How to handle duplicate keys: 'take_first': only use first value, 'take_last': only take last value, default is to concatenate the values").build();
+        duplicateHandlingParam = string("handle_dup_keys").optional().description("How to handle duplicate keys: (default) 'take_first': only use first value, 'take_last': only take last value or use a delimiter e.g. ','").build();
         trimCharactersParam = string("trim_key_chars", CharMatcher.class)
                 .transform(CharMatcher::anyOf)
                 .optional()
