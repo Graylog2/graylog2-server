@@ -86,7 +86,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         );
         mappings.put("node", ImmutableMap.of("type", "keyword"));
         Template template = new Template(List.of(configuration.getMetricsStream() + "*"),
-                new Template.Mappings(ImmutableMap.of("properties", mappings)), 1L, new Template.Settings(Map.of()));
+                new Template.Mappings(ImmutableMap.of("properties", mappings)), 99999L, new Template.Settings(Map.of()));
         dataStreamAdapter.ensureDataStreamTemplate(configuration.getMetricsTemplate(), template, configuration.getMetricsTimestamp());
     }
 
