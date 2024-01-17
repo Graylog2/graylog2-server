@@ -31,6 +31,7 @@ import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
+import org.graylog.events.processor.SearchFilterableConfig;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -60,7 +61,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = AggregationEventProcessorConfig.Builder.class)
-public abstract class AggregationEventProcessorConfig implements EventProcessorConfig {
+public abstract class AggregationEventProcessorConfig implements EventProcessorConfig, SearchFilterableConfig {
     public static final String TYPE_NAME = "aggregation-v1";
 
     private static final String FIELD_QUERY = "query";
@@ -283,5 +284,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
+    }
+
+    @Override
+    public EventProcessorConfig updateFilters(List<UsedSearchFilter> filters) {
+        return toBuilder().filters(filters).build();
     }
 }

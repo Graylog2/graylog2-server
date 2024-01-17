@@ -17,9 +17,13 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -35,12 +39,9 @@ import org.mongojack.DBUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -51,19 +52,22 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
 
     private final DBEventProcessorStateService stateService;
     private final EntityOwnershipService entityOwnerShipService;
+    private final SearchFiltersReFetcher searchFiltersRefetcher;
 
     @Inject
     public DBEventDefinitionService(MongoConnection mongoConnection,
                                     MongoJackObjectMapperProvider mapper,
                                     DBEventProcessorStateService stateService,
-                                    EntityOwnershipService entityOwnerShipService, EntityScopeService entityScopeService) {
+                                    EntityOwnershipService entityOwnerShipService, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
         super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME, entityScopeService);
         this.stateService = stateService;
         this.entityOwnerShipService = entityOwnerShipService;
+        this.searchFiltersRefetcher = searchFiltersRefetcher;
     }
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
                                                              String sortByField, String sortOrder, int page, int perPage) {
+
         return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
                 getSortBuilder(sortOrder, sortByField), page, perPage);
     }
@@ -81,6 +85,24 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         return super.save(enrichedWithUpdateDate);
+    }
+
+    @Override
+    public Optional<EventDefinitionDto> get(String id) {
+        return super.get(id).map(this::getSearchWithRefetchedFilters);
+    }
+
+    private EventDefinitionDto getSearchWithRefetchedFilters(final EventDefinitionDto eventDefinition) {
+        final EventProcessorConfig config = eventDefinition.config();
+        if (searchFiltersRefetcher.turnedOn() && config instanceof SearchFilterableConfig) {
+            final List<UsedSearchFilter> filters = ((SearchFilterableConfig) config).filters();
+            final EventProcessorConfig updatedConfig = config.updateFilters(searchFiltersRefetcher.reFetch(filters));
+            if (updatedConfig == null) {
+                return eventDefinition;
+            }
+            return eventDefinition.toBuilder().config(updatedConfig).build();
+        }
+        return eventDefinition;
     }
 
     public void updateMatchedAt(String id, DateTime timeStamp) {
