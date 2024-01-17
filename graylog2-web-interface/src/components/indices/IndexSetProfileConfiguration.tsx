@@ -23,7 +23,6 @@ import { Select } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
-import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const StyledAlert = styled(Alert)`
   overflow: auto;
@@ -39,7 +38,6 @@ const StyledH3 = styled.h3`
 
 const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string, value: string, onChange: (value: string) => void }) => {
   const { isLoading, data: { list } } = useProfiles({ pageSize: 100, page: 1, sort: { attributeId: 'name', direction: 'asc' } as Sort, query: '' }, { enabled: true });
-  const hasPermission = useHasTypeMappingPermission();
   const options = list.map(({ name: profileName, id }) => ({ value: id, label: profileName }));
 
   return (
@@ -58,7 +56,7 @@ const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string,
             <StyledSelect placeholder="Select index field type profile"
                           options={options}
                           value={value}
-                          disabled={isLoading || !hasPermission}
+                          disabled={isLoading}
                           onChange={onChange}
                           clearable={false} />
           </Input>
