@@ -17,11 +17,13 @@
 package org.graylog.scheduler;
 
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.graylog.scheduler.eventbus.JobCompletedEvent;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
@@ -31,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import jakarta.inject.Inject;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,9 +64,11 @@ public class JobExecutionEngine {
     private final RefreshingLockServiceFactory refreshingLockServiceFactory;
     private final Map<String, Integer> maxConcurrencyMap;
 
+
     private final Counter executionSuccessful;
     private final Counter executionFailed;
     private final Timer executionTime;
+    private final Meter executionDenyRate;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private final AtomicBoolean shouldCleanup = new AtomicBoolean(true);
@@ -94,6 +96,7 @@ public class JobExecutionEngine {
         this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "successful"));
         this.executionFailed = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed"));
         this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
+        this.executionDenyRate = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "deny-rate"));
     }
 
     /**
@@ -137,12 +140,14 @@ public class JobExecutionEngine {
                 if (!workerPool.execute(() -> handleTriggerWithConcurrencyLimit(trigger))) {
                     // The job couldn't be executed so we have to release the trigger again with the same nextTime
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
+                    executionDenyRate.mark();
                     return false;
                 }
 
                 return true;
             }
         }
+        executionDenyRate.mark();
         return false;
     }
 
@@ -165,6 +170,7 @@ public class JobExecutionEngine {
                     handleTrigger(trigger);
                 } catch (AlreadyLockedException e) {
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
+                    executionDenyRate.mark();
                 }
             }
         } else {
