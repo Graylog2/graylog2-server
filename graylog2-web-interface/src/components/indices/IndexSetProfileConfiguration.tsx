@@ -21,7 +21,7 @@ import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
-import useAllProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useAllProfiles';
+import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 
 const StyledAlert = styled(Alert)`
   overflow: auto;
@@ -36,13 +36,13 @@ const StyledH3 = styled.h3`
 `;
 
 const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string, value: string, onChange: (value: string) => void }) => {
-  const { isLoading, options } = useAllProfiles();
+  const { isLoading, options } = useProfileOptions();
 
   return (
     <div>
       <StyledH3>Index Set Profile</StyledH3>
       <StyledAlert>
-        With index set field type <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>profiles</Link> you can bundle up custom field types into profiles.
+        With index set field type <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>profiles</Link> you can bundle up custom field types into profiles.
         You can assign any profile to this index set.
       </StyledAlert>
       <Row>

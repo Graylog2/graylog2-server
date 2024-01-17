@@ -259,9 +259,11 @@ const IndexSetConfigurationForm = ({
                 {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
                 {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
                 <Field name="field_type_profile">
-                  {({ field: { name, value, onChange } }) => (
+                  {({ field: { name, value } }) => (
                     <IndexSetProfileConfiguration value={value}
-                                                  onChange={onChange}
+                                                  onChange={(profileId) => {
+                                                    setFieldValue(name, profileId);
+                                                  }}
                                                   name={name} />
                   )}
                 </Field>
