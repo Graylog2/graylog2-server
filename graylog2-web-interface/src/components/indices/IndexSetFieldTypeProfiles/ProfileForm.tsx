@@ -26,6 +26,7 @@ import { Button, Col, HelpBlock, Input } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { defaultCompare } from 'logic/DefaultCompare';
+import isReservedField from 'views/logic/IsReservedField';
 
 const SelectContainer = styled.div`
   flex-basis: 100%;
@@ -63,6 +64,7 @@ type Props = {
 
 const getFieldError = (field: string, occurrences: number) => {
   if (!field) return 'Filed is required';
+  if (isReservedField(field)) return 'Filed is reserved';
   if (occurrences > 1) return 'This field occurs several times';
 
   return undefined;
