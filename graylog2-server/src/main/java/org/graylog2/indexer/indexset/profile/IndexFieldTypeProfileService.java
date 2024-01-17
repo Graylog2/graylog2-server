@@ -19,6 +19,7 @@ package org.graylog2.indexer.indexset.profile;
 import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
@@ -38,6 +39,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.mongojack.WriteResult;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -158,6 +160,16 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
                 order,
                 ATTRIBUTES,
                 DEFAULTS);
+    }
+
+    @Deprecated
+    //This method has been introduced only because of technical debt in FE. Do not use it elsewhere! Paginated access is the proper way to go.
+    public List<IndexFieldTypeProfileIdAndName> getAll() {
+        return profileCollection.find()
+                .projection(Projections.include(ID_FIELD_NAME, NAME_FIELD_NAME))
+                .sort(Sorts.ascending(NAME_FIELD_NAME))
+                .map(profile -> new IndexFieldTypeProfileIdAndName(profile.id(), profile.name()))
+                .into(new LinkedList<>());
     }
 
     private void checkFieldTypeCanBeChanged(final String fieldName) {
