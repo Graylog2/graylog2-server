@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.grn;
+
 import org.graylog.events.processor.EventDefinition;
 import org.graylog2.plugin.database.users.User;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;

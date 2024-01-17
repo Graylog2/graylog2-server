@@ -21,8 +21,9 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Optional;
 
 @Singleton

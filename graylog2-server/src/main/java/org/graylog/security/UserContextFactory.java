@@ -22,10 +22,11 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 
 
 public class UserContextFactory implements Factory<UserContext> {

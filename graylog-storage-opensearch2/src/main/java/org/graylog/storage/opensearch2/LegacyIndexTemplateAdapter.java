@@ -22,7 +22,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplat
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog2.indexer.indices.Template;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class LegacyIndexTemplateAdapter implements IndexTemplateAdapter {

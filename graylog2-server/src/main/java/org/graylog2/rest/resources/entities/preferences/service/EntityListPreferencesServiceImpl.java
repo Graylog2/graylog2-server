@@ -25,7 +25,7 @@ import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPr
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.USER_ID_SUB_FIELD;
 

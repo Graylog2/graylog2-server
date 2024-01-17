@@ -390,7 +390,6 @@ describe('<EntityFilters />', () => {
         name: /type/i,
       }));
 
-      // eslint-disable-next-line testing-library/no-node-access
       expect(screen.getByRole('menuitem', { name: /string/i })).toBeDisabled();
     });
   });

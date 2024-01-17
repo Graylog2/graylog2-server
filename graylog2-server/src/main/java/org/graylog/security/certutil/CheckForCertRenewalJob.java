@@ -30,7 +30,7 @@ import org.graylog.scheduler.JobTriggerUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class CheckForCertRenewalJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(CheckForCertRenewalJob.class);

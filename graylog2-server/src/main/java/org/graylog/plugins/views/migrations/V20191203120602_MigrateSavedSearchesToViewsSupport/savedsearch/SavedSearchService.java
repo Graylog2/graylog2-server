@@ -24,7 +24,8 @@ import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.stream.Stream;
 
 /**

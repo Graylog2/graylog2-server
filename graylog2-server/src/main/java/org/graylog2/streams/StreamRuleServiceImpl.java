@@ -34,7 +34,9 @@ import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleReques
 import org.graylog2.streams.events.StreamsChangedEvent;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -157,16 +159,16 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     @Override
     public Map<String, List<StreamRule>> loadForStreamIds(Collection<String> streamIds) {
         final List<ObjectId> objectIds = streamIds.stream()
-            .map(ObjectId::new)
-            .collect(Collectors.toList());
+                .map(ObjectId::new)
+                .collect(Collectors.toList());
 
         final List<DBObject> respStreamRules = query(StreamRuleImpl.class,
-            new BasicDBObject(StreamRuleImpl.FIELD_STREAM_ID, new BasicDBObject("$in", objectIds))
+                new BasicDBObject(StreamRuleImpl.FIELD_STREAM_ID, new BasicDBObject("$in", objectIds))
         );
 
         return respStreamRules.stream()
-            .map(this::toStreamRule)
-            .collect(Collectors.groupingBy(StreamRule::getStreamId));
+                .map(this::toStreamRule)
+                .collect(Collectors.groupingBy(StreamRule::getStreamId));
     }
 
     @Override
@@ -186,7 +188,7 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     @Override
     public Map<String, Long> streamRuleCountByStream() {
         final ImmutableMap.Builder<String, Long> streamRules = ImmutableMap.builder();
-        try(DBCursor streamIds = collection(StreamImpl.class).find(new BasicDBObject(), new BasicDBObject("_id", 1))) {
+        try (DBCursor streamIds = collection(StreamImpl.class).find(new BasicDBObject(), new BasicDBObject("_id", 1))) {
             for (DBObject keys : streamIds) {
                 final ObjectId streamId = (ObjectId) keys.get("_id");
                 streamRules.put(streamId.toHexString(), streamRuleCount(streamId));

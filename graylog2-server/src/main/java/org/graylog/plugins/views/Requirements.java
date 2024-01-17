@@ -20,7 +20,8 @@ import com.google.common.collect.ForwardingMap;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -49,9 +50,9 @@ public class Requirements<O> extends ForwardingMap<String, PluginMetadataSummary
     public O rebuildRequirements(Function<O, Map<String, PluginMetadataSummary>> getter,
                                  BiFunction<O, Map<String, PluginMetadataSummary>, O> setter) {
         final Map<String, PluginMetadataSummary> requirements = Stream.concat(
-                getter.apply(dto).entrySet().stream(),
-                this.entrySet().stream()
-        )
+                        getter.apply(dto).entrySet().stream(),
+                        this.entrySet().stream()
+                )
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (entry1, entry2) -> entry1));
         return setter.apply(dto, requirements);
 

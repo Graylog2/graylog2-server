@@ -19,7 +19,6 @@ import { useMemo } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import type { MantineTheme } from '@graylog/sawmill/mantine';
 import { Button as MantineButton, useMantineTheme } from '@mantine/core';
-import styled from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -46,15 +45,6 @@ const styleProps = (style: StyleProps) => {
     default: return { color: style };
   }
 };
-
-const StyledButton = styled(MantineButton)`
-  font-weight: 400;
-  text-decoration: none !important;
-
-  &:hover, &:focus {
-    color: inherit;
-  }
-`;
 
 type Props = React.PropsWithChildren<{
   active?: boolean,
@@ -128,8 +118,17 @@ const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disab
   return {
     root: {
       ...sizeStyles,
-      ':disabled': disableStyles,
       color: other.colors.contrast[bsStyle],
+      fontWeight: 400,
+      ':disabled': disableStyles,
+      ':hover': {
+        color: other.colors.contrast[bsStyle],
+        textDecoration: 'none',
+      },
+      ':focus': {
+        color: other.colors.contrast[bsStyle],
+        textDecoration: 'none',
+      },
     },
     label: {
       gap: '0.25em',
@@ -164,25 +163,25 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
     if (href) {
       return (
-        <StyledButton component="a"
-                      href={href}
-                      target={target}
-                      rel={rel}
-                      onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-                      {...sharedProps}>
+        <MantineButton component="a"
+                       href={href}
+                       target={target}
+                       rel={rel}
+                       onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+                       {...sharedProps}>
           {children}
-        </StyledButton>
+        </MantineButton>
       );
     }
 
     return (
-      <StyledButton ref={ref}
-                    form={form}
-                    onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-                    name={name}
-                    {...sharedProps}>
+      <MantineButton ref={ref}
+                     form={form}
+                     onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+                     name={name}
+                     {...sharedProps}>
         {children}
-      </StyledButton>
+      </MantineButton>
     );
   });
 
