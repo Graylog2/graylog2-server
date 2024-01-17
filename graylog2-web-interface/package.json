@@ -164,7 +164,7 @@
     "json-loader": "^0.5.3",
     "less": "^4.1.2",
     "less-loader": "^11.0.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.3.2",
     "puppeteer": "^21.0.3",
     "react-bootstrap": "0.33.1",
     "style-loader": "3.3.3",
