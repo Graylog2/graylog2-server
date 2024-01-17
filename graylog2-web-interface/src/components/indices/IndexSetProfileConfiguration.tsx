@@ -17,12 +17,11 @@
 import React from 'react';
 import { styled } from 'styled-components';
 
-import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
-import type { Sort } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
+import useAllProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useAllProfiles';
 
 const StyledAlert = styled(Alert)`
   overflow: auto;
@@ -37,8 +36,7 @@ const StyledH3 = styled.h3`
 `;
 
 const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string, value: string, onChange: (value: string) => void }) => {
-  const { isLoading, data: { list } } = useProfiles({ pageSize: 100, page: 1, sort: { attributeId: 'name', direction: 'asc' } as Sort, query: '' }, { enabled: true });
-  const options = list.map(({ name: profileName, id }) => ({ value: id, label: profileName }));
+  const { isLoading, options } = useAllProfiles();
 
   return (
     <div>
