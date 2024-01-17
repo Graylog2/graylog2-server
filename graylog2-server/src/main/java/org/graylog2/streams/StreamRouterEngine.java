@@ -37,8 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Provider;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +188,7 @@ public class StreamRouterEngine {
             final StreamRuleType streamRuleType = streamRule.getType();
             final Stream.MatchingType matchingType = rule.getMatchingType();
             if (!ruleTypesNotNeedingFieldPresence.contains(streamRuleType)
-                && !message.hasField(streamRule.getField())) {
+                    && !message.hasField(streamRule.getField())) {
                 if (matchingType == Stream.MatchingType.AND) {
                     result.remove(rule.getStream());
                     // blacklist stream because it can't match anymore

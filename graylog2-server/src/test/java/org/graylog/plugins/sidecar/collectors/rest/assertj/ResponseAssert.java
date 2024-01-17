@@ -18,7 +18,7 @@ package org.graylog.plugins.sidecar.collectors.rest.assertj;
 
 import org.assertj.core.api.AbstractAssert;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 public class ResponseAssert extends AbstractAssert<ResponseAssert, Response> {
     public ResponseAssert(Response actual) {

@@ -42,23 +42,26 @@ import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 import java.util.Map;
 
@@ -123,7 +126,7 @@ public class SystemJobResource extends RestResource {
             @ApiResponse(code = 404, message = "Job not found.")
     })
     public SystemJobSummary get(@ApiParam(name = "jobId", required = true)
-                                   @PathParam("jobId") @NotEmpty String jobId) {
+                                @PathParam("jobId") @NotEmpty String jobId) {
         // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
         checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
 
@@ -217,7 +220,7 @@ public class SystemJobResource extends RestResource {
     @ApiOperation(value = "Acknowledge job with the given ID")
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_ACKNOWLEDGE)
     public Response acknowledgeJob(@Context UserContext userContext,
-                                                    @ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
+                                   @ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
         final int n = jobResourceHandlerService.acknowledgeJob(userContext, jobId);
         if (n < 1) {
             throw new NotFoundException("System job with ID <" + jobId + "> not found!");

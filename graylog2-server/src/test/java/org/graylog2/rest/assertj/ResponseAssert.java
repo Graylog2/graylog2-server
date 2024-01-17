@@ -18,7 +18,7 @@ package org.graylog2.rest.assertj;
 
 import org.assertj.core.api.AbstractAssert;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 public class ResponseAssert extends AbstractAssert<ResponseAssert, Response> {
     public ResponseAssert(Response actual) {
@@ -34,7 +34,7 @@ public class ResponseAssert extends AbstractAssert<ResponseAssert, Response> {
 
         final Response.Status.Family statusFamily = actual.getStatusInfo().getFamily();
 
-        if(statusFamily != Response.Status.Family.SUCCESSFUL) {
+        if (statusFamily != Response.Status.Family.SUCCESSFUL) {
             failWithMessage("Response was expected to be a success, but is <%s>", statusFamily);
         }
 

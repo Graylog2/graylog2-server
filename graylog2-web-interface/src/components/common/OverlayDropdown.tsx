@@ -14,48 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Overlay, Transition } from 'react-overlays';
-
-import { DropdownMenu } from 'components/common/index';
+import styled, { useTheme, css } from 'styled-components';
+import { Menu } from '@mantine/core';
 
 type Placement = 'top' | 'right' | 'bottom' | 'left';
 
-const ToggleDropdown = styled.span`
+const ToggleDropdown = styled.span<{ $alwaysShowCaret: boolean }>(({ $alwaysShowCaret }) => css`
   cursor: pointer;
 
-  .caret {
-    visibility: hidden;
-  }
+  ${$alwaysShowCaret ? '' : css`
+    .caret {
+      visibility: hidden;
+    }
 
-  &:hover .caret {
-    visibility: visible;
-  }
-`;
-
-const oppositePlacement = {
-  left: 'right',
-  right: 'left',
-};
-
-type _FilterProps = {
-  children: React.ReactElement,
-  style?: CSSStyleDeclaration
-};
-
-const FilterProps = ({ children, style }: _FilterProps) => (
-  <>{React.Children.map(children,
-    (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }))}
-  </>
-);
-
-FilterProps.defaultProps = {
-  style: {},
-};
+    &:hover .caret {
+      visibility: visible;
+    }
+  `}
+`);
 
 type Props = {
+  alwaysShowCaret?: boolean,
   children: React.ReactNode,
   closeOnSelect?: boolean,
   dropdownMinWidth?: number,
@@ -63,12 +44,12 @@ type Props = {
   menuContainer?: HTMLElement,
   onToggle: () => void,
   placement?: Placement,
-  renderToggle?: (payload: { onToggle: () => void, toggleTarget: React.Ref<HTMLButtonElement> }) => React.ReactNode,
   show: boolean,
   toggleChild?: React.ReactNode,
 }
 
 const OverlayDropdown = ({
+  alwaysShowCaret,
   children,
   closeOnSelect,
   dropdownMinWidth,
@@ -76,60 +57,50 @@ const OverlayDropdown = ({
   menuContainer,
   onToggle,
   placement,
-  renderToggle,
   show,
   toggleChild,
 }: Props) => {
-  const [currentPlacement, setCurrentPlacement] = useState<Placement>(placement);
   const toggleTarget = useRef<HTMLButtonElement>();
 
-  const handleOverlayEntering = (dropdownElem) => {
-    const dropdownOffsetLeft = dropdownElem.offsetLeft;
-    const dropdownWidth = dropdownElem.offsetWidth;
-    const overflowRight = dropdownOffsetLeft + dropdownWidth >= document.body.clientWidth;
-    const overflowLeft = dropdownOffsetLeft < 0;
-    const trimmedDropdown = (overflowLeft && currentPlacement === 'left') || (overflowRight && currentPlacement === 'right');
+  const theme = useTheme();
 
-    if (trimmedDropdown) {
-      setCurrentPlacement(oppositePlacement[currentPlacement] as Placement);
-    }
+  const styles = {
+    dropdown: {
+      minWidth: dropdownMinWidth,
+      backgroundColor: theme.colors.global.contentBackground,
+      border: `1px solid ${theme.colors.variant.lighter.default}`,
+      fontFamily: theme.fonts.family.body,
+      fontSize: theme.fonts.size.body,
+    },
   };
 
   return (
-    <>
-      {typeof renderToggle === 'function' ? renderToggle({ onToggle, toggleTarget }) : (
-        <ToggleDropdown onClick={onToggle}
+    <Menu opened={show}
+          withinPortal
+          position={placement}
+          closeOnClickOutside
+          closeOnItemClick={closeOnSelect}
+          styles={styles}
+          onClose={onToggle}
+          portalProps={{ target: menuContainer }}
+          zIndex={dropdownZIndex}>
+      <Menu.Target>
+        <ToggleDropdown $alwaysShowCaret={alwaysShowCaret}
+                        onClick={onToggle}
                         ref={toggleTarget}
                         role="presentation">
           {toggleChild}
         </ToggleDropdown>
-      )}
-      {show && (
-        <Overlay show={show}
-                 container={menuContainer}
-                 containerPadding={10}
-                 placement={currentPlacement}
-                 shouldUpdatePosition
-                 rootClose
-                 onHide={onToggle}
-                 target={() => toggleTarget.current}
-                 transition={Transition}
-                 onEntering={handleOverlayEntering}>
-          <FilterProps>
-            <DropdownMenu show={show}
-                          onMenuItemSelect={closeOnSelect ? onToggle : undefined}
-                          zIndex={dropdownZIndex}
-                          minWidth={dropdownMinWidth}>
-              {children}
-            </DropdownMenu>
-          </FilterProps>
-        </Overlay>
-      )}
-    </>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {children}
+      </Menu.Dropdown>
+    </Menu>
   );
 };
 
 OverlayDropdown.propTypes = {
+  alwaysShowCaret: PropTypes.bool,
   children: PropTypes.node.isRequired,
   closeOnSelect: PropTypes.bool,
   dropdownZIndex: PropTypes.number,
@@ -141,12 +112,12 @@ OverlayDropdown.propTypes = {
 };
 
 OverlayDropdown.defaultProps = {
+  alwaysShowCaret: false,
   closeOnSelect: true,
   dropdownMinWidth: undefined,
   dropdownZIndex: undefined,
   menuContainer: document.body,
   placement: 'bottom',
-  renderToggle: undefined,
   toggleChild: 'Toggle',
 };
 

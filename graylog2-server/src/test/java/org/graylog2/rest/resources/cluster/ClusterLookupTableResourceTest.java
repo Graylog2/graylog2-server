@@ -36,7 +36,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.HttpHeaders;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
@@ -236,13 +237,13 @@ public class ClusterLookupTableResourceTest {
                 .thenReturn(call);
 
         when(call.execute()).thenReturn(Response.error(
-                ResponseBody.create(null, "Resource Not Found"),
-                new okhttp3.Response.Builder() //
-                        .code(404)
-                        .message("Not Found")
-                        .protocol(Protocol.HTTP_1_1)
-                        .request(new Request.Builder().url("http://localhost/").build())
-                        .build()
+                        ResponseBody.create(null, "Resource Not Found"),
+                        new okhttp3.Response.Builder() //
+                                .code(404)
+                                .message("Not Found")
+                                .protocol(Protocol.HTTP_1_1)
+                                .request(new Request.Builder().url("http://localhost/").build())
+                                .build()
                 )
         );
     }

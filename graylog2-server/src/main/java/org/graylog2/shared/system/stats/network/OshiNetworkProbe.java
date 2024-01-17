@@ -25,7 +25,8 @@ import oshi.hardware.NetworkIF;
 import oshi.software.os.InternetProtocolStats;
 import oshi.software.os.NetworkParams;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;

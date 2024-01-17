@@ -23,6 +23,7 @@ import isEqual from 'lodash/isEqual';
 import last from 'lodash/last';
 import isInteger from 'lodash/isInteger';
 import moment from 'moment';
+import styled from 'styled-components';
 
 import {
   ControlLabel,
@@ -57,6 +58,10 @@ const defaultUnits = [
   'DAYS',
 ];
 const unitType = PropTypes.oneOf(unitValues);
+
+const StyledInputGroup = styled(InputGroup)`
+  display: flex;
+`;
 
 /**
  * Returns a duration and unit compatible with `TimeUnitInput` from a duration accepted by `moment.duration()`
@@ -250,7 +255,7 @@ const TimeUnitInput = createReactClass({
 
     const checkbox = (
       <InputGroup.Addon>
-        <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} />
+        <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} title="Toggle time" />
       </InputGroup.Addon>
     );
 
@@ -258,7 +263,7 @@ const TimeUnitInput = createReactClass({
       <FormGroup>
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
-          <InputGroup>
+          <StyledInputGroup>
             {(!required && !hideCheckbox) && checkbox}
             <FormControl type="number"
                          name={this.props.name}
@@ -274,7 +279,7 @@ const TimeUnitInput = createReactClass({
                             disabled={!this._isChecked()}>
               {options}
             </DropdownButton>
-          </InputGroup>
+          </StyledInputGroup>
           {help && <HelpBlock>{help}</HelpBlock>}
         </InputWrapper>
       </FormGroup>

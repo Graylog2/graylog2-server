@@ -24,7 +24,9 @@ import org.graylog.security.events.ActiveAuthServiceBackendChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 

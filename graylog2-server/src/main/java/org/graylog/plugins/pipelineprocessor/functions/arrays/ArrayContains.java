@@ -29,7 +29,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.List;
 

@@ -33,7 +33,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 
 public class GlobalIpLookupFunction extends AbstractGlobalLookupFunction {
@@ -75,10 +76,10 @@ public class GlobalIpLookupFunction extends AbstractGlobalLookupFunction {
         LOG.debug("Running global lookup for IP [{}] with prefix [{}].", ip, prefix);
 
         return matchEntityAgainstFunctions(this.ipFunctions, args, context, prefix);
-   }
+    }
 
-   @Override
-   boolean isEnabled(LookupTableFunction<? extends GenericLookupResult> function) {
+    @Override
+    boolean isEnabled(LookupTableFunction<? extends GenericLookupResult> function) {
         final ThreatIntelPluginConfiguration configuration = this.threatIntelPluginConfiguration();
         if (function.getClass().equals(TorExitNodeLookupFunction.class)) {
             return configuration.torEnabled();

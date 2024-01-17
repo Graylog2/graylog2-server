@@ -29,8 +29,9 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.Optional;
 import java.util.Set;
 

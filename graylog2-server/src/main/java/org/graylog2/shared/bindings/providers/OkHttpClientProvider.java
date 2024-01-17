@@ -31,10 +31,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -87,7 +89,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 .writeTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit())
                 .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
 
-        if(trustManagerAndSocketFactoryProvider != null) {
+        if (trustManagerAndSocketFactoryProvider != null) {
             // always set our own CA, might be overriden in later code
             clientBuilder.sslSocketFactory(trustManagerAndSocketFactoryProvider.getSslSocketFactory(), trustManagerAndSocketFactoryProvider.getTrustManager());
         }

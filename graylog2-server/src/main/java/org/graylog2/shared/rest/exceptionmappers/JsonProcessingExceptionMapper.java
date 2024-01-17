@@ -19,13 +19,13 @@ package org.graylog2.shared.rest.exceptionmappers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.graylog2.plugin.rest.ApiError;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static javax.ws.rs.core.Response.status;
+import static jakarta.ws.rs.core.Response.status;
 
 @Provider
 public class JsonProcessingExceptionMapper implements ExceptionMapper<JsonProcessingException> {

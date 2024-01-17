@@ -20,14 +20,16 @@ import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.PreMatching;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

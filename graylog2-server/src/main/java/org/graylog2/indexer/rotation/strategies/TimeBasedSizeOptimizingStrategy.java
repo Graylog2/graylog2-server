@@ -31,7 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.time.Duration;
 import java.time.Instant;
 
@@ -77,7 +79,7 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     @Override
     @Nonnull
     protected Result shouldRotate(final String index, IndexSet indexSet) {
-        final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(()-> new IllegalStateException("No index creation date"));
+        final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(() -> new IllegalStateException("No index creation date"));
         final Long sizeInBytes = indices.getStoreSizeInBytes(index).orElseThrow(() -> new IllegalStateException("No index size"));
 
         if (!(indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig config)) {

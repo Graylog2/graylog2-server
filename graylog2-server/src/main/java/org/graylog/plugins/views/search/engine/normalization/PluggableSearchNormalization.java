@@ -22,7 +22,8 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Set;
 

@@ -33,8 +33,8 @@ import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
@@ -92,61 +92,61 @@ public class ThrottleStateUpdaterThread extends Periodical {
                 new Gauge<Long>() {
                     @Override
                     public Long getValue() {
-                               return throttleState.appendEventsPerSec;
-                           }
-                       });
+                        return throttleState.appendEventsPerSec;
+                    }
+                });
         safelyRegister(metricRegistry,
-                       GlobalMetricNames.JOURNAL_READ_RATE,
-                       new Gauge<Long>() {
-                           @Override
-                           public Long getValue() {
-                               return throttleState.readEventsPerSec;
-                           }
-                       });
+                GlobalMetricNames.JOURNAL_READ_RATE,
+                new Gauge<Long>() {
+                    @Override
+                    public Long getValue() {
+                        return throttleState.readEventsPerSec;
+                    }
+                });
         safelyRegister(metricRegistry,
-                       GlobalMetricNames.JOURNAL_SEGMENTS,
-                       new Gauge<Integer>() {
-                           @Override
-                           public Integer getValue() {
-                               if (ThrottleStateUpdaterThread.this.journal == null) {
-                                   return 0;
-                               }
-                               return ThrottleStateUpdaterThread.this.journal.numberOfSegments();
-                           }
-                       });
+                GlobalMetricNames.JOURNAL_SEGMENTS,
+                new Gauge<Integer>() {
+                    @Override
+                    public Integer getValue() {
+                        if (ThrottleStateUpdaterThread.this.journal == null) {
+                            return 0;
+                        }
+                        return ThrottleStateUpdaterThread.this.journal.numberOfSegments();
+                    }
+                });
         safelyRegister(metricRegistry,
-                       GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES,
-                       new Gauge<Long>() {
-                           @Override
-                           public Long getValue() {
-                               return throttleState.uncommittedJournalEntries;
-                           }
-                       });
+                GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES,
+                new Gauge<Long>() {
+                    @Override
+                    public Long getValue() {
+                        return throttleState.uncommittedJournalEntries;
+                    }
+                });
         final Gauge<Long> sizeGauge = safelyRegister(metricRegistry,
-                                   GlobalMetricNames.JOURNAL_SIZE,
-                                   new Gauge<Long>() {
-                                       @Override
-                                       public Long getValue() {
-                                           return throttleState.journalSize;
-                                       }
-                                   });
+                GlobalMetricNames.JOURNAL_SIZE,
+                new Gauge<Long>() {
+                    @Override
+                    public Long getValue() {
+                        return throttleState.journalSize;
+                    }
+                });
         final Gauge<Long> sizeLimitGauge = safelyRegister(metricRegistry,
-                                        GlobalMetricNames.JOURNAL_SIZE_LIMIT,
-                                        new Gauge<Long>() {
-                                            @Override
-                                            public Long getValue() {
-                                                return throttleState.journalSizeLimit;
-                                            }
-                                        });
+                GlobalMetricNames.JOURNAL_SIZE_LIMIT,
+                new Gauge<Long>() {
+                    @Override
+                    public Long getValue() {
+                        return throttleState.journalSizeLimit;
+                    }
+                });
         safelyRegister(metricRegistry,
-                       GlobalMetricNames.JOURNAL_UTILIZATION_RATIO,
-                       new RatioGauge() {
-                           @Override
-                           protected Ratio getRatio() {
-                               return Ratio.of(sizeGauge.getValue(),
-                                               sizeLimitGauge.getValue());
-                           }
-                       });
+                GlobalMetricNames.JOURNAL_UTILIZATION_RATIO,
+                new RatioGauge() {
+                    @Override
+                    protected Ratio getRatio() {
+                        return Ratio.of(sizeGauge.getValue(),
+                                sizeLimitGauge.getValue());
+                    }
+                });
     }
 
     @Override
