@@ -29,6 +29,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -96,6 +100,18 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.9.0")) {
             fixNumberOfReplicaForMlPlugin();
         }
+        if (version().isOpenSearch()) {
+            fixDefaultNumberOfReplicasForIsmConfigs();
+        }
+    }
+
+    private void fixDefaultNumberOfReplicasForIsmConfigs() {
+        PutComposableIndexTemplateRequest request = new PutComposableIndexTemplateRequest();
+        request.name("ism-zero-replica-template");
+        request.indexTemplate(new ComposableIndexTemplate(List.of(".opendistro-ism-config"),
+                new Template(Settings.builder().put("number_of_replicas", 0).build(), null, null),
+                null, Long.MAX_VALUE, null, null));
+        openSearchClient().execute((client, requestOptions) -> client.indices().putIndexTemplate(request, requestOptions));
     }
 
     /**
