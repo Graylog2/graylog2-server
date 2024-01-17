@@ -29,6 +29,7 @@ const INITIAL_DATA: IndexSetFieldTypeProfile = {
   name: null,
   id: null,
   description: null,
+  indexSetIds: [],
 };
 
 const fetchIndexSetFieldTypeProfile = async (id: string) => {
@@ -39,6 +40,7 @@ const fetchIndexSetFieldTypeProfile = async (id: string) => {
     name: profile.name,
     description: profile.description,
     customFieldMappings: profile.custom_field_mappings,
+    indexSetIds: profile.index_set_ids,
   }));
 };
 

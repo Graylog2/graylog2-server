@@ -24,6 +24,7 @@ export type IndexSetFieldTypeProfileJson = {
   name: string,
   description: string,
   custom_field_mappings: Array<CustomFieldMapping>,
+  index_set_ids: Array<string>
 }
 
 export type IndexSetFieldTypeProfile = {
@@ -31,4 +32,7 @@ export type IndexSetFieldTypeProfile = {
   name: string,
   description: string,
   customFieldMappings: Array<CustomFieldMapping>,
+  indexSetIds: Array<string>
 }
+
+export type ProfileOptions = Array<{ value: string, label: string }>;

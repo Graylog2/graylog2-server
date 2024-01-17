@@ -49,9 +49,17 @@ const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
         name: profile.name,
         description: profile.description,
         customFieldMappings: profile.custom_field_mappings,
+        indexSetIds: profile.index_set_ids,
       })),
       pagination: { total },
-      attributes,
+      attributes: [...attributes, {
+        filterable: false,
+        id: 'index_set_ids',
+        searchable: false,
+        sortable: false,
+        title: 'Used in',
+        type: 'STRING',
+      }],
     }));
 };
 
