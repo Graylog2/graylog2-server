@@ -19,9 +19,10 @@ import React, { useState } from 'react';
 
 import { Button } from 'components/bootstrap';
 import { HoverForHelp } from 'components/common';
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
+import hasOverride from 'components/indices/helpers/hasOverride';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 
 type Props = {
   fieldType: IndexSetFieldType,
@@ -34,6 +35,7 @@ const FieldTypeActions = ({ fieldType, indexSetId, refetchFieldTypes }: Props) =
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
   const toggleEditModal = () => setShowEditModal((cur) => !cur);
+  const showResetButton = hasOverride(fieldType);
 
   return (
     <>
@@ -52,7 +54,7 @@ const FieldTypeActions = ({ fieldType, indexSetId, refetchFieldTypes }: Props) =
           )
       }
       </Button>
-      {fieldType.isCustom && (
+      {showResetButton && (
         <Button onClick={toggleResetModal}
                 role="button"
                 bsSize="xsmall"
