@@ -56,6 +56,8 @@ describe('ActionDropdown', () => {
 
     await userEvent.click(triggerButton);
 
+    await screen.findByRole('menuitem', { name: 'Foo' });
+
     expect(onClick).not.toHaveBeenCalled();
   });
 
