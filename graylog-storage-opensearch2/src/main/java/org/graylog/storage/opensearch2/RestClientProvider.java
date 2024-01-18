@@ -18,6 +18,10 @@ package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.CredentialsProvider;
@@ -30,10 +34,6 @@ import org.opensearch.client.RestClient;
 import org.opensearch.client.sniff.OpenSearchNodesSniffer;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
