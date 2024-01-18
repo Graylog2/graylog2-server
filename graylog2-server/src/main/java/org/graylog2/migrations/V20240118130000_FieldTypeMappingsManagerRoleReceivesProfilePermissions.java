@@ -38,7 +38,7 @@ public class V20240118130000_FieldTypeMappingsManagerRoleReceivesProfilePermissi
     @Override
     public void upgrade() {
         helpers.ensureBuiltinRole("Field Type Mappings Manager",
-                "Grants full control over custom field type mappings for all index sets (built-in)",
+                "Grants full control over custom field type mappings and field type profiles for all index sets (built-in)",
                 Set.of(RestPermissions.TYPE_MAPPINGS_CREATE,
                         RestPermissions.TYPE_MAPPINGS_DELETE,
                         RestPermissions.TYPE_MAPPINGS_EDIT,
