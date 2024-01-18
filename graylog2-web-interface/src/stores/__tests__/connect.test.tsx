@@ -75,7 +75,9 @@ SimpleComponentWithDummyStore.defaultProps = {
 
 describe('connect()', () => {
   beforeEach(() => {
-    SimpleStore.reset();
+    act(() => {
+      SimpleStore.reset();
+    });
   });
 
   it('does not do anything if no stores are provided', () => {
@@ -93,7 +95,10 @@ describe('connect()', () => {
   });
 
   it('connects component to store with state', () => {
-    SimpleStore.setValue(42);
+    act(() => {
+      SimpleStore.setValue(42);
+    });
+
     const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
     const wrapper = mount(<Component />);
 
@@ -106,7 +111,9 @@ describe('connect()', () => {
 
     expect(wrapper).toHaveText('No value.');
 
-    SimpleStore.setValue(42);
+    act(() => {
+      SimpleStore.setValue(42);
+    });
 
     expect(wrapper).toHaveText('Value is: 42');
 
@@ -114,7 +121,9 @@ describe('connect()', () => {
 
     expect(wrapper).toHaveText('Value is: 42');
 
-    SimpleStore.reset();
+    act(() => {
+      SimpleStore.reset();
+    });
 
     expect(wrapper).toHaveText('No value.');
   });
@@ -127,7 +136,9 @@ describe('connect()', () => {
     );
     const wrapper = mount(<Component />);
 
-    SimpleStore.setValue(42);
+    act(() => {
+      SimpleStore.setValue(42);
+    });
 
     expect(wrapper).toHaveText('Value is: 84');
   });
@@ -201,7 +212,9 @@ describe('connect()', () => {
 
       asMock(Component).mockClear();
 
-      update(next);
+      act(() => {
+        update(next);
+      });
 
       if (result) {
         expect(Component).toHaveBeenCalled();
