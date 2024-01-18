@@ -31,12 +31,13 @@ const Container = styled.div`
 `;
 
 const IndexSetProfile = () => {
-  const { name, id } = useIndexProfileWithMappingsByField();
+  const { name, id, description } = useIndexProfileWithMappingsByField();
   const [showSetModal, setShowSetModal] = useState(false);
   const toggleModal = () => setShowSetModal((cur) => !cur);
+  const title = id ? description : 'Field type mapping profile not set yet';
 
   return (
-    <Container>
+    <Container title={title}>
       <b>Field type mapping profile:</b>
       {id ? <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(id)}>{name}</Link> : <i>Not set</i>}
       <IconButton name="edit" onClick={toggleModal} title="Set field type profile" />

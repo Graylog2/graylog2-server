@@ -39,6 +39,7 @@ import {
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useIndexProfileWithMappingsByField
   from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
+import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 
 const getData = (list = [defaultField]) => (
   {
@@ -66,6 +67,7 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
     indexSets: [
       { id: '111', title: 'index set title' },
     ],
+    indexSet: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
   })]),
 }));
 
@@ -76,6 +78,7 @@ jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', ()
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile');
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField');
+jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions');
 
 jest.mock('use-query-params', () => ({
   ...jest.requireActual('use-query-params'),
@@ -119,8 +122,8 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useProfile).mockReturnValue({
       data: {
         customFieldMappings: [{ field: 'field-3', type: 'string' }],
-        name: 'My profile',
-        id: '111',
+        name: 'Profile 1',
+        id: 'profile-id-111',
         description: null,
         indexSetIds: [],
       },
@@ -133,6 +136,15 @@ describe('IndexSetFieldTypesList', () => {
       description: null,
       id: null,
       customFieldMappingsByField: {},
+    });
+
+    asMock(useProfileOptions).mockReturnValue({
+      options: [
+        { value: 'profile-id-111', label: 'Profile 1' },
+        { value: 'profile-id-222', label: 'Profile 2' },
+      ],
+      isLoading: false,
+      refetch: () => {},
     });
   });
 
@@ -245,7 +257,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexProfileWithMappingsByField).mockReturnValue({
         name: 'Profile-1',
         description: null,
-        id: '111',
+        id: 'profile-id-111',
         customFieldMappingsByField: { 'field-3': 'String type' },
       });
 
@@ -270,7 +282,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexProfileWithMappingsByField).mockReturnValue({
         name: 'Profile-1',
         description: null,
-        id: '111',
+        id: 'profile-id-111',
         customFieldMappingsByField: { 'field-2': 'Boolean' },
       });
 
@@ -312,7 +324,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexProfileWithMappingsByField).mockReturnValue({
         name: 'Profile-1',
         description: null,
-        id: '111',
+        id: 'profile-id-111',
         customFieldMappingsByField: { 'field-3': 'String' },
       });
 
@@ -355,7 +367,7 @@ describe('IndexSetFieldTypesList', () => {
       asMock(useIndexProfileWithMappingsByField).mockReturnValue({
         name: 'Profile-1',
         description: null,
-        id: '111',
+        id: 'profile-id-111',
         customFieldMappingsByField: { 'field-2': 'Boolean' },
       });
 
@@ -365,6 +377,69 @@ describe('IndexSetFieldTypesList', () => {
       fireEvent.click(originBadge);
 
       expect(tableRow).toHaveTextContent('Field type Boolean comes from the individual, custom field type mapping. It overrides not only possible mappings from the search engine index mapping, but also mapping field-2: Boolean present in profile Profile-1');
+    });
+  });
+
+  describe('Index filed type profile', () => {
+    it('shown profile name when index set has profile', async () => {
+      asMock(useIndexSetFieldTypes).mockReturnValue({
+        isLoading: false,
+        refetch: () => {},
+        data: getData([defaultField]),
+      });
+
+      asMock(useIndexProfileWithMappingsByField).mockReturnValue({
+        name: 'Profile-1',
+        description: 'Some profile description',
+        id: 'profile-id-111',
+        customFieldMappingsByField: { 'field-2': 'Boolean' },
+      });
+
+      renderIndexSetFieldTypesList();
+      const row = await screen.findByTitle('Some profile description');
+
+      expect(row).toHaveTextContent('Field type mapping profile:Profile-1');
+    });
+
+    it('shown Not set when index set has no profile', async () => {
+      asMock(useIndexSetFieldTypes).mockReturnValue({
+        isLoading: false,
+        refetch: () => {},
+        data: getData([defaultField]),
+      });
+
+      asMock(useIndexProfileWithMappingsByField).mockReturnValue({
+        name: null,
+        description: null,
+        id: null,
+        customFieldMappingsByField: null,
+      });
+
+      renderIndexSetFieldTypesList();
+      const row = await screen.findByTitle('Field type mapping profile not set yet');
+
+      expect(row).toHaveTextContent('Field type mapping profile:Not set');
+    });
+
+    it('shows set profile modal on button click', async () => {
+      asMock(useIndexSetFieldTypes).mockReturnValue({
+        isLoading: false,
+        refetch: () => {},
+        data: getData([defaultField]),
+      });
+
+      asMock(useIndexProfileWithMappingsByField).mockReturnValue({
+        name: null,
+        description: null,
+        id: null,
+        customFieldMappingsByField: null,
+      });
+
+      renderIndexSetFieldTypesList();
+      const button = await screen.findByTitle('Set field type profile');
+      fireEvent.click(button);
+      const modal = await screen.findByTestId('modal-form');
+      await within(modal).findByRole('button', { name: /Set Profile/i, hidden: true });
     });
   });
 });
