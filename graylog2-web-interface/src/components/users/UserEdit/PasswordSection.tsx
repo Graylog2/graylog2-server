@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -74,6 +75,7 @@ const PasswordGroup = () => {
                        help="Passwords must be at least 6 characters long. We recommend using a strong password."
                        maxLength={100}
                        minLength={6}
+                       autoComplete="new-password"
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        required />
@@ -82,12 +84,17 @@ const PasswordGroup = () => {
                        type="password"
                        minLength={6}
                        maxLength={100}
+                       autoComplete="new-password"
                        required
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9" />
     </>
   );
 };
+
+const InvisibleInput = styled.input`
+  display: none;
+`;
 
 const PasswordSection = ({ user: { id } }: Props) => {
   const currentUser = useCurrentUser();
@@ -105,11 +112,13 @@ const PasswordSection = ({ user: { id } }: Props) => {
               initialValues={{}}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
+            <InvisibleInput readOnly id="username" autoComplete="username" type={isCloud ? 'email' : undefined} value={isCloud ? currentUser.email : currentUser.username} />
             {requiresOldPassword && (
               <FormikFormGroup label="Old Password"
                                name="old_password"
                                type="password"
                                maxLength={100}
+                               autoComplete="current-password"
                                required
                                labelClassName="col-sm-3"
                                wrapperClassName="col-sm-9" />
