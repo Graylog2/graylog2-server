@@ -46,7 +46,11 @@ const position = (pullRight: boolean, dropup: boolean): 'top' | 'bottom' | 'top-
 
 const DropdownButton = ({ buttonTitle, children, closeOnItemClick, dropup, title, onMouseDown, onToggle, pullRight, noCaret, keepMounted, ...rest }: Props) => (
   <Menu position={position(pullRight, dropup)} onChange={onToggle} keepMounted={keepMounted} closeOnItemClick={closeOnItemClick}>
-    <Menu.Target><Button onClick={onMouseDown} {...rest} title={buttonTitle}>{title}{noCaret ? null : <>{' '}<Icon name="caret-down" /></>}</Button></Menu.Target>
+    <Menu.Target>
+      <Button onClick={onMouseDown} aria-label={buttonTitle} {...rest} title={buttonTitle}>
+        {title}{noCaret ? null : <>{' '}<Icon name="caret-down" /></>}
+      </Button>
+    </Menu.Target>
     <Menu.Dropdown>{children}</Menu.Dropdown>
   </Menu>
 );
