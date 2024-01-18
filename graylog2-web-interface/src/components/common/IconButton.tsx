@@ -49,6 +49,7 @@ type Props = {
   className?: string,
   name: IconName,
   disabled?: boolean,
+  'data-testid'?: string
 };
 
 const handleClick = (onClick) => {
@@ -57,8 +58,15 @@ const handleClick = (onClick) => {
   }
 };
 
-const IconButton = React.forwardRef<HTMLButtonElement, Props>(({ title, onClick, focusable, className, disabled, ...rest }: Props, ref) => (
-  <Wrapper ref={ref} tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button" disabled={disabled}>
+const IconButton = React.forwardRef<HTMLButtonElement, Props>(({ title, onClick, focusable, className, disabled, 'data-testid': dataTestId, ...rest }: Props, ref) => (
+  <Wrapper ref={ref}
+           tabIndex={focusable ? 0 : -1}
+           data-testid={dataTestId}
+           title={title}
+           onClick={() => handleClick(onClick)}
+           className={className}
+           type="button"
+           disabled={disabled}>
     <Icon {...rest} />
   </Wrapper>
 ));
@@ -77,6 +85,7 @@ IconButton.defaultProps = {
   title: undefined,
   name: undefined,
   disabled: false,
+  'data-testid': undefined,
 };
 
 export default IconButton;
