@@ -106,7 +106,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
   private readonly userTimezone: string;
 
-  private readonly view: View;
+  private readonly view: View | undefined;
 
   constructor(
     completers: Array<Completer>,
@@ -114,7 +114,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     streams: Array<string>,
     fieldTypes: FieldTypes,
     userTimezone: string,
-    view: View,
+    view?: View,
   ) {
     this.completers = completers;
     this.timeRange = timeRange;

@@ -32,6 +32,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { OrderedMap } from 'immutable';
 import { v4 as uuidv4 } from 'uuid';
 
+import usePluginEntities from 'hooks/usePluginEntities';
 import { MultiSelect, TimeUnitInput } from 'components/common';
 import connect from 'stores/connect';
 import Query from 'views/logic/queries/Query';
@@ -351,9 +352,8 @@ class FilterForm extends React.Component {
     const allStreamIds = union(streams.map((s) => s.id), defaultTo(eventDefinition.config.streams, []));
     const formattedStreams = this.formatStreamIds(allStreamIds);
 
-    const searchBarControls = PluginStore.exports('views.components.searchBar') ?? [];
-    const existingControls = searchBarControls.map((controlFn) => controlFn()).filter((control) => !!control);
-    const searchFiltersPlugin = existingControls.filter(({ id }) => id === 'search-filters');
+    const searchFormControls = usePluginEntities('eventDefinitions.components.searchForm');
+    const pluggableControls = searchFormControls.map((controlFn) => controlFn()).filter((control) => !!control);
 
     return (
       <fieldset>
@@ -379,7 +379,7 @@ class FilterForm extends React.Component {
           <div style={{ maring: '8px 0' }}>
             <Formik onSubmit={({ searchFilters }) => this.handleSearchFiltersChange(searchFilters)}
                     initialValues={{ searchFilters: this.getInitialSearchFilters() }}>
-              {() => renderControls(searchFiltersPlugin)}
+              {() => renderControls(pluggableControls)}
             </Formik>
           </div>
         </FormGroup>
