@@ -150,10 +150,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String TYPE_MAPPINGS_DELETE = "typemappings:delete";
     public static final String TYPE_MAPPINGS_EDIT = "typemappings:edit";
     public static final String TYPE_MAPPINGS_READ = "typemappings:read";
-    public static final String PROFILES_CREATE = "profiles:create";
-    public static final String PROFILES_DELETE = "profiles:delete";
-    public static final String PROFILES_EDIT = "profiles:edit";
-    public static final String PROFILES_READ = "profiles:read";
+    public static final String PROFILES_CREATE = "mappingprofiles:create";
+    public static final String PROFILES_DELETE = "mappingprofiles:delete";
+    public static final String PROFILES_EDIT = "mappingprofiles:edit";
+    public static final String PROFILES_READ = "mappingprofiles:read";
     public static final String URL_WHITELIST_READ = "urlwhitelist:read";
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
