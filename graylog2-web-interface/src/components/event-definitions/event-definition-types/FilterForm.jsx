@@ -352,7 +352,7 @@ class FilterForm extends React.Component {
     const allStreamIds = union(streams.map((s) => s.id), defaultTo(eventDefinition.config.streams, []));
     const formattedStreams = this.formatStreamIds(allStreamIds);
 
-    const searchFormControls = usePluginEntities('eventDefinitions.components.searchForm');
+    const searchFormControls = PluginStore.exports('eventDefinitions.components.searchForm') ?? [];
     const pluggableControls = searchFormControls.map((controlFn) => controlFn()).filter((control) => !!control);
 
     return (
