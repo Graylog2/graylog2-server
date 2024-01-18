@@ -121,6 +121,24 @@ public class IndexFieldTypeProfileServiceTest {
         assertEquals(updatedProfile, toTest.get(profile.id()).get());
     }
 
+    @Test
+    public void testAllProfilesRetrieval() {
+        final IndexFieldTypeProfile profile1 = new IndexFieldTypeProfile("123400000000000000000001", "xx", "xxxxxx", new CustomFieldMappings());
+        toTest.save(profile1);
+        final IndexFieldTypeProfile profile2 = new IndexFieldTypeProfile("123400000000000000000002", "aa", "aaaaaa", new CustomFieldMappings());
+        toTest.save(profile2);
+        final IndexFieldTypeProfile profile3 = new IndexFieldTypeProfile("123400000000000000000003", "ax", "aaaxxxxx", new CustomFieldMappings());
+        toTest.save(profile3);
+
+        final List<IndexFieldTypeProfileIdAndName> all = toTest.getAll();
+
+        assertEquals(List.of(
+                        new IndexFieldTypeProfileIdAndName("123400000000000000000002", "aa"),
+                        new IndexFieldTypeProfileIdAndName("123400000000000000000003", "ax"),
+                        new IndexFieldTypeProfileIdAndName("123400000000000000000001", "xx")
+                ),
+                all);
+    }
 
     @Test
     public void testPagination() {

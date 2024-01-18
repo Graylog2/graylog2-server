@@ -16,7 +16,6 @@
  */
 export { default as Alert } from './Alert';
 export { default as Badge } from './Badge';
-export { default as BootstrapMenuItem } from './BootstrapMenuItem';
 export { default as BootstrapModalConfirm } from './BootstrapModalConfirm';
 export { default as BootstrapModalForm } from './BootstrapModalForm';
 export { default as BootstrapModalWrapper } from './BootstrapModalWrapper';

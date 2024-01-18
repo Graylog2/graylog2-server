@@ -18,32 +18,75 @@ package org.graylog2.indexer.fieldtypes.utils;
 
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.plugin.Message;
+import org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
+import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
+import static org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin.INDEX;
+import static org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin.OVERRIDDEN_INDEX;
+import static org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin.OVERRIDDEN_PROFILE;
+import static org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin.PROFILE;
+
 public class FieldTypeDTOsMerger {
 
-    public Collection<FieldTypeDTO> merge(final Collection<FieldTypeDTO> fromNewerIndex,
-                                          final Collection<FieldTypeDTO> fromOlderIndex,
-                                          final CustomFieldMappings customFieldMappings) {
-        Map<String, FieldTypeDTO> result = new HashMap<>();
+    public Collection<IndexSetFieldType> merge(final Collection<FieldTypeDTO> fromNewerIndex,
+                                               final Collection<FieldTypeDTO> fromOlderIndex,
+                                               final CustomFieldMappings customFieldMappings,
+                                               final IndexFieldTypeProfile profile) {
+        Map<String, IndexSetFieldType> result = new HashMap<>();
         if (fromNewerIndex != null) {
-            fromNewerIndex.forEach(dto -> result.put(dto.fieldName(), dto));
+            fromNewerIndex.forEach(dto -> result.put(
+                            dto.fieldName(),
+                            toIndexSetFieldType(dto, INDEX)
+                    )
+            );
         }
         if (fromOlderIndex != null) {
-            fromOlderIndex.forEach(dto -> result.putIfAbsent(dto.fieldName(), dto));
+            fromOlderIndex.forEach(dto -> result.putIfAbsent(
+                            dto.fieldName(),
+                            toIndexSetFieldType(dto, INDEX)
+                    )
+            );
+        }
+        if (profile != null) {
+            profile.customFieldMappings().forEach(profileMapping ->
+                    result.put(
+                            profileMapping.fieldName(),
+                            toIndexSetFieldType(profileMapping.toFieldTypeDTO(), PROFILE)
+                    )
+            );
         }
         if (customFieldMappings != null) {
-            customFieldMappings.forEach(customFieldMapping ->
-                    result.put(
-                            customFieldMapping.fieldName(),
-                            customFieldMapping.toFieldTypeDTO()
-                    )
+            customFieldMappings.forEach(customFieldMapping -> {
+                        final IndexSetFieldType indexSetFieldTypeFromPrevSources = result.get(customFieldMapping.fieldName());
+                        result.put(
+                                customFieldMapping.fieldName(),
+                                toIndexSetFieldType(
+                                        customFieldMapping.toFieldTypeDTO(),
+                                        indexSetFieldTypeFromPrevSources != null && indexSetFieldTypeFromPrevSources.origin() == PROFILE
+                                                ? OVERRIDDEN_PROFILE : OVERRIDDEN_INDEX
+                                )
+
+                        );
+                    }
             );
         }
 
         return result.values();
+    }
+
+    private IndexSetFieldType toIndexSetFieldType(final FieldTypeDTO fieldTypeDTO, final FieldTypeOrigin origin) {
+        return new IndexSetFieldType(
+                fieldTypeDTO.fieldName(),
+                REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType())),
+                origin,
+                Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldTypeDTO.fieldName()));
     }
 }
