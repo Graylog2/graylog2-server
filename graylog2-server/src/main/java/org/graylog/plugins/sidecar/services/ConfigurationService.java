@@ -17,7 +17,6 @@
 package org.graylog.plugins.sidecar.services;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Template;
@@ -75,11 +74,9 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         this.templateConfiguration = createTemplateConfiguration(new MongoDbTemplateLoader(db));
         this.configurationVariableService = configurationVariableService;
 
-        DBCollection collection = db.getDB().getCollection(COLLECTION_NAME);
-
-        collection.createIndex(new BasicDBObject(Configuration.FIELD_ID, 1));
-        collection.createIndex(new BasicDBObject(Configuration.FIELD_COLLECTOR_ID, 1));
-        collection.createIndex(new BasicDBObject(Configuration.FIELD_TAGS, 1));
+        db.createIndex(new BasicDBObject(Configuration.FIELD_ID, 1));
+        db.createIndex(new BasicDBObject(Configuration.FIELD_COLLECTOR_ID, 1));
+        db.createIndex(new BasicDBObject(Configuration.FIELD_TAGS, 1));
     }
 
     private freemarker.template.Configuration createTemplateConfiguration(TemplateLoader templateLoader) {

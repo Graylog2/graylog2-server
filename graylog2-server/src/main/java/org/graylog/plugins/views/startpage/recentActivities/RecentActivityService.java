@@ -65,8 +65,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
                         .add("capped", true)
                         .add("size", maximum * 1024)
                         .add("max", maximum)
-                        .get(),
-                null );
+                        .get());
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.eventBus = eventBus;
@@ -106,7 +105,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         // show the most recent activities first
         var sort = getSortBuilder("desc", RecentActivityDTO.FIELD_TIMESTAMP);
         // no permission check for local admin
-        if(user.getUser().isLocalAdmin()) {
+        if (user.getUser().isLocalAdmin()) {
             return findPaginatedWithQueryAndSort(DBQuery.empty(), sort, page, perPage);
         }
 

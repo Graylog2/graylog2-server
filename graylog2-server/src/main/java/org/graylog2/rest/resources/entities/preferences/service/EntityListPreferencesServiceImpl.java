@@ -41,8 +41,7 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(ENTITY_LIST_PREFERENCES_MONGO_COLLECTION_NAME),
                 StoredEntityListPreferences.class,
                 StoredEntityListPreferencesId.class,
-                mapper.get(),
-                null);
+                mapper.get());
 
     }
 
@@ -54,7 +53,7 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
     @Override
     public boolean save(final StoredEntityListPreferences preferences) {
         final WriteResult<StoredEntityListPreferences, StoredEntityListPreferencesId> save = db.save(preferences);
-        return save.getWriteResult().getN() > 0;
+        return save.getN() > 0;
     }
 
     @Override

@@ -27,8 +27,8 @@ import org.joda.time.DateTime;
 import org.mongojack.DBQuery;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
+import org.mongojack.UpdateOperationValue;
 import org.mongojack.internal.update.SingleUpdateOperationValue;
-import org.mongojack.internal.update.UpdateOperationValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

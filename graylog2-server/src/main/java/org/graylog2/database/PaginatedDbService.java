@@ -61,40 +61,28 @@ public abstract class PaginatedDbService<DTO> {
                                  MongoJackObjectMapperProvider mapper,
                                  Class<DTO> dtoClass,
                                  String collectionName) {
-        this(mongoConnection, mapper, dtoClass, collectionName, null);
-    }
-
-    protected PaginatedDbService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper,
-                                 Class<DTO> dtoClass,
-                                 String collectionName,
-                                 Class<?> view) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(collectionName),
                 dtoClass,
                 ObjectId.class,
-                mapper.get(),
-                view);
+                mapper.get());
     }
 
     protected PaginatedDbService(MongoConnection mongoConnection,
                                  MongoJackObjectMapperProvider mapper,
                                  Class<DTO> dtoClass,
                                  String collectionName,
-                                 @Nullable DBObject dbOptions,
-                                 @Nullable Class<?> view) {
+                                 @Nullable DBObject dbOptions) {
         DBCollection dbCollection;
         if (!mongoConnection.getDatabase().collectionExists(collectionName)) {
             dbCollection = mongoConnection.getDatabase().createCollection(collectionName, dbOptions);
-        }
-        else {
+        } else {
             dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         }
 
         this.db = JacksonDBCollection.wrap(dbCollection,
                 dtoClass,
                 ObjectId.class,
-                mapper.get(),
-                view);
+                mapper.get());
     }
 
     /**
@@ -189,11 +177,11 @@ public abstract class PaginatedDbService<DTO> {
 
 
     protected PaginatedList<DTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(DBQuery.Query query,
-                                                                     Predicate<DTO> filter,
-                                                                     DBSort.SortBuilder sort,
-                                                                     DBQuery.Query grandTotalQuery,
-                                                                     int page,
-                                                                     int perPage) {
+                                                                                   Predicate<DTO> filter,
+                                                                                   DBSort.SortBuilder sort,
+                                                                                   DBQuery.Query grandTotalQuery,
+                                                                                   int page,
+                                                                                   int perPage) {
         // Calculate the total amount of items matching the query/filter, but before pagination
         final long total;
         try (final Stream<DTO> cursor = streamQueryWithSort(query, sort)) {
@@ -320,12 +308,12 @@ public abstract class PaginatedDbService<DTO> {
      * @return
      */
     public static <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
-        if(pageSize <= 0 || page <= 0) {
+        if (pageSize <= 0 || page <= 0) {
             throw new IllegalArgumentException("invalid page size: " + pageSize);
         }
 
         int fromIndex = (page - 1) * pageSize;
-        if(sourceList == null || sourceList.size() <= fromIndex){
+        if (sourceList == null || sourceList.size() <= fromIndex) {
             return Collections.emptyList();
         }
 

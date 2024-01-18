@@ -59,10 +59,10 @@ public class MongoIndexSetService implements IndexSetService {
                                 ClusterConfigService clusterConfigService,
                                 ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                IndexSetConfig.class,
-                ObjectId.class,
-                objectMapperProvider.get()),
+                        mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
+                        IndexSetConfig.class,
+                        ObjectId.class,
+                        objectMapperProvider.get()),
                 streamService,
                 clusterConfigService,
                 clusterEventBus);
@@ -78,8 +78,8 @@ public class MongoIndexSetService implements IndexSetService {
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = requireNonNull(clusterEventBus);
 
-        this.collection.getDbCollection().createIndex(DBSort.asc(IndexSetConfig.FIELD_INDEX_PREFIX), null, true);
-        this.collection.getDbCollection().createIndex(DBSort.desc(IndexSetConfig.FIELD_CREATION_DATE));
+        this.collection.createIndex(DBSort.asc(IndexSetConfig.FIELD_INDEX_PREFIX), null, true);
+        this.collection.createIndex(DBSort.desc(IndexSetConfig.FIELD_CREATION_DATE));
     }
 
     /**

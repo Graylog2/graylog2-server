@@ -16,6 +16,7 @@
  */
 package org.graylog.scheduler;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
@@ -23,7 +24,6 @@ import com.mongodb.client.model.Updates;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentWriter;
 import org.bson.codecs.EncoderContext;
-import org.graylog.shaded.mongojack4.org.mongojack.JacksonMongoCollection;
 import org.graylog2.database.MongoCollections;
 
 import javax.inject.Inject;
@@ -38,11 +38,11 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * TODO: Remove once DBJobDefinitionService is migrated to the new mongojack version.
  */
 public class DBCustomJobDefinitionService {
-    private final JacksonMongoCollection<JobDefinitionDto> db;
+    private final MongoCollection<JobDefinitionDto> db;
 
     @Inject
     public DBCustomJobDefinitionService(MongoCollections collections) {
-        this.db = (JacksonMongoCollection<JobDefinitionDto>) collections.get(DBJobDefinitionService.COLLECTION_NAME, JobDefinitionDto.class);
+        this.db = collections.get(DBJobDefinitionService.COLLECTION_NAME, JobDefinitionDto.class);
     }
 
     public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {

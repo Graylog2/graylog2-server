@@ -18,13 +18,12 @@ package org.graylog2.database;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.UuidRepresentation;
-import org.graylog.shaded.mongojack4.org.mongojack.JacksonMongoCollection;
-import org.graylog.shaded.mongojack4.org.mongojack.internal.MongoJackModule;
 import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import org.mongojack.JacksonMongoCollection;
+import org.mongojack.internal.MongoJackModule;
 
 @Singleton
 public class MongoCollections {
@@ -49,6 +48,13 @@ public class MongoCollections {
      * </b>
      */
     public <T> MongoCollection<T> get(String collectionName, Class<T> valueType) {
+        return JacksonMongoCollection.builder()
+                .withObjectMapper(objectMapper)
+                .build(mongoConnection.getMongoDatabase(), collectionName, valueType, UuidRepresentation.UNSPECIFIED);
+    }
+
+    @Deprecated
+    public <T> JacksonMongoCollection<T> getLegacy(String collectionName, Class<T> valueType) {
         return JacksonMongoCollection.builder()
                 .withObjectMapper(objectMapper)
                 .build(mongoConnection.getMongoDatabase(), collectionName, valueType, UuidRepresentation.UNSPECIFIED);
