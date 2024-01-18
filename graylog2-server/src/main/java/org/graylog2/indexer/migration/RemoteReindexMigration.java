@@ -1,6 +1,7 @@
 package org.graylog2.indexer.migration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -13,6 +14,7 @@ import java.util.Collection;
 @AutoValue
 @JsonDeserialize(builder = RemoteReindexMigration.Builder.class)
 @WithBeanGetter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class RemoteReindexMigration {
     private static final String FIELD_STATUS = "status";
     private static final String FIELD_INDICES = "indices";

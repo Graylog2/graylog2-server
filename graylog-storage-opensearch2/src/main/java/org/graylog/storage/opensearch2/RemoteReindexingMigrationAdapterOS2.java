@@ -24,7 +24,6 @@ import jakarta.inject.Inject;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
@@ -77,7 +76,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final IndexSetRegistry indexSetRegistry;
     private final ClusterEventBus eventBus;
 
-    private RemoteReindexMigration remoteReindexMigration = RemoteReindexMigration.builder().status(Status.STARTING).indices(List.of()).build();
+    // TODO: convert this to a proper job that supports saving state to MongoDB etc. and picks up after a restart
+    // TODO: maybe also make re-indexing sequential
+    private static RemoteReindexMigration remoteReindexMigration = RemoteReindexMigration.builder().status(Status.STARTING).indices(List.of()).build();
 
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
