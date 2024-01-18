@@ -17,7 +17,6 @@
 package org.graylog.datanode.bindings;
 
 import com.google.common.util.concurrent.ServiceManager;
-import org.graylog.datanode.metrics.NoopStreamService;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog2.plugin.inject.Graylog2Module;

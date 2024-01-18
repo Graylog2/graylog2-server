@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.metrics;
+package org.graylog.datanode.bindings;
 
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
