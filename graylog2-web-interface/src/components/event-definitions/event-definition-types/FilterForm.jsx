@@ -32,7 +32,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { OrderedMap } from 'immutable';
 import { v4 as uuidv4 } from 'uuid';
 
-import usePluginEntities from 'hooks/usePluginEntities';
 import { MultiSelect, TimeUnitInput } from 'components/common';
 import connect from 'stores/connect';
 import Query from 'views/logic/queries/Query';
