@@ -22,7 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
-import { profile1JSON, profile1 } from 'fixtures/indexSetFieldTypeProfiles';
+import { requestBodyProfile1, requestBodyProfile1JSON } from 'fixtures/indexSetFieldTypeProfiles';
 
 const urlPrefix = '/system/indices/index_sets/profiles';
 
@@ -43,9 +43,9 @@ jest.mock('util/UserNotification', () => ({
 describe('useProfileMutations', () => {
   describe('editProfile', () => {
     const putUrl = qualifyUrl(`${urlPrefix}`);
-    const requestBody = profile1;
+    const requestBody = requestBodyProfile1;
 
-    const requestBodyJSON = profile1JSON;
+    const requestBodyJSON = requestBodyProfile1JSON;
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
@@ -78,9 +78,9 @@ describe('useProfileMutations', () => {
 
   describe('createProfile', () => {
     const postUrl = qualifyUrl(`${urlPrefix}`);
-    const requestBody = profile1;
+    const requestBody = requestBodyProfile1;
 
-    const requestBodyJSON = omit(profile1JSON, ['id']);
+    const requestBodyJSON = omit(requestBodyProfile1JSON, ['id']);
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));

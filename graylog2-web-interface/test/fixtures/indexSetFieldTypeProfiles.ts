@@ -14,11 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Attributes } from 'stores/PaginationTypes';
+import omit from 'lodash/omit';
+
+import type { Attribute, Attributes } from 'stores/PaginationTypes';
 
 export const profile1JSON = {
   custom_field_mappings: [{ field: 'http_method', type: 'string' }, { field: 'user_ip', type: 'ip' }],
   name: 'Profile 1',
+  index_set_ids: [],
   description: 'Description 1',
   id: '111',
 };
@@ -26,6 +29,7 @@ export const profile2JSON = {
   custom_field_mappings: [{ field: 'user_name', type: 'string' }, { field: 'logged_in', type: 'bool' }, { field: 'sum', type: 'int' }],
   name: 'Profile 2',
   description: 'Description 2',
+  index_set_ids: [],
   id: '222',
 };
 
@@ -33,6 +37,7 @@ export const profile1 = {
   customFieldMappings: [{ field: 'http_method', type: 'string' }, { field: 'user_ip', type: 'ip' }],
   name: 'Profile 1',
   description: 'Description 1',
+  indexSetIds: [],
   id: '111',
 };
 export const profile2 = {
@@ -42,10 +47,18 @@ export const profile2 = {
     { field: 'sum', type: 'int' },
   ],
   name: 'Profile 2',
+  indexSetIds: [],
   description: 'Description 2',
   id: '222',
 };
 
+export const indexSetsAttribute: Attribute = {
+  id: 'index_set_ids',
+  searchable: false,
+  sortable: false,
+  title: 'Used in',
+  type: 'STRING',
+};
 export const attributes: Attributes = [
   {
     id: 'id',
@@ -76,4 +89,10 @@ export const attributes: Attributes = [
     type: 'STRING',
     sortable: false,
   },
+  indexSetsAttribute,
 ];
+
+export const requestBodyProfile1 = omit(profile1, 'indexSetIds');
+export const requestBodyProfile2 = omit(profile2, 'indexSetIds');
+export const requestBodyProfile1JSON = omit(profile1JSON, 'index_set_ids');
+export const requestBodyProfile2JSON = omit(profile2JSON, 'index_set_ids');

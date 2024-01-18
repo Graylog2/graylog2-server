@@ -16,6 +16,7 @@
  */
 import React, { useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import omit from 'lodash/omit';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -40,7 +41,7 @@ const EditProfile = ({
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
   const onSubmit = useCallback((newProfile: IndexSetFieldTypeProfile) => {
-    editProfile(newProfile).then(() => {
+    editProfile(omit(newProfile, 'indexSetIds')).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT, {
         app_pathname: telemetryPathName,
         app_action_value: { mappingsQuantity: newProfile?.customFieldMappings?.length },

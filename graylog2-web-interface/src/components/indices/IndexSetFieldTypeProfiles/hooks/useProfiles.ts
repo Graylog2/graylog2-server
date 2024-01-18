@@ -53,7 +53,6 @@ const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
       })),
       pagination: { total },
       attributes: [...attributes, {
-        filterable: false,
         id: 'index_set_ids',
         searchable: false,
         sortable: false,

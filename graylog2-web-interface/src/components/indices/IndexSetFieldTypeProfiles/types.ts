@@ -20,11 +20,11 @@ export type CustomFieldMapping = {
   type: string,
 }
 export type IndexSetFieldTypeProfileJson = {
-  id?: string,
+  id: string,
   name: string,
   description: string,
   custom_field_mappings: Array<CustomFieldMapping>,
-  index_set_ids: Array<string>
+  index_set_ids?: Array<string>
 }
 
 export type IndexSetFieldTypeProfile = {
@@ -33,6 +33,20 @@ export type IndexSetFieldTypeProfile = {
   description: string,
   customFieldMappings: Array<CustomFieldMapping>,
   indexSetIds: Array<string>
+}
+
+export type IndexSetFieldTypeProfileRequest = {
+  id?: string,
+  name: string,
+  description: string,
+  customFieldMappings: Array<CustomFieldMapping>,
+}
+
+export type IndexSetFieldTypeProfileRequestJson = {
+  id?: string,
+  name: string,
+  description: string,
+  custom_field_mappings: Array<CustomFieldMapping>,
 }
 
 export type ProfileOptions = Array<{ value: string, label: string }>;

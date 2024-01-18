@@ -122,9 +122,17 @@ describe('IndexSetFieldTypesList', () => {
         name: 'My profile',
         id: '111',
         description: null,
+        indexSetIds: [],
       },
       isFetched: true,
       refetch: () => {},
+    });
+
+    asMock(useIndexProfileWithMappingsByField).mockReturnValue({
+      name: null,
+      description: null,
+      id: null,
+      customFieldMappingsByField: {},
     });
   });
 
@@ -301,6 +309,13 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     it('for origin profile', async () => {
+      asMock(useIndexProfileWithMappingsByField).mockReturnValue({
+        name: 'Profile-1',
+        description: null,
+        id: '111',
+        customFieldMappingsByField: { 'field-3': 'String' },
+      });
+
       asMock(useIndexSetFieldTypes).mockReturnValue({
         isLoading: false,
         refetch: () => {},
