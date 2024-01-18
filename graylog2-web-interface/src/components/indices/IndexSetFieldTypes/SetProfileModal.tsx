@@ -21,12 +21,14 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { Select } from 'components/common';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { ModalSubmit, Select } from 'components/common';
+import { Button, Input, Modal } from 'components/bootstrap';
 import useParams from 'routing/useParams';
 import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
+import useRemoveProfileFromIndexMutation
+  from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -49,6 +51,7 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
   const [rotated, setRotated] = useState(true);
   const [profile, setProfile] = useState(null);
   const { setIndexSetFieldTypeProfile, isLoading } = useSetIndexSetProfileMutation();
+  const { removeProfileFromIndex, isLoading: isProfileRemoving } = useRemoveProfileFromIndexMutation();
   const { options, isLoading: profileOptionsIsLoading } = useProfileOptions();
 
   const sendTelemetry = useSendTelemetry();
@@ -73,6 +76,22 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
     });
   }, [setIndexSetFieldTypeProfile, indexSetId, rotated, profile, sendTelemetry, telemetryPathName, onClose]);
 
+  const onRemoveProfileFromIndex = useCallback(() => {
+    removeProfileFromIndex({ indexSetId, rotated }).then(() => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_CHANGED, {
+        app_pathname: telemetryPathName,
+        app_action_value:
+          {
+            value: 'index-field-type-profile-removed',
+            rotated,
+          },
+      });
+    }).then(() => {
+      onClose();
+
+      return IndexSetsActions.get(indexSetId);
+    });
+  }, [indexSetId, onClose, removeProfileFromIndex, rotated, sendTelemetry, telemetryPathName]);
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_CANCELED, { app_pathname: telemetryPathName, app_action_value: 'removed-custom-field-type-closed' });
     onClose();
@@ -86,35 +105,46 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
   const onChangeProfile = (newProfile: string) => setProfile(newProfile);
 
   return (
-    <BootstrapModalForm title={<span>Set Profile</span>}
-                        submitButtonText="Set Profile"
-                        onSubmitForm={onSubmit}
-                        onCancel={onCancel}
-                        show={show}
-                        bsSize="large"
-                        submitButtonDisabled={isLoading}>
-      <div>
-        <Input id="index_set_profile" label="Select profile">
-          <StyledSelect inputId="index_set_profile"
-                        options={options}
-                        value={profile}
-                        onChange={onChangeProfile}
-                        placeholder="Select profile"
-                        disabled={profileOptionsIsLoading}
-                        required />
-        </Input>
-        <StyledLabel>Select Rotation Strategy</StyledLabel>
-        <p>
-          To see and use field type profile, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
-        </p>
-        <Input type="checkbox"
-               id="rotate"
-               name="rotate"
-               label="Rotate affected indices after change"
-               onChange={() => setRotated((cur: boolean) => !cur)}
-               checked={rotated} />
-      </div>
-    </BootstrapModalForm>
+    <Modal title="Set Profile"
+           onHide={onCancel}
+           show={show}
+           data-testid="modal-form">
+      <Modal.Header closeButton>
+        <Modal.Title><span>Set Profile</span></Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div>
+          <Input id="index_set_profile" label="Select profile">
+            <StyledSelect inputId="index_set_profile"
+                          options={options}
+                          value={profile}
+                          onChange={onChangeProfile}
+                          placeholder="Select profile"
+                          disabled={profileOptionsIsLoading}
+                          required />
+          </Input>
+          <StyledLabel>Select Rotation Strategy</StyledLabel>
+          <p>
+            To see and use new profile setting (changing or removal) for index set, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+          </p>
+          <Input type="checkbox"
+                 id="rotate"
+                 name="rotate"
+                 label="Rotate affected indices after change"
+                 onChange={() => setRotated((cur: boolean) => !cur)}
+                 checked={rotated} />
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <ModalSubmit submitButtonText="Set Profile"
+                     submitLoadingText="Set Profile..."
+                     onSubmit={onSubmit}
+                     onCancel={onClose}
+                     disabledSubmit={isLoading || isProfileRemoving}
+                     isSubmitting={isLoading || isProfileRemoving}
+                     leftCol={currentProfile && <Button onClick={onRemoveProfileFromIndex} disabled={isLoading || isProfileRemoving} bsStyle="danger">Remove profile</Button>} />
+      </Modal.Footer>
+    </Modal>
   );
 };
 

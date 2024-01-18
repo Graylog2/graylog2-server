@@ -25,6 +25,8 @@ import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
 import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileModal';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
+import useRemoveProfileFromIndexMutation
+  from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
 
 const selectItem = async (select: HTMLElement, option: string | RegExp) => {
   selectEvent.openMenu(select);
@@ -41,9 +43,11 @@ const renderModal = (currentProfile = 'profile-id-111') => render(
 jest.mock('routing/useParams', () => jest.fn());
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation', () => jest.fn());
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions');
+jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation');
 
 describe('IndexSetFieldTypesList', () => {
   const setIndexSetFieldTypeProfileMock = jest.fn(() => Promise.resolve());
+  const removeProfileFromIndexMock = jest.fn(() => Promise.resolve());
 
   beforeEach(() => {
     asMock(useParams).mockImplementation(() => ({
@@ -61,6 +65,11 @@ describe('IndexSetFieldTypesList', () => {
 
     asMock(useSetIndexSetProfileMutation).mockReturnValue({
       setIndexSetFieldTypeProfile: setIndexSetFieldTypeProfileMock,
+      isLoading: false,
+    });
+
+    asMock(useRemoveProfileFromIndexMutation).mockReturnValue({
+      removeProfileFromIndex: removeProfileFromIndexMock,
       isLoading: false,
     });
   });
@@ -93,5 +102,36 @@ describe('IndexSetFieldTypesList', () => {
       indexSetId: '111',
       rotated: false,
     });
+  });
+
+  it('run removeProfileFromIndex on submit without rotation', async () => {
+    renderModal();
+    const removeButton = await screen.findByRole('button', { name: /Remove profile/i, hidden: true });
+    const checkBox = await screen.findByRole('checkbox', { name: /rotate affected indices after change/i, hidden: true });
+    fireEvent.click(checkBox);
+    fireEvent.click(removeButton);
+
+    expect(removeProfileFromIndexMock).toHaveBeenCalledWith({
+      indexSetId: '111',
+      rotated: false,
+    });
+  });
+
+  it('run removeProfileFromIndex on submit with rotation', async () => {
+    renderModal();
+    const removeButton = await screen.findByRole('button', { name: /Remove profile/i, hidden: true });
+    fireEvent.click(removeButton);
+
+    expect(removeProfileFromIndexMock).toHaveBeenCalledWith({
+      indexSetId: '111',
+      rotated: true,
+    });
+  });
+
+  it('render modal without removal button when profile is not set', async () => {
+    renderModal(null);
+    const removeButton = screen.queryByRole('button', { name: /Remove profile/i, hidden: true });
+
+    expect(removeButton).not.toBeInTheDocument();
   });
 });
