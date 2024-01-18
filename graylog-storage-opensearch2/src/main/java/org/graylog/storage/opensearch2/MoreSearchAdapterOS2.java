@@ -184,7 +184,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                 .query(queryString)
                 .range(timeRange)
                 .indices(affectedIndices)
-                .filters(filters)
+                .filters(filters == null ? Collections.emptyList() : filters)
                 .batchSize(batchSize)
                 // For correlation need the oldest messages to come in first
                 .sorting(new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.ASC));

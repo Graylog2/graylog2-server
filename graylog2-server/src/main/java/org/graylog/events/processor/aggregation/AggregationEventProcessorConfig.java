@@ -119,7 +119,8 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     }
 
     public static Builder builder() {
-        return Builder.create();
+        return Builder.create()
+                .filters(Collections.emptyList());
     }
 
     public abstract Builder toBuilder();
@@ -231,10 +232,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         if (oldEventProcessorConfig == null) {
             // Enforce event limit on newly created event filter definition
             checkEventLimitGreaterZero(validationResult);
-        } else if ( !(oldEventProcessorConfig instanceof final AggregationEventProcessorConfig oldConfig)) {
+        } else if (!(oldEventProcessorConfig instanceof final AggregationEventProcessorConfig oldConfig)) {
             // Enforce event limit on event definition type change
             checkEventLimitGreaterZero(validationResult);
-        } else if ( !oldConfig.series().isEmpty()) {
+        } else if (!oldConfig.series().isEmpty()) {
             // Enforce event limit on aggregation to filter change
             checkEventLimitGreaterZero(validationResult);
         } else if (oldConfig.eventLimit() != 0) {
