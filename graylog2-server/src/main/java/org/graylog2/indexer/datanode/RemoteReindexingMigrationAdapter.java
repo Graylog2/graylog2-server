@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.datanode;
 
-import org.graylog.plugins.views.storage.migration.RemoteReindexResult;
+import org.graylog2.indexer.migration.RemoteReindexMigration;
 
 import java.net.URI;
 import java.util.List;
@@ -26,7 +26,7 @@ public interface RemoteReindexingMigrationAdapter {
         STARTING, RUNNING, ERROR, FINISHED
     }
 
-    RemoteReindexResult start(URI uri, String username, String password, List<String> indices);
+    Status start(URI uri, String username, String password, List<String> indices);
 
-    Status status();
+    RemoteReindexMigration status();
 }

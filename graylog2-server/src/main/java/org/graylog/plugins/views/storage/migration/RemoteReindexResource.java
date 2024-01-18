@@ -32,6 +32,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.shared.security.RestPermissions;
 
 @Path("/migration")
@@ -52,7 +53,7 @@ public class RemoteReindexResource {
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "by remote reindexing", notes = "configure the host/credentials you want to use to migrate data from")
-    public RemoteReindexResult migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexRequest request) {
+    public RemoteReindexingMigrationAdapter.Status migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexRequest request) {
         return migrationService.start(request.hostname(), request.user(), request.password(), request.indices());
     }
 
@@ -61,7 +62,7 @@ public class RemoteReindexResource {
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "status", notes = "status for a running migration")
-    public RemoteReindexingMigrationAdapter.Status status() {
+    public RemoteReindexMigration status() {
         return migrationService.status();
     }
 
