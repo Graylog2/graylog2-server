@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useCallback, useState, useContext, useRef, useMemo } from 'react';
+import { useCallback, useState, useContext, useRef } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -68,6 +68,18 @@ const _extractErrorMessage = (error: FetchError) => ((error
     && error.additional.body
     && error.additional.body.message) ? error.additional.body.message : error);
 
+const usePluggableSearchAction = (loaded: boolean, view: View) => {
+  const pluggableSearchActions = usePluginEntities('views.components.searchActions');
+
+  return pluggableSearchActions.filter(
+    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+  ).map(
+    ({ component: PluggableSearchAction, key }) => (
+      <PluggableSearchAction key={key} loaded={loaded} view={view} />
+    ),
+  );
+};
+
 const SearchActionsMenu = () => {
   const dirty = useIsDirty();
   const view = useView();
@@ -100,12 +112,7 @@ const SearchActionsMenu = () => {
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
-  const pluggableSearchActions = usePluginEntities('views.components.searchActions');
-  const searchActions = useMemo(() => pluggableSearchActions.map(
-    ({ component: PluggableSearchAction, key }) => (
-      <PluggableSearchAction key={key} loaded={loaded} view={view} />
-    ),
-  ), [pluggableSearchActions, loaded, view]);
+  const pluggableActions = usePluggableSearchAction(loaded, view);
 
   const saveSearch = useCallback(async (newTitle: string) => {
     if (!view.id) {
@@ -218,10 +225,10 @@ const SearchActionsMenu = () => {
         <MenuItem disabled={disableReset} onSelect={loadNewView} icon="eraser">
           Reset search
         </MenuItem>
-        {searchActions.length > 0 ? (
+        {pluggableActions.length ? (
           <>
             <MenuItem divider />
-            {searchActions}
+            {pluggableActions}
           </>
         ) : null}
       </DropdownButton>

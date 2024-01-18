@@ -124,6 +124,10 @@ interface ProviderType {
   }>;
 }
 
+interface LogoutHook {
+  (): void | Promise<unknown>;
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
@@ -141,6 +145,7 @@ declare module 'graylog-web-plugin/plugin' {
     forwarder?: Array<PluginForwarder>;
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
+    'hooks.logout'?: Array<LogoutHook>,
   }
   interface PluginMetadata {
     name?: string,

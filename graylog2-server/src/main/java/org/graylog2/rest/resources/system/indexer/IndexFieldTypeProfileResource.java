@@ -38,6 +38,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileData;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileIdAndName;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileWithUsages;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -91,6 +92,15 @@ public class IndexFieldTypeProfileResource extends RestResource {
                                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                                      @DefaultValue("asc") @QueryParam("order") String order) {
         return profileService.getPaginated(query, filters, page, perPage, sort, order);
+    }
+
+    @GET
+    @Path("/all")
+    @Timed
+    @NoAuditEvent("No change to the DB")
+    @ApiOperation(value = "Gets list of all profiles (their ids and names only)")
+    public List<IndexFieldTypeProfileIdAndName> getAll() {
+        return profileService.getAll();
     }
 
     @POST

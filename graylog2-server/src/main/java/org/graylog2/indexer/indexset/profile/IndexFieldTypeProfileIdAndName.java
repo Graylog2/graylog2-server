@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { PluginRegistration, PluginExports } from 'graylog-web-plugin/plugin';
-import { PluginStore, PluginManifest } from 'graylog-web-plugin/plugin';
+package org.graylog2.indexer.indexset.profile;
 
-export const loadPlugin = (plugin: PluginRegistration) => PluginStore.register(plugin);
-export const unloadPlugin = (plugin: PluginRegistration) => PluginStore.unregister(plugin);
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-export const usePlugin = (plugin: PluginRegistration) => {
-  beforeAll(() => loadPlugin(plugin));
-  afterAll(() => unloadPlugin(plugin));
-};
+import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.ID_FIELD_NAME;
+import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.NAME_FIELD_NAME;
 
-export const usePluginExports = (exports: PluginExports) => usePlugin(new PluginManifest({}, exports));
+/**
+ * Mainly to be used with "all" endpoint, where returning as little info about profile as possible is important.
+ */
+public record IndexFieldTypeProfileIdAndName(@JsonProperty(ID_FIELD_NAME) String id,
+                                             @JsonProperty(NAME_FIELD_NAME) String name) {
+}
