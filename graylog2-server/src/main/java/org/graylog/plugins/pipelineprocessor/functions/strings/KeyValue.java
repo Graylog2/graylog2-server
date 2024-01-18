@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -38,6 +39,8 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 public class KeyValue extends AbstractFunction<Map<String, String>> {
 
     public static final String NAME = "key_value";
+    public static final String TAKE_FIRST = "take_first";
+    public static final String TAKE_LAST = "take_last";
     private final ParameterDescriptor<String, String> valueParam;
     private final ParameterDescriptor<String, CharMatcher> splitParam;
     private final ParameterDescriptor<String, CharMatcher> valueSplitParam;
@@ -52,9 +55,9 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
         splitParam = string("delimiters", CharMatcher.class).transform(CharMatcher::anyOf).optional().description("The characters used to separate pairs, defaults to whitespace").build();
         valueSplitParam = string("kv_delimiters", CharMatcher.class).transform(CharMatcher::anyOf).optional().description("The characters used to separate keys from values, defaults to '='").build();
 
-        ignoreEmptyValuesParam = bool("ignore_empty_values").optional().description("Whether to ignore keys with empty values, defaults to true").build();
-        allowDupeKeysParam = bool("allow_dup_keys").optional().description("Whether to allow duplicate keys, defaults to true").build();
-        duplicateHandlingParam = string("handle_dup_keys").optional().description("How to handle duplicate keys: (default) 'take_first': only use first value, 'take_last': only take last value or use a delimiter e.g. ','").build();
+        ignoreEmptyValuesParam = bool("ignore_empty_values").optional().description("Whether to ignore keys with empty values, defaults to true").defaultValue(Optional.of(true)).build();
+        allowDupeKeysParam = bool("allow_dup_keys").optional().description("Whether to allow duplicate keys, defaults to true").defaultValue(Optional.of(true)).build();
+        duplicateHandlingParam = string("handle_dup_keys").optional().defaultValue(Optional.of(TAKE_FIRST)).description("How to handle duplicate keys: (default) 'take_first': only use first value, 'take_last': only take last value or use a delimiter e.g. ','").build();
         trimCharactersParam = string("trim_key_chars", CharMatcher.class)
                 .transform(CharMatcher::anyOf)
                 .optional()
@@ -90,7 +93,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                                trimCharactersParam.optional(args, context).orElse(CharMatcher.none()),
                                trimValueCharactersParam.optional(args, context).orElse(CharMatcher.none()),
                                allowDupeKeysParam.optional(args, context).orElse(true),
-                               duplicateHandlingParam.optional(args, context).orElse("take_first"))
+                               duplicateHandlingParam.optional(args, context).orElse(TAKE_FIRST))
                 .split(value);
     }
 
@@ -191,10 +194,10 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                         throw new IllegalArgumentException("Duplicate key " + key + " is not allowed in key_value function.");
                     }
                     switch (Strings.nullToEmpty(duplicateHandling).toLowerCase(Locale.ENGLISH)) {
-                        case "take_first":
+                        case TAKE_FIRST:
                             // ignore this value
                             continue;
-                        case "take_last":
+                        case TAKE_LAST:
                             // simply reset the entry
                             break;
                         default:
