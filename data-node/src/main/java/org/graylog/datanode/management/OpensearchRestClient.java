@@ -63,7 +63,7 @@ public class OpensearchRestClient {
     public static RestClient buildNewClient(OpensearchConfiguration configuration, DatanodeConfiguration datanodeConfiguration, CustomCAX509TrustManager tm) {
         final HttpHost host = configuration.getRestBaseUrl();
 
-        final var builder = org.opensearch.client.RestClient.builder(host.toURI());
+        final var builder = org.opensearch.client.RestClient.builder(new org.apache.http.HttpHost(host.getHostName(), host.getPort(), host.getSchemeName()));
         if ("https".equals(host.getSchemeName())) {
 
             try {
