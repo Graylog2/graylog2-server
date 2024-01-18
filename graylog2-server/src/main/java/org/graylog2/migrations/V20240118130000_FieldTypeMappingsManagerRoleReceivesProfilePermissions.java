@@ -43,9 +43,9 @@ public class V20240118130000_FieldTypeMappingsManagerRoleReceivesProfilePermissi
                         RestPermissions.TYPE_MAPPINGS_DELETE,
                         RestPermissions.TYPE_MAPPINGS_EDIT,
                         RestPermissions.TYPE_MAPPINGS_READ,
-                        RestPermissions.PROFILES_CREATE,
-                        RestPermissions.PROFILES_DELETE,
-                        RestPermissions.PROFILES_EDIT,
-                        RestPermissions.PROFILES_READ));
+                        RestPermissions.MAPPING_PROFILES_CREATE,
+                        RestPermissions.MAPPING_PROFILES_DELETE,
+                        RestPermissions.MAPPING_PROFILES_EDIT,
+                        RestPermissions.MAPPING_PROFILES_READ));
     }
 }

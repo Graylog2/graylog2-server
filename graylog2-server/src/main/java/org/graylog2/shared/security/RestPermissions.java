@@ -150,10 +150,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String TYPE_MAPPINGS_DELETE = "typemappings:delete";
     public static final String TYPE_MAPPINGS_EDIT = "typemappings:edit";
     public static final String TYPE_MAPPINGS_READ = "typemappings:read";
-    public static final String PROFILES_CREATE = "mappingprofiles:create";
-    public static final String PROFILES_DELETE = "mappingprofiles:delete";
-    public static final String PROFILES_EDIT = "mappingprofiles:edit";
-    public static final String PROFILES_READ = "mappingprofiles:read";
+    public static final String MAPPING_PROFILES_CREATE = "mappingprofiles:create";
+    public static final String MAPPING_PROFILES_DELETE = "mappingprofiles:delete";
+    public static final String MAPPING_PROFILES_EDIT = "mappingprofiles:edit";
+    public static final String MAPPING_PROFILES_READ = "mappingprofiles:read";
     public static final String URL_WHITELIST_READ = "urlwhitelist:read";
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
@@ -310,10 +310,10 @@ public class RestPermissions implements PluginPermissions {
             .add(create(TYPE_MAPPINGS_DELETE, ""))
             .add(create(TYPE_MAPPINGS_EDIT, ""))
             .add(create(TYPE_MAPPINGS_READ, ""))
-            .add(create(PROFILES_CREATE, ""))
-            .add(create(PROFILES_DELETE, ""))
-            .add(create(PROFILES_EDIT, ""))
-            .add(create(PROFILES_READ, ""))
+            .add(create(MAPPING_PROFILES_CREATE, ""))
+            .add(create(MAPPING_PROFILES_DELETE, ""))
+            .add(create(MAPPING_PROFILES_EDIT, ""))
+            .add(create(MAPPING_PROFILES_READ, ""))
             .build();
 
     // Standard set of PERMISSIONS of readers.
