@@ -16,8 +16,9 @@
  */
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import styled, { useTheme, css } from 'styled-components';
-import { Menu } from '@mantine/core';
+import styled, { css } from 'styled-components';
+
+import Menu from 'components/bootstrap/Menu';
 
 type Placement = 'top' | 'right' | 'bottom' | 'left';
 
@@ -39,7 +40,6 @@ type Props = {
   alwaysShowCaret?: boolean,
   children: React.ReactNode,
   closeOnSelect?: boolean,
-  dropdownMinWidth?: number,
   dropdownZIndex?: number,
   menuContainer?: HTMLElement,
   onToggle: () => void,
@@ -52,7 +52,6 @@ const OverlayDropdown = ({
   alwaysShowCaret,
   children,
   closeOnSelect,
-  dropdownMinWidth,
   dropdownZIndex,
   menuContainer,
   onToggle,
@@ -62,25 +61,11 @@ const OverlayDropdown = ({
 }: Props) => {
   const toggleTarget = useRef<HTMLButtonElement>();
 
-  const theme = useTheme();
-
-  const styles = {
-    dropdown: {
-      minWidth: dropdownMinWidth,
-      backgroundColor: theme.colors.global.contentBackground,
-      border: `1px solid ${theme.colors.variant.lighter.default}`,
-      fontFamily: theme.fonts.family.body,
-      fontSize: theme.fonts.size.body,
-    },
-  };
-
   return (
     <Menu opened={show}
           withinPortal
           position={placement}
-          closeOnClickOutside
           closeOnItemClick={closeOnSelect}
-          styles={styles}
           onClose={onToggle}
           portalProps={{ target: menuContainer }}
           zIndex={dropdownZIndex}>
@@ -114,7 +99,6 @@ OverlayDropdown.propTypes = {
 OverlayDropdown.defaultProps = {
   alwaysShowCaret: false,
   closeOnSelect: true,
-  dropdownMinWidth: undefined,
   dropdownZIndex: undefined,
   menuContainer: document.body,
   placement: 'bottom',

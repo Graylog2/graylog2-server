@@ -125,6 +125,10 @@ interface ProviderType {
   }>;
 }
 
+interface LogoutHook {
+  (): void | Promise<unknown>;
+}
+
 type DataTiering = {
   type: string,
   TiersConfigurationFields: React.ComponentType<{}>,
@@ -151,6 +155,7 @@ declare module 'graylog-web-plugin/plugin' {
     forwarder?: Array<PluginForwarder>;
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
+    'hooks.logout'?: Array<LogoutHook>,
   }
   interface PluginMetadata {
     name?: string,

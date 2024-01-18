@@ -78,7 +78,6 @@ const QueryBar = () => {
 
   return (
     <QueryTabs queries={queries}
-               activeQueryId={activeQueryId}
                titles={queryTitles}
                dashboardId={dashboardId}
                onSelect={onSelectPage}

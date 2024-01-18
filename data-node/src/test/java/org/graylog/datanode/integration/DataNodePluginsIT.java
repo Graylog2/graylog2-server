@@ -53,7 +53,6 @@ public class DataNodePluginsIT {
                         Matchers.not(Matchers.containsString("opensearch-alerting")),
                         Matchers.not(Matchers.containsString("opensearch-custom-codecs")),
                         Matchers.not(Matchers.containsString("opensearch-geospatial")),
-                        Matchers.not(Matchers.containsString("opensearch-index-management")),
                         Matchers.not(Matchers.containsString("opensearch-knn")),
                         Matchers.not(Matchers.containsString("opensearch-neural-search")),
                         Matchers.not(Matchers.containsString("opensearch-notifications")),
