@@ -117,7 +117,8 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
             config.put("conditions", newConditions);
             doc.put(EventDefinitionDto.FIELD_STATE, EventDefinition.State.DISABLED);
             raiseNotification(StringUtils.f("Disabled invalid event definition %s", doc.get("title", String.class)),
-                    "Definition is missing the required field name - please review and update the definition.");
+                    "Definition is missing the required field name - please review and update the definition.",
+                    "/alerts/definitions/" + doc.getObjectId("_id"));
         }
         if (needsUpdate) {
             config.put("series", newSeries);
@@ -128,12 +129,13 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
 
     public record MigrationCompleted() {}
 
-    private void raiseNotification(String title, String details) {
+    private void raiseNotification(String title, String details, String url) {
         final Notification systemNotification = notificationService.buildNow()
-                .addType(Notification.Type.GENERIC)
+                .addType(Notification.Type.GENERIC_WITH_LINK)
                 .addSeverity(Notification.Severity.URGENT)
                 .addDetail("title", title)
-                .addDetail("description", details);
+                .addDetail("GENERIC_DETAILS", details)
+                .addDetail("GENERIC_URL", url);
         notificationService.publishIfFirst(systemNotification);
     }
 }
