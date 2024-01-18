@@ -30,6 +30,9 @@ import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.constraints.Min;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog.autovalue.WithBeanGetter;
@@ -41,12 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.validation.constraints.Min;
-
 import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -58,6 +55,14 @@ public class CaffeineLookupCache extends LookupCache {
 
     // Use the old GuavaLookupCache name, so we don't have to deal with migrations
     public static final String NAME = "guava_cache";
+    public static final String MAX_SIZE = "max_size";
+    public static final String EXPIRE_AFTER_ACCESS = "expire_after_access";
+    public static final String EXPIRE_AFTER_ACCESS_UNIT = "expire_after_access_unit";
+    public static final String EXPIRE_AFTER_WRITE = "expire_after_write";
+    public static final String EXPIRE_AFTER_WRITE_UNIT = "expire_after_write_unit";
+    public static final String IGNORE_NULL = "ignore_null";
+    public static final String TTL_EMPTY = "ttl_empty";
+    public static final String TTL_EMPTY_UNIT = "ttl_empty_unit";
     private final Cache<LookupCacheKey, LookupResult> cache;
     private final Config config;
 
@@ -135,9 +140,15 @@ public class CaffeineLookupCache extends LookupCache {
             try {
                 final LookupResult result = loader.call();
                 if (ignoreResult(result, config.ignoreNull())) {
-                    LOG.debug("Ignoring failed lookup for key {}", key);
+                    LOG.info("Ignoring failed lookup for key {}", key);
                     return LookupResult.builder()
                             .cacheTTL(0L)
+                            .build();
+                }
+                if (isResultEmpty(result)) {
+                    LOG.info("Empty lookup for key {} with TTL {}", key, ttlEmptyMillis());
+                    return LookupResult.builder()
+                            .cacheTTL(ttlEmptyMillis())
                             .build();
                 }
                 return result;
@@ -156,8 +167,19 @@ public class CaffeineLookupCache extends LookupCache {
         if (ignoreNull == null || !ignoreNull) {
             return false;
         }
+        return isResultEmpty(result);
+    }
+
+    private boolean isResultEmpty(LookupResult result) {
         return (result == null ||
                 (result.singleValue() == null && result.multiValue() == null && result.stringListValue() == null));
+    }
+
+    private long ttlEmptyMillis() {
+        if (config.ttlEmpty() != null && config.ttlEmptyUnit() != null) {
+            return config.ttlEmptyUnit().toMillis(config.ttlEmpty());
+        }
+        return Long.MAX_VALUE;
     }
 
     @Override
@@ -222,28 +244,37 @@ public class CaffeineLookupCache extends LookupCache {
     public abstract static class Config implements LookupCacheConfiguration {
 
         @Min(0)
-        @JsonProperty("max_size")
+        @JsonProperty(MAX_SIZE)
         public abstract int maxSize();
 
         @Min(0)
-        @JsonProperty("expire_after_access")
+        @JsonProperty(EXPIRE_AFTER_ACCESS)
         public abstract long expireAfterAccess();
 
         @Nullable
-        @JsonProperty("expire_after_access_unit")
+        @JsonProperty(EXPIRE_AFTER_ACCESS_UNIT)
         public abstract TimeUnit expireAfterAccessUnit();
 
         @Min(0)
-        @JsonProperty("expire_after_write")
+        @JsonProperty(EXPIRE_AFTER_WRITE)
         public abstract long expireAfterWrite();
 
         @Nullable
-        @JsonProperty("expire_after_write_unit")
+        @JsonProperty(EXPIRE_AFTER_WRITE_UNIT)
         public abstract TimeUnit expireAfterWriteUnit();
 
         @Nullable
-        @JsonProperty("ignore_null")
+        @JsonProperty(IGNORE_NULL)
         public abstract Boolean ignoreNull();
+
+        @Min(0)
+        @Nullable
+        @JsonProperty(TTL_EMPTY)
+        public abstract Long ttlEmpty();
+
+        @Nullable
+        @JsonProperty(TTL_EMPTY_UNIT)
+        public abstract TimeUnit ttlEmptyUnit();
 
         public static Builder builder() {
             return new AutoValue_CaffeineLookupCache_Config.Builder();
@@ -254,23 +285,29 @@ public class CaffeineLookupCache extends LookupCache {
             @JsonProperty("type")
             public abstract Builder type(String type);
 
-            @JsonProperty("max_size")
+            @JsonProperty(MAX_SIZE)
             public abstract Builder maxSize(int maxSize);
 
-            @JsonProperty("expire_after_access")
+            @JsonProperty(EXPIRE_AFTER_ACCESS)
             public abstract Builder expireAfterAccess(long expireAfterAccess);
 
-            @JsonProperty("expire_after_access_unit")
+            @JsonProperty(EXPIRE_AFTER_ACCESS_UNIT)
             public abstract Builder expireAfterAccessUnit(@Nullable TimeUnit expireAfterAccessUnit);
 
-            @JsonProperty("expire_after_write")
+            @JsonProperty(EXPIRE_AFTER_WRITE)
             public abstract Builder expireAfterWrite(long expireAfterWrite);
 
-            @JsonProperty("expire_after_write_unit")
+            @JsonProperty(EXPIRE_AFTER_WRITE_UNIT)
             public abstract Builder expireAfterWriteUnit(@Nullable TimeUnit expireAfterWriteUnit);
 
-            @JsonProperty("ignore_null")
+            @JsonProperty(IGNORE_NULL)
             public abstract Builder ignoreNull(@Nullable Boolean ignoreNull);
+
+            @JsonProperty(TTL_EMPTY)
+            public abstract Builder ttlEmpty(@Nullable Long ttlEmpty);
+
+            @JsonProperty(TTL_EMPTY_UNIT)
+            public abstract Builder ttlEmptyUnit(@Nullable TimeUnit ttlEmptyUnit);
 
             public abstract Config build();
         }
