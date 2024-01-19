@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
+import userEvent from '@testing-library/user-event';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 
@@ -39,7 +40,7 @@ const renderWithForm = (element) => render((
 ));
 
 describe('TabAbsoluteTimeRange', () => {
-  it('renders Accordions that work', () => {
+  it('renders Accordions that work', async () => {
     renderWithForm((
       <TabAbsoluteTimeRange {...defaultProps} />
     ));
@@ -52,9 +53,8 @@ describe('TabAbsoluteTimeRange', () => {
     expect(accordionItemCal.getAttribute('aria-expanded')).toEqual('true');
     expect(accordionItemTime.getAttribute('aria-expanded')).toEqual('false');
 
-    fireEvent.click(accordionItemTime);
+    userEvent.click(accordionItemTime);
 
-    expect(accordionItemCal.getAttribute('aria-expanded')).toEqual('false');
-    expect(accordionItemTime.getAttribute('aria-expanded')).toEqual('true');
+    await screen.findByText(/Date should be formatted as/i);
   });
 });
