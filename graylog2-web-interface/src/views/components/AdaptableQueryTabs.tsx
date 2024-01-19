@@ -138,7 +138,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
 
 const QueryTab = styled(NavItem)`
   &&&&.active > a {
-    padding: 6px 15px 9px 15px;
+    padding: 6px 15px 9px;
   }
 `;
 
