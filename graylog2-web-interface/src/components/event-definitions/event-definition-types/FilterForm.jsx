@@ -27,12 +27,10 @@ import memoize from 'lodash/memoize';
 import max from 'lodash/max';
 import union from 'lodash/union';
 import moment from 'moment';
-import { Formik } from 'formik';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { OrderedMap } from 'immutable';
-import { v4 as uuidv4 } from 'uuid';
 
-import { MultiSelect, TimeUnitInput } from 'components/common';
+import Store from 'logic/local-storage/Store';
+import { MultiSelect, TimeUnitInput, SearchFiltersFormControls } from 'components/common';
 import connect from 'stores/connect';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -53,6 +51,7 @@ import withLocation from 'routing/withLocation';
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
 
+export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
 const LOOKUP_PERMISSIONS = [
@@ -67,10 +66,6 @@ const _buildNewParameter = (name) => ({
   title: 'new title',
   // has no binding, no need to set binding property
 });
-
-const renderControls = (controls) => (
-  controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />)
-);
 
 class FilterForm extends React.Component {
   formatStreamIds = memoize(
@@ -148,6 +143,7 @@ class FilterForm extends React.Component {
       queryId: generateId(),
       searchTypeId: generateId(),
       queryParameterStash: {}, // keep already defined parameters around to ease editing
+      searchFiltersHidden: Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY),
     };
   }
 
@@ -210,27 +206,17 @@ class FilterForm extends React.Component {
   };
 
   handleSearchFiltersChange = (searchFilters) => {
-    // eslint-disable-next-line no-unused-vars
-    const payload = searchFilters.map(({ frontendId, ...filter }) => filter);
-
     const { query } = this.props.eventDefinition.config;
 
-    this._parseQuery(query, payload);
+    this._parseQuery(query, searchFilters);
 
-    this.propagateChange('filters', payload.toArray());
+    this.propagateChange('filters', searchFilters.toArray());
   };
 
-  getInitialSearchFilters = () => {
-    const { filters } = this.props.eventDefinition.config;
-
-    if (!filters) return new OrderedMap();
-
-    const searchFilters = new OrderedMap(filters.map((filter) => ([
-      filter.id || uuidv4(),
-      { frontendId: filter.id || uuidv4(), ...filter },
-    ])));
-
-    return searchFilters;
+  // eslint-disable-next-line class-methods-use-this
+  hideFiltersPreview = () => {
+    Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, true);
+    this.setState({ searchFiltersHidden: true });
   };
 
   handleConfigChange = (event) => {
@@ -351,9 +337,6 @@ class FilterForm extends React.Component {
     const allStreamIds = union(streams.map((s) => s.id), defaultTo(eventDefinition.config.streams, []));
     const formattedStreams = this.formatStreamIds(allStreamIds);
 
-    const searchFormControls = PluginStore.exports('eventDefinitions.components.searchForm') ?? [];
-    const pluggableControls = searchFormControls.map((controlFn) => controlFn()).filter((control) => !!control);
-
     return (
       <fieldset>
         <h2 className={commonStyles.title}>Filter</h2>
@@ -373,15 +356,16 @@ class FilterForm extends React.Component {
 
         {this.renderQueryParameters()}
 
-        <FormGroup controlId="search-filters">
-          <ControlLabel>Search Filters <small className="text-muted">(Optional)</small></ControlLabel>
-          <div style={{ maring: '8px 0' }}>
-            <Formik onSubmit={({ searchFilters }) => this.handleSearchFiltersChange(searchFilters)}
-                    initialValues={{ searchFilters: this.getInitialSearchFilters() }}>
-              {() => renderControls(pluggableControls)}
-            </Formik>
-          </div>
-        </FormGroup>
+        {!this.state.searchFiltersHidden && (
+          <FormGroup controlId="search-filters">
+            <ControlLabel>Search Filters <small className="text-muted">(Optional)</small></ControlLabel>
+            <div style={{ maring: '8px 0' }}>
+              <SearchFiltersFormControls filters={eventDefinition.config.filters}
+                                         onChange={this.handleSearchFiltersChange}
+                                         hideFiltersPreview={this.hideFiltersPreview} />
+            </div>
+          </FormGroup>
+        )}
 
         <FormGroup controlId="filter-streams">
           <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>
