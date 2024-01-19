@@ -34,7 +34,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.shared.security.RestPermissions;
 
-@Path("/migration")
+@Path("/remote-reindex-migration")
 @RequiresAuthentication
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
