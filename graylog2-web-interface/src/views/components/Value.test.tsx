@@ -35,8 +35,9 @@ const Value = (props: React.ComponentProps<typeof OriginalValue>) => (
 );
 
 describe('Value', () => {
-  const openActionsMenu = (value: string | RegExp) => {
+  const openActionsMenu = async (value: string | RegExp) => {
     userEvent.click(screen.getByText(value));
+    await screen.findByRole('menu');
   };
 
   beforeEach(() => {
@@ -55,7 +56,7 @@ describe('Value', () => {
     it('renders without type information but no children', async () => {
       render(<Value field="foo" value={42} type={FieldType.Unknown} />);
 
-      openActionsMenu('42');
+      await openActionsMenu('42');
 
       await screen.findByText('foo = 42');
     });
@@ -66,7 +67,7 @@ describe('Value', () => {
                     render={({ value }) => <>The date {value}</>}
                     type={new FieldType('date', [], [])} />);
 
-      openActionsMenu('The date 2018-10-02 16:45:40.000');
+      await openActionsMenu('The date 2018-10-02 16:45:40.000');
       const title = await screen.findByTestId('value-actions-title');
 
       expect(title).toHaveTextContent('foo = 2018-10-02 16:45:40.000');
@@ -86,7 +87,7 @@ describe('Value', () => {
                     value={false}
                     type={new FieldType('boolean', [], [])} />);
 
-      openActionsMenu('false');
+      await openActionsMenu('false');
 
       await screen.findByText('foo = false');
     });
@@ -94,7 +95,7 @@ describe('Value', () => {
     it('renders booleans as strings even if field type is unknown', async () => {
       render(<Value field="foo" value={false} type={FieldType.Unknown} />);
 
-      openActionsMenu('false');
+      await openActionsMenu('false');
 
       await screen.findByText('foo = false');
     });
@@ -104,7 +105,7 @@ describe('Value', () => {
                     value={[23, 'foo']}
                     type={FieldType.Unknown} />);
 
-      openActionsMenu('[23,"foo"]');
+      await openActionsMenu('[23,"foo"]');
 
       await screen.findByText('foo = [23,"foo"]');
     });
@@ -114,7 +115,7 @@ describe('Value', () => {
                     value={{ foo: 23 }}
                     type={FieldType.Unknown} />);
 
-      openActionsMenu('{"foo":23}');
+      await openActionsMenu('{"foo":23}');
 
       await screen.findByText('foo = {"foo":23}');
     });
@@ -124,7 +125,7 @@ describe('Value', () => {
                     value="sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1"
                     type={new FieldType('string', [], [])} />);
 
-      openActionsMenu('sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1');
+      await openActionsMenu('sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1');
 
       await screen.findByText('message = sophon unbound: [84785:0] e...');
     });
@@ -171,7 +172,7 @@ describe('Value', () => {
                                       value={{ foo: 23 }}
                                       type={FieldType.Unknown} />);
 
-      openActionsMenu('{"foo":23}');
+      userEvent.click(screen.getByText('{"foo":23}'));
 
       expect(screen.queryByText('foo = {"foo":23}')).not.toBeInTheDocument();
     });
@@ -183,7 +184,7 @@ describe('Value', () => {
                                    value={{ foo: 23 }}
                                    type={FieldType.Unknown} />);
 
-      openActionsMenu('{"foo":23}');
+      await openActionsMenu('{"foo":23}');
 
       await screen.findByText('foo = {"foo":23}');
     });

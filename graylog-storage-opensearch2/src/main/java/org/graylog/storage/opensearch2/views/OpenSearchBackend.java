@@ -52,6 +52,8 @@ import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,6 +138,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .size(0)
                 .trackTotalHits(true);
 
+        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
+
         final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
@@ -157,12 +161,16 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .must(
                                     Objects.requireNonNull(
                                             TimeRangeQueryFactory.create(
-                                                    query.effectiveTimeRange(searchType)
+                                                    query.effectiveTimeRange(searchType, nowUTCSharedBetweenSearchTypes)
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                                     )
-                            )
+                            );
+
+                    if (effectiveStreamIds.stream().noneMatch(s -> s.startsWith(IndexLookup.DATASTREAM_PREFIX))) {
+                        searchTypeOverrides
                             .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
+                    }
 
                     searchType.query().ifPresent(searchTypeQuery -> {
                         final QueryBuilder normalizedSearchTypeQuery = translateQueryString(searchTypeQuery.queryString());

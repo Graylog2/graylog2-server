@@ -92,7 +92,13 @@ const EditIconButton = styled(IconButton)(({ theme }) => css`
 
 const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen((prev) => !prev);
+    setShowActions(!isDropdownOpen);
+  };
 
   const readableReturnType = (_type: RuleBuilderTypes): string | undefined => {
     switch (_type) {
@@ -129,7 +135,7 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
 
   return (
     <StyledRow onMouseEnter={() => setShowActions(true)}
-               onMouseLeave={() => setShowActions(false)}
+               onMouseLeave={!isDropdownOpen ? () => setShowActions(false) : undefined}
                $hovered={showActions}>
       <Col xs={9} md={10}>
         <Row>
@@ -174,37 +180,20 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
             <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
                                    buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                    bsSize="xsmall"
-                                   closeOnSelect={false}
+                                   onToggle={handleDropdownToggle}
                                    dropdownZIndex={1000}>
-              {({ toggleDropdown }) => (
-                <>
-                  <MenuItem onClick={onEdit}>Edit</MenuItem>
-                  <MenuItem onClick={() => {
-                    onDuplicate();
-                    toggleDropdown();
-                    setShowActions(false);
-                  }}>
-                    Duplicate
-                  </MenuItem>
-                  <MenuItem divider />
-                  <MenuItem onClick={() => {
-                    onInsertAbove();
-                    toggleDropdown();
-                    setShowActions(false);
-                  }}>
-                    Insert above
-                  </MenuItem>
-                  <MenuItem onClick={() => {
-                    onInsertBelow();
-                    toggleDropdown();
-                    setShowActions(false);
-                  }}>
-                    Insert below
-                  </MenuItem>
-                  <MenuItem divider />
-                  <MenuItem onClick={onDelete}>Delete</MenuItem>
-                </>
-              )}
+              <MenuItem onClick={onEdit}>Edit</MenuItem>
+              <MenuItem onClick={() => {
+                onDuplicate();
+                handleDropdownToggle();
+              }}>
+                Duplicate
+              </MenuItem>
+              <MenuItem divider />
+              <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
+              <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
+              <MenuItem divider />
+              <MenuItem onClick={onDelete}>Delete</MenuItem>
             </OverlayDropdownButton>
           </ActionsContainer>
         )}

@@ -48,10 +48,10 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@mantine/core": "^6.0.4",
-    "@mantine/dropzone": "^6.0.10",
-    "@mantine/hooks": "^6.0.4",
-    "@mantine/notifications": "^6.0.4",
+    "@mantine/core": "^6.0.21",
+    "@mantine/dropzone": "^6.0.21",
+    "@mantine/hooks": "^6.0.21",
+    "@mantine/notifications": "^6.0.21",
     "@openfonts/dm-sans_latin": "^1.0.2",
     "@openfonts/source-sans-pro_latin": "^1.44.2",
     "@openfonts/ubuntu-mono_latin": "^1.44.1",
@@ -163,7 +163,7 @@
     "html-webpack-plugin": "^5.3.2",
     "json-loader": "^0.5.3",
     "less": "^4.1.2",
-    "less-loader": "^11.0.0",
+    "less-loader": "^12.0.0",
     "node-fetch": "^2.6.1",
     "puppeteer": "^21.0.3",
     "react-bootstrap": "0.33.1",
@@ -175,7 +175,8 @@
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "^4.13.1",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "whatwg-fetch": "^3.6.20"
   },
   "resolutions": {
     "@types/react": "18.0.28",

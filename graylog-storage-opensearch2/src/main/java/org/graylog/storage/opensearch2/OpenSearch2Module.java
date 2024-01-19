@@ -32,6 +32,7 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
@@ -58,6 +59,7 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
+        bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
         if (useComposableIndexTemplates) {
             bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
         } else {

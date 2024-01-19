@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.management;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
@@ -30,6 +31,7 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -60,6 +62,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<RestHighLevelClient> restClient = Optional.empty();
+    private Optional<OpenSearchClient> openSearchClient = Optional.empty();
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
 
@@ -73,9 +76,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final CustomCAX509TrustManager trustManager;
     private final NodeService<DataNodeDto> nodeService;
     private final Configuration configuration;
+    private final ObjectMapper objectMapper;
 
 
-    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService<DataNodeDto> nodeService) {
+    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager,
+                          final Configuration configuration, final NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = ProcessStateMachine.createNew();
         tracerAggregator = new StateMachineTracerAggregator();
@@ -85,6 +90,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.trustManager = trustManager;
         this.nodeService = nodeService;
         this.configuration = configuration;
+        this.objectMapper = objectMapper;
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
@@ -103,6 +109,10 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     public Optional<RestHighLevelClient> restClient() {
         return restClient;
+    }
+
+    public Optional<OpenSearchClient> openSearchClient() {
+        return openSearchClient;
     }
 
     public OpensearchInfo processInfo() {
@@ -192,6 +202,8 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         opensearchConfiguration.ifPresentOrElse(
                 (config -> {
                     commandLineProcess.start();
+                    restClient = Optional.of(createRestClient(config));
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );

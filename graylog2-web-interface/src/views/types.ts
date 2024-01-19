@@ -274,6 +274,7 @@ type DashboardAction = {
   key: string,
   component: React.ComponentType<DashboardActionComponentProps>,
   modal?: React.ComponentType<DashboardActionModalProps>,
+  useCondition?: () => boolean,
 }
 
 type AssetInformation = {
@@ -418,6 +419,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.dashboardActions'?: Array<DashboardAction>;
     'views.components.eventActions'?: Array<{
+      useCondition: () => boolean,
       component: React.ComponentType<EventActionComponentProps>,
       key: string,
     }>;
@@ -428,10 +430,12 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.messageActions'?: Array<{
       component: React.ComponentType<MessageActionComponentProps>,
       key: string,
+      useCondition: () => boolean,
     }>;
     'views.components.searchActions'?: Array<{
       component: React.ComponentType<SearchActionComponentProps>,
       key: string,
+      useCondition: () => boolean,
     }>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;

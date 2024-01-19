@@ -59,8 +59,10 @@ const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] 
 const selectEventConfig = { container: document.body };
 
 const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
-  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+  userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await screen.findByRole('menu');
+  userEvent.click(await screen.findByRole('menuitem', { name: key }));
+  await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
 };
 
 const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
