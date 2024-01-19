@@ -26,12 +26,12 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.Ticker;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.validation.constraints.Min;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -70,18 +70,30 @@ public class CaffeineLookupCache extends LookupCache {
     public CaffeineLookupCache(@Assisted("id") String id,
                                @Assisted("name") String name,
                                @Assisted LookupCacheConfiguration c,
-                               @Named("processbuffer_processors") int processorCount,
                                MetricRegistry metricRegistry) {
         super(id, name, c, metricRegistry);
         config = (Config) c;
-        Caffeine<Object, Object> builder = Caffeine.newBuilder();
+        cache = Caffeine.newBuilder()
+                .recordStats(() -> new MetricStatsCounter(this))
+                .maximumSize(config.maxSize())
+                .expireAfter(buildExpiry(config))
+                .build();
+    }
 
-        builder.recordStats(() -> new MetricStatsCounter(this));
-
-        builder.maximumSize(config.maxSize());
-        builder.expireAfter(buildExpiry(config));
-
-        cache = builder.build();
+    // Constructor with external ticker for testing
+    public CaffeineLookupCache(String id,
+                               String name,
+                               LookupCacheConfiguration c,
+                               MetricRegistry metricRegistry,
+                               Ticker fakeTicker) {
+        super(id, name, c, metricRegistry);
+        config = (Config) c;
+        cache = Caffeine.newBuilder()
+                .recordStats(() -> new MetricStatsCounter(this))
+                .maximumSize(config.maxSize())
+                .expireAfter(buildExpiry(config))
+                .ticker(fakeTicker)
+                .build();
     }
 
     private Expiry<LookupCacheKey, LookupResult> buildExpiry(Config config) {
@@ -106,10 +118,18 @@ public class CaffeineLookupCache extends LookupCache {
 
             @Override
             public long expireAfterRead(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime, long currentDuration) {
+                if (config.ttlEmpty() != null
+                        && !Boolean.TRUE.equals(config.ignoreNull())
+                        && lookupResult.isEmpty()) {
+                    LOG.trace("afterRead: empty: {}", currentDuration);
+                    return currentDuration;
+                }
                 if (config.expireAfterAccess() > 0 && config.expireAfterAccessUnit() != null) {
                     //noinspection ConstantConditions
+                    LOG.trace("afterRead: config: {}", config.expireAfterAccessUnit().toNanos(config.expireAfterAccess()));
                     return config.expireAfterAccessUnit().toNanos(config.expireAfterAccess());
                 }
+                LOG.trace("afterRead: {}", currentDuration);
                 return currentDuration;
             }
         };
@@ -140,13 +160,13 @@ public class CaffeineLookupCache extends LookupCache {
             try {
                 final LookupResult result = loader.call();
                 if (ignoreResult(result, config.ignoreNull())) {
-                    LOG.info("Ignoring failed lookup for key {}", key);
+                    LOG.trace("Ignoring failed lookup for key {}", key);
                     return LookupResult.builder()
                             .cacheTTL(0L)
                             .build();
                 }
                 if (isResultEmpty(result)) {
-                    LOG.info("Empty lookup for key {} with TTL {}", key, ttlEmptyMillis());
+                    LOG.trace("Empty lookup for key {} with TTL {}", key, ttlEmptyMillis());
                     return LookupResult.builder()
                             .cacheTTL(ttlEmptyMillis())
                             .build();
@@ -164,10 +184,10 @@ public class CaffeineLookupCache extends LookupCache {
     }
 
     private boolean ignoreResult(LookupResult result, Boolean ignoreNull) {
-        if (ignoreNull == null || !ignoreNull) {
-            return false;
+        if (Boolean.TRUE.equals(ignoreNull)) {
+            return isResultEmpty(result);
         }
-        return isResultEmpty(result);
+        return false;
     }
 
     private boolean isResultEmpty(LookupResult result) {
