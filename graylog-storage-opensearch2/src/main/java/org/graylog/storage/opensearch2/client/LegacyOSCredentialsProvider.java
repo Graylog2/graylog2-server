@@ -18,33 +18,31 @@ package org.graylog.storage.opensearch2.client;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.graylog2.configuration.IndexerHosts;
-
-import javax.annotation.Nullable;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
+import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
+import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
+import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog2.configuration.IndexerHosts;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
-public class OSCredentialsProvider implements Provider<CredentialsProvider> {
+public class LegacyOSCredentialsProvider implements Provider<CredentialsProvider> {
     private final List<URI> openSearchHosts;
     private final String defaultUserForDiscoveredNodes;
     private final String defaultPasswordForDiscoveredNodes;
     private final boolean discoveryEnabled;
 
     @Inject
-    public OSCredentialsProvider(@IndexerHosts List<URI> openSearchHosts,
-                                 @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
-                                 @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
-                                 @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled) {
+    public LegacyOSCredentialsProvider(@IndexerHosts List<URI> openSearchHosts,
+                                       @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
+                                       @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
+                                       @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled) {
         this.openSearchHosts = openSearchHosts;
         this.defaultUserForDiscoveredNodes = defaultUserForDiscoveredNodes;
         this.defaultPasswordForDiscoveredNodes = defaultPasswordForDiscoveredNodes;
