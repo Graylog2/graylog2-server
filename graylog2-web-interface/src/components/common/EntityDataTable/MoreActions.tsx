@@ -14,15 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { PluginRegistration, PluginExports } from 'graylog-web-plugin/plugin';
-import { PluginStore, PluginManifest } from 'graylog-web-plugin/plugin';
+import * as React from 'react';
 
-export const loadPlugin = (plugin: PluginRegistration) => PluginStore.register(plugin);
-export const unloadPlugin = (plugin: PluginRegistration) => PluginStore.unregister(plugin);
+import DropdownButton from 'components/bootstrap/DropdownButton';
 
-export const usePlugin = (plugin: PluginRegistration) => {
-  beforeAll(() => loadPlugin(plugin));
-  afterAll(() => unloadPlugin(plugin));
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from './Constants';
+
+type Props = React.PropsWithChildren<{
+  disabled?: boolean,
+}>
+const MoreActions = ({ children, disabled }: Props) => (
+  <DropdownButton title={MORE_ACTIONS_TITLE}
+                  bsSize="xsmall"
+                  pullRight
+                  buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+                  disabled={disabled}>
+    {children}
+  </DropdownButton>
+);
+
+MoreActions.defaultProps = {
+  disabled: false,
 };
 
-export const usePluginExports = (exports: PluginExports) => usePlugin(new PluginManifest({}, exports));
+export default MoreActions;
