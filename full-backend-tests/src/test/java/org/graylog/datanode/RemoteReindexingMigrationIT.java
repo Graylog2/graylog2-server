@@ -93,7 +93,8 @@ public class RemoteReindexingMigrationIT {
         final String request = """
                 {
                     "hostname": "%s",
-                    "indices": ["%s"]
+                    "indices": ["%s"],
+                    "synchronous": true
                 }
                 """.formatted(openSearchInstance.internalUri(), indexName);
 
