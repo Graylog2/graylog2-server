@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import com.google.auto.value.AutoValue;
+import jakarta.inject.Inject;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
@@ -36,9 +37,6 @@ import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -146,11 +144,6 @@ public class MoreSearch {
         }
 
         moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, filters, batchSize, resultCallback::call);
-    }
-
-    public void scrollQuery(String queryString, Set<String> streams, Set<Parameter> queryParameters, TimeRange timeRange,
-                            int batchSize, ScrollCallback resultCallback) throws EventProcessorException {
-        scrollQuery(queryString, streams, Collections.emptyList(), queryParameters, timeRange, batchSize, resultCallback);
     }
 
     public Set<Stream> loadStreams(Set<String> streamIds) {
