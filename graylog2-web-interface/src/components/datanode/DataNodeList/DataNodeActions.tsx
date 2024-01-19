@@ -20,9 +20,8 @@ import styled from 'styled-components';
 
 import { ConfirmDialog } from 'components/common';
 import { Button, MenuItem } from 'components/bootstrap';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import type { DataNode } from 'preflight/types';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 import {
   rejoinDataNode,
@@ -127,17 +126,13 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
   return (
     <>
       {displayAs === 'dropdown' && (
-        <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                               bsSize="xsmall"
-                               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                               disabled={false}
-                               dropdownZIndex={1000}>
+        <MoreActions>
           <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
           {!isDatanodeRunning && <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>}
           {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
           {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
           {(!isDatanodeRemoved || isRemovingDatanode) && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>}
-        </OverlayDropdownButton>
+        </MoreActions>
       )}
       {displayAs === 'buttons' && (
         <>

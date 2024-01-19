@@ -39,7 +39,7 @@ class FilteredOpenSearchNodesSnifferTest {
     void doesNotFilterNodesIfNoFilterIsSet() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer(null, null);
+        final LegacyNodesSniffer nodesSniffer = new LegacyFilteredOpenSearchNodesSniffer(null, null);
 
         assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
     }
@@ -48,7 +48,7 @@ class FilteredOpenSearchNodesSnifferTest {
     void worksWithEmptyNodesListIfFilterIsSet() throws Exception {
         final List<Node> nodes = Collections.emptyList();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("rack", "42");
+        final LegacyNodesSniffer nodesSniffer = new LegacyFilteredOpenSearchNodesSniffer("rack", "42");
 
         assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
     }
@@ -57,7 +57,7 @@ class FilteredOpenSearchNodesSnifferTest {
     void returnsNodesMatchingGivenFilter() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("rack", "42");
+        final LegacyNodesSniffer nodesSniffer = new LegacyFilteredOpenSearchNodesSniffer("rack", "42");
 
         assertThat(nodesSniffer.sniff(nodes)).containsExactly(nodeOnRack42);
     }
@@ -66,7 +66,7 @@ class FilteredOpenSearchNodesSnifferTest {
     void returnsNoNodesIfFilterDoesNotMatch() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("location", "alaska");
+        final LegacyNodesSniffer nodesSniffer = new LegacyFilteredOpenSearchNodesSniffer("location", "alaska");
 
         assertThat(nodesSniffer.sniff(nodes)).isEmpty();
     }
@@ -75,7 +75,7 @@ class FilteredOpenSearchNodesSnifferTest {
     void returnsAllNodesIfFilterMatchesAll() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("always", "true");
+        final LegacyNodesSniffer nodesSniffer = new LegacyFilteredOpenSearchNodesSniffer("always", "true");
 
         assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
     }
@@ -87,7 +87,7 @@ class FilteredOpenSearchNodesSnifferTest {
         ));
         final List<Node> nodes = Collections.singletonList(matchingNode);
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("something", "42");
+        final LegacyNodesSniffer nodesSniffer = new LegacyFilteredOpenSearchNodesSniffer("something", "42");
 
         assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
     }
@@ -112,8 +112,8 @@ class FilteredOpenSearchNodesSnifferTest {
         return ImmutableList.of(nodeOnRack42, nodeOnRack23, nodeWithNoAttributes);
     }
 
-    private NodesSniffer mockSniffer(List<Node> nodes) throws IOException {
-        final NodesSniffer mockSniffer = mock(NodesSniffer.class);
+    private LegacyNodesSniffer mockSniffer(List<Node> nodes) throws IOException {
+        final LegacyNodesSniffer mockSniffer = mock(LegacyNodesSniffer.class);
         when(mockSniffer.sniff(nodes)).thenReturn(nodes);
         return mockSniffer;
     }
