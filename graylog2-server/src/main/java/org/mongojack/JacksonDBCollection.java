@@ -30,22 +30,23 @@ public class JacksonDBCollection<T, K> {
     private final JacksonMongoCollection<T> delegate;
     private final Class<K> idType;
     private final ObjectMapper objectMapper;
+    private final DBCollection dbCollection;
 
     public static <T, K> JacksonDBCollection<T, K> wrap(
             DBCollection dbCollection, Class<T> type, Class<K> keyType,
             ObjectMapper objectMapper) {
 
-        final MongoDatabase db = dbCollection.getDB().getMongoClient().getDatabase(dbCollection.getDB().getName());
-
-        final JacksonMongoCollection<T> jacksonMongoCollection = JacksonMongoCollection.builder()
-                .withObjectMapper(objectMapper)
-                .build(db, dbCollection.getName(), type, UuidRepresentation.UNSPECIFIED);
-
-        return new JacksonDBCollection<>(jacksonMongoCollection, keyType, objectMapper);
+        return new JacksonDBCollection<>(dbCollection, type, keyType, objectMapper);
     }
 
-    private JacksonDBCollection(JacksonMongoCollection<T> delegate, Class<K> idType, ObjectMapper objectMapper) {
-        this.delegate = delegate;
+    private JacksonDBCollection(DBCollection dbCollection, Class<T> type, Class<K> idType, ObjectMapper objectMapper) {
+
+        final MongoDatabase db = dbCollection.getDB().getMongoClient().getDatabase(dbCollection.getDB().getName());
+
+        this.dbCollection = dbCollection;
+        this.delegate = JacksonMongoCollection.builder()
+                .withObjectMapper(objectMapper)
+                .build(db, dbCollection.getName(), type, UuidRepresentation.UNSPECIFIED);
         this.idType = idType;
         this.objectMapper = objectMapper;
     }
@@ -59,20 +60,17 @@ public class JacksonDBCollection<T, K> {
         delegate.createIndex(new BasicDBObject(keys.toMap()));
     }
 
-    public void createIndex(Bson keys, @Nullable String name, boolean unique) {
-        delegate.createIndex(keys, new IndexOptions().name(name).unique(unique));
-    }
-
     public DBCursor<T> find() {
-        return new DBCursor<>(delegate);
+        return new DBCursor<>(delegate, null, delegate::find);
     }
 
     public DBCursor<T> find(Bson filter) {
-        return new DBCursor<>(delegate, filter);
+        return new DBCursor<>(delegate, filter, () -> delegate.find(filter));
     }
 
     public DBCursor<T> find(DBObject dbObject) {
-        return new DBCursor<>(delegate, new BasicDBObject(dbObject.toMap()));
+        final BasicDBObject filter = new BasicDBObject(dbObject.toMap());
+        return new DBCursor<>(delegate, filter, () -> delegate.find(filter));
     }
 
     public T findOneById(K objectId) {
@@ -81,6 +79,10 @@ public class JacksonDBCollection<T, K> {
 
     public T findOne(Bson filter) throws MongoException {
         return delegate.findOne(filter);
+    }
+
+    public T findOne(DBObject filter) throws MongoException {
+        return delegate.findOne(new BasicDBObject(filter.toMap()));
     }
 
     public T findOne() {
@@ -98,6 +100,10 @@ public class JacksonDBCollection<T, K> {
 
     public long count(Bson filter) {
         return delegate.countDocuments(filter);
+    }
+
+    public long count(DBObject dbObject) {
+        return delegate.countDocuments(new BasicDBObject(dbObject.toMap()));
     }
 
     public WriteResult<T, K> save(T object) {
@@ -151,6 +157,10 @@ public class JacksonDBCollection<T, K> {
 
     public WriteResult<T, K> update(Bson query, Bson update) {
         return update(query, update, false, false);
+    }
+
+    public WriteResult<T, K> update(DBObject query, Bson update) {
+        return update((Bson) new BasicDBObject(query.toMap()), update);
     }
 
     public WriteResult<T, K> update(Bson query, T object) {
@@ -239,6 +249,10 @@ public class JacksonDBCollection<T, K> {
 
     public List<DBObject> getIndexInfo() {
         return delegate.listIndexes(DBObject.class).into(new ArrayList<>());
+    }
+
+    public DBCollection getDbCollection() {
+        return dbCollection;
     }
 
     record IndexOptionDto(

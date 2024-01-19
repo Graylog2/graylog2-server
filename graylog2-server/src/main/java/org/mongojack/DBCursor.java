@@ -12,6 +12,7 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Custom implementation of a DBCursor to support legacy code. Can only be used for find operations.
@@ -25,13 +26,9 @@ public class DBCursor<T> implements Closeable, Iterator<T>, Iterable<T> {
     private final Bson filter;
     private MongoCursor<T> cursor;
 
-    public DBCursor(JacksonMongoCollection<T> collection) {
-        this(collection, null);
-    }
-
-    public DBCursor(JacksonMongoCollection<T> collection, Bson filter) {
+    public DBCursor(JacksonMongoCollection<T> collection, Bson filter, Supplier<FindIterable<T>> findIterableSupplier) {
         this.collection = collection;
-        this.findIterable = filter == null ? collection.find() : collection.find(filter);
+        this.findIterable = findIterableSupplier.get();
         this.filter = filter;
     }
 
