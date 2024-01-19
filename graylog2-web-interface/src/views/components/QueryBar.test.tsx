@@ -30,6 +30,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery, removeQuery } from 'views/logic/slices/viewSlice';
 
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
+jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'bar');
 
 const queries = Immutable.OrderedSet(['foo', 'bar', 'baz']);
 const queryTitles = Immutable.Map({
@@ -125,7 +126,7 @@ describe('QueryBar', () => {
 
     fireEvent.click(dropdown);
 
-    const closeButton = await screen.findByRole('menuitem', { name: 'Delete' });
+    const closeButton = await screen.findByRole('menuitem', { name: 'Delete', hidden: true });
 
     fireEvent.click(closeButton);
 
