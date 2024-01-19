@@ -17,6 +17,7 @@
 package org.graylog2.indexer;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -55,11 +56,14 @@ public class IndexSetValidatorTest {
     @Mock
     private DataTieringOrchestrator dataTieringOrchestrator;
 
+    @Mock
+    private DataTieringChecker dataTieringChecker;
+
     private IndexSetValidator validator;
 
     @BeforeEach
     public void setUp() throws Exception {
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, false);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker    );
     }
 
     @Test
@@ -207,17 +211,17 @@ public class IndexSetValidatorTest {
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, true);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
 
         assertThat(validator.validate(testIndexSetConfig().toBuilder().dataTiering(mock(DataTieringConfig.class)).build())).hasValueSatisfying(v ->
-                assertThat(v.message()).contains("cloud"));
+                assertThat(v.message()).isEqualTo("data tiering feature is disabled!"));
     }
 
     @Test
     public void testWarmTierKeywordReserved() {
         IndexSetConfig config = testIndexSetConfig().toBuilder().indexPrefix("warm_").build();
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, true);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
 
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("contains reserved keyword 'warm_'!"));

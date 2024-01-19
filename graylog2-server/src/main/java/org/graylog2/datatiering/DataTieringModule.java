@@ -16,6 +16,7 @@
  */
 package org.graylog2.datatiering;
 
+import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
