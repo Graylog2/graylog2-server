@@ -175,7 +175,7 @@ public class IndexSetValidator {
 
 
     @Nullable
-    private Violation validateDataTiers(DataTieringConfig dataTieringConfig) {
+    public Violation validateDataTiers(DataTieringConfig dataTieringConfig) {
         return dataTieringOrchestrator.validate(dataTieringConfig).orElse(null);
     }
 

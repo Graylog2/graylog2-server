@@ -30,6 +30,7 @@ public class DataTieringModule extends Graylog2Module {
         install(new FactoryModuleBuilder().build(DataTierRotation.Factory.class));
         OptionalBinder.newOptionalBinder(binder(), DataTieringOrchestrator.class).setDefault().to(HotOnlyDataTieringOrchestrator.class);
         registerJacksonSubtype(HotOnlyDataTieringConfig.class, HotOnlyDataTieringConfig.TYPE);
+        addSystemRestResource(DataTieringResource.class);
     }
 
 }

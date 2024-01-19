@@ -30,4 +30,6 @@ public interface DataTieringOrchestrator {
 
     Optional<IndexSetValidator.Violation> validate(@NotNull DataTieringConfig config);
 
+    DataTieringConfig defaultConfig();
+
 }

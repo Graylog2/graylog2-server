@@ -86,4 +86,12 @@ public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
 
     }
 
+    @Override
+    public DataTieringConfig defaultConfig() {
+        return HotOnlyDataTieringConfig.builder()
+                .indexLifetimeMin(IndexLifetimeConfig.DEFAULT_LIFETIME_MIN)
+                .indexLifetimeMax(IndexLifetimeConfig.DEFAULT_LIFETIME_MAX)
+                .build();
+    }
+
 }
