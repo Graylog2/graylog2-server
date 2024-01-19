@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7;
 
-import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
@@ -46,23 +45,17 @@ public class SearchRequestFactory {
     private final SortOrderMapper sortOrderMapper;
     private final boolean allowHighlighting;
     private final boolean allowLeadingWildcardSearches;
-    private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
+    private final UsedSearchFiltersToQueryStringsMapper searchFiltersMapper;
 
     @Inject
     public SearchRequestFactory(SortOrderMapper sortOrderMapper,
                                 @Named("allow_highlighting") boolean allowHighlighting,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcardSearches,
-                                UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper) {
+                                UsedSearchFiltersToQueryStringsMapper searchFiltersMapper) {
         this.sortOrderMapper = sortOrderMapper;
         this.allowHighlighting = allowHighlighting;
         this.allowLeadingWildcardSearches = allowLeadingWildcardSearches;
-        this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
-    }
-
-    public SearchRequestFactory(SortOrderMapper sortOrderMapper,
-                                boolean allowHighlighting,
-                                boolean allowLeadingWildcardSearches) {
-        this(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
+        this.searchFiltersMapper = searchFiltersMapper;
     }
 
     public SearchSourceBuilder create(SearchesConfig config) {
@@ -99,7 +92,7 @@ public class SearchRequestFactory {
 
         applyStreamsFilter(filteredQueryBuilder, searchCommand);
 
-        usedSearchFiltersToQueryStringsMapper.map(searchCommand.filters())
+        searchFiltersMapper.map(searchCommand.filters())
                 .stream()
                 .map(this::translateQueryString)
                 .forEach(filteredQueryBuilder::filter);

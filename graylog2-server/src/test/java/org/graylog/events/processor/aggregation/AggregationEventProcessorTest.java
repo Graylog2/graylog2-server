@@ -407,7 +407,7 @@ public class AggregationEventProcessorTest {
         verify(moreSearch, never()).scrollQuery(
                 eq(config.query()),
                 eq(config.streams()),
-                eq(config.queryParameters()),
+                eq(config.filters()), eq(config.queryParameters()),
                 eq(parameters.timerange()),
                 eq(parameters.batchSize()),
                 any(MoreSearch.ScrollCallback.class)
