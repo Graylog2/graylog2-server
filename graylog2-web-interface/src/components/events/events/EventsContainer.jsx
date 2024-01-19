@@ -29,6 +29,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import Events, { PAGE_SIZES, EVENTS_MAX_OFFSET_LIMIT } from './Events';
 
 import 'components/event-definitions/event-definition-types';
+import UserNotification from 'util/UserNotification';
 
 const LOCAL_STORAGE_ITEM = 'events-last-search';
 
@@ -41,6 +42,8 @@ const fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
     pageSize: pageSize,
     filter: filter,
     timerange: timerange,
+  }).catch((error) => {
+    UserNotification.error(`Fetching alerts failed with status: ${error}`);
   });
 };
 
