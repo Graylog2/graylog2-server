@@ -115,7 +115,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
 
         {!canEditCondition ? (
           <p>
-            The event fields of system notification event definitions cannot be edited.
+            The event fields of this event definition type cannot be edited.
           </p>
         ) : (
           <>

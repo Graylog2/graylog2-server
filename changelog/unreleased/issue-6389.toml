@@ -1,5 +1,0 @@
-type = "a"
-message = "Added ability to add notifications to illuminate event definitions"
-
-issues = ["6389"]
-pulls = []

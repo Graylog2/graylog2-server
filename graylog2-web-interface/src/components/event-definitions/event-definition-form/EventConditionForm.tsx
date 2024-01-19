@@ -133,7 +133,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
 
         {!canEditCondition ? (
           <p>
-            The conditions of system notification event definitions cannot be edited.
+            The conditions of this event definition type cannot be edited.
           </p>
         ) : (
           <>
