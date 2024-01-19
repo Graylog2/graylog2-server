@@ -18,7 +18,8 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 
 import org.bson.types.ObjectId;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Date;
 
 public class RandomObjectIdProvider {

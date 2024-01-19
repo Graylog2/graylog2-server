@@ -45,18 +45,21 @@ import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -144,9 +147,9 @@ public class IndexRangesResource extends RestResource {
     @Path("/rebuild")
     @RequiresPermissions(RestPermissions.INDEXRANGES_REBUILD)
     @ApiOperation(value = "Rebuild/sync index range information.",
-            notes = "This triggers a systemjob that scans every index and stores meta information " +
-                    "about what indices contain messages in what timeranges. It atomically overwrites " +
-                    "already existing meta information.")
+                  notes = "This triggers a systemjob that scans every index and stores meta information " +
+                          "about what indices contain messages in what timeranges. It atomically overwrites " +
+                          "already existing meta information.")
     @ApiResponses(value = {
             @ApiResponse(code = 202, message = "Rebuild/sync systemjob triggered.")
     })
@@ -164,9 +167,9 @@ public class IndexRangesResource extends RestResource {
     @Path("/index_set/{indexSetId}/rebuild")
     @RequiresPermissions(RestPermissions.INDEXRANGES_REBUILD)
     @ApiOperation(value = "Rebuild/sync index range information for the given index set.",
-            notes = "This triggers a systemjob that scans every index in the given index set and stores meta information " +
-                    "about what indices contain messages in what timeranges. It atomically overwrites " +
-                    "already existing meta information.")
+                  notes = "This triggers a systemjob that scans every index in the given index set and stores meta information " +
+                          "about what indices contain messages in what timeranges. It atomically overwrites " +
+                          "already existing meta information.")
     @ApiResponses(value = {
             @ApiResponse(code = 202, message = "Rebuild/sync systemjob triggered.")
     })
@@ -174,7 +177,7 @@ public class IndexRangesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuildIndexSet(@ApiParam(name = "indexSetId") @PathParam("indexSetId") @NotBlank final String indexSetId) {
         final IndexSet indexSet = indexSetRegistry.get(indexSetId)
-                .orElseThrow(() -> new javax.ws.rs.NotFoundException("Index set <" + indexSetId + "> not found!"));
+                .orElseThrow(() -> new jakarta.ws.rs.NotFoundException("Index set <" + indexSetId + "> not found!"));
 
         submitIndexRangesJob(Collections.singleton(indexSet));
 
@@ -185,9 +188,9 @@ public class IndexRangesResource extends RestResource {
     @Timed
     @Path("/{index: [a-z_0-9-]+}/rebuild")
     @ApiOperation(value = "Rebuild/sync index range information.",
-            notes = "This triggers a system job that scans an index and stores meta information " +
-                    "about what indices contain messages in what time ranges. It atomically overwrites " +
-                    "already existing meta information.")
+                  notes = "This triggers a system job that scans an index and stores meta information " +
+                          "about what indices contain messages in what time ranges. It atomically overwrites " +
+                          "already existing meta information.")
     @ApiResponses(value = {
             @ApiResponse(code = 202, message = "Rebuild/sync system job triggered.")
     })

@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 public abstract class MoreMediaTypes {
     /**

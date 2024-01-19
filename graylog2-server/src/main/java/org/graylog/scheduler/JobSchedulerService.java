@@ -30,9 +30,10 @@ import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -122,7 +123,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
                     // we receive a job completion event via the scheduler event bus.
                     if (sleeper.sleep(loopSleepDuration.getQuantity(), loopSleepDuration.getUnit())) {
                         LOG.debug("Waited for {} {} because there are either no free worker threads or no runnable triggers",
-                                    loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
+                                loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
                     }
                 }
             } catch (InterruptedException e) {

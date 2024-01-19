@@ -32,7 +32,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
     public static final String COLLECTION_NAME = "recent_activity";

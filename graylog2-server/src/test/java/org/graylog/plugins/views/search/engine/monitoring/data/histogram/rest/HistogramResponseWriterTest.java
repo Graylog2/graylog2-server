@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.MediaType;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.Histogram;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.MultiValueBin;
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.NamedBinDefinition;
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

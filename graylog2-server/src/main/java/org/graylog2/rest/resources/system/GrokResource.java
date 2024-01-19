@@ -42,22 +42,25 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,15 +117,15 @@ public class GrokResource extends RestResource {
     @ApiOperation("Get existing grok patterns paged")
     @Produces(MediaType.APPLICATION_JSON)
     public PaginatedResponse<GrokPattern> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                     @ApiParam(name = "sort",
-                                               value = "The field to sort the result on",
-                                               required = true,
-                                               allowableValues = "title,description,id")
-                                       @DefaultValue(GrokPattern.FIELD_NAME) @QueryParam("sort") String sort,
-                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                       @DefaultValue("asc") @QueryParam("order") String order) {
+                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                  @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                  @ApiParam(name = "sort",
+                                                            value = "The field to sort the result on",
+                                                            required = true,
+                                                            allowableValues = "title,description,id")
+                                                  @DefaultValue(GrokPattern.FIELD_NAME) @QueryParam("sort") String sort,
+                                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                  @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.INPUTS_READ);
 
         SearchQuery searchQuery;
@@ -142,7 +145,7 @@ public class GrokResource extends RestResource {
     @Path("/{patternId}")
     @ApiOperation("Get the existing grok pattern")
     public GrokPattern listPattern(@ApiParam(name = "patternId", required = true)
-                                       @PathParam("patternId") String patternId) throws NotFoundException {
+                                   @PathParam("patternId") String patternId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ);
 
         return grokPatternService.load(patternId);
@@ -170,7 +173,7 @@ public class GrokResource extends RestResource {
     @ApiOperation(value = "Add a new named pattern", response = GrokPattern.class)
     @AuditEvent(type = AuditEventTypes.GROK_PATTERN_CREATE)
     public Response createPattern(@ApiParam(name = "pattern", required = true)
-                                      @Valid @NotNull GrokPattern pattern) throws ValidationException {
+                                  @Valid @NotNull GrokPattern pattern) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         // remove the ID from the pattern, this is only used to create new patterns
@@ -186,13 +189,13 @@ public class GrokResource extends RestResource {
     @ApiOperation("Add a list of new patterns")
     @AuditEvent(type = AuditEventTypes.GROK_PATTERN_IMPORT_CREATE)
     public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull
-                                               GrokPatternList patternList,
+                                       GrokPatternList patternList,
                                        // deprecated. used to drop all existing patterns before import
                                        @Deprecated @QueryParam("replace") @DefaultValue("false")
-                                               boolean deprecatedDropAllExisting,
+                                       boolean deprecatedDropAllExisting,
                                        @ApiParam(name = "import-strategy", value = "Strategy to apply when importing.")
                                        @QueryParam("import-strategy")
-                                               ImportStrategy importStrategy) throws ValidationException {
+                                       ImportStrategy importStrategy) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         try {
@@ -218,10 +221,10 @@ public class GrokResource extends RestResource {
     public Response bulkUpdatePatternsFromTextFile(@ApiParam(name = "patterns", required = true) @NotNull InputStream patternsFile,
                                                    // deprecated. used to drop all existing patterns before import
                                                    @Deprecated @QueryParam("replace") @DefaultValue("false")
-                                                           boolean deprecatedDropAllExisting,
+                                                   boolean deprecatedDropAllExisting,
                                                    @ApiParam(name = "import-strategy", value = "Strategy to apply when importing.")
                                                    @QueryParam("import-strategy")
-                                                           ImportStrategy importStrategy) throws ValidationException, IOException {
+                                                   ImportStrategy importStrategy) throws ValidationException, IOException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         final List<GrokPattern> grokPatterns = readGrokPatterns(patternsFile);
@@ -288,7 +291,7 @@ public class GrokResource extends RestResource {
 
         grokPatternService.load(patternId);
         if (grokPatternService.delete(patternId) == 0) {
-            throw new javax.ws.rs.NotFoundException("Couldn't remove Grok pattern with ID " + patternId);
+            throw new jakarta.ws.rs.NotFoundException("Couldn't remove Grok pattern with ID " + patternId);
         }
     }
 }

@@ -25,8 +25,9 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;

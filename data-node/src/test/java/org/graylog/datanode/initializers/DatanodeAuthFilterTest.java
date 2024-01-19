@@ -16,13 +16,13 @@
  */
 package org.graylog.datanode.initializers;
 
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.MultivaluedHashMap;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;

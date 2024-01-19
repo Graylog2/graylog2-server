@@ -18,7 +18,8 @@ package org.graylog.plugins.views.search.views;
 
 import com.github.zafarkhaja.semver.Version;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.net.URI;
 import java.util.Objects;
 

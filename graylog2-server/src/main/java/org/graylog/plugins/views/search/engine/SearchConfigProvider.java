@@ -20,8 +20,9 @@ import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.Period;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.Optional;
 
 public class SearchConfigProvider implements Provider<SearchConfig> {

@@ -23,8 +23,9 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.graylog2.shared.metrics.MetricUtils;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.time.Duration;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;

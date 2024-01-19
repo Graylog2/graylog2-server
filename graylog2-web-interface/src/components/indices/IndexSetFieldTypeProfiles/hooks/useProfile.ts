@@ -24,7 +24,12 @@ import type {
   IndexSetFieldTypeProfile,
 } from 'components/indices/IndexSetFieldTypeProfiles/types';
 
-const INITIAL_DATA = null;
+const INITIAL_DATA: IndexSetFieldTypeProfile = {
+  customFieldMappings: [],
+  name: null,
+  id: null,
+  description: null,
+};
 
 const fetchIndexSetFieldTypeProfile = async (id: string) => {
   const url = qualifyUrl(`/system/indices/index_sets/profiles/${id}`);

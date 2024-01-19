@@ -22,7 +22,7 @@ import com.lmax.disruptor.WorkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -40,10 +40,10 @@ public class RawMessageEncoderHandler implements WorkHandler<RawMessageEvent> {
         incomingMessages.mark();
         event.setEncodedRawMessage(event.getRawMessage().encode());
         event.setMessageIdBytes(event.getRawMessage().getIdBytes());
-        
+
         if (log.isTraceEnabled()) {
             log.trace("Serialized message {} for journal, size {} bytes",
-                      event.getRawMessage().getId(), event.getEncodedRawMessage().length);
+                    event.getRawMessage().getId(), event.getEncodedRawMessage().length);
         }
 
         // Set timestamp in event to retain access to it after we clear the raw message object below

@@ -25,7 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class MetricCounterIncrement extends AbstractFunction<Void> {
 

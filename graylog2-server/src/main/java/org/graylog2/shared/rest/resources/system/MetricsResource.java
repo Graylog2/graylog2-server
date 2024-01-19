@@ -37,16 +37,19 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +70,7 @@ public class MetricsResource extends RestResource {
     @Timed
     @RequiresPermissions(RestPermissions.METRICS_READALL)
     @ApiOperation(value = "Get all metrics",
-            notes = "Note that this might return a huge result set.")
+                  notes = "Note that this might return a huge result set.")
     @Produces(MediaType.APPLICATION_JSON)
     public MetricRegistry metrics() {
         return metricRegistry;
@@ -114,7 +117,7 @@ public class MetricsResource extends RestResource {
     })
     @NoAuditEvent("only used to retrieve multiple metrics")
     public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "Requested metrics", required = true)
-                                  @Valid @NotNull MetricsReadRequest request) {
+                                                  @Valid @NotNull MetricsReadRequest request) {
         final Map<String, Metric> metrics = metricRegistry.getMetrics();
 
         final List<Map<String, Object>> metricsList = Lists.newArrayList();
@@ -142,7 +145,7 @@ public class MetricsResource extends RestResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public MetricsSummaryResponse byNamespace(@ApiParam(name = "namespace", required = true)
-                              @PathParam("namespace") String namespace) {
+                                              @PathParam("namespace") String namespace) {
         final List<Map<String, Object>> metrics = Lists.newArrayList();
         for (Map.Entry<String, Metric> e : metricRegistry.getMetrics().entrySet()) {
             final String metricName = e.getKey();
