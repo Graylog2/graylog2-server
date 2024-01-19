@@ -91,6 +91,11 @@ const Routes = {
     INDICES: {
       LIST: '/system/indices',
       FAILURES: '/system/indices/failures',
+      FIELD_TYPE_PROFILES: {
+        OVERVIEW: '/system/indices/field-type-profiles',
+        edit: (profileId: string) => `/system/indices/field-type-profiles/${profileId}`,
+        CREATE: '/system/indices/field-type-profiles/create',
+      },
     },
     INDEX_SETS: {
       CONFIGURATION: (indexSetId: string, from?: string) => {
@@ -112,7 +117,10 @@ const Routes = {
       SHOW: (nodeId: string) => `/system/nodes/${nodeId}`,
     },
     DATANODES: {
-      OVERVIEW: '/system/datanodes',
+      LIST: '/system/datanodes',
+      SHOW: (dataNodeId: string) => `/system/datanodes/${dataNodeId}`,
+      CLUSTER: '/system/datanodes/cluster',
+      MIGRATION: '/system/datanodes/migration',
     },
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',

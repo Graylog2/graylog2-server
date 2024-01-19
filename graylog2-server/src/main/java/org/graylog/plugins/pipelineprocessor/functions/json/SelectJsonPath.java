@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
@@ -31,7 +32,9 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,23 +47,25 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
 
     public static final String NAME = "select_jsonpath";
 
+    private final ObjectMapper objectMapper;
     private final Configuration configuration;
-    private final ParameterDescriptor<JsonNode, JsonNode> jsonParam;
+    private final ParameterDescriptor<Object, Object> jsonParam;
     private final ParameterDescriptor<Map<String, String>, Map<String, JsonPath>> pathsParam;
 
     @Inject
     public SelectJsonPath(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         configuration = Configuration.builder()
                 .options(Option.SUPPRESS_EXCEPTIONS)
                 .jsonProvider(new JacksonJsonNodeJsonProvider(objectMapper))
                 .build();
 
-        jsonParam = ParameterDescriptor.type("json", JsonNode.class).description("A parsed JSON tree").build();
+        jsonParam = ParameterDescriptor.type("json", Object.class).description("A parsed JSON tree or String representation of a JSON tree").build();
         // sigh generics and type erasure
         //noinspection unchecked
         pathsParam = ParameterDescriptor.type("paths",
-                                              (Class<Map<String, String>>) new TypeLiteral<Map<String, String>>() {}.getRawType(),
-                                              (Class<Map<String, JsonPath>>) new TypeLiteral<Map<String, JsonPath>>() {}.getRawType())
+                        (Class<Map<String, String>>) new TypeLiteral<Map<String, String>>() {}.getRawType(),
+                        (Class<Map<String, JsonPath>>) new TypeLiteral<Map<String, JsonPath>>() {}.getRawType())
                 .transform(inputMap -> inputMap
                         .entrySet().stream()
                         .collect(toMap(Map.Entry::getKey, e -> JsonPath.compile(e.getValue()))))
@@ -70,7 +75,21 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
 
     @Override
     public Map<String, Object> evaluate(FunctionArgs args, EvaluationContext context) {
-        final JsonNode json = jsonParam.required(args, context);
+        final Object jsonObj = jsonParam.required(args, context);
+        JsonNode json = null;
+        if (jsonObj instanceof JsonNode jsonNode) {
+            json = jsonNode;
+        } else if (jsonObj instanceof String jsonString) {
+            try {
+                json = objectMapper.readTree(jsonString);
+            } catch (JsonProcessingException e) {
+                log.warn(context.pipelineErrorMessage("Unable to parse JSON"), e);
+            }
+        } else {
+            throw new IllegalArgumentException(context.pipelineErrorMessage(
+                    "`json` parameter must be a parsed JSON tree or String representation of a JSON tree"));
+        }
+
         final Map<String, JsonPath> paths = pathsParam.required(args, context);
         if (json == null || paths == null) {
             return Collections.emptyMap();

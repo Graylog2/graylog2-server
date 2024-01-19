@@ -31,6 +31,8 @@ const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotific
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const DataNodesPage = loadAsync(() => import('./DataNodesPage'));
+const DataNodesClusterPage = loadAsync(() => import('./DataNodesClusterPage'));
+const DataNodesMigrationPage = loadAsync(() => import('./DataNodesMigrationPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
 const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
@@ -48,7 +50,12 @@ const ImportExtractorsPage = loadAsync(() => import('./ImportExtractorsPage'));
 const IndexerFailuresPage = loadAsync(() => import('./IndexerFailuresPage'));
 const IndexSetConfigurationPage = loadAsync(() => import('./IndexSetConfigurationPage'));
 const IndexSetCreationPage = loadAsync(() => import('./IndexSetCreationPage'));
+
+const IndexSetFieldTypesPage = loadAsync(() => import('./IndexSetFieldTypesPage'));
 const IndexSetPage = loadAsync(() => import('./IndexSetPage'));
+const IndexSetFieldTypeProfileCreatePage = loadAsync(() => import('./IndexSetFieldTypeProfileCreatePage'));
+const IndexSetFieldTypeProfileEditPage = loadAsync(() => import('./IndexSetFieldTypeProfileEditPage'));
+const IndexSetFieldTypeProfilesPage = loadAsync(() => import('./IndexSetFieldTypeProfilesPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
 const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
@@ -99,8 +106,6 @@ const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
 const ViewEventDefinitionPage = loadAsync(() => import('./ViewEventDefinitionPage'));
 
-const IndexSetFieldTypesPage = loadAsync(() => import('./IndexSetFieldTypesPage'));
-
 export {
   AuthenticationCreatePage,
   AuthenticationPage,
@@ -116,7 +121,9 @@ export {
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
+  DataNodesClusterPage,
   DataNodesPage,
+  DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
@@ -136,6 +143,9 @@ export {
   IndexSetCreationPage,
   IndexSetFieldTypesPage,
   IndexSetPage,
+  IndexSetFieldTypeProfileCreatePage,
+  IndexSetFieldTypeProfileEditPage,
+  IndexSetFieldTypeProfilesPage,
   IndicesPage,
   InputsPage,
   KeyboardShortcutsPage,

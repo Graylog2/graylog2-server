@@ -84,7 +84,7 @@ export interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetCo
 }
 
 export interface WidgetResults {
- [key: string]: Result,
+  [key: string]: Result,
 }
 
 export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig, Results = WidgetResults> {
@@ -196,6 +196,7 @@ export interface SystemConfigurationComponentProps {
 
 export interface SystemConfiguration {
   configType: string;
+  displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
 }
 
@@ -239,10 +240,10 @@ export type MessagePreviewOption = {
 }
 
 type ExternalActionsHookData = {
-      error: Error | null;
-      externalValueActions: Array<ActionDefinition> | null;
-      isLoading: boolean;
-      isError: boolean
+  error: Error | null;
+  externalValueActions: Array<ActionDefinition> | null;
+  isLoading: boolean;
+  isError: boolean
 }
 
 type MessageAugmentation = {
@@ -273,6 +274,7 @@ type DashboardAction = {
   key: string,
   component: React.ComponentType<DashboardActionComponentProps>,
   modal?: React.ComponentType<DashboardActionModalProps>,
+  useCondition?: () => boolean,
 }
 
 type AssetInformation = {
@@ -417,6 +419,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.dashboardActions'?: Array<DashboardAction>;
     'views.components.eventActions'?: Array<{
+      useCondition: () => boolean,
       component: React.ComponentType<EventActionComponentProps>,
       key: string,
     }>;
@@ -427,10 +430,12 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.messageActions'?: Array<{
       component: React.ComponentType<MessageActionComponentProps>,
       key: string,
+      useCondition: () => boolean,
     }>;
     'views.components.searchActions'?: Array<{
       component: React.ComponentType<SearchActionComponentProps>,
       key: string,
+      useCondition: () => boolean,
     }>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;

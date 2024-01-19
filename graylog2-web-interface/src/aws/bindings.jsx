@@ -24,6 +24,7 @@ const bindings = AppConfig.isCloud() ? {} : {
   systemConfigurations: [
     {
       component: AwsPluginConfiguration,
+      displayName: 'Aws',
       configType: PLUGIN_CONFIG_CLASS_NAME,
     },
   ],

@@ -44,6 +44,7 @@ import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -89,10 +90,25 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
     @JsonIgnore
     public abstract Optional<GlobalOverride> globalOverride();
 
+    @Deprecated
+    /**
+     * @deprecated {@link Query#effectiveTimeRange(SearchType, DateTime)} is preferred, as it prevents problems with slight time differences between different search types.
+     */
     public TimeRange effectiveTimeRange(SearchType searchType) {
         return searchType.timerange()
                 .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
                 .orElse(this.timerange());
+    }
+
+    public TimeRange effectiveTimeRange(final SearchType searchType, final DateTime nowUTC) {
+        final TimeRange effectiveTimeRange = searchType.timerange()
+                .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
+                .orElse(this.timerange());
+
+        if (effectiveTimeRange instanceof RelativeRange) {
+            return ((RelativeRange) effectiveTimeRange).toBuilder().nowUTC(nowUTC).build();
+        }
+        return effectiveTimeRange;
     }
 
     public Set<String> effectiveStreams(SearchType searchType) {

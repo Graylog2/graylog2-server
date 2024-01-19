@@ -1,0 +1,5 @@
+type = "c"
+message = "Flag an error in rule source editor when variable name is a reserved word."
+
+issues = ["7006"]
+pulls = ["17736"]

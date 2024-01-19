@@ -15,20 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { ModalSubmit } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { SessionActions } from 'stores/sessions/SessionStore';
+import useLogin from 'components/login/useLogin';
 
 type Props = {
   onErrorChange: (message?: string) => void,
 };
 
 const SigninButton = styled(ModalSubmit)(({ theme }) => css`
-  button.btn-success {
+  button.mantine-Button-root {
     background-color: ${theme.colors.brand.primary};
     border-color: ${theme.colors.brand.primary};
     
@@ -40,55 +39,32 @@ const SigninButton = styled(ModalSubmit)(({ theme }) => css`
 `);
 
 const LoginForm = ({ onErrorChange }: Props) => {
-  const [isLoading, setIsLoading] = useState(false);
-  let promise;
-  let usernameInput;
-  let passwordInput;
+  const { login, isLoading } = useLogin(onErrorChange);
 
-  useEffect(() => () => {
-    if (promise) {
-      promise.cancel();
-    }
-  }, [promise]);
-
-  const onSignInClicked = (event) => {
+  const onSignInClicked = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onErrorChange();
-    setIsLoading(true);
-    const username = usernameInput.getValue();
-    const password = passwordInput.getValue();
+    const formData = new FormData(event.currentTarget);
+    const username = formData.get('username') as string;
+    const password = formData.get('password') as string;
     const location = document.location.host;
 
-    promise = SessionActions.login(username, password, location);
-
-    promise.catch((error) => {
-      if (error.additional.status === 401) {
-        onErrorChange('Invalid credentials, please verify them and retry.');
-      } else {
-        onErrorChange(`Error - the server returned: ${error.additional.status} - ${error.message}`);
-      }
-    });
-
-    promise.finally(() => {
-      if (!promise.isCancelled()) {
-        setIsLoading(false);
-      }
-    });
+    return login(username, password, location);
   };
 
   return (
     <form onSubmit={onSignInClicked}>
-      <Input ref={(username) => { usernameInput = username; }}
-             id="username"
+      <Input id="username"
              type="text"
              label="Username"
+             autocomplete="username"
              autoFocus
              required />
 
-      <Input ref={(password) => { passwordInput = password; }}
-             id="password"
+      <Input id="password"
              type="password"
              label="Password"
+             autocomplete="current-password"
              required />
 
       <SigninButton displayCancel={false}

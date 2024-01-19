@@ -35,7 +35,8 @@ import org.graylog2.users.events.UserDeletedEvent;
 import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -78,7 +79,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     public void addFavoriteItemFor(final String in, final SearchUser searchUser) {
         var grn = grnRegistry.parse(in);
         final var favorites = this.findForUser(searchUser);
-        if(favorites.isPresent()) {
+        if (favorites.isPresent()) {
             var fi = favorites.get();
             if (fi.items() != null && fi.items().stream().noneMatch(g -> g.toString().equalsIgnoreCase(in))) {
                 fi.items().add(0, grn);
@@ -93,7 +94,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     public void removeFavoriteItemFor(final String in, final SearchUser searchUser) {
         var grn = grnRegistry.parse(in);
         var favorites = this.findForUser(searchUser);
-        if(favorites.isPresent() && favorites.get().items() != null) {
+        if (favorites.isPresent() && favorites.get().items() != null) {
             var fi = favorites.get();
             var items = fi.items().stream().filter(i -> !i.equals(grn)).toList();
             fi.items().clear();

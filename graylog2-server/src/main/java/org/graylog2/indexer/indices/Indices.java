@@ -29,7 +29,11 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -41,9 +45,11 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.validation.constraints.NotNull;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,18 +74,21 @@ public class Indices {
     private final AuditEventSender auditEventSender;
     private final EventBus eventBus;
     private final IndicesAdapter indicesAdapter;
+    private final IndexFieldTypeProfileService profileService;
 
     @Inject
     public Indices(IndexMappingFactory indexMappingFactory,
                    NodeId nodeId,
                    AuditEventSender auditEventSender,
                    EventBus eventBus,
-                   IndicesAdapter indicesAdapter) {
+                   IndicesAdapter indicesAdapter,
+                   IndexFieldTypeProfileService profileService) {
         this.indexMappingFactory = indexMappingFactory;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;
         this.eventBus = eventBus;
         this.indicesAdapter = indicesAdapter;
+        this.profileService = profileService;
     }
 
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
@@ -183,8 +192,15 @@ public class Indices {
     }
 
     public Template getIndexTemplate(IndexSet indexSet) {
+        final TemplateIndexSetConfig templateIndexSetConfig = getTemplateIndexSetConfig(indexSet, indexSet.getConfig(), profileService);
         return indexMappingFactory.createIndexMapping(indexSet.getConfig())
-                .toTemplate(indexSet.getConfig(), indexSet.getIndexWildcard());
+                .toTemplate(templateIndexSetConfig);
+    }
+
+    Template buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
+        final TemplateIndexSetConfig templateIndexSetConfig = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
+        return indexMappingFactory.createIndexMapping(indexSetConfig)
+                .toTemplate(templateIndexSetConfig, 0L);
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {
@@ -216,9 +232,24 @@ public class Indices {
         return true;
     }
 
-    private Template buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
-        return indexMappingFactory.createIndexMapping(indexSetConfig)
-                .toTemplate(indexSetConfig, indexSet.getIndexWildcard(), 0L);
+    public TemplateIndexSetConfig getTemplateIndexSetConfig(
+            final IndexSet indexSet,
+            final IndexSetConfig indexSetConfig,
+            final IndexFieldTypeProfileService profileService) {
+        final String profileId = indexSetConfig.fieldTypeProfile();
+        final CustomFieldMappings customFieldMappings = indexSetConfig.customFieldMappings();
+        if (profileId != null && !profileId.isEmpty()) {
+            final Optional<IndexFieldTypeProfile> fieldTypeProfile = profileService.get(profileId);
+            if (fieldTypeProfile.isPresent() && !fieldTypeProfile.get().customFieldMappings().isEmpty()) {
+                return new TemplateIndexSetConfig(indexSetConfig.indexAnalyzer(),
+                        indexSet.getIndexWildcard(),
+                        fieldTypeProfile.get().customFieldMappings().mergeWith(customFieldMappings));
+            }
+        }
+
+        return new TemplateIndexSetConfig(indexSetConfig.indexAnalyzer(),
+                indexSet.getIndexWildcard(),
+                customFieldMappings);
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {
@@ -293,8 +324,8 @@ public class Indices {
 
     public Set<String> getReopenedIndices(final Collection<String> indices) {
         return indices.stream()
-            .filter(this::isReopened)
-            .collect(Collectors.toSet());
+                .filter(this::isReopened)
+                .collect(Collectors.toSet());
     }
 
     public Set<String> getReopenedIndices(final IndexSet indexSet) {
@@ -358,7 +389,7 @@ public class Indices {
     }
 
     public Optional<DateTime> indexClosingDate(String index) {
-       return indicesAdapter.indexClosingDate(index);
+        return indicesAdapter.indexClosingDate(index);
     }
 
     public IndexRangeStats indexRangeStatsOfIndex(String index) {

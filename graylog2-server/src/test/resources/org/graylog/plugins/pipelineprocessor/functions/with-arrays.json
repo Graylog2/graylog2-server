@@ -74,5 +74,16 @@
     {
       "value": "three"
     }
+  ],
+  "has_null_value": [
+    {
+      "value": null
+    },
+    {
+      "value": "two"
+    },
+    {
+      "value": 3
+    }
   ]
 }

@@ -18,6 +18,7 @@ package org.graylog2.indexer.indexset;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -31,7 +32,8 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -58,10 +60,10 @@ public class MongoIndexSetService implements IndexSetService {
                                 ClusterConfigService clusterConfigService,
                                 ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                IndexSetConfig.class,
-                ObjectId.class,
-                objectMapperProvider.get()),
+                        mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
+                        IndexSetConfig.class,
+                        ObjectId.class,
+                        objectMapperProvider.get()),
                 streamService,
                 clusterConfigService,
                 clusterEventBus);
@@ -177,6 +179,16 @@ public class MongoIndexSetService implements IndexSetService {
         clusterEventBus.post(createdEvent);
 
         return savedObject;
+    }
+
+    @Override
+    public void removeReferencesToProfile(final String profileId) {
+        collection.update(
+                new BasicDBObject(IndexSetConfig.FIELD_PROFILE_ID, profileId),
+                new BasicDBObject("$unset", new BasicDBObject(IndexSetConfig.FIELD_PROFILE_ID, "1")),
+                false,
+                true
+        );
     }
 
     /**

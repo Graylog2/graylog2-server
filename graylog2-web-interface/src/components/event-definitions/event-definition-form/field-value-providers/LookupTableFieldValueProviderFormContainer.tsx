@@ -15,22 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Col, Row } from 'components/bootstrap';
-import { Spinner } from 'components/common';
-import { useStore } from 'stores/connect';
-import { isPermitted } from 'util/PermissionsMixin';
-import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
-import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
-
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
-
-const LOOKUP_PERMISSIONS = [
-  'lookuptables:read',
-];
 
 type Props = {
   config: {},
@@ -41,40 +28,9 @@ type Props = {
   onChange: () => void,
 }
 
-const LookupTableFieldValueProviderFormContainer = ({ currentUser, ...otherProps }: Props) => {
-  const { data: fieldTypes } = useFieldTypes([], ALL_MESSAGES_TIMERANGE);
-  const lookupTables = useStore(LookupTablesStore);
-
-  useEffect(() => {
-    if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
-      return;
-    }
-
-    LookupTablesActions.searchPaginated(1, 0, undefined, false);
-  }, [currentUser.permissions]);
-
-  if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
-    return (
-      <Row>
-        <Col md={6} lg={5}>
-          <p>No Lookup Tables found.</p>
-        </Col>
-      </Row>
-    );
-  }
-
-  const isLoading = !fieldTypes || !lookupTables.tables;
-
-  if (isLoading) {
-    return <Spinner text="Loading Field Provider information..." />;
-  }
-
-  return (
-    <LookupTableFieldValueProviderForm allFieldTypes={fieldTypes}
-                                       lookupTables={lookupTables.tables}
-                                       {...otherProps} />
-  );
-};
+const LookupTableFieldValueProviderFormContainer = ({ ...otherProps }: Props) => (
+  <LookupTableFieldValueProviderForm {...otherProps} />
+);
 
 LookupTableFieldValueProviderFormContainer.propTypes = {
   config: PropTypes.object.isRequired,

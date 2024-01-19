@@ -109,7 +109,8 @@ import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -166,7 +167,7 @@ public class Server extends ServerBootstrap {
     protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
-                new VersionAwareStorageModule(),
+                new VersionAwareStorageModule(configuration),
                 new ConfigurationModule(configuration),
                 new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),

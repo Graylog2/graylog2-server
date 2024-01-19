@@ -18,7 +18,6 @@ import React, { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
 
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
 import {
@@ -31,12 +30,16 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
+import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
+import hasOverride from 'components/indices/helpers/hasOverride';
+import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
+import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/OriginFilterValueRenderer';
+import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 
 import BulkActions from './BulkActions';
 
@@ -44,35 +47,30 @@ export const ENTITY_TABLE_ID = 'index-set-field-types';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'field_name', direction: 'asc' } as Sort,
-  displayedColumns: ['field_name', 'type', 'is_custom', 'is_reserved'],
-  columnsOrder: ['field_name', 'type', 'is_custom', 'is_reserved'],
+  displayedColumns: ['field_name', 'type', 'origin', 'is_reserved'],
+  columnsOrder: ['field_name', 'type', 'origin', 'is_reserved'],
 };
 
 const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }) => css`
   color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
   margin-right: 5px;
 `);
-const isEntitySelectable = (field: IndexSetFieldType) => field.isCustom;
+const isEntitySelectable = (fieldType: IndexSetFieldType) => hasOverride(fieldType);
 const FilterValueRenderers = {
-  is_custom: (value: 'true' | 'false', title: string) => (
-    <>
-      <StyledIcon name={value === 'true' ? 'circle-check' : 'circle-xmark'} $value={value} />
-      {title}
-    </>
-  ),
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
       <StyledIcon name={value === 'true' ? 'circle-check' : 'circle-xmark'} $value={value} />
       {title}
     </>
   ),
+  origin: (value: FieldTypeOrigin, title: string) => <OriginFilterValueRenderer title={title} origin={value} />,
 };
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
-  const { data: { fieldTypes } } = useFieldTypes();
+
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -112,21 +110,7 @@ const IndexSetFieldTypesList = () => {
     { enabled: !isLoadingLayoutPreferences },
   );
 
-  const customColumnRenderers = useMemo(() => ({
-    attributes: {
-      type: {
-        renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
-      },
-      is_custom: {
-        renderCell: (isCustom: boolean) => (isCustom ? <Icon title="Field has custom field type" name="check" /> : null),
-        staticWidth: 120,
-      },
-      is_reserved: {
-        renderCell: (isReserved: boolean) => (isReserved ? <Icon title="Field has reserved field type" name="check" /> : null),
-        staticWidth: 120,
-      },
-    },
-  }), [fieldTypes]);
+  const customColumnRenderers = useCustomColumnRenderers(attributes);
 
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
@@ -181,6 +165,7 @@ const IndexSetFieldTypesList = () => {
                                             columnRenderers={customColumnRenderers}
                                             columnDefinitions={attributes}
                                             rowActions={renderActions}
+                                            expandedSectionsRenderer={expandedSections}
                                             bulkSelection={{
                                               actions: <BulkActions indexSetId={indexSetId} />,
                                               isEntitySelectable,

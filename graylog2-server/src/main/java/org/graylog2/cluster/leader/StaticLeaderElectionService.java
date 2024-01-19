@@ -19,8 +19,8 @@ package org.graylog2.cluster.leader;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.Configuration;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /**
  * Leader election based on the static {@link Configuration#isLeader()} setting in the configuration file. After node

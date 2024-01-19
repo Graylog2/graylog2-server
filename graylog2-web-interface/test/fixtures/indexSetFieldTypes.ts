@@ -16,35 +16,44 @@
  */
 
 import type { Attributes } from 'stores/PaginationTypes';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 
-export const customField = {
-  id: 'field',
-  fieldName: 'field',
+export const overriddenIndexField: IndexSetFieldType = {
+  id: 'field-1',
+  fieldName: 'field-1',
   type: 'bool',
-  isCustom: true,
+  origin: 'OVERRIDDEN_INDEX',
   isReserved: false,
 };
 
-export const secondCustomField = {
+export const overriddenProfileField: IndexSetFieldType = {
   id: 'field-2',
   fieldName: 'field-2',
   type: 'bool',
-  isCustom: true,
+  origin: 'OVERRIDDEN_PROFILE',
   isReserved: false,
 };
-export const reservedField = {
-  id: 'field',
-  fieldName: 'field',
+
+export const profileField: IndexSetFieldType = {
+  id: 'field-3',
+  fieldName: 'field-3',
+  type: 'string',
+  origin: 'PROFILE',
+  isReserved: false,
+};
+export const reservedField: IndexSetFieldType = {
+  id: 'field-4',
+  fieldName: 'field-4',
   type: 'bool',
-  isCustom: false,
+  origin: 'INDEX',
   isReserved: true,
 };
 
-export const defaultField = {
+export const defaultField: IndexSetFieldType = {
   id: 'field',
   fieldName: 'field',
   type: 'bool',
-  isCustom: false,
+  origin: 'INDEX',
   isReserved: false,
 };
 
@@ -56,10 +65,29 @@ export const attributes: Attributes = [
     sortable: true,
   },
   {
-    id: 'is_custom',
-    title: 'Custom',
+    id: 'origin',
+    title: 'Origin',
     type: 'STRING',
     sortable: true,
+    filterable: true,
+    filter_options: [
+      {
+        value: 'INDEX',
+        title: 'Index',
+      },
+      {
+        value: 'OVERRIDDEN_INDEX',
+        title: 'Overridden index',
+      },
+      {
+        value: 'OVERRIDDEN_PROFILE',
+        title: 'Overridden profile',
+      },
+      {
+        value: 'PROFILE',
+        title: 'Profile',
+      },
+    ],
   },
   {
     id: 'is_reserved',

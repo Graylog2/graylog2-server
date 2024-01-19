@@ -26,8 +26,8 @@ import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
-import { customField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
+import { overriddenIndexField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
 
 const getData = (list = [defaultField]) => (
   {
@@ -47,7 +47,7 @@ const renderIndexSetFieldTypesPage = () => render(
   </QueryParamProvider>,
 );
 
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
@@ -67,14 +67,14 @@ describe('IndexSetFieldTypesList', () => {
       data: {
         ...layoutPreferences,
         displayedAttributes: ['field_name',
-          'is_custom',
+          'origin',
           'is_reserved',
           'type'],
       },
       isInitialLoading: false,
     });
 
-    asMock(useFieldTypes).mockReturnValue({
+    asMock(useFieldTypesForMappings).mockReturnValue({
       data: {
         fieldTypes: {
           string: 'String type',
@@ -92,15 +92,15 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([customField]),
+      data: getData([overriddenIndexField]),
 
     });
 
     renderIndexSetFieldTypesPage();
-    const tableRow = await screen.findByTestId('table-row-field');
+    const tableRow = await screen.findByTestId('table-row-field-1');
     const editButton = await within(tableRow).findByText('Edit');
     fireEvent.click(editButton);
-    await screen.findByText(/change field field type/i);
+    await screen.findByText(/change field-1 field type/i);
     const modal = await screen.findByTestId('modal-form');
     await within(modal).findByText('Boolean');
 
@@ -111,7 +111,7 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useIndexSetFieldTypes).mockReturnValue({
       isLoading: false,
       refetch: () => {},
-      data: getData([customField]),
+      data: getData([overriddenIndexField]),
     });
 
     renderIndexSetFieldTypesPage();

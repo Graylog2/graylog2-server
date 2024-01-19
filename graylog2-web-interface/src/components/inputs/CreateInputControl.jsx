@@ -36,6 +36,11 @@ const NewInputRow = styled(Row)`
   margin-bottom: 8px;
 `;
 
+const StyledForm = styled.form`
+  display: flex;
+  gap: 0.25em;
+`;
+
 const CreateInputControl = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateInputControl',
@@ -143,7 +148,7 @@ const CreateInputControl = createReactClass({
     return (
       <NewInputRow className="content">
         <Col md={12}>
-          <form className="form-inline" onSubmit={this._openModal}>
+          <StyledForm className="form-inline" onSubmit={this._openModal}>
             <div className="form-group" style={{ width: 300 }}>
               <Select placeholder="Select input"
                       options={this._formatSelectOptions()}
@@ -164,7 +169,7 @@ const CreateInputControl = createReactClass({
                                 style={{ marginLeft: 10 }}>
               Find more inputs
             </ExternalLinkButton>
-          </form>
+          </StyledForm>
           {inputModal || customInputsComponent}
         </Col>
       </NewInputRow>

@@ -140,10 +140,12 @@ const BulkActions = () => {
   };
 
   return (
-    <BulkActionsDropdown>
-      <MenuItem onSelect={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</MenuItem>
-      <MenuItem onSelect={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</MenuItem>
-      <MenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)}>Delete</MenuItem>
+    <>
+      <BulkActionsDropdown>
+        <MenuItem onSelect={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</MenuItem>
+        <MenuItem onSelect={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</MenuItem>
+        <MenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)}>Delete</MenuItem>
+      </BulkActionsDropdown>
       {showDialog && (
         <ConfirmDialog title={ACTION_TEXT[actionType]?.dialogTitle}
                        show
@@ -152,7 +154,7 @@ const BulkActions = () => {
           {ACTION_TEXT[actionType]?.dialogBody(selectedItemsAmount)}
         </ConfirmDialog>
       )}
-    </BulkActionsDropdown>
+    </>
   );
 };
 

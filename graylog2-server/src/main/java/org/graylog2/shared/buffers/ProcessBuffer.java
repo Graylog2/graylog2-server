@@ -26,6 +26,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
@@ -37,9 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -83,9 +83,6 @@ public class ProcessBuffer extends Buffer {
         );
         disruptor.setDefaultExceptionHandler(new LoggingExceptionHandler(LOG));
 
-        LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>.",
-                ringBufferSize, waitStrategy.getClass().getSimpleName());
-
         //noinspection unchecked
         processors = new PartitioningWorkHandler[processorCount];
         for (int i = 0; i < processorCount; i++) {
@@ -96,6 +93,11 @@ public class ProcessBuffer extends Buffer {
         disruptor.handleEventsWith(processors);
 
         ringBuffer = disruptor.start();
+
+        LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>, " +
+                        "running {} parallel buffer processors.",
+                ringBufferSize, waitStrategy.getClass().getSimpleName(), processorCount);
+
     }
 
     private ThreadFactory threadFactory(MetricRegistry metricRegistry) {

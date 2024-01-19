@@ -34,6 +34,8 @@ import {
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DataNodesPage,
+  DataNodesClusterPage,
+  DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
@@ -52,6 +54,9 @@ import {
   IndexSetConfigurationPage,
   IndexSetCreationPage,
   IndexSetPage,
+  IndexSetFieldTypeProfileEditPage,
+  IndexSetFieldTypeProfileCreatePage,
+  IndexSetFieldTypeProfilesPage,
   IndicesPage,
   InputsPage,
   KeyboardShortcutsPage,
@@ -109,6 +114,7 @@ import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import DataNodePage from 'pages/DataNodePage';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -244,7 +250,11 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.OVERVIEW, element: <DataNodesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.MIGRATION, element: <DataNodesMigrationPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
+
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
             !isCloud && (
@@ -299,6 +309,9 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
             { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
+            { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, element: <IndexSetFieldTypeProfilesPage /> },
+            { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(':profileId'), element: <IndexSetFieldTypeProfileEditPage /> },
+            { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE, element: <IndexSetFieldTypeProfileCreatePage /> },
             ...standardPluginRoutes,
             { path: '*', element: <NotFoundPage displayPageLayout={false} /> },
           ].filter((route) => !!route),

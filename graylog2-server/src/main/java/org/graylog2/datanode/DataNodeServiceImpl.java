@@ -24,7 +24,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class DataNodeServiceImpl implements DataNodeService {
 
@@ -47,6 +47,9 @@ public class DataNodeServiceImpl implements DataNodeService {
         }
         if (nodeService.allActive().values().stream().anyMatch(n -> n.getDataNodeStatus() == DataNodeStatus.REMOVING)) {
             throw new IllegalArgumentException("Only one data node can be removed at a time.");
+        }
+        if (node.getDataNodeStatus() != DataNodeStatus.AVAILABLE) {
+            throw new IllegalArgumentException("Only running data nodes can be removed from the cluster.");
         }
         DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE);
         clusterEventBus.post(e);

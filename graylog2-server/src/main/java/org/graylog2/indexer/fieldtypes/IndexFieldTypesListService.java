@@ -21,31 +21,31 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.inmemory.InMemoryFilterExpressionParser;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
-import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.fieldtypes.utils.FieldTypeDTOsMerger;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.jetbrains.annotations.NotNull;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.graylog2.indexer.fieldtypes.FieldTypeMapper.TYPE_MAP;
-import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
-
 public class IndexFieldTypesListService {
 
     private IndexFieldTypesService indexFieldTypesService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
+    private final IndexFieldTypeProfileService profileService;
 
     private final InMemoryFilterExpressionParser inMemoryFilterExpressionParser;
 
@@ -56,12 +56,14 @@ public class IndexFieldTypesListService {
                                       final IndexSetService indexSetService,
                                       final MongoIndexSet.Factory indexSetFactory,
                                       final FieldTypeDTOsMerger fieldTypeDTOsMerger,
-                                      final InMemoryFilterExpressionParser inMemoryFilterExpressionParser) {
+                                      final InMemoryFilterExpressionParser inMemoryFilterExpressionParser,
+                                      final IndexFieldTypeProfileService profileService) {
         this.indexFieldTypesService = indexFieldTypesService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
         this.fieldTypeDTOsMerger = fieldTypeDTOsMerger;
         this.inMemoryFilterExpressionParser = inMemoryFilterExpressionParser;
+        this.profileService = profileService;
     }
 
     public PageListResponse<IndexSetFieldType> getIndexSetFieldTypesListPage(
@@ -112,6 +114,7 @@ public class IndexFieldTypesListService {
         final Optional<IndexSet> mongoIndexSet = indexSetConfig.map(indexSetFactory::create);
 
         final CustomFieldMappings customFieldMappings = indexSetConfig.map(IndexSetConfig::customFieldMappings).orElse(new CustomFieldMappings());
+        final Optional<IndexFieldTypeProfile> fieldTypeProfile = indexSetConfig.map(IndexSetConfig::fieldTypeProfile).flatMap(profileService::get);
 
         final Set<FieldTypeDTO> deflectorFieldDtos = mongoIndexSet
                 .map(IndexSet::getActiveWriteIndex)
@@ -125,21 +128,16 @@ public class IndexFieldTypesListService {
                 .map(IndexFieldTypesDTO::fields)
                 .orElse(ImmutableSet.of());
 
-        final Collection<FieldTypeDTO> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos, previousFieldDtos, customFieldMappings);
-        final List<IndexSetFieldType> filteredFields = allFields
+        final Collection<IndexSetFieldType> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos,
+                previousFieldDtos,
+                customFieldMappings,
+                fieldTypeProfile.orElse(null));
+        return allFields
                 .stream()
-                .map(fieldTypeDTO -> new IndexSetFieldType(
-                                fieldTypeDTO.fieldName(),
-                                REVERSE_TYPES.get(TYPE_MAP.get(fieldTypeDTO.physicalType())),
-                                customFieldMappings.containsCustomMappingForField(fieldTypeDTO.fieldName()),
-                                FieldTypeMappingsService.BLACKLISTED_FIELDS.contains(fieldTypeDTO.fieldName())
-                        )
-                )
                 .filter(indexSetFieldType -> indexSetFieldType.fieldName().contains(fieldNameQuery))
                 .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parse(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
                 .sorted(IndexSetFieldType.getComparator(sort, order))
                 .toList();
-        return filteredFields;
     }
 
     private String getPreviousActiveIndexSet(final IndexSet indexSet) {
