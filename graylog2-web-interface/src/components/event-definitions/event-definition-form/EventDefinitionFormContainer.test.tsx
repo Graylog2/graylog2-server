@@ -20,7 +20,13 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser as mockDefaultUser } from 'defaultMockValues';
 
+import useLocation from 'routing/useLocation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { asMock } from 'helpers/mocking';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
+import useScopePermissions from 'hooks/useScopePermissions';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
 
@@ -51,66 +57,12 @@ const exampleEntityScopeImmutable: getPermissionsByScopeReturnType = {
   scopePermissions: { is_mutable: false },
 };
 
-const mockNavigate = jest.fn();
-
 jest.mock('react-router-dom', () => {
   const original = jest.requireActual('react-router-dom');
 
   return {
     ...original,
-    useNavigate: () => mockNavigate,
-  };
-});
-
-jest.mock('routing/useLocation', () => {
-  const original = jest.requireActual('routing/useLocation');
-
-  return {
-    __esModule: true,
-    ...original,
-    default: jest.fn(() => ({ pathname: '/event-definitions' })),
-  };
-});
-
-jest.mock('logic/telemetry/useSendTelemetry', () => {
-  const original = jest.requireActual('logic/telemetry/useSendTelemetry');
-
-  return {
-    __esModule: true,
-    ...original,
-    default: () => jest.fn(),
-  };
-});
-
-const mockUseScopePermissions = jest.fn(() => exampleEntityScopeMutable);
-
-jest.mock('hooks/useScopePermissions', () => {
-  const original = jest.requireActual('hooks/useScopePermissions');
-
-  return {
-    __esModule: true,
-    ...original,
-    default: () => mockUseScopePermissions(),
-  };
-});
-
-jest.mock('hooks/useCurrentUser', () => {
-  const original = jest.requireActual('hooks/useCurrentUser');
-
-  return {
-    __esModule: true,
-    ...original,
-    default: jest.fn(() => mockDefaultUser),
-  };
-});
-
-jest.mock('components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage', () => {
-  const original = jest.requireActual('components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage');
-
-  return {
-    __esModule: true,
-    ...original,
-    default: jest.fn(() => ({ hasLocalStorageConfig: false, configFormLocalStorage: {} })),
+    useNavigate: () => jest.fn(),
   };
 });
 
@@ -210,7 +162,9 @@ jest.mock('stores/users/CurrentUserStore', () => ({
 
 jest.mock('../event-definition-types/withStreams', () => ({
   __esModule: true,
-  default: (Component: React.FC) => (props: any) => (<Component {...props} streams={[{ id: 'stream-id', title: 'stream-title' }]} />),
+  default: (Component: React.FC) => (props: any) => (
+    <Component {...props} streams={[{ id: 'stream-id', title: 'stream-title' }]} />
+  ),
 }));
 
 jest.mock('logic/telemetry/withTelemetry', () => ({
@@ -225,7 +179,21 @@ jest.mock('logic/telemetry/withTelemetry', () => ({
   ),
 }));
 
+jest.mock('components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage');
+jest.mock('routing/useLocation');
+jest.mock('logic/telemetry/useSendTelemetry');
+jest.mock('hooks/useScopePermissions');
+jest.mock('hooks/useCurrentUser');
+
 describe('EventDefinitionFormContainer', () => {
+  beforeEach(() => {
+    asMock(useLocation).mockImplementation(() => ({ pathname: '/event-definitions', search: '', hash: '', state: null, key: 'mock-key' }));
+    asMock(useSendTelemetry).mockImplementation(() => jest.fn());
+    asMock(useCurrentUser).mockImplementation(() => mockDefaultUser);
+    asMock(useEventDefinitionConfigFromLocalStorage).mockImplementation(() => ({ hasLocalStorageConfig: false, configFromLocalStorage: undefined }));
+    asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeMutable);
+  });
+
   it('should render Event Details form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
@@ -236,8 +204,8 @@ describe('EventDefinitionFormContainer', () => {
     expect(screen.getByRole('textbox', { name: /description/i })).toBeEnabled();
   });
 
-  it('should render Event Details form disabled', async () => {
-    mockUseScopePermissions.mockImplementation(() => exampleEntityScopeImmutable);
+  it('should render Event Details form disabled for immutable entities', async () => {
+    asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const titles = await screen.findAllByText(/event details/i);
@@ -248,12 +216,92 @@ describe('EventDefinitionFormContainer', () => {
   });
 
   it('should render Filters & Aggregation form enabled', async () => {
-    mockUseScopePermissions.mockImplementation(() => exampleEntityScopeMutable);
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /filter & aggregation/i });
     userEvent.click(tab);
 
     expect(screen.getByRole('textbox', { name: /search query/i })).toBeEnabled();
+  });
+
+  it('Filters & Aggregation should not be accessible for immutable entities', async () => {
+    asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    const tab = await screen.findByRole('button', { name: /filter & aggregation/i });
+    userEvent.click(tab);
+
+    expect(screen.getByText(/cannot be edited/i)).toBeVisible();
+  });
+
+  it('should render Fields form enabled', async () => {
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    const tab = await screen.findByRole('button', { name: /fields/i });
+    userEvent.click(tab);
+
+    expect(screen.getByRole('button', { name: /add custom field/i })).toBeEnabled();
+  });
+
+  it('Fields should not be accessible for immutable entities', async () => {
+    asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    const tab = await screen.findByRole('button', { name: /fields/i });
+    userEvent.click(tab);
+
+    expect(screen.getByText(/cannot be edited/i)).toBeVisible();
+  });
+
+  it('should render Notifications form enabled', async () => {
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    const tab = await screen.findByRole('button', { name: /notifications/i });
+    userEvent.click(tab);
+
+    expect(screen.getByRole('button', { name: /add notification/i })).toBeEnabled();
+  });
+
+  it('Notifications should be accessible for immutable entities', async () => {
+    asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    const tab = await screen.findByRole('button', { name: /notification/i });
+    userEvent.click(tab);
+
+    expect(screen.getByRole('button', { name: /add notification/i })).toBeEnabled();
+  });
+
+  it('should be able to add notifications', async () => {
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    const tab = await screen.findByRole('button', { name: /notification/i });
+    userEvent.click(tab);
+    const addNotificationButton = screen.getByRole('button', { name: /add notification/i });
+
+    expect(addNotificationButton).toBeEnabled();
+
+    userEvent.click(addNotificationButton);
+    userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
+    userEvent.click(screen.getByRole('button', { name: /add notification/i }));
+
+    expect(screen.getByText(/mock-notification-title/i)).toBeVisible();
+  });
+
+  it('should be able to add notifications to immutable entities', async () => {
+    asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    const tab = await screen.findByRole('button', { name: /notification/i });
+    userEvent.click(tab);
+    const addNotificationButton = screen.getByRole('button', { name: /add notification/i });
+
+    expect(addNotificationButton).toBeEnabled();
+
+    userEvent.click(addNotificationButton);
+    userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
+    userEvent.click(screen.getByRole('button', { name: /add notification/i }));
+
+    expect(screen.getByText(/mock-notification-title/i)).toBeVisible();
   });
 });
