@@ -26,6 +26,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.WriteResult;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoConnection;
@@ -52,9 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -271,14 +269,21 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public Set<String> indexSetIdsByIds(Collection<String> streamIds) {
+        Set<String> dataStreamIds = streamIds.stream()
+                .filter(s -> s.startsWith(Stream.DATASTREAM_PREFIX))
+                .collect(Collectors.toSet());
+
         final Set<ObjectId> objectIds = streamIds.stream()
+                .filter(s -> !s.startsWith(Stream.DATASTREAM_PREFIX))
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         final DBObject query = QueryBuilder.start(StreamImpl.FIELD_ID).in(objectIds).get();
         final DBObject onlyIndexSetIdField = DBProjection.include(FIELD_INDEX_SET_ID);
-        return StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
+        Set<String> indexSets = StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
                 .map(s -> s.get(FIELD_INDEX_SET_ID).toString())
                 .collect(Collectors.toSet());
+        indexSets.addAll(dataStreamIds);
+        return indexSets;
     }
 
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
