@@ -43,7 +43,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
@@ -112,6 +114,14 @@ public class ClientOS2 implements Client {
                 client.execute((c, requestOptions) -> c.indices().delete(deleteIndexRequest, requestOptions));
             }
         }
+    }
+
+    public void deleteDataStreams() {
+        client.execute((c, requestOptions) -> c.indices().getDataStream(new GetDataStreamRequest("*"), requestOptions))
+                .getDataStreams()
+                .forEach(ds -> client.execute((c, requestOptions) ->
+                        c.indices().deleteDataStream(new DeleteDataStreamRequest(ds.getName()), requestOptions))
+                );
     }
 
     @Override
@@ -312,6 +322,7 @@ public class ClientOS2 implements Client {
     @Override
     public void cleanUp() {
         LOG.debug("Removing indices: " + String.join(",", existingIndices()));
+        deleteDataStreams();
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
         refreshNode();

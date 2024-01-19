@@ -24,10 +24,11 @@ import StopPropagation from 'views/components/common/StopPropagation';
 type Props = {
   children: React.ReactNode,
   element: React.ReactNode,
+  'data-testid'?: string
 };
 
-const ActionDropdown = ({ children, element }: Props) => (
-  <StopPropagation>
+const ActionDropdown = ({ children, element, 'data-testid': dataTestid }: Props) => (
+  <StopPropagation data-testid={dataTestid}>
     <Menu position="bottom" withinPortal>
       <Menu.Target>
         {element}
@@ -43,6 +44,11 @@ const ActionDropdown = ({ children, element }: Props) => (
 ActionDropdown.propTypes = {
   children: PropTypes.node.isRequired,
   element: PropTypes.node.isRequired,
+  'data-testid': PropTypes.string,
+};
+
+ActionDropdown.defaultProps = {
+  'data-testid': undefined,
 };
 
 export default ActionDropdown;

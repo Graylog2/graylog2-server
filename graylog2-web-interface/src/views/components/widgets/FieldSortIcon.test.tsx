@@ -27,9 +27,10 @@ describe('FieldSortIcon', () => {
   const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending);
   const config = new MessagesWidgetConfig(['timestamp', 'source'], true, true, [], [currentSort]);
 
-  it('should set descending sort on click, if field sort is not defined', () => {
+  it('should set descending sort on click, if field sort is not defined', async () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
-    const { getByTitle } = render(<FieldSortIcon config={config} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={() => {}} />);
+    const setLoadingState = jest.fn();
+    const { getByTitle } = render(<FieldSortIcon config={config} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingState} />);
 
     const sortIcon = getByTitle('Sort source Descending');
 
@@ -39,6 +40,10 @@ describe('FieldSortIcon', () => {
 
     expect(onSortChangeStub).toHaveBeenCalledTimes(1);
     expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
+
+    await waitFor(() => {
+      expect(setLoadingState).toHaveBeenCalledWith(false);
+    });
   });
 
   it('should set ascending sort on click, if field sort is descending', () => {
@@ -55,12 +60,13 @@ describe('FieldSortIcon', () => {
     expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
   });
 
-  it('should set descending sort on click, if field sort is descending', () => {
+  it('should set descending sort on click, if field sort is descending', async () => {
     const initialSort = new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Ascending);
     const initialConfig = new MessagesWidgetConfig(['timestamp', 'source'], true, true, [], [initialSort]);
     const onSortChangeStub = jest.fn(() => Promise.resolve());
+    const setLoadingState = jest.fn();
 
-    const { getByTitle } = render(<FieldSortIcon config={initialConfig} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={() => {}} />);
+    const { getByTitle } = render(<FieldSortIcon config={initialConfig} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingState} />);
 
     const sortIcon = getByTitle('Sort source Descending');
 
@@ -70,6 +76,10 @@ describe('FieldSortIcon', () => {
 
     expect(onSortChangeStub).toHaveBeenCalledTimes(1);
     expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
+
+    await waitFor(() => {
+      expect(setLoadingState).toHaveBeenCalledWith(false);
+    });
   });
 
   it('should set loading state while changing sort', async () => {

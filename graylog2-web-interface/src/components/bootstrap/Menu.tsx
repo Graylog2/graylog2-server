@@ -22,24 +22,30 @@ import styled, { css, useTheme } from 'styled-components';
 type Props = PropsWithChildren<{
   closeOnItemClick?: boolean,
   onChange?: (isOpen: boolean) => void,
+  onClose?: () => void,
   opened?: boolean,
+  portalProps?: { target: HTMLElement },
   keepMounted?: boolean,
   position?: MenuProps['position'],
   shadow?: MenuProps['shadow'],
   width?: number,
   withinPortal?: boolean,
+  zIndex?: number,
 }>
 
 const Menu = ({
   children,
+  closeOnItemClick,
+  onClose,
   shadow,
   width,
   withinPortal,
   position,
   opened,
   onChange,
+  portalProps,
   keepMounted,
-  closeOnItemClick,
+  zIndex,
 }: Props) => {
   const theme = useTheme();
 
@@ -54,14 +60,17 @@ const Menu = ({
 
   return (
     <MantineMenu closeOnItemClick={closeOnItemClick}
+                 onClose={onClose}
                  shadow={shadow}
                  opened={opened}
                  onChange={onChange}
+                 portalProps={portalProps}
                  width={width}
                  position={position}
                  withinPortal={withinPortal}
                  styles={styles}
-                 keepMounted={keepMounted}>
+                 keepMounted={keepMounted}
+                 zIndex={zIndex}>
       {children}
     </MantineMenu>
   );
@@ -95,12 +104,15 @@ Menu.Label = StyledMenuLabel;
 Menu.defaultProps = {
   closeOnItemClick: true,
   position: undefined,
+  portalProps: undefined,
   shadow: undefined,
   width: undefined,
   withinPortal: false,
   opened: undefined,
   onChange: undefined,
+  onClose: undefined,
   keepMounted: undefined,
+  zIndex: undefined,
 };
 
 export default Menu;
