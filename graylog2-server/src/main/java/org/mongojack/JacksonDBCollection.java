@@ -35,7 +35,7 @@ public class JacksonDBCollection<T, K> {
             DBCollection dbCollection, Class<T> type, Class<K> keyType,
             ObjectMapper objectMapper) {
 
-        final MongoDatabase db = dbCollection.getDB().getMongoClient().getDatabase(dbCollection.getName());
+        final MongoDatabase db = dbCollection.getDB().getMongoClient().getDatabase(dbCollection.getDB().getName());
 
         final JacksonMongoCollection<T> jacksonMongoCollection = JacksonMongoCollection.builder()
                 .withObjectMapper(objectMapper)
@@ -81,6 +81,10 @@ public class JacksonDBCollection<T, K> {
 
     public T findOne(Bson filter) throws MongoException {
         return delegate.findOne(filter);
+    }
+
+    public T findOne() {
+        return delegate.findOne();
     }
 
     // TODO: check if this works
