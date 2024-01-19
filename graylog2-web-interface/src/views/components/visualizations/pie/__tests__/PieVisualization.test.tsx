@@ -51,6 +51,11 @@ const SimplePieVisualization = (props: Pick<React.ComponentProps<typeof PieVisua
 );
 
 describe('PieVisualization', () => {
+  const openActionsDropdown = async () => {
+    userEvent.click(await screen.findByText('show'));
+    await screen.findByRole('menu');
+  };
+
   beforeAll(loadViewsPlugin);
 
   afterAll(unloadViewsPlugin);
@@ -69,8 +74,7 @@ describe('PieVisualization', () => {
       .series([Series.forFunction('count()')])
       .build();
     render(<SimplePieVisualization config={config} data={oneRowPivot} />);
-    const legendItem = await screen.findByText('show');
-    await userEvent.click(legendItem);
+    await openActionsDropdown();
 
     await screen.findByText('action = show');
   });
@@ -82,9 +86,7 @@ describe('PieVisualization', () => {
       .series([Series.forFunction('count()')])
       .build();
     render(<SimplePieVisualization config={config} data={oneRowPivotOneColumnPivot} />);
-    const legendItem = await screen.findByText('show');
-    await userEvent.click(legendItem);
-
+    await openActionsDropdown();
     await screen.findByText('action = show');
   });
 });

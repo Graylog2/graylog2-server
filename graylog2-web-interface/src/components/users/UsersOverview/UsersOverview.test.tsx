@@ -43,7 +43,9 @@ jest.mock('stores/users/UsersStore', () => ({
 const clickMoreActions = async (username: string) => {
   const actions = await screen.findByRole('cell', { name: new RegExp(`edit user ${username}`, 'i') });
 
-  return fireEvent.click(await within(actions).findByRole('button', { name: /more actions/i }));
+  fireEvent.click(await within(actions).findByRole('button', { name: /more actions/i }));
+
+  await screen.findByRole('menu');
 };
 
 describe('UsersOverview', () => {
@@ -124,6 +126,7 @@ describe('UsersOverview', () => {
       await clickMoreActions(modifiableUser.fullName);
       const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.fullName}`);
       fireEvent.click(deleteButton);
+      await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
 
       await waitFor(() => {
         expect(screen.queryByTitle(`Delete user ${modifiableUser.fullName}`)).not.toBeInTheDocument();
