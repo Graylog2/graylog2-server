@@ -88,7 +88,7 @@ export const EventsStore = singletonStore(
       page = 1,
       pageSize = 25,
       filter = { alerts: 'only' },
-      timerange = { type: 'relative', range: 86400 }, // 1 day
+      timerange = { type: 'relative', range: 3600 }, // 1 hour
     }) {
       const promise = fetch('POST', this.eventsUrl({}), {
         query: query,
