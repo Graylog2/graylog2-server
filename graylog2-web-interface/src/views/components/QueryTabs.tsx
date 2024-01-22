@@ -24,6 +24,7 @@ import { Col, Row } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';
 import ElementDimensions from 'components/common/ElementDimensions';
 import type ViewState from 'views/logic/views/ViewState';
+import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 
 import QueryTitleEditModal from './queries/QueryTitleEditModal';
 import AdaptableQueryTabs from './AdaptableQueryTabs';
@@ -33,13 +34,13 @@ export interface QueryTabsProps {
   onSelect: (queryId: string) => void,
   onTitleChange: (queryId: string, newTitle: string) => void,
   queries: Immutable.OrderedSet<QueryId>,
-  activeQueryId: string,
   titles: Immutable.Map<string, string>,
   dashboardId: string,
 }
 
-const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, activeQueryId, titles, dashboardId }: QueryTabsProps) => {
+const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, titles, dashboardId }: QueryTabsProps) => {
   const queryTitleEditModal = useRef<QueryTitleEditModal | undefined | null>();
+  const activeQueryId = useCurrentQueryId();
 
   return (
     <Row>
@@ -50,7 +51,6 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, activeQueryId, 
                                 queries={queries}
                                 dashboardId={dashboardId}
                                 titles={titles}
-                                activeQueryId={activeQueryId}
                                 onRemove={onRemove}
                                 onSelect={onSelect}
                                 queryTitleEditModal={queryTitleEditModal}
@@ -75,7 +75,6 @@ QueryTabs.propTypes = {
   onSelect: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,
   queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
-  activeQueryId: PropTypes.string.isRequired,
   titles: PropTypes.object.isRequired,
 };
 

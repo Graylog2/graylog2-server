@@ -35,8 +35,10 @@ const defaultProps = {
 describe('AbsoluteDateInput', () => {
   beforeAll(() => { jest.clearAllMocks(); });
 
-  it('renders with minimal props', () => {
+  it('renders with minimal props', async () => {
     render(<AbsoluteDateInput {...defaultProps} />);
+
+    await screen.findByRole('button', { name: /insert current date/i });
 
     expect(screen).not.toBeNull();
   });
