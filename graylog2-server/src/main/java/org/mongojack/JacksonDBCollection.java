@@ -69,7 +69,6 @@ public class JacksonDBCollection<T, K> {
         this.objectMapper = objectMapper;
     }
 
-    // TODO: can we accept Bson here?
     public void createIndex(DBObject keys, DBObject options) {
         delegate.createIndex(new BasicDBObject(keys.toMap()), toIndexOptions(options));
     }
