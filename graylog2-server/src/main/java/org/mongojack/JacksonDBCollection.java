@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class JacksonDBCollection<T, K> {
 
     private final JacksonMongoCollection<T> delegate;
+    private final Class<T> valueType;
     private final Class<K> idType;
     private final ObjectMapper objectMapper;
     private final DBCollection dbCollection;
@@ -39,14 +40,15 @@ public class JacksonDBCollection<T, K> {
         return new JacksonDBCollection<>(dbCollection, type, keyType, objectMapper);
     }
 
-    private JacksonDBCollection(DBCollection dbCollection, Class<T> type, Class<K> idType, ObjectMapper objectMapper) {
+    private JacksonDBCollection(DBCollection dbCollection, Class<T> valueType, Class<K> idType, ObjectMapper objectMapper) {
 
         final MongoDatabase db = dbCollection.getDB().getMongoClient().getDatabase(dbCollection.getDB().getName());
 
         this.dbCollection = dbCollection;
         this.delegate = JacksonMongoCollection.builder()
                 .withObjectMapper(objectMapper)
-                .build(db, dbCollection.getName(), type, UuidRepresentation.UNSPECIFIED);
+                .build(db, dbCollection.getName(), valueType, UuidRepresentation.UNSPECIFIED);
+        this.valueType = valueType;
         this.idType = idType;
         this.objectMapper = objectMapper;
     }
@@ -107,11 +109,11 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> save(T object) {
-        return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object), idType);
+        return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object), valueType, idType);
     }
 
     public WriteResult<T, K> save(T object, WriteConcern concern) {
-        return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object, concern), idType);
+        return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object, concern), valueType, idType);
     }
 
     public LegacyDeleteResult<T, K> remove(DBObject query) {
@@ -142,7 +144,7 @@ public class JacksonDBCollection<T, K> {
         }
         final var coll = concern == null ? delegate : delegate.withWriteConcern(concern);
         final var options = new ReplaceOptions().upsert(upsert);
-        return new LegacyUpdateOneResult<>(coll, object, coll.replaceOne(filter, object, options), idType);
+        return new LegacyUpdateOneResult<>(coll, object, coll.replaceOne(filter, object, options), valueType, idType);
     }
 
     public WriteResult<T, K> update(Bson filter, Bson update, boolean upsert, boolean multi) {
@@ -172,7 +174,7 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> updateById(K id, T update) {
-        return new LegacyUpdateOneResult<>(delegate, update, delegate.replaceOneById(id, update), idType);
+        return new LegacyUpdateOneResult<>(delegate, update, delegate.replaceOneById(id, update), valueType, idType);
     }
 
     public WriteResult<T, K> updateMulti(Bson query, Bson update) {

@@ -33,7 +33,7 @@ public interface WriteResult<T, K> {
             return null;
         }
         if (String.class.isAssignableFrom(idType)) {
-            return (L) id.asString().toString();
+            return (L) id.toString();
         }
         if (ObjectId.class.isAssignableFrom(idType)) {
             return (L) id.asObjectId().getValue();
