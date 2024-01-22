@@ -19,7 +19,7 @@ package org.graylog.plugins.views.search.db;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -53,7 +53,7 @@ public class InMemorySearchJobServiceTest {
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-                .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
+                .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy())
                 .setTypeFactory(typeFactory)
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule())
@@ -67,7 +67,7 @@ public class InMemorySearchJobServiceTest {
                         .addSerializer(new ObjectIdSerializer()));
 
         // kludge because we don't have an injector in tests
-         ImmutableMap<String, Class> subtypes = ImmutableMap.<String, Class>builder()
+        ImmutableMap<String, Class> subtypes = ImmutableMap.<String, Class>builder()
                 .put(StreamFilter.NAME, StreamFilter.class)
                 .put(ElasticsearchQueryString.NAME, ElasticsearchQueryString.class)
                 .put(MessageList.NAME, MessageList.class)
