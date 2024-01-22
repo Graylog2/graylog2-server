@@ -107,11 +107,11 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> save(T object) {
-        return new LegacyUpdateResult<>(delegate, delegate.save(object), idType);
+        return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object), idType);
     }
 
     public WriteResult<T, K> save(T object, WriteConcern concern) {
-        return new LegacyUpdateResult<>(delegate, delegate.save(object, concern), idType);
+        return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object, concern), idType);
     }
 
     public LegacyDeleteResult<T, K> remove(DBObject query) {
@@ -142,7 +142,7 @@ public class JacksonDBCollection<T, K> {
         }
         final var coll = concern == null ? delegate : delegate.withWriteConcern(concern);
         final var options = new ReplaceOptions().upsert(upsert);
-        return new LegacyUpdateResult<>(coll, coll.replaceOne(filter, object, options), idType);
+        return new LegacyUpdateOneResult<>(coll, object, coll.replaceOne(filter, object, options), idType);
     }
 
     public WriteResult<T, K> update(Bson filter, Bson update, boolean upsert, boolean multi) {
@@ -172,7 +172,7 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> updateById(K id, T update) {
-        return new LegacyUpdateResult<>(delegate, delegate.replaceOneById(id, update), idType);
+        return new LegacyUpdateOneResult<>(delegate, update, delegate.replaceOneById(id, update), idType);
     }
 
     public WriteResult<T, K> updateMulti(Bson query, Bson update) {
@@ -180,7 +180,7 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> insert(T object) {
-        return new LegacyInsertOneResult<>(delegate, delegate.insertOne(object), idType);
+        return new LegacyInsertOneResult<>(delegate, object, delegate.insertOne(object), idType);
     }
 
     public void insert(List<T> list) {
