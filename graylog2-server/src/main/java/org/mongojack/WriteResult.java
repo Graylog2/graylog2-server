@@ -2,6 +2,7 @@ package org.mongojack;
 
 import com.mongodb.MongoException;
 import org.bson.BsonValue;
+import org.bson.types.ObjectId;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -32,7 +33,7 @@ public interface WriteResult<T, K> {
             return (L) id.asString().toString();
         }
         if (ObjectId.class.isAssignableFrom(idType)) {
-            return (L) id.asObjectId();
+            return (L) id.asObjectId().getValue();
         }
         throw new IllegalArgumentException(f("Only String and ObjectID types supported for ID. Got %s.",
                 id.getBsonType()));
