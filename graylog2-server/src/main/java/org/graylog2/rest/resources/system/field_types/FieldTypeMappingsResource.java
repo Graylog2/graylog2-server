@@ -22,15 +22,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
-import org.graylog2.indexer.indexset.CustomFieldMapping;
-import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.rest.bulk.model.BulkOperationResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +31,15 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -82,7 +82,7 @@ public class FieldTypeMappingsResource extends RestResource {
     public Response changeFieldType(@ApiParam(name = "request")
                                     @Valid
                                     @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request) {
-        checkPermissionsForCreation(request.indexSetsIds());
+        checkPermissions(request.indexSetsIds(), RestPermissions.TYPE_MAPPINGS_CREATE);
 
         var customMapping = new CustomFieldMapping(request.fieldName(), request.type());
         fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
@@ -101,7 +101,7 @@ public class FieldTypeMappingsResource extends RestResource {
     public Response setProfile(@ApiParam(name = "request")
                                @Valid
                                @NotNull(message = "Request body is mandatory") final FieldTypeProfileChangeRequest request) {
-        checkPermissionsForCreation(request.indexSetsIds());
+        checkPermissions(request.indexSetsIds(), RestPermissions.INDEXSETS_EDIT);
         fieldTypeMappingsService.setProfile(request.indexSetsIds(), request.profileId(), request.rotateImmediately());
 
         return Response.ok().build();
@@ -118,7 +118,7 @@ public class FieldTypeMappingsResource extends RestResource {
     public Response removeProfileFromIndexSets(@ApiParam(name = "request")
                                                @Valid
                                                @NotNull(message = "Request body is mandatory") final FieldTypeProfileUnsetRequest request) {
-        checkPermissionsForCreation(request.indexSetsIds());
+        checkPermissions(request.indexSetsIds(), RestPermissions.INDEXSETS_EDIT);
         fieldTypeMappingsService.removeProfileFromIndexSets(request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();
@@ -135,12 +135,12 @@ public class FieldTypeMappingsResource extends RestResource {
     public Map<String, BulkOperationResponse> removeCustomMapping(@ApiParam(name = "request")
                                                                   @Valid
                                                                   @NotNull(message = "Request body is mandatory") final CustomFieldMappingRemovalRequest request) {
-        checkPermissionsForCreation(request.indexSetsIds());
+        checkPermissions(request.indexSetsIds(), RestPermissions.TYPE_MAPPINGS_DELETE);
 
         return fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
     }
 
-    private void checkPermissionsForCreation(final Set<String> indexSetsIds) {
-        indexSetsIds.forEach(indexSetId -> checkPermission(RestPermissions.TYPE_MAPPINGS_CREATE, indexSetId));
+    private void checkPermissions(final Set<String> indexSetsIds, final String permission) {
+        indexSetsIds.forEach(indexSetId -> checkPermission(permission, indexSetId));
     }
 }
