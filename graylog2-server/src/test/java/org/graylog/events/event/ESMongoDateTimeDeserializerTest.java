@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.mongodb.DBCollection;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,7 +43,7 @@ public class ESMongoDateTimeDeserializerTest {
 
     @Before
     public void setUp() throws Exception {
-        objectMapper = new ObjectMapperProvider().get();
+        objectMapper = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()).get();
     }
 
     @Test
