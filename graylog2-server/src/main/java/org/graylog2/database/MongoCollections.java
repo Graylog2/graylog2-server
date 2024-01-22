@@ -52,11 +52,4 @@ public class MongoCollections {
                 .withObjectMapper(objectMapper)
                 .build(mongoConnection.getMongoDatabase(), collectionName, valueType, UuidRepresentation.UNSPECIFIED);
     }
-
-    @Deprecated
-    public <T> JacksonMongoCollection<T> getLegacy(String collectionName, Class<T> valueType) {
-        return JacksonMongoCollection.builder()
-                .withObjectMapper(objectMapper)
-                .build(mongoConnection.getMongoDatabase(), collectionName, valueType, UuidRepresentation.UNSPECIFIED);
-    }
 }
