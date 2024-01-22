@@ -104,8 +104,8 @@ public class RemoteReindexingMigrationIT {
         final ValidatableResponse migrationResponse = apis.post("/migration/remoteReindex", request, 200);
 
         // one document migrated
-        migrationResponse.assertThat().body("results.created", Matchers.hasSize(1));
-        migrationResponse.assertThat().body("results.created", Matchers.contains(1));
+        migrationResponse.assertThat().body("indices", Matchers.hasSize(1));
+        migrationResponse.assertThat().body("indices[0].status", Matchers.equalTo("FINISHED"));
 
         /*
 
