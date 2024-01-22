@@ -53,6 +53,7 @@ public class JobExecutionEngine {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(JobExecutionEngine.class);
+    private static final int BACKOFF_FIVE_SECONDS = 5;
 
     private final DBJobTriggerService jobTriggerService;
     private final DBJobDefinitionService jobDefinitionService;
@@ -169,6 +170,9 @@ public class JobExecutionEngine {
                             trigger.jobDefinitionType(), maxConcurrencyMap.get(trigger.jobDefinitionType()));
                     handleTrigger(trigger);
                 } catch (AlreadyLockedException e) {
+                    // Avoid endlessly retrying the same trigger (e.g. when concurrency limit is too low)
+                    // TODO: Consider smarter backoff strategy, e.g. counting number of consecutive failed attempts
+                    final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plusSeconds(BACKOFF_FIVE_SECONDS);
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
                     executionDenyRate.mark();
                 }
@@ -197,7 +201,7 @@ public class JobExecutionEngine {
         } catch (Exception e) {
             // The trigger cannot be handled because of an unknown error, retry in a few seconds
             // TODO: Check if we need to implement a max-retry after which the trigger is set to ERROR
-            final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plusSeconds(5);
+            final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plusSeconds(BACKOFF_FIVE_SECONDS);
             LOG.error("Couldn't handle trigger {} - retrying at {}", trigger.id(), nextTime, e);
             jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime));
         } finally {
