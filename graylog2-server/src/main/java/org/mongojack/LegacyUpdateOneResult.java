@@ -18,7 +18,7 @@ public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public T getSavedObject() {
-        return getN() > 0 ? object : null;
+        return object;
     }
 
     @Override
