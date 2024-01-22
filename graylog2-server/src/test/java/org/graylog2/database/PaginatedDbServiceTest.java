@@ -55,7 +55,7 @@ public class PaginatedDbServiceTest {
         public String title;
 
         @JsonCreator
-        public TestDTO(@JsonProperty("id") @Id String id, @JsonProperty("title") String title) {
+        public TestDTO(@JsonProperty("id") String id, @JsonProperty("title") String title) {
             this.id = id;
             this.title = title;
         }
