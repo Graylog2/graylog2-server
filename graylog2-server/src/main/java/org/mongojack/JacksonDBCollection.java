@@ -322,6 +322,7 @@ public class JacksonDBCollection<T, K> {
             @JsonProperty("unique") Optional<Boolean> unique,
             @JsonProperty("name") Optional<String> name,
             @JsonProperty("expireAfterSeconds") Optional<Long> expireAfterSeconds,
+            @JsonProperty("sparse") Optional<Boolean> sparse,
             @JsonProperty("collation") Optional<CollationDto> collationDto) {
 
         public IndexOptions toIndexOptions() {
@@ -329,6 +330,7 @@ public class JacksonDBCollection<T, K> {
             unique.ifPresent(io::unique);
             name.ifPresent(io::name);
             expireAfterSeconds.ifPresent(seconds -> io.expireAfter(seconds, TimeUnit.SECONDS));
+            sparse.ifPresent(io::sparse);
             collationDto.ifPresent(collation -> io.collation(collation.toCollation()));
             return io;
         }
