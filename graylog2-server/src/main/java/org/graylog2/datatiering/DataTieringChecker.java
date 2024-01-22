@@ -16,12 +16,10 @@
  */
 package org.graylog2.datatiering;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.Configuration;
 import org.graylog2.featureflag.FeatureFlags;
-
 
 @Singleton
 public class DataTieringChecker {
