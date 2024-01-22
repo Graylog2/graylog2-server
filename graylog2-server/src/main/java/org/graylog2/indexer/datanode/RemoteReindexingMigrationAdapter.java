@@ -26,7 +26,7 @@ public interface RemoteReindexingMigrationAdapter {
         STARTING, RUNNING, ERROR, FINISHED
     }
 
-    Status start(URI uri, String username, String password, List<String> indices, boolean synchronous);
+    RemoteReindexMigration start(URI uri, String username, String password, List<String> indices, boolean synchronous);
 
     RemoteReindexMigration status();
 }

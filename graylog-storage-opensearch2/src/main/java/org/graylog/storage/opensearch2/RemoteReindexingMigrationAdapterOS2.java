@@ -119,7 +119,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     @Override
-    public Status start(final URI uri, final String username, final String password, final List<String> indices, final boolean synchronous) {
+    public RemoteReindexMigration start(final URI uri, final String username, final String password, final List<String> indices, final boolean synchronous) {
         RemoteReindexingMigrationAdapterOS2.uri = uri;
         RemoteReindexingMigrationAdapterOS2.username = username;
         RemoteReindexingMigrationAdapterOS2.password = password;
@@ -135,11 +135,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
             reindex(uri, username, password, toReindex, synchronous);
 //            removeAllowlist(uri.getHost() + ":" + uri.getPort());
-            return Status.STARTING;
         } catch (MalformedURLException e) {
             LOG.error("Could not start migration: {}", e.getMessage(), e);
-            return Status.ERROR;
+            remoteReindexMigration = RemoteReindexMigration.builder().status(Status.ERROR).error(e.getMessage()).indices(remoteReindexIndices).build();
         }
+        return remoteReindexMigration;
     }
 
     @Override
