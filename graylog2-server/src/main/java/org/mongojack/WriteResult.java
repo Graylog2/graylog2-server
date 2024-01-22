@@ -29,6 +29,9 @@ public interface WriteResult<T, K> {
 
     @SuppressWarnings("unchecked")
     static <L> L toIdType(BsonValue id, Class<L> idType) {
+        if (id == null) {
+            return null;
+        }
         if (String.class.isAssignableFrom(idType)) {
             return (L) id.asString().toString();
         }
