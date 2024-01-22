@@ -69,15 +69,40 @@ const _extractErrorMessage = (error: FetchError) => ((error
     && error.additional.body.message) ? error.additional.body.message : error);
 
 const usePluggableSearchAction = (loaded: boolean, view: View) => {
+  const modalRefs = useRef({});
   const pluggableSearchActions = usePluginEntities('views.components.searchActions');
 
-  return pluggableSearchActions.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
-  ).map(
-    ({ component: PluggableSearchAction, key }) => (
-      <PluggableSearchAction key={key} loaded={loaded} view={view} />
-    ),
-  );
+  const actions = pluggableSearchActions
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .map(({ component: PluggableSearchAction, key, modals }) => {
+      if (modals) {
+        const refs = modals
+          .map(({ key: modalKey }) => modalKey)
+          .reduce((acc, mKey: string) => {
+            acc[mKey] = () => modalRefs.current[mKey];
+
+            return acc;
+          }, {});
+
+        return (
+          <PluggableSearchAction key={key}
+                                 loaded={loaded}
+                                 search={view}
+                                 modalRefs={refs} />
+        );
+      }
+
+      return <PluggableSearchAction key={key} loaded={loaded} search={view} />;
+    });
+
+  const actionModals = pluggableSearchActions
+    .filter(({ modals }) => !!modals)
+    .flatMap(({ modals }) => modals)
+    .map(({ key, component: ActionModal }) => (
+      <ActionModal key={key} search={view} ref={(r) => { modalRefs.current[key] = r; }} />
+    ));
+
+  return ({ actions, actionModals });
 };
 
 const SearchActionsMenu = () => {
@@ -112,7 +137,7 @@ const SearchActionsMenu = () => {
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
-  const pluggableActions = usePluggableSearchAction(loaded, view);
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableSearchAction(loaded, view);
 
   const saveSearch = useCallback(async (newTitle: string) => {
     if (!view.id) {
@@ -248,6 +273,7 @@ const SearchActionsMenu = () => {
                           description="Search for a User or Team to add as collaborator on this saved search."
                           onClose={toggleShareSearch} />
       )}
+      {pluggableActionModals}
     </Container>
   );
 };
