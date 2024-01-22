@@ -21,8 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.DuplicateKeyException;
+import com.mongodb.ErrorCategory;
 import com.mongodb.MongoException;
+import com.mongodb.MongoServerException;
 import com.mongodb.WriteConcern;
+import com.mongodb.WriteConcernResult;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationStrength;
@@ -32,6 +36,8 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.UpdateOptions;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
 import org.bson.UuidRepresentation;
 import org.bson.conversions.Bson;
 
@@ -124,11 +130,19 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> save(T object) {
-        return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object), valueType, idType);
+        try {
+            return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object), valueType, idType);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public WriteResult<T, K> save(T object, WriteConcern concern) {
-        return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object, concern), valueType, idType);
+        try {
+            return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object, concern), valueType, idType);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public LegacyDeleteResult<T, K> remove(DBObject query) {
@@ -159,16 +173,24 @@ public class JacksonDBCollection<T, K> {
         }
         final var coll = concern == null ? delegate : delegate.withWriteConcern(concern);
         final var options = new ReplaceOptions().upsert(upsert);
-        return new LegacyUpdateOneResult<>(coll, object, coll.replaceOne(filter, object, options), valueType, idType);
+        try {
+            return new LegacyUpdateOneResult<>(coll, object, coll.replaceOne(filter, object, options), valueType, idType);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public WriteResult<T, K> update(Bson filter, Bson update, boolean upsert, boolean multi) {
-        if (multi) {
-            return new LegacyUpdateResult<>(delegate,
-                    delegate.updateMany(filter, update, new UpdateOptions().upsert(upsert)), idType);
-        } else {
-            return new LegacyUpdateResult<>(delegate,
-                    delegate.updateOne(filter, update, new UpdateOptions().upsert(upsert)), idType);
+        try {
+            if (multi) {
+                return new LegacyUpdateResult<>(delegate,
+                        delegate.updateMany(filter, update, new UpdateOptions().upsert(upsert)), idType);
+            } else {
+                return new LegacyUpdateResult<>(delegate,
+                        delegate.updateOne(filter, update, new UpdateOptions().upsert(upsert)), idType);
+            }
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
         }
     }
 
@@ -185,11 +207,19 @@ public class JacksonDBCollection<T, K> {
     }
 
     public void updateById(K id, Bson update) {
-        delegate.updateById(id, update);
+        try {
+            delegate.updateById(id, update);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public WriteResult<T, K> updateById(K id, T update) {
-        return new LegacyUpdateOneResult<>(delegate, update, delegate.replaceOneById(id, update), valueType, idType);
+        try {
+            return new LegacyUpdateOneResult<>(delegate, update, delegate.replaceOneById(id, update), valueType, idType);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public WriteResult<T, K> updateMulti(Bson query, Bson update) {
@@ -197,11 +227,19 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> insert(T object) {
-        return new LegacyInsertOneResult<>(delegate, object, delegate.insertOne(object), idType);
+        try {
+            return new LegacyInsertOneResult<>(delegate, object, delegate.insertOne(object), idType);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public void insert(List<T> list) {
-        delegate.insert(list);
+        try {
+            delegate.insert(list);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public long getCount() {
@@ -224,7 +262,11 @@ public class JacksonDBCollection<T, K> {
                 .returnDocument(returnNew ? ReturnDocument.AFTER : ReturnDocument.BEFORE)
                 .upsert(upsert);
 
-        return delegate.findOneAndUpdate(filter, update, options);
+        try {
+            return delegate.findOneAndUpdate(filter, update, options);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public T findAndModify(Bson query, Bson update) {
@@ -241,7 +283,11 @@ public class JacksonDBCollection<T, K> {
                 .returnDocument(returnNew ? ReturnDocument.AFTER : ReturnDocument.BEFORE)
                 .upsert(upsert);
 
-        return delegate.findOneAndReplace(filter, object, options);
+        try {
+            return delegate.findOneAndReplace(filter, object, options);
+        } catch (MongoServerException e) {
+            throw possiblyAsDuplicateKeyError(e);
+        }
     }
 
     public T findAndRemove(Bson filter) {
@@ -301,22 +347,17 @@ public class JacksonDBCollection<T, K> {
     }
 
     private IndexOptions toIndexOptions(DBObject options) {
-//        final var indexOptions = new IndexOptions();
-//        for (final String key : options.keySet()) {
-//            final Object value = options.get(key);
-//            switch (key) {
-//                case "unique" -> indexOptions.unique(Boolean.parseBoolean(value.toString()));
-//                case "name" -> indexOptions.name(value.toString());
-//                case "expireAfterSeconds" ->
-//                        indexOptions.expireAfter(Long.parseLong(value.toString()), TimeUnit.SECONDS);
-//                case "collation" -> indexOptions.collation(toCollation(value));
-//            }
-//
-//            //new BasicDBObject("locale", "en").append("strength", 2))
-//            //this.db.createIndex(new BasicDBObject(sortField, 1), new BasicDBObject(COLLATION_KEY, new BasicDBObject(LOCALE_KEY, "en")));
-//
-//        }
         return objectMapper.convertValue(options.toMap(), IndexOptionDto.class).toIndexOptions();
+    }
+
+    private MongoException possiblyAsDuplicateKeyError(final MongoServerException e) {
+        if (ErrorCategory.fromErrorCode(e.getCode()) == ErrorCategory.DUPLICATE_KEY) {
+            return new DuplicateKeyException(new BsonDocument("err", new BsonString(e.getMessage())),
+                    e.getServerAddress(),
+                    WriteConcernResult.acknowledged(0, false, null));
+        } else {
+            return e;
+        }
     }
 
 }
