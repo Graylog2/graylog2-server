@@ -29,7 +29,6 @@ type Props = {
   children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
   closeOnSelect?: boolean,
   disabled?: boolean
-  dropdownMinWidth?: number
   dropdownZIndex?: number,
   onToggle?: (isOpen: boolean) => void,
   title: React.ReactNode,
@@ -45,7 +44,6 @@ const OverlayDropdownButton = ({
   children,
   closeOnSelect,
   disabled,
-  dropdownMinWidth,
   dropdownZIndex,
   onToggle: onToggleProp,
   title,
@@ -64,7 +62,6 @@ const OverlayDropdownButton = ({
     <OverlayDropdown show={show}
                      closeOnSelect={closeOnSelect}
                      dropdownZIndex={dropdownZIndex}
-                     dropdownMinWidth={dropdownMinWidth}
                      alwaysShowCaret={alwaysShowCaret}
                      toggleChild={(
                        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
@@ -90,7 +87,6 @@ OverlayDropdownButton.defaultProps = {
   buttonTitle: undefined,
   closeOnSelect: true,
   disabled: false,
-  dropdownMinWidth: undefined,
   dropdownZIndex: undefined,
   onToggle: undefined,
 };

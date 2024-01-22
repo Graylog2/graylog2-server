@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen, act } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import { alice } from 'fixtures/users';
@@ -28,6 +28,8 @@ import CurrentUserProvider from './CurrentUserProvider';
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(['getInitialState', jest.fn(() => ({}))]),
 }));
+
+jest.useFakeTimers();
 
 describe('CurrentUserProvider', () => {
   const renderSUT = () => {
@@ -45,10 +47,14 @@ describe('CurrentUserProvider', () => {
     return consume;
   };
 
-  it('provides no data when user store is empty', () => {
-    const consume = renderSUT();
+  it('shows spinner while current user is loading', async () => {
+    render(<CurrentUserProvider>Content</CurrentUserProvider>);
 
-    expect(consume).toHaveBeenCalledWith(undefined);
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+
+    await screen.findByText('Loading...');
   });
 
   it('provides current user', () => {
