@@ -17,7 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.Sets;
-import org.opensearch.client.Node;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,12 +26,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class NodeListSniffer implements NodesSniffer {
-    private static final Logger LOG = LoggerFactory.getLogger(NodeListSniffer.class);
+public class LegacyNodeListSniffer implements LegacyNodesSniffer {
+    private static final Logger LOG = LoggerFactory.getLogger(LegacyNodeListSniffer.class);
     private static final Set<String> savedNodes = ConcurrentHashMap.newKeySet();
 
-    static NodeListSniffer create() {
-        return new NodeListSniffer();
+    static LegacyNodeListSniffer create() {
+        return new LegacyNodeListSniffer();
     }
 
     @Override
