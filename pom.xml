@@ -152,7 +152,7 @@
         <mongojack.version>2.10.1.4</mongojack.version>
         <mongojack4.version>4.8.1-1</mongojack4.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.105.Final</netty.version>
+        <netty.version>4.1.106.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
