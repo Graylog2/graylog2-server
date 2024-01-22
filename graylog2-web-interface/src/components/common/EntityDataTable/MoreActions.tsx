@@ -14,14 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+import * as React from 'react';
 
+import DropdownButton from 'components/bootstrap/DropdownButton';
 
-import org.opensearch.client.Node;
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from './Constants';
 
-import java.io.IOException;
-import java.util.List;
+type Props = React.PropsWithChildren<{
+  disabled?: boolean,
+}>
+const MoreActions = ({ children, disabled }: Props) => (
+  <DropdownButton title={MORE_ACTIONS_TITLE}
+                  bsSize="xsmall"
+                  pullRight
+                  buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+                  disabled={disabled}>
+    {children}
+  </DropdownButton>
+);
 
-public interface NodesSniffer {
-    List<Node> sniff(List<Node> nodes) throws IOException;
-}
+MoreActions.defaultProps = {
+  disabled: false,
+};
+
+export default MoreActions;
