@@ -63,7 +63,7 @@ public class IndexSetValidatorTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker    );
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
     }
 
     @Test
@@ -206,15 +206,19 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void testDataTieringNotSupportedInCloud() {
+    public void testDataTieringByDefaultDisabledInCloud() {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
 
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
 
-        assertThat(validator.validate(testIndexSetConfig().toBuilder().dataTiering(mock(DataTieringConfig.class)).build())).hasValueSatisfying(v ->
+        IndexSetConfig config = testIndexSetConfig().toBuilder().dataTiering(mock(DataTieringConfig.class)).build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).isEqualTo("data tiering feature is disabled!"));
+
+        when(dataTieringChecker.isEnabled()).thenReturn(true);
+        assertThat(validator.validate(config)).isEmpty();
     }
 
     @Test
