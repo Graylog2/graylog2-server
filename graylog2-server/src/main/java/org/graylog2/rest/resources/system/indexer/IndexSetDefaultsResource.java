@@ -104,7 +104,7 @@ public class IndexSetDefaultsResource extends RestResource {
         }
 
         if (config.dataTiering() != null) {
-            violation = indexSetValidator.validateDataTiers(config.dataTiering());
+            violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
             if (violation != null) {
                 throw new BadRequestException(buildFieldError(IndexSetConfig.FIELD_DATA_TIERING, violation.message()));
             }

@@ -174,6 +174,7 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
             return retentionStrategyConfig(retentionStrategyConfig);
         }
 
+        @JsonProperty(FIELD_DATA_TIERING)
         public abstract Builder dataTiering(@Nullable DataTieringConfig dataTiering);
 
         public abstract IndexSetsDefaultConfiguration build();

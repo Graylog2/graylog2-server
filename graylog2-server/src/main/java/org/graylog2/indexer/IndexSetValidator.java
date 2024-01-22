@@ -83,7 +83,7 @@ public class IndexSetValidator {
             if (isCloud) {
                 return Optional.of(Violation.create("data tiering is not supported in cloud"));
             }
-            final Violation dataTiersViolation = validateDataTiers(newConfig.dataTiering());
+            final Violation dataTiersViolation = validateDataTieringConfig(newConfig.dataTiering());
             if (dataTiersViolation != null) {
                 return Optional.of(dataTiersViolation);
             }
@@ -175,7 +175,7 @@ public class IndexSetValidator {
 
 
     @Nullable
-    public Violation validateDataTiers(DataTieringConfig dataTieringConfig) {
+    public Violation validateDataTieringConfig(DataTieringConfig dataTieringConfig) {
         return dataTieringOrchestrator.validate(dataTieringConfig).orElse(null);
     }
 
