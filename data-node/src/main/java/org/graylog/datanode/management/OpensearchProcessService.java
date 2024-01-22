@@ -68,7 +68,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.eventBus = eventBus;
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
-        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
         this.objectMapper = objectMapper;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper);
         eventBus.register(this);
