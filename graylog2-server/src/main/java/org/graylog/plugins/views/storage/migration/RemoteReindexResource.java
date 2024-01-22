@@ -38,7 +38,7 @@ import org.graylog2.shared.security.RestPermissions;
 @RequiresAuthentication
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "Migration", description = "Migrate data from existing cluster")
+@Api(value = "ReindexMigration", description = "Migrate data from existing cluster")
 public class RemoteReindexResource {
     private final RemoteReindexingMigrationAdapter migrationService;
 
