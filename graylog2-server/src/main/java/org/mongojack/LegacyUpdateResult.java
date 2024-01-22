@@ -16,7 +16,7 @@ public class LegacyUpdateResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public int getN() {
-        return Ints.saturatedCast(updateResult.getModifiedCount());
+        return (getUpsertedId() != null) ? 1 : Ints.saturatedCast(updateResult.getMatchedCount());
     }
 
     @Override
