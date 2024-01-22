@@ -147,7 +147,7 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.22.1</log4j.version>
         <lucene.version>9.9.1</lucene.version>
-        <metrics.version>4.1.9</metrics.version>
+        <metrics.version>4.2.24</metrics.version>
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
         <mongojack.version>2.10.1.4</mongojack.version>
         <mongojack4.version>4.8.1-1</mongojack4.version>
