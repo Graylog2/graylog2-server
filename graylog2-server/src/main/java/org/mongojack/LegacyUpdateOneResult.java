@@ -50,6 +50,6 @@ public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public boolean isUpdateOfExisting() {
-        return updateResult.getUpsertedId() == null;
+        return updateResult.getUpsertedId() == null && updateResult.getModifiedCount() > 0;
     }
 }
