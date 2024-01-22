@@ -22,6 +22,7 @@ import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpRequestInterceptor;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.security.CustomCAX509TrustManager;
+import org.opensearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,5 +58,30 @@ public class OpensearchRestClient {
             }
         }
         return new RestHighLevelClient(builder);
+    }
+
+    public static RestClient buildNewClient(OpensearchConfiguration configuration, DatanodeConfiguration datanodeConfiguration, CustomCAX509TrustManager tm) {
+        final HttpHost host = configuration.getRestBaseUrl();
+
+        final var builder = org.opensearch.client.RestClient.builder(new org.apache.http.HttpHost(host.getHostName(), host.getPort(), host.getSchemeName()));
+        if ("https".equals(host.getSchemeName())) {
+
+            try {
+                final var sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
+
+                builder.setHttpClientConfigCallback(httpClientBuilder -> {
+                    httpClientBuilder.addInterceptorLast((org.apache.http.HttpRequestInterceptor) (request, context) -> {
+                        final String jwtToken = datanodeConfiguration.indexerJwtAuthTokenProvider().get();
+                        request.addHeader("Authorization", jwtToken);
+                    });
+                    httpClientBuilder.setSSLContext(sslContext);
+                    return httpClientBuilder;
+                });
+            } catch (NoSuchAlgorithmException | KeyManagementException ex) {
+                LOG.error("Could not initialize SSL correctly: {}", ex.getMessage(), ex);
+            }
+        }
+        return builder.build();
     }
 }

@@ -28,12 +28,11 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
-import DropdownButton from 'components/bootstrap/DropdownButton';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import type FetchError from 'logic/errors/FetchError';
 import { isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -123,9 +122,9 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                    entityType="dashboard"
                    onClick={() => setShowShareModal(true)} />
       {!!moreActions.length && (
-        <DropdownButton bsSize="xsmall" title={MORE_ACTIONS_TITLE} buttonTitle={MORE_ACTIONS_HOVER_TITLE}>
-          {moreActions.map((action) => action)}
-        </DropdownButton>
+        <MoreActions>
+          {moreActions}
+        </MoreActions>
       )}
       {showShareModal && (
         <EntityShareModal entityId={dashboard.id}
