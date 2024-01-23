@@ -210,7 +210,7 @@ public class Server extends ServerBootstrap {
                 new ScriptingApiModule(featureFlags),
                 new StreamsModule(),
                 new TracingModule(),
-                new DataTieringModule()
+                new DataTieringModule(),
                 new DatanodeMigrationBindings()
         );
 
