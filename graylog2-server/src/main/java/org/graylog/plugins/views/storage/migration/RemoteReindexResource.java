@@ -35,11 +35,11 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.shared.security.RestPermissions;
 
-@Path("/migration")
+@Path("/remote-reindex-migration")
 @RequiresAuthentication
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "Migration", description = "Migrate data from existing cluster")
+@Api(value = "ReindexMigration", description = "Migrate data from existing cluster")
 public class RemoteReindexResource {
     private final RemoteReindexingMigrationAdapter migrationService;
 
