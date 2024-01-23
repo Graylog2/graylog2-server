@@ -50,6 +50,13 @@ const CaffeineCacheSummary = ({ cache }: Props) => (
                   unit={cache.config.expire_after_write_unit} />
       </Value>
     </SummaryRow>
+    <SummaryRow>
+      <Title>TTL for empty results:</Title>
+      <Value>
+        <TimeUnit value={cache.config.ttl_empty}
+                  unit={cache.config.ttl_empty_unit} />
+      </Value>
+    </SummaryRow>
   </SummaryContainer>
 );
 
