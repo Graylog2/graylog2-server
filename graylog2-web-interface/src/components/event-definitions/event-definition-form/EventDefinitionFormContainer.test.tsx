@@ -75,7 +75,16 @@ jest.mock('stores/connect', () => ({
     _mapProps: (args: { [key: string]: any }) => any,
   ) => {
     const storeProps = Object.entries(stores).reduce((acc, [key, store]) => ({ ...acc, [key]: store.getInitialState() }), {});
-    const componentProps = { ...storeProps, eventDefinition: { ...mockEventDefinition, config: { ...mockEventDefinition.config, query: 'http_response_code:400' } } };
+    const componentProps = {
+      ...storeProps,
+      eventDefinition: {
+        ...mockEventDefinition,
+        config: {
+          ...mockEventDefinition.config,
+          query: 'http_response_code:400',
+        },
+      },
+    };
 
     const ConnectStoreWrapper = () => (<Component {...componentProps} />);
 
