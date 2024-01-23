@@ -128,6 +128,7 @@ describe('IndexSetFieldTypesList', () => {
         indexSetIds: [],
       },
       isFetched: true,
+      isFetching: false,
       refetch: () => {},
     });
 

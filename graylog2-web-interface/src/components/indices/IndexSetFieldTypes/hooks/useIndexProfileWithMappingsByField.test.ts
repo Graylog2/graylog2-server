@@ -61,6 +61,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
 
     asMock(useProfile).mockReturnValue({
       isFetched: true,
+      isFetching: false,
       refetch: () => {},
       data: {
         name: 'Profile 1',
