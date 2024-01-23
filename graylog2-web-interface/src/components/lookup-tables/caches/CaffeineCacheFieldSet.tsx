@@ -98,10 +98,10 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
       <Input type="checkbox"
              id="ignore_null"
              name="ignore_null"
-             label="Ignore null"
+             label="Ignore empty results"
              checked={stateConfig.ignore_null}
              onChange={handleIgnoreNullChange}
-             help="When enabled, null lookup result will be ignored and not cached."
+             help="When enabled, empty lookup results will be ignored and not cached."
              wrapperClassName="col-md-offset-3 col-md-9" />
       <TimeUnitInput label="TTL for empty results"
                      help="Empty results are removed from the cache after the specified time."
