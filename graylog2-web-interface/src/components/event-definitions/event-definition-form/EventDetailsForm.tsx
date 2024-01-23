@@ -44,9 +44,10 @@ type Props = {
     }
   },
   onChange: (name: string, value: string | number) => void,
+  canEdit: boolean,
 }
 
-const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
+const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
@@ -67,7 +68,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
     onChange('priority', toNumber(nextPriority));
   };
 
-  const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
+  const readOnly = !canEdit || eventDefinition.config.type === 'system-notifications-v1';
 
   return (
     <Row>
@@ -82,7 +83,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
                  help={get(validation, 'errors.title[0]', 'Title for this Event Definition, Events and Alerts created from it.')}
                  value={eventDefinition.title}
                  onChange={handleChange}
-                 readOnly={isSystemEventDefinition}
+                 readOnly={readOnly}
                  required />
 
           <Input id="event-definition-description"
@@ -92,7 +93,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
                  help="Longer description for this Event Definition."
                  value={eventDefinition.description}
                  onChange={handleChange}
-                 readOnly={isSystemEventDefinition}
+                 readOnly={readOnly}
                  rows={2} />
 
           <FormGroup controlId="event-definition-priority">
@@ -101,7 +102,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
                     value={toString(eventDefinition.priority)}
                     onChange={handlePriorityChange}
                     clearable={false}
-                    disabled={isSystemEventDefinition}
+                    disabled={readOnly}
                     required />
             <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
           </FormGroup>
