@@ -35,6 +35,12 @@ export type IndexSetFieldTypeProfile = {
   indexSetIds: Array<string>
 }
 
+export type IndexSetFieldTypeProfileForm = {
+  name: string,
+  description: string,
+  customFieldMappings: Array<CustomFieldMapping>,
+}
+
 export type IndexSetFieldTypeProfileRequest = {
   id?: string,
   name: string,

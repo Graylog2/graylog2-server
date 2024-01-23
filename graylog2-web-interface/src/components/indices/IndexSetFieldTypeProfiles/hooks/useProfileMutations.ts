@@ -19,14 +19,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import type { IndexSetFieldTypeProfileRequest, IndexSetFieldTypeProfileRequestJson } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import type {
+  IndexSetFieldTypeProfileForm,
+  IndexSetFieldTypeProfileRequestJson,
+} from 'components/indices/IndexSetFieldTypeProfiles/types';
 
 export const urlPrefix = '/system/indices/index_sets/profiles';
 
-const putProfile = async (profile: IndexSetFieldTypeProfileRequest) => {
+const putProfile = async ({ profile, id }: { profile: IndexSetFieldTypeProfileForm, id: string }) => {
   const url = qualifyUrl(urlPrefix);
   const body: IndexSetFieldTypeProfileRequestJson = {
-    id: profile.id,
+    id,
     name: profile.name,
     description: profile.description,
     custom_field_mappings: profile.customFieldMappings,
@@ -35,7 +38,7 @@ const putProfile = async (profile: IndexSetFieldTypeProfileRequest) => {
   return fetch('PUT', url, body);
 };
 
-const postProfile = async (profile: IndexSetFieldTypeProfileRequest) => {
+const postProfile = async (profile: IndexSetFieldTypeProfileForm) => {
   const url = qualifyUrl(urlPrefix);
   const body: IndexSetFieldTypeProfileRequestJson = {
     name: profile.name,

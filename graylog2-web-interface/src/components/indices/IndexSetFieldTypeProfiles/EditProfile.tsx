@@ -23,7 +23,10 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import type {
+  IndexSetFieldTypeProfile,
+  IndexSetFieldTypeProfileForm,
+} from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
 
@@ -40,8 +43,8 @@ const EditProfile = ({
   const { editProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
-  const onSubmit = useCallback((newProfile: IndexSetFieldTypeProfile) => {
-    editProfile(omit(newProfile, 'indexSetIds')).then(() => {
+  const onSubmit = useCallback((newProfile: IndexSetFieldTypeProfileForm) => {
+    editProfile({ profile: newProfile, id: profile.id }).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT, {
         app_pathname: telemetryPathName,
         app_action_value: { mappingsQuantity: newProfile?.customFieldMappings?.length },
@@ -49,7 +52,7 @@ const EditProfile = ({
 
       navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
     });
-  }, [editProfile, navigate, sendTelemetry, telemetryPathName]);
+  }, [editProfile, navigate, profile.id, sendTelemetry, telemetryPathName]);
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_OPENED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-opened' });
@@ -60,8 +63,10 @@ const EditProfile = ({
     navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
   }, [navigate, sendTelemetry, telemetryPathName]);
 
+  const initialValues = useMemo(() => omit(profile, ['id', 'indexSetIds']), [profile]);
+
   return (
-    <ProfileForm onCancel={onCancel} submitButtonText="Update profile" submitLoadingText="Updating profile..." onSubmit={onSubmit} initialValues={profile} />
+    <ProfileForm onCancel={onCancel} submitButtonText="Update profile" submitLoadingText="Updating profile..." onSubmit={onSubmit} initialValues={initialValues} />
   );
 };
 

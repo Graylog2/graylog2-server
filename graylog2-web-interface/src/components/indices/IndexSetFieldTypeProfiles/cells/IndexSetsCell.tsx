@@ -25,7 +25,6 @@ import { isPermitted } from 'util/PermissionsMixin';
 const List = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
 `;
 
 const IndexSetsCell = ({ indexSetIds, normalizedIndexSetsTitles }: { indexSetIds : Array<string>, normalizedIndexSetsTitles: Record<string, string> }) => {
@@ -36,15 +35,23 @@ const IndexSetsCell = ({ indexSetIds, normalizedIndexSetsTitles }: { indexSetIds
   }
 
   return (
-    <List>{indexSetIds
-      .map((indexSetId) => (
-        <Link key={indexSetId}
-              to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}
-              target="_blank">
-          {normalizedIndexSetsTitles[indexSetId]}
-        </Link>
-      ),
-      )}
+    <List>
+      {indexSetIds
+        .map((indexSetId, index) => {
+          const isLast = index === indexSetIds.length - 1;
+
+          return (
+            <>
+              <Link key={indexSetId}
+                    to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)}
+                    target="_blank">
+                {normalizedIndexSetsTitles[indexSetId]}
+              </Link>
+              {!isLast && ', '}
+            </>
+          );
+        },
+        )}
     </List>
   );
 };

@@ -92,7 +92,5 @@ export const attributes: Attributes = [
   indexSetsAttribute,
 ];
 
-export const requestBodyProfile1 = omit(profile1, 'indexSetIds');
-export const requestBodyProfile2 = omit(profile2, 'indexSetIds');
+export const formValuesProfile1 = omit(profile1, ['indexSetIds', 'id']);
 export const requestBodyProfile1JSON = omit(profile1JSON, 'index_set_ids');
-export const requestBodyProfile2JSON = omit(profile2JSON, 'index_set_ids');

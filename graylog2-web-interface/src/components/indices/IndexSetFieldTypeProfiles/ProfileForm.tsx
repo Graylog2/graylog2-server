@@ -20,7 +20,7 @@ import React, { useMemo } from 'react';
 import { Formik, Form, FieldArray, Field } from 'formik';
 import countBy from 'lodash/countBy';
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import type { IndexSetFieldTypeProfileForm } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import { FormikInput, IconButton, Select, FormSubmit, Spinner, InputOptionalInfo } from 'components/common';
 import { Button, Col, HelpBlock, Input } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
@@ -55,22 +55,22 @@ const StyledFormSubmit = styled(FormSubmit)`
   margin-top: 30px;
 `;
 type Props = {
-  initialValues?: IndexSetFieldTypeProfile,
+  initialValues?: IndexSetFieldTypeProfileForm,
   submitButtonText: string,
   submitLoadingText: string,
   onCancel: () => void,
-  onSubmit: (profile: IndexSetFieldTypeProfile) => void
+  onSubmit: (profile: IndexSetFieldTypeProfileForm) => void
 }
 
 const getFieldError = (field: string, occurrences: number) => {
-  if (!field) return 'Filed is required';
-  if (isReservedField(field)) return 'Filed is reserved';
+  if (!field) return 'Field is required';
+  if (isReservedField(field)) return 'Field is reserved';
   if (occurrences > 1) return 'This field occurs several times';
 
   return undefined;
 };
 
-const validate = (formValues: IndexSetFieldTypeProfile) => {
+const validate = (formValues: IndexSetFieldTypeProfileForm) => {
   const errors: { name?: string, customFieldMappings?: Array<{ field?: string, type?: string }>} = {};
 
   if (!formValues.name) {
@@ -134,16 +134,16 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
     })), [fieldTypes]);
   const fields = useMemo(() => (isLoading ? [] : data.map(({ value: { name } }) => ({ value: name, label: name }))), [data, isLoading]);
 
-  const _onSubmit = (profile: IndexSetFieldTypeProfile) => {
+  const _onSubmit = (profile: IndexSetFieldTypeProfileForm) => {
     onSubmit(profile);
   };
 
   return (
     <Col lg={8}>
-      <Formik<IndexSetFieldTypeProfile> initialValues={initialValues}
-                                        onSubmit={_onSubmit}
-                                        validate={validate}
-                                        validateOnChange>
+      <Formik<IndexSetFieldTypeProfileForm> initialValues={initialValues}
+                                            onSubmit={_onSubmit}
+                                            validate={validate}
+                                            validateOnChange>
         {({ isSubmitting, isValid, isValidating, values: { customFieldMappings } }) => (
           <Form>
             <FormikInput name="name"

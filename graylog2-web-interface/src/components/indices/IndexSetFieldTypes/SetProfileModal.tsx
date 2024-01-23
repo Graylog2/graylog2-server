@@ -105,45 +105,46 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
   const onChangeProfile = (newProfile: string) => setProfile(newProfile);
 
   return (
-    <Modal title="Set Profile"
-           onHide={onCancel}
+    <Modal onHide={onCancel}
            show={show}
            data-testid="modal-form">
-      <Modal.Header closeButton>
-        <Modal.Title><span>Set Profile</span></Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div>
-          <Input id="index_set_profile" label="Select profile">
-            <StyledSelect inputId="index_set_profile"
-                          options={options}
-                          value={profile}
-                          onChange={onChangeProfile}
-                          placeholder="Select profile"
-                          disabled={profileOptionsIsLoading}
-                          required />
-          </Input>
-          <StyledLabel>Select Rotation Strategy</StyledLabel>
-          <p>
-            To see and use new profile setting (changing or removal) for index set, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
-          </p>
-          <Input type="checkbox"
-                 id="rotate"
-                 name="rotate"
-                 label="Rotate affected indices after change"
-                 onChange={() => setRotated((cur: boolean) => !cur)}
-                 checked={rotated} />
-        </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <ModalSubmit submitButtonText="Set Profile"
-                     submitLoadingText="Set Profile..."
-                     onSubmit={onSubmit}
-                     onCancel={onClose}
-                     disabledSubmit={isLoading || isProfileRemoving}
-                     isSubmitting={isLoading || isProfileRemoving}
-                     leftCol={currentProfile && <Button onClick={onRemoveProfileFromIndex} disabled={isLoading || isProfileRemoving} bsStyle="danger">Remove profile</Button>} />
-      </Modal.Footer>
+      <form onSubmit={onSubmit}>
+        <Modal.Header closeButton>
+          <Modal.Title><span>Set Profile</span></Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <Input id="index_set_profile" label="Select profile">
+              <StyledSelect inputId="index_set_profile"
+                            options={options}
+                            value={profile}
+                            onChange={onChangeProfile}
+                            placeholder="Select profile"
+                            disabled={profileOptionsIsLoading}
+                            required />
+            </Input>
+            <StyledLabel>Select Rotation Strategy</StyledLabel>
+            <p>
+              To see and use new profile setting (changing or removal) for index set, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+            </p>
+            <Input type="checkbox"
+                   id="rotate"
+                   name="rotate"
+                   label="Rotate affected indices after change"
+                   onChange={() => setRotated((cur: boolean) => !cur)}
+                   checked={rotated} />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <ModalSubmit submitButtonText="Set profile"
+                       submitLoadingText="Set profile..."
+                       onCancel={onClose}
+                       submitButtonType="submit"
+                       disabledSubmit={isLoading || isProfileRemoving}
+                       isSubmitting={isLoading || isProfileRemoving}
+                       leftCol={currentProfile && <Button onClick={onRemoveProfileFromIndex} disabled={isLoading || isProfileRemoving} bsStyle="danger">Remove profile</Button>} />
+        </Modal.Footer>
+      </form>
     </Modal>
   );
 };

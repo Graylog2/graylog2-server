@@ -47,9 +47,10 @@ const fetchIndexSetFieldTypeProfile = async (id: string) => {
 const useProfile = (id: string): {
   data: IndexSetFieldTypeProfile,
   isFetched: boolean,
+  isFetching: boolean,
   refetch: () => void,
 } => {
-  const { data, isFetched, refetch } = useQuery(
+  const { data, isFetched, isFetching, refetch } = useQuery(
     ['indexSetFieldTypeProfile', id],
     () => fetchIndexSetFieldTypeProfile(id),
     {
@@ -65,6 +66,7 @@ const useProfile = (id: string): {
   return ({
     data: data ?? INITIAL_DATA,
     isFetched,
+    isFetching,
     refetch,
   });
 };

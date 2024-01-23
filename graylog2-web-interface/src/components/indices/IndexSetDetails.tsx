@@ -32,7 +32,7 @@ type Props = {
 };
 
 const IndexSetDetails = ({ indexSet }: Props) => {
-  const { data: { name: profileName }, isFetched } = useProfile(indexSet.field_type_profile);
+  const { data: { name: profileName }, isFetching } = useProfile(indexSet.field_type_profile);
 
   return (
     <StyledIndexSetDetailsRow>
@@ -49,7 +49,7 @@ const IndexSetDetails = ({ indexSet }: Props) => {
           <dt>Field type refresh interval:</dt>
           <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
           <dt>Field type profile:</dt>
-          {isFetched && (
+          {!isFetching && (
           <dd>
             {indexSet.field_type_profile
               ? (
@@ -58,7 +58,7 @@ const IndexSetDetails = ({ indexSet }: Props) => {
                   {profileName}
                 </Link>
               )
-              : 'Not set'}
+              : <i>Not set</i>}
           </dd>
           )}
         </dl>
