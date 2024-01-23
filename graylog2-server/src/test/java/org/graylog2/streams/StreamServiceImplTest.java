@@ -25,7 +25,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.junit.Before;
@@ -55,8 +54,6 @@ public class StreamServiceImplTest {
     @Mock
     private MongoIndexSet.Factory factory;
     @Mock
-    private NotificationService notificationService;
-    @Mock
     private EntityOwnershipService entityOwnershipService;
 
     private StreamService streamService;
@@ -64,7 +61,7 @@ public class StreamServiceImplTest {
     @Before
     public void setUp() throws Exception {
         this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
-                outputService, indexSetService, factory, notificationService, entityOwnershipService, new ClusterEventBus());
+                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus());
     }
 
     @Test
