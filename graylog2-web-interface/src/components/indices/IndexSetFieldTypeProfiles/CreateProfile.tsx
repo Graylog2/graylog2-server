@@ -32,6 +32,20 @@ const CreateProfile = () => {
   const navigate = useNavigate();
   const { createProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
+  const location = useLocation();
+  const initialValues = useMemo<IndexSetFieldTypeProfile>(() => {
+    const defaultCustomFieldMappings = location?.state?.customFieldMappings;
+
+    if (defaultCustomFieldMappings) {
+      return ({
+        customFieldMappings: defaultCustomFieldMappings,
+        name: null,
+        description: null,
+      });
+    }
+
+    return undefined;
+  }, [location?.state?.customFieldMappings]);
 
   const onSubmit = useCallback((profile: IndexSetFieldTypeProfile) => {
     createProfile(profile).then(() => {
@@ -54,7 +68,7 @@ const CreateProfile = () => {
   }, [navigate, sendTelemetry, telemetryPathName]);
 
   return (
-    <ProfileForm onCancel={onCancel} submitButtonText="Create profile" submitLoadingText="Creating profile..." onSubmit={onSubmit} />
+    <ProfileForm initialValues={initialValues} onCancel={onCancel} submitButtonText="Create profile" submitLoadingText="Creating profile..." onSubmit={onSubmit} />
   );
 };
 

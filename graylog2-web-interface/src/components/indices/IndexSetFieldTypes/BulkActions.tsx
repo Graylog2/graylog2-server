@@ -16,32 +16,63 @@
  */
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { styled } from 'styled-components';
 
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import MenuItem from 'components/bootstrap/MenuItem';
 import IndexSetCustomFieldTypeRemoveModal
   from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
-import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
+import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import hasOverride from 'components/indices/helpers/hasOverride';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
+import useSelectedEntitiesData from 'components/common/EntityDataTable/hooks/useSelectedEntitiesData';
 
 type Props = {
   indexSetId: string,
+  list: ReadonlyArray<IndexSetFieldType>,
 }
 
-const BulkActions = ({ indexSetId }: Props) => {
-  const { selectedEntities } = useSelectedEntities();
-  const [showResetModal, setShowResetModal] = useState<boolean>(false);
+const StyledMenuItem = styled(MenuItem)`
+  pointer-events: all;
+`;
 
+const BulkActions = ({ indexSetId, list }: Props) => {
+  const { pushWithState } = useHistory();
+  const selectedEntitiesData = useSelectedEntitiesData<IndexSetFieldType>(list);
+  const [showResetModal, setShowResetModal] = useState<boolean>(false);
+  const customFieldMappings: Array<CustomFieldMapping> = selectedEntitiesData.map(({ fieldName, type }) => ({
+    field: fieldName,
+    type,
+  }));
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
+
+  const createNewProfile = () => {
+    pushWithState(
+      Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE,
+      {
+        customFieldMappings,
+      },
+    );
+  };
+
+  const removableFields = useMemo(() => selectedEntitiesData.filter(hasOverride).map(({ fieldName }) => fieldName), [selectedEntitiesData]);
 
   return (
     <>
       <BulkActionsDropdown>
-        <MenuItem onSelect={toggleResetModal}>Reset</MenuItem>
+        <>
+          <StyledMenuItem disabled={!removableFields.length} onSelect={toggleResetModal}>Reset
+            {!removableFields.length && '(overridden only)'}
+          </StyledMenuItem>
+          <MenuItem onSelect={createNewProfile}>Create new profile</MenuItem>
+        </>
       </BulkActionsDropdown>
       {showResetModal && (
       <IndexSetCustomFieldTypeRemoveModal show
-                                          fields={selectedEntities}
+                                          fields={removableFields}
                                           onClose={toggleResetModal}
                                           indexSetIds={[indexSetId]} />
       )}

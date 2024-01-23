@@ -36,7 +36,6 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
 import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
-import hasOverride from 'components/indices/helpers/hasOverride';
 import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/OriginFilterValueRenderer';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
@@ -55,7 +54,7 @@ const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }
   color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
   margin-right: 5px;
 `);
-const isEntitySelectable = (fieldType: IndexSetFieldType) => hasOverride(fieldType);
+const isEntitySelectable = (fieldType: IndexSetFieldType) => !fieldType.isReserved;
 const FilterValueRenderers = {
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
@@ -128,6 +127,11 @@ const IndexSetFieldTypesList = () => {
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
+  const bulkSection = useMemo(() => ({
+    actions: <BulkActions indexSetId={indexSetId} list={list} />,
+    isEntitySelectable,
+  }), [indexSetId, list]);
+
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
@@ -166,10 +170,7 @@ const IndexSetFieldTypesList = () => {
                                             columnDefinitions={attributes}
                                             rowActions={renderActions}
                                             expandedSectionsRenderer={expandedSections}
-                                            bulkSelection={{
-                                              actions: <BulkActions indexSetId={indexSetId} />,
-                                              isEntitySelectable,
-                                            }} />
+                                            bulkSelection={bulkSection} />
       )}
     </PaginatedList>
   );
