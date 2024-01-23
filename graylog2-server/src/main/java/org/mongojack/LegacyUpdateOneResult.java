@@ -38,15 +38,12 @@ public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public T getSavedObject() {
-        return object;
+        return collection.findOneById(getId());
     }
 
     @Override
     public K getSavedId() {
-        final CollectibleCodec<T> codec = (CollectibleCodec<T>) collection.getCodecRegistry().get(valueType);
-        final BsonValue id = codec.getDocumentId(object);
-
-        return WriteResult.toIdType(id, idType);
+        return WriteResult.toIdType(getId(), idType);
     }
 
     @Override
@@ -67,5 +64,13 @@ public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
     @Override
     public boolean isUpdateOfExisting() {
         return updateResult.getUpsertedId() == null && updateResult.getModifiedCount() > 0;
+    }
+
+    private BsonValue getId() {
+        if (updateResult.getUpsertedId() != null) {
+            return updateResult.getUpsertedId();
+        }
+        final CollectibleCodec<T> codec = (CollectibleCodec<T>) collection.getCodecRegistry().get(valueType);
+        return codec.getDocumentId(object);
     }
 }

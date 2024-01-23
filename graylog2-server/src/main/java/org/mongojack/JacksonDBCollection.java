@@ -30,6 +30,7 @@ import com.mongodb.WriteConcernResult;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationStrength;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexOptions;
@@ -38,7 +39,9 @@ import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
+import org.bson.BsonValue;
 import org.bson.UuidRepresentation;
+import org.bson.codecs.CollectibleCodec;
 import org.bson.conversions.Bson;
 
 import javax.annotation.Nullable;
@@ -130,16 +133,27 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> save(T object) {
-        try {
-            return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object), valueType, idType);
-        } catch (MongoServerException e) {
-            throw possiblyAsDuplicateKeyError(e);
-        }
+        return save(object, null);
     }
 
     public WriteResult<T, K> save(T object, WriteConcern concern) {
+        return doSave(object, concern);
+    }
+
+    private WriteResult<T, K> doSave(T object, WriteConcern concern) {
+        final var collection = concern == null ? delegate : delegate.withWriteConcern(concern);
+
+        final CollectibleCodec<T> codec = (CollectibleCodec<T>) delegate.getCodecRegistry().get(valueType);
+        final BsonValue id = codec.getDocumentId(object);
+
         try {
-            return new LegacyUpdateOneResult<>(delegate, object, delegate.save(object, concern), valueType, idType);
+            if (id == null || id.isNull()) {
+                return new LegacyInsertOneResult<>(collection, collection.insertOne(object), idType);
+            } else {
+                final var idQuery = Filters.eq("_id", id);
+                return new LegacyUpdateOneResult<>(collection, object,
+                        collection.replaceOne(idQuery, object, new ReplaceOptions().upsert(true)), valueType, idType);
+            }
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
         }
@@ -228,7 +242,7 @@ public class JacksonDBCollection<T, K> {
 
     public WriteResult<T, K> insert(T object) {
         try {
-            return new LegacyInsertOneResult<>(delegate, object, delegate.insertOne(object), idType);
+            return new LegacyInsertOneResult<>(delegate, delegate.insertOne(object), idType);
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
         }
