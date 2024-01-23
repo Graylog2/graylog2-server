@@ -53,8 +53,8 @@ const CaffeineCacheSummary = ({ cache }: Props) => (
     <SummaryRow>
       <Title>TTL for empty results:</Title>
       <Value>
-        <TimeUnit value={cache.config.ttl_empty}
-                  unit={cache.config.ttl_empty_unit} />
+        <TimeUnit value={cache.config.ttl_empty || 0}
+                  unit={cache.config.ttl_empty_unit || 'SECONDS'} />
       </Value>
     </SummaryRow>
   </SummaryContainer>
