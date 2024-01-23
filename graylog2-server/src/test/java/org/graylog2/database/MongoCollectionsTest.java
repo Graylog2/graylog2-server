@@ -22,6 +22,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonType;
+import org.bson.BsonValue;
 import org.bson.Document;
 import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nullable;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -64,6 +66,9 @@ class MongoCollectionsTest {
     @JsonIgnoreProperties(ignoreUnknown = true)
     record IgnoreTest(@JsonProperty("ignore_me_not") String ignoreMeNot,
                       @MongoIgnore @JsonProperty("ignore_me") String ignoreMe) {}
+
+    record IdGenerationTest(@Nullable @JsonProperty("id") @Id @ObjectId String id) {}
+
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) {
@@ -120,5 +125,16 @@ class MongoCollectionsTest {
 
         final MongoCollection<IgnoreTest> collection2 = collections.get("alsoIgnoreTest", IgnoreTest.class);
         assertThat(collection2.find().first()).isEqualTo(new IgnoreTest("I should be present", "I sneaked in"));
+    }
+
+    @Test
+    void testIdGeneration() {
+        final MongoCollection<IdGenerationTest> collection = collections.get("id-generation-test", IdGenerationTest.class);
+        final var testObject = new IdGenerationTest(null);
+        final InsertOneResult result = collection.insertOne(testObject);
+        final BsonValue insertedId = result.getInsertedId();
+        assertThat(insertedId).isNotNull().satisfies(id -> assertThat(id.isObjectId()).isTrue());
+        assertThat(collection.find(Filters.eq("_id", insertedId)).first())
+                .isEqualTo(new IdGenerationTest(insertedId.asObjectId().getValue().toHexString()));
     }
 }
