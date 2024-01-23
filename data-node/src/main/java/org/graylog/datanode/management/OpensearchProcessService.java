@@ -89,14 +89,14 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
             case ADD -> {
-                shutDown();
+                this.process.stop();
                 configure(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
-                startUp();
+                this.process.start();
             }
             case REMOVE -> {
-                shutDown();
+                this.process.stop();
                 configure();
-                startUp();
+                this.process.start();
             }
         }
     }
