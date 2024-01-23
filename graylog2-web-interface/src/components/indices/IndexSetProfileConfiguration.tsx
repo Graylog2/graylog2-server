@@ -43,7 +43,7 @@ const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string,
       <StyledH3>Index Set Profile</StyledH3>
       <StyledAlert>
         With index set field type <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>profiles</Link> you can bundle up custom field types into profiles.
-        You can assign any profile to this index set.
+        You can assign any profile to this index set. To see and use profile setting for index set, you have to rotate indices.
       </StyledAlert>
       <Row>
         <Col md={12}>
