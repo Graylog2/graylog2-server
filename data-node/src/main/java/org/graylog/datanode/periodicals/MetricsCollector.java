@@ -16,18 +16,21 @@
  */
 package org.graylog.datanode.periodicals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
+import org.graylog.datanode.metrics.ClusterStatMetricsCollector;
+import org.graylog.datanode.metrics.NodeStatMetricsCollector;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.plugin.system.NodeId;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +43,16 @@ public class MetricsCollector extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(MetricsCollector.class);
     private final OpensearchProcess process;
     private final Configuration configuration;
-    private final NodeId nodeId;
+    private NodeStatMetricsCollector nodeStatMetricsCollector;
+    private ClusterStatMetricsCollector clusterStatMetricsCollector;
+    private final ObjectMapper objectMapper;
+    private boolean isLeader;
 
     @Inject
-    public MetricsCollector(OpensearchProcess process, Configuration configuration, NodeId nodeId) {
+    public MetricsCollector(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper) {
         this.process = process;
         this.configuration = configuration;
-        this.nodeId = nodeId;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -89,23 +95,40 @@ public class MetricsCollector extends Periodical {
     public void doRun() {
         if (process.isInState(ProcessState.AVAILABLE)) {
             process.restClient().ifPresent(client -> {
+                this.nodeStatMetricsCollector = new NodeStatMetricsCollector(client, objectMapper);
+                this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);
+                this.isLeader = process.isLeaderNode();
                 final IndexRequest indexRequest = new IndexRequest(configuration.getMetricsStream());
                 Map<String, Object> metrics = new HashMap<String, Object>();
                 metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
-                metrics.put("node", configuration.getHostname());
-                metrics.put("jvm_heap", Runtime.getRuntime().totalMemory());
+                String node = configuration.getDatanodeNodeName();
+                metrics.put("node", node);
+                metrics.put("dn_jvm_heap", Runtime.getRuntime().totalMemory());
+                metrics.putAll(nodeStatMetricsCollector.getNodeMetrics(node));
                 indexRequest.source(metrics);
-                client.indexAsync(indexRequest, RequestOptions.DEFAULT, new ActionListener<IndexResponse>() {
-                    @Override
-                    public void onResponse(IndexResponse indexResponse) {
-                    }
+                indexDocument(client, indexRequest);
 
-                    @Override
-                    public void onFailure(Exception e) {
-                        LOG.error("Error indexing metrics", e);
-                    }
-                });
+                if (isLeader) {
+                    metrics = new HashMap<>(clusterStatMetricsCollector.getClusterMetrics());
+                    metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
+                    indexRequest.source(metrics);
+                    indexDocument(client, indexRequest);
+                }
+
             });
         }
+    }
+
+    private static void indexDocument(RestHighLevelClient client, IndexRequest indexRequest) {
+        client.indexAsync(indexRequest, RequestOptions.DEFAULT, new ActionListener<IndexResponse>() {
+            @Override
+            public void onResponse(IndexResponse indexResponse) {
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                LOG.error("Error indexing metrics", e);
+            }
+        });
     }
 }

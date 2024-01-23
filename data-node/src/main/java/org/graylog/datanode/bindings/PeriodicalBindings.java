@@ -19,6 +19,7 @@ package org.graylog.datanode.bindings;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.bootstrap.preflight.DataNodeConfigurationPeriodical;
+import org.graylog.datanode.metrics.NodeStatMetricsCollector;
 import org.graylog.datanode.periodicals.ClusterManagerDiscovery;
 import org.graylog.datanode.periodicals.MetricsCollector;
 import org.graylog.datanode.periodicals.NodePingPeriodical;
