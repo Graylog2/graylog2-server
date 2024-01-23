@@ -130,6 +130,10 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     protected void startUp() {
         final OpensearchConfiguration config = configurationProvider.get();
         if (config.securityConfigured()) {
+            // TODO: replace with a better mechanism/StateMachine? Security is enabled (InSecure has been specified) but there is no security -> configure + start
+            if(!config.opensearchSecurityConfiguration().securityEnabled()) {
+                this.configure();
+            }
             this.process.start();
         } else {
             String noConfigMessage = """
