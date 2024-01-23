@@ -21,17 +21,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
-
-type SearchFilter = {
-  id: string,
-  type: string,
-  title: string,
-  queryString: string,
-  disabled: boolean,
-  negation: boolean,
-  frontendId?: string,
-  description?: string,
-};
+import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 type Props = {
   filters: SearchFilter[],
