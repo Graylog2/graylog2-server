@@ -36,6 +36,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 import EventDefinitionForm from './EventDefinitionForm';
 
@@ -63,6 +64,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
   const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
 
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
@@ -174,7 +176,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
     navigate(Routes.ALERTS.DEFINITIONS.LIST);
   };
 
-  if (isLoading) {
+  if (isLoading || loadingScopePermissions) {
     return <Spinner text="Loading Event information..." />;
   }
 
@@ -192,7 +194,8 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
                            defaults={defaults}
                            onChange={handleChange}
                            onCancel={handleCancel}
-                           onSubmit={handleSubmit} />
+                           onSubmit={handleSubmit}
+                           canEdit={scopePermissions.is_mutable} />
     </>
   );
 };

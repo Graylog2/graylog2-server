@@ -48,9 +48,10 @@ type Props = {
   },
   currentUser: User,
   onChange: (name: string, newConfig: EventDefinition['config']) => void,
+  canEdit: boolean,
 }
 
-const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange }: Props) => {
+const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange, canEdit }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
@@ -111,6 +112,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
+  const canEditCondition = canEdit && !isSystemEventDefinition;
 
   const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
     ? React.createElement<React.ComponentProps<any>>(eventDefinitionType.formComponent, {
@@ -129,9 +131,9 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
       <Col md={7} lg={6}>
         <h2 className={commonStyles.title}>Event Condition</h2>
 
-        {isSystemEventDefinition ? (
+        {!canEditCondition ? (
           <p>
-            The conditions of system notification event definitions cannot be edited.
+            The conditions of this event definition type cannot be edited.
           </p>
         ) : (
           <>
@@ -156,7 +158,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
         )}
       </Col>
 
-      {!isSystemEventDefinition && !disabledSelect() && (
+      {canEditCondition && !disabledSelect() && (
         <>
           <Col md={5} lg={5} lgOffset={1}>
             <HelpPanel className={styles.conditionTypesInfo}
