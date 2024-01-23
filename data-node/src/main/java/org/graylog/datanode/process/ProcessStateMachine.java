@@ -39,6 +39,8 @@ public class ProcessStateMachine {
         // Freshly created process, it hasn't started yet and doesn't have any pid.
         config.configure(ProcessState.WAITING_FOR_CONFIGURATION)
                 .permit(ProcessEvent.PROCESS_PREPARED, ProcessState.PREPARED)
+                // jump to started only allowed to facilitate startup with insecure config
+                .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING)
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED);
 
         config.configure(ProcessState.PREPARED)
