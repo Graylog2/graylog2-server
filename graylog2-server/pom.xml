@@ -710,7 +710,10 @@
             <groupId>one.util</groupId>
             <artifactId>streamex</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.stateless4j</groupId>
+            <artifactId>stateless4j</artifactId>
+        </dependency>
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
             <groupId>junit</groupId>
