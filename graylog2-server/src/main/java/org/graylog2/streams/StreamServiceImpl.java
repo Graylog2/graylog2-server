@@ -36,8 +36,6 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -83,7 +81,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final OutputService outputService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
-    private final NotificationService notificationService;
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
 
@@ -93,7 +90,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              OutputService outputService,
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
-                             NotificationService notificationService,
                              EntityOwnershipService entityOwnershipService,
                              ClusterEventBus clusterEventBus) {
         super(mongoConnection);
@@ -101,7 +97,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.outputService = outputService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
-        this.notificationService = notificationService;
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
     }
@@ -310,13 +305,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         }
 
         final String streamId = stream.getId();
-        for (Notification notification : notificationService.all()) {
-            Object rawValue = notification.getDetail("stream_id");
-            if (rawValue != null && rawValue.toString().equals(streamId)) {
-                LOG.debug("Removing notification that references stream: {}", notification);
-                notificationService.destroy(notification);
-            }
-        }
+        // we need to remove notifications referencing this stream. This happens in the DeletedStreamNotificationListener
+        // triggered by the StreamDeletedEvent below.
         super.destroy(stream);
 
         clusterEventBus.post(StreamsChangedEvent.create(streamId));
