@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
@@ -64,7 +64,8 @@ const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await screen.findByRole('button', { name: /update preview/i });
-  fireEvent.click(applyButton);
+
+  await userEvent.click(applyButton);
 };
 
 const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
@@ -73,8 +74,17 @@ const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
 
   await act(async () => {
     await selectEvent.openMenu(newFunctionSelect);
+  });
+
+  await act(async () => {
     await selectEvent.select(newFunctionSelect, functionName, selectEventConfig);
+  });
+
+  await act(async () => {
     await selectEvent.openMenu(newFieldSelect);
+  });
+
+  await act(async () => {
     await selectEvent.select(newFieldSelect, fieldName, selectEventConfig);
   });
 };
@@ -161,7 +171,12 @@ describe('AggregationWizard', () => {
     renderSUT({ config, onChange: onChangeMock });
 
     const nameInput = await screen.findByLabelText(/Name/);
-    userEvent.type(nameInput, 'New name');
+
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.type(nameInput, 'New name');
+    });
+
     await selectMetric('Count', 'http_method');
     await submitWidgetConfigForm();
 
@@ -190,8 +205,13 @@ describe('AggregationWizard', () => {
 
     expect(screen.getByText('Percentile is required.')).toBeInTheDocument();
 
-    await selectEvent.openMenu(percentileInput);
-    await selectEvent.select(percentileInput, '50', selectEventConfig);
+    await act(async () => {
+      await selectEvent.openMenu(percentileInput);
+    });
+
+    await act(async () => {
+      await selectEvent.select(percentileInput, '50', selectEventConfig);
+    });
 
     await submitWidgetConfigForm();
 
@@ -214,15 +234,20 @@ describe('AggregationWizard', () => {
     renderSUT({ config, onChange: onChangeMock });
 
     const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-    fireEvent.click(addMetricButton);
+    await userEvent.click(addMetricButton);
 
     await waitFor(() => expect(screen.getAllByLabelText('Select a function')).toHaveLength(2));
     const newNameInput = screen.getAllByLabelText(/Name/)[1];
 
-    userEvent.type(newNameInput, 'New function');
+    await act(async () => {
+      await userEvent.type(newNameInput, 'New function');
+    });
 
     await selectMetric('Minimum', 'http_method', 1);
-    await submitWidgetConfigForm();
+
+    await act(async () => {
+      await submitWidgetConfigForm();
+    });
 
     const updatedConfig = config.toBuilder()
       .series([
