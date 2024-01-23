@@ -44,9 +44,10 @@ type Props = {
     }
   },
   onChange: (name: string, value: unknown) => void,
+  canEdit: boolean,
 }
 
-const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Props) => {
+const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdit }: Props) => {
   const [editField, setEditField] = useState<string | undefined>(undefined);
   const [showFieldForm, setShowFieldForm] = useState<boolean>(false);
 
@@ -90,6 +91,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
   };
 
   const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
+  const canEditCondition = canEdit && !isSystemEventDefinition;
 
   if (showFieldForm) {
     return (
@@ -111,9 +113,9 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
       <Col md={12}>
         <h2 className={commonStyles.title}>Event Fields <small>(optional)</small></h2>
 
-        {isSystemEventDefinition ? (
+        {!canEditCondition ? (
           <p>
-            The event fields of system notification event definitions cannot be edited.
+            The event fields of this event definition type cannot be edited.
           </p>
         ) : (
           <>
