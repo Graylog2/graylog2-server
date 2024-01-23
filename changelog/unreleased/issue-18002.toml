@@ -1,0 +1,7 @@
+type = "fixed"
+message = "Fixes MoreSearch, so that it does not throw errors when affected indices are null or empty. Because of that, MoreSearch is safer to user on fresh installation, with no messages and therefore no index ranges."
+
+issues = ["18002"]
+pulls = ["18023"]
+
+
