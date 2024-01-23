@@ -48,8 +48,14 @@ public interface WriteResult<T, K> {
         if (id == null) {
             return null;
         }
+        // TODO: check if this works correctly
         if (String.class.isAssignableFrom(idType)) {
-            return (L) id.toString();
+            if (id.isObjectId()) {
+                return (L) id.asObjectId().getValue().toHexString();
+            }
+            if (id.isString()) {
+                return (L) id.asString().getValue();
+            }
         }
         if (ObjectId.class.isAssignableFrom(idType)) {
             return (L) id.asObjectId().getValue();
