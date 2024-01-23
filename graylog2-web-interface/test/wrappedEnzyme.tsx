@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/// <reference types="jest-enzyme" />
 import type * as React from 'react';
 import type { ReactWrapper, ShallowWrapper } from 'enzyme';
 import { configure, mount, shallow } from 'enzyme';

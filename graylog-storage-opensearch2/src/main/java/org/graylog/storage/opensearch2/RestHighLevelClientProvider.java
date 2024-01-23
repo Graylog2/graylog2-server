@@ -30,8 +30,6 @@ import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
@@ -48,7 +46,6 @@ import java.util.function.Supplier;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
-    private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
     private final Supplier<RestHighLevelClient> clientSupplier;
     private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
 
@@ -90,7 +87,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     runsWithDataNode || indexerUseJwtAuthentication,
                     indexerJwtAuthTokenProvider);
 
-            var sniffer = SnifferWrapper.create(
+            var sniffer = LegacySnifferWrapper.create(
                     client.getLowLevelClient(),
                     TimeUnit.SECONDS.toMillis(5),
                     discoveryFrequency,
@@ -98,10 +95,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             );
 
             if (discoveryEnabled) {
-                sniffer.add(FilteredOpenSearchNodesSniffer.create(discoveryFilter));
+                sniffer.add(LegacyFilteredOpenSearchNodesSniffer.create(discoveryFilter));
             }
             if (nodeActivity) {
-                sniffer.add(NodeListSniffer.create());
+                sniffer.add(LegacyNodeListSniffer.create());
             }
 
             sniffer.build().ifPresent(s -> shutdownService.register(s::close));
@@ -163,7 +160,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     }
 
                     if (muteElasticsearchDeprecationWarnings) {
-                        httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
+                        httpClientConfig.addInterceptorFirst(new LegacyOpenSearchFilterDeprecationWarningsInterceptor());
                     }
 
                     if (hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {

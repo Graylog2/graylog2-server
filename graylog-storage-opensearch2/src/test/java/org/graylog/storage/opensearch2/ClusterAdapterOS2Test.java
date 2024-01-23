@@ -107,7 +107,7 @@ class ClusterAdapterOS2Test {
 
     @Test
     void returnsEmptyOptionalForHealthWhenElasticsearchExceptionThrown() {
-        when(client.execute(any())).thenThrow(new OpenSearchException("Exception"));
+        when(client.execute(any(ThrowingBiFunction.class))).thenThrow(new OpenSearchException("Exception"));
         final Optional<HealthStatus> healthStatus = clusterAdapter.health();
         assertThat(healthStatus).isEmpty();
     }

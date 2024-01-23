@@ -42,6 +42,7 @@ import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
 import org.graylog.plugins.views.search.searchfilters.module.SearchFiltersModule;
+import org.graylog.plugins.views.storage.migration.DatanodeMigrationBindings;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
@@ -207,7 +208,8 @@ public class Server extends ServerBootstrap {
                 new ScopedEntitiesModule(),
                 new ScriptingApiModule(featureFlags),
                 new StreamsModule(),
-                new TracingModule()
+                new TracingModule(),
+                new DatanodeMigrationBindings()
         );
 
         if (featureFlags.isOn(FIELD_TYPES_MANAGEMENT_FEATURE)) {

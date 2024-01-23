@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { MenuItem } from 'components/bootstrap';
 
@@ -33,7 +34,7 @@ describe('WidgetActionDropdown', () => {
 
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
 
-    menuButton.click();
+    await userEvent.click(menuButton);
 
     await screen.findByRole('menuitem', { name: 'Foo' });
   });
@@ -48,10 +49,10 @@ describe('WidgetActionDropdown', () => {
     ));
 
     const menuButton = await screen.findByRole('button', { name: /open actions dropdown/i });
-    menuButton.click();
+    await userEvent.click(menuButton);
 
     const fooAction = await screen.findByRole('menuitem', { name: 'Foo' });
-    fooAction.click();
+    await userEvent.click(fooAction);
 
     await waitFor(() => {
       expect(screen.queryByText('Foo')).not.toBeInTheDocument();

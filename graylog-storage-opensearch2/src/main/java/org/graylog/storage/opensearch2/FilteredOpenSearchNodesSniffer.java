@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.opensearch.client.Node;
 
 import java.util.Collections;
 import java.util.List;
