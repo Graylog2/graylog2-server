@@ -26,12 +26,15 @@ import type { SearchFilter } from 'components/event-definitions/event-definition
 type Props = {
   filters: SearchFilter[],
   onChange: (filters: SearchFilter[]) => void,
-  hideFiltersPreview?: () => void,
+  hideFiltersPreview?: (val: boolean) => void,
 };
 
 function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview }: Props) {
   const searchFiltersPlugin = usePluginEntities('eventDefinitions.components.searchForm') ?? [];
   const pluggableControls = searchFiltersPlugin.map((controlFn) => controlFn()).filter((control) => !!control);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  React.useEffect(() => hideFiltersPreview(!pluggableControls.length), []);
 
   const initialFilters = React.useMemo(() => {
     const searchFilters = OrderedMap(filters.map((filter) => ([
@@ -42,7 +45,7 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview }: Pr
     return { searchFilters };
   }, [filters]);
 
-  if (!pluggableControls.length) return <SearchFilterBanner onHide={hideFiltersPreview} pluggableControls={pluggableControls} />;
+  if (!pluggableControls.length) return <SearchFilterBanner onHide={() => hideFiltersPreview(true)} pluggableControls={pluggableControls} />;
 
   const SearchFiltersComponent = pluggableControls[0].component;
 

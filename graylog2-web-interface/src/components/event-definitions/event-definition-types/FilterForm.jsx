@@ -143,7 +143,7 @@ class FilterForm extends React.Component {
       queryId: generateId(),
       searchTypeId: generateId(),
       queryParameterStash: {}, // keep already defined parameters around to ease editing
-      searchFiltersHidden: Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY),
+      searchFiltersHidden: false,
     };
   }
 
@@ -214,9 +214,9 @@ class FilterForm extends React.Component {
   };
 
   // eslint-disable-next-line class-methods-use-this
-  hideFiltersPreview = () => {
-    Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, true);
-    this.setState({ searchFiltersHidden: true });
+  hideFiltersPreview = (value) => {
+    Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
+    this.setState({ searchFiltersHidden: value });
   };
 
   handleConfigChange = (event) => {
