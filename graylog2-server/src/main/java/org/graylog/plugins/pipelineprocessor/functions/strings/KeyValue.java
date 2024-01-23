@@ -211,7 +211,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                     break;
                 case TAKE_LAST:
                     // simply reset the entry
-                    map.put(key, entryFields.next());
+                    map.put(key, processValue(entryFields.next()));
                     break;
                 case ARRAY:
                     concatArrayValues(map, key, processValue(entryFields.next()));
