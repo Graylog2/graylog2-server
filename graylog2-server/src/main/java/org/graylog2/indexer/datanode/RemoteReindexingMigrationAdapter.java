@@ -23,7 +23,7 @@ import java.util.List;
 
 public interface RemoteReindexingMigrationAdapter {
     enum Status {
-        STARTING, RUNNING, ERROR, FINISHED
+        NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
     }
 
     RemoteReindexMigration start(URI uri, String username, String password, List<String> indices, boolean synchronous);

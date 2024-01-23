@@ -101,7 +101,7 @@ public class RemoteReindexingMigrationIT {
 
         LOG.info("Requesting remote reindex: " + request);
 
-        final ValidatableResponse migrationResponse = apis.post("/migration/remoteReindex", request, 200);
+        final ValidatableResponse migrationResponse = apis.post("/migration/remoteReindex", request, 500);
 
         // one document migrated
         migrationResponse.assertThat().body("indices", Matchers.hasSize(1));

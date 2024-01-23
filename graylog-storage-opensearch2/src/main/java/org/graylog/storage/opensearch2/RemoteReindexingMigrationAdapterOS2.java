@@ -20,14 +20,11 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.graylog.plugins.views.storage.migration.RemoteReindexIndexFinishedEvent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
@@ -80,12 +77,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final Indices indices;
     private final IndexSetRegistry indexSetRegistry;
     private final ClusterEventBus eventBus;
-    private final EventBus localEventBus;
 
-    // TODO: convert this to a proper job that supports saving state to MongoDB etc. and picks up after a restart
-    // TODO: maybe also make re-indexing sequential
     private static List<RemoteReindexIndex> remoteReindexIndices = new ArrayList<>();
-    private static RemoteReindexMigration remoteReindexMigration = RemoteReindexMigration.builder().status(Status.STARTING).indices(remoteReindexIndices).build();
+    private static RemoteReindexMigration remoteReindexMigration = RemoteReindexMigration.builder().status(Status.NOT_STARTED).indices(remoteReindexIndices).build();
 
     private static URI uri;
     private static String username;
@@ -97,25 +91,13 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                final NodeService<DataNodeDto> nodeService,
                                                final Indices indices,
                                                final IndexSetRegistry indexSetRegistry,
-                                               final ClusterEventBus eventBus,
-                                               final EventBus localEventBus) {
+                                               final ClusterEventBus eventBus) {
         this.client = client;
         this.httpClient = httpClient;
         this.nodeService = nodeService;
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
         this.eventBus = eventBus;
-        this.localEventBus = localEventBus;
-
-        localEventBus.register(this);
-    }
-
-    @Subscribe
-    public void handleRemoteReindexIndexFinishedEvent(RemoteReindexIndexFinishedEvent event) {
-        remoteReindexIndices.stream()
-                .filter(f -> f.status().equals(Status.STARTING))
-                .findFirst()
-                .ifPresent(i -> reindex(uri, username, password, i.name(), false));
     }
 
     @Override
@@ -133,13 +115,59 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
             waitForClusterRestart(activeNodes);
 
-            reindex(uri, username, password, toReindex, synchronous);
+            if (synchronous) {
+                remoteReindexMigration = reindexSynchronously(toReindex);
+            } else {
+                if (!indices.isEmpty()) {
+                    for (final var index : indices) {
+                        remoteReindexIndices.add(new RemoteReindexIndex(index, Status.STARTING));
+                    }
+                    remoteReindexMigration = RemoteReindexMigration.builder().status(Status.RUNNING).indices(remoteReindexIndices).build();
+                    reindexIndexAsynchronoulsy(indices.get(0));
+                } else {
+                    remoteReindexMigration = RemoteReindexMigration.builder().status(Status.FINISHED).indices(remoteReindexIndices).build();
+
+                }
+            }
 //            removeAllowlist(uri.getHost() + ":" + uri.getPort());
         } catch (MalformedURLException e) {
             LOG.error("Could not start migration: {}", e.getMessage(), e);
             remoteReindexMigration = RemoteReindexMigration.builder().status(Status.ERROR).error(e.getMessage()).indices(remoteReindexIndices).build();
         }
         return remoteReindexMigration;
+    }
+
+    ReindexRequest createReindexRequest(final String index, final BytesReference query) {
+        final ReindexRequest reindexRequest = new ReindexRequest();
+        reindexRequest
+                .setRemoteInfo(new RemoteInfo(uri.getScheme(), uri.getHost(), uri.getPort(), uri.getPath(), query, username, password, Map.of(), RemoteInfo.DEFAULT_SOCKET_TIMEOUT, RemoteInfo.DEFAULT_CONNECT_TIMEOUT))
+                .setSourceIndices(index).setDestIndex(index);
+        return reindexRequest;
+    }
+
+    RemoteReindexMigration reindexSynchronously(final List<String> indices) {
+        final List<RemoteReindexIndex> remoteReindexIndices = new ArrayList<>();
+        for (String index : indices) {
+            remoteReindexIndices.add(reIndexIndex(index));
+        }
+        return RemoteReindexMigration.builder().status(Status.FINISHED).indices(remoteReindexIndices).build();
+    }
+
+    private RemoteReindexIndex reIndexIndex(String index) {
+        try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
+            final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
+
+            if (this.indices.exists(index)) {
+                return RemoteReindexIndex.createError(index, "Can't migrate index " + index + ", as it already exists in the target indexer.");
+            } else {
+                this.indices.create(index, indexSetRegistry.getForIndex(index).orElse(indexSetRegistry.getDefault()));
+                final var response = client.execute((c, requestOptions) -> c.reindex(createReindexRequest(index, query), requestOptions));
+                return RemoteReindexIndex.createFinished(index, new Duration(response.getTotal()), response.getBatches());
+            }
+        } catch (IOException e) {
+            LOG.error("Could not reindex index: {} - {}", index, e.getMessage(), e);
+            return RemoteReindexIndex.createError(index, e.getMessage());
+        }
     }
 
     @Override
@@ -219,94 +247,53 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    void reindex(final URI uri, final String username, final String password, final List<String> indices, final boolean sychronous) {
-        for (final var index : indices) {
-            remoteReindexIndices.add(new RemoteReindexIndex(index, Status.STARTING));
-        }
-        remoteReindexMigration = RemoteReindexMigration.builder().status(Status.RUNNING).indices(remoteReindexIndices).build();
-        reindex(uri, username, password, remoteReindexIndices.get(0).name(), sychronous);
-    }
-
-    void reindex(final URI uri, final String username, final String password, final String index, final boolean sychronous) {
+    private void reindexIndexAsynchronoulsy(final String index) {
         try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
-            BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
+            final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
 
             if (this.indices.exists(index)) {
-                remoteReindexIndices.add(new RemoteReindexIndex(index, Status.ERROR, "Can't migrate index " + index + ", as it already exists in the target indexer."));
+                remoteReindexIndices.stream().filter(f -> f.getName().equals(index)).forEach(r -> {
+                    r.setStatus(Status.ERROR);
+                    r.setErrorMsg("Can't migrate index " + index + ", as it already exists in the target indexer.");
+                });
+                remoteReindexIndices.stream()
+                        .filter(f -> f.getStatus().equals(Status.STARTING))
+                        .findFirst()
+                        .ifPresent(i -> reindexIndexAsynchronoulsy(i.getName()));
             } else {
                 this.indices.create(index, indexSetRegistry.getForIndex(index).orElse(indexSetRegistry.getDefault()));
+                final var response = client.execute((c, requestOptions) -> c.reindexAsync(createReindexRequest(index, query), requestOptions, new ReindexActionListener<>(index) {
+                    @Override
+                    public void onResponse(final BulkByScrollResponse response) {
+                        remoteReindexIndices.stream().filter(f -> f.getName().equals(index)).forEach(r -> {
+                            r.setStatus(Status.FINISHED);
+                            r.setTook(new Duration(response.getTotal()));
+                            r.setBatches(response.getBatches());
+                        });
+                        remoteReindexIndices.stream()
+                                .filter(f -> f.getStatus().equals(Status.STARTING))
+                                .findFirst()
+                                .ifPresent(i -> reindexIndexAsynchronoulsy(i.getName()));
+                    }
 
-                final ReindexRequest reindexRequest = new ReindexRequest();
-                reindexRequest
-                        .setRemoteInfo(new RemoteInfo(uri.getScheme(), uri.getHost(), uri.getPort(), uri.getPath(), query, username, password, Map.of(), RemoteInfo.DEFAULT_SOCKET_TIMEOUT, RemoteInfo.DEFAULT_CONNECT_TIMEOUT))
-                        .setSourceIndices(index).setDestIndex(index);
-
-                if (sychronous) {
-                    reindexSynchronously(index, reindexRequest);
-                } else {
-                    reindexAsynchronously(index, reindexRequest);
-                }
+                    @Override
+                    public void onFailure(final Exception e) {
+                        remoteReindexIndices.stream().filter(f -> f.getName().equals(index)).forEach(r -> {
+                            r.setStatus(Status.ERROR);
+                            r.setErrorMsg("Can't migrate index " + index + ", " + e.getMessage());
+                        });
+                        remoteReindexIndices.stream()
+                                .filter(f -> f.getStatus().equals(Status.STARTING))
+                                .findFirst()
+                                .ifPresent(i -> reindexIndexAsynchronoulsy(i.getName()));
+                    }
+                }));
             }
         } catch (IOException e) {
             LOG.error("Could not reindex index: {} - {}", index, e.getMessage(), e);
-            replaceStateForIndexError(index, e.getMessage());
-        }
-    }
-
-    private void reindexAsynchronously(String index, ReindexRequest reindexRequest) {
-        final var reindexResult = client.execute((c, requestOptions) -> c.reindexAsync(reindexRequest, requestOptions, new ReindexActionListener<>(index) {
-            @Override
-            public void onResponse(final BulkByScrollResponse response) {
-                replaceStateForSuccess(index, new Duration(response.getTotal()), response.getBatches());
-            }
-
-            @Override
-            public void onFailure(final Exception e) {
-                replaceStateForIndexError(index, e.getMessage());
-            }
-        }));
-        replaceState(index, Status.RUNNING);
-    }
-
-    private void reindexSynchronously(String index, ReindexRequest reindexRequest) {
-        final var response = client.execute((c, requestOptions) -> c.reindex(reindexRequest, requestOptions));
-        replaceStateForSuccess(index, new Duration(response.getTotal()), response.getBatches());
-    }
-
-    private void replaceState(final String index, Status status) {
-        synchronized (remoteReindexIndices) {
-            final var unused = remoteReindexIndices.stream().filter(f -> f.name().equals(index)).findFirst().map(i -> {
-                final var others = remoteReindexIndices.stream().filter(f -> !f.name().equals(index)).toList();
-                remoteReindexIndices.clear();
-                remoteReindexIndices.addAll(others);
-                remoteReindexIndices.add(new RemoteReindexIndex(i.name(), status, i.created()));
-                return null;
-            });
-        }
-    }
-
-    private void replaceStateForSuccess(final String index, final Duration duration, final int batches) {
-        synchronized (remoteReindexIndices) {
-            final var unused = remoteReindexIndices.stream().filter(f -> f.name().equals(index)).findFirst().map(i -> {
-                final var others = remoteReindexIndices.stream().filter(f -> !f.name().equals(index)).toList();
-                remoteReindexIndices.clear();
-                remoteReindexIndices.addAll(others);
-                remoteReindexIndices.add(new RemoteReindexIndex(i.name(), Status.FINISHED, i.created(), duration, batches));
-                localEventBus.post(new RemoteReindexIndexFinishedEvent(i.name(), Status.FINISHED));
-                return null;
-            });
-        }
-    }
-
-    private void replaceStateForIndexError(final String index, final String message) {
-        synchronized (remoteReindexIndices) {
-            final var unused = remoteReindexIndices.stream().filter(f -> f.name().equals(index)).findFirst().map(i -> {
-                final var others = remoteReindexIndices.stream().filter(f -> !f.name().equals(index)).toList();
-                remoteReindexIndices.clear();
-                remoteReindexIndices.addAll(others);
-                remoteReindexIndices.add(new RemoteReindexIndex(i.name(), Status.ERROR, i.created(), message));
-                localEventBus.post(new RemoteReindexIndexFinishedEvent(i.name(), Status.ERROR));
-                return null;
+            remoteReindexIndices.stream().filter(f -> f.getName().equals(index)).forEach(r -> {
+                r.setStatus(Status.ERROR);
+                r.setErrorMsg("Can't migrate index " + index + ", " + e.getMessage());
             });
         }
     }
