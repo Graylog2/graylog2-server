@@ -165,8 +165,12 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                                     )
-                            )
+                            );
+
+                    if (effectiveStreamIds.stream().noneMatch(s -> s.startsWith(IndexLookup.DATASTREAM_PREFIX))) {
+                        searchTypeOverrides
                             .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
+                    }
 
                     searchType.query().ifPresent(searchTypeQuery -> {
                         final QueryBuilder normalizedSearchTypeQuery = translateQueryString(searchTypeQuery.queryString());

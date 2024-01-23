@@ -31,10 +31,9 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import DropdownButton from 'components/bootstrap/DropdownButton';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 import StreamModal from '../StreamModal';
 
@@ -160,10 +159,7 @@ const StreamActions = ({
                    entityType="stream"
                    onClick={toggleEntityShareModal}
                    bsSize="xsmall" />
-      <DropdownButton title={MORE_ACTIONS_TITLE}
-                      bsSize="xsmall"
-                      buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                      disabled={isNotEditable}>
+      <MoreActions disabled={isNotEditable}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
           <MenuItem onSelect={onToggleStreamStatus}
                     disabled={isDefaultStream || isNotEditable}>
@@ -225,7 +221,7 @@ const StreamActions = ({
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
-      </DropdownButton>
+      </MoreActions>
       {showUpdateModal && (
         <StreamModal title="Editing Stream"
                      onSubmit={onUpdate}

@@ -147,6 +147,7 @@ const DashboardActionsMenu = () => {
         <DropdownButton title={<Icon name="ellipsis-h" />}
                         id="query-tab-actions-dropdown"
                         pullRight
+                        keepMounted
                         buttonTitle="More Actions"
                         noCaret>
           {dashboardActions.length > 0 && (
