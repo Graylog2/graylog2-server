@@ -189,10 +189,11 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
 
                 String key = processKey(entryFields.next());
                 if (entryFields.hasNext()) {
+                    String value = processValue(entryFields.next());
                     if (map.containsKey(key)) {
-                        handleDuplicateKey(map, entryFields, key);
+                        handleDuplicateKey(map, key, value);
                     } else {
-                        handleNewKey(entryFields, map, key);
+                        handleKeyUpdate(map, key, value);
                     }
                 } else if (!ignoreEmptyValues) {
                     throw new IllegalArgumentException("Missing value for key " + key);
@@ -201,23 +202,16 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
             return map;
         }
 
-        private void handleDuplicateKey(Map<String, String> map, Iterator<String> entryFields, String key) {
+        private void handleDuplicateKey(Map<String, String> map, String key, String value) {
             if (!allowDupeKeys) {
                 throw new IllegalArgumentException("Duplicate key " + key + " is not allowed in key_value function.");
             }
+
             switch (Strings.nullToEmpty(duplicateHandling).toLowerCase(Locale.ENGLISH)) {
-                case TAKE_FIRST:
-                    // ignore this value
-                    break;
-                case TAKE_LAST:
-                    // simply reset the entry
-                    map.put(key, processValue(entryFields.next()));
-                    break;
-                case ARRAY:
-                    concatArrayValues(map, key, processValue(entryFields.next()));
-                    break;
-                default:
-                    concatDelimiter(map, key, processValue(entryFields.next()));
+                case TAKE_FIRST -> {/* ignore this value */}
+                case TAKE_LAST -> handleKeyUpdate(map, key, value);
+                case ARRAY -> concatArrayValues(map, key, value);
+                default -> concatDelimiter(map, key, value);
             }
         }
 
@@ -229,8 +223,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
             return valueTrimMatcher.trimFrom(value);
         }
 
-        private void handleNewKey(Iterator<String> entryFields, Map<String, String> map, String key) {
-            String value = processValue(entryFields.next());
+        private void handleKeyUpdate(Map<String, String> map, String key, String value) {
             map.put(key, value);
         }
 
