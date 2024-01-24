@@ -189,10 +189,10 @@ export const ViewGenerator = async ({
   aggregations: Array<EventDefinitionAggregation>
   groupBy: Array<string>,
   queryParameters: Array<ParameterJson>,
-  searchFilters: Array<SearchFilter>,
+  searchFilters?: Array<SearchFilter>,
 },
 ) => {
-  const query = QueryGenerator(streams, undefined, timeRange, queryString, searchFilters);
+  const query = QueryGenerator(streams, undefined, timeRange, queryString, (searchFilters || []));
   const search = Search.create().toBuilder().queries([query]).parameters(queryParameters.map((param) => Parameter.fromJSON(param)))
     .build();
   const viewState = await ViewStateGenerator({ streams, aggregations, groupBy });

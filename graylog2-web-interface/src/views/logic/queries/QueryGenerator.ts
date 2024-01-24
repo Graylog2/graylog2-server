@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { OrderedMap } from 'immutable';
+import { v4 as uuidv4 } from 'uuid';
 
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import type { TimeRange, ElasticsearchQueryString, QueryId, FilterType } from 'views/logic/queries/Query';
@@ -36,7 +37,7 @@ export default (
     : null;
   const streamFilter = filtersForQuery(streamIds);
   const searchFiltersMap: FilterType = searchFilters
-    ? OrderedMap(searchFilters?.map((filter) => [filter.id, filter]))
+    ? OrderedMap(searchFilters?.map((filter) => [filter.id || uuidv4(), { frontendId: filter.id || uuidv4(), ...filter }]))
     : OrderedMap();
   const builder = Query.builder()
     .id(id)
