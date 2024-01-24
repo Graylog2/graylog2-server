@@ -45,6 +45,10 @@ public interface Stream extends Persisted {
      */
     String FAILURES_STREAM_ID = "000000000000000000000004";
     /**
+     * The prefix of all streams managed by OpenSearch as data streams
+     */
+    String DATASTREAM_PREFIX = "datastream:";
+    /**
      * Contains all default event streams. (e.g. events and system events)
      */
     ImmutableSet<String> DEFAULT_EVENT_STREAM_IDS = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);

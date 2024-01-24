@@ -33,7 +33,6 @@ import 'components/indices/retention';
 import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
 import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
 import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
-import useHistory from 'routing/useHistory';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
@@ -41,6 +40,8 @@ import type {
   Strategies,
 } from 'components/indices/Types';
 import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
+import useHistory from 'routing/useHistory';
+import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
 
 type Props = {
   cancelLink: string,
@@ -184,6 +185,8 @@ const IndexSetConfigurationForm = ({
   submitLoadingText,
 } : Props) => {
   const history = useHistory();
+  const [indexSetState] = useState<IndexSet>(indexSet);
+  const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
   const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
     { value: 'data_tiering', label: 'Data Tiering' },
@@ -196,7 +199,6 @@ const IndexSetConfigurationForm = ({
     return 'data_tiering';
   };
 
-  const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
   const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
@@ -249,7 +251,6 @@ const IndexSetConfigurationForm = ({
                 initialValues={prepareDataTieringInitialValues(indexSet)}>
           {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
-
               <Form>
                 <Row>
                   <Col md={12}>
@@ -315,8 +316,8 @@ const IndexSetConfigurationForm = ({
                 </Row>
                 {isCloud ? (
                   <>
-                    {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
-                    {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                    {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
+                    {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
                   </>
                 ) : (
                   <>
@@ -338,14 +339,23 @@ const IndexSetConfigurationForm = ({
                     )
                       : (
                         <ConfigSegment>
-                          {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
-                          {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                          {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
+                          {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
                         </ConfigSegment>
                       )}
 
                   </>
                 )}
 
+                <Field name="field_type_profile">
+                  {({ field: { name, value } }) => (
+                    <IndexSetProfileConfiguration value={value}
+                                                  onChange={(profileId) => {
+                                                    setFieldValue(name, profileId);
+                                                  }}
+                                                  name={name} />
+                  )}
+                </Field>
                 <Row>
                   <Col md={9} mdOffset={3}>
                     <StyledFormSubmit disabledSubmit={!isValid}

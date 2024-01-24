@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import CustomFieldMappingsCell from 'components/indices/IndexSetFieldTypeProfiles/cells/CustomFieldMappingsCell';
+import IndexSetsCell from 'components/indices/IndexSetFieldTypeProfiles/cells/IndexSetsCell';
 
-const customColumnRenderers = ({
+const useCustomColumnRenderers = (normalizedIndexSetsTitles: Record<string, string>) => useMemo(() => ({
   attributes: {
     custom_field_mappings: {
       renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => (
@@ -28,7 +29,10 @@ const customColumnRenderers = ({
       ),
       staticWidth: 200,
     },
+    index_set_ids: {
+      renderCell: (indexSetIds: Array<string>) => <IndexSetsCell indexSetIds={indexSetIds} normalizedIndexSetsTitles={normalizedIndexSetsTitles} />,
+    },
   },
-});
+}), [normalizedIndexSetsTitles]);
 
-export default customColumnRenderers;
+export default useCustomColumnRenderers;

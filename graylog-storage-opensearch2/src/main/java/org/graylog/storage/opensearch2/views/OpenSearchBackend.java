@@ -18,6 +18,9 @@ package org.graylog.storage.opensearch2.views;
 
 import com.google.common.collect.Maps;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -53,13 +56,10 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,7 +167,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                                     )
                             );
 
-                    if (effectiveStreamIds.stream().noneMatch(s -> s.startsWith(IndexLookup.DATASTREAM_PREFIX))) {
+                    if (effectiveStreamIds.stream().noneMatch(s -> s.startsWith(Stream.DATASTREAM_PREFIX))) {
                         searchTypeOverrides
                             .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
                     }
