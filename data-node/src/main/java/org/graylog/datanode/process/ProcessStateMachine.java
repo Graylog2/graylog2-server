@@ -18,9 +18,9 @@ package org.graylog.datanode.process;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
+import org.graylog.datanode.management.StateMachineTracerAggregator;
 
-public class ProcessStateMachine {
-
+public class ProcessStateMachine extends StateMachine<ProcessState, ProcessEvent> {
     /**
      * How many times can the OS rest api call fail before we switch to the failed state
      */
@@ -28,7 +28,14 @@ public class ProcessStateMachine {
     public static final int MAX_REST_STARTUP_FAILURES = 5;
     public static final int MAX_REBOOT_FAILURES = 3;
 
-    public static StateMachine<ProcessState, ProcessEvent> createNew() {
+    StateMachineTracerAggregator tracerAggregator = new StateMachineTracerAggregator();
+
+    public ProcessStateMachine(ProcessState initialState, StateMachineConfig<ProcessState, ProcessEvent> config) {
+        super(initialState, config);
+        setTrace(tracerAggregator);
+    }
+
+    public static ProcessStateMachine createNew() {
 
         final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
@@ -100,6 +107,10 @@ public class ProcessStateMachine {
                 .permit(ProcessEvent.RESET, ProcessState.WAITING_FOR_CONFIGURATION)
                 .ignore(ProcessEvent.PROCESS_STOPPED);
 
-        return new StateMachine<>(ProcessState.WAITING_FOR_CONFIGURATION, config);
+        return new ProcessStateMachine(ProcessState.WAITING_FOR_CONFIGURATION, config);
+    }
+
+    public StateMachineTracerAggregator getTracerAggregator() {
+        return tracerAggregator;
     }
 }
