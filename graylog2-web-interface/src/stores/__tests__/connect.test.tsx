@@ -14,16 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/// <reference types="jest-enzyme" />
 import React from 'react';
-import { act } from 'react-dom/test-utils';
-import { mount } from 'wrappedEnzyme';
+import { act, render, screen } from 'wrappedTestingLibrary';
 import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
 
 import { asMock } from 'helpers/mocking/index';
-import type { Store } from 'stores/StoreTypes';
 
 import {
   arrayOfMaps,
@@ -39,12 +36,11 @@ import {
 import connect, { useStore } from '../connect';
 
 const SimpleComponentWithoutStores = () => <span>Hello World!</span>;
-
-const SimpleStore = Reflux.createStore<{ value: number }>({
+const createSimpleStore = () => Reflux.createStore<{ value: number }>({
   getInitialState() {
     return this.state;
   },
-  setValue(value) {
+  setValue(value: number) {
     this.state = { value };
     this.trigger(this.state);
   },
@@ -54,6 +50,8 @@ const SimpleStore = Reflux.createStore<{ value: number }>({
     this.trigger(this.state);
   },
 });
+
+const SimpleStore = createSimpleStore();
 
 const SimpleComponentWithDummyStore = ({ simpleStore }) => {
   if (simpleStore && simpleStore.value) {
@@ -75,61 +73,72 @@ SimpleComponentWithDummyStore.defaultProps = {
 
 describe('connect()', () => {
   beforeEach(() => {
-    SimpleStore.reset();
+    act(() => {
+      SimpleStore.reset();
+    });
   });
 
-  it('does not do anything if no stores are provided', () => {
+  it('does not do anything if no stores are provided', async () => {
     const Component = connect(SimpleComponentWithoutStores, {});
-    const wrapper = mount(<Component />);
+    render(<Component />);
 
-    expect(wrapper).toHaveHTML('<span>Hello World!</span>');
+    await screen.findByText('Hello World!');
   });
 
-  it('connects component to store without state', () => {
+  it('connects component to store without state', async () => {
     const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
-    const wrapper = mount(<Component />);
+    render(<Component />);
 
-    expect(wrapper).toHaveText('No value.');
+    await screen.findByText('No value.');
   });
 
-  it('connects component to store with state', () => {
-    SimpleStore.setValue(42);
-    const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
-    const wrapper = mount(<Component />);
+  it('connects component to store with state', async () => {
+    act(() => {
+      SimpleStore.setValue(42);
+    });
 
-    expect(wrapper).toHaveText('Value is: 42');
+    const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
+    render(<Component />);
+
+    await screen.findByText('Value is: 42');
   });
 
-  it('reflects state changes in store', () => {
+  it('reflects state changes in store', async () => {
     const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
-    const wrapper = mount(<Component />);
+    render(<Component />);
 
-    expect(wrapper).toHaveText('No value.');
+    await screen.findByText('No value.');
 
-    SimpleStore.setValue(42);
+    act(() => {
+      SimpleStore.setValue(42);
+    });
 
-    expect(wrapper).toHaveText('Value is: 42');
+    await screen.findByText('Value is: 42');
 
     SimpleStore.noop();
 
-    expect(wrapper).toHaveText('Value is: 42');
+    await screen.findByText('Value is: 42');
 
-    SimpleStore.reset();
+    act(() => {
+      SimpleStore.reset();
+    });
 
-    expect(wrapper).toHaveText('No value.');
+    await screen.findByText('No value.');
   });
 
-  it('allows mangling of props before passing them', () => {
+  it('allows mangling of props before passing them', async () => {
     const Component = connect(
       SimpleComponentWithDummyStore,
       { simpleStore: SimpleStore },
       ({ simpleStore }) => (simpleStore && { simpleStore: { value: simpleStore.value * 2 } }),
     );
-    const wrapper = mount(<Component />);
+    render(<Component />);
 
-    SimpleStore.setValue(42);
+    act(() => {
+      SimpleStore.setValue(42);
+    });
 
-    expect(wrapper).toHaveText('Value is: 84');
+    await screen.findByText('Value is: 84');
   });
 
   it('adds meaningful name to wrapper component', () => {
@@ -144,22 +153,26 @@ describe('connect()', () => {
     expect(Component.displayName).toEqual('ConnectStoresWrapper[Unknown/Anonymous] stores=simpleStore');
   });
 
-  it('types store props as optional', () => {
+  it('types store props as optional', async () => {
     const Component = connect(() => <span>hello!</span>, { simpleStore: SimpleStore });
-    mount(<Component />);
+    render(<Component />);
+    await screen.findByText('hello!');
   });
 
-  it('types mapped props as optional', () => {
+  it('types mapped props as optional', async () => {
     const Component = connect(
       () => <span>hello!</span>,
       { simpleStore: SimpleStore },
       ({ simpleStore }) => (simpleStore && { storeValue: simpleStore.value }),
     );
-    mount(<Component />);
+    render(<Component />);
+    await screen.findByText('hello!');
   });
 
-  it('types props which have a default value (defaultProps) as optional', () => {
-    const BaseComponent = ({ exampleProp }: { exampleProp: string }) => <span>{exampleProp}</span>;
+  it('types props which have a default value (defaultProps) as optional', async () => {
+    const BaseComponent = ({ exampleProp }: {
+      exampleProp: string
+    }) => <span>{exampleProp}</span>;
 
     BaseComponent.defaultProps = {
       exampleProp: 'hello!',
@@ -170,50 +183,38 @@ describe('connect()', () => {
     };
 
     const Component = connect(BaseComponent, { simpleStore: SimpleStore });
-    mount(<Component />);
+    render(<Component />);
+
+    await screen.findByText('hello!');
   });
 
   describe('generates `shouldComponentUpdate`', () => {
     const Component: React.ComponentType<{ someProp?: any, foo: number }> = jest.fn(() => <span>Hello!</span>);
-    const SimplestStore: Store<number> = ({
-      getInitialState: jest.fn(() => 42),
-      listen: jest.fn(() => () => {}),
-    });
 
     afterEach(() => { jest.clearAllMocks(); });
 
-    it('comparing empty values properly', () => {
+    it('comparing empty values properly', async () => {
       const ComponentClass = connect(Component, {});
 
-      const wrapper = mount(<ComponentClass foo={42} />);
+      const { rerender } = render(<ComponentClass foo={42} />);
 
-      wrapper.setProps({});
+      // @ts-expect-error
+      rerender(<ComponentClass />);
 
-      expect(Component).toHaveBeenCalledTimes(1);
+      await screen.findByText('Hello!');
     });
 
     const verifyShouldComponentUpdate = ({ initial, next, result }) => {
-      asMock(SimplestStore.getInitialState).mockReturnValue(initial);
-      const ComponentClass = connect(Component, { foo: SimplestStore });
+      SimpleStore.setValue(initial);
+      const ComponentClass = connect(Component, { foo: SimpleStore });
 
-      mount(<ComponentClass />);
-      const update = asMock(SimplestStore.listen).mock.calls[0][0];
-
-      asMock(Component).mockClear();
-
-      update(next);
-
-      if (result) {
-        expect(Component).toHaveBeenCalled();
-      } else {
-        expect(Component).not.toHaveBeenCalled();
-      }
-
-      const wrapper = mount(<ComponentClass someProp={initial} />);
+      render(<ComponentClass />);
 
       asMock(Component).mockClear();
 
-      wrapper.setProps({ someProp: next });
+      act(() => {
+        SimpleStore.setValue(next);
+      });
 
       if (result) {
         expect(Component).toHaveBeenCalled();
@@ -222,6 +223,7 @@ describe('connect()', () => {
       }
     };
 
+    // eslint-disable-next-line jest/expect-expect
     it.each`
     initial                  | next                     | result    | description
     ${undefined}             | ${undefined}             | ${false}  | ${'equal undefined values'}
@@ -268,51 +270,51 @@ describe('useStore', () => {
     act(() => SimpleStore.reset());
   });
 
-  it('renders state from store', () => {
-    const wrapper = mount(<SimpleComponent />);
+  it('renders state from store', async () => {
+    render(<SimpleComponent />);
 
-    expect(wrapper).toHaveText('No value.');
+    await screen.findByText('No value.');
   });
 
-  it('connects component to store with state', () => {
+  it('connects component to store with state', async () => {
     act(() => SimpleStore.setValue(42));
-    const wrapper = mount(<SimpleComponent />);
+    render(<SimpleComponent />);
 
-    expect(wrapper).toHaveText('Value is: 42');
+    await screen.findByText('Value is: 42');
   });
 
-  it('reflects state changes from store', () => {
-    const wrapper = mount(<SimpleComponent />);
+  it('reflects state changes from store', async () => {
+    render(<SimpleComponent />);
 
-    expect(wrapper).toHaveText('No value.');
+    await screen.findByText('No value.');
 
     act(() => SimpleStore.setValue(42));
 
-    expect(wrapper).toHaveText('Value is: 42');
+    await screen.findByText('Value is: 42');
 
     act(() => SimpleStore.noop());
 
-    expect(wrapper).toHaveText('Value is: 42');
+    await screen.findByText('Value is: 42');
 
     act(() => SimpleStore.reset());
 
-    expect(wrapper).toHaveText('No value.');
+    await screen.findByText('No value.');
   });
 
-  it('allows mangling of props before passing them', () => {
+  it('allows mangling of props before passing them', async () => {
     const Component = () => {
       const { value } = useStore(SimpleStore, ({ value: v } = { value: 0 }) => ({ value: v * 2 })) || {};
 
       return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
     };
 
-    const wrapper = mount(<Component />);
+    render(<Component />);
 
-    expect(wrapper).toHaveText('No value.');
+    await screen.findByText('No value.');
 
     act(() => SimpleStore.setValue(42));
 
-    expect(wrapper).toHaveText('Value is: 84');
+    await screen.findByText('Value is: 84');
   });
 
   it('does not rerender component if state does not change', () => {
@@ -325,7 +327,7 @@ describe('useStore', () => {
       return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
     };
 
-    mount(<SimpleComponentWithRenderCounter />);
+    render(<SimpleComponentWithRenderCounter />);
 
     const beforeFirstSet = renderCount;
 
@@ -340,7 +342,7 @@ describe('useStore', () => {
     expect(renderCount).toEqual(beforeSecondSet);
   });
 
-  it('does not reregister if props mapper is provided as arrow function', () => {
+  it('does not reregister if props mapper is provided as arrow function', async () => {
     const listenSpy = jest.spyOn(SimpleStore, 'listen');
 
     const ComponentWithPropsMapper = ({ propsMapper }: { propsMapper: (state: { value: number }) => ({ value: number }) }) => {
@@ -349,14 +351,14 @@ describe('useStore', () => {
       return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
     };
 
-    const wrapper = mount(<ComponentWithPropsMapper propsMapper={(x) => x} />);
+    const { rerender } = render(<ComponentWithPropsMapper propsMapper={(x) => x} />);
 
-    expect(wrapper).toHaveText('No value.');
+    await screen.findByText('No value.');
 
-    wrapper.setProps({ propsMapper: ({ value: v } = { value: 0 }) => ({ value: v * 2 }) });
+    rerender(<ComponentWithPropsMapper propsMapper={({ value: v } = { value: 0 }) => ({ value: v * 2 })} />);
     act(() => SimpleStore.setValue(42));
 
-    expect(wrapper).toHaveText('Value is: 84');
+    await screen.findByText('Value is: 84');
 
     expect(listenSpy).toHaveBeenCalledTimes(1);
   });

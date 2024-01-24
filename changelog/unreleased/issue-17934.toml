@@ -1,0 +1,5 @@
+type = "a"
+message = "Add new column 'Origin' to index set field type mapping page instead of is custom"
+
+pulls = ["17878"]
+issues=["17934"]

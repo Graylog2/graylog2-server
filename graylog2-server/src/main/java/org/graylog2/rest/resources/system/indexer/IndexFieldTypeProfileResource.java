@@ -38,10 +38,12 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileData;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileIdAndName;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileWithUsages;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 
@@ -70,6 +72,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets profile by id")
     public IndexFieldTypeProfileWithUsages retrieveById(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
+        checkPermission(RestPermissions.MAPPING_PROFILES_READ, profileId);
         return profileService.getWithUsages(profileId)
                 .orElseThrow(() -> new NotFoundException("No profile with id : " + profileId));
     }
@@ -90,7 +93,18 @@ public class IndexFieldTypeProfileResource extends RestResource {
                                                                      @DefaultValue(IndexFieldTypeProfile.NAME_FIELD_NAME) @QueryParam("sort") String sort,
                                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                                      @DefaultValue("asc") @QueryParam("order") String order) {
+        checkPermission(RestPermissions.MAPPING_PROFILES_READ);
         return profileService.getPaginated(query, filters, page, perPage, sort, order);
+    }
+
+    @GET
+    @Path("/all")
+    @Timed
+    @NoAuditEvent("No change to the DB")
+    @ApiOperation(value = "Gets list of all profiles (their ids and names only)")
+    public List<IndexFieldTypeProfileIdAndName> getAll() {
+        checkPermission(RestPermissions.MAPPING_PROFILES_READ);
+        return profileService.getAll();
     }
 
     @POST
@@ -98,6 +112,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_CREATE)
     @ApiOperation(value = "Creates a new profile")
     public IndexFieldTypeProfile create(@ApiParam(name = "profileData") IndexFieldTypeProfileData profileData) {
+        checkPermission(RestPermissions.MAPPING_PROFILES_CREATE);
         return profileService.save(new IndexFieldTypeProfile(profileData));
     }
 
@@ -106,6 +121,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_UPDATE)
     @ApiOperation(value = "Updates existing profile")
     public void update(@ApiParam(name = "profile") IndexFieldTypeProfile profile) {
+        checkPermission(RestPermissions.MAPPING_PROFILES_EDIT, profile.id());
         final boolean updated = profileService.update(profile.id(), profile);
         if (!updated) {
             throw new NotFoundException("Profile does not exist : " + profile.id());
@@ -118,6 +134,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_DELETE)
     @ApiOperation(value = "Removes a profile")
     public void delete(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
+        checkPermission(RestPermissions.MAPPING_PROFILES_DELETE, profileId);
         profileService.delete(profileId);
     }
 

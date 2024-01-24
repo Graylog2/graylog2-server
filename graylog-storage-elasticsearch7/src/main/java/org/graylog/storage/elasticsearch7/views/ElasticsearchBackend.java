@@ -52,6 +52,8 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,6 +139,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .size(0)
                 .trackTotalHits(true);
 
+
+        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
+
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
@@ -158,7 +163,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .must(
                                     Objects.requireNonNull(
                                             TimeRangeQueryFactory.create(
-                                                    query.effectiveTimeRange(searchType)
+                                                    query.effectiveTimeRange(searchType, nowUTCSharedBetweenSearchTypes)
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                                     )

@@ -16,19 +16,14 @@
  */
 import React from 'react';
 
-import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import CustomFieldMappingsCell from 'components/indices/IndexSetFieldTypeProfiles/cells/CustomFieldMappingsCell';
+import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
 
-const customColumnRenderers = ({
-  attributes: {
-    custom_field_mappings: {
-      renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => (
-        <CustomFieldMappingsCell profile={profile}
-                                 customFieldTypes={customFieldTypes} />
-      ),
-      staticWidth: 200,
-    },
-  },
-});
+const OverriddenProfileExpandedSection = ({ type }: ExpandedSectionProps) => (
+  <span>
+    Field type <i>{type}</i> comes from the individual, custom field type mapping.
+    It overrides possible mappings from the search engine index mapping,
+    either immediately (if index was rotated) or during the next rotation.
+  </span>
+);
 
-export default customColumnRenderers;
+export default OverriddenProfileExpandedSection;

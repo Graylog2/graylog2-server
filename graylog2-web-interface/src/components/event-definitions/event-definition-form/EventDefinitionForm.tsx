@@ -79,6 +79,7 @@ type Props = {
   onChange: (key: string, value: unknown) => void,
   onCancel: () => void,
   onSubmit: () => void
+  canEdit: boolean,
 }
 
 const EventDefinitionForm = ({
@@ -92,6 +93,7 @@ const EventDefinitionForm = ({
   onChange,
   onCancel,
   onSubmit,
+  canEdit,
 }: Props) => {
   const { step } = useQuery();
   const [activeStep, setActiveStep] = useState(step as string || STEP_KEYS[0]);
@@ -135,17 +137,17 @@ const EventDefinitionForm = ({
     {
       key: STEP_KEYS[0],
       title: 'Event Details',
-      component: <EventDetailsForm {...defaultStepProps} />,
+      component: <EventDetailsForm {...defaultStepProps} canEdit={canEdit} />,
     },
     {
       key: STEP_KEYS[1],
       title: defaultTo(eventDefinitionType.displayName, 'Condition'),
-      component: <EventConditionForm {...defaultStepProps} />,
+      component: <EventConditionForm {...defaultStepProps} canEdit={canEdit} />,
     },
     {
       key: STEP_KEYS[2],
       title: 'Fields',
-      component: <FieldsForm {...defaultStepProps} />,
+      component: <FieldsForm {...defaultStepProps} canEdit={canEdit} />,
     },
     {
       key: STEP_KEYS[3],
