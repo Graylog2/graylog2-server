@@ -62,7 +62,7 @@ const StyledTopRow = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
-const isEntitySelectable = (fieldType: IndexSetFieldType) => hasOverride(fieldType);
+const isEntitySelectable = (fieldType: IndexSetFieldType) => !fieldType.isReserved;
 const FilterValueRenderers = {
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
