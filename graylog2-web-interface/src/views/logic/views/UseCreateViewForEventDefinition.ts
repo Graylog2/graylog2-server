@@ -42,8 +42,10 @@ const useCreateViewForEventDefinition = (
 
   const groupBy = eventDefinition?.config?.group_by ?? [];
 
+  const searchFilters = eventDefinition?.config?.filters ?? [];
+
   return useMemo(
-    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters }),
+    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters, searchFilters }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
