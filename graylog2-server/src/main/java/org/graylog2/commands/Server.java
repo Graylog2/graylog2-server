@@ -26,6 +26,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import jakarta.inject.Inject;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
@@ -79,6 +80,7 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
+import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
@@ -110,8 +112,6 @@ import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -210,7 +210,7 @@ public class Server extends ServerBootstrap {
                 new ScriptingApiModule(featureFlags),
                 new StreamsModule(),
                 new TracingModule(),
-                new DataTieringModule(),
+                new DataTieringModule(new DataTieringChecker(featureFlags, configuration)),
                 new DatanodeMigrationBindings()
         );
 

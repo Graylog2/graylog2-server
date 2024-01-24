@@ -26,7 +26,9 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 
-@Api(value = "DataTiering", description = "Data tiering management")
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "DataTiering", description = "Data tiering management", tags = CLOUD_VISIBLE)
 @Path("/datatiering")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
