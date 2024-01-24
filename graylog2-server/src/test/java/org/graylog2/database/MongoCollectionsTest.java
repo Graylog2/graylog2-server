@@ -18,8 +18,10 @@ package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonType;
 import org.bson.BsonValue;
@@ -69,6 +71,10 @@ class MongoCollectionsTest {
                       @MongoIgnore @JsonProperty("ignore_me") String ignoreMe) {}
 
     record IdGenerationTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record TimestampTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id,
+                         @JsonProperty("timestamp") DateTime timestamp) {}
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) {
@@ -144,5 +150,26 @@ class MongoCollectionsTest {
         assertThat(insertedId).isNotNull().satisfies(id -> assertThat(id.isObjectId()).isTrue());
         assertThat(collection.find(Filters.eq("_id", insertedId)).first())
                 .isEqualTo(new IdGenerationTest(insertedId.asObjectId().getValue().toHexString()));
+    }
+
+    @Test
+    void testTimestampToJodaDateTimeConversion() {
+        final MongoCollection<TimestampTest> collection = collections.get("timestamp-test", TimestampTest.class);
+
+        final DateTime now = DateTime.now();
+
+        final ObjectId objectId = new ObjectId();
+        final Map<String, Object> fields = Map.of(
+                "$set", Map.of("_id", objectId),
+                "$currentDate", Map.of("timestamp", Map.of("$type", "timestamp"))
+        );
+
+        collection.updateOne(Filters.eq("_id", objectId), new BasicDBObject(fields),
+                new UpdateOptions().upsert(true));
+        final TimestampTest timestampTest = collection.find(Filters.eq("_id", objectId)).first();
+        assertThat(timestampTest).isNotNull().satisfies(tt ->
+                assertThat(tt.timestamp().getMillis()).isGreaterThanOrEqualTo(
+                        now.withMillisOfSecond(0).getMillis())
+        );
     }
 }

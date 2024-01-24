@@ -76,12 +76,6 @@ public abstract class NodeDto implements Node {
         @JsonProperty("transport_address")
         public abstract B setTransportAddress(String transportAddress);
 
-        // TODO: check how to properly fix this
-//        @JsonProperty("last_seen")
-//        public B setLastSeen(Timestamp timestamp) {
-//            return setLastSeen(new DateTime(timestamp.getTime() * 1000L, DateTimeZone.UTC));
-//        }
-
         @JsonProperty("last_seen")
         public abstract B setLastSeen(DateTime lastSeen);
 
