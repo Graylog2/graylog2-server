@@ -52,14 +52,6 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
     }
   }, [indexName, indexSetId]);
 
-  const _onCloseIndex = useCallback(() => {
-    if (window.confirm(`Really close index ${indexName}?`)) {
-      IndicesActions.close(indexName).then(() => {
-        IndicesActions.list(indexSetId);
-      });
-    }
-  }, [indexName, indexSetId]);
-
   const _onDeleteIndex = useCallback(() => {
     if (window.confirm(`Really delete index ${indexName}?`)) {
       IndicesActions.delete(indexName).then(() => {
@@ -72,7 +64,6 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
     if (isDeflector) {
       return (
         <span>
-          <Button bsStyle="warning" bsSize="xs" disabled>Active write index cannot be closed</Button>{' '}
           <Button bsStyle="danger" bsSize="xs" disabled>Active write index cannot be deleted</Button>
         </span>
       );
@@ -81,11 +72,10 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
     return (
       <span>
         <Button bsStyle="warning" bsSize="xs" onClick={_onRecalculateIndex}>Recalculate index ranges</Button>{' '}
-        <Button bsStyle="warning" bsSize="xs" onClick={_onCloseIndex}>Close index</Button>{' '}
         <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>Delete index</Button>
       </span>
     );
-  }, [isDeflector, _onCloseIndex, _onDeleteIndex, _onRecalculateIndex]);
+  }, [isDeflector, _onDeleteIndex, _onRecalculateIndex]);
 
   if (!index || !index.all_shards) {
     return <Spinner />;
