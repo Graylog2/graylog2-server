@@ -442,6 +442,11 @@
                 <artifactId>unboundid-ldapsdk</artifactId>
                 <version>${unboundid-ldap.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.stateless4j</groupId>
+                <artifactId>stateless4j</artifactId>
+                <version>${stateless4j.version}</version>
+            </dependency>
 
             <!-- Tracing dependencies -->
             <dependency>

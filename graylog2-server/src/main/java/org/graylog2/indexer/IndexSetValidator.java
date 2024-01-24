@@ -21,6 +21,7 @@ import com.google.common.base.Strings;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -51,17 +52,16 @@ public class IndexSetValidator {
     private final IndexSetRegistry indexSetRegistry;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final DataTieringOrchestrator dataTieringOrchestrator;
-    private final boolean isCloud;
+    private final DataTieringChecker dataTieringChecker;
 
     @Inject
     public IndexSetValidator(IndexSetRegistry indexSetRegistry,
                              ElasticsearchConfiguration elasticsearchConfiguration,
-                             DataTieringOrchestrator dataTieringOrchestrator,
-                             @Named("is_cloud") boolean isCloud) {
+                             DataTieringOrchestrator dataTieringOrchestrator, DataTieringChecker dataTieringChecker) {
         this.indexSetRegistry = indexSetRegistry;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
-        this.isCloud = isCloud;
+        this.dataTieringChecker = dataTieringChecker;
     }
 
     public Optional<Violation> validate(IndexSetConfig newConfig) {
@@ -80,8 +80,8 @@ public class IndexSetValidator {
         }
 
         if (newConfig.dataTiering() != null) {
-            if (isCloud) {
-                return Optional.of(Violation.create("data tiering is not supported in cloud"));
+            if (!dataTieringChecker.isEnabled()) {
+                return Optional.of(Violation.create("data tiering feature is disabled!"));
             }
             final Violation dataTiersViolation = validateDataTieringConfig(newConfig.dataTiering());
             if (dataTiersViolation != null) {
