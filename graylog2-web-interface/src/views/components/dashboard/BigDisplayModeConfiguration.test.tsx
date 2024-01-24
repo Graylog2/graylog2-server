@@ -69,11 +69,11 @@ describe('BigDisplayModeConfiguration', () => {
     <BigDisplayModeConfiguration view={view} {...props} />
   ));
 
-  it('disables menu item if `disabled` prop is `true`', () => {
-    const { getByText, queryByText } = render(<SUT disabled />);
-    const menuItem = getByText('Full Screen');
+  it('disables menu item if `disabled` prop is `true`', async () => {
+    const { queryByText, findByText } = render(<SUT disabled />);
+    const menuItem = await findByText('Full Screen');
 
-    fireEvent.submit(menuItem);
+    fireEvent.click(menuItem);
 
     expect(queryByText('Configuring Full Screen')).toBeNull();
   });

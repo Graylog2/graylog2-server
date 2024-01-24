@@ -21,6 +21,7 @@ import get from 'lodash/get';
 import { useStore } from 'stores/connect';
 import User from 'logic/users/User';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import Spinner from 'components/common/Spinner';
 
 import CurrentUserContext from './CurrentUserContext';
 
@@ -28,13 +29,15 @@ const CurrentUserProvider = ({ children }) => {
   const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
   const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;
 
-  return currentUser
-    ? (
-      <CurrentUserContext.Provider value={currentUser}>
-        {children}
-      </CurrentUserContext.Provider>
-    )
-    : children;
+  if (!currentUser) {
+    return <Spinner />;
+  }
+
+  return (
+    <CurrentUserContext.Provider value={currentUser}>
+      {children}
+    </CurrentUserContext.Provider>
+  );
 };
 
 CurrentUserProvider.propTypes = {

@@ -265,15 +265,28 @@ type DashboardActionModalProps = {
   ref: React.Ref<unknown>,
 }
 
+type SearchActionModalProps = {
+  search: View,
+  ref: React.Ref<unknown>,
+}
+
 type AssetInformationComponentProps = {
   identifiers: unknown,
   addToQuery: (id: string) => void;
 }
 
+type SearchAction = {
+  component: React.ComponentType<SearchActionComponentProps>,
+  key: string,
+  modals: Array<{ key: string, component: React.ComponentType<SearchActionModalProps> }>,
+  useCondition: () => boolean,
+};
+
 type DashboardAction = {
   key: string,
   component: React.ComponentType<DashboardActionComponentProps>,
   modal?: React.ComponentType<DashboardActionModalProps>,
+  useCondition?: () => boolean,
 }
 
 type AssetInformation = {
@@ -291,7 +304,8 @@ type MessageActionComponentProps = {
 
 type SearchActionComponentProps = {
   loaded: boolean,
-  view: View,
+  search: View,
+  modalRefs?: { [key: string]: () => unknown },
 }
 
 export type CopyParamsToView = (sourceView: View, targetView: View) => View;
@@ -418,6 +432,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.dashboardActions'?: Array<DashboardAction>;
     'views.components.eventActions'?: Array<{
+      useCondition: () => boolean,
       component: React.ComponentType<EventActionComponentProps>,
       key: string,
     }>;
@@ -428,11 +443,9 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.messageActions'?: Array<{
       component: React.ComponentType<MessageActionComponentProps>,
       key: string,
+      useCondition: () => boolean,
     }>;
-    'views.components.searchActions'?: Array<{
-      component: React.ComponentType<SearchActionComponentProps>,
-      key: string,
-    }>;
+    'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;

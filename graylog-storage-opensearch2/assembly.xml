@@ -14,11 +14,29 @@
             <scope>runtime</scope>
             <useProjectArtifact>true</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.graylog:graylog-storage-opensearch2</include>
                 <include>org.graylog.shaded:opensearch2-rest-high-level-client</include>
                 <include>org.graylog.shaded:opensearch2-rest-client-sniffer</include>
+                <include>org.opensearch.client:opensearch-java</include>
+                <include>org.opensearch.client:opensearch-rest-client</include>
+                <include>org.opensearch.client:opensearch-rest-client-sniffer</include>
+                <include>org.apache.httpcomponents:httpasyncclient</include>
+                <include>org.apache.httpcomponents:httpclient</include>
+                <include>org.apache.httpcomponents:httpcore</include>
+                <include>org.apache.httpcomponents:httpcore-nio</include>
+                <include>jakarta.json.bind:jakarta.json.bind-api</include>
+                <include>jakarta.json:jakarta.json-api</include>
             </includes>
+            <unpackOptions>
+                <excludes>
+                    <!-- Including module-info.class files would turn the
+                         artifact into a Java module and we would run into
+                         class loader issues. -->
+                    <exclude>module-info.class</exclude>
+                </excludes>
+            </unpackOptions>
         </dependencySet>
     </dependencySets>
 </assembly>
