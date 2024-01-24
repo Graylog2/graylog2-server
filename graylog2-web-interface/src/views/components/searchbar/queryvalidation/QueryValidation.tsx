@@ -95,7 +95,10 @@ const shakeAnimation = keyframes`
   }
 `;
 
-const StyledPopover = styled(Popover)(({ $shaking }) => css`
+type ExtraProps = {
+  $shaking: boolean,
+}
+const StyledPopover: React.ComponentType<React.ComponentProps<typeof Popover> & ExtraProps> = styled(Popover)<ExtraProps>(({ $shaking }) => css`
   animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
 `);
 
