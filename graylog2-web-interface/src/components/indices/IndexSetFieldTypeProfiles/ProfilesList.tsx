@@ -16,6 +16,8 @@
  */
 import React, { useCallback, useMemo } from 'react';
 import { useQueryParam, StringParam } from 'use-query-params';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 
 import {
   NoEntitiesExist,
@@ -36,19 +38,22 @@ import type {
 import useProfiles
   from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 import useExpandedSectionsRenderer from 'components/indices/IndexSetFieldTypeProfiles/ExpandedSectionsRenderer';
-import customColumnRenderers from 'components/indices/IndexSetFieldTypeProfiles/helpers/customColumnRenderers';
+import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypeProfiles/helpers/useCustomColumnRenderers';
 import profileActions from 'components/indices/IndexSetFieldTypeProfiles/helpers/profileActions';
+import { useStore } from 'stores/connect';
+import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
 
 export const ENTITY_TABLE_ID = 'index-set-field-type-profiles';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'name', direction: 'asc' } as Sort,
-  displayedColumns: ['name', 'description', 'custom_field_mappings'],
-  columnsOrder: ['name', 'description', 'custom_field_mappings'],
+  displayedColumns: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
+  columnsOrder: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
 };
 
 const ProfilesList = () => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
+  const { indexSets } = useStore(IndexSetsStore);
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -98,6 +103,10 @@ const ProfilesList = () => {
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
   const expandedSectionsRenderer = useExpandedSectionsRenderer();
+
+  const normalizedIndexSetsTitles = useMemo(() => mapValues(keyBy(indexSets, 'id'), 'title'), [indexSets]);
+
+  const customColumnRenderers = useCustomColumnRenderers(normalizedIndexSetsTitles);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;

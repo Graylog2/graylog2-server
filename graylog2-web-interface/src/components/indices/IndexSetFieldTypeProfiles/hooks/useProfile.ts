@@ -24,7 +24,13 @@ import type {
   IndexSetFieldTypeProfile,
 } from 'components/indices/IndexSetFieldTypeProfiles/types';
 
-const INITIAL_DATA = null;
+const INITIAL_DATA: IndexSetFieldTypeProfile = {
+  customFieldMappings: [],
+  name: null,
+  id: null,
+  description: null,
+  indexSetIds: [],
+};
 
 const fetchIndexSetFieldTypeProfile = async (id: string) => {
   const url = qualifyUrl(`/system/indices/index_sets/profiles/${id}`);
@@ -34,15 +40,17 @@ const fetchIndexSetFieldTypeProfile = async (id: string) => {
     name: profile.name,
     description: profile.description,
     customFieldMappings: profile.custom_field_mappings,
+    indexSetIds: profile.index_set_ids,
   }));
 };
 
 const useProfile = (id: string): {
   data: IndexSetFieldTypeProfile,
   isFetched: boolean,
+  isFetching: boolean,
   refetch: () => void,
 } => {
-  const { data, isFetched, refetch } = useQuery(
+  const { data, isFetched, isFetching, refetch } = useQuery(
     ['indexSetFieldTypeProfile', id],
     () => fetchIndexSetFieldTypeProfile(id),
     {
@@ -58,6 +66,7 @@ const useProfile = (id: string): {
   return ({
     data: data ?? INITIAL_DATA,
     isFetched,
+    isFetching,
     refetch,
   });
 };
