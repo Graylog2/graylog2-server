@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 
 import { LinkContainer } from 'components/common/router';
@@ -71,6 +70,16 @@ const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string
   );
 };
 
+const usePluggableMessageActions = (id: string, index: string) => {
+  const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.messageActions');
+
+  return pluggableMenuActions.filter(
+    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+  ).map(
+    ({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />,
+  );
+};
+
 type Props = {
   index: string,
   id: string,
@@ -100,10 +109,7 @@ const MessageActions = ({
   streams,
   searchConfig,
 }: Props) => {
-  const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.messageActions');
-  const menuActions = useMemo(() => pluggableMenuActions.map(
-    ({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />,
-  ), [id, index, pluggableMenuActions]);
+  const pluggableActions = usePluggableMessageActions(id, index);
 
   if (disabled) {
     return <ButtonGroup />;
@@ -127,7 +133,7 @@ const MessageActions = ({
     <ButtonGroup>
       {showChanges}
       <Button bsSize="small" href={messageUrl}>Permalink</Button>
-      {menuActions}
+      {pluggableActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />

@@ -31,14 +31,13 @@ import {
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import UserNotification from 'util/UserNotification';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -211,19 +210,14 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
                      entityType="event_definition"
                      onClick={handleShare}
                      bsSize="xsmall" />
-        <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                               bsSize="xsmall"
-                               dropdownZIndex={1000}>
-          {showActions() && (
-            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-                <MenuItem data-testid="edit-button">
-                  Edit
-                </MenuItem>
-              </LinkContainer>
-            </IfPermitted>
-          )}
+        <MoreActions>
+          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
+              <MenuItem data-testid="edit-button">
+                Edit
+              </MenuItem>
+            </LinkContainer>
+          </IfPermitted>
           {!isSystemEventDefinition() && (
             <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
           )}
@@ -257,7 +251,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
               </>
             )
           }
-        </OverlayDropdownButton>
+        </MoreActions>
       </ButtonToolbar>
       {showDialog && (
         <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
