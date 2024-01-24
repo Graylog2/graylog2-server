@@ -115,9 +115,8 @@ public class JacksonDBCollection<T, K> {
         return delegate.findOne();
     }
 
-    // TODO: check if this works
-    public Iterable<?> distinct(String fieldName) {
-        return delegate.distinct(fieldName, BasicDBObject.class);
+    public <TResult> Iterable<TResult> distinct(String fieldName, Class<TResult> tResultClass) {
+        return delegate.distinct(fieldName, tResultClass);
     }
 
     public long count() {
