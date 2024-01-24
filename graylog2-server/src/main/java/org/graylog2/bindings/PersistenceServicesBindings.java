@@ -30,6 +30,8 @@ import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.database.suggestions.MongoEntitySuggestionService;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.IndexFailureServiceImpl;
+import org.graylog2.indexer.datastream.DataStreamService;
+import org.graylog2.indexer.datastream.DataStreamServiceImpl;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.graylog2.inputs.InputService;
@@ -76,5 +78,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
         bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);
         bind(EntityTitleService.class).to(EntityTitleServiceImpl.class);
+        bind(DataStreamService.class).to(DataStreamServiceImpl.class);
     }
 }

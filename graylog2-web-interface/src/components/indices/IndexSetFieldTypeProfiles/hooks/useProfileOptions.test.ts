@@ -20,71 +20,45 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
-import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import { profile1JSON, profile2JSON, profile1, profile2, indexSetsAttribute } from 'fixtures/indexSetFieldTypeProfiles';
+import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 
-const mockData = {
-  attributes: [],
-  query: '',
-  pagination: {
-    total: 1,
-    count: 1,
-    page: 1,
-    per_page: 10,
-  },
-  defaults: {
-    sort: {
-      id: 'name',
-      direction: 'ASC',
-    } as { id: string, direction: 'ASC' | 'DESC'},
-  },
-  total: 1,
-  sort: 'name',
-  order: 'desc',
-  elements: [profile1JSON, profile2JSON],
-};
+const mockData = [
+  { name: 'Profile 1', id: '111' },
+  { name: 'Profile 2', id: '222' },
+];
 
-const expectedState = {
-  attributes: [indexSetsAttribute],
-  list: [profile1, profile2],
-  pagination: {
-    total: 1,
-  },
-};
+const expectedState = [
+  { label: 'Profile 1', value: '111' },
+  { label: 'Profile 2', value: '222' },
+];
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
-jest.mock('@graylog/server-api', () => ({
-  SystemFieldTypes: {
-    getAllFieldTypes: jest.fn(() => Promise.resolve()),
-  },
-}));
+const renderUseProfileOptions = () => renderHook(() => useProfileOptions());
 
-const renderUseProfilesHook = () => renderHook(() => useProfiles({ page: 1, query: '', pageSize: 10, sort: { attributeId: 'name', direction: 'asc' } }, { enabled: true }));
-
-describe('useProfiles custom hook', () => {
+describe('useProfileOptions custom hook', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('Test return initial data and take from fetch', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
-    const { result, waitFor } = renderUseProfilesHook();
+    const { result, waitFor } = renderUseProfileOptions();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/index_sets/profiles/paginated?page=1&per_page=10&sort=name&order=asc'));
+    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/index_sets/profiles/all'));
 
-    expect(result.current.data).toEqual(expectedState);
+    expect(result.current.options).toEqual(expectedState);
   });
 
   it('Test trigger notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderUseProfilesHook();
+    const { result, waitFor } = renderUseProfileOptions();
 
     await suppressConsole(async () => {
       await waitFor(() => result.current.isLoading);
@@ -92,7 +66,7 @@ describe('useProfiles custom hook', () => {
     });
 
     expect(UserNotification.error).toHaveBeenCalledWith(
-      'Loading index field type profiles failed with status: Error: Error',
-      'Could not load index field type profiles');
+      'Loading index field type profile options failed with status: Error: Error',
+      'Could not load index field type profile options');
   });
 });
