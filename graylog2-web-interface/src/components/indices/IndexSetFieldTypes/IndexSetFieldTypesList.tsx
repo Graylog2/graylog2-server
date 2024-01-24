@@ -39,6 +39,7 @@ import expandedSections from 'components/indices/IndexSetFieldTypes/originExpand
 import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/OriginFilterValueRenderer';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
+import IndexSetProfile from 'components/indices/IndexSetFieldTypes/IndexSetProfile';
 
 import BulkActions from './BulkActions';
 
@@ -54,7 +55,14 @@ const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }
   color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
   margin-right: 5px;
 `);
-const isEntitySelectable = (fieldType: IndexSetFieldType) => !fieldType.isReserved;
+const StyledTopRow = styled.div`
+  margin-bottom: 5px;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+`;
+const isEntitySelectable = (fieldType: IndexSetFieldType) => hasOverride(fieldType);
 const FilterValueRenderers = {
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
@@ -140,7 +148,7 @@ const IndexSetFieldTypesList = () => {
     <PaginatedList totalItems={pagination?.total}
                    pageSize={layoutConfig.pageSize}
                    showPageSizeSelect={false}>
-      <div style={{ marginBottom: 5 }}>
+      <StyledTopRow>
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
                     query={query}
@@ -150,7 +158,8 @@ const IndexSetFieldTypesList = () => {
                          setUrlQueryFilters={onChangeFilters}
                          filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
-      </div>
+        <IndexSetProfile />
+      </StyledTopRow>
       {pagination?.total === 0 && (
         <NoEntitiesExist>
           No fields have been found.

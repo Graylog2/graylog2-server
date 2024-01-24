@@ -51,6 +51,7 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
     public static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(IndexSetFieldType.FIELD_NAME).title("Field name")
                     .sortable(true)
+                    .filterable(true)
                     .build(),
             EntityAttribute.builder().id(IndexSetFieldType.ORIGIN).title("Origin")
                     .type(SearchQueryField.Type.STRING)

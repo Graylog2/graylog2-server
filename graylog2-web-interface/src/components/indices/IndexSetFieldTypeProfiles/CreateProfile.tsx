@@ -22,7 +22,9 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import type {
+  IndexSetFieldTypeProfileForm,
+} from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
 
@@ -47,7 +49,7 @@ const CreateProfile = () => {
     return undefined;
   }, [location?.state?.customFieldMappings]);
 
-  const onSubmit = useCallback((profile: IndexSetFieldTypeProfile) => {
+  const onSubmit = useCallback((profile: IndexSetFieldTypeProfileForm) => {
     createProfile(profile).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CREATED, {
         app_pathname: telemetryPathName,

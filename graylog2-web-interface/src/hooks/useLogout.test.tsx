@@ -19,9 +19,11 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import DefaultProviders from 'DefaultProviders';
+import userEvent from '@testing-library/user-event';
 
 import Routes from 'routing/Routes';
 import { usePluginExports } from 'views/test/testPlugins';
+import suppressConsole from 'helpers/suppressConsole';
 
 import useLogout from './useLogout';
 
@@ -48,7 +50,7 @@ describe('useLogout', () => {
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
-      logoutButton.click();
+      userEvent.click(logoutButton);
 
       await screen.findByText('Logged out');
     });
@@ -63,7 +65,7 @@ describe('useLogout', () => {
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
-      logoutButton.click();
+      userEvent.click(logoutButton);
 
       await screen.findByText('Logged out');
 
@@ -81,7 +83,10 @@ describe('useLogout', () => {
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
-      logoutButton.click();
+
+      suppressConsole(() => {
+        userEvent.click(logoutButton);
+      });
 
       await screen.findByText('Logged out');
 
