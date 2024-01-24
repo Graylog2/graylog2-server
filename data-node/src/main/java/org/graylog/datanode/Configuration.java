@@ -215,9 +215,7 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "metrics_timestamp")
     private String metricsTimestamp = "timestamp";
-
-    @Parameter(value = "metrics_template")
-    private String metricsTemplate = "gl-datanode-metrics-template";
+    
     @Parameter(value = "metrics_stream")
     private String metricsStream = "gl-datanode-metrics";
 
@@ -384,10 +382,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getMetricsTimestamp() {
         return metricsTimestamp;
-    }
-
-    public String getMetricsTemplate() {
-        return metricsTemplate;
     }
 
     public String getMetricsStream() {

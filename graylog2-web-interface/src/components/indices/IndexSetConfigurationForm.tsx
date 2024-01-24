@@ -36,6 +36,7 @@ import type {
 } from 'components/indices/Types';
 import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import useHistory from 'routing/useHistory';
+import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
 
 type Props = {
   cancelLink: string,
@@ -186,7 +187,6 @@ const IndexSetConfigurationForm = ({
                 initialValues={indexSetState}>
           {({ isValid, setFieldValue, isSubmitting }) => (
             <IndexRetentionProvider>
-
               <Form>
                 <Row>
                   <Col md={12}>
@@ -258,6 +258,15 @@ const IndexSetConfigurationForm = ({
                 </Row>
                 {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
                 {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                <Field name="field_type_profile">
+                  {({ field: { name, value } }) => (
+                    <IndexSetProfileConfiguration value={value}
+                                                  onChange={(profileId) => {
+                                                    setFieldValue(name, profileId);
+                                                  }}
+                                                  name={name} />
+                  )}
+                </Field>
                 <Row>
                   <Col md={9} mdOffset={3}>
                     <StyledFormSubmit disabledSubmit={!isValid}
@@ -269,7 +278,6 @@ const IndexSetConfigurationForm = ({
                                       onCancel={onCancel} />
                   </Col>
                 </Row>
-
               </Form>
             </IndexRetentionProvider>
 
