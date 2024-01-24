@@ -21,12 +21,12 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Updates;
+import jakarta.inject.Inject;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentWriter;
 import org.bson.codecs.EncoderContext;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollections;
-
-import jakarta.inject.Inject;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -46,7 +46,7 @@ public class DBCustomJobDefinitionService {
     }
 
     public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
-        final var jobDefinitionId = requireNonNull(dto.id(), "Job definition ID cannot be null");
+        var jobDefinitionId = new ObjectId(requireNonNull(dto.id(), "Job definition ID cannot be null"));
 
         final var codec = db.getCodecRegistry().get(JobDefinitionDto.class);
         try (final var writer = new BsonDocumentWriter(new BsonDocument())) {
