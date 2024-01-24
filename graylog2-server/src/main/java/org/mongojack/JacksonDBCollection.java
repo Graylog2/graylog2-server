@@ -43,6 +43,11 @@ import org.bson.BsonValue;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.CollectibleCodec;
 import org.bson.conversions.Bson;
+import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
+import org.graylog2.database.jackson.legacy.LegacyDeleteResult;
+import org.graylog2.database.jackson.legacy.LegacyInsertOneResult;
+import org.graylog2.database.jackson.legacy.LegacyUpdateOneResult;
+import org.graylog2.database.jackson.legacy.LegacyUpdateResult;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -50,6 +55,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Compatibility layer to support existing code interacting with the Mongojack 2.x API.
+ *
+ * @deprecated use {@link org.graylog2.database.MongoCollections} as an entrypoint for interacting with MongoDB.
+ */
+@Deprecated
 public class JacksonDBCollection<T, K> {
 
     private final JacksonMongoCollection<T> delegate;
@@ -70,9 +81,13 @@ public class JacksonDBCollection<T, K> {
         final MongoDatabase db = dbCollection.getDB().getMongoClient().getDatabase(dbCollection.getDB().getName());
 
         this.dbCollection = dbCollection;
-        this.delegate = JacksonMongoCollection.builder()
+        final JacksonMongoCollection<T> jacksonMongoCollection = JacksonMongoCollection.builder()
                 .withObjectMapper(objectMapper)
                 .build(db, dbCollection.getName(), valueType, UuidRepresentation.UNSPECIFIED);
+        final CustomJacksonCodecRegistry jacksonCodecRegistry = new CustomJacksonCodecRegistry(objectMapper,
+                jacksonMongoCollection.getCodecRegistry());
+        jacksonCodecRegistry.addCodecForClass(valueType);
+        this.delegate = (JacksonMongoCollection<T>) jacksonMongoCollection.withCodecRegistry(jacksonCodecRegistry);
         this.valueType = valueType;
         this.idType = idType;
         this.objectMapper = objectMapper;

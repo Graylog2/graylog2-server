@@ -24,6 +24,7 @@ import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonType;
 import org.bson.BsonValue;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -37,7 +38,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.time.ZoneOffset;
@@ -53,8 +53,9 @@ class MongoCollectionsTest {
     private MongoCollections collections;
     private EncryptedValueService encryptedValueService;
 
-    record Person(@JsonProperty("id") @Id @ObjectId String id,
-                  @JsonProperty("external_id") @ObjectId String externalId,
+    record Person(@JsonProperty("id") @Id @org.mongojack.ObjectId String id,
+                  @JsonProperty("external_id") @org.mongojack.ObjectId String externalId,
+                  @JsonProperty("object_id") ObjectId objectId,
                   @JsonProperty("first_name") String firstName,
                   @JsonProperty("created_at") ZonedDateTime createdAt,
                   @JsonProperty("last_modified_at") DateTime lastModifiedAt) {
@@ -67,8 +68,7 @@ class MongoCollectionsTest {
     record IgnoreTest(@JsonProperty("ignore_me_not") String ignoreMeNot,
                       @MongoIgnore @JsonProperty("ignore_me") String ignoreMe) {}
 
-    record IdGenerationTest(@Nullable @JsonProperty("id") @Id @ObjectId String id) {}
-
+    record IdGenerationTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id) {}
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) {
@@ -82,6 +82,7 @@ class MongoCollectionsTest {
         final Person person = new Person(
                 "000000000000000000000001",
                 "000000000000000000000002",
+                new ObjectId("000000000000000000000003"),
                 "Gary",
                 ZonedDateTime.now(ZoneOffset.UTC).withNano(0),
                 DateTime.now(DateTimeZone.UTC).withMillisOfSecond(0));
@@ -91,11 +92,18 @@ class MongoCollectionsTest {
                 assertThat(bson.asObjectId().getValue().toHexString()).isEqualTo(person.id()));
 
         assertThat(collection.find()).hasSize(1).allMatch(person::equals);
-        assertThat(collection.find(Filters.eq("_id", person.id()))).hasSize(1);
+        assertThat(collection.find(Filters.eq("_id", new ObjectId(person.id())))).hasSize(1);
+        assertThat(collection.find(Filters.type("_id", BsonType.OBJECT_ID))).hasSize(1);
         assertThat(collection.find(Filters.type("external_id", BsonType.OBJECT_ID))).hasSize(1);
+        assertThat(collection.find(Filters.eq("external_id", new ObjectId(person.externalId())))).hasSize(1);
+        assertThat(collection.find(Filters.type("object_id", BsonType.OBJECT_ID))).hasSize(1);
+        assertThat(collection.find(Filters.eq("object_id", person.objectId()))).hasSize(1);
         assertThat(collection.find(Filters.type("first_name", BsonType.STRING))).hasSize(1);
+        assertThat(collection.find(Filters.eq("first_name", person.firstName()))).hasSize(1);
         assertThat(collection.find(Filters.type("created_at", BsonType.DATE_TIME))).hasSize(1);
+        assertThat(collection.find(Filters.eq("created_at", person.createdAt()))).hasSize(1);
         assertThat(collection.find(Filters.type("last_modified_at", BsonType.DATE_TIME))).hasSize(1);
+        assertThat(collection.find(Filters.eq("last_modified_at", person.lastModifiedAt()))).hasSize(1);
     }
 
     @Test

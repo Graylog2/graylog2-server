@@ -14,13 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.mongojack;
+package org.graylog2.database.jackson.legacy;
 
 import com.google.common.primitives.Ints;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonValue;
 import org.bson.codecs.CollectibleCodec;
+import org.mongojack.JacksonMongoCollection;
+import org.mongojack.WriteResult;
 
+/**
+ * Compatibility layer to support existing code interacting with the Mongojack 2.x API.
+ *
+ * @deprecated use {@link org.graylog2.database.MongoCollections} as an entrypoint for interacting with MongoDB.
+ */
+@Deprecated
 public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
     protected final JacksonMongoCollection<T> collection;
     private final T object;

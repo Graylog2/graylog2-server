@@ -22,6 +22,12 @@ import org.bson.types.ObjectId;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+/**
+ * Compatibility layer to support existing code interacting with the Mongojack 2.x API.
+ *
+ * @deprecated use {@link org.graylog2.database.MongoCollections} as an entrypoint for interacting with MongoDB.
+ */
+@Deprecated
 public interface WriteResult<T, K> {
     default T getSavedObject() {
         throw new MongoException("No objects to return");

@@ -31,11 +31,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Custom implementation of a DBCursor to support legacy code. Can only be used for find operations.
+ * Compatibility layer to support existing code interacting with the Mongojack 2.x API.
  *
- * @param <T>
+ * @deprecated use {@link org.graylog2.database.MongoCollections} as an entrypoint for interacting with MongoDB.
  */
 @NotThreadSafe
+@Deprecated
 public class DBCursor<T> implements Closeable, Iterator<T>, Iterable<T> {
     private final JacksonMongoCollection<T> collection;
     private final FindIterable<T> findIterable;

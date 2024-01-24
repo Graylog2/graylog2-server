@@ -20,9 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.UuidRepresentation;
 import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
-import org.mongojack.JacksonMongoCollection;
+import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.mongojack.internal.MongoJackModule;
 
 @Singleton
@@ -40,16 +39,13 @@ public class MongoCollections {
     }
 
     /**
-     * Get a MongoCollection configured to use Mongojack for serialization/deserialization of objects.
-     * <p>
-     * <b>
-     * To encourage usage of the mongodb driver API, we are intentionally not returning a {@link JacksonMongoCollection}
-     * but rather the generic {@link MongoCollection} interface here.
-     * </b>
+     * Get a MongoCollection configured to use Jackson for serialization/deserialization of objects.
      */
     public <T> MongoCollection<T> get(String collectionName, Class<T> valueType) {
-        return JacksonMongoCollection.builder()
-                .withObjectMapper(objectMapper)
-                .build(mongoConnection.getMongoDatabase(), collectionName, valueType, UuidRepresentation.UNSPECIFIED);
+        final MongoCollection<T> collection = mongoConnection.getMongoDatabase().getCollection(collectionName, valueType);
+        final CustomJacksonCodecRegistry jacksonCodecRegistry = new CustomJacksonCodecRegistry(this.objectMapper,
+                collection.getCodecRegistry());
+        jacksonCodecRegistry.addCodecForClass(valueType);
+        return collection.withCodecRegistry(jacksonCodecRegistry);
     }
 }
