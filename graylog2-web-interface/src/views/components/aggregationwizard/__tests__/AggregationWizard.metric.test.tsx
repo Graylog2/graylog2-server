@@ -172,12 +172,12 @@ describe('AggregationWizard', () => {
 
     const nameInput = await screen.findByLabelText(/Name/);
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await userEvent.type(nameInput, 'New name');
+
     await act(async () => {
-      await userEvent.type(nameInput, 'New name');
+      await selectMetric('Count', 'http_method');
     });
 
-    await selectMetric('Count', 'http_method');
     await submitWidgetConfigForm();
 
     const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('New name').build();
@@ -239,11 +239,11 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(screen.getAllByLabelText('Select a function')).toHaveLength(2));
     const newNameInput = screen.getAllByLabelText(/Name/)[1];
 
-    await act(async () => {
-      await userEvent.type(newNameInput, 'New function');
-    });
+    await userEvent.type(newNameInput, 'New function');
 
-    await selectMetric('Minimum', 'http_method', 1);
+    await act(async () => {
+      await selectMetric('Minimum', 'http_method', 1);
+    });
 
     await act(async () => {
       await submitWidgetConfigForm();
