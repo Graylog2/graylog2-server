@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 public class IndexLookup {
 
-    public final static String DATASTREAM_PREFIX = "datastream:";
     private final IndexRangeService indexRangeService;
     private final StreamService streamService;
     private final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams;
@@ -60,10 +59,10 @@ public class IndexLookup {
         }
 
         Set<String> result = streamIds.stream()
-                .filter(s -> s.startsWith(DATASTREAM_PREFIX))
-                .map(s -> s.substring(DATASTREAM_PREFIX.length()))
+                .filter(s -> s.startsWith(Stream.DATASTREAM_PREFIX))
+                .map(s -> s.substring(Stream.DATASTREAM_PREFIX.length()))
                 .collect(Collectors.toSet());
-        streamIds = streamIds.stream().filter(s -> !s.startsWith(DATASTREAM_PREFIX)).collect(Collectors.toSet());
+        streamIds = streamIds.stream().filter(s -> !s.startsWith(Stream.DATASTREAM_PREFIX)).collect(Collectors.toSet());
 
         final Set<Stream> usedStreams = streamService.loadByIds(streamIds);
         final SortedSet<IndexRange> candidateIndices = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
