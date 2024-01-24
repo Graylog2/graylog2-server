@@ -61,11 +61,13 @@ describe('useRemoveCustomFieldTypeMutation', () => {
 
     asMock(useProfile).mockReturnValue({
       isFetched: true,
+      isFetching: false,
       refetch: () => {},
       data: {
         name: 'Profile 1',
         id: 'profile-id-111',
         description: 'Profile description',
+        indexSetIds: [],
         customFieldMappings: [{
           field: 'field-1',
           type: 'ip',
