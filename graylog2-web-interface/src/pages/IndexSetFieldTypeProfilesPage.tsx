@@ -25,6 +25,7 @@ import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesL
 import CreateProfileButton from 'components/indices/IndexSetFieldTypeProfiles/CreateProfileButton';
 import { IndicesPageNavigation } from 'components/indices';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
+import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
 
 const IndexSetFieldTypeProfilesPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,8 @@ const IndexSetFieldTypeProfilesPage = () => {
   useEffect(() => {
     if (!hasMappingPermission) {
       navigate(Routes.NOTFOUND);
+    } else {
+      IndexSetsActions.list(false);
     }
   }, [hasMappingPermission, navigate]);
 
