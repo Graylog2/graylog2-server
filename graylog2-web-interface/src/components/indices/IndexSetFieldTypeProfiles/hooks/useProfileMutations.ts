@@ -20,16 +20,16 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type {
-  IndexSetFieldTypeProfile,
-  IndexSetFieldTypeProfileJson,
+  IndexSetFieldTypeProfileForm,
+  IndexSetFieldTypeProfileRequestJson,
 } from 'components/indices/IndexSetFieldTypeProfiles/types';
 
 export const urlPrefix = '/system/indices/index_sets/profiles';
 
-const putProfile = async (profile: IndexSetFieldTypeProfile) => {
+const putProfile = async ({ profile, id }: { profile: IndexSetFieldTypeProfileForm, id: string }) => {
   const url = qualifyUrl(urlPrefix);
-  const body: IndexSetFieldTypeProfileJson = {
-    id: profile.id,
+  const body: IndexSetFieldTypeProfileRequestJson = {
+    id,
     name: profile.name,
     description: profile.description,
     custom_field_mappings: profile.customFieldMappings,
@@ -38,9 +38,9 @@ const putProfile = async (profile: IndexSetFieldTypeProfile) => {
   return fetch('PUT', url, body);
 };
 
-const postProfile = async (profile: IndexSetFieldTypeProfile) => {
+const postProfile = async (profile: IndexSetFieldTypeProfileForm) => {
   const url = qualifyUrl(urlPrefix);
-  const body: IndexSetFieldTypeProfileJson = {
+  const body: IndexSetFieldTypeProfileRequestJson = {
     name: profile.name,
     description: profile.description,
     custom_field_mappings: profile.customFieldMappings,
