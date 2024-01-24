@@ -97,13 +97,15 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     expect(editMock).toHaveBeenCalledWith({
-      name: 'Profile 1 new name',
-      description: 'Description 1',
+      profile: {
+        name: 'Profile 1 new name',
+        description: 'Description 1',
+        customFieldMappings: [
+          { field: 'date', type: 'string' },
+          { field: 'user_ip', type: 'ip' },
+        ],
+      },
       id: '111',
-      customFieldMappings: [
-        { field: 'date', type: 'string' },
-        { field: 'user_ip', type: 'ip' },
-      ],
     });
   });
 
@@ -130,14 +132,16 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     expect(editMock).toHaveBeenCalledWith({
-      name: 'Profile 1',
-      description: 'Description 1',
       id: '111',
-      customFieldMappings: [
-        { field: 'http_method', type: 'string' },
-        { field: 'user_ip', type: 'ip' },
-        { field: 'date', type: 'string' },
-      ],
+      profile: {
+        name: 'Profile 1',
+        description: 'Description 1',
+        customFieldMappings: [
+          { field: 'http_method', type: 'string' },
+          { field: 'user_ip', type: 'ip' },
+          { field: 'date', type: 'string' },
+        ],
+      },
     });
   });
 });
