@@ -54,7 +54,6 @@ public interface WriteResult<T, K> {
         if (id == null) {
             return null;
         }
-        // TODO: check if this works correctly
         if (String.class.isAssignableFrom(idType)) {
             if (id.isObjectId()) {
                 return (L) id.asObjectId().getValue().toHexString();
