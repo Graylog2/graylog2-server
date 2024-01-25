@@ -55,8 +55,7 @@ const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string,
                           options={options}
                           value={value}
                           disabled={isLoading}
-                          onChange={onChange}
-                          clearable={false} />
+                          onChange={onChange} />
           </Input>
         </Col>
       </Row>
