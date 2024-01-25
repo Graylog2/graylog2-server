@@ -218,7 +218,7 @@ const QueryValidation = () => {
       </Popover.Target>
       {hasExplanations && showExplanation && (
         <StyledPopoverDropdown id="query-validation-error-explanation"
-                               title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
+                               title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} /> as React.ComponentProps<typeof StyledPopoverDropdown>['title']}
                                $shaking={shakingPopover}>
           <div role="alert">
             {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
