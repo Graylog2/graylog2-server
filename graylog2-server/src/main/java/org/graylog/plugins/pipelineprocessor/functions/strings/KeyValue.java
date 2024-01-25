@@ -20,7 +20,6 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.inject.TypeLiteral;
-import java.util.Collections;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -28,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -59,7 +59,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
 
         ignoreEmptyValuesParam = bool("ignore_empty_values").optional().description("Whether to ignore keys with empty values, defaults to true").defaultValue(Optional.of(true)).build();
         allowDupeKeysParam = bool("allow_dup_keys").optional().description("Whether to allow duplicate keys, defaults to true").defaultValue(Optional.of(true)).build();
-        duplicateHandlingParam = string("handle_dup_keys").optional().defaultValue(Optional.of(TAKE_FIRST)).description("How to handle duplicate keys: (default) 'take_first': only use first value, 'take_last': only take last value, 'array': gather them as a string list or use a delimiter e.g. ','").build();
+        duplicateHandlingParam = string("handle_dup_keys").optional().defaultValue(Optional.of(TAKE_FIRST)).description("How to handle duplicate keys: (default) 'take_first': only use first value, 'take_last': only take last value or use a delimiter e.g. ','").build();
         trimCharactersParam = string("trim_key_chars", CharMatcher.class)
                 .transform(CharMatcher::anyOf)
                 .optional()
@@ -210,7 +210,6 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
             switch (Strings.nullToEmpty(duplicateHandling).toLowerCase(Locale.ENGLISH)) {
                 case TAKE_FIRST -> {/* ignore this value */}
                 case TAKE_LAST -> handleKeyUpdate(map, key, value);
-                case ARRAY -> concatArrayValues(map, key, value);
                 default -> concatDelimiter(map, key, value);
             }
         }
@@ -225,19 +224,6 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
 
         private void handleKeyUpdate(Map<String, String> map, String key, String value) {
             map.put(key, value);
-        }
-
-        private void concatArrayValues(Map<String, String> map, String key, String value) {
-            String[] array = map.get(key).split(",");
-            value = valueTrimMatcher.trimFrom(value);
-
-            StringBuilder result = new StringBuilder();
-            result.append("[");
-            for (String element : array) {
-                result.append("\"").append(element).append("\",");
-            }
-            result.append("\"").append(value).append("\"]");
-            map.put(key, result.toString());
         }
 
         private void concatDelimiter(Map<String, String> map, String key, String value) {

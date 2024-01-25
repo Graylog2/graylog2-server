@@ -76,20 +76,6 @@ class KeyValueTest {
     }
 
     @Test
-    void testArray() {
-        final Map<String, Expression> arguments = Map.of("value", valueExpression, "handle_dup_keys",
-                new StringExpression(new CommonToken(0), "ARRAY"));
-
-        Map<String, String> result = classUnderTest.evaluate(new FunctionArgs(classUnderTest, arguments), evaluationContext);
-
-        Map<String, String> expectedResult = new HashMap<>();
-        expectedResult.put("test", "[\"do\",\"remi\"]");
-        expectedResult.put("number", "12345");
-
-        assertThat(result).containsExactlyInAnyOrderEntriesOf(expectedResult);
-    }
-
-    @Test
     void testConcatDemiliter() {
         final Map<String, Expression> arguments = Map.of("value", valueExpression, "handle_dup_keys",
                 new StringExpression(new CommonToken(0), ","));
