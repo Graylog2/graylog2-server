@@ -18,6 +18,7 @@ package org.graylog2.migrations;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategyConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -110,5 +111,15 @@ public class MaintenanceStrategiesHelper {
                         DeletionRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices()));
             }
         }
+    }
+
+    public HotOnlyDataTieringConfig dataTieringConfigFromServerConf() {
+        if (!elasticsearchConfiguration.useDataTiering()) {
+            return null;
+        }
+        return HotOnlyDataTieringConfig.builder()
+                .indexLifetimeMin(elasticsearchConfiguration.getDataTieringIndexLifetimeMin())
+                .indexLifetimeMax(elasticsearchConfiguration.getDataTieringIndexLifetimeMax())
+                .build();
     }
 }
