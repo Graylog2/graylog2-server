@@ -124,7 +124,7 @@ const initialFormValues = (currentTimeRange: SearchBarFormValues['timerange'] | 
   });
 };
 
-type Props = {
+type Props = React.PropsWithChildren<{
   show: boolean,
   currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride,
   limitDuration: number,
@@ -133,15 +133,10 @@ type Props = {
   setCurrentTimeRange: (timeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => void,
   toggleDropdownShow: () => void,
   validTypes?: Array<SupportedTimeRangeType>,
-};
-
-const PlaceholderButton = styled.button`
-  position: relative;
-  visibility: hidden;
-  left: -10%;
-`;
+}>;
 
 const TimeRangePicker = ({
+  children,
   show,
   noOverride,
   toggleDropdownShow,
@@ -215,9 +210,10 @@ const TimeRangePicker = ({
              position={position}
              withinPortal
              withArrow
-             width={735}>
+             width={735}
+             zIndex={1060}>
       <Popover.Target>
-        <PlaceholderButton />
+        {children}
       </Popover.Target>
       <Popover.Dropdown title={title}>
         <Formik<TimeRangePickerFormValues> initialValues={initialValues}

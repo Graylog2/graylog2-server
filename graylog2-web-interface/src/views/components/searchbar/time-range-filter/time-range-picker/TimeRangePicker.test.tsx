@@ -26,7 +26,7 @@ import ToolsStore from 'stores/tools/ToolsStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
 
-import TimeRangePicker from './TimeRangePicker';
+import OriginalTimeRangePicker from './TimeRangePicker';
 
 jest.mock('hooks/useCurrentUser');
 
@@ -57,6 +57,12 @@ const defaultProps = {
   toggleDropdownShow: jest.fn(),
   position: 'bottom',
 } as const;
+
+const TimeRangePicker = (props: React.ComponentProps<typeof OriginalTimeRangePicker>) => (
+  <OriginalTimeRangePicker {...props}>
+    <button type="button">Open</button>
+  </OriginalTimeRangePicker>
+);
 
 describe('TimeRangePicker', () => {
   beforeEach(() => {

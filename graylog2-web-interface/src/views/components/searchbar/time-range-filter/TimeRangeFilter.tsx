@@ -96,27 +96,26 @@ const TimeRangeFilter = ({
   const hideTimeRangeDropDown = () => show && toggleShow();
 
   return (
-    <FlexContainer className={className} ref={containerRef}>
-      {showDropdownButton && (
-        <>
-          <TimeRangeFilterButtons disabled={disabled}
-                                  toggleShow={toggleShow}
-                                  onPresetSelectOpen={hideTimeRangeDropDown}
-                                  setCurrentTimeRange={onChange}
-                                  showPresetDropdown={showPresetDropdown}
-                                  hasErrorOnMount={hasErrorOnMount} />
-          <TimeRangePicker show={show}
-                           currentTimeRange={value}
-                           limitDuration={limitDuration}
-                           noOverride={noOverride}
-                           setCurrentTimeRange={onChange}
-                           toggleDropdownShow={toggleShow}
-                           validTypes={validTypes}
-                           position={position} />
-        </>
-      )}
-      <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
-    </FlexContainer>
+    <TimeRangePicker show={show}
+                     currentTimeRange={value}
+                     limitDuration={limitDuration}
+                     noOverride={noOverride}
+                     setCurrentTimeRange={onChange}
+                     toggleDropdownShow={toggleShow}
+                     validTypes={validTypes}
+                     position={position}>
+      <FlexContainer className={className} ref={containerRef}>
+        {showDropdownButton && (
+        <TimeRangeFilterButtons disabled={disabled}
+                                toggleShow={toggleShow}
+                                onPresetSelectOpen={hideTimeRangeDropDown}
+                                setCurrentTimeRange={onChange}
+                                showPresetDropdown={showPresetDropdown}
+                                hasErrorOnMount={hasErrorOnMount} />
+        )}
+        <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
+      </FlexContainer>
+    </TimeRangePicker>
   );
 };
 
