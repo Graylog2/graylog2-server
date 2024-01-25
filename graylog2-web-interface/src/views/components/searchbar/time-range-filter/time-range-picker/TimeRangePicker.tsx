@@ -19,6 +19,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
+import { Portal } from '@mantine/core';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
@@ -214,42 +215,44 @@ const TimeRangePicker = ({
       <Popover.Target>
         {children}
       </Popover.Target>
-      <Popover.Dropdown title={title}>
-        <Formik<TimeRangePickerFormValues> initialValues={initialValues}
-                                           validate={_validateTimeRange}
-                                           onSubmit={handleSubmit}
-                                           validateOnMount>
-          {(({ isValid, submitForm }) => (
-            <KeyCapture shortcuts={[
-              { actionKey: 'submit-form', callback: submitForm, scope: 'general', options: { displayInOverview: false } },
-              { actionKey: 'close-modal', callback: handleCancel, scope: 'general', options: { displayInOverview: false } },
-            ]}>
-              <Form>
-                <Row>
-                  <Col md={12}>
-                    <TimeRangePresetRow />
-                    <TimeRangeTabs limitDuration={limitDuration}
-                                   validTypes={validTypes}
-                                   setValidatingKeyword={setValidatingKeyword} />
-                  </Col>
-                </Row>
+      <Portal>
+        <Popover.Dropdown title={title}>
+          <Formik<TimeRangePickerFormValues> initialValues={initialValues}
+                                             validate={_validateTimeRange}
+                                             onSubmit={handleSubmit}
+                                             validateOnMount>
+            {(({ isValid, submitForm }) => (
+              <KeyCapture shortcuts={[
+                { actionKey: 'submit-form', callback: submitForm, scope: 'general', options: { displayInOverview: false } },
+                { actionKey: 'close-modal', callback: handleCancel, scope: 'general', options: { displayInOverview: false } },
+              ]}>
+                <Form>
+                  <Row>
+                    <Col md={12}>
+                      <TimeRangePresetRow />
+                      <TimeRangeTabs limitDuration={limitDuration}
+                                     validTypes={validTypes}
+                                     setValidatingKeyword={setValidatingKeyword} />
+                    </Col>
+                  </Row>
 
-                <Row className="row-sm">
-                  <Col md={6}>
-                    <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
-                  </Col>
-                  <Col md={6}>
-                    <ModalSubmit leftCol={noOverride && <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>}
-                                 onCancel={handleCancel}
-                                 disabledSubmit={!isValid || validatingKeyword}
-                                 submitButtonText="Update time range" />
-                  </Col>
-                </Row>
-              </Form>
-            </KeyCapture>
-          ))}
-        </Formik>
-      </Popover.Dropdown>
+                  <Row className="row-sm">
+                    <Col md={6}>
+                      <Timezone>All timezones using: <b>{userTimezone}</b></Timezone>
+                    </Col>
+                    <Col md={6}>
+                      <ModalSubmit leftCol={noOverride && <Button bsStyle="link" onClick={handleNoOverride}>No Override</Button>}
+                                   onCancel={handleCancel}
+                                   disabledSubmit={!isValid || validatingKeyword}
+                                   submitButtonText="Update time range" />
+                    </Col>
+                  </Row>
+                </Form>
+              </KeyCapture>
+            ))}
+          </Formik>
+        </Popover.Dropdown>
+      </Portal>
     </Popover>
   );
 };
