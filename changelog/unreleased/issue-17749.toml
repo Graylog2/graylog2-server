@@ -1,0 +1,5 @@
+type = "a"
+message = "Add deleting index set field type profile action"
+
+issues = ["17815"]
+pulls = ["18031"]

@@ -179,6 +179,44 @@
         }
       ],
       "state" : "ENABLED"
+    },
+    {
+      "_id" : { "$oid": "658ee55d69d2bd68430e0463" },
+      "_scope" : "DEFAULT",
+      "title" : "missing_field",
+      "description" : "illegal event definition",
+      "updated_at" : { "$date": "2023-12-29T15:27:25.628Z" },
+      "priority" : 2,
+      "alert" : false,
+      "config" : {
+        "type" : "aggregation-v1",
+        "query" : "",
+        "query_parameters" : [],
+        "streams" : [],
+        "group_by" : [],
+        "series" : [],
+        "conditions" : {
+          "expression" : null
+        },
+        "search_within_ms" : 300000,
+        "execute_every_ms" : 300000
+      },
+      "field_spec" : {},
+      "key_spec" : [],
+      "notification_settings" : {
+        "grace_period_ms" : 300000,
+        "backlog_size" : 0
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000002"
+          ]
+        }
+      ],
+      "state" : "DISABLED"
     }
   ]
 }
