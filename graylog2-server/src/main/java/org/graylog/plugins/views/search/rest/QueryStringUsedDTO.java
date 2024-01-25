@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog.plugins.views.search.rest;
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import ProfileActions from 'components/indices/IndexSetFieldTypeProfiles/ProfileActions';
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
-const profileActions = ({ id, name }: IndexSetFieldTypeProfile) => <ProfileActions profileId={id} profileName={name} />;
-
-export default profileActions;
+public record QueryStringUsedDTO(@JsonProperty("query_string") @NotNull @NotEmpty String queryString) {
+}

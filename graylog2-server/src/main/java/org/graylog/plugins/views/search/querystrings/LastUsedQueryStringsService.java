@@ -14,11 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog.plugins.views.search.querystrings;
 
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import ProfileActions from 'components/indices/IndexSetFieldTypeProfiles/ProfileActions';
+import org.graylog2.plugin.database.users.User;
 
-const profileActions = ({ id, name }: IndexSetFieldTypeProfile) => <ProfileActions profileId={id} profileName={name} />;
+import java.util.List;
 
-export default profileActions;
+public interface LastUsedQueryStringsService {
+    int DEFAULT_LIMIT = 10;
+
+    default List<QueryString> get(User user) {
+        return get(user, DEFAULT_LIMIT);
+    }
+
+    List<QueryString> get(User user, int limit);
+
+    void save(User user, String queryString);
+}
