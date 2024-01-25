@@ -25,19 +25,10 @@ import org.graylog2.plugin.inject.Graylog2Module;
 
 public class DataTieringModule extends Graylog2Module {
 
-    private final DataTieringChecker dataTieringChecker;
-
-    public DataTieringModule(DataTieringChecker dataTieringChecker) {
-        this.dataTieringChecker = dataTieringChecker;
-    }
-
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder().build(DataTierRotation.Factory.class));
         OptionalBinder.newOptionalBinder(binder(), DataTieringOrchestrator.class).setDefault().to(HotOnlyDataTieringOrchestrator.class);
         registerJacksonSubtype(HotOnlyDataTieringConfig.class, HotOnlyDataTieringConfig.TYPE);
-        if (dataTieringChecker.isEnabled()) {
-            addSystemRestResource(DataTieringResource.class);
-        }
     }
 }
