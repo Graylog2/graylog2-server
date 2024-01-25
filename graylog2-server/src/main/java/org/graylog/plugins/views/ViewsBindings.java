@@ -54,6 +54,8 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
+import org.graylog.plugins.views.search.querystrings.MongoLastUsedQueryStringsService;
 import org.graylog.plugins.views.search.rest.DashboardsResource;
 import org.graylog.plugins.views.search.rest.ExportJobsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
@@ -61,6 +63,7 @@ import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
+import org.graylog.plugins.views.search.rest.QueryStringsResource;
 import org.graylog.plugins.views.search.rest.QueryValidationResource;
 import org.graylog.plugins.views.search.rest.SavedSearchesResource;
 import org.graylog.plugins.views.search.rest.SearchMetadataResource;
@@ -261,6 +264,9 @@ public class ViewsBindings extends ViewsModule {
         viewResolverBinder();
 
         install(new EngineBindings());
+
+        bind(LastUsedQueryStringsService.class).to(MongoLastUsedQueryStringsService.class);
+        addSystemRestResource(QueryStringsResource.class);
     }
 
     private void registerExportBackendProvider() {
