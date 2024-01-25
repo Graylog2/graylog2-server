@@ -156,7 +156,7 @@ class MongoCollectionsTest {
     void testTimestampToJodaDateTimeConversion() {
         final MongoCollection<TimestampTest> collection = collections.get("timestamp-test", TimestampTest.class);
 
-        final DateTime now = DateTime.now();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
 
         final ObjectId objectId = new ObjectId();
         final Map<String, Object> fields = Map.of(
