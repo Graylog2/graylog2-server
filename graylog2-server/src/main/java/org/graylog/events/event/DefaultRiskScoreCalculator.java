@@ -20,6 +20,6 @@ public class DefaultRiskScoreCalculator implements RiskScoreCalculator {
 
     @Override
     public void assignRiskScore(Event event) {
-        event.setRiskScore(event.getPriority());
+        event.setRiskScore(0);
     }
 }
