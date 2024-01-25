@@ -21,10 +21,10 @@ import pickBy from 'lodash/pickBy';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
-const useSelectedEntitiesData = <Entity extends EntityBase>(list : ReadonlyArray<Entity>):Array<Entity> => {
+const useSelectedEntitiesData = <Entity extends EntityBase>(data : ReadonlyArray<Entity>):Array<Entity> => {
   const { selectedEntities } = useSelectedEntities();
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<Entity['id'], Entity> | {}>({});
-  const normalizedList = useMemo(() => keyBy(list, 'id'), [list]);
+  const normalizedList = useMemo(() => keyBy(data, 'id'), [data]);
   const selectedEntitiesSet = useMemo(() => new Set(selectedEntities), [selectedEntities]);
 
   useEffect(() => {
