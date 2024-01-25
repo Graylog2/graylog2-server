@@ -49,7 +49,6 @@ const defaultCurrentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timera
 describe('XYPlot', () => {
   const timestampPivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const config = AggregationWidgetConfig.builder().rowPivots([timestampPivot]).build();
-  const getChartColor = () => undefined;
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42], name: 'count()' }];
 
@@ -68,7 +67,6 @@ describe('XYPlot', () => {
       <TestStoreProvider view={view} initialQuery={currentQuery.id}>
         <XYPlot chartData={chartData}
                 config={config}
-                getChartColor={getChartColor}
                 setChartColor={setChartColor}
                 {...props} />
       </TestStoreProvider>
@@ -98,7 +96,6 @@ describe('XYPlot', () => {
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: 'linear' },
       xaxis: { fixedrange: true },
-      showlegend: false,
       hovermode: 'x',
     });
 

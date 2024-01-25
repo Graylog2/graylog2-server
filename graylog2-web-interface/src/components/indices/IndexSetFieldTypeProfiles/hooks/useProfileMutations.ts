@@ -49,6 +49,12 @@ const postProfile = async (profile: IndexSetFieldTypeProfileForm) => {
   return fetch('POST', url, body);
 };
 
+const deleteProfile = async (id: string) => {
+  const url = qualifyUrl(`${urlPrefix}/${id}`);
+
+  return fetch('DELETE', url);
+};
+
 const useProfileMutation = () => {
   const queryClient = useQueryClient();
 
@@ -74,13 +80,25 @@ const useProfileMutation = () => {
       return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
     },
   });
+  const remove = useMutation(deleteProfile, {
+    onError: (errorThrown) => {
+      UserNotification.error(`Deleting index set field type profile failed with status: ${errorThrown}`,
+        'Could not delete index set field type profile');
+    },
+    onSuccess: () => {
+      UserNotification.success('Index set field type profile has been successfully deleted.', 'Success!');
+
+      return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
+    },
+  });
 
   return ({
     editProfile: put.mutateAsync,
     isEditLoading: put.isLoading,
     createProfile: post.mutateAsync,
     isCreateLoading: post.isLoading,
-    isLoading: post.mutateAsync || post.isLoading,
+    isLoading: post.mutateAsync || post.isLoading || remove.isLoading,
+    deleteProfile: remove.mutateAsync,
   });
 };
 

@@ -25,11 +25,13 @@ import type { SearchFilter } from 'components/event-definitions/event-definition
 
 export default (
   streamId?: string | string[],
+  // eslint-disable-next-line default-param-last
   id: QueryId | undefined = generateId(),
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
   searchFilters?: SearchFilter[],
 ): Query => {
+  // eslint-disable-next-line no-nested-ternary
   const streamIds = streamId
     ? streamId instanceof Array
       ? streamId
@@ -37,7 +39,7 @@ export default (
     : null;
   const streamFilter = filtersForQuery(streamIds);
   const searchFiltersMap: FilterType = searchFilters
-    ? OrderedMap(searchFilters?.map((filter) => [filter.id || uuidv4(), { frontendId: filter.id || uuidv4(), ...filter }]))
+    ? OrderedMap(searchFilters?.map((filter) => [filter.id || uuidv4(), filter]))
     : OrderedMap();
   const builder = Query.builder()
     .id(id)
