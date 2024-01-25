@@ -27,7 +27,7 @@ jest.mock('views/hooks/useSaveViewFormControls');
 
 const SavedSearchForm = (props: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
   <OriginalSavedSearchForm {...props}>
-    <button />
+    <button type="button">Submit</button>
   </OriginalSavedSearchForm>
 );
 
