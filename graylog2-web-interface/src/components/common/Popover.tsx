@@ -41,7 +41,7 @@ const Popover = (props: React.ComponentProps<typeof MantinePopover>) => {
 };
 
 type DropdownProps = Omit<React.ComponentProps<typeof MantinePopover.Dropdown>, 'title'> & {
-  title: React.ReactNode,
+  title?: React.ReactNode,
 }
 
 const Children = styled.div(({ theme }) => css`
@@ -57,9 +57,11 @@ const Title = styled.h4(({ theme }) => css`
 
 const Dropdown = ({ title, children, ...rest }: DropdownProps) => (
   <MantinePopover.Dropdown {...rest}>
-    <Title>
-      {title}
-    </Title>
+    {title && (
+      <Title>
+        {title}
+      </Title>
+    )}
 
     <Children>
       {children}
