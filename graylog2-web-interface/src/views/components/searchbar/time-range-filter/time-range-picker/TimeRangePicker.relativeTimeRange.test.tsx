@@ -38,6 +38,7 @@ jest.mock('stores/tools/ToolsStore', () => ({}));
 
 describe('TimeRangePicker relative time range', () => {
   const defaultProps = {
+    show: true,
     currentTimeRange: {
       type: 'relative',
       from: 300,

@@ -97,7 +97,7 @@ const shakeAnimation = keyframes`
 type ExtraProps = {
   $shaking: boolean,
 }
-const StyledPopoverDropdown: React.ComponentType<React.ComponentProps<typeof Popover.Dropdown> & ExtraProps> = styled(Popover.Dropdown)<ExtraProps>(({ $shaking }) => css`
+const StyledPopoverDropdown = styled(Popover.Dropdown)<ExtraProps>(({ $shaking }) => css`
   animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
 `);
 
@@ -218,7 +218,7 @@ const QueryValidation = () => {
       </Popover.Target>
       {hasExplanations && showExplanation && (
         <StyledPopoverDropdown id="query-validation-error-explanation"
-                               title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} /> as React.ComponentProps<typeof StyledPopoverDropdown>['title']}
+                               title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                                $shaking={shakingPopover}>
           <div role="alert">
             {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (

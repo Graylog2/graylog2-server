@@ -40,7 +40,7 @@ const Popover = (props: React.ComponentProps<typeof MantinePopover>) => {
   return <MantinePopover styles={styles} zIndex={1032} {...props} />;
 };
 
-type DropdownProps = React.ComponentProps<typeof MantinePopover.Dropdown> & {
+type DropdownProps = Omit<React.ComponentProps<typeof MantinePopover.Dropdown>, 'title'> & {
   title: React.ReactNode,
 }
 
