@@ -198,6 +198,7 @@ describe('Aggregation Widget', () => {
       userEvent.click(timeRangePickerButton);
 
       const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
+      jest.setSystemTime(mockedUnixTime);
       userEvent.click(absoluteTabButton);
 
       const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
