@@ -210,17 +210,16 @@ const SearchActionsMenu = () => {
 
   return (
     <Container aria-label="Search Meta Buttons">
-      <SaveViewButton title={title}
-                      ref={formTarget}
-                      onClick={toggleFormModal} />
-      {showForm && (
-        <SavedSearchForm target={formTarget.current}
-                         saveSearch={saveSearch}
-                         saveAsSearch={saveAsSearch}
-                         isCreateNew={isNew || !isAllowedToEdit}
-                         toggleModal={toggleFormModal}
-                         value={currentTitle} />
-      )}
+      <SavedSearchForm show={showForm}
+                       saveSearch={saveSearch}
+                       saveAsSearch={saveAsSearch}
+                       isCreateNew={isNew || !isAllowedToEdit}
+                       toggleModal={toggleFormModal}
+                       value={currentTitle}>
+        <SaveViewButton title={title}
+                        ref={formTarget}
+                        onClick={toggleFormModal} />
+      </SavedSearchForm>
       <Button title="Load a previously saved search"
               onClick={toggleListModal}>
         <Icon name="folder" type="regular" /> Load
