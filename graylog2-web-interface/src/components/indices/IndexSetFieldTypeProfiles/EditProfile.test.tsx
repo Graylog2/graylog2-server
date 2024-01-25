@@ -45,6 +45,7 @@ const selectItem = async (select: HTMLElement, option: string | RegExp) => {
 describe('IndexSetFieldTypesList', () => {
   const createMock = jest.fn(() => Promise.resolve());
   const editMock = jest.fn(() => Promise.resolve());
+  const deleteMock = jest.fn(() => Promise.resolve());
 
   beforeAll(loadViewsPlugin);
 
@@ -69,6 +70,7 @@ describe('IndexSetFieldTypesList', () => {
       createProfile: createMock,
       isCreateLoading: false,
       isLoading: false,
+      deleteProfile: deleteMock,
     }));
 
     asMock(useFieldTypes).mockImplementation(() => (
