@@ -213,6 +213,7 @@ const TimeRangePicker = ({
              data-testid="timerange-type"
              opened={show}
              position={position}
+             withinPortal
              withArrow
              width={735}>
       <Popover.Target>
