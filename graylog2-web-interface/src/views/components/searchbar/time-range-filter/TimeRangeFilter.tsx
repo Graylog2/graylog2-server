@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useContext, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Overlay } from 'react-overlays';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
@@ -99,26 +98,23 @@ const TimeRangeFilter = ({
   return (
     <FlexContainer className={className} ref={containerRef}>
       {showDropdownButton && (
-        <TimeRangeFilterButtons disabled={disabled}
-                                toggleShow={toggleShow}
-                                onPresetSelectOpen={hideTimeRangeDropDown}
-                                setCurrentTimeRange={onChange}
-                                showPresetDropdown={showPresetDropdown}
-                                hasErrorOnMount={hasErrorOnMount} />
+        <>
+          <TimeRangeFilterButtons disabled={disabled}
+                                  toggleShow={toggleShow}
+                                  onPresetSelectOpen={hideTimeRangeDropDown}
+                                  setCurrentTimeRange={onChange}
+                                  showPresetDropdown={showPresetDropdown}
+                                  hasErrorOnMount={hasErrorOnMount} />
+          <TimeRangePicker show={show}
+                           currentTimeRange={value}
+                           limitDuration={limitDuration}
+                           noOverride={noOverride}
+                           setCurrentTimeRange={onChange}
+                           toggleDropdownShow={toggleShow}
+                           validTypes={validTypes}
+                           position={position} />
+        </>
       )}
-      <Overlay show={show}
-               trigger="click"
-               placement="bottom"
-               onHide={toggleShow}
-               container={containerRef.current}>
-        <TimeRangePicker currentTimeRange={value}
-                         limitDuration={limitDuration}
-                         noOverride={noOverride}
-                         setCurrentTimeRange={onChange}
-                         toggleDropdownShow={toggleShow}
-                         validTypes={validTypes}
-                         position={position} />
-      </Overlay>
       <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
     </FlexContainer>
   );
