@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Overlay, Transition } from 'react-overlays';
 import { useDisclosure } from '@mantine/hooks';
 
+import Popover from 'components/common/Popover';
 import useClickOutside from 'hooks/useClickOutside';
 
 type Triggers = 'click' | 'focus' | 'hover';
@@ -31,8 +31,9 @@ type Props = {
   placement: 'top' | 'right' | 'bottom' | 'left',
   trigger?: Triggers | Array<Triggers>,
   className?: string,
-  container?: React.ReactElement,
   rootClose?: boolean,
+  width?: number,
+  title?: React.ReactNode,
 }
 
 const TriggerWrap = styled.span`
@@ -43,7 +44,7 @@ const Container = styled.div`
   display: inline-block;
 `;
 
-const OverlayTrigger = ({ children, container, placement, overlay, rootClose, trigger, testId, className, ...overlayProps }: Props) => {
+const OverlayTrigger = ({ children, placement, overlay, rootClose, trigger, testId, className, title, width }: Props) => {
   const [opened, { close, open, toggle }] = useDisclosure(false);
   const containerRef = useRef();
 
@@ -57,31 +58,26 @@ const OverlayTrigger = ({ children, container, placement, overlay, rootClose, tr
 
   return (
     <Container ref={containerRef} data-testid={testId} className={className}>
-      <TriggerWrap className={children.props.className}
-                   ref={setControl}
-                   role="button"
-                   onClick={click ? toggle : undefined}
-                   onMouseEnter={hover ? open : undefined}
-                   onMouseLeave={hover ? close : undefined}
-                   onFocus={focus ? open : undefined}
-                   onBlur={focus ? open : undefined}>
-        {children}
-      </TriggerWrap>
+      <Popover opened={opened} withArrow width={width} position={placement} withinPortal>
+        <Popover.Target>
+          <TriggerWrap className={children.props.className}
+                       ref={setControl}
+                       role="button"
+                       onClick={click ? toggle : undefined}
+                       onMouseEnter={hover ? open : undefined}
+                       onMouseLeave={hover ? close : undefined}
+                       onFocus={focus ? open : undefined}
+                       onBlur={focus ? open : undefined}>
+            {children}
+          </TriggerWrap>
+        </Popover.Target>
 
-      {opened && (
-      <Overlay show={opened}
-               container={container ?? containerRef.current}
-               containerPadding={10}
-               placement={placement}
-               shouldUpdatePosition
-               target={control}
-               transition={Transition}
-               {...overlayProps}>
-        <div ref={setDropdown}>
-          {overlay}
-        </div>
-      </Overlay>
-      )}
+        <Popover.Dropdown title={title}>
+          <div ref={setDropdown}>
+            {overlay}
+          </div>
+        </Popover.Dropdown>
+      </Popover>
     </Container>
   );
 };
@@ -89,9 +85,10 @@ const OverlayTrigger = ({ children, container, placement, overlay, rootClose, tr
 OverlayTrigger.defaultProps = {
   trigger: 'click',
   rootClose: false,
-  container: null,
   testId: undefined,
   className: undefined,
+  width: 275,
+  title: undefined,
 };
 
 export default OverlayTrigger;
