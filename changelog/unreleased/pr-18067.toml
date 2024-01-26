@@ -1,0 +1,12 @@
+type = "a"
+message = "Extend search query input with option to view search query history."
+
+issues = ["Graylog2/graylog-plugin-enterprise/issues/4012"]
+pulls = ["18067"]
+
+details.user = """
+The history is scoped by user and sorted chronologically. The history contains all queries executed on the search page, dashboards and dashboard widgets.
+It can be opened by clicking on the history icon or by pressing a keyboard shortcut.
+
+While it is open, it can be filtered using the query input. When an entity has been selected, it will replace the current value of the query input.
+"""
