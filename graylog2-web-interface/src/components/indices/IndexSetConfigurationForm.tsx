@@ -244,7 +244,7 @@ const IndexSetConfigurationForm = ({
   const onCancel = () => history.push(cancelLink);
 
   const isCloud = AppConfig.isCloud();
-  const enableDataTieringCloud = useFeature("data_tiering_cloud")
+  const enableDataTieringCloud = useFeature('data_tiering_cloud');
 
   return (
     <Row>
