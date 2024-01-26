@@ -55,7 +55,7 @@ public class IndexSetsDefaultConfigurationFactory {
                 .rotationStrategyConfig(rotationConfig.right)
                 .retentionStrategyClass(retentionConfig.left)
                 .retentionStrategyConfig(retentionConfig.right)
-                .dataTiering(maintenanceStrategiesHelper.dataTieringConfigFromServerConf())
+                .dataTiering(maintenanceStrategiesHelper.defaultDataTieringConfig())
                 .build();
     }
 
@@ -68,7 +68,7 @@ public class IndexSetsDefaultConfigurationFactory {
                     .indexLifetimeMax(config.indexLifetimeMax())
                     .build();
         } else {
-            dataTieringConfig = maintenanceStrategiesHelper.dataTieringConfigFromServerConf();
+            dataTieringConfig = maintenanceStrategiesHelper.defaultDataTieringConfig();
         }
         return oldConfig.toBuilder().dataTiering(dataTieringConfig).build();
     }

@@ -99,15 +99,6 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "rotation_strategy", required = true)
     private String rotationStrategy = TimeBasedSizeOptimizingStrategy.NAME;
 
-    @Parameter(value = "use_data_tiering")
-    private boolean useDataTiering = true;
-
-    @Parameter(value = "data_tiering_index_lifetime_min")
-    private Period dataTieringIndexLifetimeMin = IndexLifetimeConfig.DEFAULT_LIFETIME_MIN;
-
-    @Parameter(value = "data_tiering_index_lifetime_max")
-    private Period dataTieringIndexLifetimeMax = IndexLifetimeConfig.DEFAULT_LIFETIME_MAX;
-
     // Rotation
     @Parameter(value = "elasticsearch_max_time_per_index", required = true)
     private Period maxTimePerIndex = Period.days(1);
@@ -307,18 +298,6 @@ public class ElasticsearchConfiguration {
 
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
-    }
-
-    public boolean useDataTiering() {
-        return useDataTiering;
-    }
-
-    public Period getDataTieringIndexLifetimeMin() {
-        return dataTieringIndexLifetimeMin;
-    }
-
-    public Period getDataTieringIndexLifetimeMax() {
-        return dataTieringIndexLifetimeMax;
     }
 
     public boolean allowFlexibleRetentionPeriod() {

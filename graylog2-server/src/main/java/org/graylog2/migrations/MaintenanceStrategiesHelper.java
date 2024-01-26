@@ -16,6 +16,8 @@
  */
 package org.graylog2.migrations;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
@@ -31,6 +33,7 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -38,9 +41,6 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import java.util.Map;
 
@@ -113,13 +113,10 @@ public class MaintenanceStrategiesHelper {
         }
     }
 
-    public HotOnlyDataTieringConfig dataTieringConfigFromServerConf() {
-        if (!elasticsearchConfiguration.useDataTiering()) {
-            return null;
-        }
+    public HotOnlyDataTieringConfig defaultDataTieringConfig() {
         return HotOnlyDataTieringConfig.builder()
-                .indexLifetimeMin(elasticsearchConfiguration.getDataTieringIndexLifetimeMin())
-                .indexLifetimeMax(elasticsearchConfiguration.getDataTieringIndexLifetimeMax())
+                .indexLifetimeMin(IndexLifetimeConfig.DEFAULT_LIFETIME_MIN)
+                .indexLifetimeMax(IndexLifetimeConfig.DEFAULT_LIFETIME_MAX)
                 .build();
     }
 }
