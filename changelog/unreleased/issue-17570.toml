@@ -1,4 +1,4 @@
-type = "c"
+type = "r"
 message = "The close index button has been removed from the index set overview page for a specific index."
 
 issues = ["17570"]
