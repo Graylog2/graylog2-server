@@ -83,6 +83,7 @@ export type Completer = {
 };
 
 export type Editor = {
+  container: HTMLElement | undefined,
   commands: Commands,
   completer: Completer,
   completers: Array<AutoCompleter>,

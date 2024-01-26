@@ -19,6 +19,7 @@ import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'r
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
+import { createGlobalStyle } from 'styled-components';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -31,6 +32,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type View from 'views/logic/views/View';
 import useView from 'views/hooks/useView';
+import useElementDimensions from 'hooks/useElementDimensions';
 
 import type { AutoCompleter, Editor, Command } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
@@ -40,6 +42,13 @@ import SearchBarAutoCompletions from '../SearchBarAutocompletions';
 import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
 
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
+
+const GlobalEditorStyles = createGlobalStyle<{ $width?: number; $offsetLeft: number }>`
+  .ace_editor.ace_autocomplete {
+    width: ${(props) => (props.$width ?? 600) - 12}px !important;
+    left: ${(props) => (props.$offsetLeft ?? 143) + 7}px !important;
+  }
+`;
 
 const displayValidationErrors = () => {
   QueryValidationActions.displayValidationErrors();
@@ -216,6 +225,8 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   name,
 }, outerRef) => {
   const innerRef = useRef<Editor>(null);
+  const inputElement = innerRef.current?.container;
+  const { width: inputWidth } = useElementDimensions(inputElement);
   const { userTimezone } = useUserDateTime();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
@@ -245,22 +256,26 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   useImperativeHandle(outerRef, () => innerRef.current, []);
 
   return (
-    <BasicQueryInput height={height}
-                     className={className}
-                     disabled={false}
-                     enableAutocompletion={enableSmartSearch}
-                     error={error}
-                     inputId={inputId}
-                     warning={warning}
-                     maxLines={maxLines}
-                     onBlur={onBlur}
-                     onExecute={onExecute}
-                     onChange={_onChange}
-                     onLoad={onLoadEditor}
-                     placeholder={placeholder}
-                     ref={updateEditorConfiguration}
-                     value={value}
-                     wrapEnabled={wrapEnabled} />
+    <>
+      <GlobalEditorStyles $width={inputWidth} $offsetLeft={inputElement?.offsetLeft} />
+      <BasicQueryInput height={height}
+                       className={className}
+                       disabled={false}
+                       enableAutocompletion={enableSmartSearch}
+                       error={error}
+                       inputId={inputId}
+                       warning={warning}
+                       maxLines={maxLines}
+                       onBlur={onBlur}
+                       onExecute={onExecute}
+                       onChange={_onChange}
+                       onLoad={onLoadEditor}
+                       placeholder={placeholder}
+                       ref={updateEditorConfiguration}
+                       value={value}
+                       wrapEnabled={wrapEnabled} />
+
+    </>
   );
 });
 
