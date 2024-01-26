@@ -33,6 +33,7 @@ type EventCallback = {
 };
 
 export type Session = {
+  curOp: { args: unknown },
   getLength: () => number,
   getTokens: (no: number) => Array<Token>,
   getTokenAt: (no: number, idx: number) => Token | undefined | null,
@@ -85,7 +86,8 @@ export type Editor = {
   commands: Commands,
   completer: Completer,
   completers: Array<AutoCompleter>,
-  execCommand: (command: string) => void,
+  execCommand: (command: string, args?: Record<string, unknown>) => void,
+  focus: () => void,
   session: Session,
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,

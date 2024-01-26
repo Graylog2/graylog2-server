@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext, useRef } from 'react';
+import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
@@ -100,7 +100,7 @@ const _onLoadEditor = (editor: Editor, isInitialTokenizerUpdate: React.MutableRe
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
 
     editor.session.on('tokenizerUpdate', () => {
-      if (editor.isFocused() && !editor.completer?.activated && !isInitialTokenizerUpdate.current) {
+      if (editor.isFocused() && !editor.completer?.activated && editor.getValue() && !isInitialTokenizerUpdate.current) {
         editor.execCommand('startAutocomplete');
       }
 
@@ -116,8 +116,13 @@ const _onLoadEditor = (editor: Editor, isInitialTokenizerUpdate: React.MutableRe
 // This is necessary for configuration options which rely on external data.
 // Unfortunately it is not possible to configure for example the command once
 // with the `onLoad` or `commands` prop, because the reference for the related function will be outdated.
-const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCompleter, commands: Array<Command>) => {
-  const editor = node && node.editor;
+const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCompleter, commands: Array<Command>, ref: React.MutableRefObject<Editor>) => {
+  const editor = node?.editor;
+
+  if (ref && editor) {
+    // eslint-disable-next-line no-param-reassign
+    ref.current = editor;
+  }
 
   if (editor) {
     editor.commands.on('afterExec', () => {
@@ -188,7 +193,7 @@ type Props = BaseProps & {
   validate: () => Promise<FormikErrors<{}>>,
 };
 
-const QueryInput = ({
+const QueryInput = React.forwardRef<Editor, Props>(({
   className,
   commands,
   completerFactory = defaultCompleterFactory,
@@ -209,7 +214,8 @@ const QueryInput = ({
   warning,
   wrapEnabled,
   name,
-}: Props) => {
+}, outerRef) => {
+  const innerRef = useRef<Editor>(null);
   const { userTimezone } = useUserDateTime();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
@@ -229,12 +235,14 @@ const QueryInput = ({
     bindKey: { win: 'Enter', mac: 'Enter' },
     exec: onExecute,
   }], [commands, onExecute]);
-  const updateEditorConfiguration = useCallback((node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands), [_commands, completer]);
+  const updateEditorConfiguration = useCallback((node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands, innerRef), [_commands, completer]);
   const _onChange = useCallback((newQuery: string) => {
     onChange({ target: { value: newQuery, name } });
 
     return Promise.resolve(newQuery);
   }, [name, onChange]);
+
+  useImperativeHandle(outerRef, () => innerRef.current, []);
 
   return (
     <BasicQueryInput height={height}
@@ -254,7 +262,7 @@ const QueryInput = ({
                      value={value}
                      wrapEnabled={wrapEnabled} />
   );
-};
+});
 
 QueryInput.propTypes = {
   className: PropTypes.string,

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -58,6 +58,8 @@ import { setGlobalOverride, execute } from 'views/logic/slices/searchExecutionSl
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useHandlerContext from 'views/components/useHandlerContext';
 import type { TimeRange } from 'views/logic/queries/Query';
+import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 
 import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -103,6 +105,7 @@ const useInitialFormValues = (timerange: TimeRange, queryString: string) => {
 };
 
 const DashboardSearchBar = () => {
+  const editorRef = useRef<Editor>(null);
   const { userTimezone } = useUserDateTime();
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { timerange, query: { query_string: queryString = '' } = {} } = useGlobalOverride() ?? {};
@@ -174,6 +177,7 @@ const DashboardSearchBar = () => {
                                                   isValidating={isValidating}
                                                   validate={validateForm}
                                                   warning={warnings.queryString}
+                                                  ref={editorRef}
                                                   onExecute={handleSubmit as () => void}
                                                   commands={customCommands} />
                                     )}
@@ -184,6 +188,7 @@ const DashboardSearchBar = () => {
                           </Field>
 
                           <QueryValidation />
+                          <QueryHistoryButton editorRef={editorRef} />
                         </SearchInputAndValidationContainer>
                       </SearchButtonAndQuery>
 

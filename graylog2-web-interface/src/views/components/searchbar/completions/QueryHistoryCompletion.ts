@@ -20,10 +20,18 @@ import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
 class QueryHistoryCompletion implements Completer {
   // eslint-disable-next-line class-methods-use-this
-  getCompletions = ({ tokens }: CompleterContext) => {
-    if (tokens?.length) {
+  getCompletions = ({ tokens, commandArgs }: CompleterContext) => {
+    const isShowHistoryCommand = typeof commandArgs === 'object' && 'context' in commandArgs && commandArgs?.context === 'showHistory';
+    const inputHasValue = !!tokens?.length;
+
+    if (inputHasValue && !isShowHistoryCommand) {
       return [];
     }
+
+    // display complete history when "show history" command triggered completions,
+    // otherwise use default logic to filter completions.
+    const displayAlways = inputHasValue && isShowHistoryCommand;
+    const matcher = displayAlways ? () => true : undefined;
 
     return SearchSuggestions.suggestQueryStrings(50)
       .then((response) => response.sort((
@@ -34,6 +42,7 @@ class QueryHistoryCompletion implements Completer {
         caption: entry.query,
         name: entry.query,
         score: index,
+        matcher,
         completer: {
           insertMatch: ({ setValue }: { setValue: (value: string) => void }) => {
             setValue(entry.query);

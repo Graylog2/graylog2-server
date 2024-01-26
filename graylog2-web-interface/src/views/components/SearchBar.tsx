@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
@@ -65,6 +65,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { updateQuery } from 'views/logic/slices/viewSlice';
 import useHandlerContext from 'views/components/useHandlerContext';
+import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -132,6 +134,7 @@ type Props = {
 };
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
+  const editorRef = useRef<Editor>(null);
   const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({
     key: stream.title,
     value: stream.id,
@@ -216,6 +219,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                                     <PluggableCommands usage="search_query">
                                       {(customCommands) => (
                                         <QueryInput value={value}
+                                                    ref={editorRef}
                                                     timeRange={values.timerange}
                                                     streams={values.streams}
                                                     name={name}
@@ -236,6 +240,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                             </Field>
 
                             <QueryValidation />
+                            <QueryHistoryButton editorRef={editorRef} />
                           </SearchInputAndValidationContainer>
                         </SearchButtonAndQuery>
                         {!editing && <SearchActionsMenu />}
