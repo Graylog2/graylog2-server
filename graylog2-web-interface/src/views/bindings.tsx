@@ -103,8 +103,6 @@ import ChangeFieldType, {
   isChangeFieldTypeEnabled,
   isChangeFieldTypeHidden,
 } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
-import QueryHistoryCompletion from 'views/components/searchbar/completions/QueryHistoryCompletion';
-import AppConfig from 'util/AppConfig';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -394,7 +392,6 @@ const exports: PluginExports = {
     new FieldNameCompletion(),
     new FieldValueCompletion(),
     new OperatorCompletion(),
-    AppConfig.isFeatureEnabled('search_query_history') ? new QueryHistoryCompletion() : null,
   ].filter(Boolean),
   'views.hooks.loadingView': [
     requirementsProvided,

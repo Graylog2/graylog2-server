@@ -36,7 +36,7 @@ export type FieldTypes = { all: FieldIndex, query: FieldIndex };
 type FieldIndex = { [fieldName: string]: FieldTypeMapping };
 
 export type CompleterContext = Readonly<{
-  commandArgs: unknown,
+  commandArgs?: unknown,
   currentToken: Token | undefined | null,
   prevToken: Token | undefined | null,
   prefix: string,

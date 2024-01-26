@@ -30,6 +30,7 @@ import useFeature from 'hooks/useFeature';
 const viewActions = {
   undo: { keys: 'mod+shift+z', description: 'Undo last action' },
   redo: { keys: 'mod+shift+y', description: 'Redo last action' },
+  'show-query-history': { keys: 'ctrl+shift+h', description: 'Show your search query history' },
 };
 
 export const hotKeysCollections: HotkeyCollections = {

@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
+import { SearchSuggestions } from '@graylog/server-api';
 import IconButton from 'components/common/IconButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
+import useHotkey from 'hooks/useHotkey';
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -35,9 +37,33 @@ const QueryHistoryButton = ({ editorRef }: Props) => {
   const showQueryHistory = () => {
     if (editorRef.current) {
       editorRef.current.focus();
-      editorRef.current.execCommand('startAutocomplete', { context: 'showHistory' });
+
+      SearchSuggestions.suggestQueryStrings(50).then((response) => {
+        const options = response.sort((
+          { last_used: lastUsedA }, { last_used: lastUsedB }) => new Date(lastUsedA).getTime() - new Date(lastUsedB).getTime(),
+        ).map((entry, index) => ({
+          value: entry.query,
+          meta: 'history',
+          score: index,
+          completer: {
+            insertMatch: (editor: { setValue: (value: string) => void }, data) => {
+              editor.setValue(data.value);
+            },
+          },
+        }));
+
+        editorRef.current.execCommand('startAutocomplete', {
+          matches: options,
+        });
+      });
     }
   };
+
+  useHotkey({
+    actionKey: 'show-query-history',
+    callback: () => showQueryHistory(),
+    scope: 'search',
+  });
 
   return (
     <ButtonContainer>
