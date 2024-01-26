@@ -85,5 +85,4 @@ public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
                 toIndexLifetimeConfig(config));
 
     }
-
 }

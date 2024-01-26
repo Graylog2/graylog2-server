@@ -34,7 +34,7 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
-import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
 
@@ -130,10 +130,10 @@ public class ElasticsearchConfiguration {
     private Size timeSizeOptimizingRotationMaxShardSize = Size.gigabytes(50);
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME)
-    private Period timeSizeOptimizingRetentionMinLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MIN;
+    private Period timeSizeOptimizingRetentionMinLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MIN;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME)
-    private Period timeSizeOptimizingRetentionMaxLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MAX;
+    private Period timeSizeOptimizingRetentionMaxLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MAX;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY)
     private Period timeSizeOptimizingRetentionFixedLeeway;
@@ -167,17 +167,15 @@ public class ElasticsearchConfiguration {
      */
     @Parameter(value = MAX_INDEX_RETENTION_PERIOD)
     private Period maxIndexRetentionPeriod = null;
+    @Parameter(value = "elasticsearch_index_optimization_timeout", validators = DurationCastedToIntegerValidator.class)
+    private Duration indexOptimizationTimeout = Duration.hours(1L);
+    @Parameter(value = "elasticsearch_index_optimization_jobs", validators = PositiveIntegerValidator.class)
+    private int indexOptimizationJobs = 10;
 
     @Nullable
     public Period getMaxIndexRetentionPeriod() {
         return maxIndexRetentionPeriod;
     }
-
-    @Parameter(value = "elasticsearch_index_optimization_timeout", validators = DurationCastedToIntegerValidator.class)
-    private Duration indexOptimizationTimeout = Duration.hours(1L);
-
-    @Parameter(value = "elasticsearch_index_optimization_jobs", validators = PositiveIntegerValidator.class)
-    private int indexOptimizationJobs = 10;
 
     public String getDefaultIndexPrefix() {
         return defaultIndexPrefix.toLowerCase(Locale.ENGLISH);
@@ -302,7 +300,9 @@ public class ElasticsearchConfiguration {
         return indexOptimizationJobs;
     }
 
-    public boolean allowFlexibleRetentionPeriod() { return allowFlexibleRetentionPeriod; }
+    public boolean allowFlexibleRetentionPeriod() {
+        return allowFlexibleRetentionPeriod;
+    }
 
     @ValidatorMethod
     @SuppressWarnings("unused")

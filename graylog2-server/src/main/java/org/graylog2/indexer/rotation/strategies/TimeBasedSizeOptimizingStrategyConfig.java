@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Period;
 
@@ -34,9 +35,6 @@ import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_
 @WithBeanGetter
 @JsonDeserialize(builder = TimeBasedSizeOptimizingStrategyConfig.Builder.class)
 public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationStrategyConfig {
-
-    public static final Period DEFAULT_LIFETIME_MIN = Period.days(30);
-    public static final Period DEFAULT_LIFETIME_MAX = Period.days(40);
 
     public static Builder builder() {
         return Builder.create();
@@ -54,8 +52,8 @@ public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationS
         public static Builder create() {
             return new AutoValue_TimeBasedSizeOptimizingStrategyConfig.Builder()
                     .type(TimeBasedSizeOptimizingStrategyConfig.class.getCanonicalName())
-                    .indexLifetimeMin(DEFAULT_LIFETIME_MIN)
-                    .indexLifetimeMax(DEFAULT_LIFETIME_MAX);
+                    .indexLifetimeMin(IndexLifetimeConfig.DEFAULT_LIFETIME_MIN)
+                    .indexLifetimeMax(IndexLifetimeConfig.DEFAULT_LIFETIME_MAX);
         }
 
         @JsonProperty(TYPE_FIELD)

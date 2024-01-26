@@ -20,15 +20,17 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
 import java.util.concurrent.TimeUnit;
+
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
 
 /**
  * In-database configuration (via ClusterConfigService) for index set
@@ -118,6 +120,10 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         return retentionStrategyConfig();
     }
 
+    @NotNull
+    @JsonProperty(FIELD_DATA_TIERING)
+    public abstract DataTieringConfig dataTiering();
+
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
@@ -166,6 +172,9 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         public Builder retentionStrategy(RetentionStrategyConfig retentionStrategyConfig) {
             return retentionStrategyConfig(retentionStrategyConfig);
         }
+
+        @JsonProperty(FIELD_DATA_TIERING)
+        public abstract Builder dataTiering(DataTieringConfig dataTiering);
 
         public abstract IndexSetsDefaultConfiguration build();
     }

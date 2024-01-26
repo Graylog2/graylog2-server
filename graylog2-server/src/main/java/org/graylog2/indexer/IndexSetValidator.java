@@ -83,7 +83,7 @@ public class IndexSetValidator {
             if (!dataTieringChecker.isEnabled()) {
                 return Optional.of(Violation.create("data tiering feature is disabled!"));
             }
-            final Violation dataTiersViolation = validateDataTiers(newConfig.dataTiering());
+            final Violation dataTiersViolation = validateDataTieringConfig(newConfig.dataTiering());
             if (dataTiersViolation != null) {
                 return Optional.of(dataTiersViolation);
             }
@@ -175,7 +175,7 @@ public class IndexSetValidator {
 
 
     @Nullable
-    private Violation validateDataTiers(DataTieringConfig dataTieringConfig) {
+    public Violation validateDataTieringConfig(DataTieringConfig dataTieringConfig) {
         return dataTieringOrchestrator.validate(dataTieringConfig).orElse(null);
     }
 

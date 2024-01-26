@@ -27,6 +27,8 @@ import org.joda.time.Period;
 public abstract class IndexLifetimeConfig {
     public static final String FIELD_INDEX_LIFETIME_MIN = "index_lifetime_min";
     public static final String FIELD_INDEX_LIFETIME_MAX = "index_lifetime_max";
+    public static final Period DEFAULT_LIFETIME_MIN = Period.days(30);
+    public static final Period DEFAULT_LIFETIME_MAX = Period.days(40);
 
     public static Builder builder() {
         return new AutoValue_IndexLifetimeConfig.Builder();

@@ -31,5 +31,4 @@ public class DataTieringModule extends Graylog2Module {
         OptionalBinder.newOptionalBinder(binder(), DataTieringOrchestrator.class).setDefault().to(HotOnlyDataTieringOrchestrator.class);
         registerJacksonSubtype(HotOnlyDataTieringConfig.class, HotOnlyDataTieringConfig.TYPE);
     }
-
 }
