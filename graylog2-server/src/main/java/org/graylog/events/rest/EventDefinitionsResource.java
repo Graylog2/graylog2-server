@@ -291,6 +291,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
+
+        dto = dto.toBuilder().state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED).build();
         recentActivityService.update(definitionId, GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(eventDefinitionHandler.update(dto, schedule)).build();
     }
@@ -312,8 +314,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             String msg = "Unable to delete event definition <" + dependencyTitle
                     + "> - please remove all references from event definitions: " + StringUtils.join(dependenciesTitles, ",");
             ValidationResult validationResult = new ValidationResult()
-                .addError("dependency", msg)
-                .addContext("dependency_ids", dependenciesIds);
+                    .addError("dependency", msg)
+                    .addContext("dependency_ids", dependenciesIds);
             throw new ValidationFailureException(validationResult, msg);
         }
 
@@ -473,7 +475,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     /**
      * Check that if this Event Definitions Processor Config is being modified, it is allowed to be.
-     * @param oldEventDefinition - The Existing Event Definition
+     *
+     * @param oldEventDefinition     - The Existing Event Definition
      * @param updatedEventDefinition - The Event Definition with pending updates
      */
     @VisibleForTesting
