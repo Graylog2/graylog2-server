@@ -17,11 +17,12 @@
 package org.graylog.datanode.periodicals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.metrics.ClusterStatMetricsCollector;
-import org.graylog.datanode.metrics.NodeStatMetricsCollector;
+import org.graylog.datanode.metrics.NodeMetricsCollector;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
@@ -42,6 +43,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -51,7 +56,7 @@ public class MetricsCollector extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(MetricsCollector.class);
     private final OpensearchProcess process;
     private final Configuration configuration;
-    private NodeStatMetricsCollector nodeStatMetricsCollector;
+    private NodeMetricsCollector nodeStatMetricsCollector;
     private ClusterStatMetricsCollector clusterStatMetricsCollector;
     private final ObjectMapper objectMapper;
     private boolean isLeader;
@@ -103,7 +108,7 @@ public class MetricsCollector extends Periodical {
     public void doRun() {
         if (process.isInState(ProcessState.AVAILABLE)) {
             process.restClient().ifPresent(client -> {
-                this.nodeStatMetricsCollector = new NodeStatMetricsCollector(client, objectMapper);
+                this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);
                 this.isLeader = process.isLeaderNode();
 
@@ -112,7 +117,7 @@ public class MetricsCollector extends Periodical {
                 metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
                 String node = configuration.getDatanodeNodeName();
                 metrics.put("node", node);
-                metrics.put("dn_jvm_heap", Runtime.getRuntime().totalMemory());
+                addJvmMetrics(metrics);
                 metrics.putAll(nodeStatMetricsCollector.getNodeMetrics(node));
                 indexRequest.source(metrics);
                 indexDocument(client, indexRequest);
@@ -126,6 +131,37 @@ public class MetricsCollector extends Periodical {
 
             });
         }
+    }
+
+    private void addJvmMetrics(Map<String, Object> metrics) {
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
+        metrics.put("dn_heap_usage", calcUsage(memoryMXBean.getHeapMemoryUsage()));
+        metrics.put("dn_non_heap_usage", calcUsage(memoryMXBean.getNonHeapMemoryUsage()));
+
+        Runtime runtime = Runtime.getRuntime();
+        metrics.put("dn_processors", runtime.availableProcessors());
+
+        metrics.put("dn_thread_count", Thread.activeCount());
+
+        long gcTime = ManagementFactory.getGarbageCollectorMXBeans().stream()
+                .mapToLong(GarbageCollectorMXBean::getCollectionTime)
+                .sum();
+        metrics.put("dn_gc_time", gcTime);
+    }
+
+
+    public static Map<String, Map<String, String>> getDatanodeMetrics() {
+        return Map.of(
+                "dn_heap_usage", ImmutableMap.of("type", "float"),
+                "dn_non_heap_usage", ImmutableMap.of("type", "float"),
+                "dn_processors", ImmutableMap.of("type", "integer"),
+                "dn_thread_count", ImmutableMap.of("type", "integer"),
+                "dn_gc_time", ImmutableMap.of("type", "long")
+        );
+    }
+
+    private float calcUsage(MemoryUsage memoryUsage) {
+        return 100 * (float) memoryUsage.getUsed() / memoryUsage.getCommitted();
     }
 
     private Map<String, Object> getPreviousMetricsForCluster(RestHighLevelClient client) {

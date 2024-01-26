@@ -38,11 +38,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class NodeStatMetricsCollectorTest {
+public class NodeMetricsCollectorTest {
 
     private final String NODENAME = "datanode1";
 
-    NodeStatMetricsCollector collector;
+    NodeMetricsCollector collector;
     @Mock
     RestHighLevelClient client;
 
@@ -55,12 +55,12 @@ public class NodeStatMetricsCollectorTest {
         RestClient lowLevelClient = mock(RestClient.class);
         when(client.getLowLevelClient()).thenReturn(lowLevelClient);
         when(lowLevelClient.performRequest(any())).thenReturn(response);
-        this.collector = new NodeStatMetricsCollector(client, new ObjectMapperProvider().get());
+        this.collector = new NodeMetricsCollector(client, new ObjectMapperProvider().get());
     }
 
     @Test
     public void getNodeMetrics() {
-        Map<String, Object> nodeMetrics = collector.getNodeMetrics(NODENAME, "");
+        Map<String, Object> nodeMetrics = collector.getNodeMetrics(NODENAME);
         assertThat(nodeMetrics.get("cpu_load")).isEqualTo(26.4873046875);
         assertThat(nodeMetrics.get("disk_free")).isEqualTo(572.1824f);
     }

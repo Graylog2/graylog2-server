@@ -49,10 +49,9 @@ public class ClusterStatMetricsCollector {
         try {
             Response response = client.getLowLevelClient().performRequest(clusterStatRequest);
             JsonNode responseNode = objectMapper.readValue(response.getEntity().getContent(), JsonNode.class);
-            JsonNode clusterStats = responseNode.get("_all");
 
-            if (clusterStats != null) {
-                DocumentContext statContext = JsonPath.parse(clusterStats.toString());
+            if (responseNode != null) {
+                DocumentContext statContext = JsonPath.parse(responseNode.toString());
 
                 Map<String, Object> metrics = new HashMap<>();
 
@@ -62,9 +61,12 @@ public class ClusterStatMetricsCollector {
                             String fieldName = metric.getFieldName();
                             try {
                                 Object value = statContext.read(metric.getClusterStat());
-                                if (value instanceof Integer current && metric.isRateMetric() && previousMetrics.containsKey(fieldName)) {
-                                    Integer previous = (Integer) previousMetrics.get(fieldName);
-                                    metrics.put(metric.getRateFieldName(), current - previous);
+                                if (value instanceof Number current && metric.isRateMetric() && previousMetrics.containsKey(fieldName)) {
+                                    Number previous = (Number) previousMetrics.get(fieldName);
+                                    long rate = current.longValue() - previous.longValue();
+                                    if (rate > 0) {
+                                        metrics.put(metric.getRateFieldName(), rate);
+                                    }
                                 }
                                 metrics.put(fieldName, value);
                             } catch (Exception e) {

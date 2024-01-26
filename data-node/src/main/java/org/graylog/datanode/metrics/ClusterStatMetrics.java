@@ -21,9 +21,15 @@ import org.graylog.storage.opensearch2.ism.policy.actions.RollupAction;
 import java.util.Locale;
 
 public enum ClusterStatMetrics {
-    DOC_COUNT("long", new RollupAction.IsmRollup.AvgMetric(), "$.primaries.docs.count", false),
-    SEARCH_LATENCY("integer", new RollupAction.IsmRollup.AvgMetric(), "$.total.search.query_time_in_millis", true),
-    INDEX_LATENCY("integer", new RollupAction.IsmRollup.AvgMetric(), "$.total.indexing.index_time_in_millis", true),
+    DOC_COUNT("long", new RollupAction.IsmRollup.AvgMetric(), "$._all.primaries.docs.count", false),
+    SHARDS_TOTAL("integer", new RollupAction.IsmRollup.AvgMetric(), "$._shards.total", false),
+    SHARDS_SUCCESSFUL("integer", new RollupAction.IsmRollup.AvgMetric(), "$._shards.successful", false),
+    SHARDS_FAILED("integer", new RollupAction.IsmRollup.AvgMetric(), "$._shards.failed", false),
+    SEARCH_LATENCY("integer", new RollupAction.IsmRollup.AvgMetric(), "$._all.total.search.query_time_in_millis", true),
+    INDEX_LATENCY("integer", new RollupAction.IsmRollup.AvgMetric(), "$._all.total.indexing.index_time_in_millis", true),
+    SEARCH_OPS("long", new RollupAction.IsmRollup.AvgMetric(), "$._all.total.search.query_total", true),
+    INDEX_OPS("long", new RollupAction.IsmRollup.AvgMetric(), "$._all.total.indexing.index_total", true),
+
     ;
     private final String mappingType;
     private final RollupAction.IsmRollup.AggregationMetric aggregationMetric;

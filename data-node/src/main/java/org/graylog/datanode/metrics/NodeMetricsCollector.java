@@ -34,20 +34,40 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class NodeStatMetricsCollector {
+public class NodeMetricsCollector {
 
-    Logger log = LoggerFactory.getLogger(NodeStatMetricsCollector.class);
+    Logger log = LoggerFactory.getLogger(NodeMetricsCollector.class);
 
     private final RestHighLevelClient client;
     private final ObjectMapper objectMapper;
 
-    public NodeStatMetricsCollector(RestHighLevelClient client, ObjectMapper objectMapper) {
+    public NodeMetricsCollector(RestHighLevelClient client, ObjectMapper objectMapper) {
         this.client = client;
         this.objectMapper = objectMapper;
     }
 
     public Map<String, Object> getNodeMetrics(String node) {
+        Map<String, Object> metrics = new HashMap<>();
+
         Request nodeStatRequest = new Request("GET", "_nodes/" + node + "/stats");
+        final DocumentContext nodeContext = getNodeContextFromRequest(node, nodeStatRequest);
+
+        if (Objects.nonNull(nodeContext)) {
+            Arrays.stream(NodeStatMetrics.values())
+                    .filter(m -> Objects.nonNull(m.getNodeStat()))
+                    .forEach(metric -> {
+                        try {
+                            metrics.put(metric.getFieldName(), metric.mapValue(nodeContext.read(metric.getNodeStat())));
+                        } catch (Exception e) {
+                            log.error("Could not retrieve metric {} for node {}", metric.getFieldName(), node);
+                        }
+                    });
+        }
+
+        return metrics;
+    }
+
+    private DocumentContext getNodeContextFromRequest(String node, Request nodeStatRequest) {
         try {
             Response response = client.getLowLevelClient().performRequest(nodeStatRequest);
             Filter nodeFilter = Filter.filter(Criteria.where("name").eq(node));
@@ -55,28 +75,13 @@ public class NodeStatMetricsCollector {
 
             if (nodeStatNode != null) {
                 JsonNode nodeStats = objectMapper.convertValue(nodeStatNode, JsonNode.class);
-                DocumentContext nodeContext = JsonPath.parse(nodeStats.get(0).toString());
-
-                Map<String, Object> metrics = new HashMap<>();
-
-                Arrays.stream(NodeStatMetrics.values())
-                        .filter(m -> Objects.nonNull(m.getNodeStat()))
-                        .forEach(metric -> {
-                            try {
-                                metrics.put(metric.getFieldName(), metric.mapValue(nodeContext.read(metric.getNodeStat())));
-                            } catch (Exception e) {
-                                log.error("Could not retrieve metric {} for node {}", metric.getFieldName(), node);
-                            }
-                        });
-
-                return metrics;
+                return JsonPath.parse(nodeStats.get(0).toString());
             }
-
             throw new IOException("No node stats returned for node");
         } catch (IOException e) {
             log.error("Error retrieving node stats for node {}", node, e);
         }
-        return Map.of();
+        return null;
     }
 
 }

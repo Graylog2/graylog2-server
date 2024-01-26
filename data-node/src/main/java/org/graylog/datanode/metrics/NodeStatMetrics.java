@@ -24,11 +24,25 @@ import java.util.function.Function;
 
 public enum NodeStatMetrics {
     CPU_LOAD("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.cpu.load_average.1m"),
-    MEM_FREE("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.free_in_bytes", NodeStatMetrics::bytesToGb),
+    MEM_FREE("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.free_in_bytes", NodeStatMetrics::bytesToMb),
     MEM_TOTAL_USED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.used_percent"),
     MEM_HEAP_USED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.jvm.mem.heap_used_percent"),
     DISK_FREE("float", new RollupAction.IsmRollup.AvgMetric(), "$.fs.total.available_in_bytes", NodeStatMetrics::bytesToGb),
+    THREAD_POOL_WRITE_THREADS("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.threads"),
+    THREAD_POOL_WRITE_QUEUE("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.queue"),
+    THREAD_POOL_WRITE_REJECTED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.rejected"),
+    THREAD_POOL_SEARCH_THREADS("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.search.threads"),
+    THREAD_POOL_SEARCH_QUEUE("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.search.queue"),
+    THREAD_POOL_SEARCH_REJECTED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.search.rejected"),
+    THREAD_POOL_MERGE_THREADS("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.force_merge.threads"),
+    THREAD_POOL_MERGE_QUEUE("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.force_merge.queue"),
+    THREAD_POOL_MERGE_REJECTED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.force_merge.rejected"),
     ;
+
+    private static float bytesToMb(Object v) {
+        var number = (v instanceof Long) ? (long) v : (int) v;
+        return number / (float) (1024 * 1024);
+    }
 
     private static float bytesToGb(Object v) {
         var number = (v instanceof Long) ? (long) v : (int) v;
