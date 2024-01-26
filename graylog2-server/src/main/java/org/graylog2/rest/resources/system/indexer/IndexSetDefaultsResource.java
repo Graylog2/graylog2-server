@@ -103,11 +103,9 @@ public class IndexSetDefaultsResource extends RestResource {
             throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.RETENTION_STRATEGY_CONFIG, violation.message()));
         }
 
-        if (config.dataTiering() != null) {
-            violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
-            if (violation != null) {
-                throw new BadRequestException(buildFieldError(IndexSetConfig.FIELD_DATA_TIERING, violation.message()));
-            }
+        violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
+        if (violation != null) {
+            throw new BadRequestException(buildFieldError(IndexSetConfig.FIELD_DATA_TIERING, violation.message()));
         }
 
         clusterConfigService.write(config);

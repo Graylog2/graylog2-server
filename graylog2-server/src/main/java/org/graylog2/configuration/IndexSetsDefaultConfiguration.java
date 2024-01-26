@@ -28,7 +28,6 @@ import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
@@ -121,7 +120,7 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         return retentionStrategyConfig();
     }
 
-    @Nullable
+    @NotNull
     @JsonProperty(FIELD_DATA_TIERING)
     public abstract DataTieringConfig dataTiering();
 
@@ -175,7 +174,7 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         }
 
         @JsonProperty(FIELD_DATA_TIERING)
-        public abstract Builder dataTiering(@Nullable DataTieringConfig dataTiering);
+        public abstract Builder dataTiering(DataTieringConfig dataTiering);
 
         public abstract IndexSetsDefaultConfiguration build();
     }
