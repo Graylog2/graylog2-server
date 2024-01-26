@@ -89,6 +89,15 @@ public class MoreSearch {
         final String queryString = parameters.query().trim();
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
 
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Result.builder()
+                    .resultsCount(0)
+                    .results(List.of())
+                    .usedIndexNames(Set.of())
+                    .duration(0)
+                    .executedQuery(queryString)
+                    .build();
+        }
         return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
     }
 
