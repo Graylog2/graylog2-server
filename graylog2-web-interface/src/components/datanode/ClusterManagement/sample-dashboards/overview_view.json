@@ -1,342 +1,90 @@
 {
-  "id": "graylog-security-views__overview",
+  "id": "aa96e05c21259f3d24e21341",
   "type": "DASHBOARD",
-  "title": "Overview",
-  "summary": "Read Only Overview",
-  "description": "in development",
-  "search_id": "656510c70548c8792779eea7",
+  "title": "datanodes",
+  "summary": "",
+  "description": "",
+  "search_id": "65afe9594b6125b944033fb8",
   "properties": [],
+  "requires": {},
   "state": {
-    "73018ceb-e1c0-4ac1-9af9-1264b0ff567b": {
+    "05864639-f434-4d63-9f1a-bc0024f79f8b": {
       "selected_fields": null,
-      "formatting": {
-        "highlighting": []
-      },
+      "static_message_list_id": null,
       "titles": {
-        "tab": {
-          "title": "Overview"
-        },
         "widget": {
-          "0158561e-7807-4d47-80a1-dbafabf71e40": "High Illuminate Alerts by alert_signature (Top 15)",
-          "c7d9d7f9-7431-47d1-ae7a-5e958aa89906": "Msg Count by gim_event_subcategory (Top 15)",
-          "b92598f2-7ffd-45bd-bb4a-6df8d7bf69ac": "High Illuminate Alerts",
-          "67b16271-7591-4c54-8b41-e56b1e3d63b8": "Logon Attempts",
-          "bbd6f20c-fb4a-4c44-b4a2-bb4e06d6f369": "High Illuminate Alerts by event_source (Top 15)",
-          "7b3035f8-b363-46bc-b3f8-dd62a67be4b6": "High Illuminate Alerts by event_source_product (Top 15)",
-          "3cc84937-9207-4a02-b826-4793763c1355": "Logon Attempts by event_source_product (top 15)",
-          "22b924fe-61a0-48ed-bf16-46d7dd1275a8": "High Illuminate Alerts by user_name (Top 15)",
-          "6c72064e-c73a-4d41-b102-868eedfebfb0": "Authentication Msgs: Success",
-          "819ae1b2-c3a9-40fe-8a1b-35ecb3ee1aaa": "Msg Count by event_source_product (Top 15)",
-          "7e7fbc8e-4ddf-4d5f-86d5-c6983a2781c3": "Message Count",
-          "748ce594-2965-4322-83ec-88c0258550fe": "Logon Failures",
-          "3c193653-3d7f-4915-b786-361e33c17f91": "Msg Count by event_source  (Top 15)"
+          "a6e3d286-5efb-470e-a0a0-a5b3898f147c": "Search Latency (ms)",
+          "b41a8a9e-5ac3-485f-9e6b-9b22a92e1a9c": "CPU Usage (%) (copy)",
+          "d7d52d4c-5f38-4169-bdda-de252894d547": "Heap Memory Used (%)",
+          "fa8339ad-d069-42c3-b531-941426aec526": "All Messages",
+          "d02e752d-f324-4e0d-a9fd-19a7192518e0": "Message Count",
+          "4057ca77-e5e7-47bc-8b97-def6b6915542": "Free Disk Space (gb)",
+          "ec14deeb-2dba-4a93-bc16-fe0a2b020797": "Index Latency (ms)",
+          "df0c1860-6351-4e30-afea-c3e5598e5421": "Indexed Documents",
+          "e0133cb1-018e-456e-bd5c-7c460a0b7a36": "CPU Usage (%)"
+        },
+        "tab": {
+          "title": "OpenSearch Metrics"
         }
       },
       "widgets": [
         {
-          "id": "7b3035f8-b363-46bc-b3f8-dd62a67be4b6",
+          "id": "df0c1860-6351-4e30-afea-c3e5598e5421",
           "type": "aggregation",
-          "config": {
-            "column_pivots": [],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "count()",
-                  "chart_color": "#bf360c"
-                }
-              ]
-            },
-            "rollup": true,
-            "row_pivots": [
-              {
-                "fields": [
-                  "event_source_product"
-                ],
-                "type": "values",
-                "config": {
-                  "limit": 0
-                }
-              }
-            ],
-            "series": [
-              {
-                "config": {
-                  "name": null
-                },
-                "function": "count()"
-              }
-            ],
-            "sort": [],
-            "visualization": "bar",
-            "visualization_config": {
-              "barmode": "group",
-              "axis_type": "linear"
-            },
-            "event_annotation": false
-          },
+          "filter": null,
           "filters": [],
           "timerange": {
-            "from": 86400,
+            "from": 18000,
             "type": "relative"
           },
           "query": {
             "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity AND event_source_product) AND alert_severity:(high OR critical)"
+            "query_string": ""
           },
-          "streams": []
-        },
-        {
-          "id": "819ae1b2-c3a9-40fe-8a1b-35ecb3ee1aaa",
-          "type": "aggregation",
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
           "config": {
-            "column_pivots": [],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "count()",
-                  "chart_color": "#758085"
-                }
-              ]
-            },
-            "rollup": true,
-            "row_pivots": [
-              {
-                "fields": [
-                  "event_source_product"
-                ],
-                "type": "values",
-                "config": {
-                  "limit": 0
-                }
-              }
-            ],
-            "series": [
-              {
-                "config": {
-                  "name": ""
-                },
-                "function": "count()"
-              }
-            ],
-            "sort": [],
-            "visualization": "bar",
-            "visualization_config": {
-              "barmode": "group",
-              "axis_type": "linear"
-            },
-            "event_annotation": false
-          },
-          "filters": [],
-          "timerange": {
-            "from": 86400,
-            "type": "relative"
-          },
-          "query": {
-            "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:event_source_product"
-          },
-          "streams": []
-        },
-        {
-          "id": "748ce594-2965-4322-83ec-88c0258550fe",
-          "type": "aggregation",
-          "config": {
-            "column_pivots": [],
-            "rollup": true,
             "row_pivots": [],
+            "column_pivots": [],
             "series": [
               {
                 "config": {
-                  "name": null
+                  "name": "Indexed Documents"
                 },
-                "function": "count()"
+                "function": "latest(doc_count)"
               }
             ],
             "sort": [],
             "visualization": "numeric",
             "visualization_config": {
-              "trend": true,
-              "trend_preference": "LOWER"
+              "trend": false,
+              "trend_preference": "NEUTRAL"
             },
-            "event_annotation": false
-          },
-          "filters": [],
-          "timerange": {
-            "from": 86400,
-            "type": "relative"
-          },
-          "query": {
-            "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(failure)"
-          },
-          "streams": []
-        },
-        {
-          "id": "b92598f2-7ffd-45bd-bb4a-6df8d7bf69ac",
-          "type": "aggregation",
-          "config": {
-            "column_pivots": [],
-            "rollup": true,
-            "row_pivots": [],
-            "series": [
-              {
-                "config": {
-                  "name": null
-                },
-                "function": "count()"
-              }
-            ],
-            "sort": [],
-            "visualization": "numeric",
-            "visualization_config": {
-              "trend": true,
-              "trend_preference": "LOWER"
-            },
-            "event_annotation": false
-          },
-          "filters": [],
-          "timerange": {
-            "from": 86400,
-            "type": "relative"
-          },
-          "query": {
-            "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity) AND alert_severity:(high OR critical)"
-          },
-          "streams": []
-        },
-        {
-          "id": "3c193653-3d7f-4915-b786-361e33c17f91",
-          "type": "aggregation",
-          "config": {
-            "column_pivots": [],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "count()",
-                  "chart_color": "#758085"
-                }
-              ]
-            },
-            "rollup": true,
-            "row_pivots": [
-              {
-                "fields": [
-                  "event_source"
-                ],
-                "type": "values",
-                "config": {
-                  "limit": 0
-                }
-              }
-            ],
-            "series": [
-              {
-                "config": {
-                  "name": null
-                },
-                "function": "count()"
-              }
-            ],
-            "sort": [],
-            "visualization": "bar",
-            "visualization_config": {
-              "barmode": "group",
-              "axis_type": "linear"
-            },
-            "event_annotation": false
-          },
-          "filters": [],
-          "timerange": {
-            "from": 86400,
-            "type": "relative"
-          },
-          "query": {
-            "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_source AND gim_event_subcategory)"
-          },
-          "streams": []
-        },
-        {
-          "id": "3cc84937-9207-4a02-b826-4793763c1355",
-          "type": "aggregation",
-          "config": {
-            "column_pivots": [
-              {
-                "fields": [
-                  "event_outcome"
-                ],
-                "type": "values",
-                "config": {
-                  "limit": 0
-                }
-              }
-            ],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "failure",
-                  "chart_color": "#ff943f"
-                },
-                {
-                  "field_name": "success",
-                  "chart_color": "#4b6ab7"
-                }
-              ]
-            },
+            "formatting_settings": null,
             "rollup": false,
-            "row_pivots": [
-              {
-                "fields": [
-                  "event_source_product"
-                ],
-                "type": "values",
-                "config": {
-                  "limit": 0
-                }
-              }
-            ],
-            "series": [
-              {
-                "config": {
-                  "name": null
-                },
-                "function": "count()"
-              }
-            ],
-            "sort": [],
-            "visualization": "bar",
-            "visualization_config": {
-              "barmode": "stack",
-              "axis_type": "linear"
-            },
-            "event_annotation": false
-          },
+            "event_annotation": false,
+            "column_limit": null,
+            "row_limit": null
+          }
+        },
+        {
+          "id": "d7d52d4c-5f38-4169-bdda-de252894d547",
+          "type": "aggregation",
+          "filter": null,
           "filters": [],
           "timerange": {
-            "from": 86400,
+            "from": 18000,
             "type": "relative"
           },
           "query": {
             "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_category) AND _exists_:(event_source_product AND event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
+            "query_string": ""
           },
-          "streams": []
-        },
-        {
-          "id": "7e7fbc8e-4ddf-4d5f-86d5-c6983a2781c3",
-          "type": "aggregation",
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
           "config": {
-            "column_pivots": [],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "count()",
-                  "chart_color": "#4c575d"
-                }
-              ]
-            },
-            "rollup": true,
             "row_pivots": [
               {
                 "fields": [
@@ -345,401 +93,452 @@
                 "type": "time",
                 "config": {
                   "interval": {
-                    "type": "auto",
-                    "scaling": 1
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
                   }
                 }
               }
             ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
             "series": [
               {
                 "config": {
-                  "name": null
+                  "name": "Heap Memory used (%)"
                 },
-                "function": "count()"
+                "function": "avg(mem_heap_used)"
               }
             ],
             "sort": [],
-            "visualization": "area",
+            "visualization": "line",
             "visualization_config": {
               "interpolation": "linear",
               "axis_type": "linear"
             },
-            "event_annotation": false
-          },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "column_limit": 15,
+            "row_limit": null
+          }
+        },
+        {
+          "id": "4057ca77-e5e7-47bc-8b97-def6b6915542",
+          "type": "aggregation",
+          "filter": null,
           "filters": [],
           "timerange": {
-            "from": 86400,
+            "from": 18000,
             "type": "relative"
           },
           "query": {
             "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code OR anomaly_detector_name) AND _exists_:(timestamp)"
+            "query_string": ""
           },
-          "streams": []
-        },
-        {
-          "id": "c7d9d7f9-7431-47d1-ae7a-5e958aa89906",
-          "type": "aggregation",
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
           "config": {
-            "column_pivots": [],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "count()",
-                  "chart_color": "#758085"
-                }
-              ]
-            },
-            "rollup": true,
             "row_pivots": [
               {
                 "fields": [
-                  "gim_event_subcategory"
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
                 ],
                 "type": "values",
                 "config": {
-                  "limit": 0
+                  "limit": 15,
+                  "skip_empty_values": true
                 }
               }
             ],
             "series": [
               {
                 "config": {
-                  "name": null
+                  "name": "Free disk space (%)"
                 },
-                "function": "count()"
+                "function": "avg(disk_free)"
               }
             ],
             "sort": [],
-            "visualization": "bar",
+            "visualization": "line",
             "visualization_config": {
-              "barmode": "group",
+              "interpolation": "linear",
               "axis_type": "linear"
             },
-            "event_annotation": false
-          },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "column_limit": 15,
+            "row_limit": null
+          }
+        },
+        {
+          "id": "e0133cb1-018e-456e-bd5c-7c460a0b7a36",
+          "type": "aggregation",
+          "filter": null,
           "filters": [],
           "timerange": {
-            "from": 86400,
+            "from": 18000,
             "type": "relative"
           },
           "query": {
             "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_subcategory)"
+            "query_string": ""
           },
-          "streams": []
-        },
-        {
-          "id": "67b16271-7591-4c54-8b41-e56b1e3d63b8",
-          "type": "aggregation",
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
           "config": {
-            "column_pivots": [],
-            "rollup": true,
-            "row_pivots": [],
-            "series": [
-              {
-                "config": {
-                  "name": null
-                },
-                "function": "count()"
-              }
-            ],
-            "sort": [],
-            "visualization": "numeric",
-            "visualization_config": {
-              "trend": true,
-              "trend_preference": "NEUTRAL"
-            },
-            "event_annotation": false
-          },
-          "filters": [],
-          "timerange": {
-            "from": 86400,
-            "type": "relative"
-          },
-          "query": {
-            "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
-          },
-          "streams": []
-        },
-        {
-          "id": "22b924fe-61a0-48ed-bf16-46d7dd1275a8",
-          "type": "aggregation",
-          "config": {
-            "column_pivots": [],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "count()",
-                  "chart_color": "#bf360c"
-                }
-              ]
-            },
-            "rollup": true,
             "row_pivots": [
               {
                 "fields": [
-                  "user_name"
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
                 ],
                 "type": "values",
                 "config": {
-                  "limit": 0
+                  "limit": 15,
+                  "skip_empty_values": true
                 }
               }
             ],
             "series": [
               {
                 "config": {
-                  "name": null
+                  "name": "CPU Load (%)"
                 },
-                "function": "count()"
+                "function": "avg(cpu_load)"
               }
             ],
             "sort": [],
-            "visualization": "bar",
+            "visualization": "line",
             "visualization_config": {
-              "barmode": "group",
+              "interpolation": "linear",
               "axis_type": "linear"
             },
-            "event_annotation": false
-          },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "column_limit": 15,
+            "row_limit": null
+          }
+        },
+        {
+          "id": "a6e3d286-5efb-470e-a0a0-a5b3898f147c",
+          "type": "aggregation",
+          "filter": null,
           "filters": [],
           "timerange": {
-            "from": 86400,
+            "from": 18000,
             "type": "relative"
           },
           "query": {
             "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity AND user_name) AND alert_severity:(high OR critical)"
+            "query_string": "NOT(_exists_:node)"
           },
-          "streams": []
-        },
-        {
-          "id": "bbd6f20c-fb4a-4c44-b4a2-bb4e06d6f369",
-          "type": "aggregation",
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
           "config": {
-            "column_pivots": [],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "count()",
-                  "chart_color": "#bf360c"
-                }
-              ]
-            },
-            "rollup": true,
             "row_pivots": [
               {
                 "fields": [
-                  "event_source"
+                  "timestamp"
                 ],
-                "type": "values",
+                "type": "time",
                 "config": {
-                  "limit": 0
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
                 }
               }
             ],
+            "column_pivots": [],
             "series": [
               {
                 "config": {
-                  "name": null
+                  "name": "Search Latency"
                 },
-                "function": "count()"
+                "function": "avg(search_latency)"
               }
             ],
             "sort": [],
-            "visualization": "bar",
+            "visualization": "line",
             "visualization_config": {
-              "barmode": "group",
+              "interpolation": "linear",
               "axis_type": "linear"
             },
-            "event_annotation": false
-          },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "column_limit": null,
+            "row_limit": null
+          }
+        },
+        {
+          "id": "ec14deeb-2dba-4a93-bc16-fe0a2b020797",
+          "type": "aggregation",
+          "filter": null,
           "filters": [],
           "timerange": {
-            "from": 86400,
+            "from": 18000,
             "type": "relative"
           },
           "query": {
             "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity AND event_source) AND alert_severity:(high OR critical)"
+            "query_string": "NOT(_exists_:node)"
           },
-          "streams": []
-        },
-        {
-          "id": "0158561e-7807-4d47-80a1-dbafabf71e40",
-          "type": "aggregation",
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
           "config": {
-            "column_pivots": [],
-            "formatting_settings": {
-              "chart_colors": [
-                {
-                  "field_name": "count()",
-                  "chart_color": "#bf360c"
-                }
-              ]
-            },
-            "rollup": true,
             "row_pivots": [
               {
                 "fields": [
-                  "alert_signature"
+                  "timestamp"
                 ],
-                "type": "values",
+                "type": "time",
                 "config": {
-                  "limit": 0
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
                 }
               }
             ],
+            "column_pivots": [],
             "series": [
               {
                 "config": {
-                  "name": null
+                  "name": "Index Latency"
                 },
-                "function": "count()"
+                "function": "avg(index_latency)"
               }
             ],
             "sort": [],
-            "visualization": "bar",
+            "visualization": "line",
             "visualization_config": {
-              "barmode": "group",
+              "interpolation": "linear",
               "axis_type": "linear"
             },
-            "event_annotation": false
-          },
-          "filters": [],
-          "timerange": {
-            "from": 86400,
-            "type": "relative"
-          },
-          "query": {
-            "type": "elasticsearch",
-            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity AND alert_signature) AND alert_severity:(high OR critical)"
-          },
-          "streams": []
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "column_limit": null,
+            "row_limit": null
+          }
         }
       ],
       "widget_mapping": {
-        "0158561e-7807-4d47-80a1-dbafabf71e40": [
-          "7d34455e-9680-47b7-b781-7fe648461fa3"
+        "e0133cb1-018e-456e-bd5c-7c460a0b7a36": [
+          "26805996-d281-4cd8-8186-c8a94bd528be"
         ],
-        "c7d9d7f9-7431-47d1-ae7a-5e958aa89906": [
-          "e8bd4945-b4dd-49ef-83aa-479e638b0957"
+        "d7d52d4c-5f38-4169-bdda-de252894d547": [
+          "d57871c8-54c4-489b-aafe-83a6615422b9"
         ],
-        "b92598f2-7ffd-45bd-bb4a-6df8d7bf69ac": [
-          "fb0aa7b5-9bac-429f-ae3d-c6206d81e2b5",
-          "cf0149a8-906d-4a29-b0f6-6cc22b3f0d30"
+        "df0c1860-6351-4e30-afea-c3e5598e5421": [
+          "f315cd76-3bd3-4f67-9635-c601be14b2ef"
         ],
-        "67b16271-7591-4c54-8b41-e56b1e3d63b8": [
-          "cb1c4108-ec60-434d-8811-93d52aee5510",
-          "d131d892-f0dc-4c12-a1d0-8a0e5a603755"
+        "ec14deeb-2dba-4a93-bc16-fe0a2b020797": [
+          "5d90d178-ac75-429e-9508-8bed4081b158"
         ],
-        "bbd6f20c-fb4a-4c44-b4a2-bb4e06d6f369": [
-          "de1e5a85-4947-48e2-b8a2-88c99e6133e5"
+        "a6e3d286-5efb-470e-a0a0-a5b3898f147c": [
+          "20eec658-d934-4faa-a77d-03331635ae54"
         ],
-        "7b3035f8-b363-46bc-b3f8-dd62a67be4b6": [
-          "4a6d4d7e-0cce-48a9-89cb-f2d1fd822c91"
-        ],
-        "3cc84937-9207-4a02-b826-4793763c1355": [
-          "6ffb5cda-7534-4eaf-b9fe-5aba76a720dc"
-        ],
-        "22b924fe-61a0-48ed-bf16-46d7dd1275a8": [
-          "1af3fa21-0856-4e40-b6bb-d3770c7b405f"
-        ],
-        "819ae1b2-c3a9-40fe-8a1b-35ecb3ee1aaa": [
-          "55b21db0-c39a-4824-a791-419c62d7c0de"
-        ],
-        "7e7fbc8e-4ddf-4d5f-86d5-c6983a2781c3": [
-          "c89d6eca-ea11-43cd-b931-8d3b96e43226"
-        ],
-        "748ce594-2965-4322-83ec-88c0258550fe": [
-          "9246abe7-14b7-427c-abc8-ed48b36a4061",
-          "0374d9ce-61dc-43d9-9715-45a2f8691193"
-        ],
-        "3c193653-3d7f-4915-b786-361e33c17f91": [
-          "3a78178a-18c7-48ad-9cfc-b55f4bb3cd73"
+        "4057ca77-e5e7-47bc-8b97-def6b6915542": [
+          "1fcafb7b-ab7a-4141-9ad3-a1445c39f9de"
         ]
       },
       "positions": {
-        "0158561e-7807-4d47-80a1-dbafabf71e40": {
-          "col": 7,
-          "row": 84,
-          "height": 4,
-          "width": 6
-        },
-        "c7d9d7f9-7431-47d1-ae7a-5e958aa89906": {
+        "e0133cb1-018e-456e-bd5c-7c460a0b7a36": {
           "col": 1,
-          "row": 88,
+          "row": 5,
           "height": 4,
-          "width": 6
-        },
-        "b92598f2-7ffd-45bd-bb4a-6df8d7bf69ac": {
-          "col": 9,
-          "row": 74,
-          "height": 2,
           "width": 4
         },
-        "67b16271-7591-4c54-8b41-e56b1e3d63b8": {
-          "col": 1,
-          "row": 74,
-          "height": 2,
-          "width": 4
-        },
-        "bbd6f20c-fb4a-4c44-b4a2-bb4e06d6f369": {
-          "col": 7,
-          "row": 76,
-          "height": 4,
-          "width": 6
-        },
-        "7b3035f8-b363-46bc-b3f8-dd62a67be4b6": {
-          "col": 7,
-          "row": 80,
-          "height": 4,
-          "width": 6
-        },
-        "3cc84937-9207-4a02-b826-4793763c1355": {
-          "col": 1,
-          "row": 80,
-          "height": 4,
-          "width": 6
-        },
-        "22b924fe-61a0-48ed-bf16-46d7dd1275a8": {
-          "col": 7,
-          "row": 88,
-          "height": 4,
-          "width": 6
-        },
-        "819ae1b2-c3a9-40fe-8a1b-35ecb3ee1aaa": {
-          "col": 1,
-          "row": 84,
-          "height": 4,
-          "width": 6
-        },
-        "7e7fbc8e-4ddf-4d5f-86d5-c6983a2781c3": {
-          "col": 1,
-          "row": 71,
-          "height": 3,
-          "width": "Infinity"
-        },
-        "748ce594-2965-4322-83ec-88c0258550fe": {
+        "d7d52d4c-5f38-4169-bdda-de252894d547": {
           "col": 5,
-          "row": 74,
-          "height": 2,
+          "row": 5,
+          "height": 4,
           "width": 4
         },
-        "3c193653-3d7f-4915-b786-361e33c17f91": {
-          "col": 1,
-          "row": 76,
+        "df0c1860-6351-4e30-afea-c3e5598e5421": {
+          "col": 9,
+          "row": 1,
           "height": 4,
-          "width": 6
+          "width": 4
+        },
+        "ec14deeb-2dba-4a93-bc16-fe0a2b020797": {
+          "col": 5,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        },
+        "a6e3d286-5efb-470e-a0a0-a5b3898f147c": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        },
+        "4057ca77-e5e7-47bc-8b97-def6b6915542": {
+          "col": 9,
+          "row": 5,
+          "height": 4,
+          "width": 4
         }
+      },
+      "formatting": {
+        "highlighting": []
+      },
+      "display_mode_settings": {
+        "positions": {}
+      }
+    },
+    "d3c5d315-959c-4b20-9fc4-52baa593db3b": {
+      "selected_fields": null,
+      "static_message_list_id": null,
+      "titles": {
+        "widget": {
+          "undefined": "CPU Usage (%) (copy)",
+          "59b137cb-e454-401b-bd41-6e872e68459d": "Total Memory Used (%)",
+          "3f25116d-3c10-4ffa-ad6f-4d0956e5bc27": "CPU Usage (%)",
+          "0763b9ec-5cc2-4706-abb9-a4315c093416": "Heap Memory Used (%)"
+        },
+        "tab": {
+          "title": "Datanode Metrics"
+        }
+      },
+      "widgets": [
+        {
+          "id": "59b137cb-e454-401b-bd41-6e872e68459d",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 18000,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Total Memory used (%)"
+                },
+                "function": "avg(mem_total_used)"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "column_limit": 15,
+            "row_limit": null
+          }
+        }
+      ],
+      "widget_mapping": {
+        "59b137cb-e454-401b-bd41-6e872e68459d": [
+          "2add13cf-5a50-4ac5-ac13-390f689cc2fd"
+        ]
+      },
+      "positions": {
+        "59b137cb-e454-401b-bd41-6e872e68459d": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        }
+      },
+      "formatting": {
+        "highlighting": []
+      },
+      "display_mode_settings": {
+        "positions": {}
       }
     }
   },
-  "created_at": "2021-03-15T20:32:50.170Z",
-  "owner": "john.hartley",
-  "requires": [],
-  "favorite": false
+  "owner": "admin",
+  "created_at": "2024-01-04T16:40:19.327Z",
+  "favorite": true
 }
