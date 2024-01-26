@@ -40,7 +40,7 @@ const QueryHistoryButton = ({ editorRef }: Props) => {
 
       SearchSuggestions.suggestQueryStrings(50).then((response) => {
         const options = response.sort((
-          { last_used: lastUsedA }, { last_used: lastUsedB }) => new Date(lastUsedA).getTime() - new Date(lastUsedB).getTime(),
+          { last_used: lastUsedA }, { last_used: lastUsedB }) => new Date(lastUsedB).getTime() - new Date(lastUsedA).getTime(),
         ).map((entry, index) => ({
           value: entry.query,
           meta: 'history',
