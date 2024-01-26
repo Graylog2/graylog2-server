@@ -304,7 +304,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
                                  text={selectedText}
                                  buttonTitle="Copy (Ctrl+C / &#8984;C)"
                                  disabled={this.isCopyDisabled()} />
-                <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose container={this.overlayContainerRef.current}>
+                <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
                   <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
                     <Icon name="clipboard" fixedWidth />
                   </Button>
