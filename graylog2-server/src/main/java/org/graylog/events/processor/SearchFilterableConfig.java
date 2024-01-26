@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.events.processor;
 
-import type User from 'logic/users/User';
-import { singleton } from 'logic/singleton';
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 
-const CurrentUserContext = React.createContext<User | undefined>(undefined);
+import java.util.List;
 
-export default singleton('contexts.CurrentUserContext', () => CurrentUserContext);
+public interface SearchFilterableConfig {
+    List<UsedSearchFilter> filters();
+}

@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+import type { SearchBarControl } from 'views/types';
+
 interface EventDefinitionType {
   type: string,
   displayName: string,
@@ -31,5 +34,6 @@ interface EventDefinitionType {
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
+    'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>
   }
 }

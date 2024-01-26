@@ -334,11 +334,11 @@ export interface SearchBarControl {
   id: string;
   onSearchSubmit?: <T extends Query | undefined>(values: CombinedSearchBarFormValues, dispatch: AppDispatch, currentQuery?: T) => Promise<T>,
   onDashboardWidgetSubmit: (values: CombinedSearchBarFormValues, dispatch: AppDispatch, currentWidget: Widget) => Promise<Widget | void>,
-  onValidate?: (values: CombinedSearchBarFormValues, context: HandlerContext) => FormikErrors<{}>,
+  onValidate?: (values: CombinedSearchBarFormValues, context?: HandlerContext) => FormikErrors<{}>,
   placement: 'left' | 'right';
   useInitialSearchValues?: (currentQuery?: Query) => ({ [key: string]: any }),
   useInitialDashboardWidgetValues?: (currentWidget: Widget) => ({ [key: string]: any }),
-  validationPayload?: (values: CombinedSearchBarFormValues, context: HandlerContext) => ({ [key: string]: any }),
+  validationPayload?: (values: CombinedSearchBarFormValues, context?: HandlerContext) => ({ [key: string]: any }),
 }
 
 export type SearchFilter = {

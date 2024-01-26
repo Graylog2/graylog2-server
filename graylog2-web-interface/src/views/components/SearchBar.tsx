@@ -22,6 +22,7 @@ import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
 
+import useView from 'views/hooks/useView';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
@@ -135,6 +136,7 @@ type Props = {
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const editorRef = useRef<Editor>(null);
+  const view = useView();
   const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({
     key: stream.title,
     value: stream.id,
@@ -220,6 +222,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                                       {(customCommands) => (
                                         <QueryInput value={value}
                                                     ref={editorRef}
+                                                    view={view}
                                                     timeRange={values.timerange}
                                                     streams={values.streams}
                                                     name={name}
