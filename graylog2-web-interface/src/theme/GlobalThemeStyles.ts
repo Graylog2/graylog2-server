@@ -652,7 +652,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
+    background-color: ${theme.colors.variant.lighter.info};
     color: ${theme.colors.input.colorDisabled};
   }
 
