@@ -120,8 +120,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     }
 
     public static Builder builder() {
-        return Builder.create()
-                .filters(Collections.emptyList());
+        return Builder.create();
     }
 
     public abstract Builder toBuilder();
