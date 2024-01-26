@@ -17,9 +17,8 @@
 import { useState, useRef } from 'react';
 import * as React from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import { Overlay } from 'react-overlays';
 
-import { Popover } from 'components/bootstrap';
+import Popover from 'components/common/Popover';
 
 const HOTSPOT_HEIGHT = 80;
 
@@ -86,23 +85,21 @@ const Hotspot = ({ children, positionX, positionY, index }: TooltipProps) => {
 
   return (
     <HotspotContainer $positionX={positionX} $positionY={positionY} ref={container}>
-      <HotspotTrigger onMouseOver={showPopover}
-                      onMouseOut={hidePopover}
-                      onFocus={showPopover}
-                      onBlur={hidePopover}
-                      ref={target}>
-        {index + 1}
-      </HotspotTrigger>
 
-      <Overlay show={show}
-               contianer={container.current}
-               target={target.current}
-               shouldUpdatePosition
-               placement="bottom">
-        <Popover id="session-badge-details">
+      <Popover opened={show} position="bottom" id="session-badge-details" width={275}>
+        <Popover.Target>
+          <HotspotTrigger onMouseOver={showPopover}
+                          onMouseOut={hidePopover}
+                          onFocus={showPopover}
+                          onBlur={hidePopover}
+                          ref={target}>
+            {index + 1}
+          </HotspotTrigger>
+        </Popover.Target>
+        <Popover.Dropdown>
           {children}
-        </Popover>
-      </Overlay>
+        </Popover.Dropdown>
+      </Popover>
     </HotspotContainer>
   );
 };

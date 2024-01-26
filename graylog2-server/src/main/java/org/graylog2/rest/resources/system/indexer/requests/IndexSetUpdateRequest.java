@@ -19,6 +19,8 @@ package org.graylog2.rest.resources.system.indexer.requests;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -26,10 +28,6 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_PROFILE_ID;
@@ -102,6 +100,7 @@ public record IndexSetUpdateRequest(@JsonProperty("title") @NotBlank String titl
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
                 .fieldTypeProfile(fieldTypeProfile())
+                .customFieldMappings(oldConfig.customFieldMappings())
                 .dataTiering(Boolean.FALSE.equals(useLegacyRotation()) ? dataTiering() : null)
                 .build();
     }
