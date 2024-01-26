@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import com.google.auto.value.AutoValue;
+import jakarta.inject.Inject;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
@@ -34,8 +35,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.HashSet;
 import java.util.List;
@@ -89,6 +88,15 @@ public class MoreSearch {
         final String queryString = parameters.query().trim();
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
 
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Result.builder()
+                    .resultsCount(0)
+                    .results(List.of())
+                    .usedIndexNames(Set.of())
+                    .duration(0)
+                    .executedQuery(queryString)
+                    .build();
+        }
         return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
     }
 

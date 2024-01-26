@@ -114,7 +114,7 @@
         <commons-net.version>3.10.0</commons-net.version>
         <commons-validator.version>1.8.0</commons-validator.version>
         <commons-io.version>2.15.1</commons-io.version>
-        <disruptor.version>3.4.4</disruptor.version>
+        <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.24.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
@@ -185,17 +185,17 @@
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
-        <assertj-core.version>3.25.1</assertj-core.version>
+        <assertj-core.version>3.25.2</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
         <equalsverifier.version>3.15.6</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
-        <mockito.version>5.9.0</mockito.version>
+        <mockito.version>5.10.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.19.3</testcontainers.version>
+        <testcontainers.version>1.19.4</testcontainers.version>
         <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -540,7 +540,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.2.0</version>
+                    <version>4.8.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>

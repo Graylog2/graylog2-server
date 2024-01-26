@@ -16,18 +16,40 @@
  */
 import React from 'react';
 
-import { Button, ButtonToolbar } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 
-const ProfileActions = ({ profileId }: { profileId: string }) => (
-  <ButtonToolbar>
-    <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>
-      <Button bsSize="xs">
-        Edit
-      </Button>
-    </LinkContainer>
-  </ButtonToolbar>
-);
+const ProfileActions = ({ profileId, profileName }: { profileId: string, profileName: string }) => {
+  const { deselectEntity } = useSelectedEntities();
+  const { deleteProfile } = useProfileMutations();
+
+  const onDelete = () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`You are about to delete profile: "${profileName}". Are you sure?`)) {
+      deleteProfile(profileId).then(() => {
+        deselectEntity(profileId);
+      });
+    }
+  };
+
+  return (
+    <ButtonToolbar>
+      <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>
+        <Button bsSize="xs">
+          Edit
+        </Button>
+      </LinkContainer>
+      <MoreActions>
+        <MenuItem onSelect={onDelete}>
+          Delete
+        </MenuItem>
+      </MoreActions>
+    </ButtonToolbar>
+  );
+};
 
 export default ProfileActions;

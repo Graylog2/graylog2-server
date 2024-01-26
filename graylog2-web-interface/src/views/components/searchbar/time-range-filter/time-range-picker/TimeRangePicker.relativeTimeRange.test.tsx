@@ -38,6 +38,7 @@ jest.mock('stores/tools/ToolsStore', () => ({}));
 
 describe('TimeRangePicker relative time range', () => {
   const defaultProps = {
+    show: true,
     currentTimeRange: {
       type: 'relative',
       from: 300,
@@ -50,7 +51,9 @@ describe('TimeRangePicker relative time range', () => {
   } as const;
 
   const TimeRangePicker = (allProps: Partial<React.ComponentProps<typeof TimeRangePicker>>) => (
-    <OriginalTimeRangePicker {...defaultProps} {...allProps} />
+    <OriginalTimeRangePicker {...defaultProps} {...allProps}>
+      <button type="button">Open</button>
+    </OriginalTimeRangePicker>
   );
 
   const getSubmitButton = () => screen.getByRole('button', { name: /Update time range/i });
