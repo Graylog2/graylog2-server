@@ -42,6 +42,7 @@ import type {
 import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import useHistory from 'routing/useHistory';
 import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
+import useFeature from 'hooks/useFeature';
 
 type Props = {
   cancelLink: string,
@@ -243,6 +244,7 @@ const IndexSetConfigurationForm = ({
   const onCancel = () => history.push(cancelLink);
 
   const isCloud = AppConfig.isCloud();
+  const enableDataTieringCloud = useFeature('data_tiering_cloud');
 
   return (
     <Row>
@@ -314,7 +316,7 @@ const IndexSetConfigurationForm = ({
                     </HideOnCloud>
                   </Col>
                 </Row>
-                {isCloud ? (
+                {isCloud && !enableDataTieringCloud ? (
                   <>
                     {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
                     {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
