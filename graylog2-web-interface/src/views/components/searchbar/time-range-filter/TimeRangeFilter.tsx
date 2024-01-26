@@ -56,6 +56,7 @@ type Props = {
   showPresetDropdown?: boolean,
   validTypes?: Array<SupportedTimeRangeType>,
   value: TimeRange | NoTimeRangeOverride,
+  withinPortal?: boolean,
 };
 
 const TimeRangeFilter = ({
@@ -69,6 +70,7 @@ const TimeRangeFilter = ({
   className,
   showPresetDropdown = true,
   limitDuration,
+  withinPortal,
 }: Props) => {
   const containerRef = useRef();
   const { showDropdownButton } = useContext(TimeRangeFilterSettingsContext);
@@ -103,7 +105,8 @@ const TimeRangeFilter = ({
                      setCurrentTimeRange={onChange}
                      toggleDropdownShow={toggleShow}
                      validTypes={validTypes}
-                     position={position}>
+                     position={position}
+                     withinPortal={withinPortal}>
       <FlexContainer className={className} ref={containerRef}>
         {showDropdownButton && (
         <TimeRangeFilterButtons disabled={disabled}
@@ -125,6 +128,7 @@ TimeRangeFilter.propTypes = {
   hasErrorOnMount: PropTypes.bool,
   noOverride: PropTypes.bool,
   validTypes: PropTypes.arrayOf(PropTypes.string),
+  withinPortal: PropTypes.bool,
 };
 
 TimeRangeFilter.defaultProps = {
@@ -135,6 +139,7 @@ TimeRangeFilter.defaultProps = {
   validTypes: undefined,
   position: 'bottom',
   showPresetDropdown: true,
+  withinPortal: true,
 };
 
 export default TimeRangeFilter;
