@@ -22,6 +22,8 @@ import IconButton from 'components/common/IconButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useHotkey from 'hooks/useHotkey';
 
+const QUERY_HISTORY_LIMIT = 100;
+
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -38,7 +40,7 @@ const QueryHistoryButton = ({ editorRef }: Props) => {
     if (editorRef.current) {
       editorRef.current.focus();
 
-      SearchSuggestions.suggestQueryStrings(50).then((response) => {
+      SearchSuggestions.suggestQueryStrings(QUERY_HISTORY_LIMIT).then((response) => {
         const options = response.sort((
           { last_used: lastUsedA }, { last_used: lastUsedB }) => new Date(lastUsedB).getTime() - new Date(lastUsedA).getTime(),
         ).map((entry, index) => ({
