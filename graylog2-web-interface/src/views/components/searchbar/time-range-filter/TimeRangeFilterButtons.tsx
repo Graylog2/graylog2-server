@@ -53,12 +53,12 @@ const TimeRangeFilterButtons = ({
 }: Props) => {
   const { submitForm, isValid } = useFormikContext();
 
-  const _onClick = (e) => {
+  const _onClick = (e: React.MouseEvent<HTMLElement>) => {
     e.currentTarget.blur();
     toggleShow();
   };
 
-  const selectRelativeTimeRangePreset = (timerange) => {
+  const selectRelativeTimeRangePreset = (timerange: TimeRange | {}) => {
     setCurrentTimeRange(normalizeIfAllMessagesRange(timerange));
 
     if (isValid) {
