@@ -54,7 +54,7 @@ public class MigrationStateResource {
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "trigger migration step")
     public CurrentStateInformation migrate(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
-        final MigrationState newState = stateMachine.trigger(request.step());
+        final MigrationState newState = stateMachine.trigger(request.step(), request.args());
         return new CurrentStateInformation(newState, stateMachine.nextSteps());
     }
 
