@@ -1,7 +1,7 @@
 type = "a"
 message = "Extend search query input with option to view search query history."
 
-issues = ["Graylog2/graylog-plugin-enterprise/issues/4012"]
+issues = ["Graylog2/graylog-plugin-enterprise#4012"]
 pulls = ["18067"]
 
 details.user = """
