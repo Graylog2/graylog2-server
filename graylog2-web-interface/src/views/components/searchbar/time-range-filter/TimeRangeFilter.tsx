@@ -137,7 +137,7 @@ TimeRangeFilter.defaultProps = {
   hasErrorOnMount: false,
   noOverride: false,
   validTypes: undefined,
-  position: 'bottom',
+  position: 'bottom-start',
   showPresetDropdown: true,
   withinPortal: true,
 };

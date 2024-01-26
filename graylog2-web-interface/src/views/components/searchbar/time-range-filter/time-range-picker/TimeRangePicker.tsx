@@ -19,7 +19,6 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import { Form, Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
-import { Portal } from '@mantine/core';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
