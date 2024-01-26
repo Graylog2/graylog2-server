@@ -21,15 +21,16 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,14 +38,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ClusterStatMetricsCollectorTest {
 
     ClusterStatMetricsCollector collector;
     @Mock
     RestHighLevelClient client;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         Response response = mock(Response.class);
         HttpEntity entity = mock(HttpEntity.class);
@@ -58,9 +59,13 @@ public class ClusterStatMetricsCollectorTest {
 
     @Test
     public void getClusterMetrics() {
-        final Map<String, Object> previousMetrics = Map.of();
-        Map<String, Object> nodeMetrics = collector.getClusterMetrics(previousMetrics);
-        assertThat(nodeMetrics.get("doc_count")).isEqualTo(6206956);
+        final Map<String, Object> previousMetrics = Map.of("search_ops", 5);
+        Map<String, Object> clusterMetrics = collector.getClusterMetrics(previousMetrics);
+        assertThat(clusterMetrics.get("doc_count")).isEqualTo(6206956);
+        assertThat(clusterMetrics.get("search_ops")).isEqualTo(13);
+        assertThat(clusterMetrics.get("search_ops_rate")).isEqualTo(8L);
+        String[] allMetrics = Arrays.stream(ClusterStatMetrics.values()).map(ClusterStatMetrics::getFieldName).toArray(String[]::new);
+        assertThat(clusterMetrics).containsKeys(allMetrics);
     }
 
     private final static String clusterStatResponse = """

@@ -21,15 +21,16 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class NodeMetricsCollectorTest {
 
     private final String NODENAME = "datanode1";
@@ -46,7 +47,7 @@ public class NodeMetricsCollectorTest {
     @Mock
     RestHighLevelClient client;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         Response response = mock(Response.class);
         HttpEntity entity = mock(HttpEntity.class);
@@ -63,6 +64,8 @@ public class NodeMetricsCollectorTest {
         Map<String, Object> nodeMetrics = collector.getNodeMetrics(NODENAME);
         assertThat(nodeMetrics.get("cpu_load")).isEqualTo(26.4873046875);
         assertThat(nodeMetrics.get("disk_free")).isEqualTo(572.1824f);
+        String[] allMetrics = Arrays.stream(NodeStatMetrics.values()).map(NodeStatMetrics::getFieldName).toArray(String[]::new);
+        assertThat(nodeMetrics).containsKeys(allMetrics);
     }
 
 
