@@ -98,6 +98,11 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
                         ClusterStatMetrics::getFieldName, metric -> ImmutableMap.of("type", metric.getMappingType())
                 ))
         );
+        mappings.putAll(
+                Arrays.stream(ClusterStatMetrics.values()).filter(ClusterStatMetrics::isRateMetric).collect(Collectors.toMap(
+                        ClusterStatMetrics::getRateFieldName, metric -> ImmutableMap.of("type", metric.getMappingType())
+                ))
+        );
         return mappings;
     }
 

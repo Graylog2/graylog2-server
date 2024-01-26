@@ -27,16 +27,24 @@ import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog2.plugin.periodical.Periodical;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class MetricsCollector extends Periodical {
 
@@ -98,6 +106,7 @@ public class MetricsCollector extends Periodical {
                 this.nodeStatMetricsCollector = new NodeStatMetricsCollector(client, objectMapper);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);
                 this.isLeader = process.isLeaderNode();
+
                 final IndexRequest indexRequest = new IndexRequest(configuration.getMetricsStream());
                 Map<String, Object> metrics = new HashMap<String, Object>();
                 metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
@@ -109,7 +118,7 @@ public class MetricsCollector extends Periodical {
                 indexDocument(client, indexRequest);
 
                 if (isLeader) {
-                    metrics = new HashMap<>(clusterStatMetricsCollector.getClusterMetrics());
+                    metrics = new HashMap<>(clusterStatMetricsCollector.getClusterMetrics(getPreviousMetricsForCluster(client)));
                     metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
                     indexRequest.source(metrics);
                     indexDocument(client, indexRequest);
@@ -117,6 +126,29 @@ public class MetricsCollector extends Periodical {
 
             });
         }
+    }
+
+    private Map<String, Object> getPreviousMetricsForCluster(RestHighLevelClient client) {
+        SearchRequest searchRequest = new SearchRequest(configuration.getMetricsStream());
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("node")));  // You can adjust the query based on your requirements
+        searchSourceBuilder.size(1);  // Retrieve only one document
+        searchSourceBuilder.sort(SortBuilders.fieldSort(configuration.getMetricsTimestamp()).order(SortOrder.DESC));  // Sort by timestamp in descending order
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse searchResponse = null;
+        try {
+            searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            LOG.error("Could not retrieve previous metrics", e);
+        }
+
+        if (Objects.nonNull(searchResponse) && searchResponse.getHits().getTotalHits().value > 0) {
+            // Retrieve the first hit (latest document) from the search response
+            return searchResponse.getHits().getAt(0).getSourceAsMap();
+        } else {
+            LOG.info("No previous metrics for cluster");
+        }
+        return Map.of();
     }
 
     private static void indexDocument(RestHighLevelClient client, IndexRequest indexRequest) {

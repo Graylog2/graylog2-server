@@ -60,7 +60,7 @@ public class NodeStatMetricsCollectorTest {
 
     @Test
     public void getNodeMetrics() {
-        Map<String, Object> nodeMetrics = collector.getNodeMetrics(NODENAME);
+        Map<String, Object> nodeMetrics = collector.getNodeMetrics(NODENAME, "");
         assertThat(nodeMetrics.get("cpu_load")).isEqualTo(26.4873046875);
         assertThat(nodeMetrics.get("disk_free")).isEqualTo(572.1824f);
     }

@@ -44,7 +44,7 @@ public class ClusterStatMetricsCollector {
         this.objectMapper = objectMapper;
     }
 
-    public Map<String, Object> getClusterMetrics() {
+    public Map<String, Object> getClusterMetrics(Map<String, Object> previousMetrics) {
         Request clusterStatRequest = new Request("GET", "_stats");
         try {
             Response response = client.getLowLevelClient().performRequest(clusterStatRequest);
@@ -59,10 +59,16 @@ public class ClusterStatMetricsCollector {
                 Arrays.stream(ClusterStatMetrics.values())
                         .filter(m -> Objects.nonNull(m.getClusterStat()))
                         .forEach(metric -> {
+                            String fieldName = metric.getFieldName();
                             try {
-                                metrics.put(metric.getFieldName(), statContext.read(metric.getClusterStat()));
+                                Object value = statContext.read(metric.getClusterStat());
+                                if (value instanceof Integer current && metric.isRateMetric() && previousMetrics.containsKey(fieldName)) {
+                                    Integer previous = (Integer) previousMetrics.get(fieldName);
+                                    metrics.put(metric.getRateFieldName(), current - previous);
+                                }
+                                metrics.put(fieldName, value);
                             } catch (Exception e) {
-                                log.error("Could not retrieve cluster metric {}", metric.getFieldName());
+                                log.error("Could not retrieve cluster metric {}", fieldName);
                             }
                         });
 

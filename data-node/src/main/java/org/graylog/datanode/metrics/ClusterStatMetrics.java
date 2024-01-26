@@ -21,18 +21,22 @@ import org.graylog.storage.opensearch2.ism.policy.actions.RollupAction;
 import java.util.Locale;
 
 public enum ClusterStatMetrics {
-    DOC_COUNT("long", new RollupAction.IsmRollup.AvgMetric(), "$.primaries.docs.count"),
-    SEARCH_LATENCY("integer", new RollupAction.IsmRollup.AvgMetric(), "$.total.search.query_time_in_millis"),
-    INDEX_LATENCY("integer", new RollupAction.IsmRollup.AvgMetric(), "$.total.indexing.index_time_in_millis"),
+    DOC_COUNT("long", new RollupAction.IsmRollup.AvgMetric(), "$.primaries.docs.count", false),
+    SEARCH_LATENCY("integer", new RollupAction.IsmRollup.AvgMetric(), "$.total.search.query_time_in_millis", true),
+    INDEX_LATENCY("integer", new RollupAction.IsmRollup.AvgMetric(), "$.total.indexing.index_time_in_millis", true),
     ;
     private final String mappingType;
     private final RollupAction.IsmRollup.AggregationMetric aggregationMetric;
     private final String clusterStat;
+    private final boolean rateMetric;
+    private static final String RATE_SUFFIX = "_rate";
 
-    ClusterStatMetrics(String mappingType, RollupAction.IsmRollup.AggregationMetric aggregationMetric, String clusterStat) {
+
+    ClusterStatMetrics(String mappingType, RollupAction.IsmRollup.AggregationMetric aggregationMetric, String clusterStat, boolean rateMetric) {
         this.mappingType = mappingType;
         this.aggregationMetric = aggregationMetric;
         this.clusterStat = clusterStat;
+        this.rateMetric = rateMetric;
     }
 
     public String getMappingType() {
@@ -47,8 +51,19 @@ public enum ClusterStatMetrics {
         return name().toLowerCase(Locale.ROOT);
     }
 
+    public String getRateFieldName() {
+        if (!isRateMetric()) {
+            throw new RuntimeException("Metric is not a rate metric");
+        }
+        return getFieldName() + RATE_SUFFIX;
+    }
+
     public String getClusterStat() {
         return clusterStat;
+    }
+
+    public boolean isRateMetric() {
+        return rateMetric;
     }
 
 }

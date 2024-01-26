@@ -58,7 +58,8 @@ public class ClusterStatMetricsCollectorTest {
 
     @Test
     public void getClusterMetrics() {
-        Map<String, Object> nodeMetrics = collector.getClusterMetrics();
+        final Map<String, Object> previousMetrics = Map.of();
+        Map<String, Object> nodeMetrics = collector.getClusterMetrics(previousMetrics);
         assertThat(nodeMetrics.get("doc_count")).isEqualTo(6206956);
     }
 
