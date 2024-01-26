@@ -27,16 +27,9 @@ import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
-
-const getChartColor = (fullData: Array<ChartConfig>, name: string) => {
-  const data = fullData.find((d) => (d.name === name));
-
-  return data?.line?.color;
-};
 
 const LineVisualization = makeVisualization(({
   config,
@@ -79,7 +72,6 @@ const LineVisualization = makeVisualization(({
             plotLayout={layout}
             axisType={axisType}
             effectiveTimerange={effectiveTimerange}
-            getChartColor={getChartColor}
             height={height}
             chartData={chartDataResult} />
   );

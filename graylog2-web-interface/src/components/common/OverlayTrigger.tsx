@@ -15,9 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { createRef } from 'react';
-import { Overlay, Transition } from 'react-overlays';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
+import { Overlay, Transition } from 'react-overlays';
+import { useDisclosure } from '@mantine/hooks';
+
+import useClickOutside from 'hooks/useClickOutside';
 
 type Triggers = 'click' | 'focus' | 'hover';
 
@@ -32,10 +35,6 @@ type Props = {
   rootClose?: boolean,
 }
 
-type State = {
-  show: boolean,
-}
-
 const TriggerWrap = styled.span`
   display: inline-block;
 `;
@@ -44,87 +43,55 @@ const Container = styled.div`
   display: inline-block;
 `;
 
-class OverlayTrigger extends React.Component<Props, State> {
-  targetRef = createRef<HTMLButtonElement>();
+const OverlayTrigger = ({ children, container, placement, overlay, rootClose, trigger, testId, className, ...overlayProps }: Props) => {
+  const [opened, { close, open, toggle }] = useDisclosure(false);
+  const containerRef = useRef();
 
-  containerRef = createRef<HTMLElement>();
+  const [dropdown, setDropdown] = useState<HTMLDivElement | null>(null);
+  const [control, setControl] = useState<HTMLSpanElement | null>(null);
+  useClickOutside(rootClose ? close : () => {}, null, [control, dropdown]);
 
-  static defaultProps = {
-    trigger: 'click',
-    rootClose: false,
-    container: null,
-    testId: undefined,
-    className: undefined,
-  };
+  const hover = trigger === 'hover' || trigger?.includes?.('hover');
+  const focus = trigger === 'focus' || trigger?.includes?.('focus');
+  const click = trigger === 'click' || trigger?.includes?.('click');
 
-  constructor(props) {
-    super(props);
+  return (
+    <Container ref={containerRef} data-testid={testId} className={className}>
+      <TriggerWrap className={children.props.className}
+                   ref={setControl}
+                   role="button"
+                   onClick={click ? toggle : undefined}
+                   onMouseEnter={hover ? open : undefined}
+                   onMouseLeave={hover ? close : undefined}
+                   onFocus={focus ? open : undefined}
+                   onBlur={focus ? open : undefined}>
+        {children}
+      </TriggerWrap>
 
-    this.state = {
-      show: false,
-    };
-  }
+      {opened && (
+      <Overlay show={opened}
+               container={container ?? containerRef.current}
+               containerPadding={10}
+               placement={placement}
+               shouldUpdatePosition
+               target={control}
+               transition={Transition}
+               {...overlayProps}>
+        <div ref={setDropdown}>
+          {overlay}
+        </div>
+      </Overlay>
+      )}
+    </Container>
+  );
+};
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  hide() {
-    this.setState({ show: false });
-  }
-
-  render() {
-    let triggerables;
-    const { children, container, placement, overlay, rootClose, trigger, testId, className, ...overlayProps } = this.props;
-    const { show } = this.state;
-
-    const setShow = (isShown: boolean) => this.setState({ show: isShown });
-    const toggleShow = () => setShow(!show);
-
-    const _onTrigger = {
-      click: {
-        onClick: toggleShow,
-      },
-      hover: {
-        onMouseEnter: () => setShow(true),
-        onMouseLeave: () => setShow(false),
-      },
-      focus: {
-        onFocus: () => setShow(true),
-        onBlur: () => setShow(false),
-      },
-    };
-
-    if (Array.isArray(trigger)) {
-      const multipleTriggers = {};
-
-      trigger.forEach((triggerType) => {
-        triggerables = Object.assign(multipleTriggers, _onTrigger[triggerType]);
-      });
-    } else {
-      triggerables = _onTrigger[trigger];
-    }
-
-    return (
-      <Container ref={() => this.containerRef} data-testid={testId} className={className}>
-        <TriggerWrap ref={this.targetRef} className={children.props.className} role="button">
-          {React.cloneElement(children, { ...triggerables, className: '' })}
-        </TriggerWrap>
-
-        {show && (
-          <Overlay show={show}
-                   container={container ?? this.containerRef.current}
-                   containerPadding={10}
-                   placement={placement}
-                   shouldUpdatePosition
-                   rootClose={rootClose}
-                   target={this.targetRef.current}
-                   transition={Transition}
-                   onHide={toggleShow}
-                   {...overlayProps}>
-            {overlay}
-          </Overlay>
-        )}
-      </Container>
-    );
-  }
-}
+OverlayTrigger.defaultProps = {
+  trigger: 'click',
+  rootClose: false,
+  container: null,
+  testId: undefined,
+  className: undefined,
+};
 
 export default OverlayTrigger;
