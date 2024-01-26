@@ -17,6 +17,7 @@
 package org.graylog.events.event;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,11 +28,12 @@ class EventReplayInfoTest {
     @Test
     public void testCreateNoFilters() {
         // Backwards-compatibility test for events that previously did not have filters.
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         final EventReplayInfo info = EventReplayInfo.builder()
                 .query("*")
                 .streams(Collections.singleton("stream"))
-                .timerangeStart(DateTime.now().minusMinutes(1))
-                .timerangeEnd(DateTime.now()).build();
+                .timerangeStart(now.minusMinutes(1))
+                .timerangeEnd(now).build();
         Assertions.assertNotNull(info.filters());
         Assertions.assertTrue(info.filters().isEmpty());
     }
