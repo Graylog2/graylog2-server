@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -90,7 +91,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final AtomicInteger count = new AtomicInteger(0);
         final List<ResultMessage> allResults = new ArrayList<>(expectedNumberOfMessages);
 
-        toTest.scrollEvents("*", RelativeRange.allTime(), Set.of(INDEX_NAME), ALL_STREAMS, batchSize,
+        toTest.scrollEvents("*", RelativeRange.allTime(), Set.of(INDEX_NAME), ALL_STREAMS, Collections.emptyList(), batchSize,
                 getCountingAndCollectingScrollEventsCallback(count, allResults));
 
         assertThat(count).hasValue(expectedNumberOfMessages / batchSize + 1);
@@ -109,7 +110,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final AtomicInteger count = new AtomicInteger(0);
         final List<ResultMessage> allResults = new ArrayList<>(expectedNumberOfMessages);
 
-        toTest.scrollEvents("*", AbsoluteRange.create(new DateTime(2018, 1, 1, 1, 1, DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC)), Set.of(INDEX_NAME), Set.of("000000000000000000000001"), batchSize,
+        toTest.scrollEvents("*", AbsoluteRange.create(new DateTime(2018, 1, 1, 1, 1, DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC)), Set.of(INDEX_NAME), Set.of("000000000000000000000001"), Collections.emptyList(), batchSize,
                 getCountingAndCollectingScrollEventsCallback(count, allResults));
 
         assertThat(count).hasValue(expectedNumberOfMessages / batchSize);
@@ -129,7 +130,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final AtomicInteger count = new AtomicInteger(0);
         final List<ResultMessage> allResults = new ArrayList<>(expectedNumberOfMessages);
 
-        toTest.scrollEvents("message:Ahoj", RelativeRange.allTime(), Set.of(INDEX_NAME), Set.of("000000000000000000000001"), batchSize,
+        toTest.scrollEvents("message:Ahoj", RelativeRange.allTime(), Set.of(INDEX_NAME), Set.of("000000000000000000000001"), Collections.emptyList(), batchSize,
                 getCountingAndCollectingScrollEventsCallback(count, allResults));
 
         assertThat(count).hasValue(2);
@@ -148,7 +149,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final AtomicInteger count = new AtomicInteger(0);
         final List<ResultMessage> allResults = new ArrayList<>(expectedNumberOfMessages);
 
-        toTest.scrollEvents("message:Ahoj", AbsoluteRange.create(new DateTime(2021, 1, 1, 1, 1, DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC)), Set.of(INDEX_NAME), Set.of("000000000000000000000001"), batchSize,
+        toTest.scrollEvents("message:Ahoj", AbsoluteRange.create(new DateTime(2021, 1, 1, 1, 1, DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC)), Set.of(INDEX_NAME), Set.of("000000000000000000000001"), Collections.emptyList(), batchSize,
                 getCountingAndCollectingScrollEventsCallback(count, allResults));
 
         assertThat(count).hasValue(1);
@@ -162,7 +163,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
     public void scrollEventsReturnsNoMessagesIfTheyDoNotMatchQueryString() throws Exception {
         final AtomicInteger count = new AtomicInteger(0);
         final Collection<ResultMessage> allResults = new ArrayList<>(1);
-        toTest.scrollEvents("message:moin", RelativeRange.allTime(), Set.of(INDEX_NAME), Set.of("000000000000000000000001"), 2,
+        toTest.scrollEvents("message:moin", RelativeRange.allTime(), Set.of(INDEX_NAME), Set.of("000000000000000000000001"), Collections.emptyList(), 2,
                 getCountingAndCollectingScrollEventsCallback(count, allResults));
 
         assertThat(count).hasValue(0);
