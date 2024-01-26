@@ -15,16 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect, useMemo, useState } from 'react';
-import keyBy from 'lodash/keyBy';
 import pickBy from 'lodash/pickBy';
 
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
-const useSelectedEntitiesData = <Entity extends EntityBase>(data : ReadonlyArray<Entity>):Array<Entity> => {
+const useSelectedEntitiesData = <Entity extends EntityBase>(normalizedData : Record<string, Entity>):Array<Entity> => {
   const { selectedEntities } = useSelectedEntities();
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<Entity['id'], Entity> | {}>({});
-  const normalizedList = useMemo(() => keyBy(data, 'id'), [data]);
   const selectedEntitiesSet = useMemo(() => new Set(selectedEntities), [selectedEntities]);
 
   useEffect(() => {
@@ -32,15 +30,15 @@ const useSelectedEntitiesData = <Entity extends EntityBase>(data : ReadonlyArray
       const newItems = pickBy(cur, ({ id }: Entity) => selectedEntitiesSet.has(id));
 
       selectedEntities.forEach((id) => {
-        if (normalizedList[id]) {
-          newItems[id] = normalizedList[id];
+        if (normalizedData[id]) {
+          newItems[id] = normalizedData[id];
         }
       });
 
       return newItems;
     });
   },
-  [normalizedList, selectedEntities, selectedEntitiesSet]);
+  [normalizedData, selectedEntities, selectedEntitiesSet]);
 
   return Object.values(selectedEntitiesData);
 };

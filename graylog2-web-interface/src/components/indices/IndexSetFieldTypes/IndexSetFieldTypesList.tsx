@@ -17,8 +17,12 @@
 import React, { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
+import { useQueryClient } from '@tanstack/react-query';
+import Immutable from 'immutable';
 
-import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
+import useIndexSetFieldTypes, {
+  fetchIndexSetFieldTypes,
+} from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
 import {
   Icon,
@@ -28,7 +32,7 @@ import {
 } from 'components/common';
 import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import type { Sort } from 'stores/PaginationTypes';
+import type { Sort, SearchParams } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
@@ -75,6 +79,8 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
+  const queryClient = useQueryClient();
+
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
 
@@ -119,11 +125,32 @@ const IndexSetFieldTypesList = () => {
 
   const customColumnRenderers = useCustomColumnRenderers(attributes);
 
+  const onSubmitCallback = useCallback((params: {
+    indexSetSelection: Array<string>,
+    newFieldType: string,
+    rotated: boolean,
+    field: string,
+  }) => {
+    const searchParamsForName: SearchParams = {
+      page: 1,
+      pageSize: 20,
+      query: '',
+      sort: {
+        attributeId: 'field_name',
+        direction: 'asc',
+      },
+      filters: Immutable.OrderedMap({ field_name: [params.field] }),
+    };
+
+    queryClient.fetchQuery(['indexSetFieldTypes', searchParamsForName],
+      () => fetchIndexSetFieldTypes(params.indexSetSelection[0], searchParamsForName),
+    ).then(() => refetchFieldTypes());
+  }, [queryClient, refetchFieldTypes]);
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
-                      refetchFieldTypes={refetchFieldTypes} />
-  ), [indexSetId, refetchFieldTypes]);
+                      onSubmitCallback={onSubmitCallback} />
+  ), [indexSetId, onSubmitCallback]);
 
   const onSearch = useCallback((val: string) => {
     paginationQueryParameter.resetPage();
@@ -136,9 +163,9 @@ const IndexSetFieldTypesList = () => {
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
   const bulkSection = useMemo(() => ({
-    actions: <BulkActions indexSetId={indexSetId} list={list} />,
+    actions: <BulkActions indexSetId={indexSetId} />,
     isEntitySelectable,
-  }), [indexSetId, list]);
+  }), [indexSetId]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;

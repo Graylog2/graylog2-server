@@ -53,3 +53,10 @@ export type PaginatedFieldTypeUsagesResponse = PaginatedListJSON & {
   elements: Array<FieldTypeUsageElement>,
   attributes: Array<Attribute>,
 };
+
+export type OnSubmitCallbackProps = {
+  indexSetSelection: Array<string>,
+  newFieldType: string,
+  rotated: boolean,
+  field: string,
+}

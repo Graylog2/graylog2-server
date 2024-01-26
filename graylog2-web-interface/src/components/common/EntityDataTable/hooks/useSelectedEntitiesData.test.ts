@@ -38,11 +38,20 @@ describe('useSelectedEntitiesData.test hook', () => {
       deselectEntity: () => {},
     };
     asMock(useSelectedEntities).mockImplementation(() => selectedEntities);
-    const list = [{ id: 'id-1', name: 'name' }, { id: 'id-2', name: 'name' }, { id: 'id-3', name: 'name' }];
-    const { result, waitFor, rerender } = renderHook((params: Array<{ id: string, name: string }> = list) => useSelectedEntitiesData(params));
+    const list = {
+      'id-1': { id: 'id-1', name: 'name' },
+      'id-2': { id: 'id-2', name: 'name' },
+      'id-3': { id: 'id-3', name: 'name' },
+    };
+    const { result, waitFor, rerender } = renderHook((params: Record<string, { id: string, name: string }> = list) => useSelectedEntitiesData(params));
     await waitFor(() => expect(result.current).toEqual([{ id: 'id-1', name: 'name' }, { id: 'id-2', name: 'name' }]));
     selectedEntities.selectEntity('id-5');
-    rerender([{ id: 'id-4', name: 'name' }, { id: 'id-5', name: 'name' }, { id: 'id-6', name: 'name' }]);
+    const newList = {
+      'id-4': { id: 'id-4', name: 'name' },
+      'id-5': { id: 'id-5', name: 'name' },
+      'id-6': { id: 'id-6', name: 'name' },
+    };
+    rerender(newList);
     await waitFor(() => expect(result.current).toEqual([{ id: 'id-1', name: 'name' }, { id: 'id-2', name: 'name' }, { id: 'id-5', name: 'name' }]));
   });
 });

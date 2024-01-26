@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { styled } from 'styled-components';
 
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -29,34 +29,37 @@ import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypePro
 import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import useSelectedEntitiesData from 'components/common/EntityDataTable/hooks/useSelectedEntitiesData';
+import useNormalizedFieldTypesCacheData
+  from 'components/indices/IndexSetFieldTypes/hooks/useNormalizedFieldTypesCacheData';
 
 type Props = {
   indexSetId: string,
-  list: ReadonlyArray<IndexSetFieldType>,
 }
 
 const StyledMenuItem = styled(MenuItem)`
   pointer-events: all;
 `;
 
-const BulkActions = ({ indexSetId, list }: Props) => {
+const BulkActions = ({ indexSetId }: Props) => {
   const { pushWithState } = useHistory();
-  const selectedEntitiesData = useSelectedEntitiesData<IndexSetFieldType>(list);
+  const normalizedCacheData = useNormalizedFieldTypesCacheData();
+  const selectedEntitiesData = useSelectedEntitiesData<IndexSetFieldType>(normalizedCacheData);
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const customFieldMappings: Array<CustomFieldMapping> = selectedEntitiesData.map(({ fieldName, type }) => ({
     field: fieldName,
     type,
   }));
+
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
 
-  const createNewProfile = () => {
+  const createNewProfile = useCallback(() => {
     pushWithState(
       Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE,
       {
         customFieldMappings,
       },
     );
-  };
+  }, [customFieldMappings, pushWithState]);
 
   const removableFields = useMemo(() => selectedEntitiesData.filter(hasOverride).map(({ fieldName }) => fieldName), [selectedEntitiesData]);
 

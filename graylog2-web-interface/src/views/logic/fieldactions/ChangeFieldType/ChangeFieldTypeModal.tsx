@@ -32,6 +32,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
+import type { OnSubmitCallbackProps } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -54,7 +55,7 @@ const failureStreamId = '000000000000000000000004';
 type Props = {
   show: boolean,
   onClose: () => void,
-  onSubmitCallback?: () => void,
+  onSubmitCallback?: (params: OnSubmitCallbackProps) => void,
   initialSelectedIndexSets: Array<string>,
   showSelectionTable?: boolean,
   showFieldSelect?: boolean,
@@ -109,9 +110,12 @@ const ChangeFieldTypeModal = ({
             isAllIndexesSelected: indexSetSelection.length === initialSelectedIndexSets.length,
           },
       });
-
-      onClose();
-    }).then(() => onSubmitCallback && onSubmitCallback());
+    }).then(() => onSubmitCallback && onSubmitCallback({
+      indexSetSelection,
+      newFieldType: type,
+      rotated,
+      field: fieldName,
+    })).then(() => onClose());
   }, [fieldName, indexSetSelection, initialSelectedIndexSets.length, onClose, onSubmitCallback, putFieldTypeMutation, rotated, sendTelemetry, telemetryPathName, type]);
 
   const onChangeFieldType = useCallback((value: string) => {
