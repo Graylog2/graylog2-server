@@ -45,6 +45,7 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
   }, [indexName]);
 
   const _onRecalculateIndex = useCallback(() => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Really recalculate the index ranges for index ${indexName}?`)) {
       IndexRangesActions.recalculateIndex(indexName).then(() => {
         IndicesActions.list(indexSetId);
@@ -53,6 +54,7 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
   }, [indexName, indexSetId]);
 
   const _onDeleteIndex = useCallback(() => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Really delete index ${indexName}?`)) {
       IndicesActions.delete(indexName).then(() => {
         IndicesActions.list(indexSetId);
