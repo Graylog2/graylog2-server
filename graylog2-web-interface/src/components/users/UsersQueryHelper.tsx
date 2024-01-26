@@ -16,12 +16,11 @@
  */
 import * as React from 'react';
 
-import { Popover, Table, Button } from 'components/bootstrap';
+import { Table, Button } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
 
 const userQueryHelperPopover = (
-  <Popover id="user-search-query-help"
-           title="Search Syntax Help">
+  <>
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -50,11 +49,11 @@ const userQueryHelperPopover = (
       Find users with a email containing example.com:<br />
       <kbd>email:example.com</kbd><br />
     </p>
-  </Popover>
+  </>
 );
 
 const UserQueryHelper = () => (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={userQueryHelperPopover}>
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={userQueryHelperPopover} title="Search Syntax Help">
     <Button bsStyle="link"><Icon name="question-circle" /></Button>
   </OverlayTrigger>
 );

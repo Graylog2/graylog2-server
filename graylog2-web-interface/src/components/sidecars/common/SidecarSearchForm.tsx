@@ -18,14 +18,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { OverlayTrigger, SearchForm, Icon } from 'components/common';
-import { Popover, Table, Button } from 'components/bootstrap';
-
-import style from './SidecarSearchForm.css';
+import { Table, Button } from 'components/bootstrap';
 
 const queryHelpPopover = (
-  <Popover id="search-query-help"
-           className={style.popoverWide}
-           title="Search Syntax Help">
+  <>
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -70,16 +66,22 @@ const queryHelpPopover = (
       Find sidecars with <code>failing</code> or <code>unknown</code> status:<br />
       <kbd>status:failing status:unknown</kbd><br />
     </p>
-  </Popover>
+  </>
 );
 
 const queryHelp = (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover}>
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover} title="Search Syntax Help" width={500}>
     <Button bsStyle="link"><Icon name="question-circle" /></Button>
   </OverlayTrigger>
 );
 
-const SidecarSearchForm = ({ query, onSearch, onReset, children }) => (
+type Props = React.PropsWithChildren<{
+  query: string,
+  onSearch: (query: string) => void,
+  onReset: () => void,
+}>;
+
+const SidecarSearchForm = ({ query, onSearch, onReset, children }: Props) => (
   <SearchForm query={query}
               onSearch={onSearch}
               onReset={onReset}
