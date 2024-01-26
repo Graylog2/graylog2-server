@@ -20,8 +20,7 @@ import { OverlayTrigger, Icon } from 'components/common';
 import { Popover, Table, Button } from 'components/bootstrap';
 
 const RolesQueryHelperPopover = (
-  <Popover id="role-search-query-help"
-           title="Search Syntax Help">
+  <>
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -46,11 +45,11 @@ const RolesQueryHelperPopover = (
       Find role with a name containing manager:<br />
       <kbd>name:manager</kbd><br />
     </p>
-  </Popover>
+  </>
 );
 
 const RolesQueryHelper = () => (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={RolesQueryHelperPopover}>
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={RolesQueryHelperPopover} title="Search Syntax Help">
     <Button bsStyle="link"><Icon name="question-circle" /></Button>
   </OverlayTrigger>
 );
