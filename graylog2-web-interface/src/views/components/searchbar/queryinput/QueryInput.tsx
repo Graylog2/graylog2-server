@@ -164,7 +164,8 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
   }
 };
 
-const useCompleter = ({ streams, timeRange, completerFactory, userTimezone, view }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory' | 'view'> & { userTimezone: string }) => {
+const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory' | 'view'>) => {
+  const { userTimezone } = useUserDateTime();
   const completers = usePluginEntities('views.completers');
   const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
   const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
@@ -227,10 +228,9 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   const innerRef = useRef<Editor>(null);
   const inputElement = innerRef.current?.container;
   const { width: inputWidth } = useElementDimensions(inputElement);
-  const { userTimezone } = useUserDateTime();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
-  const completer = useCompleter({ streams, timeRange, completerFactory, userTimezone, view });
+  const completer = useCompleter({ streams, timeRange, completerFactory, view });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
   const onExecute = useCallback((editor: Editor) => handleExecution({
     editor,
