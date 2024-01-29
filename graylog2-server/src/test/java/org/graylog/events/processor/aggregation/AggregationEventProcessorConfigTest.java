@@ -32,6 +32,7 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -88,7 +89,7 @@ public class AggregationEventProcessorConfigTest {
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService,
-                mock(EntityOwnershipService.class), null);
+                mock(EntityOwnershipService.class), null, new IgnoreSearchFilters());
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     }
 

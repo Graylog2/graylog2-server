@@ -53,4 +53,9 @@ public class MigrationActionsImpl implements MigrationActions {
     public boolean isOldClusterStopped() {
         return false;
     }
+
+    @Override
+    public void rollingUpgradeSelected() {
+
+    }
 }

@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.buffers;
 
-import com.lmax.disruptor.WorkHandler;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 

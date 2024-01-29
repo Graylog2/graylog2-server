@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2.events.search;
 
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.MoreSearchAdapterIT;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch2.MoreSearchAdapterOS2;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.Scroll;
@@ -47,7 +48,7 @@ public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
                         (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                                 client, initialResult, query, scroll, fields, limit
                         ),
-                        new SearchRequestFactory(sortOrderMapper, false, true)
+                        new SearchRequestFactory(sortOrderMapper, false, true, new IgnoreSearchFilters())
                 )
 
         );
