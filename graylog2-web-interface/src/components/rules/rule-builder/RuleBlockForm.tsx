@@ -64,10 +64,6 @@ const SelectedBlockInfo = styled(Row)(({ theme }) => css`
   margin-bottom: ${theme.spacings.md};
 `);
 
-const HelpPopover = styled(Popover)(() => css`
-  min-width: 700px;
-`);
-
 const OptionTitle = styled.p(({ theme }) => css`
   margin-bottom: ${theme.spacings.xxs};
 `);
@@ -170,13 +166,6 @@ const RuleBlockForm = ({
       onAdd(values);
     }
   };
-
-  const buildHelpPopover = (blockDict: BlockDict) => (
-    <HelpPopover id="selected-block-Dict-help"
-                 title="Function Syntax Help">
-      <RuleHelperTable entries={[blockDict]} expanded={{ [blockDict.name]: true }} />
-    </HelpPopover>
-  );
 
   const optionRenderer = (option: Option, isSelected: boolean) => (
     <>

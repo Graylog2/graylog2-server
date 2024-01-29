@@ -21,7 +21,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
-import { Label, Popover } from 'components/bootstrap';
+import { Label } from 'components/bootstrap';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
@@ -110,15 +110,9 @@ const InputStateBadge = createReactClass({
         <small><LinkToNode nodeId={node} />: {state.state}<br />
         </small>
       )));
-      const popover = (
-        <Popover id="inputstate-badge-details"
-                 title={`Input States for ${input.title}`}>
-          {popOverText}
-        </Popover>
-      );
 
       return (
-        <OverlayTrigger trigger="click" placement="bottom" overlay={popover} rootClose>
+        <OverlayTrigger trigger="click" placement="bottom" overlay={popOverText} rootClose title={`Input States for ${input.title}`}>
           <Label bsStyle={this._labelClassForState(sorted)}
                  title="Click to show details"
                  bsSize="xsmall"

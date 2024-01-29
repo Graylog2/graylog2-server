@@ -28,7 +28,8 @@ type Props = {
     primary: boolean,
   }
 }
-const ShardRouting = ({ route }) => {
+
+const ShardRouting = ({ route }: Props) => {
   const tooltip = <>State: <i>{route.state}</i> on {route.node_hostname} ({route.node_name})</>;
 
   return (

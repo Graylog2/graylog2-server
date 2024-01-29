@@ -20,7 +20,6 @@ import type { $PropertyType } from 'utility-types';
 
 import type UserOverview from 'logic/users/UserOverview';
 import { OverlayTrigger, RelativeTime } from 'components/common';
-import { Popover } from 'components/bootstrap';
 
 import LoggedInIcon from '../../LoggedInIcon';
 
@@ -40,19 +39,17 @@ const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => 
   <Td>
     <OverlayTrigger trigger={['hover', 'focus']}
                     placement="right"
-                    overlay={(
-                      <Popover id="session-badge-details"
-                               title={sessionActive ? 'Logged in' : ''}>
-                        {sessionActive ? (
-                          <>
-                            <div>Last activity: {lastActivity
-                              ? <RelativeTime dateTime={lastActivity} /> : '-'}
-                            </div>
-                            <div>Client address: {clientAddress ?? '-'}</div>
-                          </>
-                        ) : 'Not logged in'}
-                      </Popover>
-                    )}
+                    title={sessionActive ? 'Logged in' : undefined}
+                    overlay={sessionActive
+                      ? (
+                        <>
+                          <div>Last activity: {lastActivity
+                            ? <RelativeTime dateTime={lastActivity} /> : '-'}
+                          </div>
+                          <div>Client address: {clientAddress ?? '-'}</div>
+                        </>
+                      )
+                      : <>Not logged in</>}
                     rootClose>
       <LoggedInIcon active={sessionActive} />
     </OverlayTrigger>
