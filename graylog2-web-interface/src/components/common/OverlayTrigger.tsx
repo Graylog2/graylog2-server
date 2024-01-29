@@ -27,7 +27,7 @@ type Triggers = 'click' | 'focus' | 'hover';
 type Props = {
   testId?: string,
   children: React.ReactElement,
-  overlay: React.ReactElement,
+  overlay: React.ReactNode,
   placement: 'top' | 'right' | 'bottom' | 'left',
   trigger?: Triggers | Array<Triggers>,
   className?: string,
