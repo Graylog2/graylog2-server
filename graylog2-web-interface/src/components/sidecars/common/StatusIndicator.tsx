@@ -62,7 +62,7 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
 
   if (message && id) {
     return (
-      <OverlayTrigger placement="top" overlay={<span>{message}</span>} rootClose trigger="hover">
+      <OverlayTrigger placement="top" overlay={message} rootClose trigger="hover">
         <span className={`${className} ${style.indicator}`}>
           <Icon name={icon} fixedWidth /> {text}
         </span>
