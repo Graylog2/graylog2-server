@@ -20,7 +20,7 @@ import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormSubmit, Icon, OverlayTrigger, Select } from 'components/common';
-import { Button, Col, Popover, Row } from 'components/bootstrap';
+import { Button, Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
@@ -215,7 +215,9 @@ const RuleBlockForm = ({
                         <OverlayTrigger trigger="click"
                                         rootClose
                                         placement="right"
-                                        overlay={buildHelpPopover(selectedBlockDict)}>
+                                        title="Function Syntax Help"
+                                        width={700}
+                                        overlay={<RuleHelperTable entries={[selectedBlockDict]} expanded={{ [selectedBlockDict.name]: true }} />}>
                           <Button bsStyle="link">
                             <Icon name="question-circle"
                                   fixedWidth

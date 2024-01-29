@@ -21,11 +21,11 @@ import { OverlayTrigger, Icon } from 'components/common';
 import { Table, Button } from 'components/bootstrap';
 
 const COMMON_FIELD_MAP = {
-  id: (entityName) => `Id of the ${entityName}, which is a unique reference.`,
-  title: (entityName) => `Title of the ${entityName}.`,
-  name: (entityName) => `Name of the ${entityName}.`,
-  description: (entityName) => `Short description of the ${entityName}.`,
-  summary: (entityName) => `Long summary of the ${entityName}.`,
+  id: (entityName: string) => `Id of the ${entityName}, which is a unique reference.`,
+  title: (entityName: string) => `Title of the ${entityName}.`,
+  name: (entityName: string) => `Name of the ${entityName}.`,
+  description: (entityName: string) => `Short description of the ${entityName}.`,
+  summary: (entityName: string) => `Long summary of the ${entityName}.`,
 };
 
 type CommonFields = keyof typeof COMMON_FIELD_MAP;

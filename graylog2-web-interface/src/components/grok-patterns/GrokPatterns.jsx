@@ -198,7 +198,7 @@ class GrokPatterns extends React.Component {
     const { pagination, patterns } = this.state;
 
     const queryHelperComponent = (
-      <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={<GrokPatternQueryHelper />}>
+      <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={<GrokPatternQueryHelper />} title="Search Syntax Help" width={500}>
         <Button bsStyle="link" className="archive-search-help-button">
           <Icon name="question-circle" fixedWidth />
         </Button>

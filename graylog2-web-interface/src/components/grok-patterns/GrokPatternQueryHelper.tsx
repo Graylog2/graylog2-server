@@ -16,12 +16,10 @@
  */
 import * as React from 'react';
 
-import { Popover, Table } from 'components/bootstrap';
+import Table from 'components/bootstrap/Table';
 
 const GrokPatternQueryHelper = () => (
-  <Popover id="search-query-help"
-           className="popover-wide"
-           title="Search Syntax Help">
+  <>
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -46,7 +44,7 @@ const GrokPatternQueryHelper = () => (
       Find grok patterns containing COMMON in the pattern:<br />
       <kbd>pattern:COMMON</kbd><br />
     </p>
-  </Popover>
+  </>
 );
 
 export default GrokPatternQueryHelper;
