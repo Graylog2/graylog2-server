@@ -20,6 +20,7 @@ import com.mongodb.DBCollection;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
@@ -50,6 +51,8 @@ public class NodeServiceImplTest {
 
     @Mock
     private Configuration configuration;
+    @Mock
+    private LeaderElectionService leaderElectionService;
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
     private NodeService nodeService;
@@ -58,7 +61,7 @@ public class NodeServiceImplTest {
     public void setUp() throws Exception {
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
         this.nodeService = new NodeServiceImpl(
-                new ServerNodeClusterService(mongodb.mongoConnection(), configuration));
+                new ServerNodeClusterService(mongodb.mongoConnection(), configuration, leaderElectionService));
     }
 
     @Test
@@ -111,5 +114,5 @@ public class NodeServiceImplTest {
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
 
     }
-    
+
 }

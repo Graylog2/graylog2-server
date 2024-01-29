@@ -24,6 +24,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.system.NodeId;
@@ -55,6 +56,8 @@ public class ServerNodeClusterServiceTest {
 
     @Mock
     private Configuration configuration;
+    @Mock
+    private LeaderElectionService leaderElectionService;
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
     private ServerNodeClusterService nodeService;
@@ -63,7 +66,7 @@ public class ServerNodeClusterServiceTest {
     public void setUp() throws Exception {
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
         this.nodeService =
-                new ServerNodeClusterService(mongodb.mongoConnection(), configuration);
+                new ServerNodeClusterService(mongodb.mongoConnection(), configuration, leaderElectionService);
     }
 
     @Test

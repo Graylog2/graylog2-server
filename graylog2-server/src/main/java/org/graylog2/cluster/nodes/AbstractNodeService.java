@@ -21,17 +21,17 @@ import com.mongodb.AggregationOptions;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -51,6 +51,8 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
 
     public static final String LAST_SEEN_FIELD = "$last_seen";
     private final long pingTimeout;
+
+    private final LeaderElectionService leaderElectionService;
     private final static Map<String, Object> lastSeenFieldDefinition = Map.of("last_seen", Map.of("$type", "timestamp"));
     private final static DBObject addLastSeenFieldAsDate = new BasicDBObject("$addFields", Map.of("last_seen_date", Map.of("$cond",
             Map.of(
@@ -63,14 +65,19 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
     private final Class<T> nodeClass;
 
     @Inject
-    public AbstractNodeService(final MongoConnection mongoConnection, Configuration configuration, Class<T> nodeClass) {
-        this(mongoConnection, configuration.getStaleLeaderTimeout(), nodeClass);
+    public AbstractNodeService(final MongoConnection mongoConnection,
+                               final Configuration configuration,
+                               final Class<T> nodeClass,
+                               final LeaderElectionService leaderElectionService) {
+        this(mongoConnection, configuration.getStaleLeaderTimeout(), nodeClass, leaderElectionService);
+
     }
 
-    private AbstractNodeService(final MongoConnection mongoConnection, final int staleLeaderTimeout, Class<T> nodeClass) {
+    private AbstractNodeService(final MongoConnection mongoConnection, final int staleLeaderTimeout, Class<T> nodeClass, final LeaderElectionService leaderElectionService) {
         super(mongoConnection);
         this.pingTimeout = staleLeaderTimeout;
         this.nodeClass = nodeClass;
+        this.leaderElectionService = leaderElectionService;
     }
 
     @Override
@@ -221,11 +228,13 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
             LOG.warn("Did not find meta info of this node. Re-registering.");
             registerServer(dto);
         }
-        try {
-            // Remove old nodes that are no longer running. (Just some housekeeping)
-            dropOutdated();
-        } catch (Exception e) {
-            LOG.warn("Caught exception during node ping.", e);
+        if (leaderElectionService.isLeader()) {
+            try {
+                // Remove old nodes that are no longer running. (Just some housekeeping)
+                dropOutdated();
+            } catch (Exception e) {
+                LOG.warn("Caught exception during node ping.", e);
+            }
         }
     }
 }
