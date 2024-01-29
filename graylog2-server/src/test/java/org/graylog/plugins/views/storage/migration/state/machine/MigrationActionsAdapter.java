@@ -14,39 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration.state.actions;
+package org.graylog.plugins.views.storage.migration.state.machine;
 
-import jakarta.inject.Inject;
-import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 
-public class MigrationActionsImpl implements MigrationActions {
-
-    private final ClusterConfigService clusterConfigService;
-
-    @Inject
-    public MigrationActionsImpl(ClusterConfigService clusterConfigService) {
-        this.clusterConfigService = clusterConfigService;
-    }
-
+public class MigrationActionsAdapter implements MigrationActions {
     @Override
     public void resetMigration() {
-        clusterConfigService.remove(DatanodeMigrationConfiguration.class);
+
     }
 
     @Override
     public void migrateIndexTemplates() {
-        // TODO!
+
     }
 
     @Override
     public void migrateWithoutDowntime() {
-        // TODO!
+
     }
 
     @Override
     public void migrateWithDowntime() {
-        // TODO!
+
     }
 
     @Override
