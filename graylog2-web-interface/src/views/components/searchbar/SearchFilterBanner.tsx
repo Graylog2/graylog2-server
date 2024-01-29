@@ -35,7 +35,7 @@ const StyledButtonBar = styled.div`
   justify-content: flex-end;
 `;
 
-const SearchFilterHelp = styled(HoverForHelp)`
+const SearchFilterHelp = styled((props: any) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 

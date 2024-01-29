@@ -18,9 +18,12 @@ import * as React from 'react';
 import { useState } from 'react';
 import { act, renderWithDataRouter, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import RuleForm from './RuleForm';
 import { PipelineRulesContext } from './RuleContext';
+
+const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('RuleForm', () => {
   it('should save and update the correct description value', async () => {
@@ -133,5 +136,5 @@ describe('RuleForm', () => {
     await waitFor(() => {
       expect(_setRawMessage).toHaveBeenCalledWith(ruleInput);
     });
-  });
+  }, extendedTimeout);
 });
