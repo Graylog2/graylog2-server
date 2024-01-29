@@ -213,7 +213,6 @@ class FilterForm extends React.Component {
     this.propagateChange('filters', searchFilters.toArray());
   };
 
-  // eslint-disable-next-line class-methods-use-this
   hideFiltersPreview = (value) => {
     Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
     this.setState({ searchFiltersHidden: value });
