@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
@@ -31,7 +32,9 @@ import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
+import org.graylog.events.processor.SearchFilterableConfig;
 import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -59,11 +62,12 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = AggregationEventProcessorConfig.Builder.class)
-public abstract class AggregationEventProcessorConfig implements EventProcessorConfig {
+public abstract class AggregationEventProcessorConfig implements EventProcessorConfig, SearchFilterableConfig {
     public static final String TYPE_NAME = "aggregation-v1";
 
     private static final String FIELD_QUERY = "query";
     private static final String FIELD_QUERY_PARAMETERS = "query_parameters";
+    private static final String FIELD_FILTERS = "filters";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_GROUP_BY = "group_by";
     private static final String FIELD_SERIES = "series";
@@ -77,6 +81,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @JsonProperty(FIELD_QUERY_PARAMETERS)
     public abstract ImmutableSet<Parameter> queryParameters();
+
+    @JsonProperty(FIELD_FILTERS)
+    public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty(FIELD_STREAMS)
     public abstract ImmutableSet<String> streams();
@@ -147,6 +154,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         public static Builder create() {
             return new AutoValue_AggregationEventProcessorConfig.Builder()
                     .queryParameters(ImmutableSet.of())
+                    .filters(Collections.emptyList())
                     .type(TYPE_NAME)
                     .eventLimit(0);
         }
@@ -156,6 +164,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
         @JsonProperty(FIELD_QUERY_PARAMETERS)
         public abstract Builder queryParameters(Set<Parameter> queryParameters);
+
+        @JsonProperty(FIELD_FILTERS)
+        public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
@@ -221,10 +232,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         if (oldEventProcessorConfig == null) {
             // Enforce event limit on newly created event filter definition
             checkEventLimitGreaterZero(validationResult);
-        } else if ( !(oldEventProcessorConfig instanceof final AggregationEventProcessorConfig oldConfig)) {
+        } else if (!(oldEventProcessorConfig instanceof final AggregationEventProcessorConfig oldConfig)) {
             // Enforce event limit on event definition type change
             checkEventLimitGreaterZero(validationResult);
-        } else if ( !oldConfig.series().isEmpty()) {
+        } else if (!oldConfig.series().isEmpty()) {
             // Enforce event limit on aggregation to filter change
             checkEventLimitGreaterZero(validationResult);
         } else if (oldConfig.eventLimit() != 0) {
@@ -255,6 +266,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         return AggregationEventProcessorConfigEntity.builder()
                 .type(type())
                 .query(ValueReference.of(query()))
+                .filters(ImmutableList.copyOf(filters()))
                 .streams(streamRefs)
                 .groupBy(groupBy())
                 .series(series().stream().map(SeriesSpecEntity::fromNativeEntity).toList())
@@ -274,5 +286,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
+    }
+
+    @Override
+    public EventProcessorConfig updateFilters(List<UsedSearchFilter> filters) {
+        return toBuilder().filters(filters).build();
     }
 }

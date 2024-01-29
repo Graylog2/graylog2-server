@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -31,5 +32,6 @@ public interface MoreSearchAdapter {
     interface ScrollEventsCallback {
         void accept(List<ResultMessage> results, AtomicBoolean requestContinue) throws EventProcessorException;
     }
-    void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
+
+    void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 }

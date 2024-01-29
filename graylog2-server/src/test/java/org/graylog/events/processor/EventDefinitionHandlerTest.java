@@ -26,6 +26,7 @@ import org.graylog.events.TestEventProcessorParameters;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
@@ -105,7 +106,7 @@ public class EventDefinitionHandlerTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES)));
+        this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
         this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 

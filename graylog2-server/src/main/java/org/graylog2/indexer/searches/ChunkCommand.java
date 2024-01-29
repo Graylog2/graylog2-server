@@ -18,6 +18,7 @@ package org.graylog2.indexer.searches;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -44,6 +45,8 @@ public abstract class ChunkCommand {
 
     public abstract Optional<String> filter();
 
+    public abstract List<UsedSearchFilter> filters();
+
     public abstract Optional<TimeRange> range();
 
     public abstract OptionalInt limit();
@@ -56,6 +59,7 @@ public abstract class ChunkCommand {
         return new AutoValue_ChunkCommand.Builder()
                 .query("")
                 .fields(Collections.emptyList())
+                .filters(Collections.emptyList())
                 .highlight(false);
     }
 
@@ -66,6 +70,7 @@ public abstract class ChunkCommand {
         public abstract Builder streams(Set<String> streams);
         public abstract Builder sorting(Sorting sorting);
         public abstract Builder filter(@Nullable String filter);
+        public abstract Builder filters(List<UsedSearchFilter> filters);
         public abstract Builder range(TimeRange range);
         public abstract Builder limit(int limit);
         public abstract Builder offset(int offset);
