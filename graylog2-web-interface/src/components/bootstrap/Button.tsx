@@ -18,7 +18,9 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import type { MantineTheme } from '@graylog/sawmill/mantine';
-import { Button as MantineButton, useMantineTheme } from '@mantine/core';
+import { Button as MantineButton } from '@mantine/core';
+import type { DefaultTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -98,35 +100,35 @@ const stylesForSize = (size: BsSize) => {
 
 type Other = MantineTheme['other'];
 
-const disabledStyles = (style: ColorVariant, other: Other) => {
-  const colors = other.colors.disabled[style];
+const disabledStyles = (style: ColorVariant, colors: DefaultTheme['colors']) => {
+  const disabledColors = colors.disabled[style];
 
   return {
     ':disabled': {
       pointerEvents: 'all',
-      color: colors.color,
-      backgroundColor: colors.background,
+      color: disabledColors.color,
+      backgroundColor: disabledColors.background,
       opacity: '0.65',
     },
   };
 };
 
-const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disabled: boolean) => {
+const generateStyles = (colors: DefaultTheme['colors'], bsStyle: StyleProps, bsSize: BsSize, disabled: boolean) => {
   const sizeStyles = stylesForSize(bsSize);
-  const disableStyles = (disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, other) : {});
+  const disableStyles = (disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, colors) : {});
 
   return {
     root: {
       ...sizeStyles,
-      color: other.colors.contrast[bsStyle],
+      color: colors.contrast[bsStyle],
       fontWeight: 400,
       ':disabled': disableStyles,
       ':hover': {
-        color: other.colors.contrast[bsStyle],
+        color: colors.contrast[bsStyle],
         textDecoration: 'none',
       },
       ':focus': {
-        color: other.colors.contrast[bsStyle],
+        color: colors.contrast[bsStyle],
         textDecoration: 'none',
       },
     },
@@ -142,9 +144,9 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
     'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
     title, form, target, type, rel, role, name, tabIndex, children,
   }, ref) => {
-    const theme = useMantineTheme();
+    const theme = useTheme();
     const style = mapStyle(bsStyle);
-    const styles = useMemo(() => generateStyles(theme.other, style, bsSize, disabled), [bsSize, disabled, style, theme.other]);
+    const styles = useMemo(() => generateStyles(theme.colors, style, bsSize, disabled), [bsSize, disabled, style, theme.other]);
 
     const sharedProps = {
       id,
