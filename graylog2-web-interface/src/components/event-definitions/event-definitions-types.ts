@@ -45,6 +45,17 @@ export type Scheduler = {
   status: string
 };
 
+export type SearchFilter = {
+  id: string,
+  type: string,
+  title: string,
+  queryString: string,
+  disabled: boolean,
+  negation: boolean,
+  frontendId?: string,
+  description?: string,
+};
+
 export type EventDefinition = {
   id: string,
   config?: {
@@ -54,6 +65,7 @@ export type EventDefinition = {
     event_limit?: number,
     sigma_rule_id?: string,
     streams?: Array<string>
+    filters?: Array<SearchFilter>,
   },
   title: string,
   description?: string,

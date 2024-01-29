@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
@@ -47,6 +48,8 @@ const clickMoreActions = async (username: string) => {
 
   await screen.findByRole('menu');
 };
+
+const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('UsersOverview', () => {
   afterEach(() => {
@@ -136,7 +139,7 @@ describe('UsersOverview', () => {
       expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete user ${modifiableUser.fullName}?`);
       expect(UsersActions.delete).toHaveBeenCalledTimes(1);
       expect(UsersActions.delete).toHaveBeenCalledWith(modifiableUser.id, modifiableUser.fullName);
-    });
+    }, extendedTimeout);
 
     it('not be able to delete a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));

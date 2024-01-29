@@ -18,6 +18,11 @@
 import { Popover as BootstrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
+/*
+  IMPORTANT: This is the legacy bootstrap Popover component. It should not be used for new code, the Mantine-based
+  `components/common/Popover component should be used instead.
+ */
+
 const Popover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
   const arrowColor = theme.colors.variant.lightest.default;
