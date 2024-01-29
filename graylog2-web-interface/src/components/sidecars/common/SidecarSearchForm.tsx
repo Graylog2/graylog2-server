@@ -17,47 +17,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { OverlayTrigger, SearchForm, Icon } from 'components/common';
-import { Table, Button } from 'components/bootstrap';
+import { SearchForm } from 'components/common';
+import QueryHelper from 'components/common/QueryHelper';
 
-const queryHelpPopover = (
+const queryExamples = (
   <>
-    <p><strong>Available search fields</strong></p>
-    <Table condensed>
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>name</td>
-          <td>Sidecar name</td>
-        </tr>
-        <tr>
-          <td>status</td>
-          <td>Status of the sidecar as it appears in the list, i.e. running, failing, or unknown</td>
-        </tr>
-        <tr>
-          <td>operating_system</td>
-          <td>Operating system the sidecar is running on</td>
-        </tr>
-        <tr>
-          <td>last_seen</td>
-          <td>Date and time when the sidecar last communicated with Graylog</td>
-        </tr>
-        <tr>
-          <td>node_id</td>
-          <td>Identifier of the sidecar</td>
-        </tr>
-        <tr>
-          <td>sidecar_version</td>
-          <td>Sidecar version</td>
-        </tr>
-      </tbody>
-    </Table>
-    <p><strong>Examples</strong></p>
     <p>
       Find sidecars that did not communicate with Graylog since a date:<br />
       <kbd>{'last_seen:<=2018-04-10'}</kbd><br />
@@ -69,10 +33,16 @@ const queryHelpPopover = (
   </>
 );
 
+const fieldMap = {
+  status: 'Status of the sidecar as it appears in the list, i.e. running, failing, or unknown',
+  operating_system: 'Operating system the sidecar is running on',
+  last_seen: 'Date and time when the sidecar last communicated with Graylog',
+  node_id: 'Identifier of the sidecar',
+  sidecar_version: 'Sidecar version',
+};
+
 const queryHelp = (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover} title="Search Syntax Help" width={500}>
-    <Button bsStyle="link"><Icon name="question-circle" /></Button>
-  </OverlayTrigger>
+  <QueryHelper entityName="sidecar" example={queryExamples} commonFields={['name']} fieldMap={fieldMap} />
 );
 
 type Props = React.PropsWithChildren<{
