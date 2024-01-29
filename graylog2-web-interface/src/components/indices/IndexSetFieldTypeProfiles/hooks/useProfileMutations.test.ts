@@ -22,7 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
-import { profile1JSON, profile1 } from 'fixtures/indexSetFieldTypeProfiles';
+import { formValuesProfile1, requestBodyProfile1JSON } from 'fixtures/indexSetFieldTypeProfiles';
 
 const urlPrefix = '/system/indices/index_sets/profiles';
 
@@ -43,9 +43,9 @@ jest.mock('util/UserNotification', () => ({
 describe('useProfileMutations', () => {
   describe('editProfile', () => {
     const putUrl = qualifyUrl(`${urlPrefix}`);
-    const requestBody = profile1;
+    const requestBody = { profile: formValuesProfile1, id: '111' };
 
-    const requestBodyJSON = profile1JSON;
+    const requestBodyJSON = requestBodyProfile1JSON;
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
@@ -78,9 +78,9 @@ describe('useProfileMutations', () => {
 
   describe('createProfile', () => {
     const postUrl = qualifyUrl(`${urlPrefix}`);
-    const requestBody = profile1;
+    const requestBody = formValuesProfile1;
 
-    const requestBodyJSON = omit(profile1JSON, ['id']);
+    const requestBodyJSON = omit(requestBodyProfile1JSON, ['id']);
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
@@ -108,6 +108,38 @@ describe('useProfileMutations', () => {
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
         'Creating index set field type profile failed with status: Error: Error',
         'Could not create index set field type profile'));
+    });
+  });
+
+  describe('deleteProfile', () => {
+    const deleteUrl = qualifyUrl(`${urlPrefix}/111`);
+
+    it('should run fetch and display UserNotification', async () => {
+      asMock(fetch).mockImplementation(() => Promise.resolve({}));
+
+      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+
+      act(() => {
+        result.current.deleteProfile('111');
+      });
+
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith('DELETE', deleteUrl));
+
+      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Index set field type profile has been successfully deleted.', 'Success!'));
+    });
+
+    it('should display notification on fail', async () => {
+      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+
+      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+
+      act(() => {
+        result.current.deleteProfile('111').catch(() => {});
+      });
+
+      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
+        'Deleting index set field type profile failed with status: Error: Error',
+        'Could not delete index set field type profile'));
     });
   });
 });

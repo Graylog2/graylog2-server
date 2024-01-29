@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2.events.search;
 
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.MoreSearchAdapterIT;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch2.MoreSearchAdapterOS2;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.PaginationOS2;
@@ -43,7 +44,7 @@ public class MoreSearchAdapterOS2UsingPaginationIT extends MoreSearchAdapterIT {
         final OpenSearchClient client = openSearchInstance.openSearchClient();
         return new MoreSearchAdapterOS2(client, true, sortOrderMapper,
                 new PaginationOS2(client,
-                        new SearchRequestFactory(sortOrderMapper, false, true)
+                        new SearchRequestFactory(sortOrderMapper, false, true, new IgnoreSearchFilters())
                 )
 
         );

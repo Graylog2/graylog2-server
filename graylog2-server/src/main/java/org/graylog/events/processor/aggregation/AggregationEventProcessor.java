@@ -194,7 +194,8 @@ public class AggregationEventProcessor implements EventProcessor {
             LOG.debug("scrollQueryString: {}", scrollQueryString);
 
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
-            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
+            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.filters(),
+                    config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
         }
     }
 
@@ -262,7 +263,8 @@ public class AggregationEventProcessor implements EventProcessor {
         };
 
         try {
-            moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+            moreSearch.scrollQuery(config.query(), streams, config.filters(), config.queryParameters(),
+                    parameters.timerange(), parameters.batchSize(), callback);
         } catch (EventLimitReachedException e) {
             notificationService.publishIfFirst(notificationService.buildNow()
                     .addType(EVENT_LIMIT_REACHED)

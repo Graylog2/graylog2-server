@@ -36,9 +36,7 @@ public class MigrationStateMachineBuilder {
 
         // Major decision - remote reindexing or rolling upgrade(in-place)?
         config.configure(MigrationState.NEW)
-                .permit(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME, () -> {
-                    LOG.info("Selected inplace migration");
-                })
+                .permit(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME, migrationActions::rollingUpgradeSelected)
                 .permit(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME, () -> {
                     LOG.info("Selected remote reindex migration");
                 });

@@ -25,24 +25,11 @@ import { AggregationType, AggregationResult } from 'views/components/aggregation
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
-import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
-
-const getChartColor = (fullData: Array<ChartConfig>, name: string) => {
-  const data = fullData.find((d) => (d.name === name));
-
-  if (data && data.line && data.line.color) {
-    const { line: { color } } = data;
-
-    return color;
-  }
-
-  return undefined;
-};
 
 const AreaVisualization = makeVisualization(({
   config,
@@ -87,7 +74,6 @@ const AreaVisualization = makeVisualization(({
             axisType={visualizationConfig.axisType}
             plotLayout={layout}
             effectiveTimerange={effectiveTimerange}
-            getChartColor={getChartColor}
             height={height}
             chartData={chartDataResult} />
   );

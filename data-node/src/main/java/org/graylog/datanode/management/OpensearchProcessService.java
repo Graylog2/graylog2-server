@@ -34,6 +34,7 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final EventBus eventBus;
     private final NodeId nodeId;
     private final DataNodeProvisioningService dataNodeProvisioningService;
+    private final IndexFieldTypesService indexFieldTypesService;
     private final ObjectMapper objectMapper;
 
     @Inject
@@ -63,12 +65,15 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final NodeService<DataNodeDto> nodeService,
                                     final Configuration configuration,
                                     final DataNodeProvisioningService dataNodeProvisioningService,
-                                    final NodeId nodeId, ObjectMapper objectMapper) {
+                                    final NodeId nodeId,
+                                    final IndexFieldTypesService indexFieldTypesService,
+                                    final ObjectMapper objectMapper) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.objectMapper = objectMapper;
+        this.indexFieldTypesService = indexFieldTypesService;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper);
         eventBus.register(this);
     }
@@ -80,7 +85,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
         process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName()));
-        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, objectMapper));
+        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, indexFieldTypesService, objectMapper));
         return process;
     }
 
