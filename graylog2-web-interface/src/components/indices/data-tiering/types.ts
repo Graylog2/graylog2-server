@@ -19,15 +19,16 @@ export const DATA_TIERING_TYPE = {
   HOT_WARM: 'hot_warm',
 } as const;
 
-type DataTieringType = typeof DATA_TIERING_TYPE[keyof typeof DATA_TIERING_TYPE];
+export type DataTieringType = typeof DATA_TIERING_TYPE[keyof typeof DATA_TIERING_TYPE];
 
 export type DataTieringConfig = {
   type: DataTieringType
   index_lifetime_min: string,
   index_lifetime_max: string,
   index_hot_lifetime_min?: string,
-  warm_tier_enabled: boolean,
-  archive_before_deletion: boolean,
+  warm_tier_enabled?: boolean,
+  archive_before_deletion?: boolean,
+  warm_tier_repository_name?: string | null,
 }
 
 export type DataTieringFormValues = {
@@ -37,4 +38,5 @@ export type DataTieringFormValues = {
   index_hot_lifetime_min?: number,
   warm_tier_enabled: boolean,
   archive_before_deletion: boolean,
+  warm_tier_repository_name?: string | null,
 }

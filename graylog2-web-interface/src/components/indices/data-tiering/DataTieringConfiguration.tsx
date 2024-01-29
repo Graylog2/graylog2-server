@@ -24,6 +24,7 @@ import { FormikFormGroup } from 'components/common';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
+const hotWarmOnlyFormFields = ['index_hot_lifetime_min', 'warm_tier_enabled', 'archive_before_deletion', 'warm_tier_repository_name'];
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
@@ -45,16 +46,26 @@ export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSetForm
 export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore) : IndexSet => {
   if (!values.data_tiering) return values as unknown as IndexSet;
 
-  const defaultValues = {
-    type: 'hot_only',
+  const hotWarmDefaultValues = {
     warm_tier_enabled: false,
     archive_before_deletion: false,
+    warm_tier_repository_name: null,
   };
 
   const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
-  const dataTieringType = dataTieringPlugin?.type ?? defaultValues.type;
+  const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   let { data_tiering } = values;
+
+  if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
+    data_tiering = { ...hotWarmDefaultValues, ...data_tiering };
+  }
+
+  if (dataTieringType === DATA_TIERING_TYPE.HOT_ONLY) {
+    hotWarmOnlyFormFields.forEach((field) => {
+      delete data_tiering[field];
+    });
+  }
 
   dayFields.forEach((field) => {
     if (data_tiering[field]) {
@@ -62,7 +73,7 @@ export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore
     }
   });
 
-  data_tiering = { ...defaultValues, ...data_tiering, type: dataTieringType };
+  data_tiering = { ...data_tiering, type: dataTieringType };
 
   return { ...values, data_tiering } as unknown as IndexSet;
 };
