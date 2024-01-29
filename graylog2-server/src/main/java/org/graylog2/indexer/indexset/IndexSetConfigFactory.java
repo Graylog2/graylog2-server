@@ -16,14 +16,13 @@
  */
 package org.graylog2.indexer.indexset;
 
+import jakarta.inject.Inject;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -60,7 +59,9 @@ public class IndexSetConfigFactory {
                 .rotationStrategyClass(defaultConfig.rotationStrategyClass())
                 .rotationStrategy(defaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())
-                .retentionStrategy(defaultConfig.retentionStrategyConfig());
+                .retentionStrategy(defaultConfig.retentionStrategyConfig())
+                .dataTiering(defaultConfig.dataTiering())
+                ;
     }
 
     private static ZonedDateTime getCreationDate() {
