@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useImperativeHandle, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useDisclosure } from '@mantine/hooks';
 
@@ -44,8 +44,19 @@ const Container = styled.div`
   display: inline-block;
 `;
 
-const OverlayTrigger = ({ children, placement, overlay, rootClose, trigger, testId, className, title, width }: Props) => {
+type OverlayType = {
+  hide: () => void,
+};
+const OverlayTrigger = React.forwardRef<OverlayType, Props>(({ children, placement, overlay, rootClose, trigger, testId, className, title, width }, ref) => {
   const [opened, { close, open, toggle }] = useDisclosure(false);
+
+  useImperativeHandle(ref, () => ({
+    hide: close,
+  }), [close]);
+
+  // @ts-ignore
+  OverlayTrigger.hide = close;
+
   const containerRef = useRef();
 
   const [dropdown, setDropdown] = useState<HTMLDivElement | null>(null);
@@ -80,7 +91,7 @@ const OverlayTrigger = ({ children, placement, overlay, rootClose, trigger, test
       </Popover>
     </Container>
   );
-};
+});
 
 OverlayTrigger.defaultProps = {
   trigger: 'click',
