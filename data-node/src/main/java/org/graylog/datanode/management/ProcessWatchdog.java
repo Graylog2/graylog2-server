@@ -75,8 +75,8 @@ public class ProcessWatchdog implements StateMachineTracer {
             if (!restartCounter.failedTooManyTimes()) {
                 try {
                     LOG.info("Detected terminated process, restarting. Attempt #{}", restartCounter.failuresCount() + 1);
-                    process.restart();
-                } catch (IOException e) {
+                    process.start();
+                } catch (Exception e) {
                     LOG.warn("Failed to restart process", e);
                 } finally {
                     restartCounter.increment();

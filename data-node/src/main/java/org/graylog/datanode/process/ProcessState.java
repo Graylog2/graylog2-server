@@ -24,6 +24,10 @@ public enum ProcessState {
      */
     WAITING_FOR_CONFIGURATION(DataNodeStatus.UNCONFIGURED),
     /**
+     * All configuration files have been written
+     */
+    PREPARED(DataNodeStatus.PREPARED),
+    /**
      * The process is running on the underlying OS and has a process ID. It's not responding to the REST API yet
      */
     STARTING(DataNodeStatus.STARTING),
