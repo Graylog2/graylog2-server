@@ -26,7 +26,7 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -60,8 +60,10 @@ const widgetConfig = AggregationWidgetConfig
 const selectEventConfig = { container: document.body };
 
 const addSortElement = async () => {
-  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-  await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
+  userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await screen.findByRole('menu');
+  userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
+  await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
 };
 
 const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
@@ -207,7 +209,7 @@ describe('AggregationWizard', () => {
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
     await waitFor(() => expect(applyButton).toBeDisabled());
-  });
+  }, extendedTimeout);
 
   it('should require direction when creating a sort element', async () => {
     renderSUT();
@@ -218,7 +220,7 @@ describe('AggregationWizard', () => {
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
     await waitFor(() => expect(applyButton).toBeDisabled());
-  });
+  }, extendedTimeout);
 
   it('should remove all sorts', async () => {
     const onChangeMock = jest.fn();
@@ -242,7 +244,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should correctly update sort of sort elements', async () => {
     const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);

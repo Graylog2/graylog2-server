@@ -213,6 +213,24 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
+    @Parameter(value = "metrics_timestamp")
+    private String metricsTimestamp = "timestamp";
+    
+    @Parameter(value = "metrics_stream")
+    private String metricsStream = "gl-datanode-metrics";
+
+    @Parameter(value = "metrics_retention")
+    private String metricsRetention = "14d";
+
+    @Parameter(value = "metrics_daily_retention")
+    private String metricsDailyRetention = "365d";
+
+    @Parameter(value = "metrics_daily_index")
+    private String metricsDailyIndex = "gl-datanode-metrics-daily";
+
+    @Parameter(value = "metrics_policy")
+    private String metricsPolicy = "gl-datanode-metrics-ism";
+
     public boolean isInsecureStartup() {
         return insecureStartup;
     }
@@ -288,8 +306,8 @@ public class Configuration extends BaseConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validatePasswordSecret() throws ValidationException {
-        if (passwordSecret == null || passwordSecret.length() < 16) {
-            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
+        if (passwordSecret == null || passwordSecret.length() < 64) {
+            throw new ValidationException("The minimum length for \"password_secret\" is 64 characters.");
         }
     }
 
@@ -359,6 +377,31 @@ public class Configuration extends BaseConfiguration {
 
     public String getClustername() {
         return clustername;
+    }
+
+
+    public String getMetricsTimestamp() {
+        return metricsTimestamp;
+    }
+
+    public String getMetricsStream() {
+        return metricsStream;
+    }
+
+    public String getMetricsRetention() {
+        return metricsRetention;
+    }
+
+    public String getMetricsDailyRetention() {
+        return metricsDailyRetention;
+    }
+
+    public String getMetricsDailyIndex() {
+        return metricsDailyIndex;
+    }
+
+    public String getMetricsPolicy() {
+        return metricsPolicy;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
@@ -582,4 +625,5 @@ public class Configuration extends BaseConfiguration {
     public String getRootPasswordSha2() {
         return rootPasswordSha2;
     }
+
 }

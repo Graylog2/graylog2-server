@@ -25,12 +25,12 @@ import { MenuItem, ButtonToolbar } from 'components/bootstrap';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 type Props = {
   isTestLoading: boolean,
@@ -40,6 +40,7 @@ type Props = {
 };
 
 const EventNotificationActions = ({ isTestLoading, notification, refetchEventNotification, onTest }: Props) => {
+  const { deselectEntity } = useSelectedEntities();
   const [showDialog, setShowDialog] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(undefined);
   const sendTelemetry = useSendTelemetry();
@@ -63,6 +64,8 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
   const handleDelete = () => {
     EventNotificationsActions.delete(notification).then(
       () => {
+        deselectEntity(notification.id);
+
         UserNotification.success('Event Notification deleted successfully',
           `Event Notification "${notification.title}" was deleted successfully.`);
       },
@@ -83,10 +86,7 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
                      onClick={() => setShowShareNotification(notification)}
                      bsSize="xsmall" />
 
-        <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                               bsSize="xsmall"
-                               dropdownZIndex={1000}>
+        <MoreActions>
 
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
@@ -107,7 +107,7 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
               <MenuItem onClick={onDelete}>Delete</MenuItem>
             </IfPermitted>
           </IfPermitted>
-        </OverlayDropdownButton>
+        </MoreActions>
 
       </ButtonToolbar>
       {showDialog && (

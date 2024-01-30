@@ -32,37 +32,28 @@ const Container = styled(ButtonToolbar)`
 const StyledButton = styled(Button)(({ theme }) => css`
   font-family: ${theme.fonts.family.navigation};
   font-size: ${theme.fonts.size.navigation};
+  color: ${theme.colors.variant.darker.default};
+  
+  &:hover,
+  &:focus {
+    background: inherit;
+    text-decoration: none;
+  }
 
-  &&&& {
-    color: ${theme.colors.variant.darker.default};
-    
+  &:hover {
+    color: inherit;
+    ${hoverIndicatorStyles(theme)}
+  }
+
+  &.active {
+    color: ${theme.colors.global.textDefault};
+
+    ${activeIndicatorStyles(theme)}
+
     &:hover,
     &:focus {
-      text-decoration: none;
-    }
-
-    > div {
-      &:hover,
-      &:focus {
-        color: ${theme.colors.variant.darker.default};
-      }
-    }
-
-    &:hover {
-      ${hoverIndicatorStyles(theme)}
-    }
-
-    &.active {
-      color: ${theme.colors.global.textDefault};
-
       ${activeIndicatorStyles(theme)}
-
-      &:hover,
-      &:focus {
-        ${activeIndicatorStyles(theme)}
-      }
     }
-  }
 `);
 
 StyledButton.displayName = 'Button';

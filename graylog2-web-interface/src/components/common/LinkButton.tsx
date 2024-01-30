@@ -22,12 +22,11 @@ import { Button } from 'components/bootstrap';
 
 type ButtonProps = React.ComponentProps<typeof Button>;
 
-type Props = ButtonProps & {
+type Props = Omit<ButtonProps, 'target'> & {
   to: string,
   target?: '_blank' | '_self' | '_parent' | '_top' | 'framename',
 }
 
-// eslint-disable-next-line react/prop-types
 const LinkButton = ({ to, target, onClick, ...restButtonProps }: Props) => {
   const navigate = useNavigate();
   const handleOnClick = useCallback((e) => {

@@ -16,24 +16,32 @@
  */
 package org.graylog.datanode.management;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.datanode.RemoteReindexAllowlistEvent;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
@@ -45,6 +53,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final EventBus eventBus;
     private final NodeId nodeId;
+    private final DataNodeProvisioningService dataNodeProvisioningService;
+    private final IndexFieldTypesService indexFieldTypesService;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
@@ -53,28 +64,57 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final CustomCAX509TrustManager trustManager,
                                     final NodeService<DataNodeDto> nodeService,
                                     final Configuration configuration,
-                                    final NodeId nodeId) {
+                                    final DataNodeProvisioningService dataNodeProvisioningService,
+                                    final NodeId nodeId,
+                                    final IndexFieldTypesService indexFieldTypesService,
+                                    final ObjectMapper objectMapper) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
         this.nodeId = nodeId;
-        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
+        this.dataNodeProvisioningService = dataNodeProvisioningService;
+        this.objectMapper = objectMapper;
+        this.indexFieldTypesService = indexFieldTypesService;
+        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper);
         eventBus.register(this);
     }
 
-    private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService<DataNodeDto> nodeService) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService);
+    private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration,
+                                                      final NodeService<DataNodeDto> nodeService, final ObjectMapper objectMapper) {
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService, objectMapper);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
         process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName()));
+        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, indexFieldTypesService, objectMapper));
         return process;
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
+        switch (event.action()) {
+            case ADD -> {
+                this.process.stop();
+                configure(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
+                this.process.start();
+            }
+            case REMOVE -> {
+                this.process.stop();
+                configure();
+                this.process.start();
+            }
+        }
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STORED -> startWithConfig();
+            case STARTUP_REQUESTED -> startUp();
+            case STORED -> {
+                configure();
+                dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
+            }
         }
     }
 
@@ -93,23 +133,59 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Override
     protected void startUp() {
-        startWithConfig();
-    }
-
-    private void startWithConfig() {
         final OpensearchConfiguration config = configurationProvider.get();
         if (config.securityConfigured()) {
-            this.process.startWithConfig(config);
+            this.configure();
+            this.process.start();
         } else {
-
             String noConfigMessage = """
-                \n
-                ========================================================================================================
-                It seems you are starting Data node for the first time. The current configuration is not sufficient to
-                start the indexer process because a security configuration is missing. You have to either provide http
-                and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
-                ========================================================================================================
-                """;
+                    \n
+                    ========================================================================================================
+                    It seems you are starting Data node for the first time. The current configuration is not sufficient to
+                    start the indexer process because a security configuration is missing. You have to either provide http
+                    and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
+                    ========================================================================================================
+                    """;
+            LOG.info(noConfigMessage);
+        }
+    }
+
+    protected void configure() {
+        this.configure(Map.of());
+    }
+
+    private void configure(Map<String, String> additionalConfig) {
+        final OpensearchConfiguration original = configurationProvider.get();
+
+        final var finalAdditionalConfig = new HashMap<String, String>();
+        finalAdditionalConfig.putAll(original.additionalConfiguration());
+        finalAdditionalConfig.putAll(additionalConfig);
+
+        final var config = new OpensearchConfiguration(
+                original.opensearchDistribution(),
+                original.datanodeDirectories(),
+                original.bindAddress(),
+                original.hostname(),
+                original.httpPort(),
+                original.transportPort(),
+                original.clusterName(),
+                original.nodeName(),
+                original.nodeRoles(),
+                original.discoverySeedHosts(),
+                original.opensearchSecurityConfiguration(),
+                finalAdditionalConfig);
+
+        if (config.securityConfigured()) {
+            this.process.configure(config);
+        } else {
+            String noConfigMessage = """
+                    \n
+                    ========================================================================================================
+                    It seems you are starting Data node for the first time. The current configuration is not sufficient to
+                    start the indexer process because a security configuration is missing. You have to either provide http
+                    and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
+                    ========================================================================================================
+                    """;
             LOG.info(noConfigMessage);
         }
         eventBus.post(new OpensearchConfigurationChangeEvent(config));

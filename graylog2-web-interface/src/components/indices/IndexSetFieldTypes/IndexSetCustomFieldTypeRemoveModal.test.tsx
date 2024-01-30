@@ -23,12 +23,14 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useIndexProfileWithMappingsByField
+  from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 
 const mockOnClosed = jest.fn();
-const mockUpdateSelectedEntities = jest.fn();
 const renderIndexSetCustomFieldTypeRemoveModal = () => render(
   <TestStoreProvider>
-    <IndexSetCustomFieldTypeRemoveModal setSelectedFields={mockUpdateSelectedEntities} fields={['field']} indexSetIds={['111']} show onClose={mockOnClosed} />
+    <IndexSetCustomFieldTypeRemoveModal indexSetIds={['111']} show onClose={mockOnClosed} fields={['field']} />
   </TestStoreProvider>,
 );
 
@@ -44,6 +46,8 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
 }));
 
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation', () => jest.fn());
+jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
+jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField');
 
 describe('IndexSetFieldTypesList', () => {
   const mockedRemoveCustomFieldTypeMutation = jest.fn(() => Promise.resolve());
@@ -53,9 +57,23 @@ describe('IndexSetFieldTypesList', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
+    asMock(useSelectedEntities).mockReturnValue({
+      selectedEntities: ['field'],
+      setSelectedEntities: () => {},
+      selectEntity: () => {},
+      deselectEntity: () => {},
+    });
+
     asMock(useRemoveCustomFieldTypeMutation).mockReturnValue({
       removeCustomFieldTypeMutation: mockedRemoveCustomFieldTypeMutation,
       isLoading: false,
+    });
+
+    asMock(useIndexProfileWithMappingsByField).mockReturnValue({
+      name: null,
+      description: null,
+      id: null,
+      customFieldMappingsByField: {},
     });
   });
 
@@ -63,7 +81,10 @@ describe('IndexSetFieldTypesList', () => {
     it('Runs mockedRemoveCustomFieldTypeMutation on submit with rotation', async () => {
       renderIndexSetCustomFieldTypeRemoveModal();
 
-      const submit = await screen.findByTitle(/remove custom field type/i);
+      const submit = await screen.findByRole('button', {
+        name: /remove field type overrides/i,
+        hidden: true,
+      });
       fireEvent.click(submit);
 
       expect(mockedRemoveCustomFieldTypeMutation).toHaveBeenCalledWith({
@@ -77,7 +98,10 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetCustomFieldTypeRemoveModal();
 
       const checkbox = await screen.findByText(/rotate affected indices after change/i);
-      const submit = await screen.findByTitle(/remove custom field type/i);
+      const submit = await screen.findByRole('button', {
+        name: /remove field type overrides/i,
+        hidden: true,
+      });
       fireEvent.click(checkbox);
       fireEvent.click(submit);
 

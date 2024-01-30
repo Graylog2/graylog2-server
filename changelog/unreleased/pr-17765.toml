@@ -1,0 +1,9 @@
+type = "changed"
+message = "Transition from javax to jakarta namespace."
+
+pulls = ["17765","Graylog2/graylog-plugin-enterprise#6347"]
+
+details.user = """
+This change is mostly relevant for plugin developers. Please consult the upgrade notes for
+further information.
+"""

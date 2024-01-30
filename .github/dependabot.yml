@@ -6,6 +6,13 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    ignore:
+      # The AWS SDKs receive patch updates almost every day. Reduce dependabot
+      # pull-request noise by ignoring patch updates.
+      - dependency-name: "software.amazon.awssdk:bom"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "com.amazonaws:aws-java-sdk-bom"
+        update-types: ["version-update:semver-patch"]
     open-pull-requests-limit: 25
     labels:
       - dependencies

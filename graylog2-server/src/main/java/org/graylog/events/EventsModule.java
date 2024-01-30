@@ -27,6 +27,8 @@ import org.graylog.events.contentpack.entities.HttpEventNotificationConfigV2Enti
 import org.graylog.events.contentpack.entities.LegacyAlarmCallbackEventNotificationConfigEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.contentpack.facade.NotificationFacade;
+import org.graylog.events.event.DefaultRiskScoreCalculator;
+import org.graylog.events.event.RiskScoreCalculator;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
@@ -186,5 +188,8 @@ public class EventsModule extends PluginModule {
         addMigration(V20230629140000_RenameFieldTypeOfEventDefinitionSeries.class);
 
         serviceBinder().addBinding().to(NotificationSystemEventPublisher.class).in(Scopes.SINGLETON);
+
+        OptionalBinder.newOptionalBinder(binder(), RiskScoreCalculator.class)
+                .setDefault().to(DefaultRiskScoreCalculator.class);
     }
 }

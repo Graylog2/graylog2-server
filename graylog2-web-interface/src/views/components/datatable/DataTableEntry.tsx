@@ -19,7 +19,6 @@ import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
 import get from 'lodash/get';
-import styled, { css } from 'styled-components';
 
 import Value from 'views/components/Value';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
@@ -31,13 +30,10 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
+import TableDataCell from './TableDataCell';
+
 import CustomHighlighting from '../highlighting/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
-
-const StyledTd = styled.td<{ $isNumeric: boolean }>(({ $isNumeric, theme }) => css`
-  ${$isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
-  ${$isNumeric ? 'text-align: right' : ''}
-`);
 
 type Field = {
   field: string,
@@ -65,7 +61,7 @@ const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <StyledTd $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
+    <TableDataCell $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined
@@ -77,7 +73,7 @@ const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
             ) : null}
         </CustomHighlighting>
       </AdditionalContext.Provider>
-    </StyledTd>
+    </TableDataCell>
   );
 };
 

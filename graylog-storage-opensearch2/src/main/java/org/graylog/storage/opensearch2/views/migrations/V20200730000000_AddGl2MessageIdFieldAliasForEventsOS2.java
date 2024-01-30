@@ -24,7 +24,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRe
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.indexer.ElasticsearchException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Set;

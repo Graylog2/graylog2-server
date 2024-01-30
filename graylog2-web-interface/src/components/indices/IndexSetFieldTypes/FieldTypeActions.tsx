@@ -19,23 +19,23 @@ import React, { useState } from 'react';
 
 import { Button } from 'components/bootstrap';
 import { HoverForHelp } from 'components/common';
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
-import IndexSetCustomFieldTypeRemoveModal
-  from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
+import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
+import hasOverride from 'components/indices/helpers/hasOverride';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 
 type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
-  setSelectedFields: React.Dispatch<React.SetStateAction<Array<string>>>
   refetchFieldTypes: () => void,
 }
 
-const FieldTypeActions = ({ fieldType, indexSetId, setSelectedFields, refetchFieldTypes }: Props) => {
+const FieldTypeActions = ({ fieldType, indexSetId, refetchFieldTypes }: Props) => {
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
   const toggleEditModal = () => setShowEditModal((cur) => !cur);
+  const showResetButton = hasOverride(fieldType);
 
   return (
     <>
@@ -46,15 +46,15 @@ const FieldTypeActions = ({ fieldType, indexSetId, setSelectedFields, refetchFie
               title={`Edit field type for ${fieldType.fieldName}`}
               tabIndex={0}>
         Edit {
-        fieldType.isReserved && (
-          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-            We use reserved fields internally and expect a certain structure from them. Changing the field type for
-            reserved fields might impact the stability of Graylog
-          </HoverForHelp>
-        )
+          fieldType.isReserved && (
+            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+              We use reserved fields internally and expect a certain structure from them. Changing the field type for
+              reserved fields might impact the stability of Graylog
+            </HoverForHelp>
+          )
       }
       </Button>
-      {fieldType.isCustom && (
+      {showResetButton && (
         <Button onClick={toggleResetModal}
                 role="button"
                 bsSize="xsmall"
@@ -67,8 +67,7 @@ const FieldTypeActions = ({ fieldType, indexSetId, setSelectedFields, refetchFie
         <IndexSetCustomFieldTypeRemoveModal show
                                             fields={[fieldType.fieldName]}
                                             onClose={toggleResetModal}
-                                            indexSetIds={[indexSetId]}
-                                            setSelectedFields={setSelectedFields} />
+                                            indexSetIds={[indexSetId]} />
       )}
       {showEditModal && (
         <ChangeFieldTypeModal initialSelectedIndexSets={[indexSetId]}

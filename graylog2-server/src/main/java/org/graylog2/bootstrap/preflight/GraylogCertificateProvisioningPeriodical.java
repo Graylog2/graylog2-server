@@ -51,9 +51,10 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -158,7 +159,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         try {
             // only load nodes that are in a state that need sth done
             final var nodes = dataNodeProvisioningService.findAllNodesThatNeedAttention();
-            if(!nodes.isEmpty()) {
+            if (!nodes.isEmpty()) {
 
                 final var password = configuration.configuredCaExists()
                         ? configuration.getCaPassword().toCharArray()
@@ -221,7 +222,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     });
                 }
 
-                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STORED, List.of())
+                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_REQUESTED, List.of())
                         .forEach(c -> {
                             dataNodeProvisioningService.save(c.asConnecting());
                             executor.submit(() -> checkConnectivity(c));

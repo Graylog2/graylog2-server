@@ -21,6 +21,7 @@ export { default as LookupTablesOverview } from './LookupTablesOverview';
 export { default as LUTTableEntry } from './LUTTableEntry';
 export { default as LookupTableView } from './LookupTableView';
 export { default as LookupTableForm } from './LookupTableForm';
+export { default as LookupTableFields } from './LookupTableFields';
 // eslint-disable-next-line
 export { default as LookupTableCreate } from './LookupTableCreate';
 

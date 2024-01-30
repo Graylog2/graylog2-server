@@ -43,6 +43,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExecutionContext> implements TestEngine {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
@@ -84,9 +85,10 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         PluginJarsProvider pluginJarsProvider = instantiateFactory(descriptor.getPluginJarsProvider());
         MavenProjectDirProvider mavenProjectDirProvider = instantiateFactory(descriptor.getMavenProjectDirProvider());
         boolean withEnabledMailServer = descriptor.withEnabledMailServer();
+        final Map<String, String> configParams = descriptor.getAdditionalConfigurationParameters();
 
         if (Lifecycle.VM.equals(descriptor.getLifecycle())) {
-            try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer)) {
+            try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer, configParams)) {
                 this.execute(request, descriptor.getChildren(), backend);
             } catch (Exception exception) {
                 /* Fail hard if the containerized backend failed to start. */
@@ -101,7 +103,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                     fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
                     preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
                 }
-                try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer)) {
+                try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer, configParams)) {
                     this.execute(request, Collections.singleton(td), backend);
                 } catch (Exception exception) {
                     /* Fail hard if the containerized backend failed to start. */

@@ -23,8 +23,8 @@ const perspectivesBindings = {
   perspectives: [
     {
       id: 'default',
-      title: 'Classic Graylog UI',
-      brandLink: Routes.WELCOME,
+      title: 'General',
+      welcomeRoute: Routes.WELCOME,
       brandComponent: DefaultBrand,
     },
   ],

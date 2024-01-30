@@ -19,17 +19,21 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
-import mockComponent from 'helpers/mocking/MockComponent';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
-import SavedSearchForm from './SavedSearchForm';
+import OriginalSavedSearchForm from './SavedSearchForm';
 
-jest.mock('react-overlays', () => ({ Position: mockComponent('MockPosition') }));
-jest.mock('components/common/Portal', () => ({ children }) => (children));
 jest.mock('views/hooks/useSaveViewFormControls');
+
+const SavedSearchForm = (props: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
+  <OriginalSavedSearchForm {...props}>
+    <button type="button">Submit</button>
+  </OriginalSavedSearchForm>
+);
 
 describe('SavedSearchForm', () => {
   const props = {
+    show: true,
     value: 'new Title',
     saveAsSearch: () => {},
     disableCreateNew: false,
@@ -112,10 +116,9 @@ describe('SavedSearchForm', () => {
                               saveAsSearch={onSaveAs} />);
 
       const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      userEvent.click(saveAsButton);
 
-      expect(() => userEvent.click(saveAsButton)).toThrow(new Error('unable to click element as it has or inherits pointer-events set to "none".'));
-
-      expect(onSaveAs).toHaveBeenCalledTimes(0);
+      expect(onSaveAs).not.toHaveBeenCalled();
     });
 
     it('should handle create new', async () => {

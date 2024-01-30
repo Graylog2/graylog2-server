@@ -28,6 +28,7 @@
 }
 
 :local(.scrollableList) {
+    min-width: 200px;
     max-height: 340px; /* 10 items */
     overflow: auto;
 }

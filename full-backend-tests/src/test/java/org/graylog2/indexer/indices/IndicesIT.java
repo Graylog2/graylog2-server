@@ -24,7 +24,6 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
@@ -40,6 +39,7 @@ import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -122,7 +122,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter()
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class)
         );
     }
 
@@ -376,7 +377,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter());
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class));
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
 
@@ -408,7 +410,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter());
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class));
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)

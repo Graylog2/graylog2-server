@@ -19,12 +19,8 @@ import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css, withTheme } from 'styled-components';
 import merge from 'lodash/merge';
-import { Overlay, RootCloseWrapper } from 'react-overlays';
 
-import { Popover } from 'components/bootstrap';
-import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
-import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import { ROOT_FONT_SIZE } from 'theme/constants';
@@ -73,10 +69,6 @@ export type ChartConfig = {
   originalName?: string,
 };
 
-export type ColorMap = {
-  [key: string]: string,
-};
-
 export type ChartColor = {
   line?: ChartMarker,
   marker?: ChartMarker,
@@ -87,7 +79,6 @@ export type ChartColor = {
 
 type Props = {
   chartData: Array<any>,
-  getChartColor?: (data: Array<ChartConfig>, name: string) => string | undefined | null,
   layout: {},
   onZoom: (from: string, to: string) => boolean,
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor,
@@ -118,14 +109,12 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     chartData: PropTypes.array.isRequired,
     layout: PropTypes.object,
     onZoom: PropTypes.func,
-    getChartColor: PropTypes.func,
     setChartColor: PropTypes.func,
   };
 
   static defaultProps = {
     layout: {},
     onZoom: () => true,
-    getChartColor: undefined,
     setChartColor: undefined,
   };
 
@@ -154,25 +143,6 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     return true;
   };
 
-  _onLegendClick = (e: any) => {
-    const name = e.node.textContent;
-    const target = e.node.querySelector('g.layers');
-    const { getChartColor } = this.props;
-
-    if (getChartColor) {
-      const color = getChartColor(e.fullData, name);
-
-      this.setState({ legendConfig: { name, target, color } });
-    }
-
-    return false;
-  };
-
-  _onColorSelect = (setColor: (name: string, color: string) => Promise<unknown>, name: string, newColor: string) => setColor(name, newColor)
-    .then(this._onCloseColorPopup);
-
-  _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
-
   render() {
     const { chartData, layout, setChartColor, theme } = this.props;
     const fontSettings = {
@@ -183,7 +153,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     const defaultLayout = {
       shapes: [],
       autosize: true,
-      showlegend: true,
+      showlegend: false,
       margin: {
         t: 10,
         l: 40,
@@ -221,11 +191,9 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     };
     const plotLayout = merge({}, defaultLayout, layout);
 
-    const { legendConfig } = this.state;
-
     return (
       <ChartColorContext.Consumer>
-        {({ colors, setColor }) => {
+        {({ colors }) => {
           plotLayout.shapes = plotLayout.shapes.map((shape) => ({
             ...shape,
             line: { color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
@@ -260,33 +228,14 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
               {(interactive) => (
                 <RenderCompletionCallback.Consumer>
                   {(onRenderComplete) => (
-                    <>
-                      <StyledPlot data={newChartData}
-                                  useResizeHandler
-                                  layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
-                                  style={style}
-                                  onAfterPlot={onRenderComplete}
-                                  onClick={interactive ? null : () => false}
-                                  onLegendClick={interactive ? this._onLegendClick : () => false}
-                                  onRelayout={interactive ? this._onRelayout : () => false}
-                                  config={config} />
-                      {legendConfig && (
-                        <RootCloseWrapper event="mousedown"
-                                          onRootClose={this._onCloseColorPopup}>
-                          <Overlay show
-                                   placement="top"
-                                   target={legendConfig.target}>
-                            <Popover id="legend-config"
-                                     title={`Configuration for ${legendConfig.name}`}
-                                     className={styles.locals.customPopover}>
-                              <ColorPicker color={legendConfig.color}
-                                           colors={defaultColors}
-                                           onChange={(newColor) => this._onColorSelect(setColor, legendConfig.name, newColor)} />
-                            </Popover>
-                          </Overlay>
-                        </RootCloseWrapper>
-                      )}
-                    </>
+                    <StyledPlot data={newChartData}
+                                useResizeHandler
+                                layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
+                                style={style}
+                                onAfterPlot={onRenderComplete}
+                                onClick={interactive ? null : () => false}
+                                onRelayout={interactive ? this._onRelayout : () => false}
+                                config={config} />
                   )}
                 </RenderCompletionCallback.Consumer>
               )}

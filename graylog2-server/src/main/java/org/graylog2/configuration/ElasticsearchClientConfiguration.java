@@ -53,6 +53,20 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
     Duration elasticsearchVersionProbeDelay = Duration.seconds(5L);
 
+    /**
+     * Zero means unlimited attempts, will try until one datanode appears. The elasticsearch_version_probe_attempts
+     * fallback property is used because the
+     */
+    @Parameter(value = "datanode_startup_connection_attempts", fallbackPropertyName = "elasticsearch_version_probe_attempts", validators = {PositiveIntegerValidator.class})
+    int datanodeStartupConnectionAttempts = 0;
+
+    /**
+     * Seconds between each attempt to access datanode. Too long and you'll be waiting unnecessarily, too short and you
+     * will be flooded by error messages in your logs.
+     */
+    @Parameter(value = "datanode_startup_connection_delay", fallbackPropertyName = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
+    Duration datanodeStartupConnectionDelay = Duration.seconds(5L);
+
     @Parameter(value = "elasticsearch_max_total_connections", validators = {PositiveIntegerValidator.class})
     int elasticsearchMaxTotalConnections = 200;
 

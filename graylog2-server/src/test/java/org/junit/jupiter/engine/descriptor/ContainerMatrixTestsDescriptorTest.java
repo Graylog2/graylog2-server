@@ -23,11 +23,13 @@ import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 class ContainerMatrixTestsDescriptorTest {
 
     @Test
     void createKey() {
-        final String key = ContainerMatrixTestsDescriptor.createKey(Lifecycle.CLASS, "mavenDir", "jarDir", SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.valueOf("1.2.3")), MongodbServer.MONGO5, true);
-        Assertions.assertThat(key).isEqualTo("Lifecycle: CLASS, MavenProjectDirProvider: mavenDir, PluginJarsProvider: jarDir, Search: OpenSearch:1.2.3, MongoDB: 5.0, Mailserver: enabled");
+        final String key = ContainerMatrixTestsDescriptor.createKey(Lifecycle.CLASS, "mavenDir", "jarDir", SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.valueOf("1.2.3")), MongodbServer.MONGO5, true, Map.of("p1", "v1"));
+        Assertions.assertThat(key).isEqualTo("Lifecycle: CLASS, MavenProjectDirProvider: mavenDir, PluginJarsProvider: jarDir, Search: OpenSearch:1.2.3, MongoDB: 5.0, Mailserver: enabled, p1: v1");
     }
 }

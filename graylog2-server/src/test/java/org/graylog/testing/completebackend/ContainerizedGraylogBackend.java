@@ -33,13 +33,14 @@ import org.testcontainers.containers.Network;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackend.class);
-    public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdran";
+    public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdranHasToBeAtLeastSixtyFourCharactersInLength";
     public static final String ROOT_PASSWORD_PLAINTEXT = "admin";
     public static final String ROOT_PASSWORD_SHA_2 = DigestUtils.sha256Hex(ROOT_PASSWORD_PLAINTEXT);
 
@@ -58,13 +59,14 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          final MavenProjectDirProvider mavenProjectDirProvider,
                                                                          final List<String> enabledFeatureFlags,
                                                                          final boolean preImportLicense,
-                                                                         final boolean withMailServerEnabled) {
+                                                                         final boolean withMailServerEnabled,
+                                                                         Map<String, String> configParams) {
 
         LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
         final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, enabledFeatureFlags);
         LOG.debug("Done creating backend services");
 
-        return new ContainerizedGraylogBackend().create(services, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense);
+        return new ContainerizedGraylogBackend().create(services, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
     }
 
     private ContainerizedGraylogBackend create(Services services,
@@ -73,7 +75,8 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                final PluginJarsProvider pluginJarsProvider,
                                                final MavenProjectDirProvider mavenProjectDirProvider,
                                                final List<String> enabledFeatureFlags,
-                                               final boolean preImportLicense) {
+                                               final boolean preImportLicense,
+                                               Map<String, String> configParams) {
         this.services = services;
 
         var mongoDB = services.getMongoDBInstance();
@@ -87,7 +90,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
         var searchServer = services.getSearchServerInstance();
         try {
-            var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags);
+            var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
             this.node = NodeInstance.createStarted(nodeContainerConfig);
 
             // ensure that all containers and networks will be removed after all tests finish

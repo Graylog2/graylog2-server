@@ -47,6 +47,7 @@ export const TELEMETRY_EVENT_TYPE = {
     MOVE: 'Search Widget Moved',
     DUPLICATE: 'Search Widget Duplicate',
     COPY_TO_DASHBOARD: 'Search Widget Copy To Dashboard Clicked',
+    CREATE_NEW_DASHBOARD: 'Search Widget Create New Dashboard Clicked',
     SEARCH_WIDGET_HORIZONTAL_STRETCH: 'Search Widget Horizontal Width Toggled',
     SEARCH_WIDGET_EXTRA_ACTION: 'Search Widget Extra Action Clicked',
     WIDGET_EDIT_TOGGLED: 'Search Widget Edit Toggled',
@@ -458,6 +459,18 @@ export const TELEMETRY_EVENT_TYPE = {
     ASSIGNED: 'Team Assigned',
     UNASSIGNED: 'Team Unassigned',
     DELETED: 'Team Deleted',
+  },
+  INDEX_SET_FIELD_TYPE_PROFILE: {
+    NEW_OPENED: 'Index Set Field Type Profile Creating New Opened',
+    NEW_CANCELED: 'Index Set Field Type Profile Creating New Canceled',
+    CREATED: 'Index Set Field Type Profile Created',
+    EDIT_OPENED: 'Index Set Field Type Profile Edit Opened',
+    EDIT_CANCELED: 'Index Set Field Type Profile Edit Canceled',
+    EDIT: 'Index Set Field Type Profile Edited',
+    CHANGE_FOR_INDEX_OPENED: 'Index Set Field Type Profile Change For Index Opened',
+    CHANGE_FOR_INDEX_CANCELED: 'Index Set Field Type Profile Change For Index  Canceled',
+    CHANGE_FOR_INDEX_CHANGED: 'Index Set Field Type Profile Change For Index Changed',
+    CHANGE_FOR_INDEX_REMOVED: 'Index Set Field Type Profile Change For Index Remoced',
   },
 } as const;
 

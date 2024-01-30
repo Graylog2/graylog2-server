@@ -26,7 +26,7 @@ import org.bson.codecs.EncoderContext;
 import org.graylog.shaded.mongojack4.org.mongojack.JacksonMongoCollection;
 import org.graylog2.database.MongoCollections;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.f;

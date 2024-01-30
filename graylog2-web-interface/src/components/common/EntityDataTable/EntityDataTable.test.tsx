@@ -23,6 +23,7 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { Column } from 'components/common/EntityDataTable/types';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import EntityDataTable from './EntityDataTable';
 
@@ -179,36 +180,22 @@ describe('<EntityDataTable />', () => {
     expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', direction: 'asc' });
   });
 
-  it('should provide selected item ids for bulk actions', async () => {
-    const renderBulkActions = jest.fn(() => <div>Custom bulk actions</div>);
-
-    render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
-                            onSortChange={() => {}}
-                            onColumnsChange={() => {}}
-                            bulkSelection={{ actions: renderBulkActions }}
-                            columnDefinitions={columnDefinitions} />);
-
-    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
-    userEvent.click(rowCheckboxes[0]);
-
-    await screen.findByText('Custom bulk actions');
-
-    await waitFor(() => expect(renderBulkActions).toHaveBeenCalledWith(['row-id'], expect.any(Function)));
-  });
-
-  it('should provide bulk actions with function to update selected items', async () => {
+  it('bulk actions should update selected items', async () => {
     const selectedItemInfo = '1 item selected';
-    const renderBulkActions = (_selectedItemIds: Array<string>, setSelectedItemIds: (selectedItemIds: Array<string>) => void) => (
-      <button onClick={() => setSelectedItemIds([])} type="button">Reset selection</button>
-    );
+
+    const BulkActions = () => {
+      const { setSelectedEntities } = useSelectedEntities();
+
+      return <button onClick={() => setSelectedEntities([])} type="button">Reset selection</button>;
+    };
+
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
-                            bulkSelection={{ actions: renderBulkActions }}
+                            bulkSelection={{ actions: <BulkActions /> }}
                             columnDefinitions={columnDefinitions} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
@@ -230,7 +217,7 @@ describe('<EntityDataTable />', () => {
                             data={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
-                            bulkSelection={{ actions: () => <div /> }}
+                            bulkSelection={{ actions: <div /> }}
                             columnDefinitions={columnDefinitions} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
@@ -256,11 +243,10 @@ describe('<EntityDataTable />', () => {
                             data={data}
                             onSortChange={() => {}}
                             onColumnsChange={onColumnsChange}
-                            bulkSelection={{ actions: () => <div /> }}
                             columnDefinitions={columnDefinitions} />);
 
-    userEvent.click(screen.getByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(screen.getByRole('menuitem', { name: /show title/i }));
+    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /show title/i }));
 
     expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);
   });

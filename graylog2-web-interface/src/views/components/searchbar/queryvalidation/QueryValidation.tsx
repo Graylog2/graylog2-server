@@ -17,11 +17,10 @@
 import * as React from 'react';
 import { useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { Overlay, Transition } from 'react-overlays';
 import delay from 'lodash/delay';
 import { useFormikContext } from 'formik';
 
-import { Popover } from 'components/bootstrap';
+import Popover from 'components/common/Popover';
 import Icon from 'components/common/Icon';
 import StringUtils from 'util/StringUtils';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -95,7 +94,10 @@ const shakeAnimation = keyframes`
   }
 `;
 
-const StyledPopover = styled(Popover)(({ $shaking }) => css`
+type ExtraProps = {
+  $shaking: boolean,
+}
+const StyledPopoverDropdown = styled(Popover.Dropdown)<ExtraProps>(({ $shaking }) => css`
   animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
 `);
 
@@ -196,32 +198,28 @@ const QueryValidation = () => {
   const hasExplanations = validationState && validationState?.status !== 'OK';
 
   return (
-    <>
-      <Container ref={explanationTriggerRef}>
-        {hasExplanations ? (
-          <ExplanationTrigger title="Toggle validation error explanation"
-                              onClick={toggleShow}
-                              $clickable
-                              tabIndex={0}
-                              type="button">
-            <ErrorIcon $status={status} name="exclamation-circle" />
-          </ExplanationTrigger>
-        ) : (
-          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                             title="Search query syntax documentation"
-                             text={<Icon name="lightbulb" />} />
-        )}
-      </Container>
+    <Popover opened={hasExplanations && showExplanation} position="bottom" width={500} withArrow>
+      <Popover.Target>
+        <Container ref={explanationTriggerRef}>
+          {hasExplanations ? (
+            <ExplanationTrigger title="Toggle validation error explanation"
+                                onClick={toggleShow}
+                                $clickable
+                                tabIndex={0}
+                                type="button">
+              <ErrorIcon $status={status} name="exclamation-circle" />
+            </ExplanationTrigger>
+          ) : (
+            <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                               title="Search query syntax documentation"
+                               text={<Icon name="lightbulb" />} />
+          )}
+        </Container>
+      </Popover.Target>
       {hasExplanations && showExplanation && (
-      <Overlay show
-               containerPadding={10}
-               placement="bottom"
-               target={explanationTriggerRef.current}
-               shouldUpdatePosition
-               transition={Transition}>
-        <StyledPopover id="query-validation-error-explanation"
-                       title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
-                       $shaking={shakingPopover}>
+        <StyledPopoverDropdown id="query-validation-error-explanation"
+                               title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
+                               $shaking={shakingPopover}>
           <div role="alert">
             {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
               <Explanation key={id}>
@@ -236,10 +234,9 @@ const QueryValidation = () => {
               (<PlugableExplanation validationState={validationState} key={index} />)),
             )}
           </div>
-        </StyledPopover>
-      </Overlay>
+        </StyledPopoverDropdown>
       )}
-    </>
+    </Popover>
   );
 };
 

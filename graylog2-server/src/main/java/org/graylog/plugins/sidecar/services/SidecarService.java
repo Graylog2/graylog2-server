@@ -44,9 +44,11 @@ import org.joda.time.Period;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
-import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.inject.Inject;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

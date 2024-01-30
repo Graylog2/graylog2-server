@@ -33,7 +33,6 @@ import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.searches.IndexRangeStats;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -257,8 +256,6 @@ public class MongoIndexRangeServiceTest {
     @Test
     @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void testHandleIndexDeletion() throws Exception {
-        when(indexSetRegistry.isManagedIndex("graylog_1")).thenReturn(true);
-
         assertThat(indexRangeService.findAll()).hasSize(2);
 
         localEventBus.post(IndicesDeletedEvent.create(Collections.singleton("graylog_1")));

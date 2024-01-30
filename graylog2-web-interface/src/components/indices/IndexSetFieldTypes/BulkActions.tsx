@@ -22,28 +22,30 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import MenuItem from 'components/bootstrap/MenuItem';
 import IndexSetCustomFieldTypeRemoveModal
   from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
-  selectedFields: Array<string>,
-  setSelectedFields: React.Dispatch<React.SetStateAction<Array<string>>>,
   indexSetId: string,
 }
 
-const BulkActions = ({ selectedFields, setSelectedFields, indexSetId }: Props) => {
+const BulkActions = ({ indexSetId }: Props) => {
+  const { selectedEntities } = useSelectedEntities();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
+
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
 
   return (
-    <BulkActionsDropdown selectedEntities={selectedFields} setSelectedEntities={setSelectedFields}>
-      <MenuItem onSelect={toggleResetModal}>Reset</MenuItem>
+    <>
+      <BulkActionsDropdown>
+        <MenuItem onSelect={toggleResetModal}>Reset</MenuItem>
+      </BulkActionsDropdown>
       {showResetModal && (
-        <IndexSetCustomFieldTypeRemoveModal show
-                                            fields={selectedFields}
-                                            onClose={toggleResetModal}
-                                            indexSetIds={[indexSetId]}
-                                            setSelectedFields={setSelectedFields} />
+      <IndexSetCustomFieldTypeRemoveModal show
+                                          fields={selectedEntities}
+                                          onClose={toggleResetModal}
+                                          indexSetIds={[indexSetId]} />
       )}
-    </BulkActionsDropdown>
+    </>
   );
 };
 

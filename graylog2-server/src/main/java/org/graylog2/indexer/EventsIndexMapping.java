@@ -18,19 +18,19 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
 import org.graylog2.indexer.indices.Template;
 
 import java.util.Map;
 
 public abstract class EventsIndexMapping implements IndexMappingTemplate {
     @Override
-    public Template toTemplate(IndexSetConfig indexSetConfig, String indexPattern, Long order) {
+    public Template toTemplate(TemplateIndexSetConfig indexSetConfig, Long order) {
         final String indexRefreshInterval = "1s"; // TODO: Index refresh interval must be configurable
 
         var mappings = new Template.Mappings(buildMappings());
         var settings = new Template.Settings(Map.of("index.refresh_interval", indexRefreshInterval));
-        return Template.create(indexPattern, mappings, order, settings);
+        return Template.create(indexSetConfig.indexWildcard(), mappings, order, settings);
     }
 
     protected ImmutableMap<String, Object> buildMappings() {

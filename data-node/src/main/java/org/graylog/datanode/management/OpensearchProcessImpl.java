@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.management;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
@@ -30,9 +31,13 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.security.CustomCAX509TrustManager;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +48,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -59,6 +65,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<RestHighLevelClient> restClient = Optional.empty();
+    private Optional<OpenSearchClient> openSearchClient = Optional.empty();
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
 
@@ -72,9 +79,11 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final CustomCAX509TrustManager trustManager;
     private final NodeService<DataNodeDto> nodeService;
     private final Configuration configuration;
+    private final ObjectMapper objectMapper;
 
 
-    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService<DataNodeDto> nodeService) {
+    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager,
+                          final Configuration configuration, final NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = ProcessStateMachine.createNew();
         tracerAggregator = new StateMachineTracerAggregator();
@@ -84,10 +93,15 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.trustManager = trustManager;
         this.nodeService = nodeService;
         this.configuration = configuration;
+        this.objectMapper = objectMapper;
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
         return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
+    }
+
+    private RestClient createNewRestClient(OpensearchConfiguration configuration) {
+        return OpensearchRestClient.buildNewClient(configuration, datanodeConfiguration, trustManager);
     }
 
     @Override
@@ -102,6 +116,10 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     public Optional<RestHighLevelClient> restClient() {
         return restClient;
+    }
+
+    public Optional<OpenSearchClient> openSearchClient() {
+        return openSearchClient;
     }
 
     public OpensearchInfo processInfo() {
@@ -122,6 +140,15 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public String getOpensearchClusterUrl() {
         return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
+    }
+
+    @Override
+    public String getDatanodeRestApiUrl() {
+        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::securityConfigured).orElse(false);
+        String protocol = secured ? "https" : "http";
+        String host = configuration.getHostname();
+        final int port = configuration.getDatanodeHttpPort();
+        return String.format(Locale.ROOT, "%s://%s:%d", protocol, host, port);
     }
 
     public void onEvent(ProcessEvent event) {
@@ -148,9 +175,23 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     @Override
-    public void startWithConfig(OpensearchConfiguration configuration) {
+    public void configure(OpensearchConfiguration configuration) {
         this.opensearchConfiguration = Optional.of(configuration);
-        restart();
+        configure();
+    }
+
+    private void configure() {
+        opensearchConfiguration.ifPresentOrElse(
+                (config -> {
+                    // refresh TM if the SSL certs changed
+                    trustManager.refresh();
+                    // refresh the seed hosts
+                    writeSeedHostsList();
+                    commandLineProcess = new OpensearchCommandLineProcess(config, this);
+                    restClient = Optional.of(createRestClient(config));
+                }),
+                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+        );
     }
 
     private void writeSeedHostsList() {
@@ -164,17 +205,14 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     }
     @Override
-    public synchronized void restart() {
+    public synchronized void start() {
         opensearchConfiguration.ifPresentOrElse(
                 (config -> {
-                    stopProcess();
-                    // refresh TM if the SSL certs changed
-                    trustManager.refresh();
-                    // refresh the seed hosts
-                    writeSeedHostsList();
-                    commandLineProcess = new OpensearchCommandLineProcess(config, this);
                     commandLineProcess.start();
                     restClient = Optional.of(createRestClient(config));
+                    final var transport = new RestClientTransport(createNewRestClient(config), new JacksonJsonpMapper(objectMapper));
+                    final var client = new org.opensearch.client.opensearch.OpenSearchClient(transport);
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, client, objectMapper));
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );
@@ -214,6 +252,9 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public void onReset() {
         onEvent(ProcessEvent.RESET);
+        stop();
+        configure();
+        start();
     }
 
     @Override
