@@ -80,10 +80,17 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
 
   await act(async () => {
     await selectEvent.openMenu(sortFieldSelect);
-    await selectEvent.select(sortFieldSelect, option, selectEventConfig);
-    await selectEvent.openMenu(sortDirectionSelect);
-    await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
   });
+
+  await selectEvent.select(sortFieldSelect, option, selectEventConfig);
+
+  await act(async () => {
+    await selectEvent.openMenu(sortDirectionSelect);
+  });
+
+  await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
+
+  await within(httpMethodSortContainer).findByText('Descending');
 };
 
 const renderSUT = (props = {}) => render((
