@@ -17,6 +17,8 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.inmemory.InMemoryFilterExpressionParser;
 import org.graylog2.indexer.IndexSet;
@@ -32,24 +34,25 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.jetbrains.annotations.NotNull;
 
-import jakarta.inject.Inject;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class IndexFieldTypesListService {
 
-    private IndexFieldTypesService indexFieldTypesService;
+    private final IndexFieldTypesService indexFieldTypesService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
     private final IndexFieldTypeProfileService profileService;
 
     private final InMemoryFilterExpressionParser inMemoryFilterExpressionParser;
 
-    private FieldTypeDTOsMerger fieldTypeDTOsMerger;
+    private final FieldTypeDTOsMerger fieldTypeDTOsMerger;
 
     @Inject
     public IndexFieldTypesListService(final IndexFieldTypesService indexFieldTypesService,
@@ -108,6 +111,10 @@ public class IndexFieldTypesListService {
         return getFilteredList(indexSetId, fieldNameQuery, filters, sort, order);
     }
 
+    public Map<String, List<IndexSetFieldType>> getIndexSetFieldTypesList(final Set<String> indexSetId, final Collection<String> fieldNameQuery) {
+        return getFilteredList(indexSetId, fieldNameQuery);
+    }
+
     @NotNull
     private List<IndexSetFieldType> getFilteredList(String indexSetId, String fieldNameQuery, List<String> filters, String sort, Sorting.Direction order) {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
@@ -118,13 +125,13 @@ public class IndexFieldTypesListService {
 
         final Set<FieldTypeDTO> deflectorFieldDtos = mongoIndexSet
                 .map(IndexSet::getActiveWriteIndex)
-                .map(indexName -> indexFieldTypesService.findOneByIndexName(indexName))
+                .map(indexFieldTypesService::findOneByIndexName)
                 .map(IndexFieldTypesDTO::fields)
                 .orElse(ImmutableSet.of());
 
         final Set<FieldTypeDTO> previousFieldDtos = mongoIndexSet
                 .map(this::getPreviousActiveIndexSet)
-                .map(indexName -> indexFieldTypesService.findOneByIndexName(indexName))
+                .map(indexFieldTypesService::findOneByIndexName)
                 .map(IndexFieldTypesDTO::fields)
                 .orElse(ImmutableSet.of());
 
@@ -138,6 +145,45 @@ public class IndexFieldTypesListService {
                 .filter(indexSetFieldType -> inMemoryFilterExpressionParser.parse(filters, IndexSetFieldType.ATTRIBUTES).test(indexSetFieldType))
                 .sorted(IndexSetFieldType.getComparator(sort, order))
                 .toList();
+    }
+
+    @NotNull
+    private Map<String, List<IndexSetFieldType>> getFilteredList(Set<String> indexSetIds, Collection<String> fieldNames) {
+        final var indexSetConfigs = indexSetService.findByIds(indexSetIds);
+        final var mongoIndexSets = indexSetConfigs.stream().collect(Collectors.toMap(IndexSetConfig::id, indexSetFactory::create));
+        final var activeWriteIndices = mongoIndexSets.values().stream().map(MongoIndexSet::getActiveWriteIndex).collect(Collectors.toSet());
+        final var previousActiveIndexSets = mongoIndexSets.values().stream().map(this::getPreviousActiveIndexSet).collect(Collectors.toSet());
+
+        final var indexFieldTypes = indexFieldTypesService.findForIndexSets(Sets.union(activeWriteIndices, previousActiveIndexSets))
+                .stream()
+                .collect(Collectors.toMap(IndexFieldTypesDTO::indexName, Function.identity()));
+
+        return indexSetConfigs.stream()
+                .collect(Collectors.toMap(IndexSetConfig::id,
+                        indexSetConfig -> {
+                            final var mongoIndexSet = indexSetFactory.create(indexSetConfig);
+                            final var customFieldMappings = indexSetConfig.customFieldMappings();
+                            final var fieldTypeProfile = profileService.get(indexSetConfig.fieldTypeProfile());
+
+                            final Set<FieldTypeDTO> deflectorFieldDtos = indexFieldTypes.get(mongoIndexSet.getActiveWriteIndex()).fields();
+
+                            final Set<FieldTypeDTO> previousFieldDtos = indexFieldTypes.get(this.getPreviousActiveIndexSet(mongoIndexSet)).fields();
+
+                            final Collection<IndexSetFieldType> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos,
+                                    previousFieldDtos,
+                                    customFieldMappings,
+                                    fieldTypeProfile.orElse(null));
+                            return allFields
+                                    .stream()
+                                    .filter(indexSetFieldType -> fieldNames.contains(indexSetFieldType.fieldName()))
+                                    .toList();
+                        }));
+    }
+
+    @NotNull
+    private Map<String, List<IndexSetFieldType>> getFilteredList(Collection<String> indexSetIds, String fieldNameQuery, List<String> filters, String sort, Sorting.Direction order) {
+        return indexSetIds.stream()
+                .collect(Collectors.toMap(Function.identity(), indexSetId -> getFilteredList(indexSetId, fieldNameQuery, filters, sort, order)));
     }
 
     private String getPreviousActiveIndexSet(final IndexSet indexSet) {
