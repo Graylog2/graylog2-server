@@ -154,7 +154,7 @@ public class IndexFieldTypesListService {
         final var activeWriteIndices = mongoIndexSets.values().stream().map(MongoIndexSet::getActiveWriteIndex).collect(Collectors.toSet());
         final var previousActiveIndexSets = mongoIndexSets.values().stream().map(this::getPreviousActiveIndexSet).collect(Collectors.toSet());
 
-        final var indexFieldTypes = indexFieldTypesService.findForIndexSets(Sets.union(activeWriteIndices, previousActiveIndexSets))
+        final var indexFieldTypes = indexFieldTypesService.findByIndexNames(Sets.union(activeWriteIndices, previousActiveIndexSets))
                 .stream()
                 .collect(Collectors.toMap(IndexFieldTypesDTO::indexName, Function.identity()));
 
@@ -163,7 +163,8 @@ public class IndexFieldTypesListService {
                         indexSetConfig -> {
                             final var mongoIndexSet = indexSetFactory.create(indexSetConfig);
                             final var customFieldMappings = indexSetConfig.customFieldMappings();
-                            final var fieldTypeProfile = profileService.get(indexSetConfig.fieldTypeProfile());
+                            final var fieldTypeProfile = Optional.ofNullable(indexSetConfig.fieldTypeProfile())
+                                    .flatMap(profileService::get);
 
                             final Set<FieldTypeDTO> deflectorFieldDtos = Optional.ofNullable(indexFieldTypes.get(mongoIndexSet.getActiveWriteIndex()))
                                     .map(IndexFieldTypesDTO::fields)
