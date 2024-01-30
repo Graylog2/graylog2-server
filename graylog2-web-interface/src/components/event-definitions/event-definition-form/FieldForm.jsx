@@ -20,7 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 
-import { Select, HoverForHelp, } from 'components/common';
+import { Select, HoverForHelp } from 'components/common';
 import {
   Button,
   ButtonToolbar,
