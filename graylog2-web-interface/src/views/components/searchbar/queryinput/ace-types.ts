@@ -99,10 +99,10 @@ export type Editor = {
 };
 
 export type CompletionResult = {
-  name: string,
+  name?: string,
   value: string,
   score: number,
-  meta: any,
+  meta?: any,
   caption?: string,
 };
 

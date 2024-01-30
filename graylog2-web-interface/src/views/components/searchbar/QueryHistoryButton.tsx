@@ -21,6 +21,7 @@ import { SearchSuggestions } from '@graylog/server-api';
 import IconButton from 'components/common/IconButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useHotkey from 'hooks/useHotkey';
+import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';
 
 const QUERY_HISTORY_LIMIT = 100;
 
@@ -31,33 +32,30 @@ const ButtonContainer = styled.div`
   margin-left: 6px;
 `;
 
+export const fetchQueryHistory = () => SearchSuggestions.suggestQueryStrings(QUERY_HISTORY_LIMIT).then((response) => (
+  response.sort((
+    { last_used: lastUsedA }, { last_used: lastUsedB }) => new Date(lastUsedB).getTime() - new Date(lastUsedA).getTime(),
+  ).map((entry, index) => ({
+    value: entry.query,
+    meta: 'history',
+    score: index,
+    completer: {
+      insertMatch: (editor: { setValue: (value: string) => void }, data) => {
+        editor.setValue(data.value);
+      },
+    },
+  }))));
+
 type Props = {
   editorRef: React.MutableRefObject<Editor>
 }
 
 const QueryHistoryButton = ({ editorRef }: Props) => {
-  const showQueryHistory = () => {
+  const showQueryHistory = async () => {
     if (editorRef.current) {
       editorRef.current.focus();
 
-      SearchSuggestions.suggestQueryStrings(QUERY_HISTORY_LIMIT).then((response) => {
-        const options = response.sort((
-          { last_used: lastUsedA }, { last_used: lastUsedB }) => new Date(lastUsedB).getTime() - new Date(lastUsedA).getTime(),
-        ).map((entry, index) => ({
-          value: entry.query,
-          meta: 'history',
-          score: index,
-          completer: {
-            insertMatch: (editor: { setValue: (value: string) => void }, data) => {
-              editor.setValue(data.value);
-            },
-          },
-        }));
-
-        editorRef.current.execCommand('startAutocomplete', {
-          matches: options,
-        });
-      });
+      startAutocomplete(editorRef.current, { matches: await fetchQueryHistory() });
     }
   };
 

@@ -32,6 +32,8 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type View from 'views/logic/views/View';
 import useElementDimensions from 'hooks/useElementDimensions';
+import { fetchQueryHistory } from 'views/components/searchbar/QueryHistoryButton';
+import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';
 
 import type { AutoCompleter, Editor, Command } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
@@ -109,7 +111,7 @@ const _onLoadEditor = (editor: Editor, isInitialTokenizerUpdate: React.MutableRe
 
     editor.session.on('tokenizerUpdate', () => {
       if (editor.isFocused() && !editor.completer?.activated && editor.getValue() && !isInitialTokenizerUpdate.current) {
-        editor.execCommand('startAutocomplete');
+        startAutocomplete(editor);
       }
 
       if (isInitialTokenizerUpdate.current) {
@@ -241,11 +243,25 @@ const QueryInput = React.forwardRef<Editor, Props>(({
     isValidating,
     validate,
   }), [onExecuteProp, value, error, disableExecution, isValidating, validate]);
-  const _commands = useMemo(() => [...commands, {
-    name: 'Execute',
-    bindKey: { win: 'Enter', mac: 'Enter' },
-    exec: onExecute,
-  }], [commands, onExecute]);
+  const _commands = useMemo(() => [
+    ...commands,
+    {
+      name: 'Execute',
+      bindKey: { win: 'Enter', mac: 'Enter' },
+      exec: onExecute,
+    },
+    {
+      name: 'Show Completions',
+      bindKey: { win: 'Alt-Space', mac: 'Alt-Space' },
+      exec: async (editor) => {
+        const args = editor.getValue()
+          ? undefined
+          : { matches: await fetchQueryHistory() };
+
+        startAutocomplete(editor, args);
+      },
+    },
+  ], [commands, onExecute]);
   const updateEditorConfiguration = useCallback((node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands, innerRef), [_commands, completer]);
   const _onChange = useCallback((newQuery: string) => {
     onChange({ target: { value: newQuery, name } });
