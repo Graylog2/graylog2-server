@@ -145,7 +145,7 @@ describe('DashboardActionsMenu', () => {
 
   it('should open edit dashboard meta information modal', async () => {
     const { findByText } = render(<SUT />);
-    (await screen.findByRole('button', { name: /more actions/i })).click();
+    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     const editMenuItem = await screen.findByText(/Edit metadata/i);
 
     userEvent.click(editMenuItem);
@@ -176,7 +176,7 @@ describe('DashboardActionsMenu', () => {
 
     const saveButton = queryByTitle(/Save dashboard/);
     const shareButton = queryByTitle(/Share/);
-    const extrasButton = queryByRole(/^menu$/);
+    const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
     expect(shareButton).not.toBeInTheDocument();
@@ -191,7 +191,7 @@ describe('DashboardActionsMenu', () => {
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);
     const shareButton = queryByTitle(/Share/);
-    const extrasButton = queryByRole(/^menu$/);
+    const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
     expect(saveAsButton).not.toBeInTheDocument();
