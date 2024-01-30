@@ -22,34 +22,19 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
-import java.util.concurrent.TimeUnit;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoteReindexIndex {
-    final String name;
-    Status status;
-    final DateTime created;
-    Duration took;
-    Integer batches;
-    String errorMsg;
+    private final String name;
+    private Status status;
+    private final DateTime created;
+    private Duration took;
+    private Integer batches;
+    private String errorMsg;
 
     public RemoteReindexIndex(final String name, final Status status) {
         this.name = name;
         this.status = status;
         this.created = DateTime.now(DateTimeZone.UTC);
-    }
-
-    public static RemoteReindexIndex createError(final String name, final String errorMsg) {
-        var r = new RemoteReindexIndex(name, Status.ERROR);
-        r.setErrorMsg(errorMsg);
-        return r;
-    }
-
-    public static RemoteReindexIndex createFinished(String name, Duration duration, int batches) {
-        var r = new RemoteReindexIndex(name, Status.FINISHED);
-        r.setTook(duration);
-        r.setBatches(batches);
-        return r;
     }
 
     public String getName() {
@@ -60,9 +45,6 @@ public class RemoteReindexIndex {
         return status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     public DateTime getCreated() {
         return created;
@@ -72,23 +54,24 @@ public class RemoteReindexIndex {
         return took;
     }
 
-    public void setTook(Duration took) {
-        this.took = took;
-    }
 
     public Integer getBatches() {
         return batches;
     }
 
-    public void setBatches(Integer batches) {
-        this.batches = batches;
-    }
 
     public String getErrorMsg() {
         return errorMsg;
     }
 
-    public void setErrorMsg(String errorMsg) {
+    public void onError(String errorMsg) {
+        this.status = Status.ERROR;
         this.errorMsg = errorMsg;
+    }
+
+    public void onFinished(Duration duration, int batches) {
+        this.status = Status.FINISHED;
+        this.took = duration;
+        this.batches = batches;
     }
 }

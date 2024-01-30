@@ -26,6 +26,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -58,12 +59,12 @@ public class RemoteReindexResource {
     }
 
     @GET
-    @Path("/remoteReindex")
+    @Path("/status/{migrationID}")
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "status", notes = "status for a running migration")
-    public RemoteReindexMigration status() {
-        return migrationService.status();
+    public RemoteReindexMigration status(@ApiParam(name = "migrationID") @PathParam("migrationID") String migrationID) {
+        return migrationService.status(migrationID);
     }
 
 }

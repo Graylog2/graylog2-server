@@ -16,59 +16,84 @@
  */
 package org.graylog2.indexer.migration;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
-@AutoValue
-@JsonDeserialize(builder = RemoteReindexMigration.Builder.class)
-@WithBeanGetter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class RemoteReindexMigration {
-    private static final String FIELD_STATUS = "status";
-    private static final String FIELD_INDICES = "indices";
-    private static final String FIELD_ERROR = "error";
+public class RemoteReindexMigration {
 
-    @JsonProperty(FIELD_STATUS)
-    public abstract Status status();
+    @JsonProperty("id")
+    private final String id;
+    private List<RemoteReindexIndex> indices = new ArrayList<>();
+    @JsonProperty("status")
+    private Status status;
 
-    @JsonProperty(FIELD_INDICES)
-    public abstract Collection<RemoteReindexIndex> indices();
+    @JsonProperty("error")
+    private String error;
 
-    @JsonProperty(FIELD_ERROR)
-    @Nullable
-    public abstract String error();
+    @JsonIgnore
+    private Runnable finishCallback;
 
-    public static Builder builder() {
-        return Builder.create();
+    private RemoteReindexMigration(@NotNull String migrationID) {
+        this.id = migrationID;
+        this.status = Status.NOT_STARTED;
     }
 
-    public abstract Builder toBuilder();
+    public RemoteReindexMigration() {
+        this(UUID.randomUUID().toString());
+    }
 
-    @AutoValue.Builder
-    public static abstract class Builder {
-        @JsonProperty(FIELD_STATUS)
-        public abstract Builder status(Status status);
+    public static RemoteReindexMigration nonExistent(String migrationID) {
+        return new RemoteReindexMigration(migrationID).status(Status.NOT_STARTED);
+    }
 
-        @JsonProperty(FIELD_STATUS)
-        public abstract Builder indices(Collection<RemoteReindexIndex> indices);
+    public RemoteReindexMigration status(Status status) {
+        this.status = status;
+        return this;
+    }
 
-        @JsonProperty(FIELD_ERROR)
-        @Nullable
-        public abstract Builder error(String error);
+    public RemoteReindexMigration setIndices(List<RemoteReindexIndex> indices) {
+        this.indices = indices;
+        return this;
+    }
 
-        @JsonCreator
-        public static Builder create() {
-            return new AutoValue_RemoteReindexMigration.Builder();
+    public RemoteReindexMigration error(String message) {
+        this.error = message;
+        return this;
+    }
+
+    @JsonProperty("indices")
+    public List<RemoteReindexIndex> indices() {
+        return indices;
+    }
+
+    public Optional<RemoteReindexIndex> indexByName(String name) {
+        return indices.stream().filter(i -> Objects.equals(i.getName(), name)).findFirst();
+    }
+
+    public String id() {
+        return id;
+    }
+
+     public RemoteReindexMigration setFinishCallback(Runnable finishCallback) {
+        this.finishCallback = finishCallback;
+        return this;
+    }
+
+
+    public void finish() {
+        if(finishCallback != null) {
+            finishCallback.run();
         }
-
-        public abstract RemoteReindexMigration build();
+        status(Status.FINISHED);
     }
 }
