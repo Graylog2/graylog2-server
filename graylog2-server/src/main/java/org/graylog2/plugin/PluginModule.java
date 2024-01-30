@@ -255,7 +255,6 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     private MapBinder<String, EventStorageHandler.Factory> eventStorageHandlerBinder() {
-        Multibinder.newSetBinder(binder(), SchedulerCapabilities.class);
         return MapBinder.newMapBinder(binder(), String.class, EventStorageHandler.Factory.class);
     }
 
