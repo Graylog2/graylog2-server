@@ -16,43 +16,16 @@
  */
 import * as React from 'react';
 
-import { OverlayTrigger, Icon } from 'components/common';
-import { Popover, Table, Button } from 'components/bootstrap';
+import QueryHelper from 'components/common/QueryHelper';
 
-const RolesQueryHelperPopover = (
-  <Popover id="role-search-query-help"
-           title="Search Syntax Help">
-    <p><strong>Available search fields</strong></p>
-    <Table condensed>
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>name</td>
-          <td>The name of a role</td>
-        </tr>
-        <tr>
-          <td>description</td>
-          <td>The description of a role</td>
-        </tr>
-      </tbody>
-    </Table>
-    <p><strong>Examples</strong></p>
-    <p>
-      Find role with a name containing manager:<br />
-      <kbd>name:manager</kbd><br />
-    </p>
-  </Popover>
+const queryExample = (
+  <p>
+    Find role with a name containing manager:<br />
+    <kbd>name:manager</kbd><br />
+  </p>
 );
-
 const RolesQueryHelper = () => (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={RolesQueryHelperPopover}>
-    <Button bsStyle="link"><Icon name="question-circle" /></Button>
-  </OverlayTrigger>
+  <QueryHelper entityName="role" example={queryExample} commonFields={['name', 'description']} />
 );
 
 export default RolesQueryHelper;

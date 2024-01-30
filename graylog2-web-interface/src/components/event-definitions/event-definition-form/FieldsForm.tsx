@@ -21,8 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 
-import { OverlayTrigger, Icon } from 'components/common';
-import { Alert, Col, Row, Button } from 'components/bootstrap';
+import { Alert, Col, Row } from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import type User from 'logic/users/User';
 
@@ -34,6 +33,7 @@ import './field-value-providers';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
+import HoverForHelp from 'components/common/HoverForHelp';
 
 type Props = {
   currentUser: User,
@@ -137,11 +137,9 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
               <dl>
                 <dt>
                   Keys
-                  <OverlayTrigger placement="right"
-                                  trigger={['click', 'hover']}
-                                  overlay={<EventKeyHelpPopover id="key-header-popover" />}>
-                    <Button bsStyle="link" bsSize="xsmall"><Icon name="question-circle" /></Button>
-                  </OverlayTrigger>
+                  <HoverForHelp title="More about Event Keys" trigger={['click', 'hover']} placement="right">
+                    <EventKeyHelpPopover />
+                  </HoverForHelp>
                 </dt>
                 <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>
               </dl>

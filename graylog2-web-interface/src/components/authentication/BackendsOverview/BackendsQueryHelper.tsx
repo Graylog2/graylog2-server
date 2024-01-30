@@ -17,11 +17,10 @@
 import * as React from 'react';
 
 import { OverlayTrigger, Icon } from 'components/common';
-import { Popover, Table, Button } from 'components/bootstrap';
+import { Table, Button } from 'components/bootstrap';
 
 const backendQueryHelperPopover = (
-  <Popover id="user-search-query-help"
-           title="Search Syntax Help">
+  <>
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -46,14 +45,16 @@ const backendQueryHelperPopover = (
       Find backends with a title containing LDAP:<br />
       <kbd>title:LDAP</kbd><br />
     </p>
-  </Popover>
+  </>
 );
 
 const BackendQueryHelper = () => (
   <OverlayTrigger overlay={backendQueryHelperPopover}
+                  title="Search Syntax Help"
                   placement="right"
                   rootClose
-                  trigger="click">
+                  trigger="click"
+                  width={500}>
     <Button bsStyle="link">
       <Icon name="question-circle" />
     </Button>

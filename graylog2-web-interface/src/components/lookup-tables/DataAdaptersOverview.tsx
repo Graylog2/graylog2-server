@@ -17,13 +17,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
+import { Row, Col, Table } from 'components/bootstrap';
 import {
-  OverlayTrigger,
   PaginatedList,
   SearchForm,
   Spinner,
-  Icon,
   NoSearchResult,
   NoEntitiesExist,
 } from 'components/common';
@@ -32,6 +30,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter, PaginationType } from 'logic/lookup-tables/types';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
+import QueryHelper from 'components/common/QueryHelper';
 
 import Styles from './Overview.css';
 
@@ -39,38 +38,8 @@ const ScrollContainer = styled.div`
   overflow-x: auto;
 `;
 
-const buildHelpPopover = () => (
-  <Popover id="search-query-help"
-           className={Styles.popoverWide}
-           title="Search Syntax Help">
-    <p><strong>Available search fields</strong></p>
-    <Table condensed>
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>id</td>
-          <td>Data Adapter ID</td>
-        </tr>
-        <tr>
-          <td>title</td>
-          <td>The title of the data adapter</td>
-        </tr>
-        <tr>
-          <td>name</td>
-          <td>The reference name of the data adapter</td>
-        </tr>
-        <tr>
-          <td>description</td>
-          <td>The description of data adapter</td>
-        </tr>
-      </tbody>
-    </Table>
-    <p><strong>Example</strong></p>
+const queryExamples = (
+  <>
     <p>
       Find data adapters by parts of their names:<br />
       <kbd>name:geoip</kbd><br />
@@ -81,16 +50,13 @@ const buildHelpPopover = () => (
       <kbd>geoip</kbd> <br />is the same as<br />
       <kbd>title:geoip</kbd>
     </p>
-  </Popover>
+  </>
 );
 
 const queryHelpComponent = (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-    <Button bsStyle="link"
-            className={Styles.searchHelpButton}>
-      <Icon name="question-circle" fixedWidth />
-    </Button>
-  </OverlayTrigger>
+  <QueryHelper entityName="data adapter"
+               commonFields={['id', 'title', 'name', 'description']}
+               example={queryExamples} />
 );
 
 const NoResults = ({ query }: { query: string }) => (

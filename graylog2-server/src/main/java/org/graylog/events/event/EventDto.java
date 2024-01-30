@@ -50,6 +50,7 @@ public abstract class EventDto {
     public static final String FIELD_KEY_TUPLE = "key_tuple";
     public static final String FIELD_KEY = "key";
     public static final String FIELD_PRIORITY = "priority";
+    public static final String FIELD_RISK_SCORE = "risk_score";
     public static final String FIELD_FIELDS = "fields";
     private static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
     private static final String FIELD_REPLAY_INFO = "replay_info";
@@ -100,6 +101,9 @@ public abstract class EventDto {
     @JsonProperty(FIELD_PRIORITY)
     public abstract long priority();
 
+    @JsonProperty(FIELD_RISK_SCORE)
+    public abstract long riskScore();
+
     @JsonProperty(FIELD_ALERT)
     public abstract boolean alert();
 
@@ -126,7 +130,8 @@ public abstract class EventDto {
         public static Builder create() {
             return new AutoValue_EventDto.Builder()
                     .sourceStreams(ImmutableSet.of())
-                    .groupByFields(ImmutableMap.of());
+                    .groupByFields(ImmutableMap.of())
+                    .riskScore(0);
         }
 
         @JsonProperty(FIELD_ID)
@@ -177,6 +182,9 @@ public abstract class EventDto {
 
         @JsonProperty(FIELD_PRIORITY)
         public abstract Builder priority(long priority);
+
+        @JsonProperty(FIELD_RISK_SCORE)
+        public abstract Builder riskScore(long riskScore);
 
         @JsonProperty(FIELD_ALERT)
         public abstract Builder alert(boolean alert);

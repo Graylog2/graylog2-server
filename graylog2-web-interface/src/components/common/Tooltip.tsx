@@ -15,26 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import { Tooltip as MantineTooltip } from '@mantine/core';
+import { useTheme } from 'styled-components';
 
-import { OverlayTrigger, Icon } from 'components/common';
+type Props = React.ComponentProps<typeof MantineTooltip>;
 
-type Props = {
-  errorText: string,
-  title: string,
-  placement: 'bottom' | 'top' | 'right' | 'left',
+const Tooltip = (props: Props) => {
+  const theme = useTheme();
+  const styles = () => ({
+    tooltip: {
+      backgroundColor: theme.colors.global.contentBackground,
+      color: theme.colors.global.textDefault,
+      fontWeight: 400,
+      fontSize: theme.fonts.size.root,
+    },
+  });
+
+  return <MantineTooltip styles={styles} {...props} />;
 };
 
-const StyledSpan = styled.span`
-  margin-right: 5px;
-`;
-
-const ErrorPopover = ({ errorText, title = 'Error', placement = 'bottom' }: Props) => (
-  <OverlayTrigger trigger={['hover', 'focus']} placement={placement} overlay={errorText} title={title} width={400}>
-    <StyledSpan>
-      <Icon name="exclamation-triangle" className="text-danger" />
-    </StyledSpan>
-  </OverlayTrigger>
-);
-
-export default ErrorPopover;
+export default Tooltip;

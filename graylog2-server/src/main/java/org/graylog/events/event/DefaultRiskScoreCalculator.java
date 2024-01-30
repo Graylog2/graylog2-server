@@ -14,10 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-:local(.overlay) {
-    max-width: 400px;
-}
+package org.graylog.events.event;
 
-:local(.trigger) {
-    margin-right: 5px;
+public class DefaultRiskScoreCalculator implements RiskScoreCalculator {
+
+    @Override
+    public void assignRiskScore(Event event) {
+        event.setRiskScore(0);
+    }
 }
