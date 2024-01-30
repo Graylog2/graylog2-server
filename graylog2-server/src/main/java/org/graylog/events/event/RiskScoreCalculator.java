@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import RolesQueryHelper from 'components/roles/RolesQueryHelper';
+package org.graylog.events.event;
 
-export default RolesQueryHelper;
+public interface RiskScoreCalculator {
+    void assignRiskScore(Event event);
+}

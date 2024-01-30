@@ -76,12 +76,10 @@ class ImportsViewModal extends React.Component {
   _buildVariableName = (name) => `\${sidecar.${name}}`;
 
   _formatUpload(upload) {
-    const tooltip = <Tooltip id={`${upload.id}-status-tooltip`}>{upload.collector_id}</Tooltip>;
-
     return (
       <tr key={upload.id}>
         <td>
-          <OverlayTrigger placement="top" overlay={tooltip} rootClose>
+          <OverlayTrigger placement="top" overlay={upload.collector_id} rootClose>
             <span>{upload.node_id}</span>
           </OverlayTrigger>
         </td>
