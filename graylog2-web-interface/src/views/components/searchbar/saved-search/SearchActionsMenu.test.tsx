@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 
@@ -144,7 +144,7 @@ describe('SearchActionsMenu', () => {
       asMock(useHistory).mockReturnValue(history);
     });
 
-    const findTitleInput = () => screen.getByRole('textbox', { name: /title/i });
+    const findTitleInput = () => screen.findByRole('textbox', { name: /title/i });
 
     it('should export current search as dashboard', async () => {
       asMock(useCurrentUser).mockReturnValue(
@@ -281,6 +281,7 @@ describe('SearchActionsMenu', () => {
         .build();
 
       await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
+      await waitForElementToBeRemoved(screen.queryByText('Pluggable component!'));
     });
 
     it('should save search when pressing related keyboard shortcut', async () => {

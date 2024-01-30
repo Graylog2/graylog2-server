@@ -70,12 +70,12 @@ const IndexSetConfigurationPage = () => {
   }
 
   const saveConfiguration = (newIndexSet: IndexSet) => {
-    _saveConfiguration(history, newIndexSet);
-
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_UPDATED, {
       app_pathname: 'indexsets',
       app_section: 'indexset',
     });
+
+    return _saveConfiguration(history, newIndexSet);
   };
 
   return (

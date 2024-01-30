@@ -18,15 +18,15 @@ package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
-import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.retention.executors.CountBasedRetentionExecutor;
+import org.graylog2.indexer.retention.executors.TimeBasedRetentionExecutor;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,20 +39,19 @@ import java.util.concurrent.TimeUnit;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_CLOSE;
 
 public class ClosingRetentionStrategy extends AbstractIndexRetentionStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(ClosingRetentionStrategy.class);
     public static final String NAME = "close";
-
+    private static final Logger LOG = LoggerFactory.getLogger(ClosingRetentionStrategy.class);
     private final Indices indices;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
 
     @Inject
     public ClosingRetentionStrategy(Indices indices,
-                                    ActivityWriter activityWriter,
                                     NodeId nodeId,
                                     AuditEventSender auditEventSender,
-                                    JobSchedulerClock clock) {
-        super(indices, activityWriter, clock);
+                                    CountBasedRetentionExecutor countBasedRetentionExecutor,
+                                    TimeBasedRetentionExecutor timeBasedRetentionExecutor) {
+        super(countBasedRetentionExecutor, timeBasedRetentionExecutor);
         this.indices = indices;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;

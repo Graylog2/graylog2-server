@@ -19,8 +19,8 @@ import styled, { css } from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
 import type UserOverview from 'logic/users/UserOverview';
-import { OverlayTrigger, Icon } from 'components/common';
-import { Popover } from 'components/bootstrap';
+import { Icon } from 'components/common';
+import Tooltip from 'components/common/Tooltip';
 
 type Props = {
   authServiceEnabled: $PropertyType<UserOverview, 'authServiceEnabled'>,
@@ -38,18 +38,11 @@ const Td = styled.td`
 
 const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => (
   <Td>
-    <OverlayTrigger trigger={['hover', 'focus']}
-                    placement="right"
-                    overlay={(
-                      <Popover id="session-badge-details">
-                        {`User is ${accountStatus}`}{!authServiceEnabled ? ' (authentication service is disabled)' : ''}
-                      </Popover>
-                    )}
-                    rootClose>
+    <Tooltip withArrow position="right" label={<>{`User is ${accountStatus}`}{!authServiceEnabled ? ' (authentication service is disabled)' : ''}</>}>
       <Wrapper $enabled={authServiceEnabled && accountStatus === 'enabled'}>
         <Icon name={accountStatus === 'enabled' ? 'check-circle' : 'times-circle'} />
       </Wrapper>
-    </OverlayTrigger>
+    </Tooltip>
   </Td>
 );
 

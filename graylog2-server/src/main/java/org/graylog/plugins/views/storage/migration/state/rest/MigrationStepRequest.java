@@ -19,5 +19,7 @@ package org.graylog.plugins.views.storage.migration.state.rest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 
-public record MigrationStepRequest(@JsonProperty("step") MigrationStep step) {
+import java.util.Map;
+
+public record MigrationStepRequest(@JsonProperty("step") MigrationStep step, @JsonProperty("args") Map<String, Object> args) {
 }

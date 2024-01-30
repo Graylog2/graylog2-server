@@ -80,19 +80,6 @@ const _generateSeries = (mapKeys: KeyMapper): Generator => ({
   };
 };
 
-const getChartColor = (fullDataArray: ChartConfig[], name: string) => {
-  const fullData = fullDataArray.find((d) => d.labels.indexOf(name) >= 0);
-
-  if (fullData?.labels && fullData?.marker?.colors) {
-    const indexOfName = fullData.labels.indexOf(name);
-    const { marker: { colors } } = fullData;
-
-    return colors[indexOfName];
-  }
-
-  return undefined;
-};
-
 const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   const colors = chart.originalLabels.map((label) => colorMap.get(label));
 
@@ -113,8 +100,6 @@ const PieVisualization = makeVisualization(({ config, data }: VisualizationCompo
   return (
     <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide>
       <GenericPlot chartData={transformedData}
-                   layout={{ showlegend: false }}
-                   getChartColor={getChartColor}
                    setChartColor={setChartColor} />
     </PlotLegend>
   );

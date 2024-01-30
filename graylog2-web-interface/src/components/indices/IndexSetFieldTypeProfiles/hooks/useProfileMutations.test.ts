@@ -110,4 +110,36 @@ describe('useProfileMutations', () => {
         'Could not create index set field type profile'));
     });
   });
+
+  describe('deleteProfile', () => {
+    const deleteUrl = qualifyUrl(`${urlPrefix}/111`);
+
+    it('should run fetch and display UserNotification', async () => {
+      asMock(fetch).mockImplementation(() => Promise.resolve({}));
+
+      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+
+      act(() => {
+        result.current.deleteProfile('111');
+      });
+
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith('DELETE', deleteUrl));
+
+      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Index set field type profile has been successfully deleted.', 'Success!'));
+    });
+
+    it('should display notification on fail', async () => {
+      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+
+      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+
+      act(() => {
+        result.current.deleteProfile('111').catch(() => {});
+      });
+
+      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
+        'Deleting index set field type profile failed with status: Error: Error',
+        'Could not delete index set field type profile'));
+    });
+  });
 });

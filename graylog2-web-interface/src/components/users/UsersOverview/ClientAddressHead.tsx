@@ -16,37 +16,32 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useDisclosure } from '@mantine/hooks';
 
-import { OverlayTrigger, Icon } from 'components/common';
-import { Popover, Button } from 'components/bootstrap';
+import { Icon, Tooltip } from 'components/common';
+import { Button } from 'components/bootstrap';
 
 type Props = {
   title: string,
 };
 
-const TooltipButton = styled(Button)`
+const IconWithHelp = styled(Icon)`
   cursor: help;
-  padding: 0 0 0 2px;
-  display: inline-flex;
 `;
 
 const ClientAddressHead = ({ title }: Props) => {
-  const popover = (
-    <Popover id="client-address-help">
-      <p>
-        The address of the client used to initially establish the session, not necessarily its current address.
-      </p>
-    </Popover>
-  );
+  const [opened, { toggle }] = useDisclosure(false);
 
   return (
     <th>
       {title}
-      <OverlayTrigger trigger="click" rootClose placement="top" overlay={popover}>
-        <TooltipButton bsStyle="link">
-          <Icon name="question-circle" fixedWidth />
-        </TooltipButton>
-      </OverlayTrigger>
+      <Tooltip opened={opened}
+               withArrow
+               label="The address of the client used to initially establish the session, not necessarily its current address.">
+        <Button bsStyle="link" onClick={toggle}>
+          <IconWithHelp name="question-circle" fixedWidth />
+        </Button>
+      </Tooltip>
     </th>
   );
 };

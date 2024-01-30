@@ -16,7 +16,6 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { AutoAffix } from 'react-overlays';
 
 import { Spinner, Wizard, ScrollButton } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
@@ -157,11 +156,7 @@ class ContentPackEdit extends React.Component {
       <div>
         <Wizard steps={steps} onStepChange={this._stepChanged} affixed>
           {this.state.selectedStep !== 'preview' ? (
-            <AutoAffix viewportOffsetTop={65}>
-              <div>
-                <ContentPackDetails contentPack={this.props.contentPack} />
-              </div>
-            </AutoAffix>
+            <ContentPackDetails contentPack={this.props.contentPack} />
           ) : undefined}
         </Wizard>
         <ScrollButton position="middle" />
