@@ -230,18 +230,18 @@ describe('IndexSetConfigurationForm', () => {
                                {...props} />
   );
 
-  it('Should render IndexSetConfigurationForm', () => {
+  it('Should render IndexSetConfigurationForm', async () => {
     render(<SUT />);
 
-    const titleText = screen.getByText(/title/i);
+    const titleText = await screen.findByText(/title/i);
 
     expect(titleText).toBeInTheDocument();
   });
 
-  it('Should render create IndexSetConfigurationForm', () => {
+  it('Should render create IndexSetConfigurationForm', async () => {
     render(<SUT create />);
 
-    const indexPrefix = screen.getByText(/index prefix/i);
+    const indexPrefix = await screen.findByText(/index prefix/i);
 
     expect(indexPrefix).toBeInTheDocument();
   });

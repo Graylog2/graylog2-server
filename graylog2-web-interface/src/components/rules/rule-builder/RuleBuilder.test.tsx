@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { renderWithDataRouter } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -29,20 +29,26 @@ import { PipelineRulesContext } from '../RuleContext';
 jest.mock('hooks/useRuleBuilder');
 
 describe('RuleBuilder', () => {
+  let originalConsoleError;
+
   beforeAll(() => {
-    jest.spyOn(console, 'error').mockImplementation((message) => {
+    // eslint-disable-next-line no-console
+    originalConsoleError = console.error;
+
+    // eslint-disable-next-line no-console
+    console.error = (message: string) => {
       if (!JSON.stringify(message || '').includes('Warning: validateDOMNesting')) {
-        // eslint-disable-next-line no-console
-        console.error(message);
+        originalConsoleError(message);
       }
-    });
+    };
   });
 
   afterEach(() => {
+    console.error = originalConsoleError;
     jest.restoreAllMocks();
   });
 
-  it('should save Title and Description', () => {
+  it('should save Title and Description', async () => {
     const createRule = jest.fn();
     const title = 'title';
     const description = 'description';
@@ -53,7 +59,7 @@ describe('RuleBuilder', () => {
       createRule,
     } as any);
 
-    const { getByLabelText, getByRole } = renderWithDataRouter((
+    render((
       <PipelineRulesContext.Provider value={{
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
@@ -62,12 +68,13 @@ describe('RuleBuilder', () => {
         <RuleBuilder />
       </PipelineRulesContext.Provider>
     ));
-    const titleInput = getByLabelText('Title');
-    const descriptionInput = getByLabelText('Description');
+
+    const titleInput = await screen.findByLabelText('Title');
+    const descriptionInput = await screen.findByLabelText('Description');
 
     userEvent.paste(titleInput, title);
     userEvent.paste(descriptionInput, description);
-    const createRuleButton = getByRole('button', { name: 'Create rule' });
+    const createRuleButton = await screen.findByRole('button', { name: 'Create rule' });
     userEvent.click(createRuleButton);
 
     expect(createRule).toHaveBeenCalledWith({
@@ -88,7 +95,7 @@ describe('RuleBuilder', () => {
       updateRule,
     } as any);
 
-    const { getByLabelText, getByRole } = renderWithDataRouter((
+    const { getByLabelText, getByRole } = render((
       <PipelineRulesContext.Provider value={{
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
@@ -121,7 +128,7 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByRole } = renderWithDataRouter((
+    const { getByRole } = render((
       <PipelineRulesContext.Provider value={{
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
@@ -150,7 +157,7 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByText, getByRole } = renderWithDataRouter((
+    const { getByText, getByRole } = render((
       <PipelineRulesContext.Provider value={{
         simulateRule: () => {},
         setRawMessageToSimulate: () => {},
@@ -180,7 +187,7 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByText, getByTestId } = renderWithDataRouter((
+    const { getByText, getByTestId } = render((
       <PipelineRulesContext.Provider value={{
         ruleSimulationResult: {
           fields: { message: rawMessageToSimulate },

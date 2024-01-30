@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen, within, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
@@ -161,14 +161,22 @@ describe('Aggregation Widget', () => {
       userEvent.type(nameInput, 'Metric name');
 
       const metricFieldSelect = await screen.findByLabelText('Select a function');
-      await selectEvent.openMenu(metricFieldSelect);
+
+      await act(async () => {
+        await selectEvent.openMenu(metricFieldSelect);
+      });
+
       await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
 
       await findWidgetConfigSubmitButton();
 
       // Change widget search controls
       const streamsSelect = await screen.findByLabelText('Select streams the search should include. Searches in all streams if empty.');
-      await selectEvent.openMenu(streamsSelect);
+
+      await act(async () => {
+        await selectEvent.openMenu(streamsSelect);
+      });
+
       await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
 
       await screen.findByRole('button', {
