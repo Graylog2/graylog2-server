@@ -39,8 +39,11 @@ export const fetchQueryHistory = () => SearchSuggestions.suggestQueryStrings(QUE
     meta: 'history',
     score: index,
     completer: {
-      insertMatch: (editor: { setValue: (value: string) => void }, data) => {
-        editor.setValue(data.value);
+      insertMatch: (
+        editor: { setValue: (value: string, cursorPosition?: number) => void },
+        data: { value: string },
+      ) => {
+        editor.setValue(data.value, 1);
       },
     },
   }))));
