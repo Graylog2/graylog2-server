@@ -42,12 +42,10 @@ public interface WriteResult<T, K> {
     }
 
     default Object getUpsertedId() {
-        throw new MongoException("No Id to return");
+        return null;
     }
 
-    default boolean isUpdateOfExisting() {
-        throw new MongoException("No update information available");
-    }
+    boolean isUpdateOfExisting();
 
     @SuppressWarnings("unchecked")
     static <L> L toIdType(BsonValue id, Class<L> idType) {
@@ -67,5 +65,17 @@ public interface WriteResult<T, K> {
         }
         throw new IllegalArgumentException(f("Only String and ObjectID types supported for ID. Got %s.",
                 id.getBsonType()));
+    }
+
+    static Object extractValue(BsonValue bsonValue) {
+        if (bsonValue == null) {
+            return null;
+        }
+        return switch (bsonValue.getBsonType()) {
+            case OBJECT_ID -> bsonValue.asObjectId().getValue();
+            case STRING -> bsonValue.asString().getValue();
+            default -> throw new IllegalArgumentException(f("Only String and ObjectID types supported for ID. Got %s.",
+                    bsonValue.getBsonType()));
+        };
     }
 }

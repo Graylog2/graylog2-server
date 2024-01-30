@@ -44,4 +44,9 @@ public class LegacyDeleteResult<T, K> implements WriteResult<T, K> {
     public boolean wasAcknowledged() {
         return deleteResult.wasAcknowledged();
     }
+
+    @Override
+    public boolean isUpdateOfExisting() {
+        return false;
+    }
 }

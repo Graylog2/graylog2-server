@@ -16,7 +16,9 @@
  */
 package org.graylog2.database.jackson.legacy;
 
-import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.MongoException;
+import com.mongodb.client.result.InsertManyResult;
+import org.bson.BsonValue;
 import org.mongojack.JacksonMongoCollection;
 import org.mongojack.WriteResult;
 
@@ -26,21 +28,30 @@ import org.mongojack.WriteResult;
  * @deprecated use {@link org.graylog2.database.MongoCollections} as an entrypoint for interacting with MongoDB.
  */
 @Deprecated
-public class LegacyInsertOneResult<T, K> implements WriteResult<T, K> {
+public class LegacyInsertManyResult<T, K> implements WriteResult<T, K> {
     private final JacksonMongoCollection<T> collection;
-    private final InsertOneResult insertOneResult;
+    private final InsertManyResult insertOneResult;
     private final Class<K> idType;
 
-    public LegacyInsertOneResult(JacksonMongoCollection<T> collection, InsertOneResult insertOneResult,
-                                 Class<K> idType) {
+    public LegacyInsertManyResult(JacksonMongoCollection<T> collection, InsertManyResult insertManyResult,
+                                  Class<K> idType) {
         this.collection = collection;
-        this.insertOneResult = insertOneResult;
+        this.insertOneResult = insertManyResult;
         this.idType = idType;
     }
 
     @Override
     public T getSavedObject() {
-        return collection.findOneById(insertOneResult.getInsertedId());
+        final BsonValue firstId = getFirstId();
+
+        if (firstId != null) {
+            final T item = collection.findOneById(firstId);
+            if (item != null) {
+                return item;
+            }
+        }
+
+        throw new MongoException("No objects to return");
     }
 
     @Override
@@ -55,11 +66,20 @@ public class LegacyInsertOneResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public K getSavedId() {
-        return WriteResult.toIdType(insertOneResult.getInsertedId(), idType);
+        final BsonValue firstId = getFirstId();
+
+        if (firstId != null) {
+            return WriteResult.toIdType(firstId, idType);
+        }
+        throw new MongoException("No objects to return");
     }
 
     @Override
     public boolean isUpdateOfExisting() {
         return false;
+    }
+
+    private BsonValue getFirstId() {
+        return insertOneResult.getInsertedIds().get(0);
     }
 }

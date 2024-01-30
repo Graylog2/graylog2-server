@@ -45,6 +45,7 @@ import org.bson.codecs.CollectibleCodec;
 import org.bson.conversions.Bson;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.graylog2.database.jackson.legacy.LegacyDeleteResult;
+import org.graylog2.database.jackson.legacy.LegacyInsertManyResult;
 import org.graylog2.database.jackson.legacy.LegacyInsertOneResult;
 import org.graylog2.database.jackson.legacy.LegacyUpdateOneResult;
 import org.graylog2.database.jackson.legacy.LegacyUpdateResult;
@@ -191,18 +192,18 @@ public class JacksonDBCollection<T, K> {
     }
 
     public WriteResult<T, K> update(Bson filter, T object, boolean upsert, boolean multi) {
-        return update(filter, object, upsert, multi, null);
+        return update(filter, object, upsert, multi, delegate.getWriteConcern());
     }
 
     public WriteResult<T, K> update(Bson filter, T object, boolean upsert, boolean multi,
                                     @Nullable WriteConcern concern) {
         if (multi) {
-            throw new IllegalArgumentException(("Multi-update ist not supported for object-based updates."));
+            throw new IllegalArgumentException(("Multi-update is not supported for object-based updates."));
         }
         final var coll = concern == null ? delegate : delegate.withWriteConcern(concern);
         final var options = new ReplaceOptions().upsert(upsert);
         try {
-            return new LegacyUpdateOneResult<>(coll, object, coll.replaceOne(filter, object, options), valueType, idType);
+            return new LegacyUpdateResult<>(coll, coll.replaceOne(filter, object, options));
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
         }
@@ -212,10 +213,10 @@ public class JacksonDBCollection<T, K> {
         try {
             if (multi) {
                 return new LegacyUpdateResult<>(delegate,
-                        delegate.updateMany(filter, update, new UpdateOptions().upsert(upsert)), idType);
+                        delegate.updateMany(filter, update, new UpdateOptions().upsert(upsert)));
             } else {
                 return new LegacyUpdateResult<>(delegate,
-                        delegate.updateOne(filter, update, new UpdateOptions().upsert(upsert)), idType);
+                        delegate.updateOne(filter, update, new UpdateOptions().upsert(upsert)));
             }
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
@@ -244,7 +245,7 @@ public class JacksonDBCollection<T, K> {
 
     public WriteResult<T, K> updateById(K id, T update) {
         try {
-            return new LegacyUpdateOneResult<>(delegate, update, delegate.replaceOneById(id, update), valueType, idType);
+            return new LegacyUpdateResult<>(delegate, delegate.replaceOneById(id, update));
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
         }
@@ -262,9 +263,9 @@ public class JacksonDBCollection<T, K> {
         }
     }
 
-    public void insert(List<T> list) {
+    public WriteResult<T, K> insert(List<T> list) {
         try {
-            delegate.insert(list);
+            return new LegacyInsertManyResult<>(delegate, delegate.insertMany(list), idType);
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
         }

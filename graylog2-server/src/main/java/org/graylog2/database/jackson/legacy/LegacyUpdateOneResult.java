@@ -17,6 +17,7 @@
 package org.graylog2.database.jackson.legacy;
 
 import com.google.common.primitives.Ints;
+import com.mongodb.MongoException;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonValue;
 import org.bson.codecs.CollectibleCodec;
@@ -46,11 +47,17 @@ public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public T getSavedObject() {
+        if (!wasSaved()) {
+            throw new MongoException("No objects to return");
+        }
         return collection.findOneById(getId());
     }
 
     @Override
     public K getSavedId() {
+        if (!wasSaved()) {
+            throw new MongoException("No objects to return");
+        }
         return WriteResult.toIdType(getId(), idType);
     }
 
@@ -66,12 +73,12 @@ public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public Object getUpsertedId() {
-        return WriteResult.toIdType(updateResult.getUpsertedId(), idType);
+        return WriteResult.extractValue(updateResult.getUpsertedId());
     }
 
     @Override
     public boolean isUpdateOfExisting() {
-        return updateResult.getUpsertedId() == null && updateResult.getModifiedCount() > 0;
+        return updateResult.getMatchedCount() > 0;
     }
 
     private BsonValue getId() {
@@ -80,5 +87,9 @@ public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
         }
         final CollectibleCodec<T> codec = (CollectibleCodec<T>) collection.getCodecRegistry().get(valueType);
         return codec.getDocumentId(object);
+    }
+
+    private boolean wasSaved() {
+        return updateResult.getUpsertedId() != null || updateResult.getMatchedCount() > 0;
     }
 }

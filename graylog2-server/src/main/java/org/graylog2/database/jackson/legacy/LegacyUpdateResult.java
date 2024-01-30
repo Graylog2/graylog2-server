@@ -30,12 +30,10 @@ import org.mongojack.WriteResult;
 public class LegacyUpdateResult<T, K> implements WriteResult<T, K> {
     protected final JacksonMongoCollection<T> collection;
     private final UpdateResult updateResult;
-    private final Class<K> idType;
 
-    public LegacyUpdateResult(JacksonMongoCollection<T> collection, UpdateResult updateResult, Class<K> idType) {
+    public LegacyUpdateResult(JacksonMongoCollection<T> collection, UpdateResult updateResult) {
         this.collection = collection;
         this.updateResult = updateResult;
-        this.idType = idType;
     }
 
     @Override
@@ -50,11 +48,11 @@ public class LegacyUpdateResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public Object getUpsertedId() {
-        return WriteResult.toIdType(updateResult.getUpsertedId(), idType);
+        return WriteResult.extractValue(updateResult.getUpsertedId());
     }
 
     @Override
     public boolean isUpdateOfExisting() {
-        return updateResult.getUpsertedId() == null;
+        return updateResult.getMatchedCount() > 0;
     }
 }
