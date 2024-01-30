@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 
-const MockedQueryInput = React.forwardRef<HTMLElement, { value: string }>(({ value }, ref) => (
+const MockedBasicQueryInput = React.forwardRef<HTMLElement, { value: string }>(({ value }, ref) => (
   <span ref={ref}>{value}</span>
 ));
 
-export default MockedQueryInput;
+export default MockedBasicQueryInput;

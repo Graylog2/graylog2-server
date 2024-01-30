@@ -392,7 +392,7 @@ const exports: PluginExports = {
     new FieldNameCompletion(),
     new FieldValueCompletion(),
     new OperatorCompletion(),
-  ].filter(Boolean),
+  ],
   'views.hooks.loadingView': [
     requirementsProvided,
     bindSearchParamsFromQuery,

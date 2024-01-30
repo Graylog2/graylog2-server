@@ -42,7 +42,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {},
 }));
 
-jest.mock('views/components/QueryBar', () => mockComponent('hows preview of global override time range'));
+jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
 jest.mock('views/stores/StreamsStore');
 jest.mock('views/components/common/WindowLeaveMessage', () => jest.fn(mockComponent('WindowLeaveMessage')));
