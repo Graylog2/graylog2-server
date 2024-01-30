@@ -16,13 +16,14 @@
  */
 package org.graylog2.configuration;
 
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.migrations.MaintenanceStrategiesHelper;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-
-import jakarta.inject.Inject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -53,6 +54,22 @@ public class IndexSetsDefaultConfigurationFactory {
                 .rotationStrategyClass(rotationConfig.left)
                 .rotationStrategyConfig(rotationConfig.right)
                 .retentionStrategyClass(retentionConfig.left)
-                .retentionStrategyConfig(retentionConfig.right).build();
+                .retentionStrategyConfig(retentionConfig.right)
+                .dataTiering(maintenanceStrategiesHelper.defaultDataTieringConfig())
+                .build();
+    }
+
+    public IndexSetsDefaultConfiguration addDataTieringDefaults(IndexSetsDefaultConfiguration oldConfig) {
+        HotOnlyDataTieringConfig dataTieringConfig;
+        if (oldConfig.rotationStrategyConfig() instanceof TimeBasedSizeOptimizingStrategyConfig config) {
+            // Take already configured min/max settings from TSO
+            dataTieringConfig = HotOnlyDataTieringConfig.builder()
+                    .indexLifetimeMin(config.indexLifetimeMin())
+                    .indexLifetimeMax(config.indexLifetimeMax())
+                    .build();
+        } else {
+            dataTieringConfig = maintenanceStrategiesHelper.defaultDataTieringConfig();
+        }
+        return oldConfig.toBuilder().dataTiering(dataTieringConfig).build();
     }
 }
