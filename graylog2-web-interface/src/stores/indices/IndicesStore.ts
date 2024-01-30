@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch,{ fetchPeriodically } from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 export const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
