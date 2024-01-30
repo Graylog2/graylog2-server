@@ -33,8 +33,9 @@ import org.graylog.storage.opensearch2.ism.policy.actions.Action;
 import org.graylog.storage.opensearch2.ism.policy.actions.DeleteAction;
 import org.graylog.storage.opensearch2.ism.policy.actions.RolloverAction;
 import org.graylog.storage.opensearch2.ism.policy.actions.RollupAction;
-import org.graylog2.indexer.datastream.DataStreamAdapter;
-import org.graylog2.indexer.indices.Template;
+import org.graylog2.indexer.datastream.DataStreamService;
+import org.graylog2.indexer.datastream.DataStreamServiceImpl;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,13 +49,15 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
     private final OpensearchProcess process;
     private final Configuration configuration;
+    private final IndexFieldTypesService indexFieldTypesService;
     private final ObjectMapper objectMapper;
-    private DataStreamAdapter dataStreamAdapter;
+    private DataStreamService dataStreamService;
 
-    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper) {
+    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper) {
         this.process = process;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
+        this.indexFieldTypesService = indexFieldTypesService;
     }
 
     @Override
@@ -65,34 +68,25 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
         if (destination == ProcessState.AVAILABLE && source == ProcessState.STARTING) {
             process.openSearchClient().ifPresent(client -> {
-                if (dataStreamAdapter == null) {
+                if (dataStreamService == null) {
                     final IsmApi ismApi = new IsmApi(client, objectMapper);
-                    dataStreamAdapter = new DataStreamAdapterOS2(client, objectMapper, ismApi);
+                    dataStreamService = new DataStreamServiceImpl(
+                            new DataStreamAdapterOS2(client, objectMapper, ismApi),
+                            indexFieldTypesService
+                    );
                 }
-                updateDataStreamTemplate();
-                dataStreamAdapter.createDataStream(configuration.getMetricsStream());
-                configureMetricsIsm(configuration);
+                dataStreamService.createDataStream(configuration.getMetricsStream(),
+                        configuration.getMetricsTimestamp(),
+                        createMappings(),
+                        createPolicy(configuration));
             });
-
-
         }
     }
 
-    private void updateDataStreamTemplate() {
-        Map<String, Object> mappings = new HashMap<>();
-        mappings.put(configuration.getMetricsTimestamp(), ImmutableMap.of(
-                "type", "date",
-                "format", "yyyy-MM-dd HH:mm:ss.SSS||strict_date_optional_time||epoch_millis")
-        );
+    private Map<String, Map<String, String>> createMappings() {
+        Map<String, Map<String, String>> mappings = new HashMap<>();
         mappings.put("node", ImmutableMap.of("type", "keyword"));
-        Template template = new Template(List.of(configuration.getMetricsStream() + "*"),
-                new Template.Mappings(ImmutableMap.of("properties", mappings)), 99999L, new Template.Settings(Map.of()));
-        dataStreamAdapter.ensureDataStreamTemplate(configuration.getMetricsTemplate(), template, configuration.getMetricsTimestamp());
-    }
-
-    private void configureMetricsIsm(Configuration configuration) {
-        dataStreamAdapter.applyIsmPolicy(configuration.getMetricsStream(),
-                createPolicy(configuration));
+        return mappings;
     }
 
     private IsmPolicy createPolicy(Configuration configuration) {
@@ -142,7 +136,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         );
         RollupAction rollupAction = new RollupAction(ismRollup);
         final List<Action> actions = ImmutableList.of(new Action(rollupAction));
-        final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState, new Policy.Condition("13d")));
+        final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState, new Policy.Condition(configuration.getMetricsRetention())));
         return new Policy.State("rollup", actions, transitions);
     }
 

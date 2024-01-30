@@ -21,12 +21,14 @@ import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.migrations.Migration;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -59,6 +61,8 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
 
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private NotificationService notificationService;
 
     private MongoCollection<Document> eventDefinitionsCollection;
 
@@ -68,7 +72,8 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
     public void setUp() {
         this.migration = new V20230629140000_RenameFieldTypeOfEventDefinitionSeries(
                 clusterConfigService,
-                mongodb.mongoConnection()
+                mongodb.mongoConnection(),
+                notificationService
         );
         this.eventDefinitionsCollection = mongodb.mongoConnection().getMongoDatabase().getCollection("event_definitions");
     }
@@ -94,32 +99,25 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
     @Test
     @MongoDBFixtures("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions.json")
     public void migratesEventDefinitionsProperly() {
-        this.migration.upgrade();
-
-        final V20230629140000_RenameFieldTypeOfEventDefinitionSeries.MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted).isNotNull();
-
-        assertThat(eventDefinitionsCollection.countDocuments()).isEqualTo(4);
-
-        var actualCollection = collectionToJson();
         var expectedCollection = resourceFile("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json");
-
-        uncheckedJSONAssertEquals(expectedCollection, actualCollection);
+        runMigration(5, expectedCollection);
     }
 
     @Test
     @MongoDBFixtures("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json")
     public void doesNotChangeMigratedEventDefinitions() {
+        var expectedCollection = resourceFile("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json");
+        runMigration(5, expectedCollection);
+    }
+
+    private void runMigration(int expectedCount, String expectedCollection) {
         this.migration.upgrade();
 
         final V20230629140000_RenameFieldTypeOfEventDefinitionSeries.MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted).isNotNull();
-
-        assertThat(eventDefinitionsCollection.countDocuments()).isEqualTo(4);
+        assertThat(eventDefinitionsCollection.countDocuments()).isEqualTo(expectedCount);
 
         var actualCollection = collectionToJson();
-        var expectedCollection = resourceFile("V20230629140000_RenameFieldTypeOfEventDefinitionSeries/mixed_event_definitions-after.json");
-
         uncheckedJSONAssertEquals(expectedCollection, actualCollection);
     }
 

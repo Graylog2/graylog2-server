@@ -16,6 +16,7 @@
  */
 
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
+import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 export type EventDefinition = {
   _scope: string,
@@ -28,6 +29,7 @@ export type EventDefinition = {
     type: string,
     query: string,
     query_parameters: ParameterJson[],
+    filters: SearchFilter[],
     streams: string[],
     group_by: string[],
     series: Array<{field: string, id: string, type: string}>,

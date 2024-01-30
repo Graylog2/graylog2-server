@@ -20,7 +20,7 @@ import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormSubmit, Icon, OverlayTrigger, Select } from 'components/common';
-import { Button, Col, Popover, Row } from 'components/bootstrap';
+import { Button, Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
@@ -62,10 +62,6 @@ const SelectedBlock = styled.div(({ theme }) => css`
 
 const SelectedBlockInfo = styled(Row)(({ theme }) => css`
   margin-bottom: ${theme.spacings.md};
-`);
-
-const HelpPopover = styled(Popover)(() => css`
-  min-width: 700px;
 `);
 
 const OptionTitle = styled.p(({ theme }) => css`
@@ -171,13 +167,6 @@ const RuleBlockForm = ({
     }
   };
 
-  const buildHelpPopover = (blockDict: BlockDict) => (
-    <HelpPopover id="selected-block-Dict-help"
-                 title="Function Syntax Help">
-      <RuleHelperTable entries={[blockDict]} expanded={{ [blockDict.name]: true }} />
-    </HelpPopover>
-  );
-
   const optionRenderer = (option: Option, isSelected: boolean) => (
     <>
       <OptionTitle>{option.label}</OptionTitle>
@@ -215,7 +204,9 @@ const RuleBlockForm = ({
                         <OverlayTrigger trigger="click"
                                         rootClose
                                         placement="right"
-                                        overlay={buildHelpPopover(selectedBlockDict)}>
+                                        title="Function Syntax Help"
+                                        width={700}
+                                        overlay={<RuleHelperTable entries={[selectedBlockDict]} expanded={{ [selectedBlockDict.name]: true }} />}>
                           <Button bsStyle="link">
                             <Icon name="question-circle"
                                   fixedWidth

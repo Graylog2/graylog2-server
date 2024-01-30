@@ -18,14 +18,14 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { OverlayTrigger, Icon } from 'components/common';
-import { Popover, Table, Button } from 'components/bootstrap';
+import { Table, Button } from 'components/bootstrap';
 
 const COMMON_FIELD_MAP = {
-  id: (entityName) => `Id of the ${entityName}, which is a unique reference.`,
-  title: (entityName) => `Title of the ${entityName}.`,
-  name: (entityName) => `Name of the ${entityName}.`,
-  description: (entityName) => `Short description of the ${entityName}.`,
-  summary: (entityName) => `Long summary of the ${entityName}.`,
+  id: (entityName: string) => `Id of the ${entityName}, which is a unique reference.`,
+  title: (entityName: string) => `Title of the ${entityName}.`,
+  name: (entityName: string) => `Name of the ${entityName}.`,
+  description: (entityName: string) => `Short description of the ${entityName}.`,
+  summary: (entityName: string) => `Long summary of the ${entityName}.`,
 };
 
 type CommonFields = keyof typeof COMMON_FIELD_MAP;
@@ -36,10 +36,6 @@ type Props = {
   example?: React.ReactNode,
   entityName?: string,
 };
-
-const WidePopover = styled(Popover)`
-  max-width: 500px;
-`;
 
 const QueryHelpButton = styled(Button)`
   padding: 6px 8px;
@@ -65,8 +61,8 @@ const defaultExample = (
   </>
 );
 
-const queryHelpPopover = (commonFields, fieldMap, example, entityName) => (
-  <WidePopover id="team-search-query-help" title="Search Syntax Help">
+const queryHelpPopover = (commonFields: Props['commonFields'], fieldMap: Props['fieldMap'], example: Props['example'], entityName: Props['entityName']) => (
+  <>
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -82,11 +78,11 @@ const queryHelpPopover = (commonFields, fieldMap, example, entityName) => (
     </Table>
     <p><strong>Examples</strong></p>
     {example || defaultExample}
-  </WidePopover>
+  </>
 );
 
 const QueryHelper = ({ commonFields, fieldMap, example, entityName }: Props) => (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover(commonFields, fieldMap, example, entityName)}>
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover(commonFields, fieldMap, example, entityName)} title="Search Syntax Help" width={500}>
     <QueryHelpButton bsStyle="link"><Icon name="question-circle" /></QueryHelpButton>
   </OverlayTrigger>
 );

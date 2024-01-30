@@ -114,7 +114,7 @@
         <commons-net.version>3.10.0</commons-net.version>
         <commons-validator.version>1.8.0</commons-validator.version>
         <commons-io.version>2.15.1</commons-io.version>
-        <disruptor.version>3.4.4</disruptor.version>
+        <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.24.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
@@ -142,17 +142,17 @@
         <jmte.version>5.0.0</jmte.version>
         <joda-time.version>2.12.6</joda-time.version>
         <jool.version>0.9.15</jool.version>
-        <json-path.version>2.8.0</json-path.version>
+        <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.6.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.22.1</log4j.version>
-        <lucene.version>9.9.1</lucene.version>
+        <lucene.version>9.9.2</lucene.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
         <mongojack.version>2.10.1.4</mongojack.version>
         <mongojack4.version>4.8.1-1</mongojack4.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.105.Final</netty.version>
+        <netty.version>4.1.106.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -171,7 +171,7 @@
         <siv-mode.version>1.5.0</siv-mode.version>
         <slf4j.version>2.0.11</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
-        <swagger.version>1.6.12</swagger.version>
+        <swagger.version>1.6.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>6.0.11</unboundid-ldap.version>
@@ -181,20 +181,21 @@
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.11.5</jjwt.version>
+        <stateless4j.version>2.6.0</stateless4j.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
-        <assertj-core.version>3.25.1</assertj-core.version>
+        <assertj-core.version>3.25.2</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
         <equalsverifier.version>3.15.6</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
-        <mockito.version>5.9.0</mockito.version>
+        <mockito.version>5.10.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.19.3</testcontainers.version>
+        <testcontainers.version>1.19.4</testcontainers.version>
         <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -539,7 +540,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.2.0</version>
+                    <version>4.8.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
