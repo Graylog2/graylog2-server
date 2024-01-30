@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.storage.migration;
 
-import java.util.List;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 
-public record RemoteReindexResult(List<ReindexResult> results) {
+public record RemoteReindexIndexFinishedEvent(String index, RemoteReindexingMigrationAdapter.Status status) {
 }

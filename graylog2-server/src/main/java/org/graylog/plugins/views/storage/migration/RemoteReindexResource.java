@@ -26,12 +26,14 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.shared.security.RestPermissions;
 
 @Path("/remote-reindex-migration")
@@ -52,17 +54,17 @@ public class RemoteReindexResource {
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "by remote reindexing", notes = "configure the host/credentials you want to use to migrate data from")
-    public RemoteReindexResult migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexRequest request) {
-        return migrationService.start(request.hostname(), request.user(), request.password(), request.indices());
+    public RemoteReindexMigration migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexRequest request) {
+        return migrationService.start(request.hostname(), request.user(), request.password(), request.indices(), request.synchronous());
     }
 
     @GET
-    @Path("/remoteReindex")
+    @Path("/status/{migrationID}")
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "status", notes = "status for a running migration")
-    public RemoteReindexingMigrationAdapter.Status status() {
-        return migrationService.status();
+    public RemoteReindexMigration status(@ApiParam(name = "migrationID") @PathParam("migrationID") String migrationID) {
+        return migrationService.status(migrationID);
     }
 
 }
