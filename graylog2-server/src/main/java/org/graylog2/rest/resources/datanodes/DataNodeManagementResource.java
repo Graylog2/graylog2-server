@@ -19,19 +19,7 @@ package org.graylog2.rest.resources.datanodes;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.security.certutil.CertRenewalService;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.datanode.DataNodeService;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -40,6 +28,17 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.security.certutil.CertRenewalService;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.datanode.DataNodeService;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_REMOVE;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_RESET;
@@ -56,12 +55,23 @@ public class DataNodeManagementResource extends RestResource {
     private final DataNodeService dataNodeService;
     private final NodeService<DataNodeDto> nodeService;
     private final CertRenewalService certRenewalService;
+    private final Boolean runsWithDataNode;
 
     @Inject
-    protected DataNodeManagementResource(DataNodeService dataNodeService, NodeService<DataNodeDto> nodeService, CertRenewalService certRenewalService) {
+    protected DataNodeManagementResource(DataNodeService dataNodeService, NodeService<DataNodeDto> nodeService,
+                                         CertRenewalService certRenewalService,
+                                         @RunsWithDataNode Boolean runsWithDataNode) {
         this.dataNodeService = dataNodeService;
         this.nodeService = nodeService;
         this.certRenewalService = certRenewalService;
+        this.runsWithDataNode = runsWithDataNode;
+    }
+
+    @GET
+    @Path("configured")
+    @ApiOperation("Returns whether this Graylog is running against a data node search backend")
+    public Boolean runsWithDataNode() {
+        return runsWithDataNode;
     }
 
     @GET

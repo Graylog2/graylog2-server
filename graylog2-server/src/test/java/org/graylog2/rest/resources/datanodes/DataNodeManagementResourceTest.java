@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.datanodes;
 
+import jakarta.ws.rs.NotFoundException;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -26,8 +27,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import jakarta.ws.rs.NotFoundException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -49,7 +48,7 @@ public class DataNodeManagementResourceTest {
 
     @Before
     public void setUp() {
-        classUnderTest = new DataNodeManagementResource(dataNodeService, nodeService, certRenewalService);
+        classUnderTest = new DataNodeManagementResource(dataNodeService, nodeService, certRenewalService, true);
     }
 
     @Test
