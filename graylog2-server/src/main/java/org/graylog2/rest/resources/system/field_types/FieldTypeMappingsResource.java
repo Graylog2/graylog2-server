@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.field_types;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,6 +38,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesListService;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -149,14 +151,28 @@ public class FieldTypeMappingsResource extends RestResource {
             @ApiResponse(code = 403, message = "Unauthorized")
     })
     @AuditEvent(type = FIELD_TYPE_MAPPING_DELETE)
-    public Map<String, List<IndexSetFieldType>> removeCustomMapping(@ApiParam(name = "request")
+    public Map<String, MappingRemovalResult> removeCustomMapping(@ApiParam(name = "request")
                                                                   @Valid
                                                                   @NotNull(message = "Request body is mandatory") final CustomFieldMappingRemovalRequest request) {
         checkPermissions(request.indexSetsIds(), RestPermissions.TYPE_MAPPINGS_DELETE);
 
-        fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
-        return this.indexFieldTypesListService.getIndexSetFieldTypesList(request.indexSetsIds(), request.fieldNames());
+        final var result = fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
+        final var newTypes = this.indexFieldTypesListService.getIndexSetFieldTypesList(request.indexSetsIds(), request.fieldNames());
+        return result
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, value -> new MappingRemovalResult(
+                        value.getValue().successfullyPerformed(),
+                        value.getValue().failures(),
+                        value.getValue().errors(),
+                        newTypes.get(value.getKey())
+                )));
     }
+
+    public record MappingRemovalResult(@JsonProperty("successfully_performed") int successfullyPerformed,
+                                       @JsonProperty("failures") List<BulkOperationFailure> failures,
+                                       @JsonProperty("errors") List<String> errors,
+                                       @JsonProperty("succeeded") List<IndexSetFieldType> succeeded) {}
 
     private void checkPermissions(final Set<String> indexSetsIds, final String permission) {
         indexSetsIds.forEach(indexSetId -> checkPermission(permission, indexSetId));
