@@ -27,8 +27,10 @@ import memoize from 'lodash/memoize';
 import max from 'lodash/max';
 import union from 'lodash/union';
 import moment from 'moment';
+import { OrderedMap } from 'immutable';
 
-import { MultiSelect, TimeUnitInput } from 'components/common';
+import Store from 'logic/local-storage/Store';
+import { MultiSelect, TimeUnitInput, SearchFiltersFormControls } from 'components/common';
 import connect from 'stores/connect';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -49,6 +51,7 @@ import withLocation from 'routing/withLocation';
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
 
+export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
 const LOOKUP_PERMISSIONS = [
@@ -84,7 +87,7 @@ class FilterForm extends React.Component {
     (streamIds) => streamIds.join('-'),
   );
 
-  _parseQuery = debounce((queryString) => {
+  _parseQuery = debounce((queryString, searchFilters = new OrderedMap()) => {
     if (!this._userCanViewLookupTables()) {
       return;
     }
@@ -95,6 +98,7 @@ class FilterForm extends React.Component {
       .id(queryId)
       .query({ type: 'elasticsearch', query_string: queryString })
       .timerange({ type: 'relative', range: 1000 })
+      .filters(searchFilters.toList())
       .searchTypes([{
         id: searchTypeId,
         type: 'messages',
@@ -139,6 +143,7 @@ class FilterForm extends React.Component {
       queryId: generateId(),
       searchTypeId: generateId(),
       queryParameterStash: {}, // keep already defined parameters around to ease editing
+      searchFiltersHidden: false,
     };
   }
 
@@ -151,7 +156,6 @@ class FilterForm extends React.Component {
   propagateChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
     const config = cloneDeep(eventDefinition.config);
-
     config[key] = value;
     onChange('config', config);
   };
@@ -199,6 +203,19 @@ class FilterForm extends React.Component {
   handleQueryChange = (event) => {
     this._parseQuery(event.target.value);
     this.handleConfigChange(event);
+  };
+
+  handleSearchFiltersChange = (searchFilters) => {
+    const { query } = this.props.eventDefinition.config;
+
+    this._parseQuery(query, searchFilters);
+
+    this.propagateChange('filters', searchFilters.toArray());
+  };
+
+  hideFiltersPreview = (value) => {
+    Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
+    this.setState({ searchFiltersHidden: value });
   };
 
   handleConfigChange = (event) => {
@@ -337,6 +354,17 @@ class FilterForm extends React.Component {
                onChange={this.handleQueryChange} />
 
         {this.renderQueryParameters()}
+
+        {!this.state.searchFiltersHidden && (
+          <FormGroup controlId="search-filters">
+            <ControlLabel>Search Filters <small className="text-muted">(Optional)</small></ControlLabel>
+            <div style={{ maring: '8px 0' }}>
+              <SearchFiltersFormControls filters={eventDefinition.config.filters}
+                                         onChange={this.handleSearchFiltersChange}
+                                         hideFiltersPreview={this.hideFiltersPreview} />
+            </div>
+          </FormGroup>
+        )}
 
         <FormGroup controlId="filter-streams">
           <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>

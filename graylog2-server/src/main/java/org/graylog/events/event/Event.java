@@ -101,6 +101,10 @@ public interface Event extends Indexable {
 
     EventReplayInfo getReplayInfo();
 
+    long getRiskScore();
+
+    void setRiskScore(long riskScore);
+
     EventDto toDto();
 
     static Event fromDto(EventDto from) {
@@ -112,6 +116,7 @@ public interface Event extends Indexable {
         event.setFields(from.fields());
         event.setGroupByFields(from.groupByFields());
         event.setPriority(from.priority());
+        event.setRiskScore(from.riskScore());
 
         from.timerangeStart().ifPresent(event::setTimerangeStart);
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
