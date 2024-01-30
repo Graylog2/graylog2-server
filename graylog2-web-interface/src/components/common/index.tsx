@@ -108,6 +108,7 @@ export { default as TimeUnit } from './TimeUnit';
 export { default as TimeUnitInput } from './TimeUnitInput';
 export { default as Timestamp } from './Timestamp';
 export { default as TimezoneSelect } from './TimezoneSelect';
+export { default as Tooltip } from './Tooltip';
 export { default as TypeAheadDataFilter } from './TypeAheadDataFilter';
 export { default as TypeAheadFieldInput } from './TypeAheadFieldInput';
 export { default as TypeAheadInput } from './TypeAheadInput';

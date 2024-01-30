@@ -26,7 +26,7 @@ import {
   NoSearchResult,
   NoEntitiesExist,
 } from 'components/common';
-import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
+import { Row, Col, Table, Button } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
@@ -39,10 +39,8 @@ const ScrollContainer = styled.div`
   overflow-x: auto;
 `;
 
-const buildHelpPopover = () => (
-  <Popover id="search-query-help"
-           className={Styles.popoverWide}
-           title="Search Syntax Help">
+const HelpPopover = () => (
+  <>
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
@@ -81,7 +79,7 @@ const buildHelpPopover = () => (
       <kbd>guava</kbd> <br />is the same as<br />
       <kbd>title:guava</kbd>
     </p>
-  </Popover>
+  </>
 );
 
 const NoResults = ({ query }: { query: string }) => (
@@ -114,7 +112,7 @@ type Props = {
 };
 
 const queryHelpComponent = (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={<HelpPopover />} title="Search Syntax Help" width={500}>
     <Button bsStyle="link"
             className={Styles.searchHelpButton}>
       <Icon name="question-circle" fixedWidth />

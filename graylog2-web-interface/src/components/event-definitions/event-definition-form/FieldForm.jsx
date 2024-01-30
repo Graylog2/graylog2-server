@@ -20,11 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 
-import {
-  OverlayTrigger,
-  Icon,
-  Select,
-} from 'components/common';
+import { Select, HoverForHelp, } from 'components/common';
 import {
   Button,
   ButtonToolbar,
@@ -259,11 +255,9 @@ class FieldForm extends React.Component {
           <FormGroup validationState={validation.errors.key_position ? 'error' : null}>
             <ControlLabel>
               Use Field as Event Key&emsp;
-              <OverlayTrigger placement="right"
-                              trigger={['click', 'focus']}
-                              overlay={<EventKeyHelpPopover id="key-popover" />}>
-                <Button bsStyle="link" bsSize="xsmall"><Icon name="question-circle" /></Button>
-              </OverlayTrigger>
+              <HoverForHelp title="More about Event Keys" trigger={['click', 'hover']} placement="right">
+                <EventKeyHelpPopover />
+              </HoverForHelp>
             </ControlLabel>
             <InputGroup>
               <InputGroup.Addon>

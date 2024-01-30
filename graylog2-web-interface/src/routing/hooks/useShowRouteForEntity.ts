@@ -67,7 +67,7 @@ const useShowRouteForEntity = (id: string, type: string) => {
     case 'stream':
       return Routes.stream_search(id);
     case 'search_filter':
-      return Routes.getPluginRoute('MY-FILTERS_DETAILS_FILTERID')(id);
+      return Routes.getPluginRoute('MY-FILTERS_DETAILS_FILTERID')?.(id);
     case 'report':
       return Routes.getPluginRoute('REPORTS_REPORTID_CONFIGURATION')?.(id);
     case 'role':
