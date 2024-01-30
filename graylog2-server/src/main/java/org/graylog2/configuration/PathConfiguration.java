@@ -17,7 +17,6 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.validators.DirectoryPathWritableValidator;
 import org.graylog2.configuration.converters.SortedPathSetConverter;
 
 import java.nio.file.Path;
@@ -35,7 +34,7 @@ public class PathConfiguration {
     @Parameter(value = "bin_dir", required = true)
     private Path binDir = DEFAULT_BIN_DIR;
 
-    @Parameter(value = "data_dir", required = true, validators = DirectoryPathWritableValidator.class)
+    @Parameter(value = "data_dir", required = true)
     private Path dataDir;
 
     @Parameter(value = "plugin_dir", required = true)
@@ -61,6 +60,7 @@ public class PathConfiguration {
     public Path getDataDir() {
         return dataDir;
     }
+
     public Path getNativeLibDir() {
         return dataDir.resolve("libnative");
     }
