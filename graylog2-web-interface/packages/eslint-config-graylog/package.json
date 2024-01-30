@@ -15,8 +15,8 @@
   "dependencies": {
     "@babel/eslint-parser": "7.16.5",
     "@tanstack/eslint-plugin-query": "4.36.1",
-    "@typescript-eslint/eslint-plugin": "6.19.1",
-    "@typescript-eslint/parser": "6.19.1",
+    "@typescript-eslint/eslint-plugin": "6.20.0",
+    "@typescript-eslint/parser": "6.20.0",
     "eslint": "8.56.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-import-resolver-webpack": "0.13.8",
