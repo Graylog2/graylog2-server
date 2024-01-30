@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.process;
 
-import com.google.inject.Provider;
+import jakarta.inject.Provider;
 import jakarta.inject.Inject;
 
 public class ProcessStateMachineProvider implements Provider<ProcessStateMachine> {
