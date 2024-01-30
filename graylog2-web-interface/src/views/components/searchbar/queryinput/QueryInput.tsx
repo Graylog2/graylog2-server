@@ -251,7 +251,7 @@ const QueryInput = React.forwardRef<Editor, Props>(({
       exec: onExecute,
     },
     {
-      name: 'Show Completions',
+      name: 'Show completions',
       bindKey: { win: 'Alt-Space', mac: 'Alt-Space' },
       exec: async (editor) => {
         const args = editor.getValue()
@@ -260,6 +260,11 @@ const QueryInput = React.forwardRef<Editor, Props>(({
 
         startAutocomplete(editor, args);
       },
+    },
+    {
+      name: 'Do nothing',
+      bindKey: { win: 'Ctrl-Space|Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
+      exec: () => {},
     },
   ], [commands, onExecute]);
   const updateEditorConfiguration = useCallback((node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands, innerRef), [_commands, completer]);
