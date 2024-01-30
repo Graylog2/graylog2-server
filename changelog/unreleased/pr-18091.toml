@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix Session not timing out on index set details page"
+
+issues = ["18063"]
+pulls = ["18091"]
+
