@@ -165,9 +165,13 @@ public class IndexFieldTypesListService {
                             final var customFieldMappings = indexSetConfig.customFieldMappings();
                             final var fieldTypeProfile = profileService.get(indexSetConfig.fieldTypeProfile());
 
-                            final Set<FieldTypeDTO> deflectorFieldDtos = indexFieldTypes.get(mongoIndexSet.getActiveWriteIndex()).fields();
+                            final Set<FieldTypeDTO> deflectorFieldDtos = Optional.ofNullable(indexFieldTypes.get(mongoIndexSet.getActiveWriteIndex()))
+                                    .map(IndexFieldTypesDTO::fields)
+                                    .orElse(ImmutableSet.of());
 
-                            final Set<FieldTypeDTO> previousFieldDtos = indexFieldTypes.get(this.getPreviousActiveIndexSet(mongoIndexSet)).fields();
+                            final Set<FieldTypeDTO> previousFieldDtos = Optional.ofNullable(indexFieldTypes.get(this.getPreviousActiveIndexSet(mongoIndexSet)))
+                                    .map(IndexFieldTypesDTO::fields)
+                                    .orElse(ImmutableSet.of());
 
                             final Collection<IndexSetFieldType> allFields = fieldTypeDTOsMerger.merge(deflectorFieldDtos,
                                     previousFieldDtos,
@@ -178,12 +182,6 @@ public class IndexFieldTypesListService {
                                     .filter(indexSetFieldType -> fieldNames.contains(indexSetFieldType.fieldName()))
                                     .toList();
                         }));
-    }
-
-    @NotNull
-    private Map<String, List<IndexSetFieldType>> getFilteredList(Collection<String> indexSetIds, String fieldNameQuery, List<String> filters, String sort, Sorting.Direction order) {
-        return indexSetIds.stream()
-                .collect(Collectors.toMap(Function.identity(), indexSetId -> getFilteredList(indexSetId, fieldNameQuery, filters, sort, order)));
     }
 
     private String getPreviousActiveIndexSet(final IndexSet indexSet) {
