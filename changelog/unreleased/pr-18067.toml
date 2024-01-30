@@ -6,7 +6,10 @@ pulls = ["18067"]
 
 details.user = """
 The history is scoped by user and sorted chronologically. The history contains all queries executed on the search page, dashboards and dashboard widgets.
-It can be opened by clicking on the history icon or by pressing a keyboard shortcut.
+It can be opened by clicking on the history icon or by pressing the keyboard shortcut alt+shift+h.
 
-While it is open, it can be filtered using the query input. When an entity has been selected, it will replace the current value of the query input.
+While it is open, it can be filtered using the query input. When a previous query has been selected, it will replace the current value of the query input.
+
+With this change we are also removing the keyboard shortcuts ctrl+space and ctrl+shift+space to manually display the suggestions.
+It is still possible to display the suggestions by pressing alt+space.
 """
