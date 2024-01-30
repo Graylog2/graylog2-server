@@ -14,12 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.event;
+package org.graylog.events.processor.modifier;
 
-public class DefaultRiskScoreCalculator implements RiskScoreCalculator {
+import org.graylog.events.event.EventWithContext;
 
-    @Override
-    public void assignRiskScore(Event event) {
-        event.setRiskScore(0);
-    }
+/**
+ * Event modifiers can modify events before notifications and storage handlers run.
+ */
+public interface EventModifier {
+    /**
+     * Performs modification operations on the given {@link EventWithContext}.
+     *
+     * @param eventWithContext the event with context
+     * @throws EventModifierException when the modification fails
+     */
+    void accept(EventWithContext eventWithContext) throws EventModifierException;
 }

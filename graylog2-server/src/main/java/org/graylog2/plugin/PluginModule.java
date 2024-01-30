@@ -22,6 +22,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.fields.providers.FieldValueProvider;
 import org.graylog.events.notifications.EventNotification;
@@ -29,6 +30,7 @@ import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorParameters;
+import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
@@ -69,8 +71,6 @@ import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.graylog2.web.PluginUISettingsProvider;
-
-import jakarta.ws.rs.ext.ExceptionMapper;
 
 import java.util.Collections;
 import java.util.Set;
@@ -246,7 +246,16 @@ public abstract class PluginModule extends Graylog2Module {
         registerJacksonSubtype(parametersClass, name);
     }
 
+    protected Multibinder<EventModifier> eventModifierBinder() {
+        return Multibinder.newSetBinder(binder(), EventModifier.class);
+    }
+
+    protected void addEventModifier(Class<? extends EventModifier> eventModifierClass) {
+        eventModifierBinder().addBinding().to(eventModifierClass);
+    }
+
     private MapBinder<String, EventStorageHandler.Factory> eventStorageHandlerBinder() {
+        Multibinder.newSetBinder(binder(), SchedulerCapabilities.class);
         return MapBinder.newMapBinder(binder(), String.class, EventStorageHandler.Factory.class);
     }
 

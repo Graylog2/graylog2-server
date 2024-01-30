@@ -17,23 +17,25 @@
 package org.graylog.events.processor;
 
 import com.google.common.base.Stopwatch;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.events.event.EventProcessorEventFactory;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.FieldValue;
 import org.graylog.events.notifications.EventNotificationHandler;
+import org.graylog.events.processor.modifier.EventModifier;
+import org.graylog.events.processor.modifier.EventModifierException;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
 import org.graylog.events.processor.storage.EventStorageHandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -48,6 +50,7 @@ public class EventProcessorEngine {
     private final Provider<EventProcessorEventFactory> eventFactoryProvider;
     private final EventProcessorExecutionMetrics metrics;
     private final EventDefinitionHandler eventDefinitionHandler;
+    private final Set<EventModifier> eventModifiers;
 
     @Inject
     public EventProcessorEngine(Map<String, EventProcessor.Factory> eventProcessorFactories,
@@ -57,7 +60,8 @@ public class EventProcessorEngine {
                                 EventStorageHandlerEngine storageHandlerEngine,
                                 Provider<EventProcessorEventFactory> eventFactoryProvider,
                                 EventProcessorExecutionMetrics metrics,
-                                EventDefinitionHandler eventDefinitionHandler) {
+                                EventDefinitionHandler eventDefinitionHandler,
+                                Set<EventModifier> eventModifiers) {
         this.dbService = dbService;
         this.eventProcessorFactories = eventProcessorFactories;
         this.fieldSpecEngine = fieldSpecEngine;
@@ -66,6 +70,7 @@ public class EventProcessorEngine {
         this.eventFactoryProvider = eventFactoryProvider;
         this.metrics = metrics;
         this.eventDefinitionHandler = eventDefinitionHandler;
+        this.eventModifiers = eventModifiers;
     }
 
     private EventDefinition getEventDefinition(String id) throws EventProcessorException {
@@ -122,7 +127,7 @@ public class EventProcessorEngine {
             fieldSpecEngine.execute(eventsWithContext, eventDefinition.fieldSpec());
 
             // We can only set the key when the field spec is done
-            eventsWithContext.forEach(eventWithContext -> {
+            for (final EventWithContext eventWithContext : eventsWithContext) {
                 final List<String> keyTuple = eventDefinition.keySpec().stream()
                         .map(fieldName -> eventWithContext.event().getField(fieldName))
                         .filter(Objects::nonNull)
@@ -136,7 +141,22 @@ public class EventProcessorEngine {
                 }
 
                 eventWithContext.event().setKeyTuple(keyTuple);
-            });
+
+                // Event modifiers should run after fields have been set.
+                for (EventModifier eventModifier : eventModifiers) {
+                    try {
+                        eventModifier.accept(eventWithContext);
+                    } catch (EventModifierException e) {
+                        if (e.isSkip()) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Skipping failed event modifier", e);
+                            }
+                        } else {
+                            throw new EventProcessorException("Failed to execute event modifier", e.isPermanent(), eventDefinition, e);
+                        }
+                    }
+                }
+            }
 
             // First process notifications - those might modify the events
             notificationHandler.handleEvents(eventDefinition, eventsWithContext);
@@ -147,8 +167,10 @@ public class EventProcessorEngine {
             } catch (EventStorageHandlerException e) {
                 throw new EventProcessorException("Failed to execute storage handlers", false, eventDefinition, e);
             }
+        } catch (EventProcessorException e) {
+            throw new EventProcessorException("Couldn't emit events for: " + eventDefinition, e);
         } catch (Exception e) {
-            throw new EventProcessorException("Couldn't emit events for: " + eventDefinition.toString(), false, eventDefinition, e);
+            throw new EventProcessorException("Couldn't emit events for: " + eventDefinition, false, eventDefinition, e);
         }
     }
 }
