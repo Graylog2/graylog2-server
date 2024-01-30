@@ -222,7 +222,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     });
                 }
 
-                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STORED, List.of())
+                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_REQUESTED, List.of())
                         .forEach(c -> {
                             dataNodeProvisioningService.save(c.asConnecting());
                             executor.submit(() -> checkConnectivity(c));

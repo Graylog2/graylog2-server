@@ -46,6 +46,7 @@ import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
 import HighlightingRule, { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
@@ -180,6 +181,7 @@ export const ViewGenerator = async ({
   aggregations,
   groupBy,
   queryParameters,
+  searchFilters,
 }: {
   streams: string | string[] | undefined | null,
   timeRange: AbsoluteTimeRange | RelativeTimeRangeStartOnly,
@@ -187,9 +189,10 @@ export const ViewGenerator = async ({
   aggregations: Array<EventDefinitionAggregation>
   groupBy: Array<string>,
   queryParameters: Array<ParameterJson>,
+  searchFilters?: Array<SearchFilter>,
 },
 ) => {
-  const query = QueryGenerator(streams, undefined, timeRange, queryString);
+  const query = QueryGenerator(streams, undefined, timeRange, queryString, (searchFilters || []));
   const search = Search.create().toBuilder().queries([query]).parameters(queryParameters.map((param) => Parameter.fromJSON(param)))
     .build();
   const viewState = await ViewStateGenerator({ streams, aggregations, groupBy });

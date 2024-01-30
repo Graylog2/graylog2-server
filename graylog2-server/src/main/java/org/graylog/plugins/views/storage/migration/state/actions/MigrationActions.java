@@ -16,10 +16,13 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
+import java.util.Map;
+
 /**
  * Set of callbacks used during the migration in different states.
  */
-public interface MigrationActions {
+public interface MigrationActions extends WithArgs {
+
     void resetMigration();
 
     void migrateIndexTemplates();
@@ -29,4 +32,6 @@ public interface MigrationActions {
     void migrateWithDowntime();
 
     boolean isOldClusterStopped();
+
+    void rollingUpgradeSelected();
 }

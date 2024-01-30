@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchemaGenerator;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
@@ -455,7 +456,7 @@ public class Generator {
             return createTypeSchema(modelName, Collections.singletonMap("type", modelName), models);
         }
 
-        final String modelName = returnType.getSimpleName();
+        final String modelName = uniqueModelName(genericType, returnType);
         final Map<String, Object> genericTypeSchema = schemaForType(genericType);
         if (!isObjectOrArray(genericTypeSchema)) {
             return createTypeSchema(null, genericTypeSchema, Collections.emptyMap());
@@ -463,6 +464,17 @@ public class Generator {
 
         final TypeSchema inlineSchema = extractInlineModels(genericTypeSchema);
         return createTypeSchema(modelName, inlineSchema.type(), inlineSchema.models());
+    }
+
+    private String uniqueModelName(Type genericType, Class<?> returnType) {
+        final var simpleName = returnType.getSimpleName();
+        if (genericType instanceof ParameterizedType parameterizedType) {
+            final var classNames = Arrays.stream(parameterizedType.getActualTypeArguments())
+                    .map(type -> uniqueModelName(type, classForType(type)))
+                    .toList();
+            return simpleName + "_" + Joiner.on("_").join(classNames);
+        }
+        return simpleName;
     }
 
     private TypeSchema extractInlineModels(Map<String, Object> genericTypeSchema) {

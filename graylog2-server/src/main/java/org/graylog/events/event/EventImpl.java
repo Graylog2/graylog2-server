@@ -54,6 +54,7 @@ public class EventImpl implements Event {
     private String source;
     private ImmutableList<String> keyTuple = ImmutableList.of();
     private long priority;
+    private long riskScore;
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
@@ -239,6 +240,16 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public long getRiskScore() {
+        return riskScore;
+    }
+
+    @Override
+    public void setRiskScore(long riskScore) {
+        this.riskScore = riskScore;
+    }
+
+    @Override
     public boolean getAlert() {
         return alert;
     }
@@ -316,6 +327,7 @@ public class EventImpl implements Event {
                 .keyTuple(getKeyTuple())
                 .key(String.join("|", getKeyTuple()))
                 .priority(getPriority())
+                .riskScore(getRiskScore())
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))

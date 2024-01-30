@@ -15,19 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { cloneElement, useState, useRef } from 'react';
+import { cloneElement, useCallback, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Overlay } from 'react-overlays';
 
-import { Popover } from 'components/bootstrap';
 import ColorPicker from 'components/common/ColorPicker';
-
-const StyledPopover = styled(Popover)`
-  .popover-content {
-    padding: 0;
-  }
-`;
+import Popover from 'components/common/Popover';
 
 type Props = {
   id: string,
@@ -52,36 +44,28 @@ const ColorPickerPopover = ({ id, placement, title, triggerNode, onChange, ...re
   const [show, setShow] = useState(false);
   const toggleTarget = useRef();
 
-  const handleToggle = () => {
-    setShow(!show);
-  };
+  const handleToggle = useCallback(() => { setShow(!show); }, [show]);
 
-  const handleChange = (newColor, event) => {
+  const onClose = useCallback(() => setShow(false), []);
+
+  const handleChange = useCallback((newColor: string, event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(newColor, event, handleToggle);
-  };
+  }, [handleToggle, onChange]);
 
   return (
-    <>
-      {cloneElement(triggerNode, {
-        onClick: handleToggle,
-        ref: toggleTarget,
-      })}
+    <Popover id={id} opened={show} position={placement} onClose={onClose}>
+      <Popover.Target>
+        {cloneElement(triggerNode, {
+          onClick: handleToggle,
+          ref: toggleTarget,
+        })}
+      </Popover.Target>
 
-      {show && (
-        <Overlay show={show}
-                 containerPadding={10}
-                 placement={placement}
-                 shouldUpdatePosition
-                 target={toggleTarget.current}
-                 rootClose
-                 onHide={handleToggle}>
-          <StyledPopover id={id} title={title}>
-            <ColorPicker onChange={handleChange}
-                         {...rest} />
-          </StyledPopover>
-        </Overlay>
-      )}
-    </>
+      <Popover.Dropdown title={title}>
+        <ColorPicker onChange={handleChange}
+                     {...rest} />
+      </Popover.Dropdown>
+    </Popover>
   );
 };
 

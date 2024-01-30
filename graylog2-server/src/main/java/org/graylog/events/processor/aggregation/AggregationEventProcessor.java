@@ -24,12 +24,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
 import org.graylog.events.event.EventOriginContext;
 import org.graylog.events.event.EventReplayInfo;
 import org.graylog.events.event.EventWithContext;
+import org.graylog.events.event.RiskScoreCalculator;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventConsumer;
 import org.graylog.events.processor.EventDefinition;
@@ -59,8 +61,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -96,6 +96,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final Messages messages;
     private final NotificationService notificationService;
     private final PermittedStreams permittedStreams;
+    private final RiskScoreCalculator riskScoreCalculator;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -105,7 +106,8 @@ public class AggregationEventProcessor implements EventProcessor {
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
                                      Messages messages, NotificationService notificationService,
-                                     PermittedStreams permittedStreams) {
+                                     PermittedStreams permittedStreams,
+                                     RiskScoreCalculator riskScoreCalculator) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -116,6 +118,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.messages = messages;
         this.notificationService = notificationService;
         this.permittedStreams = permittedStreams;
+        this.riskScoreCalculator = riskScoreCalculator;
     }
 
     @Override
@@ -194,7 +197,8 @@ public class AggregationEventProcessor implements EventProcessor {
             LOG.debug("scrollQueryString: {}", scrollQueryString);
 
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
-            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
+            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.filters(),
+                    config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
         }
     }
 
@@ -250,6 +254,7 @@ public class AggregationEventProcessor implements EventProcessor {
                         .streams(event.getSourceStreams())
                         .build());
 
+                riskScoreCalculator.assignRiskScore(event);
                 eventsWithContext.add(EventWithContext.create(event, msg));
                 if (config.eventLimit() != 0) {
                     if (messageCount.incrementAndGet() >= config.eventLimit()) {
@@ -262,7 +267,8 @@ public class AggregationEventProcessor implements EventProcessor {
         };
 
         try {
-            moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+            moreSearch.scrollQuery(config.query(), streams, config.filters(), config.queryParameters(),
+                    parameters.timerange(), parameters.batchSize(), callback);
         } catch (EventLimitReachedException e) {
             notificationService.publishIfFirst(notificationService.buildNow()
                     .addType(EVENT_LIMIT_REACHED)
@@ -392,6 +398,8 @@ public class AggregationEventProcessor implements EventProcessor {
             // TODO: Can we find a useful source value?
             final Message message = new Message(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
+
+            riskScoreCalculator.assignRiskScore(event);
 
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
             eventsWithContext.add(EventWithContext.create(event, message));
