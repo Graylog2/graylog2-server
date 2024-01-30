@@ -25,10 +25,10 @@ import resultJson from './sample-dashboards/overview_results.json';
 
 const ClusterManagementOverview = () => {
   const datanodePlugin = PluginStore.exports('datanode');
-  const EnterpriseDynamicSearch = datanodePlugin[0]?.EnterpriseDynamicSearch;
+  const ClusterManagementSearch = datanodePlugin[0]?.ClusterManagementSearch;
 
-  if (EnterpriseDynamicSearch) {
-    return <EnterpriseDynamicSearch viewId={viewJson?.id} />;
+  if (ClusterManagementSearch) {
+    return <ClusterManagementSearch />;
   }
 
   return <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={[]} />;

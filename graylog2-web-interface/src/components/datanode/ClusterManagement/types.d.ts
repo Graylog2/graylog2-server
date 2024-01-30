@@ -16,14 +16,8 @@
  */
 import type * as React from 'react';
 
-interface EnterpriseDynamicSearchProps {
-  licenseSubject: string,
-  viewId: string,
-  SearchAreaContainer?: React.ComponentType,
-}
-
 interface DatanodePlugin {
-  EnterpriseDynamicSearch?: React.ComponentType<EnterpriseDynamicSearchProps>;
+  ClusterManagementSearch?: React.ComponentType;
 }
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

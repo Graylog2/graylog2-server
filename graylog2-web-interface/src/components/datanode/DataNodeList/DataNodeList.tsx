@@ -40,7 +40,7 @@ import useDataNodes from '../hooks/useDataNodes';
 const ENTITY_TABLE_ID = 'datanodes';
 const DEFAULT_LAYOUT = {
   pageSize: 10,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
+  sort: { attributeId: 'hostname', direction: 'asc' } as Sort,
   displayedColumns: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
   columnsOrder: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
 };
