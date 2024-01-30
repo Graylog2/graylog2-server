@@ -15,19 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import ClusterManagementTeaserSearch from './ClusterManagementTeaserSearch';
+import TeaserSearch from 'components/security/teaser/TeaserSearch';
 
-const ClusterManagementOverview = () => {
-  const datanodePlugin = PluginStore.exports('datanode');
-  const ClusterManagementSearch = datanodePlugin[0]?.ClusterManagementSearch;
+import viewJson from './sample-dashboards/overview_view.json';
+import searchJson from './sample-dashboards/overview_search.json';
+import resultJson from './sample-dashboards/overview_results.json';
 
-  if (ClusterManagementSearch) {
-    return <ClusterManagementSearch />;
-  }
+const hotspots = [
+  {
+    positionX: '50%',
+    positionY: '120px',
+    description: 'Show performance metrics of your data node and managed OpenSearch cluster.',
+  },
+];
 
-  return <ClusterManagementTeaserSearch />;
-};
+const ClusterManagementTeaserSearch = () => (
+  <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
+);
 
-export default ClusterManagementOverview;
+export default ClusterManagementTeaserSearch;
