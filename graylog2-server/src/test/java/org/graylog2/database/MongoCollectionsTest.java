@@ -30,10 +30,10 @@ import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
+import org.graylog.testing.mongodb.MongoJackExtension;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +50,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
+@ExtendWith(MongoJackExtension.class)
 class MongoCollectionsTest {
 
     private MongoCollections collections;
@@ -77,8 +78,8 @@ class MongoCollectionsTest {
                          @JsonProperty("timestamp") DateTime timestamp) {}
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService) {
-        collections = new MongoCollections(new CommonMongoJackObjectMapperProvider(new ObjectMapperProvider()), mongoDBTestService.mongoConnection());
+    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
+        collections = new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection());
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
     }
 

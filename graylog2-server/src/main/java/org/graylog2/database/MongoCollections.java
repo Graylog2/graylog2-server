@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.mongojack.internal.MongoJackModule;
 
@@ -31,7 +31,7 @@ public class MongoCollections {
     private final MongoConnection mongoConnection;
 
     @Inject
-    public MongoCollections(CommonMongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
+    public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
 
