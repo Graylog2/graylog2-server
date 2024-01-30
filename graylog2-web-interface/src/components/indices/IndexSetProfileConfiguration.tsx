@@ -52,6 +52,7 @@ const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string,
                  wrapperClassName="col-sm-9"
                  label="Index field type mapping profile">
             <StyledSelect placeholder="Select index field type profile"
+                          inputId={name}
                           options={options}
                           value={value}
                           disabled={isLoading}

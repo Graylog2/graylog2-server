@@ -42,7 +42,7 @@ const selectItem = async (select: HTMLElement, option: string | RegExp) => {
   return selectEvent.select(select, option);
 };
 
-describe('IndexSetFieldTypesList', () => {
+describe('EditProfile', () => {
   const createMock = jest.fn(() => Promise.resolve());
   const editMock = jest.fn(() => Promise.resolve());
   const deleteMock = jest.fn(() => Promise.resolve());
