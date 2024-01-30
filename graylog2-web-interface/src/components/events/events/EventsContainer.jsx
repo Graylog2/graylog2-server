@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import isObject from 'lodash/isObject';
 
 import { Spinner } from 'components/common';
+import UserNotification from 'util/UserNotification';
 import connect from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -29,7 +30,6 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import Events, { PAGE_SIZES, EVENTS_MAX_OFFSET_LIMIT } from './Events';
 
 import 'components/event-definitions/event-definition-types';
-import UserNotification from 'util/UserNotification';
 
 const LOCAL_STORAGE_ITEM = 'events-last-search';
 
