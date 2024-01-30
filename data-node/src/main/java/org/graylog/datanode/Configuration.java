@@ -82,17 +82,17 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_data_location", required = true)
-    private String opensearchDataLocation = "datanode/data";
+    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchDataLocation = Path.of("datanode/data");
 
-    @Parameter(value = "opensearch_logs_location", required = true)
-    private String opensearchLogsLocation = "datanode/logs";
+    @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchLogsLocation = Path.of("datanode/logs");
 
-    @Parameter(value = "opensearch_config_location", required = true)
-    private String opensearchConfigLocation = "datanode/config";
+    @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
+    private Path opensearchConfigLocation = Path.of("datanode/config");
 
-    @Parameter(value = "config_location", required = true)
-    private String configLocation = "config";
+    @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
+    private Path configLocation = null;
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
@@ -118,16 +118,16 @@ public class Configuration extends BaseConfiguration {
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
     @Parameter(value = "opensearch_network_host")
-    private String opensearchNetworkHostHost = null;
+    private String opensearchNetworkHost = null;
 
     @Parameter(value = "transport_certificate")
-    private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
+    private String datanodeTransportCertificate = null;
 
     @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
     @Parameter(value = "http_certificate")
-    private String datanodeHttpCertificate = "datanode-http-certificates.p12";
+    private String datanodeHttpCertificate = null;
 
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
@@ -174,6 +174,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "hostname")
     private String hostname = null;
 
+    @Parameter(value = "clustername")
+    private String clustername = "datanode-cluster";
+
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
 
@@ -210,6 +213,24 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
+    @Parameter(value = "metrics_timestamp")
+    private String metricsTimestamp = "timestamp";
+    
+    @Parameter(value = "metrics_stream")
+    private String metricsStream = "gl-datanode-metrics";
+
+    @Parameter(value = "metrics_retention")
+    private String metricsRetention = "14d";
+
+    @Parameter(value = "metrics_daily_retention")
+    private String metricsDailyRetention = "365d";
+
+    @Parameter(value = "metrics_daily_index")
+    private String metricsDailyIndex = "gl-datanode-metrics-daily";
+
+    @Parameter(value = "metrics_policy")
+    private String metricsPolicy = "gl-datanode-metrics-ism";
+
     public boolean isInsecureStartup() {
         return insecureStartup;
     }
@@ -237,7 +258,7 @@ public class Configuration extends BaseConfiguration {
     /**
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
-    public String getOpensearchConfigLocation() {
+    public Path getOpensearchConfigLocation() {
         return opensearchConfigLocation;
     }
 
@@ -247,21 +268,22 @@ public class Configuration extends BaseConfiguration {
      * We treat it as read only for the datanode and should never persist anything in it.
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
-    public String getDatanodeConfigurationLocation() {
+    @Nullable
+    public Path getDatanodeConfigurationLocation() {
         return configLocation;
     }
 
     /**
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
-    public String getOpensearchDataLocation() {
+    public Path getOpensearchDataLocation() {
         return opensearchDataLocation;
     }
 
     /**
      * Use {@link DatanodeDirectories} to obtain a reference to this directory.
      */
-    public String getOpensearchLogsLocation() {
+    public Path getOpensearchLogsLocation() {
         return opensearchLogsLocation;
     }
 
@@ -284,8 +306,8 @@ public class Configuration extends BaseConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validatePasswordSecret() throws ValidationException {
-        if (passwordSecret == null || passwordSecret.length() < 16) {
-            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
+        if (passwordSecret == null || passwordSecret.length() < 64) {
+            throw new ValidationException("The minimum length for \"password_secret\" is 64 characters.");
         }
     }
 
@@ -306,7 +328,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public String getDatanodeNodeName() {
-        return datanodeNodeName;
+        return datanodeNodeName != null && !datanodeNodeName.isBlank() ? datanodeNodeName : getHostname();
     }
 
     public String getInitialManagerNodes() {
@@ -341,8 +363,8 @@ public class Configuration extends BaseConfiguration {
         return datanodeHttpCertificatePassword;
     }
 
-    public Optional<String> getOpensearchNetworkHostHost() {
-        return Optional.ofNullable(opensearchNetworkHostHost);
+    public Optional<String> getOpensearchNetworkHost() {
+        return Optional.ofNullable(opensearchNetworkHost);
     }
 
     public String getBindAddress() {
@@ -351,6 +373,35 @@ public class Configuration extends BaseConfiguration {
 
     public int getDatanodeHttpPort() {
         return datanodeHttpPort;
+    }
+
+    public String getClustername() {
+        return clustername;
+    }
+
+
+    public String getMetricsTimestamp() {
+        return metricsTimestamp;
+    }
+
+    public String getMetricsStream() {
+        return metricsStream;
+    }
+
+    public String getMetricsRetention() {
+        return metricsRetention;
+    }
+
+    public String getMetricsDailyRetention() {
+        return metricsDailyRetention;
+    }
+
+    public String getMetricsDailyIndex() {
+        return metricsDailyIndex;
+    }
+
+    public String getMetricsPolicy() {
+        return metricsPolicy;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
@@ -574,4 +625,5 @@ public class Configuration extends BaseConfiguration {
     public String getRootPasswordSha2() {
         return rootPasswordSha2;
     }
+
 }

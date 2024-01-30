@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 module.exports = {
-  customSyntax: '@stylelint/postcss-css-in-js',
+  customSyntax: 'postcss-styled-syntax',
   extends: [
     'stylelint-config-standard',
     'stylelint-config-styled-components',
@@ -28,6 +28,7 @@ module.exports = {
     'function-name-case': null,
     'function-whitespace-after': null,
     'max-empty-lines': 2,
+    'media-query-no-invalid': null,
     'no-descending-specificity': null,
     'no-empty-first-line': null,
     'no-empty-source': null,
@@ -40,6 +41,7 @@ module.exports = {
     'property-no-vendor-prefix': [true, {
       ignoreProperties: ['grid-rows', 'grid-columns', 'grid-row', 'grid-column'],
     }],
+    'selector-class-pattern': null,
     'string-quotes': 'single',
     'value-no-vendor-prefix': [true, {
       ignoreValues: ['grid', 'inline-grid'],

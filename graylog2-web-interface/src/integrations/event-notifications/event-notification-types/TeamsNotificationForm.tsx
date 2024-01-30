@@ -23,6 +23,7 @@ import { getValueFromInput } from 'util/FormsUtils';
 import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
 import { ColorPickerPopover, TimezoneSelect } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
+import type { SelectCallback } from 'components/bootstrap/types';
 
 import type { ConfigType, ValidationType } from '../types';
 
@@ -87,7 +88,7 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
     };
   }
 
-  handleBacklogSizeChange = (event: { target: { name: string; }; }) => {
+  handleBacklogSizeChange: SelectCallback = (event: { target: { name: string; }; }) => {
     const { name } = event.target;
     const value = getValueFromInput(event.target);
 

@@ -17,40 +17,36 @@
 package org.graylog.storage.elasticsearch7.views.export;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportException;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
-import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog.plugins.views.search.export.TestData;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
 
     private IndexLookup indexLookup;
-    private ElasticsearchExportBackend sut;
+    private ElasticsearchExportBackend backend;
+
+    private ElasticsearchExportITHelper helper;
 
     @Rule
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
@@ -63,8 +59,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     @Before
     public void setUp() {
         indexLookup = mock(IndexLookup.class);
+        backend = new ElasticsearchExportBackend(indexLookup, requestStrategy(), false, new IgnoreSearchFilters());
+        helper = new ElasticsearchExportITHelper(indexLookup, backend);
 
-        sut = new ElasticsearchExportBackend(indexLookup, requestStrategy(), false, new IgnoreSearchFilters());
     }
 
     private RequestStrategy requestStrategy() {
@@ -76,32 +73,28 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesCorrectIndicesAndStreams() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .streams(ImmutableSet.of("stream-01", "stream-02"))
                 .build();
 
-        mockIndexLookupFor(command, "graylog_0", "graylog_1");
+        helper.mockIndexLookupFor(command, "graylog_0", "graylog_1");
 
-        runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
+        helper.runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
                 "graylog_1, 2015-01-01T01:59:59.999Z, source-2, He",
                 "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho"
         );
     }
 
-    protected ExportMessagesCommand.Builder commandBuilderWithAllStreams() {
-        return defaultCommandBuilder().streams(ImmutableSet.of("stream-01", "stream-02", "stream-03"));
-    }
-
     @Test
     public void usesQueryString() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .queryString(ElasticsearchQueryString.of("Ha Ho"))
                 .build();
 
-        runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
+        helper.runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
@@ -111,11 +104,11 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesTimeRange() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams()
-                .timeRange(timerange("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.000Z"))
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
+                .timeRange(AbsoluteRange.create("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.000Z"))
                 .build();
 
-        runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
+        helper.runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
                 "graylog_1, 2015-01-01T01:59:59.999Z, source-2, He",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
@@ -125,11 +118,11 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesFieldsInOrder() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .fieldsInOrder("timestamp", "message")
                 .build();
 
-        runWithExpectedResultIgnoringSort(command, "timestamp,message",
+        helper.runWithExpectedResultIgnoringSort(command, "timestamp,message",
                 "graylog_0, 2015-01-01T04:00:00.000Z, Ho",
                 "graylog_0, 2015-01-01T03:00:00.000Z, Hi",
                 "graylog_1, 2015-01-01T01:59:59.999Z, He",
@@ -140,9 +133,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void marksFirstChunk() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams().build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
 
-        SimpleMessageChunk[] chunks = collectChunksFor(command).toArray(new SimpleMessageChunk[0]);
+        SimpleMessageChunk[] chunks = helper.collectChunksFor(command).toArray(new SimpleMessageChunk[0]);
 
         assertThat(chunks[0].isFirstChunk()).isTrue();
     }
@@ -151,10 +144,10 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void failsWithLeadingHighlightQueryIfDisallowed() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams().queryString(ElasticsearchQueryString.of("*a")).build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().queryString(ElasticsearchQueryString.of("*a")).build();
 
         assertThatExceptionOfType(ExportException.class)
-                .isThrownBy(() -> sut.run(command, chunk -> {}))
+                .isThrownBy(() -> backend.run(command, chunk -> {}))
                 .withCauseInstanceOf(ElasticsearchException.class);
     }
 
@@ -162,9 +155,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void respectsResultLimitIfSet() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams().chunkSize(1).limit(3).build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().chunkSize(1).limit(3).build();
 
-        SimpleMessageChunk totalResult = collectTotalResult(command);
+        SimpleMessageChunk totalResult = helper.collectTotalResult(command);
 
         assertThat(totalResult.messages()).hasSize(3);
     }
@@ -173,9 +166,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void deliversCompleteLastChunkIfLimitIsReached() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams().chunkSize(2).limit(3).build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().chunkSize(2).limit(3).build();
 
-        SimpleMessageChunk totalResult = collectTotalResult(command);
+        SimpleMessageChunk totalResult = helper.collectTotalResult(command);
 
         assertThat(totalResult.messages()).hasSize(4);
     }
@@ -184,14 +177,14 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void resultsHaveAllMessageFields() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .fieldsInOrder("timestamp", "message")
                 .build();
 
-        LinkedHashSet<SimpleMessageChunk> allChunks = collectChunksFor(command);
+        LinkedHashSet<SimpleMessageChunk> allChunks = helper.collectChunksFor(command);
         SimpleMessageChunk totalResult = allChunks.iterator().next();
 
-        Set<String> allFieldsInResult = actualFieldNamesFrom(totalResult);
+        Set<String> allFieldsInResult = helper.actualFieldNamesFrom(totalResult);
 
         assertThat(allFieldsInResult).containsExactlyInAnyOrder(
                 "gl2_message_id",
@@ -206,9 +199,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void sortsByTimestampAscending() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams().build();
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
 
-        runWithExpectedResult(command, "timestamp,source,message",
+        helper.runWithExpectedResult(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
                 "graylog_1, 2015-01-01T01:59:59.999Z, source-2, He",
                 "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
@@ -219,101 +212,16 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesProvidedTimeZone() {
         importFixture("messages.json");
 
-        ExportMessagesCommand command = commandBuilderWithAllStreams()
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .timeZone(DateTimeZone.forID("Australia/Adelaide")) // UTC+9:30
                 .build();
 
-        runWithExpectedResult(command, "timestamp,source,message",
+        helper.runWithExpectedResult(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T11:30:00.000+10:30, source-1, Ha",
                 "graylog_1, 2015-01-01T12:29:59.999+10:30, source-2, He",
                 "graylog_0, 2015-01-01T13:30:00.000+10:30, source-1, Hi",
                 "graylog_0, 2015-01-01T14:30:00.000+10:30, source-2, Ho");
     }
 
-    private Set<String> actualFieldNamesFrom(SimpleMessageChunk chunk) {
-        return chunk.messages()
-                .stream().map(m -> m.fields().keySet()).reduce(Sets::union)
-                .orElseThrow(() -> new RuntimeException("failed to collect field names"));
-    }
 
-    public void mockIndexLookupFor(ExportMessagesCommand command, String... indexNames) {
-        when(indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange()))
-                .thenReturn(ImmutableSet.copyOf(indexNames));
-    }
-
-    private ExportMessagesCommand.Builder defaultCommandBuilder() {
-        return ExportMessagesCommand.withDefaults().toBuilder()
-                .timeRange(allMessagesTimeRange());
-    }
-
-    protected void runWithExpectedResult(ExportMessagesCommand command, @SuppressWarnings("SameParameterValue") String resultFields, String... messageValues) {
-        SimpleMessageChunk totalResult = collectTotalResult(command);
-
-        assertResultMatches(resultFields, totalResult, messageValues, true);
-    }
-
-    protected void runWithExpectedResultIgnoringSort(ExportMessagesCommand command, String resultFields, String... messageValues) {
-        SimpleMessageChunk totalResult = collectTotalResult(command);
-
-        assertResultMatches(resultFields, totalResult, messageValues, false);
-    }
-
-    private void assertResultMatches(String resultFields, SimpleMessageChunk totalResult, String[] messageValues, boolean expectSorted) {
-        Object[][] values = Arrays.stream(messageValues).map(this::toObjectArray).toArray(Object[][]::new);
-
-        SimpleMessageChunk expected = TestData.simpleMessageChunkWithIndexNames(resultFields, values);
-
-        assertThat(totalResult).isEqualTo(expected);
-
-        if (expectSorted) {
-            assertThat(totalResult.messages()).containsExactlyElementsOf(expected.messages());
-        }
-    }
-
-    private Object[] toObjectArray(String s) {
-        return Arrays.stream(s.split(",")).map(String::trim).toArray();
-    }
-
-    private SimpleMessageChunk collectTotalResult(ExportMessagesCommand command) {
-        LinkedHashSet<SimpleMessageChunk> allChunks = collectChunksFor(command);
-
-        LinkedHashSet<SimpleMessage> allMessages = new LinkedHashSet<>();
-
-        for (SimpleMessageChunk chunk : allChunks) {
-            keepOnlyRelevantFields(chunk, command.fieldsInOrder());
-            allMessages.addAll(chunk.messages());
-        }
-
-        return SimpleMessageChunk.from(command.fieldsInOrder(), allMessages);
-    }
-
-    private void keepOnlyRelevantFields(SimpleMessageChunk chunk, LinkedHashSet<String> relevantFields) {
-        for (SimpleMessage msg : chunk.messages()) {
-            Set<String> allFieldsInMessage = ImmutableSet.copyOf(msg.fields().keySet());
-            for (String name : allFieldsInMessage) {
-                if (!relevantFields.contains(name)) {
-                    msg.fields().remove(name);
-                }
-            }
-        }
-    }
-
-    private LinkedHashSet<SimpleMessageChunk> collectChunksFor(ExportMessagesCommand command) {
-        LinkedHashSet<SimpleMessageChunk> allChunks = new LinkedHashSet<>();
-
-        sut.run(command, allChunks::add);
-        return allChunks;
-    }
-
-    private AbsoluteRange allMessagesTimeRange() {
-        return timerange("2015-01-01T00:00:00.000Z", "2015-01-03T00:00:00.000Z");
-    }
-
-    private AbsoluteRange timerange(@SuppressWarnings("SameParameterValue") String from, String to) {
-        try {
-            return AbsoluteRange.create(from, to);
-        } catch (InvalidRangeParametersException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

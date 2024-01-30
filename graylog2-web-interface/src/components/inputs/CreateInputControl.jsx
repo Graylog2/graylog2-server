@@ -28,9 +28,17 @@ import { InputForm } from 'components/inputs';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesActions, InputTypesStore } from 'stores/inputs/InputTypesStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 const NewInputRow = styled(Row)`
   margin-bottom: 8px;
+`;
+
+const StyledForm = styled.form`
+  display: flex;
+  gap: 0.25em;
 `;
 
 const CreateInputControl = createReactClass({
@@ -40,6 +48,7 @@ const CreateInputControl = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(InputTypesStore)],
@@ -76,8 +85,8 @@ const CreateInputControl = createReactClass({
 
     this.setState({ selectedInput: selectedInput });
 
-    this.props.sendTelemetry('input_value_change', {
-      app_pathname: 'inputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SELECTED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'input-select',
       event_details: { value: selectedInput },
     });
@@ -105,8 +114,8 @@ const CreateInputControl = createReactClass({
   },
 
   _createInput(data) {
-    this.props.sendTelemetry('form_submit', {
-      app_pathname: 'inputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_CREATED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'input-create',
     });
 
@@ -139,7 +148,7 @@ const CreateInputControl = createReactClass({
     return (
       <NewInputRow className="content">
         <Col md={12}>
-          <form className="form-inline" onSubmit={this._openModal}>
+          <StyledForm className="form-inline" onSubmit={this._openModal}>
             <div className="form-group" style={{ width: 300 }}>
               <Select placeholder="Select input"
                       options={this._formatSelectOptions()}
@@ -152,15 +161,15 @@ const CreateInputControl = createReactClass({
             <ExternalLinkButton href="https://marketplace.graylog.org/"
                                 bsStyle="info"
                                 onClick={() => {
-                                  this.props.sendTelemetry('click', {
-                                    app_pathname: 'inputs',
+                                  this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.FIND_MORE_CLICKED, {
+                                    app_pathname: getPathnameWithoutId(this.props.location.pathname),
                                     app_action_value: 'inputs-find-more',
                                   });
                                 }}
                                 style={{ marginLeft: 10 }}>
               Find more inputs
             </ExternalLinkButton>
-          </form>
+          </StyledForm>
           {inputModal || customInputsComponent}
         </Col>
       </NewInputRow>
@@ -168,4 +177,4 @@ const CreateInputControl = createReactClass({
   },
 });
 
-export default withTelemetry(CreateInputControl);
+export default withLocation(withTelemetry(CreateInputControl));

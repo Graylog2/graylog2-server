@@ -15,66 +15,69 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import connect from 'stores/connect';
 
 import ConfigurationList from './ConfigurationList';
 
-const ConfigurationListContainer = createReactClass({
-  mixins: [Reflux.connect(CollectorConfigurationsStore, 'configurations'), Reflux.connect(CollectorsStore, 'collectors')],
+const handleDelete = (configuration) => CollectorConfigurationsActions.delete(configuration);
 
+const reloadConfiguration = () => {
+  CollectorConfigurationsActions.list({});
+  CollectorsActions.all();
+};
+
+const validateConfiguration = (configuration) => CollectorConfigurationsActions.validate(configuration);
+
+class ConfigurationListContainer extends React.Component {
   componentDidMount() {
-    this._reloadConfiguration();
-  },
+    reloadConfiguration();
+  }
 
-  _reloadConfiguration() {
-    CollectorConfigurationsActions.list({});
-    CollectorsActions.all();
-  },
-
-  validateConfiguration(configuration) {
-    return CollectorConfigurationsActions.validate(configuration);
-  },
-
-  handlePageChange(page, pageSize) {
-    const { query } = this.state.configurations;
+  handlePageChange = (page, pageSize) => {
+    const { query } = this.props.configurations;
 
     CollectorConfigurationsActions.list({ query: query, page: page, pageSize: pageSize });
-  },
+  };
 
-  handleQueryChange(query = '', callback = () => {}) {
-    const { pageSize } = this.state.configurations.pagination;
+  handleQueryChange = (query = '', callback = () => {}) => {
+    const { pageSize } = this.props.configurations.pagination;
 
     CollectorConfigurationsActions.list({ query: query, pageSize: pageSize }).finally(callback);
-  },
+  };
 
-  handleClone(configuration, name, callback) {
+  handleClone = (configuration, name, callback) => {
+    const { sendTelemetry } = this.props;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_CLONED, {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
+    });
+
     CollectorConfigurationsActions.copyConfiguration(configuration, name)
       .then((response) => {
         callback();
 
         return response;
       });
-  },
-
-  handleDelete(configuration) {
-    CollectorConfigurationsActions.delete(configuration);
-  },
+  };
 
   render() {
-    const { collectors, configurations } = this.state;
-    const isLoading = !collectors || !collectors.collectors || !configurations || !configurations.paginatedConfigurations;
+    const { collectors, configurations } = this.props;
+    const isLoading = !collectors || !configurations || !configurations.paginatedConfigurations;
 
     if (isLoading) {
       return <Spinner />;
     }
 
     return (
-      <ConfigurationList collectors={collectors.collectors}
+      <ConfigurationList collectors={collectors}
                          query={configurations.query}
                          pagination={configurations.pagination}
                          total={configurations.total}
@@ -82,10 +85,28 @@ const ConfigurationListContainer = createReactClass({
                          onPageChange={this.handlePageChange}
                          onQueryChange={this.handleQueryChange}
                          onClone={this.handleClone}
-                         onDelete={this.handleDelete}
-                         validateConfiguration={this.validateConfiguration} />
+                         onDelete={handleDelete}
+                         validateConfiguration={validateConfiguration} />
     );
-  },
-});
+  }
+}
 
-export default ConfigurationListContainer;
+ConfigurationListContainer.propTypes = {
+  configurations: PropTypes.object,
+  collectors: PropTypes.array,
+  sendTelemetry: PropTypes.func,
+};
+
+ConfigurationListContainer.defaultProps = {
+  configurations: undefined,
+  collectors: undefined,
+  sendTelemetry: () => {},
+};
+
+export default withTelemetry(connect(ConfigurationListContainer, {
+  configurations: CollectorConfigurationsStore,
+  collectorsState: CollectorsStore,
+}, ({ configurations, collectorsState }) => ({
+  collectors: collectorsState.collectors,
+  configurations,
+})));

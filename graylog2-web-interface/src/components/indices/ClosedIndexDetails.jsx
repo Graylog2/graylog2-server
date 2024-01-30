@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Alert, Button } from 'components/bootstrap';
-import { IndexRangeSummary } from 'components/indices';
+import IndexRangeSummary from 'components/indices/IndexRangeSummary';
 import { IndicesActions } from 'stores/indices/IndicesStore';
 
 class ClosedIndexDetails extends React.Component {

@@ -19,11 +19,12 @@ package org.graylog2.bootstrap.preflight.web;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.util.encoders.Base64;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -51,11 +52,7 @@ public class BasicAuthFilter implements ContainerRequestFilter {
         final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
 
         if (authorization == null || authorization.isEmpty()) {
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("You cannot access this resource, missing authorization header!")
-                    .type(MediaType.TEXT_PLAIN_TYPE)
-                    .header("WWW-Authenticate", "Basic realm=" + this.realm)
-                    .build());
+            abortRequestUnauthorized(requestContext, "You cannot access this resource, missing authorization header!");
             return;
         }
 
@@ -63,17 +60,27 @@ public class BasicAuthFilter implements ContainerRequestFilter {
 
         String usernameAndPassword = new String(Base64.decode(encodedUserPassword.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 
-        final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
-        final String username = tokenizer.nextToken();
-        final String password = tokenizer.nextToken();
+        final String[] parts = usernameAndPassword.split(":");
+
+        if (parts.length != 2) {
+            abortRequestUnauthorized(requestContext, "You cannot access this resource, invalid username/password combination!");
+            return;
+        }
+
+        final String username = parts[0];
+        final String password = parts[1];
 
         if (!isUserMatching(username, password)) {
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("You cannot access this resource, invalid username/password combination!")
-                    .type(MediaType.TEXT_PLAIN_TYPE)
-                    .header("WWW-Authenticate", "Basic realm=" + this.realm)
-                    .build());
+            abortRequestUnauthorized(requestContext, "You cannot access this resource, invalid username/password combination!");
         }
+    }
+
+    private void abortRequestUnauthorized(ContainerRequestContext requestContext, String message) {
+        requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+                .entity(message)
+                .type(MediaType.TEXT_PLAIN_TYPE)
+                .header("WWW-Authenticate", "Basic realm=" + this.realm)
+                .build());
     }
 
     private boolean isUserMatching(String username, String password) {

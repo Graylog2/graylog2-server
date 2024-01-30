@@ -25,6 +25,9 @@ import DecoratorList from 'views/components/messagelist/decorators/DecoratorList
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
 import formatDecorator from './FormatDecorator';
@@ -59,6 +62,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   const onCreate = useCallback(
     ({ stream, ...rest }: Decorator) => setModifiedDecorators([...modifiedDecorators, {
@@ -76,12 +80,12 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const onSubmit = useCallback(() => {
     onSave(modifiedDecorators);
 
-    sendTelemetry('form_submit', {
-      app_pathname: 'configurations',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.DECORATORS_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'decorators',
       app_action_value: 'configuration-save',
     });
-  }, [onSave, modifiedDecorators, sendTelemetry]);
+  }, [onSave, modifiedDecorators, sendTelemetry, pathname]);
 
   const currentDecorators = modifiedDecorators.filter((decorator) => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
   const decoratorItems = currentDecorators

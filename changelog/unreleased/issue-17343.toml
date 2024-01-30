@@ -1,0 +1,5 @@
+type = "added"
+message = "Add option to add custom field type to non existing field. Add option to change field type with option to choose field from the list"
+
+issues = ["17343"]
+pulls = ["17408"]

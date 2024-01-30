@@ -17,7 +17,7 @@
 package org.graylog2.database.dbcatalog;
 
 
-import org.graylog2.cluster.NodeImpl;
+import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
@@ -68,11 +68,11 @@ class DbEntitiesScannerTest {
         final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("nodes").get();
-        final DbEntityCatalogEntry entryByModelClass = dbEntitiesCatalog.getByModelClass(NodeImpl.class).get();
+        final DbEntityCatalogEntry entryByModelClass = dbEntitiesCatalog.getByModelClass(ServerNodeEntity.class).get();
 
         assertSame(entryByCollectionName, entryByModelClass);
 
-        assertEquals(new DbEntityCatalogEntry("nodes", "node_id", NodeImpl.class, NOBODY_ALLOWED), entryByCollectionName);
+        assertEquals(new DbEntityCatalogEntry("nodes", "node_id", ServerNodeEntity.class, NOBODY_ALLOWED), entryByCollectionName);
     }
 
     @Test

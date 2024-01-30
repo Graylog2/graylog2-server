@@ -35,13 +35,17 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settin
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.WriteRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
@@ -54,6 +58,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealt
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
@@ -63,9 +69,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -108,10 +116,31 @@ public class ClientOS2 implements Client {
         }
     }
 
+    public void deleteDataStreams() {
+        client.execute((c, requestOptions) -> c.indices().getDataStream(new GetDataStreamRequest("*"), requestOptions))
+                .getDataStreams()
+                .forEach(ds -> client.execute((c, requestOptions) ->
+                        c.indices().deleteDataStream(new DeleteDataStreamRequest(ds.getName()), requestOptions))
+                );
+    }
+
     @Override
     public void closeIndex(String index) {
         final CloseIndexRequest closeIndexRequest = new CloseIndexRequest(index);
         client.execute((c, requestOptions) -> c.indices().close(closeIndexRequest, requestOptions));
+    }
+
+    public Optional<Map<String, Object>> findMessage(String index, String queryString) {
+        return client.execute((restHighLevelClient, requestOptions) -> {
+            final SearchRequest searchRequest = new SearchRequest();
+            searchRequest.indices(index);
+            final SearchSourceBuilder source = new SearchSourceBuilder();
+            source.query(QueryBuilders.queryStringQuery(queryString));
+            source.size(1);
+            searchRequest.source(source);
+            final SearchResponse response = restHighLevelClient.search(searchRequest, requestOptions);
+            return Arrays.stream(response.getHits().getHits()).map(r -> r.getSourceAsMap()).findFirst();
+        });
     }
 
     @Override
@@ -293,6 +322,7 @@ public class ClientOS2 implements Client {
     @Override
     public void cleanUp() {
         LOG.debug("Removing indices: " + String.join(",", existingIndices()));
+        deleteDataStreams();
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
         refreshNode();

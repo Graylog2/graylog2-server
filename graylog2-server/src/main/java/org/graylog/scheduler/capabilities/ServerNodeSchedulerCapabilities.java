@@ -19,7 +19,8 @@ package org.graylog.scheduler.capabilities;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.cluster.leader.LeaderElectionService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Set;
 
 public class ServerNodeSchedulerCapabilities implements SchedulerCapabilities {

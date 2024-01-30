@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { parse, stringify } from 'qs';
 
+import useLocation from 'routing/useLocation';
 import type { Pagination } from 'stores/PaginationTypes';
 
 type UseLocationSearchPaginationType = {

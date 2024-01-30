@@ -17,6 +17,7 @@
 import type * as React from 'react';
 
 import type FetchError from 'logic/errors/FetchError';
+import type { DataTieringConfig } from 'components/indices/data-tiering';
 
 interface PluginRoute {
   path: string;
@@ -24,12 +25,6 @@ interface PluginRoute {
   parentComponent?: React.ComponentType | null;
   permissions?: string | Array<string>;
   requiredFeatureFlag?: string;
-}
-interface PluginNavigation {
-  path: string;
-  description: string;
-  requiredFeatureFlag?: string;
-  children?: Array<PluginNavigationDropdownItem>
 }
 
 interface PluginNavigationDropdownItem {
@@ -39,14 +34,25 @@ interface PluginNavigationDropdownItem {
   requiredFeatureFlag?: string,
 }
 
+type PluginNavigationLink = {
+  path: string;
+}
+
+type PluginNavigationDropdown = {
+  children: Array<PluginNavigationDropdownItem>;
+}
+
+type PluginNavigation = {
+  description: string;
+  requiredFeatureFlag?: string;
+  perspective?: string;
+  BadgeComponent?: React.ComponentType<{ text: string }>;
+  position?: 'last' | undefined,
+} & (PluginNavigationLink | PluginNavigationDropdown)
+
 interface PluginNavigationItems {
   key: string;
   component: React.ComponentType<{ smallScreen?: boolean }>;
-}
-interface SystemNavigationItem {
-  description: string;
-  path: string;
-  permissions: string | Array<string>;
 }
 interface GlobalNotification {
   key: string;
@@ -119,11 +125,24 @@ interface ProviderType {
   }>;
 }
 
+interface LogoutHook {
+  (): void | Promise<unknown>;
+}
+
+type DataTiering = {
+  type: string,
+  TiersConfigurationFields: React.ComponentType<{}>,
+  TiersSummary: React.ComponentType<{
+    config: DataTieringConfig
+  }>,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    dataTiering?: Array<DataTiering>
+    defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    systemnavigation?: Array<SystemNavigationItem>;
     globalNotifications?: Array<GlobalNotification>
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
@@ -136,6 +155,7 @@ declare module 'graylog-web-plugin/plugin' {
     forwarder?: Array<PluginForwarder>;
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
+    'hooks.logout'?: Array<LogoutHook>,
   }
   interface PluginMetadata {
     name?: string,

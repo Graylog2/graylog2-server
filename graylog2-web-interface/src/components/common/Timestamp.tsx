@@ -34,7 +34,7 @@ type Props = {
 /**
  * Component that renders a given date time based on the user time zone in a `time` HTML element.
  * It is capable of render date times in different formats, accepting ISO 8601
- * strings, JS native Date objects, and Moment.js Date objects.
+ * strings, JS native Date objects, and Moment.js Date objects. On hover the component displays the time in UTC.
  *
  * While the component is using the user time zone by default, it is also possible
  * to change the time zone for the given date, something that helps, for instance, to display a local time

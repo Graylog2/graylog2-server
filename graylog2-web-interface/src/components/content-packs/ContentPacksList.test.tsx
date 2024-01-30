@@ -20,24 +20,26 @@ import userEvent from '@testing-library/user-event';
 
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
+import type { ContentPackInstallation, ContentPackMetadata } from './Types';
+
 describe('<ContentPacksList />', () => {
   const contentPacks = [
-    { id: '1', rev: 1, title: 'UFW Grok Patterns', summary: 'Content Pack: Grok Patterns to extract informations from UFW logfiles', version: '1.0' },
-    { id: '2', rev: 1, title: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', version: '2.1' },
-    { id: '3', rev: 1, title: 'Backup Content Pack', summary: '', version: '3.0' },
-    { id: '4', rev: 1, title: 'SSH Archive', summary: 'A crypted backup over ssh.', version: '3.4' },
-    { id: '5', rev: 1, title: 'FTP Backup', summary: 'Fast but insecure backup', version: '1.0' },
-    { id: '6', rev: 1, title: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles', version: '1.0' },
-    { id: '7', rev: 1, title: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', version: '2.1' },
-    { id: '8', rev: 1, title: 'Backup Content Pack', summary: '', version: '3.0', states: ['installed'] },
-    { id: '9', rev: 1, title: 'SSH Archive', summary: 'A crypted backup over ssh.', version: '3.4' },
-    { id: '10', rev: 1, title: 'FTP Backup', summary: 'Fast but insecure backup', version: '1.0' },
-    { id: '11', rev: 1, title: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles', version: '1.0' },
-    { id: '12', rev: 1, title: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', version: '2.1' },
-    { id: '13', rev: 1, title: 'Backup Content Pack', summary: '', version: '3.0' },
-    { id: '14', rev: 1, title: 'SSH Archive', summary: 'A crypted backup over ssh.', version: '3.4' },
-    { id: '15', rev: 1, title: 'FTP Backup', summary: 'Fast but insecure backup', version: '1.0' },
-  ];
+    { id: '1', rev: 1, name: 'UFW Grok Patterns', summary: 'Content Pack: Grok Patterns to extract informations from UFW logfiles', server_version: '1.0' },
+    { id: '2', rev: 1, name: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', server_version: '2.1' },
+    { id: '3', rev: 1, name: 'Backup Content Pack', summary: '', server_version: '3.0' },
+    { id: '4', rev: 1, name: 'SSH Archive', summary: 'A crypted backup over ssh.', server_version: '3.4' },
+    { id: '5', rev: 1, name: 'FTP Backup', summary: 'Fast but insecure backup', server_version: '1.0' },
+    { id: '6', rev: 1, name: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles', server_version: '1.0' },
+    { id: '7', rev: 1, name: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', server_version: '2.1' },
+    { id: '8', rev: 1, name: 'Backup Content Pack', summary: '', server_version: '3.0', states: ['installed'] },
+    { id: '9', rev: 1, name: 'SSH Archive', summary: 'A crypted backup over ssh.', server_version: '3.4' },
+    { id: '10', rev: 1, name: 'FTP Backup', summary: 'Fast but insecure backup', server_version: '1.0' },
+    { id: '11', rev: 1, name: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles', server_version: '1.0' },
+    { id: '12', rev: 1, name: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', server_version: '2.1' },
+    { id: '13', rev: 1, name: 'Backup Content Pack', summary: '', server_version: '3.0' },
+    { id: '14', rev: 1, name: 'SSH Archive', summary: 'A crypted backup over ssh.', server_version: '3.4' },
+    { id: '15', rev: 1, name: 'FTP Backup', summary: 'Fast but insecure backup', server_version: '1.0' },
+  ] as Array<ContentPackInstallation>;
 
   it('should render with empty content packs', async () => {
     render(<ContentPacksList contentPacks={[]} />);
@@ -49,7 +51,7 @@ describe('<ContentPacksList />', () => {
     const metadata = {
       1: { 1: { installation_count: 1 } },
       2: { 5: { installation_count: 2 } },
-    };
+    } as ContentPackMetadata;
     render(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
 
     await screen.findByText('Content Pack: Grok Patterns to extract informations from UFW logfiles');
@@ -72,7 +74,9 @@ describe('<ContentPacksList />', () => {
     const deleteFn = jest.fn();
     render(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
 
-    userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
+    userEvent.click((await screen.findAllByRole('button', { name: /more actions/i }))[0]);
+
+    userEvent.click(await screen.findByRole('menuitem', { name: 'Delete All Versions' }));
 
     expect(deleteFn).toHaveBeenCalledTimes(1);
   });

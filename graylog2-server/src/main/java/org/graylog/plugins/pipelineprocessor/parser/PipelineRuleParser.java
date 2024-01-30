@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.mina.util.IdentityHashSet;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
@@ -90,9 +89,11 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -294,11 +295,13 @@ public class PipelineRuleParser {
 
         @Override
         public void exitVarAssignStmt(RuleLangParser.VarAssignStmtContext ctx) {
-            final String name = unquote(ctx.varName.getText(), '`');
-            final Expression expr = exprs.get(ctx.expression());
-            parseContext.defineVar(name, expr);
-            definedVars.add(name);
-            parseContext.statements.add(new VarAssignStatement(name, expr));
+            if (ctx.varName != null) {
+                final String name = unquote(ctx.varName.getText(), '`');
+                final Expression expr = exprs.get(ctx.expression());
+                parseContext.defineVar(name, expr);
+                definedVars.add(name);
+                parseContext.statements.add(new VarAssignStatement(name, expr));
+            }
         }
 
         @Override
@@ -893,7 +896,7 @@ public class PipelineRuleParser {
         private ParseTreeProperty<List<Expression>> argsLists = new ParseTreeProperty<>();
         private Set<ParseError> errors = Sets.newHashSet();
         // inner nodes in the parse tree will be ignored during type checker printing, they only transport type information
-        private Set<RuleContext> innerNodes = new IdentityHashSet<>();
+        private Map<RuleContext, Boolean> innerNodes = new IdentityHashMap<>();
         public List<Statement> statements = Lists.newArrayList();
         public List<Rule> rules = Lists.newArrayList();
         private Map<String, Expression> varDecls = Maps.newHashMap();
@@ -936,11 +939,11 @@ public class PipelineRuleParser {
         }
 
         public void addInnerNode(RuleContext node) {
-            innerNodes.add(node);
+            innerNodes.put(node, Boolean.TRUE);
         }
 
         public boolean isInnerNode(RuleContext node) {
-            return innerNodes.contains(node);
+            return innerNodes.containsKey(node);
         }
 
         /**

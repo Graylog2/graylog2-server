@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -87,124 +87,124 @@
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.9.0-1</opensearch.shaded.version>
-        <airline.version>2.9.0</airline.version>
-        <amqp-client.version>5.19.0</amqp-client.version>
-        <antlr.version>4.8-1</antlr.version>
+        <opensearch.shaded.version>2.11.0-1</opensearch.shaded.version>
+        <airline.version>3.0.0</airline.version>
+        <amqp-client.version>5.20.0</amqp-client.version>
+        <antlr.version>4.13.1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
-        <asm.version>9.5</asm.version>
+        <asm.version>9.6</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <aws-java-sdk-1.version>1.12.559</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.20.153</aws-java-sdk-2.version>
+        <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
+        <aws-java-sdk-2.version>2.23.4</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>1.1.9</aws-msk-iam-auth.version>
-        <bouncycastle.version>1.76</bouncycastle.version>
-        <byte-buddy.version>1.14.8</byte-buddy.version>
-        <caffeine.version>2.8.1</caffeine.version>
+        <aws-msk-iam-auth.version>2.0.2</aws-msk-iam-auth.version>
+        <bouncycastle.version>1.77</bouncycastle.version>
+        <byte-buddy.version>1.14.11</byte-buddy.version>
+        <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.162</classgraph.version>
+        <classgraph.version>4.8.165</classgraph.version>
         <commons-codec.version>1.16.0</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
-        <commons-email.version>1.5</commons-email.version>
-        <commons-lang3.version>3.13.0</commons-lang3.version>
-        <commons-net.version>3.9.0</commons-net.version>
-        <commons-validator.version>1.7</commons-validator.version>
-        <commons-io.version>2.13.0</commons-io.version>
-        <disruptor.version>3.4.4</disruptor.version>
-        <error-prone.version>2.22.0</error-prone.version>
+        <commons-email.version>1.6.0</commons-email.version>
+        <commons-lang3.version>3.14.0</commons-lang3.version>
+        <commons-net.version>3.10.0</commons-net.version>
+        <commons-validator.version>1.8.0</commons-validator.version>
+        <commons-io.version>2.15.1</commons-io.version>
+        <disruptor.version>4.0.0</disruptor.version>
+        <error-prone.version>2.24.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
-        <geoip2.version>2.12.0</geoip2.version>
+        <geoip2.version>4.2.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
-        <grpc.version>1.58.0</grpc.version>
+        <grpc.version>1.61.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>32.1.2-jre</guava.version>
-        <guice.version>6.0.0</guice.version>
+        <guava.version>33.0.0-jre</guava.version>
+        <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
-        <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.15.2</jackson.version>
+        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <hk2.version>3.0.5</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
+        <jackson.version>2.15.3</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
-        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
-        <javax.inject.version>1</javax.inject.version>
-        <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
+        <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
+        <jakarta.inject.version>2.0.1</jakarta.inject.version>
+        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>2.37</jersey.version>
+        <jersey.version>3.1.5</jersey.version>
         <jmte.version>5.0.0</jmte.version>
-        <joda-time.version>2.12.5</joda-time.version>
+        <joda-time.version>2.12.6</joda-time.version>
         <jool.version>0.9.15</jool.version>
-        <json-path.version>2.8.0</json-path.version>
-        <kafka.version>3.5.1</kafka.version>
+        <json-path.version>2.9.0</json-path.version>
+        <kafka.version>3.6.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.20.0</log4j.version>
-        <lucene.version>9.1.0</lucene.version>
+        <log4j.version>2.22.1</log4j.version>
+        <lucene.version>9.9.2</lucene.version>
         <metrics.version>4.1.9</metrics.version>
-        <mongodb-driver.version>4.8.1</mongodb-driver.version>
-        <mongojack.version>2.10.1.3</mongojack.version>
-        <mongojack4.version>4.8.0-1</mongojack4.version>
+        <mongodb-driver.version>4.11.1</mongodb-driver.version>
+        <mongojack.version>2.10.1.4</mongojack.version>
+        <mongojack4.version>4.8.1-1</mongojack4.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.100.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.61.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>4.11.0</okhttp.version>
-        <okio.version>3.5.0</okio.version>
+        <netty.version>4.1.106.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
+        <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.30.0</opentelemetry.version>
+        <opentelemetry.version>1.32.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
-        <prometheus-client.version>0.11.0</prometheus-client.version>
-        <protobuf.version>3.24.3</protobuf.version>
+        <prometheus-client.version>0.16.0</prometheus-client.version>
+        <protobuf.version>3.25.2</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>1.12.0</shiro.version>
+        <shiro.version>1.13.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.4.6</oshi.version>
-        <siv-mode.version>1.4.4</siv-mode.version>
-        <slf4j.version>2.0.9</slf4j.version>
+        <oshi.version>6.4.11</oshi.version>
+        <siv-mode.version>1.5.0</siv-mode.version>
+        <slf4j.version>2.0.11</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
-        <swagger.version>1.5.13</swagger.version>
+        <swagger.version>1.6.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>6.0.10</unboundid-ldap.version>
+        <unboundid-ldap.version>6.0.11</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
-        <validation-api.version>2.0.1.Final</validation-api.version>
-        <zstd.version>1.5.5-5</zstd.version>
+        <validation-api.version>3.0.2</validation-api.version>
+        <zstd.version>1.5.5-11</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.11.5</jjwt.version>
+        <stateless4j.version>2.6.0</stateless4j.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
-        <assertj-core.version>3.24.2</assertj-core.version>
+        <assertj-core.version>3.25.2</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <equalsverifier.version>3.15.2</equalsverifier.version>
+        <equalsverifier.version>3.15.6</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.10.0</junit-jupiter.version>
-        <mockito.version>5.6.0</mockito.version>
-        <restassured.version>5.3.2</restassured.version>
+        <junit-jupiter.version>5.10.1</junit-jupiter.version>
+        <mockito.version>5.10.0</mockito.version>
+        <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.19.1</testcontainers.version>
-        <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
+        <testcontainers.version>1.19.4</testcontainers.version>
+        <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v18.18.0</nodejs.version>
         <yarn.version>v1.22.19</yarn.version>
 
         <!-- Plugin versions -->
-        <license-maven.version>4.0.rc2</license-maven.version>
-        <download-maven-plugin.version>1.6.8</download-maven-plugin.version>
+        <license-maven.version>4.3</license-maven.version>
+        <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
     </properties>
 
 
@@ -238,6 +238,12 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${apache-httpclient.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -373,12 +379,22 @@
                 <artifactId>okhttp-tls</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
-            <!-- Explicitly manage okio to fix CVE-2023-3635. Can probably be removed with next okhttp update -->
+            <!-- Explicitly manage avro to fix CVE-2023-39410. We are using this only as a transitive dependency in
+                 plugins. Remove once its usages are updated and the fixed version is pulled in automatically. -->
             <dependency>
-                <groupId>com.squareup.okio</groupId>
-                <artifactId>okio</artifactId>
-                <version>${okio.version}</version>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>1.11.3</version>
             </dependency>
+            <!-- Explicitly manage commons-compress to fix CVE-2023-42503. We are using this only as a transitive
+                 dependency in plugins. Remove once its usages are updated and the fixed version is pulled in
+                 automatically. -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.25.0</version>
+            </dependency>
+
             <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
@@ -444,7 +460,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.3.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -454,7 +470,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.12.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -469,7 +485,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -499,7 +515,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.21.0</version>
+                    <version>3.21.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -509,32 +525,32 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.16.1</version>
+                    <version>2.16.2</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.7.3.6</version>
+                    <version>4.8.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.6</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.14.0</version>
+                    <version>1.15.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.antlr</groupId>
@@ -604,6 +620,15 @@
                                         <exclude>asm:asm</exclude>
                                         <!-- Mockito should by now have all the features we need. -->
                                         <exclude>org.powermock</exclude>
+                                        <!-- Ban AWS SDK bundle dependencies for v1 and v2. These would add hundreds of
+                                             megabytes to our production artifacts and must be avoided. -->
+                                        <exclude>com.amazonaws:aws-java-sdk-bundle</exclude>
+                                        <exclude>software.amazon.awssdk:bundle</exclude>
+                                        <!-- Ban some javax dependencies after the move to jakarta -->
+                                        <exclude>javax.inject:*</exclude>
+                                        <exclude>javax.validation:*</exclude>
+                                        <exclude>javax.ws.rs:javax.*</exclude>
+                                        <exclude>com.fasterxml.jackson.jaxrs:*</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
@@ -640,7 +665,7 @@
                         <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                         <bundledSignature>jdk-non-portable</bundledSignature>
                         <!-- Workaround until signatures for ${commons-io.version} are released: -->
-                        <bundledSignature>commons-io-unsafe-2.11.0</bundledSignature>
+                        <bundledSignature>commons-io-unsafe-2.14.0</bundledSignature>
                     </bundledSignatures>
                     <signatures>
                         <![CDATA[
@@ -747,13 +772,29 @@
                             org.junit.jupiter.params.shadow.**
                             org.apache.http.util.**
 
-                            @defaultMessage Prefer using javax.inject.
+                            @defaultMessage Use jakarta.inject.
                             com.google.inject.Inject
                             com.google.inject.Scope
                             com.google.inject.Singleton
                             com.google.inject.Provider
                             com.google.inject.name.Named
+                            javax.inject.**
+
+                            javax.persistence.** @ Use jakarta.persistence.
+
+                            @defaultMessage Use jakarta.annotation.
+                            javax.annotation.sql.**
+                            javax.annotation.security.**
+                            javax.annotation.Resources
+                            javax.annotation.Resource
+                            javax.annotation.Resource$AuthenticationType
+                            javax.annotation.ManagedBean
+                            javax.annotation.Generated
+                            javax.annotation.PreDestroy
+                            javax.annotation.Priority
+                            javax.annotation.PostConstruct
                         ]]>
+
                     </signatures>
                 </configuration>
                 <executions>
@@ -880,7 +921,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <groupId>org.graylog.repackaged</groupId>
                 <artifactId>download-maven-plugin</artifactId>
                 <version>${download-maven-plugin.version}</version>
                 <configuration>
@@ -905,7 +946,7 @@
                         <licenseSet>
                             <header>com/mycila/maven/plugin/license/templates/SSPL-1.txt</header>
                             <properties>
-                                <project.inceptionYear>2020</project.inceptionYear>
+                                <year>2020</year>
                                 <owner>Graylog, Inc.</owner>
                             </properties>
                             <keywords>

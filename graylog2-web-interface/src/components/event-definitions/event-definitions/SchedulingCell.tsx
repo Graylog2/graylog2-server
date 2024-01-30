@@ -19,7 +19,7 @@ import moment from 'moment';
 import styled, { css } from 'styled-components';
 
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
-import { Popover, Button } from 'components/bootstrap';
+import Button from 'components/bootstrap/Button';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 
 import type { Scheduler, EventDefinition } from '../event-definitions-types';
@@ -27,10 +27,6 @@ import type { Scheduler, EventDefinition } from '../event-definitions-types';
 type Props = {
   definition: EventDefinition,
 };
-
-const WidePopover = styled(Popover)`
-  max-width: 500px;
-`;
 
 const DetailTitle = styled.dt`
   float: left;
@@ -64,34 +60,32 @@ const getTimeRange = (scheduler: Scheduler) => {
   );
 };
 
-const detailsPopover = (title, scheduler: Scheduler, clearNotifications: () => void) => (
-  <WidePopover id="event-definition-details" title={`${title} details.`}>
-    <dl>
-      <DetailTitle>Status:</DetailTitle>
-      <DetailValue>{scheduler.status}</DetailValue>
-      {scheduler.triggered_at && (
+const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) => (
+  <dl>
+    <DetailTitle>Status:</DetailTitle>
+    <DetailValue>{scheduler.status}</DetailValue>
+    {scheduler.triggered_at && (
       <>
         <DetailTitle>Last execution:</DetailTitle>
         <DetailValue><Timestamp dateTime={scheduler.triggered_at} /></DetailValue>
       </>
-      )}
-      {scheduler.next_time && (
+    )}
+    {scheduler.next_time && (
       <>
         <DetailTitle>Next execution:</DetailTitle>
         <DetailValue><Timestamp dateTime={scheduler.next_time} /></DetailValue>
       </>
-      )}
-      {getTimeRange(scheduler)}
-      <DetailTitle>Queued notifications:</DetailTitle>
-      <DetailValue>{scheduler.queued_notifications}
-        {scheduler.queued_notifications > 0 && (
-        <Button bsStyle="link" bsSize="xsmall" onClick={clearNotifications()}>
+    )}
+    {getTimeRange(scheduler)}
+    <DetailTitle>Queued notifications:</DetailTitle>
+    <DetailValue>{scheduler.queued_notifications}
+      {scheduler.queued_notifications > 0 && (
+        <Button bsStyle="link" bsSize="xsmall" onClick={clearNotifications}>
           clear
         </Button>
-        )}
-      </DetailValue>
-    </dl>
-  </WidePopover>
+      )}
+    </DetailValue>
+  </dl>
 );
 
 const SchedulingInfo = ({
@@ -114,7 +108,12 @@ const SchedulingInfo = ({
   return (
     <>
       {`Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
-      <OverlayTrigger trigger="click" rootClose placement="left" overlay={detailsPopover(title, scheduler, clearNotifications)}>
+      <OverlayTrigger trigger="click"
+                      rootClose
+                      placement="left"
+                      title={`${title} details.`}
+                      overlay={detailsPopover(scheduler, clearNotifications)}
+                      width={500}>
         <DetailsButton bsStyle="link"><Icon name="circle-info" /></DetailsButton>
       </OverlayTrigger>
     </>

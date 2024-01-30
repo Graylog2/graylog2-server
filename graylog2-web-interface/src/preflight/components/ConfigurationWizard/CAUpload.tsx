@@ -57,7 +57,7 @@ const File = styled.div`
   align-items: center;
 `;
 
-const DeleteIcon = styled(Icon)`
+const DeleteIcon: React.ComponentType<{ name: 'xmark', onClick: () => void }> = styled(Icon)`
   cursor: pointer;
 `;
 

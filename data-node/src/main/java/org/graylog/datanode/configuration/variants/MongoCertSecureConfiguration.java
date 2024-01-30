@@ -26,15 +26,14 @@ import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLoca
 import org.graylog2.cluster.certificates.CertificatesService;
 import org.graylog2.plugin.system.NodeId;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public final class MongoCertSecureConfiguration extends SecureConfiguration {
 
-    private final KeystoreFileLocation finalTransportKeystoreLocation;
-    private final KeystoreFileLocation finalHttpKeystoreLocation;
     private final KeystoreReEncryption keystoreReEncryption;
     private final CertificatesService certificatesService;
 
@@ -55,13 +54,6 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
         this.keystoreReEncryption = keystoreReEncryption;
         this.certificatesService = certificatesService;
 
-        this.finalTransportKeystoreLocation = new KeystoreFileLocation(
-                opensearchConfigDir.resolve(localConfiguration.getDatanodeTransportCertificate())
-        );
-        this.finalHttpKeystoreLocation = new KeystoreFileLocation(
-                opensearchConfigDir.resolve(localConfiguration.getDatanodeHttpCertificate())
-        );
-
         this.mongoLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
         this.secret = passwordSecret.toCharArray();
 
@@ -70,19 +62,23 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
     }
 
     @Override
-    public boolean checkPrerequisites(Configuration localConfiguration) {
+    public boolean isConfigured(Configuration localConfiguration) {
         return certificatesService.hasCert(mongoLocation);
     }
 
     @Override
     public OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException {
+
+        final KeystoreFileLocation targetTransportKeystoreLocation = getTransportKeystoreLocation();
+        final KeystoreFileLocation targetHttpKeystoreLocation = getHttpKeystoreLocation();
+
         // this will take the mongodb-stored keys and persist them on a disk, in the opensearch configuration directory
-        keystoreReEncryption.reEncyptWithSecret(mongoLocation, mongoKeystorePassword, finalTransportKeystoreLocation);
-        keystoreReEncryption.reEncyptWithSecret(mongoLocation, mongoKeystorePassword, finalHttpKeystoreLocation);
+        keystoreReEncryption.reEncyptWithSecret(mongoLocation, mongoKeystorePassword, targetTransportKeystoreLocation);
+        keystoreReEncryption.reEncyptWithSecret(mongoLocation, mongoKeystorePassword, targetHttpKeystoreLocation);
 
         return new OpensearchSecurityConfiguration(
-                new KeystoreInformation(finalTransportKeystoreLocation.keystorePath().toAbsolutePath(), secret),
-                new KeystoreInformation(finalHttpKeystoreLocation.keystorePath().toAbsolutePath(), secret)
+                new KeystoreInformation(targetTransportKeystoreLocation.keystorePath().toAbsolutePath(), secret),
+                new KeystoreInformation(targetHttpKeystoreLocation.keystorePath().toAbsolutePath(), secret)
         );
     }
 }

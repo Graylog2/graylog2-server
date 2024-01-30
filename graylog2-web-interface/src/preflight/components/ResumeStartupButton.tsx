@@ -36,8 +36,10 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children, variant, compac
 
   const onResumeStartup = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (dataNodes?.length || window.confirm('Are you sure you want to resume startup without a running Graylog data node?')) {
-      fetch('POST', qualifyUrl('/api/status/finish-config'), undefined, false)
+    if (dataNodes?.length || window.confirm('Are you sure you want to resume startup without a running Graylog data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.')) {
+      const status = (dataNodes?.length) ? 'finish' : 'skip';
+
+      fetch('POST', qualifyUrl(`/api/status/${status}-config`), undefined, false)
         .then(() => {
           setIsWaitingForStartup(true);
         })

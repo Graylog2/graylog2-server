@@ -1,0 +1,4 @@
+type = "f"
+message = "Remove entity from bulk select state, when removing single entity in tables with bulk actions."
+
+pulls = ["17656"]

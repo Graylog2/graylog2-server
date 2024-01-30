@@ -18,9 +18,11 @@ import * as Immutable from 'immutable';
 
 import FindNewActiveQuery from 'views/logic/views/FindNewActiveQuery';
 
+const emptyList = Immutable.List<string>();
+
 describe('FindNewActiveQuery', () => {
   it('does not break when there are no queries left', () => {
-    expect(FindNewActiveQuery(Immutable.List(), 'deadbeef')).toBeUndefined();
+    expect(FindNewActiveQuery(emptyList, 'deadbeef', emptyList)).toBeUndefined();
     expect(FindNewActiveQuery(Immutable.List(['foo']), 'deadbeef', Immutable.List(['foo']))).toBeUndefined();
   });
 

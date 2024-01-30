@@ -19,11 +19,13 @@ package org.graylog2;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import org.graylog2.plugin.Tools;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +43,6 @@ import static org.graylog2.configuration.ConfigurationHelper.initConfig;
 
 @SuppressWarnings("deprecation")
 public class ConfigurationTest {
-
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
@@ -291,6 +292,41 @@ public class ConfigurationTest {
         final Configuration configuration = initConfig(new Configuration(), validProperties);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(3000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(3000);
+    }
+
+    @Test
+    public void defaultProcessorNumbers() throws Exception {
+        // number of buffer processors:
+        // process, output
+        final int[][] baseline = {
+                {1, 1}, // 1  available processor
+                {1, 1}, // 2  available processors
+                {2, 1}, // 3  available processors
+                {2, 1}, // 4  available processors
+                {2, 1}, // 5  available processors
+                {3, 2}, // 6  available processors
+                {3, 2}, // 7  available processors
+                {4, 2}, // 8  available processors
+                {4, 2}, // 9  available processors
+                {4, 2}, // 10 available processors
+                {5, 2}, // 11 available processors
+                {5, 3}, // 12 available processors
+                {5, 3}, // 13 available processors
+                {6, 3}, // 14 available processors
+                {6, 3}, // 15 available processors
+                {6, 3}, // 16 available processors
+        };
+
+        final int[][] actual = new int[baseline.length][2];
+        for (int i = 0; i < actual.length; i++) {
+            try (final var tools = Mockito.mockStatic(Tools.class)) {
+                tools.when(Tools::availableProcessors).thenReturn(i + 1);
+                final Configuration config = initConfig(new Configuration(), validProperties);
+                actual[i][0] = config.getProcessBufferProcessors();
+                actual[i][1] = config.getOutputBufferProcessors();
+            }
+        }
+        assertThat(actual).isEqualTo(baseline);
     }
 
     /**

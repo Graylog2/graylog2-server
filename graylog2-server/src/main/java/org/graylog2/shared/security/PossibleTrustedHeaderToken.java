@@ -16,18 +16,23 @@
  */
 package org.graylog2.shared.security;
 
+import org.apache.commons.collections4.SetUtils;
 import org.apache.shiro.authc.HostAuthenticationToken;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Set;
 
 public class PossibleTrustedHeaderToken implements HostAuthenticationToken, RemoteAddressAuthenticationToken {
 
     private final String host;
     private final String remoteAddr;
+    private final Set<Class<?>> matchedResources;
 
-    public PossibleTrustedHeaderToken(String host, String remoteAddr) {
+    public PossibleTrustedHeaderToken(String host, String remoteAddr, Set<Class<?>> matchedResources) {
         this.host = host;
         this.remoteAddr = remoteAddr;
+        this.matchedResources = SetUtils.emptyIfNull(matchedResources);
     }
 
     /**
@@ -65,5 +70,13 @@ public class PossibleTrustedHeaderToken implements HostAuthenticationToken, Remo
      */
     public String getRemoteAddr() {
         return remoteAddr;
+    }
+
+    /**
+     * The resource classes that have matched for the request this token is associated with.
+     */
+    @Nonnull
+    public Set<Class<?>> getMatchedResources() {
+        return matchedResources;
     }
 }

@@ -86,7 +86,7 @@ public class DecoratorServiceImplTest {
     @Test
     public void findByIdThrowsIllegalArgumentExceptionForInvalidObjectId() throws NotFoundException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("invalid hexadecimal representation of an ObjectId: [NOPE]");
+        expectedException.expectMessage("state should be: hexString has 24 characters");
 
         decoratorService.findById("NOPE");
     }
@@ -165,7 +165,7 @@ public class DecoratorServiceImplTest {
     @Test
     public void deleteThrowsIllegalArgumentExceptionForInvalidObjectId() {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("invalid hexadecimal representation of an ObjectId: [NOPE]");
+        expectedException.expectMessage("state should be: hexString has 24 characters");
 
         decoratorService.delete("NOPE");
     }

@@ -19,18 +19,19 @@ package org.graylog2.indexer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.utilities.AssertJsonPath;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 public class EventsIndexMappingTest {
@@ -38,6 +39,7 @@ public class EventsIndexMappingTest {
     private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private static final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+    private static final TemplateIndexSetConfig templateIndexSetConfig = mock(TemplateIndexSetConfig.class);
     public static final String DATE_FORMAT = "uuuu-MM-dd HH:mm:ss.SSS";
 
     @ParameterizedTest
@@ -47,15 +49,16 @@ public class EventsIndexMappingTest {
     })
     void createsValidMappingTemplates(final String versionString) throws Exception {
         final SearchVersion version = SearchVersion.decode(versionString);
-        final IndexMappingTemplate mapping = new EventIndexTemplateProvider().create(version, Mockito.mock(IndexSetConfig.class));
+        final IndexMappingTemplate mapping = new EventIndexTemplateProvider().create(version, indexSetConfig);
+        doReturn("test_*").when(templateIndexSetConfig).indexWildcard();
 
-        var template1 = mapping.toTemplate(indexSetConfig, "test_*");
+        var template1 = mapping.toTemplate(templateIndexSetConfig);
         assertThat(template1.indexPatterns()).isEqualTo(List.of("test_*"));
         assertThat(template1.order()).isEqualTo(-1);
         assertJsonPath(template1.mappings(), this::assertStandardMappingValues);
         assertJsonPath(template1.settings(), this::assertStandardSettingsValues);
 
-        var template2 = mapping.toTemplate(indexSetConfig, "test_*", 23L);
+        var template2 = mapping.toTemplate(templateIndexSetConfig, 23L);
         assertThat(template2.indexPatterns()).isEqualTo(List.of("test_*"));
         assertThat(template2.order()).isEqualTo(23);
         assertJsonPath(template2.mappings(), this::assertStandardMappingValues);

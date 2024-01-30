@@ -29,6 +29,8 @@ import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigu
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import SourceViewModal from './SourceViewModal';
 import ImportsViewModal from './ImportsViewModal';
@@ -64,6 +66,7 @@ const ConfigurationForm = ({
   const [showUploadsModal, setShowUploadsModal] = useState(false);
   const defaultTemplates = useRef({});
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     CollectorsActions.all().then((response) => setCollectors(response.collectors));
@@ -87,7 +90,14 @@ const ConfigurationForm = ({
     });
   };
 
-  const _save = () => {
+  const _save = async () => {
+    const isCreate = action === 'create';
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`CONFIGURATION_${isCreate ? 'CREATED' : 'UPDATED'}`], {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
+    });
+
     if (_hasErrors()) {
       // Ensure we display an error on the template field, as this is not validated by the browser
       _validateFormData(formData, true);
@@ -95,12 +105,16 @@ const ConfigurationForm = ({
       return;
     }
 
-    if (action === 'create') {
-      CollectorConfigurationsActions.createConfiguration(formData)
+    let promise;
+
+    if (isCreate) {
+      promise = CollectorConfigurationsActions.createConfiguration(formData)
         .then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
     } else {
-      CollectorConfigurationsActions.updateConfiguration(formData);
+      promise = CollectorConfigurationsActions.updateConfiguration(formData);
     }
+
+    await promise;
   };
 
   const _debouncedValidateFormData = debounce(_validateFormData, 200);
@@ -173,6 +187,7 @@ const ConfigurationForm = ({
       nextFormData.template = defaultTemplate;
     }
 
+    _debouncedValidateFormData(nextFormData, true);
     setFormData(nextFormData);
   };
 

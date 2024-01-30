@@ -1,5 +1,6 @@
 ```js
 import createReactClass from 'create-react-class';
+import SortableList from './SortableList'
 
 const SortableListExample = createReactClass({
   getInitialState() {

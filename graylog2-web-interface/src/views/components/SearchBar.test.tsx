@@ -58,6 +58,12 @@ jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('stores/useAppDispatch');
 
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
+
 const query = MockQuery.builder()
   .timerange({ type: 'relative', from: 300 })
   .query({ type: 'elasticsearch', query_string: '*' })
@@ -117,7 +123,8 @@ describe('SearchBar', () => {
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).toContain('disabled'));
-    await waitFor(() => expect(timeRangePickerButton.firstChild).toHaveClass('fa-exclamation-triangle'));
+    const exclamationIcon = timeRangePickerButton.querySelector('svg');
+    await waitFor(() => expect(exclamationIcon).toHaveClass('fa-exclamation-triangle'));
   });
 
   it('should hide the save load controls if editing the widget', async () => {

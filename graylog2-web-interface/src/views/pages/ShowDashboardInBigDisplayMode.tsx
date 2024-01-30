@@ -20,10 +20,9 @@ import styled from 'styled-components';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import BigDisplayModeHeader from 'views/components/dashboard/BigDisplayModeHeader';
 import CycleQueryTab from 'views/components/dashboard/bigdisplay/CycleQueryTab';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
-import type { Location } from 'routing/withLocation';
-import withLocation from 'routing/withLocation';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useQuery from 'routing/useQuery';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -31,10 +30,6 @@ type BigDisplayModeQuery = {
   tabs?: Array<number>,
   interval: number,
   refresh: number,
-};
-
-type Props = {
-  location: Location,
 };
 
 const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayModeQuery): BigDisplayModeQuery => ({
@@ -50,23 +45,29 @@ const BodyPositioningWrapper = styled.div`
   padding: 10px;
 `;
 
-const ShowDashboardInBigDisplayMode = ({ location }: Props) => {
-  const { query } = location;
-  const configuration = castQueryWithDefaults(query);
+const AutoRefreshSearch = ({ refreshInterval }: { refreshInterval: number }) => {
+  const { startAutoRefresh, stopAutoRefresh } = useAutoRefresh();
 
   useEffect(() => {
-    RefreshActions.setInterval(configuration.refresh * 1000);
-    RefreshActions.enable();
+    startAutoRefresh(refreshInterval * 1000);
 
     return () => {
-      RefreshActions.disable();
+      stopAutoRefresh();
     };
-  }, [configuration.refresh]);
+  }, [refreshInterval, startAutoRefresh, stopAutoRefresh]);
+
+  return null;
+};
+
+const ShowDashboardInBigDisplayMode = () => {
+  const query = useQuery();
+  const configuration = castQueryWithDefaults(query);
 
   return (
     <InteractiveContext.Provider value={false}>
       <BodyPositioningWrapper>
         <ShowViewPage>
+          <AutoRefreshSearch refreshInterval={configuration.refresh} />
           <CycleQueryTab interval={configuration.interval} tabs={configuration.tabs} />
           <BigDisplayModeHeader />
         </ShowViewPage>
@@ -75,4 +76,4 @@ const ShowDashboardInBigDisplayMode = ({ location }: Props) => {
   );
 };
 
-export default withLocation(ShowDashboardInBigDisplayMode);
+export default ShowDashboardInBigDisplayMode;

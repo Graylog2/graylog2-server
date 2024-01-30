@@ -173,7 +173,7 @@ const getConfigurationComponent = (
 
   const element = React.createElement(strategyPlugin.configComponent as React.ComponentType<ConfigComponentProps>, componentProps);
 
-  return (<span key={strategyType}>{element}</span>);
+  return (<div key={strategyType}>{element}</div>);
 };
 
 const IndexMaintenanceStrategiesConfiguration = ({
@@ -277,7 +277,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   );
 
   return (
-    <span>
+    <div>
       <StyledH3>{title}</StyledH3>
       {description && (
         <StyledAlert>
@@ -341,7 +341,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
           )}
         </Col>
       </Row>
-    </span>
+    </div>
   );
 };
 

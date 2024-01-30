@@ -32,8 +32,11 @@ public interface IndexRangeService {
 
     WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange);
 
+    boolean renameIndex(String from, String to);
+
     boolean remove(String index);
 
     IndexRange calculateRange(String index);
+
     IndexRange createUnknownRange(String index);
 }

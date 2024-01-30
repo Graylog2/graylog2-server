@@ -39,14 +39,16 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * Web endpoints for the Kinesis auto-setup.
@@ -80,9 +82,9 @@ public class KinesisSetupResource extends RestResource implements PluginRestReso
 
         final User user = getCurrentUser();
         LOG.info("User [{}] agreed to the Kinesis auto-setup, which will create a Kinesis stream [{}], " +
-                 "role/policy, and a CloudWatch log group subscription. " +
-                 "This has been recorded, as the listed user has accepted the responsibility in associated potentially " +
-                 "incurring cost(s).", user.getId(), request.streamName());
+                "role/policy, and a CloudWatch log group subscription. " +
+                "This has been recorded, as the listed user has accepted the responsibility in associated potentially " +
+                "incurring cost(s).", user.getId(), request.streamName());
 
         return kinesisService.createNewKinesisStream(request);
     }

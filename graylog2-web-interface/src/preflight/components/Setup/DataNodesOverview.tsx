@@ -21,8 +21,8 @@ import styled from 'styled-components';
 import Spinner from 'components/common/Spinner';
 import Alert from 'components/bootstrap/Alert';
 import useDataNodes from 'preflight/hooks/useDataNodes';
-import DataNodeBadge from 'components/datanode/DataNodeBadge';
 import { Badge, List } from 'preflight/components/common';
+import DataNodeBadge from 'components/datanode/DataNodeList/DataNodeBadge';
 
 const P = styled.p`
   max-width: 700px;

@@ -28,7 +28,7 @@ const StyledRow = styled(Row)`
 
 type Props = {
   label: React.ReactElement | string,
-  value: unknown,
+  value: React.ReactNode,
   help?: string,
   className?: string,
 };
@@ -49,7 +49,7 @@ const BooleanValue = ({ value }: { value: boolean }) => (
   <><BooleanIcon name={value ? 'check-circle' : 'times-circle'} value={value} /> {value ? 'yes' : 'no'}</>
 );
 
-const readableValue = (value: Props['value']) => {
+const readableValue = (value: Props['value']): React.ReactNode => {
   if (typeof value === 'boolean') {
     return <BooleanValue value={value} />;
   }

@@ -51,20 +51,23 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -146,7 +149,7 @@ public class ContentPackResource extends RestResource {
                 .collect(Collectors.toMap(Revisioned::revision, Function.identity()));
         Map<Integer, Set<ConstraintCheckResult>> constraintMap = contentPacks.stream()
                 .collect(Collectors.toMap(Revisioned::revision, contentPackService::checkConstraints));
-        if(contentPackMap.size() <= 0) {
+        if (contentPackMap.size() <= 0) {
             throw new NotFoundException("Content pack " + id + " not found!");
         }
 
@@ -235,8 +238,8 @@ public class ContentPackResource extends RestResource {
             @PathParam("contentPackId") final ModelId contentPackId) {
         checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
         if (!contentPackInstallationPersistenceService.findByContentPackId(contentPackId).isEmpty()) {
-               throw new BadRequestException("Content pack " + contentPackId +
-                       " with all its revisions can't be deleted: There are still installations of this content pack");
+            throw new BadRequestException("Content pack " + contentPackId +
+                    " with all its revisions can't be deleted: There are still installations of this content pack");
         }
         final int deleted = contentPackPersistenceService.deleteById(contentPackId);
 
@@ -321,7 +324,7 @@ public class ContentPackResource extends RestResource {
     @GET
     @Path("{contentPackId}/installations/{installationId}/uninstall_details")
     @Timed
-    @ApiOperation(value="Get details about which entities will actually be uninstalled")
+    @ApiOperation(value = "Get details about which entities will actually be uninstalled")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })

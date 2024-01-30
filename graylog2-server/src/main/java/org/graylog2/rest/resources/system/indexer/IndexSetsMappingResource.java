@@ -20,28 +20,33 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesListService;
 import org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.requests.FieldTypeSummaryRequest;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldTypeSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -55,11 +60,67 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class IndexSetsMappingResource extends RestResource {
     private final IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService;
     private final PermittedStreams permittedStreams;
+    private final IndexFieldTypesListService indexFieldTypesListService;
 
     @Inject
-    public IndexSetsMappingResource(IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService, PermittedStreams permittedStreams) {
+    public IndexSetsMappingResource(final IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService,
+                                    final IndexFieldTypesListService indexFieldTypesListService,
+                                    final PermittedStreams permittedStreams) {
         this.indexSetFieldTypeSummaryService = indexSetFieldTypeSummaryService;
+        this.indexFieldTypesListService = indexFieldTypesListService;
         this.permittedStreams = permittedStreams;
+    }
+
+    @GET
+    @Path("/{index_set_id}")
+    @Timed
+    @NoAuditEvent("No change to the DB")
+    @ApiOperation(value = "Gets list of field_name-field_type pairs for given index set, paginated")
+    public PageListResponse<IndexSetFieldType> indexSetFieldTypesList(@ApiParam(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
+                                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                                      @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                                      @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                                      @ApiParam(name = "sort",
+                                                                                value = "The field to sort the result on",
+                                                                                required = true,
+                                                                                allowableValues = "field_name,type,origin,is_reserved")
+                                                                      @DefaultValue(IndexSetFieldType.DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
+                                                                      @DefaultValue("asc") @QueryParam("order") String order,
+                                                                      @Context SearchUser searchUser) {
+        checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
+        return indexFieldTypesListService.getIndexSetFieldTypesListPage(indexSetId,
+                query,
+                filters,
+                page,
+                perPage,
+                sort,
+                Sorting.Direction.valueOf(order.toUpperCase(Locale.ROOT)));
+    }
+
+    @GET
+    @Path("/{index_set_id}/all")
+    @Timed
+    @NoAuditEvent("No change to the DB")
+    @ApiOperation(value = "Gets list of all field_name-field_type pairs for given index set")
+    public List<IndexSetFieldType> indexSetFieldTypesList(@ApiParam(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
+                                                          @ApiParam(name = "fieldNameQuery") @QueryParam("fieldNameQuery") @DefaultValue("") String fieldNameQuery,
+                                                          @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                          @ApiParam(name = "sort",
+                                                                    value = "The field to sort the result on",
+                                                                    required = true,
+                                                                    allowableValues = "field_name,type,origin,is_reserved")
+                                                          @DefaultValue(IndexSetFieldType.DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                          @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
+                                                          @DefaultValue("asc") @QueryParam("order") String order,
+                                                          @Context SearchUser searchUser) {
+        checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
+        return indexFieldTypesListService.getIndexSetFieldTypesList(indexSetId,
+                fieldNameQuery,
+                filters,
+                sort,
+                Sorting.Direction.valueOf(order.toUpperCase(Locale.ROOT)));
     }
 
     @POST
@@ -92,7 +153,7 @@ public class IndexSetsMappingResource extends RestResource {
 
     private Set<String> normalizeStreamIds(Set<String> streams, SearchUser searchUser) {
         return (streams == null || streams.isEmpty())
-                ? permittedStreams.load(searchUser)
+                ? permittedStreams.loadAllMessageStreams(searchUser)
                 : streams;
     }
 }

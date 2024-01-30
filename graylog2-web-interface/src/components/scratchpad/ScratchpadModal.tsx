@@ -21,7 +21,7 @@ import ClipboardJS from 'clipboard';
 import debounce from 'lodash/debounce';
 
 import { OverlayTrigger } from 'components/common';
-import { Alert, Button, ButtonGroup, Tooltip, BootstrapModalConfirm } from 'components/bootstrap';
+import { Alert, Button, ButtonGroup, BootstrapModalConfirm } from 'components/bootstrap';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
@@ -216,7 +216,7 @@ const Scratchpad = () => {
                        position={position}>
       <ContentArea>
         {!isSecurityWarningConfirmed && (
-          <StyledAlert bsStyle="warning" bsSize="sm">
+          <StyledAlert bsStyle="warning">
             <AlertNote>
               We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in
               this area.
@@ -235,11 +235,11 @@ const Scratchpad = () => {
           <OverlayTrigger placement="right"
                           trigger={['hover', 'focus']}
                           overlay={(
-                            <Tooltip id="scratchpad-help" show>
+                            <>
                               You can use this space to store personal notes and other information while interacting with
                               Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP
                               addresses you need in various investigations.
-                            </Tooltip>
+                            </>
                           )}>
             <Button bsStyle="link">
               <Icon name="question-circle" />

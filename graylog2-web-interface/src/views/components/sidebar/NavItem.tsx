@@ -81,7 +81,7 @@ const Container = styled.button<ContainerProps>(({ theme: { colors, fonts }, $is
       transform: skewY(45deg);
       bottom: calc(50% - 12px);
     }
-  `}
+`}
   /* stylelint-enable selector-max-empty-lines, indentation */
 `);
 

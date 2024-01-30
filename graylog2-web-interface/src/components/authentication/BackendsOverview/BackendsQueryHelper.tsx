@@ -16,48 +16,17 @@
  */
 import * as React from 'react';
 
-import { OverlayTrigger, Icon } from 'components/common';
-import { Popover, Table, Button } from 'components/bootstrap';
+import QueryHelper from 'components/common/QueryHelper';
 
-const backendQueryHelperPopover = (
-  <Popover id="user-search-query-help"
-           title="Search Syntax Help">
-    <p><strong>Available search fields</strong></p>
-    <Table condensed>
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>title</td>
-          <td>The title of a backend</td>
-        </tr>
-        <tr>
-          <td>description</td>
-          <td>The description of a backends.</td>
-        </tr>
-      </tbody>
-    </Table>
-    <p><strong>Examples</strong></p>
-    <p>
-      Find backends with a title containing LDAP:<br />
-      <kbd>title:LDAP</kbd><br />
-    </p>
-  </Popover>
+const queryExample = (
+  <p>
+    Find backends with a title containing LDAP:<br />
+    <kbd>title:LDAP</kbd><br />
+  </p>
 );
 
 const BackendQueryHelper = () => (
-  <OverlayTrigger overlay={backendQueryHelperPopover}
-                  placement="right"
-                  rootClose
-                  trigger="click">
-    <Button bsStyle="link">
-      <Icon name="question-circle" />
-    </Button>
-  </OverlayTrigger>
+  <QueryHelper entityName="backend" example={queryExample} commonFields={['title', 'description']} />
 );
 
 export default BackendQueryHelper;

@@ -19,6 +19,10 @@ package org.graylog.datanode.bindings;
 import com.google.inject.AbstractModule;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
+import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
+import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
+import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
+import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog.datanode.configuration.OpensearchDistributionProvider;
@@ -30,5 +34,7 @@ public class DatanodeConfigurationBindings extends AbstractModule {
         bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(DatanodeConfiguration.class).toProvider(DatanodeConfigurationProvider.class);
         bind(OpensearchDistribution.class).toProvider(OpensearchDistributionProvider.class);
+        bind(StateFileParser.class).to(StateFileParserImpl.class);
+        bind(ShardStatsParser.class).to(ShardStatsParserImpl.class);
     }
 }

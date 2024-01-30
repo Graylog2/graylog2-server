@@ -16,24 +16,24 @@
  */
 import AppConfig from '../AppConfig';
 
-type MenuItem = { path: string };
+type MenuItem = {
+  path: string,
+};
 
-function filterMenuItems(
-  menuItems: Array<MenuItem>,
+const filterMenuItems = <T extends MenuItem>(
+  menuItems: Array<T>,
   toExclude: Array<string>,
-): Array<MenuItem> {
-  return menuItems.filter((item) => !toExclude.includes(item.path));
-}
+): Array<T> => menuItems.filter((item) => !toExclude.includes(item.path));
 
-export function filterCloudMenuItems(
-  menuItems: Array<MenuItem>,
+export const filterCloudMenuItems = <T extends MenuItem>(
+  menuItems: Array<T>,
   toExclude: Array<string>,
-): Array<MenuItem> {
+): Array<T> => {
   if (!AppConfig.isCloud()) {
     return menuItems;
   }
 
   return filterMenuItems(menuItems, toExclude);
-}
+};
 
 export default filterMenuItems;

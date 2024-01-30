@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -24,6 +24,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { createSearch } from 'fixtures/searches';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
+import Button from 'components/bootstrap/Button';
 
 import AddWidgetButton from './AddWidgetButton';
 
@@ -31,7 +32,7 @@ const mockAggregateActionHandler = jest.fn();
 const mockAddMessageCountActionHandler = jest.fn();
 const mockAddMessageTableActionHandler = jest.fn();
 
-const MockCreateParameterDialog = () => <span>42</span>;
+const MockCreateParameterDialog = ({ onClose }: { onClose: () => void }) => <Button onClick={onClose}>42</Button>;
 
 const bindings: PluginExports = {
   creators: [
@@ -82,84 +83,64 @@ describe('AddWidgetButton', () => {
 
   const onClick = jest.fn();
 
-  it('contains menu items for all widget types', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
+  it('contains menu items for all widget types', async () => {
+    render(<AddWidgetButton onClick={onClick} />);
+    await screen.findByText(/Use the following options to add an aggregation/i);
 
     ['Aggregation', 'Message Count', 'Message Table', 'Parameter']
-      .forEach((title) => expect(wrapper.find(`button[children="${title}"]`)).toExist());
+      .forEach((title) => expect(screen.getByRole('button', { name: title })).toBeInTheDocument());
   });
 
-  it('clicking on option to add aggregation calls AggregateActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
+  it('clicking on option to add aggregation calls AggregateActionHandler', async () => {
+    render(<AddWidgetButton onClick={onClick} />);
 
-    const addAggregation = wrapper.find('button[children="Aggregation"]');
+    const addAggregation = await screen.findByRole('button', { name: 'Aggregation' });
 
-    expect(addAggregation).toExist();
-
-    addAggregation.simulate('click');
+    addAggregation.click();
 
     expect(mockAggregateActionHandler).toHaveBeenCalled();
   });
 
-  it('clicking on option to add message count calls AddMessageCountActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
+  it('clicking on option to add message count calls AddMessageCountActionHandler', async () => {
+    render(<AddWidgetButton onClick={onClick} />);
 
-    const addMessageCount = wrapper.find('button[children="Message Count"]');
+    const addMessageCount = await screen.findByRole('button', { name: 'Message Count' });
 
-    expect(addMessageCount).toExist();
-
-    addMessageCount.simulate('click');
+    addMessageCount.click();
 
     expect(mockAddMessageCountActionHandler).toHaveBeenCalled();
   });
 
-  it('clicking on option to add message table calls AddMessageTableActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
+  it('clicking on option to add message table calls AddMessageTableActionHandler', async () => {
+    render(<AddWidgetButton onClick={onClick} />);
 
-    const addMessageTable = wrapper.find('button[children="Message Table"]');
+    const addMessageTable = await screen.findByRole('button', { name: 'Message Table' });
 
-    expect(addMessageTable).toExist();
-
-    addMessageTable.simulate('click');
+    addMessageTable.click();
 
     expect(mockAddMessageTableActionHandler).toHaveBeenCalled();
   });
 
-  it('clicking on option to add a parameter renders MockCreateParameterDialog', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
+  it('clicking on option to add a parameter renders MockCreateParameterDialog', async () => {
+    render(<AddWidgetButton onClick={onClick} />);
 
-    const addMessageTable = wrapper.find('button[children="Parameter"]');
+    const addParameter = await screen.findByRole('button', { name: 'Parameter' });
 
-    expect(addMessageTable).toExist();
+    addParameter.click();
 
-    addMessageTable.simulate('click');
-
-    wrapper.update();
-
-    expect(wrapper.find('MockCreateParameterDialog')).toExist();
+    await screen.findByRole('button', { name: '42' });
   });
 
-  it('calling onClose from creator component removes it', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} />);
+  it('calling onClose from creator component removes it', async () => {
+    render(<AddWidgetButton onClick={onClick} />);
 
-    const addMessageTable = wrapper.find('button[children="Parameter"]');
+    const addParameter = await screen.findByRole('button', { name: 'Parameter' });
 
-    expect(addMessageTable).toExist();
+    addParameter.click();
 
-    addMessageTable.simulate('click');
+    const mockDialogButton = await screen.findByRole('button', { name: '42' });
+    mockDialogButton.click();
 
-    wrapper.update();
-
-    const mockCreateParameterDialog = wrapper.find('MockCreateParameterDialog');
-
-    expect(mockCreateParameterDialog).toExist();
-
-    const { onClose } = mockCreateParameterDialog.props() as { onClose: () => void };
-
-    onClose();
-
-    wrapper.update();
-
-    expect(wrapper.find('MockCreateParameterDialog')).not.toExist();
+    expect(screen.queryByRole('button', { name: '42' })).not.toBeInTheDocument();
   });
 });

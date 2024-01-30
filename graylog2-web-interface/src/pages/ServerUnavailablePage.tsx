@@ -110,7 +110,7 @@ const ServerUnavailablePage = ({ server }: Props) => {
   return (
     <DocumentTitle title="Server unavailable">
       <LoginChrome>
-        <Modal show>
+        <Modal show onHide={() => {}}>
           <Modal.Header>
             <Modal.Title><Icon name="exclamation-triangle" /> {modalTitle}</Modal.Title>
           </Modal.Header>

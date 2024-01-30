@@ -54,7 +54,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -64,6 +65,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamEntityIdOrThrow;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
 
 public class PipelineFacade implements EntityFacade<PipelineDao> {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineFacade.class);
@@ -112,7 +116,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     private Set<ValueReference> connectedStreams(String pipelineId, EntityDescriptorIds entityDescriptorIds) {
         final Set<PipelineConnections> connections = connectionsService.loadByPipelineId(pipelineId);
         return connections.stream()
-                .map(pipelineConnections -> entityDescriptorIds.getOrThrow(pipelineConnections.streamId(), ModelTypes.STREAM_V1))
+                .map(pipelineConnections -> getStreamEntityIdOrThrow(pipelineConnections.streamId(), entityDescriptorIds))
                 .map(ValueReference::of)
                 .collect(Collectors.toSet());
     }
@@ -157,20 +161,18 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     private Set<Stream> connectedStreams(Set<EntityDescriptor> connectedStreamEntities, Map<EntityDescriptor, Object> nativeEntities) {
         final ImmutableSet.Builder<Stream> streams = ImmutableSet.builder();
         for (EntityDescriptor descriptor : connectedStreamEntities) {
-            final Object stream = nativeEntities.get(descriptor);
+            final Object stream = resolveStreamEntityObject(descriptor.id().id(), nativeEntities);
             if (stream instanceof Stream) {
                 streams.add((Stream) stream);
             } else {
                 if (EntityDescriptorIds.isSystemStreamDescriptor(descriptor)) {
                     try {
                         streams.add(streamService.load(descriptor.id().id()));
-                    }
-                    catch (NotFoundException e) {
+                    } catch (NotFoundException e) {
                         LOG.warn("Default stream {} not found!", descriptor.id().id(), e);
                         throw new MissingNativeEntityException(descriptor);
                     }
-                }
-                else {
+                } else {
                     throw new MissingNativeEntityException(descriptor);
                 }
             }
@@ -283,7 +285,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
             pipelineConnections.stream()
                     .map(PipelineConnections::streamId)
                     .map(ModelId::of)
-                    .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
+                    .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_REF_V1))
                     .forEach(stream -> mutableGraph.putEdge(entityDescriptor, stream));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline {}", entityDescriptor, e);
@@ -321,9 +323,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
 
         pipelineEntity.connectedStreams().stream()
                 .map(valueReference -> valueReference.asString(parameters))
-                .map(ModelId::of)
-                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM_V1))
-                .map(entities::get)
+                .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(streamEntity -> mutableGraph.putEdge(entity, streamEntity));
 

@@ -40,7 +40,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 
-const StyledMenuItem = styled(MenuItem)`
+const StyledMenuItem: typeof MenuItem = styled(MenuItem)`
   && > a {
     display: flex;
     justify-content: space-between;
@@ -100,7 +100,7 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
     href: action.linkTarget(handlerArgs),
     target: '_blank',
     rel: 'noopener noreferrer',
-  };
+  } as const;
 
   const onSelect = useCallback(() => {
     const { resetFocus = false } = action;

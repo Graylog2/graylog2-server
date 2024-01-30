@@ -21,6 +21,8 @@ import AppConfig from 'util/AppConfig';
 import { extendedSearchPath, viewsPath } from 'views/Constants';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
+export const SECURITY_PATH = '/security';
+
 type RoutesRelativeTimeRange = {
   relative: number
 };
@@ -64,7 +66,13 @@ const Routes = {
       show: (notificationId: string) => `/alerts/notifications/${notificationId}`,
     },
   },
-  SECURITY: '/security',
+  SECURITY: {
+    OVERVIEW: `${SECURITY_PATH}/overview`,
+    USER_ACTIVITY: `${SECURITY_PATH}/user-activity`,
+    HOST_ACTIVITY: `${SECURITY_PATH}/host-activity`,
+    NETWORK_ACTIVITY: `${SECURITY_PATH}/network-activity`,
+    ANOMALIES: `${SECURITY_PATH}/anomalies`,
+  },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   WELCOME: '/welcome',
@@ -83,6 +91,11 @@ const Routes = {
     INDICES: {
       LIST: '/system/indices',
       FAILURES: '/system/indices/failures',
+      FIELD_TYPE_PROFILES: {
+        OVERVIEW: '/system/indices/field-type-profiles',
+        edit: (profileId: string) => `/system/indices/field-type-profiles/${profileId}`,
+        CREATE: '/system/indices/field-type-profiles/create',
+      },
     },
     INDEX_SETS: {
       CONFIGURATION: (indexSetId: string, from?: string) => {
@@ -93,6 +106,7 @@ const Routes = {
         return `/system/index_sets/${indexSetId}/configuration`;
       },
       SHOW: (indexSetId: string) => `/system/index_sets/${indexSetId}`,
+      FIELD_TYPES: (indexSetId: string) => `/system/index_sets/${indexSetId}/field-types`,
       CREATE: '/system/index_sets/create',
     },
     INPUTS: '/system/inputs',
@@ -101,6 +115,12 @@ const Routes = {
     NODES: {
       LIST: '/system/nodes',
       SHOW: (nodeId: string) => `/system/nodes/${nodeId}`,
+    },
+    DATANODES: {
+      LIST: '/system/datanodes',
+      SHOW: (dataNodeId: string) => `/system/datanodes/${dataNodeId}`,
+      CLUSTER: '/system/datanodes/cluster',
+      MIGRATION: '/system/datanodes/migration',
     },
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
@@ -184,6 +204,7 @@ const Routes = {
     VIEWID: (id: string) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
+  KEYBOARD_SHORTCUTS: '/keyboard-shortcuts',
   search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[]) => {
     const route = new URI(Routes.SEARCH);
     const queryParams: SearchQueryParams = {
@@ -370,7 +391,7 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
 const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
 
 /**
- * Exported constants for using strings to check if a plugin is registered by it's description.
+ * Exported constants for using strings to check if a plugin is registered by its description.
  *
  */
 export const ENTERPRISE_ROUTE_DESCRIPTION = 'Enterprise';

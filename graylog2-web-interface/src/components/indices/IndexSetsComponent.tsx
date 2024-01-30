@@ -30,7 +30,41 @@ import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSetsStoreState, IndexSet, IndexSetStats } from 'stores/indices/IndexSetsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+
+const Toolbar = styled(Row)(({ theme }) => css`
+  border-bottom: 1px solid ${theme.colors.gray[90]};
+  padding-bottom: ${theme.spacings.sm};
+`);
+
+const GlobalStatsCol = styled(Col)(({ theme }) => css`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacings.xs};
+`);
+
+const GlobalStats = styled.p`
+  margin-bottom: 0;
+`;
+
+const StatsInfoText = styled.span`
+  font-style: italic;
+`;
+
+const formatStatsString = (stats: IndexSetStats) => {
+  if (!stats) {
+    return 'N/A';
+  }
+
+  const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
+  const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
+  const size = NumberUtils.formatBytes(stats.size);
+
+  return `${indices}, ${documents}, ${size}`;
+};
 
 const IndexSetsComponent = () => {
   const DEFAULT_PAGE_NUMBER = 1;
@@ -39,6 +73,7 @@ const IndexSetsComponent = () => {
   const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } = useStore<IndexSetsStoreState>(IndexSetsStore);
   const { page, resetPage }: PaginationQueryParameterResult = usePaginationQueryParameter();
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   const [statsEnabled, setStatsEnabled] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>(undefined);
@@ -83,8 +118,8 @@ const IndexSetsComponent = () => {
   };
 
   const onSetDefault = (indexSet: IndexSet) => () => {
-    sendTelemetry('click', {
-      app_pathname: 'indices',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_DEFAULT_SET, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'index-sets',
       app_action_value: 'set-default-index-set',
     });
@@ -97,8 +132,8 @@ const IndexSetsComponent = () => {
   };
 
   const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {
-    sendTelemetry('form_submit', {
-      app_pathname: 'indices',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_DELETED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'index-sets',
       app_action_value: 'delete-index-set',
     });
@@ -107,38 +142,6 @@ const IndexSetsComponent = () => {
       resetPage();
     });
   };
-
-  const formatStatsString = (stats: IndexSetStats) => {
-    if (!stats) {
-      return 'N/A';
-    }
-
-    const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
-    const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
-    const size = NumberUtils.formatBytes(stats.size);
-
-    return `${indices}, ${documents}, ${size}`;
-  };
-
-  const Toolbar = styled(Row)(({ theme }) => css`
-    border-bottom: 1px solid ${theme.colors.gray[90]};
-    padding-bottom: 15px;
-`);
-
-  const GlobalStatsCol = styled(Col)`
-    display: flex;
-    align-items: center;
-    gap: 10px;
-`;
-
-  const GlobalStats = styled.p`
-    margin-bottom: 0;
-`;
-
-  const StatsInfoText = styled.span(({ theme }) => css`
-    color: ${theme.colors.global.textAlt};
-    font-style: italic;
-`);
 
   const statsDisabledText = 'Stats are disabled by default';
 

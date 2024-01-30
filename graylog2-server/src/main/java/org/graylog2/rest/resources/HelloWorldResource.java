@@ -26,11 +26,12 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.HelloWorldResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import static java.util.Objects.requireNonNull;
 
@@ -54,10 +55,10 @@ public class HelloWorldResource extends RestResource {
     public HelloWorldResponse helloWorld() {
         final ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("UNKNOWN"));
         return HelloWorldResponse.create(
-            clusterId.clusterId(),
-            nodeId.getNodeId(),
-            Version.CURRENT_CLASSPATH.toString(),
-            "Manage your logs in the dark and have lasers going and make it look like you're from space!"
+                clusterId.clusterId(),
+                nodeId.getNodeId(),
+                Version.CURRENT_CLASSPATH.toString(),
+                "Manage your logs in the dark and have lasers going and make it look like you're from space!"
         );
     }
 }

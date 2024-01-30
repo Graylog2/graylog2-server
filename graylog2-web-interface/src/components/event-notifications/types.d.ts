@@ -14,6 +14,37 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+export type HttpEventNotificationV2 = EventNotification & {
+  config: HttpNotificationConfigV2,
+};
+
+export type EncryptedValue = {
+  is_set?: boolean,
+  set_value?: string,
+  keep_value?: boolean,
+  delete_value?: boolean
+};
+
+export type HttpNotificationConfigV2 = {
+  type: 'http-notification-v2',
+  url: string,
+  basic_auth?: EncryptedValue,
+  api_key_as_header: boolean,
+  api_key?: string,
+  api_secret?: EncryptedValue,
+  skip_tls_verification: boolean,
+  time_zone?: string,
+  method: string,
+  content_type?: string,
+  body_template?: string,
+  headers?: string,
+};
+
+export type HttpNotificationValidationV2 = {
+  failed?: boolean,
+  errors?: ErrorType,
+}
+
 interface EventNotificationTypes {
   type: string,
   displayName: string,

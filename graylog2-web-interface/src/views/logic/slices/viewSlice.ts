@@ -16,7 +16,7 @@
  */
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type * as Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { ViewState, RootState, GetState } from 'views/types';
@@ -217,7 +217,7 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
     .build();
 
   const indexedQueryIds = search.queries.map((query) => query.id).toList();
-  const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
+  const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery, Immutable.List([queryId]));
 
   await dispatch(selectQuery(newActiveQuery));
   await dispatch(updateView(newView, true));

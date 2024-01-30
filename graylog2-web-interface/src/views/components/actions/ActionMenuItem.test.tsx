@@ -26,10 +26,13 @@ import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import { asMock } from 'helpers/mocking';
 import useAppDispatch from 'stores/useAppDispatch';
+import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
-import ActionMenuItem from './ActionMenuItem';
+import OriginalActionMenuItem from './ActionMenuItem';
 
 jest.mock('stores/useAppDispatch');
+
+const ActionMenuItem = wrapWithMenu(OriginalActionMenuItem);
 
 describe('ActionMenuItem', () => {
   const baseAction = {

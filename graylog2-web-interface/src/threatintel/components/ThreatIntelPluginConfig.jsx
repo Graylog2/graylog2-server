@@ -23,6 +23,7 @@ import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import withTelemetry from 'logic/telemetry/withTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const ThreatIntelPluginConfig = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -101,10 +102,9 @@ const ThreatIntelPluginConfig = createReactClass({
   _saveConfig() {
     const { updateConfig, sendTelemetry } = this.props;
 
-    sendTelemetry('form_submit', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.THREATINTEL_CONFIGURATION_UPDATED, {
       app_pathname: 'configurations',
       app_section: 'threat-intel',
-      app_action_value: 'configuration-save',
     });
 
     updateConfig(this.state.config).then(() => {

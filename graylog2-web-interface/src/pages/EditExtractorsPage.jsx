@@ -42,13 +42,6 @@ const EditExtractorsPage = createReactClass({
 
   mixins: [Reflux.connect(ExtractorsStore), Reflux.connect(InputsStore)],
 
-  getInitialState() {
-    return {
-      extractor: undefined,
-      exampleMessage: undefined,
-    };
-  },
-
   componentDidMount() {
     const { params } = this.props;
 

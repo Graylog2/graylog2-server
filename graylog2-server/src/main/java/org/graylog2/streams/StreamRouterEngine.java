@@ -37,8 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Provider;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +188,7 @@ public class StreamRouterEngine {
             final StreamRuleType streamRuleType = streamRule.getType();
             final Stream.MatchingType matchingType = rule.getMatchingType();
             if (!ruleTypesNotNeedingFieldPresence.contains(streamRuleType)
-                && !message.hasField(streamRule.getField())) {
+                    && !message.hasField(streamRule.getField())) {
                 if (matchingType == Stream.MatchingType.AND) {
                     result.remove(rule.getStream());
                     // blacklist stream because it can't match anymore
@@ -221,7 +223,6 @@ public class StreamRouterEngine {
         final Stream defaultStream = defaultStreamProvider.get();
         boolean alreadyRemovedDefaultStream = false;
         for (Stream stream : result) {
-            streamMetrics.markIncomingMeter(stream.getId());
             if (stream.getRemoveMatchesFromDefaultStream()) {
                 if (alreadyRemovedDefaultStream || message.removeStream(defaultStream)) {
                     alreadyRemovedDefaultStream = true;
@@ -239,11 +240,6 @@ public class StreamRouterEngine {
                     }
                 }
             }
-        }
-        // either the message stayed on the default stream, in which case we mark that stream's throughput,
-        // or someone removed it, in which case we don't mark it.
-        if (!alreadyRemovedDefaultStream) {
-            streamMetrics.markIncomingMeter(defaultStream.getId());
         }
 
         return ImmutableList.copyOf(result);

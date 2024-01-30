@@ -16,17 +16,19 @@
  */
 import * as React from 'react';
 
-import { Button, Popover } from 'components/bootstrap';
-import { OverlayTrigger } from 'components/common';
+import { Button } from 'components/bootstrap';
+import Popover from 'components/common/Popover';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import DecoratorStyles from './decoratorStyles.css';
 
-const PopoverHelp = () => {
-  const popoverHelp = (
-    <Popover id="decorators-help"
-             className={DecoratorStyles.helpPopover}>
+const PopoverHelp = () => (
+  <Popover width={275} position="right" withArrow withinPortal>
+    <Popover.Target>
+      <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
+    </Popover.Target>
+    <Popover.Dropdown>
       <p className="description">
         Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only
         shown in the search results. Decorator config is stored <strong>per stream</strong>.
@@ -38,15 +40,9 @@ const PopoverHelp = () => {
         Read more about message decorators in the <DocumentationLink page={DocsHelper.PAGES.DECORATORS}
                                                                      text="documentation" />.
       </p>
-    </Popover>
-  );
-
-  return (
-    <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
-      <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
-    </OverlayTrigger>
-  );
-};
+    </Popover.Dropdown>
+  </Popover>
+);
 
 PopoverHelp.propTypes = {};
 

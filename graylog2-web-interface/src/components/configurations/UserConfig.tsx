@@ -30,6 +30,9 @@ import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted, ISODurationInput } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => css`
   &&.deflist {
@@ -52,6 +55,7 @@ const UserConfig = () => {
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG).then(() => {
@@ -63,8 +67,8 @@ const UserConfig = () => {
   }, [configuration]);
 
   const saveConfig = (values) => {
-    sendTelemetry('form_submit', {
-      app_pathname: 'configurations',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.USER_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'user',
       app_action_value: 'configuration-save',
     });
@@ -110,7 +114,7 @@ const UserConfig = () => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal && formConfig}
+          <Modal show={showModal && !!formConfig}
                  onHide={resetConfig}
                  aria-modal="true"
                  aria-labelledby="dialog_label">

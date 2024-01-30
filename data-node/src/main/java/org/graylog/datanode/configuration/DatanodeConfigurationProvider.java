@@ -21,9 +21,9 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class DatanodeConfigurationProvider implements Provider<DatanodeConfiguration> {
@@ -39,15 +39,9 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
         datanodeConfiguration = new DatanodeConfiguration(
                 opensearchDistributionProvider,
                 DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
-                getNodesFromConfig(localConfiguration.getDatanodeNodeName()),
                 localConfiguration.getProcessLogsBufferSize(),
                 jwtTokenProvider
         );
-    }
-
-    public static String getNodesFromConfig(final String configProperty) {
-        if (configProperty != null) return configProperty;
-        return Tools.getLocalCanonicalHostname();
     }
 
     @Override

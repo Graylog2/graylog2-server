@@ -32,6 +32,17 @@ import OriginalDashboardSearchBar from './DashboardSearchBar';
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 
+jest.mock('views/hooks/useAutoRefresh', () => () => ({
+  refreshConfig: null,
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
+
+jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
+  data: 'PT1S',
+  isInitialLoading: false,
+}));
+
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
   SearchConfigActions: {

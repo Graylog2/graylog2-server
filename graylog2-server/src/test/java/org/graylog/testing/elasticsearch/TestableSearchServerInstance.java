@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * This rule starts a Datanode instance and provides a configured {@link Client}.
+ * This rule starts a SearchServer instance and provides a configured {@link Client}.
  */
 public abstract class TestableSearchServerInstance extends ExternalResource implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(TestableSearchServerInstance.class);
@@ -85,6 +85,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         } else {
             isFirstContainerStart = false;
         }
+        LOG.debug("Using cached instance {}", image);
         return containersByVersion.get(cacheKey);
     }
 
@@ -100,6 +101,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     @Override
     public void close() {
+        LOG.debug("Closing instance {}", imageName());
         container.close();
         containersByVersion.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(container))

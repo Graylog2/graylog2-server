@@ -27,7 +27,8 @@ import org.joda.time.DateTimeZone;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class ActionService {
     @Inject
     public ActionService(MongoConnection mongoConnection,
                          MongoJackObjectMapperProvider mapper,
-                         EtagService etagService){
+                         EtagService etagService) {
         this.etagService = etagService;
         dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION_NAME),

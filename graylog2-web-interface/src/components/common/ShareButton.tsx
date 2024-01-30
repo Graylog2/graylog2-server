@@ -16,10 +16,12 @@
  */
 import * as React from 'react';
 
+import type { StyleProps } from 'components/bootstrap/Button';
 import Button from 'components/bootstrap/Button';
 import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import HasOwnership from 'components/common/HasOwnership';
 import Icon from 'components/common/Icon';
+import type { BsSize } from 'components/bootstrap/types';
 
 type Props = {
   /**
@@ -30,8 +32,8 @@ type Props = {
   entityId: string,
   entityType: string,
   onClick: () => void,
-  bsStyle?: string,
-  bsSize?: string
+  bsStyle?: StyleProps,
+  bsSize?: BsSize,
 };
 
 const ShareButton = ({ bsStyle, bsSize, entityId, entityType, onClick, disabledInfo }: Props) => (

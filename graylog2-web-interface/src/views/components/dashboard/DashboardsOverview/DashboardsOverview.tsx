@@ -32,14 +32,6 @@ import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/ho
 
 import BulkActions from './BulkActions';
 
-const renderBulkActions = (
-  selectedDashboardIds: Array<string>,
-  setSelectedDashboardIds: (streamIds: Array<string>) => void,
-) => (
-  <BulkActions selectedDashboardIds={selectedDashboardIds}
-               setSelectedDashboardIds={setSelectedDashboardIds} />
-);
-
 const DashboardsOverview = () => {
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -116,7 +108,7 @@ const DashboardsOverview = () => {
       )}
       {!!dashboards?.length && (
         <EntityDataTable<View> activeSort={layoutConfig.sort}
-                               bulkSelection={{ actions: renderBulkActions }}
+                               bulkSelection={{ actions: <BulkActions /> }}
                                columnDefinitions={attributes}
                                columnRenderers={customColumnRenderers}
                                columnsOrder={DEFAULT_LAYOUT.columnsOrder}

@@ -48,6 +48,12 @@ type ConfigurationModalProps = {
   view: View,
 };
 
+interface CheckboxTarget {
+  target: {
+    checked: boolean,
+  }
+}
+
 const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalProps) => {
   const availableTabs = view.search.queries.keySeq().map((query, idx) => [
     idx,
@@ -90,7 +96,9 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
             <li key={`${idx}-${title}`}>
               <Checkbox inline
                         checked={queryTabs.includes(idx)}
-                        onChange={(event) => (event.target.checked ? addQueryTab(idx) : removeQueryTab(idx))}>
+                        onChange={(event) => ((event as unknown as CheckboxTarget).target.checked
+                          ? addQueryTab(idx)
+                          : removeQueryTab(idx))}>
                 {title}
               </Checkbox>
             </li>

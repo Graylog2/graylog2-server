@@ -24,7 +24,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.shaded.opensearch2.org.opensearch.common.text.Text;
+import org.graylog.shaded.opensearch2.org.opensearch.core.common.text.Text;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
@@ -43,8 +43,9 @@ import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

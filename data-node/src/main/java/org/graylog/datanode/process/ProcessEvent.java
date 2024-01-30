@@ -17,9 +17,12 @@
 package org.graylog.datanode.process;
 
 public enum ProcessEvent {
+    PROCESS_PREPARED,
     PROCESS_STARTED,
     HEALTH_CHECK_OK,
     HEALTH_CHECK_FAILED,
-    PROCESS_STOPPED, // user-triggered action
+    PROCESS_STOPPED,
+    PROCESS_REMOVE,
+    RESET, // user-triggered action
     PROCESS_TERMINATED // failure from outside, not requested
 }

@@ -23,7 +23,10 @@ import { Formik, Form, Field } from 'formik';
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput, InputOptionalInfo as Opt } from 'components/common';
 import { Input, Button, ButtonToolbar } from 'components/bootstrap';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { WizardFormValues } from './BackendWizardContext';
 import BackendWizardContext from './BackendWizardContext';
@@ -93,7 +96,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendValidationErrors, authBackendMeta: { backendHasPassword } } = stepsState;
-
+  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   const _onTransportSecurityChange = (event, values, setFieldValue, onChange) => {
@@ -114,8 +117,8 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   };
 
   const _onSubmitAll = (validateForm) => {
-    sendTelemetry('click', {
-      app_pathname: 'authentication',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_SERVER_CONFIG_SAVE_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'directory-service',
       app_action_value: 'server-configuration-save',
     });
@@ -254,8 +257,8 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
             <Button bsStyle="primary"
                     disabled={isSubmitting}
                     onClick={() => {
-                      sendTelemetry('click', {
-                        app_pathname: 'authentication',
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_USER_SYNC_CLICKED, {
+                        app_pathname: getPathnameWithoutId(pathname),
                         app_section: 'directory-service',
                         app_action_value: 'usersync-button',
                       });

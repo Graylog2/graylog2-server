@@ -45,8 +45,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
+
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -102,7 +103,7 @@ public class SearchResourceExecutionTest {
             }
         };
 
-        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of("Default Stream"));
+        when(searchUser.streams().loadMessageStreamsWithFallback()).thenReturn(ImmutableSet.of("Default Stream"));
     }
 
     @Test
@@ -234,7 +235,7 @@ public class SearchResourceExecutionTest {
         final Search search = makeNewSearch("search1");
         persistSearch(search);
 
-        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of());
+        when(searchUser.streams().loadMessageStreamsWithFallback()).thenReturn(ImmutableSet.of());
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> this.searchResource.executeQuery(search.id(), null, searchUser));
@@ -245,7 +246,7 @@ public class SearchResourceExecutionTest {
         final Search search = makeNewSearch("search1");
         final SearchDTO searchDTO = SearchDTO.fromSearch(search);
 
-        when(searchUser.streams().loadAll()).thenReturn(ImmutableSet.of());
+        when(searchUser.streams().loadMessageStreamsWithFallback()).thenReturn(ImmutableSet.of());
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> this.searchResource.executeSyncJob(searchDTO, 0, searchUser));

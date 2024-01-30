@@ -29,7 +29,6 @@ export type SidebarSectionProps = {
   results: any,
   toggleSidebar: () => void
 };
-/* eslint-enable react/no-unused-prop-types */
 
 export type SidebarSection = {
   key: string,

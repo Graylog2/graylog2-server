@@ -17,10 +17,9 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { IndexSetConfigurationForm } from 'components/indices';
+import { IndexSetConfigurationForm, IndicesPageNavigation } from 'components/indices';
 import { useStore } from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -31,8 +30,8 @@ import useParams from 'routing/useParams';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
-
-import useSendTelemetry from '../logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) => IndexSetsActions.update(indexSet).then(() => {
   history.push(Routes.SYSTEM.INDICES.LIST);
@@ -71,28 +70,23 @@ const IndexSetConfigurationPage = () => {
   }
 
   const saveConfiguration = (newIndexSet: IndexSet) => {
-    _saveConfiguration(history, newIndexSet);
-
-    sendTelemetry('form_submit', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_UPDATED, {
       app_pathname: 'indexsets',
       app_section: 'indexset',
-      app_action_value: 'configuration-form',
     });
+
+    return _saveConfiguration(history, newIndexSet);
   };
 
   return (
     <DocumentTitle title="Configure Index Set">
+      <IndicesPageNavigation />
       <div>
         <PageHeader title="Configure Index Set"
                     documentationLink={{
                       title: 'Index model documentation',
                       path: DocsHelper.PAGES.INDEX_MODEL,
-                    }}
-                    topActions={(
-                      <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                        <Button bsStyle="info">Index sets overview</Button>
-                      </LinkContainer>
-                    )}>
+                    }}>
           <span>
             Modify the current configuration for this index set, allowing you to customize the retention, sharding,
             and replication of messages coming from one or more streams.

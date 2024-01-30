@@ -62,6 +62,7 @@ import org.graylog.storage.elasticsearch7.blocks.BlockSettingsParser;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
+import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
@@ -79,7 +80,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -582,5 +585,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + index);
         return response.getSetting(index, "index.uuid");
+    }
+
+    //Snapshots not supported for ES
+    @Override
+    public Optional<WarmIndexInfo> getWarmIndexInfo(String index) {
+        return Optional.empty();
     }
 }

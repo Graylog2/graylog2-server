@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
+import userEvent from '@testing-library/user-event';
 
 import GrokPatternFilter from './GrokPatternFilter';
 
@@ -27,36 +28,45 @@ describe('<GrokPatternFilter />', () => {
     { name: 'DATE', pattern: '%{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}' },
   ];
 
-  it('should render grok pattern input without patterns', () => {
-    const wrapper = mount(<GrokPatternFilter patterns={[]} addToPattern={() => {}} />);
+  it('should render grok pattern input without patterns', async () => {
+    render(<GrokPatternFilter patterns={[]} addToPattern={() => {}} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/filter pattern/i);
   });
 
-  it('should render grok pattern input with patterns', () => {
-    const wrapper = mount(<GrokPatternFilter patterns={grokPatterns} addToPattern={() => {}} />);
+  it('should render grok pattern input with patterns', async () => {
+    render(<GrokPatternFilter patterns={grokPatterns} addToPattern={() => {}} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText(/filter pattern/i);
   });
 
-  it('should add a grok pattern when selected', () => {
+  it('should add a grok pattern when selected', async () => {
     const changeFn = jest.fn((pattern) => {
       expect(pattern).toEqual('COMMONMAC');
     });
-    const wrapper = mount(<GrokPatternFilter patterns={grokPatterns} addToPattern={changeFn} />);
+    render(<GrokPatternFilter patterns={grokPatterns} addToPattern={changeFn} />);
 
-    wrapper.find('button[children="Add"]').at(0).simulate('click');
+    const addButton = await screen.findAllByRole('button', { name: 'Add' });
+    addButton[0].click();
 
     expect(changeFn.mock.calls.length).toBe(1);
   });
 
-  it('should filter the grok patterns', () => {
-    const wrapper = mount(<GrokPatternFilter patterns={grokPatterns} addToPattern={() => {}} />);
+  it('should filter the grok patterns', async () => {
+    render(<GrokPatternFilter patterns={grokPatterns} addToPattern={() => {}} />);
 
-    expect(wrapper.find('button[children="Add"]').length).toBe(3);
+    const addButtons = await screen.findAllByRole('button', { name: 'Add' });
 
-    wrapper.find('input#pattern-selector').simulate('change', { target: { value: 'COMMON' } });
+    expect(addButtons).toHaveLength(3);
 
-    expect(wrapper.find('button[children="Add"]').length).toBe(1);
+    const patternFilter = await screen.findByRole('textbox', { name: /filter pattern/i });
+
+    userEvent.type(patternFilter, 'COMMON');
+
+    await waitFor(async () => {
+      const buttons = await screen.findAllByRole('button', { name: 'Add' });
+
+      expect(buttons).toHaveLength(1);
+    });
   });
 });

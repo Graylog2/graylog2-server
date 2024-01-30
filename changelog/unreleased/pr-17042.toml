@@ -1,0 +1,5 @@
+type = "a"
+message = "Including basic data node usage information in telemetry."
+
+pulls = ["17042"]
+

@@ -27,21 +27,7 @@ export type TelemetryEvent = {
   [key: string]: unknown,
 };
 
-export type TelemetryEventType =
-  '$pageview'
-  | 'view'
-  | 'click'
-  | 'hotkey_usage'
-  | 'form_submit'
-  | 'popover_open'
-  | 'popover_close'
-  | 'input_button_toggle'
-  | 'input_value_change'
-  | 'modal_close'
-  | 'modal_open'
-  | 'select'
-  | 'visit'
-  | 'navigate' | EventType;
+export type TelemetryEventType = '$pageview' | EventType;
 
 type ContextType = {
   sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent | { [key: string]: unknown }) => void,

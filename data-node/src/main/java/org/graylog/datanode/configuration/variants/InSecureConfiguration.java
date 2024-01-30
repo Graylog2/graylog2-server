@@ -22,7 +22,7 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 public class InSecureConfiguration implements SecurityConfigurationVariant {
 
     @Override
-    public boolean checkPrerequisites(final Configuration localConfiguration) {
+    public boolean isConfigured(final Configuration localConfiguration) {
         return localConfiguration.isInsecureStartup();
     }
 

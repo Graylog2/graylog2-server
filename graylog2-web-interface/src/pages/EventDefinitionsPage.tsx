@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import { LinkContainer } from 'components/common/router';
 import { Button, Col, Row } from 'components/bootstrap';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
@@ -25,11 +26,9 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
-import useHistory from 'routing/useHistory';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const EventDefinitionsPage = () => {
-  const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
@@ -39,18 +38,18 @@ const EventDefinitionsPage = () => {
       <PageHeader title="Event Definitions"
                   actions={(
                     <IfPermitted permissions="eventdefinitions:create">
-                      <Button bsStyle="success"
-                              onClick={() => {
-                                sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CREATE_BUTTON_CLICKED, {
-                                  app_pathname: getPathnameWithoutId(pathname),
-                                  app_section: 'event-definitions',
-                                  app_action_value: 'create-event-definition-button',
-                                });
-
-                                history.push(Routes.ALERTS.DEFINITIONS.CREATE);
-                              }}>
-                        Create event definition
-                      </Button>
+                      <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                        <Button bsStyle="success"
+                                onClick={() => {
+                                  sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CREATE_BUTTON_CLICKED, {
+                                    app_pathname: getPathnameWithoutId(pathname),
+                                    app_section: 'event-definitions',
+                                    app_action_value: 'create-event-definition-button',
+                                  });
+                                }}>
+                          Create event definition
+                        </Button>
+                      </LinkContainer>
                     </IfPermitted>
                     )}
                   documentationLink={{

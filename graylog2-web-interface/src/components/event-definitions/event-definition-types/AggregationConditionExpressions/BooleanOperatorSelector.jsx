@@ -26,7 +26,7 @@ const OperatorSelector = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
 `);
 
-const BooleanOperatorSelect = styled(({ isFirstElement, ...props }) => <FormGroup {...props} />)`
+const BooleanOperatorSelect = styled(({ isFirstElement: _ignored, ...props }) => <FormGroup {...props} />)`
   width: 100px;
   margin-left: ${(props) => (props.isFirstElement ? '' : '1em')};
   margin-right: 1em;
@@ -43,6 +43,7 @@ const BooleanOperatorSelector = ({ initialText, operator, onOperatorChange }) =>
       <BooleanOperatorSelect isFirstElement={!initialText}>
         <Select className="boolean-operator"
                 matchProp="label"
+                aria-label="Boolean Operator"
                 size="small"
                 onChange={onOperatorChange}
                 options={[

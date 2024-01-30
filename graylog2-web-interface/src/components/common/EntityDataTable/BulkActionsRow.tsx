@@ -19,6 +19,8 @@ import styled from 'styled-components';
 
 import StringUtils from 'util/StringUtils';
 
+import useSelectedEntities from './hooks/useSelectedEntities';
+
 const Container = styled.div`
   display: flex;
   align-items: center;
@@ -29,21 +31,22 @@ const SelectedEntitiesAmount = styled.div`
 `;
 
 type Props = {
-  bulkActions: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
-  selectedEntities: Array<string>,
-  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
-
+  bulkActions: React.ReactNode,
 };
 
-const BulkActionsRow = ({ selectedEntities, setSelectedEntities, bulkActions: bulkActionsDropdown }: Props) => (
-  <Container>
-    {bulkActionsDropdown(selectedEntities, setSelectedEntities)}
-    {!!selectedEntities.length && (
-      <SelectedEntitiesAmount>
-        {selectedEntities.length} {StringUtils.pluralize(selectedEntities.length, 'item', 'items')} selected
-      </SelectedEntitiesAmount>
-    )}
-  </Container>
-);
+const BulkActionsRow = ({ bulkActions }: Props) => {
+  const { selectedEntities } = useSelectedEntities();
+
+  return (
+    <Container>
+      {bulkActions}
+      {!!selectedEntities.length && (
+        <SelectedEntitiesAmount>
+          {selectedEntities.length} {StringUtils.pluralize(selectedEntities.length, 'item', 'items')} selected
+        </SelectedEntitiesAmount>
+      )}
+    </Container>
+  );
+};
 
 export default BulkActionsRow;

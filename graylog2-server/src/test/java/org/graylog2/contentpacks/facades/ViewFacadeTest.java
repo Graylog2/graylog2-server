@@ -85,7 +85,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -278,7 +279,7 @@ public class ViewFacadeTest {
     @Test
     @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldResolveDependencyForCreation() {
-        final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_V1);
+        final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_REF_V1);
         final EntityDescriptor viewEntityDescriptor = EntityDescriptor.create(viewId, ModelTypes.SEARCH_V1);
         Graph graph = facade.resolveNativeEntity(viewEntityDescriptor);
 

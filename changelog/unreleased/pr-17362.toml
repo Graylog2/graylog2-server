@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Prevent adding same entity data table filter multiple times"
+
+pulls = ["17362"]

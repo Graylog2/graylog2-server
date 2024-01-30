@@ -32,13 +32,20 @@ type Props = {
 };
 
 const StyledContainer = styled.div`
-  & .react-resizable {
-    border: 1px solid #d4d5d7;
-    border-radius: 0 0 5px 5px;
+  & .source-code-editor div {
+    border-color: ${({ theme }) => theme.colors.input.border};
+    border-radius: 0;
+
+    & .ace_editor {
+      border-radius: 0;
+    }
   }
 
   & .ace_tooltip.ace-graylog {
-    background-color: #f5f5f5;
+    background-color: ${({ theme }) => theme.colors.global.background};
+    padding: 4px;
+    padding-left: 0;
+    line-height: 1.5;
   }
 `;
 
@@ -57,7 +64,7 @@ const RuleForm = ({ create }: Props) => {
   const [errorMessage, setErrorMessage] = useState('');
   const history = useHistory();
 
-  const handleError = (error) => {
+  const handleError = (error: { responseMessage: string }) => {
     if (error?.responseMessage?.includes('duplicate key error')) {
       const duplicatedTitle = error.responseMessage.match(/title: "(.*)"/i)[1];
       setErrorMessage(`Rule title "${duplicatedTitle}" already exists!`);

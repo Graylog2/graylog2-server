@@ -25,7 +25,7 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StatusLabel = styled(Label)(({ $clickable }: { $clickable: boolean }) => css`
+const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
   cursor: ${$clickable ? 'pointer' : 'default'};
   display: inline-flex;
   justify-content: center;

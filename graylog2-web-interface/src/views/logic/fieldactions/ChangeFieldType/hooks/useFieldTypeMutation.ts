@@ -24,7 +24,7 @@ import type { ChangeFieldTypeBody, ChangeFieldTypeBodyJson } from 'views/logic/f
 
 export const urlPrefix = '/system/indices/mappings';
 
-const putFiledType = async ({
+const putFieldType = async ({
   indexSetSelection,
   newFieldType,
   rotated,
@@ -41,8 +41,8 @@ const putFiledType = async ({
   return fetch('PUT', url, body);
 };
 
-const usePutFiledTypeMutation = () => {
-  const put = useMutation(putFiledType, {
+const usePutFieldTypeMutation = () => {
+  const put = useMutation(putFieldType, {
     onError: (errorThrown) => {
       UserNotification.error(`Changing the field type failed with status: ${errorThrown}`,
         'Could not change the field type');
@@ -52,7 +52,7 @@ const usePutFiledTypeMutation = () => {
     },
   });
 
-  return { putFiledTypeMutation: put.mutateAsync, isLoading: put.isLoading };
+  return { putFieldTypeMutation: put.mutateAsync, isLoading: put.isLoading };
 };
 
-export default usePutFiledTypeMutation;
+export default usePutFieldTypeMutation;

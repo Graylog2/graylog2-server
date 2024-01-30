@@ -32,6 +32,7 @@ import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import type { BsSize } from 'components/bootstrap/types';
 
 type PresetOption = {
   eventKey?: TimeRange,
@@ -44,7 +45,7 @@ const ExternalIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
-const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
+const AdminMenuItem: React.ComponentType<React.ComponentProps<typeof MenuItem>> = styled(MenuItem)(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
@@ -120,7 +121,7 @@ type Props = {
   onToggle?: (open: boolean) => void,
   className?: string,
   displayTitle?: boolean,
-  bsSize?: string,
+  bsSize?: BsSize,
   header: string,
   disabled?: boolean,
   onChange?: (timerange: TimeRange) => void,
@@ -140,7 +141,7 @@ const TimeRangePresetDropdown = ({
   const location = useLocation();
   const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled);
 
-  const _onChange = useCallback((timerange: TimeRange) => {
+  const _onChange = useCallback((timerange: any) => {
     if (timerange !== null && timerange !== undefined) {
       onChange(onInitializingTimerange(timerange, formatTime));
     }
@@ -170,13 +171,12 @@ const TimeRangePresetDropdown = ({
                     bsSize={bsSize}
                     className={className}
                     onToggle={onToggle}
-                    onMouseDown={onMouseDown}
-                    onSelect={_onChange}>
+                    onMouseDown={onMouseDown}>
       {header && (
         <MenuItem header>{header}</MenuItem>
       )}
       {options ? options.map(({ eventKey, key, disabled: isDisabled, label }) => (
-        <MenuItem eventKey={eventKey} key={key} disabled={isDisabled}>
+        <MenuItem key={key} disabled={isDisabled} onClick={() => _onChange(eventKey)}>
           {label}
         </MenuItem>
       )) : (

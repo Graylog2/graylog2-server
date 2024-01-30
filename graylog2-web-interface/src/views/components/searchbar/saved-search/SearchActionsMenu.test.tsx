@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 
@@ -144,7 +144,7 @@ describe('SearchActionsMenu', () => {
       asMock(useHistory).mockReturnValue(history);
     });
 
-    const findTitleInput = () => screen.getByRole('textbox', { name: /title/i });
+    const findTitleInput = () => screen.findByRole('textbox', { name: /title/i });
 
     it('should export current search as dashboard', async () => {
       asMock(useCurrentUser).mockReturnValue(
@@ -154,6 +154,7 @@ describe('SearchActionsMenu', () => {
       );
 
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
       userEvent.click(exportAsDashboardMenuItem);
       await waitFor(() => expect(history.pushWithState).toHaveBeenCalledTimes(1));
@@ -169,6 +170,7 @@ describe('SearchActionsMenu', () => {
       );
 
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       await screen.findByText('Export');
 
@@ -177,6 +179,7 @@ describe('SearchActionsMenu', () => {
 
     it('should open file export modal', async () => {
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const exportMenuItem = await screen.findByText('Export');
       userEvent.click(exportMenuItem);
@@ -193,6 +196,7 @@ describe('SearchActionsMenu', () => {
 
       asMock(useView).mockReturnValue(createView('some-id'));
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportMenuItem = await screen.findByText('Edit metadata');
       userEvent.click(exportMenuItem);
 
@@ -204,6 +208,7 @@ describe('SearchActionsMenu', () => {
       const loadNewView = jest.fn(() => Promise.resolve());
 
       render(<SimpleSearchActionsMenu loadNewView={loadNewView} />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const resetSearch = await screen.findByText('Reset search');
 
@@ -276,6 +281,7 @@ describe('SearchActionsMenu', () => {
         .build();
 
       await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
+      await waitForElementToBeRemoved(screen.queryByText('Pluggable component!'));
     });
 
     it('should save search when pressing related keyboard shortcut', async () => {
