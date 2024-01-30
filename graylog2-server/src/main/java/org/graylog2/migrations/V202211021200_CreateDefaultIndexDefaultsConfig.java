@@ -50,13 +50,20 @@ public class V202211021200_CreateDefaultIndexDefaultsConfig extends Migration {
 
     @Override
     public void upgrade() {
-        if (clusterConfigService.get(IndexSetsDefaultConfiguration.class) != null) {
+        IndexSetsDefaultConfiguration indexSetsDefaultConfiguration = clusterConfigService.get(IndexSetsDefaultConfiguration.class);
+
+        if (indexSetsDefaultConfiguration == null) {
+            indexSetsDefaultConfiguration = factory.create();
+        } else if (indexSetsDefaultConfiguration.dataTiering() == null) {
+            LOG.info("Applying data tiering to Indexset defaults");
+            indexSetsDefaultConfiguration = factory.addDataTieringDefaults(indexSetsDefaultConfiguration);
+        } else {
             LOG.debug("Migration already completed.");
             return;
         }
 
         try {
-            clusterConfigService.write(factory.create());
+            clusterConfigService.write(indexSetsDefaultConfiguration);
             LOG.debug("IndexSetsDefaultConfiguration saved.");
         } catch (Exception e) {
             LOG.error("Unable to write IndexSetsDefaultConfiguration.", e);
