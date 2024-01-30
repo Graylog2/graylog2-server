@@ -18,13 +18,14 @@ package org.graylog2.indexer.rotation.strategies;
 
 import com.github.joschi.jadconfig.util.Size;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.common.IndexRotator;
+import org.graylog2.indexer.rotation.common.IndexRotator.Result;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -40,27 +41,35 @@ import java.time.Instant;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.humanReadableByteCount;
 
-public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingStrategy.class);
+public class TimeBasedSizeOptimizingStrategy implements RotationStrategy {
     public static final String NAME = "time-size-optimizing";
-
+    private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingStrategy.class);
     private final JobSchedulerClock clock;
     private final org.joda.time.Period rotationPeriod;
-
+    private final Indices indices;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
+    private final IndexRotator indexRotator;
     private final Size maxShardSize;
     private final Size minShardSize;
 
+
     @Inject
     public TimeBasedSizeOptimizingStrategy(Indices indices,
-                                           NodeId nodeId,
-                                           AuditEventSender auditEventSender,
                                            ElasticsearchConfiguration elasticsearchConfiguration,
-                                           JobSchedulerClock clock) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
+                                           JobSchedulerClock clock,
+                                           IndexRotator indexRotator) {
+        this.indices = indices;
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
+        this.indexRotator = indexRotator;
         this.clock = clock;
         this.rotationPeriod = elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod();
         this.maxShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize();
         this.minShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize();
+    }
+
+    @Override
+    public void rotate(IndexSet indexSet) {
+        indexRotator.rotate(indexSet, this::shouldRotate);
     }
 
     @Override
@@ -76,7 +85,10 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
                 .build();
     }
 
-    @Override
+    private IndexRotator.Result createResult(boolean shouldRotate, String message) {
+        return IndexRotator.createResult(shouldRotate, message, this.getClass().getCanonicalName());
+    }
+
     @Nonnull
     protected Result shouldRotate(final String index, IndexSet indexSet) {
         final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(() -> new IllegalStateException("No index creation date"));

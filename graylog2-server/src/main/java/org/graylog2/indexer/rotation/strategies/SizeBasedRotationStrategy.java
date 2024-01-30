@@ -16,12 +16,11 @@
  */
 package org.graylog2.indexer.rotation.strategies;
 
-import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.common.IndexRotator;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.graylog2.plugin.system.NodeId;
 
 import javax.annotation.Nullable;
 
@@ -31,15 +30,24 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 
-public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
+import static org.graylog2.indexer.rotation.common.IndexRotator.createResult;
+
+public class SizeBasedRotationStrategy implements RotationStrategy {
     public static final String NAME = "size";
+
+    private final Indices indices;
+    private final IndexRotator indexRotator;
 
     @Inject
     public SizeBasedRotationStrategy(Indices indices,
-                                     NodeId nodeId,
-                                     AuditEventSender auditEventSender,
-                                     ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
+                                     IndexRotator indexRotator) {
+        this.indices = indices;
+        this.indexRotator = indexRotator;
+    }
+
+    @Override
+    public void rotate(IndexSet indexSet) {
+        indexRotator.rotate(indexSet, this::shouldRotate);
     }
 
     @Override
@@ -53,8 +61,7 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
     }
 
     @Nullable
-    @Override
-    protected Result shouldRotate(final String index, IndexSet indexSet) {
+    private IndexRotator.Result shouldRotate(final String index, IndexSet indexSet) {
         if (!(indexSet.getConfig().rotationStrategy() instanceof SizeBasedRotationStrategyConfig)) {
             throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
         }
@@ -74,7 +81,7 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
                 new MessageFormat("Storage size for index <{0}> is {1} bytes, below the maximum of {2} bytes. Not doing anything.", Locale.ENGLISH);
         final String message = format.format(new Object[]{index, sizeInBytes, config.maxSize()});
 
-        return createResult(shouldRotate, message);
+        return createResult(shouldRotate, message, this.getClass().getCanonicalName());
     }
 
     @Override

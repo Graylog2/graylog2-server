@@ -35,12 +35,13 @@ public class TestableProcess implements ManagableProcess<String> {
     }
 
     @Override
-    public void startWithConfig(String ignored) {
-        restart();
+    public void configure(String ignored) {
+        LOG.debug("Preparing process");
+        onEvent(ProcessEvent.PROCESS_PREPARED);
     }
 
     @Override
-    public void restart() {
+    public void start() {
         LOG.debug("Starting process");
         onEvent(ProcessEvent.PROCESS_STARTED);
     }
