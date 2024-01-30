@@ -30,7 +30,6 @@ import useFeature from 'hooks/useFeature';
 const viewActions = {
   undo: { keys: 'mod+shift+z', description: 'Undo last action' },
   redo: { keys: 'mod+shift+y', description: 'Redo last action' },
-  'show-query-history': { keys: 'ctrl+shift+h', description: 'Show your search query history' },
 };
 
 export const hotKeysCollections: HotkeyCollections = {
@@ -60,6 +59,18 @@ export const hotKeysCollections: HotkeyCollections = {
       ...viewActions,
       save: { keys: 'mod+s', description: 'Save dashboard' },
       'save-as': { keys: 'mod+shift+s', description: 'Save dashboard as' },
+    },
+  },
+  'query-input': {
+    title: 'Query Input',
+    description: 'Keyboard shortcuts for query input in search bar, available when input is focussed.',
+    // Please note, any changes to keybindings also need to be made in the query input component.
+    actions: {
+      'submit-search': { keys: 'return', description: 'Execute the search' },
+      'insert-newline': { keys: 'shift+return', description: 'Create a new line' },
+      'create-search-filter': { keys: 'alt+return', description: 'Create search filter based on current query' },
+      'show-suggestions': { keys: 'alt+space', description: 'Show suggestions, displays query history when input is empty' },
+      'show-history': { keys: 'alt+shift+h', description: 'View your search query history' },
     },
   },
   scratchpad: {

@@ -34,6 +34,7 @@ import type View from 'views/logic/views/View';
 import useElementDimensions from 'hooks/useElementDimensions';
 import { fetchQueryHistory } from 'views/components/searchbar/QueryHistoryButton';
 import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';
+import useHotkey from 'hooks/useHotkey';
 
 import type { AutoCompleter, Editor, Command } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
@@ -182,6 +183,33 @@ const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props
     [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
 };
 
+const useShowHotkeysInOverview = () => {
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'submit-search',
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'insert-newline',
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'create-search-filter',
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'show-suggestions',
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'show-history',
+  });
+};
+
 type Props = BaseProps & {
   commands?: Array<Command>,
   completerFactory?: (
@@ -253,12 +281,19 @@ const QueryInput = React.forwardRef<Editor, Props>(({
     {
       name: 'Show completions',
       bindKey: { win: 'Alt-Space', mac: 'Alt-Space' },
-      exec: async (editor) => {
+      exec: async (editor: Editor) => {
         const args = editor.getValue()
           ? undefined
           : { matches: await fetchQueryHistory() };
 
         startAutocomplete(editor, args);
+      },
+    },
+    {
+      name: 'Show query history',
+      bindKey: { win: 'Alt-Shift-H', mac: 'Alt-Shift-H' },
+      exec: async (editor: Editor) => {
+        startAutocomplete(editor, { matches: await fetchQueryHistory() });
       },
     },
     {
@@ -274,6 +309,7 @@ const QueryInput = React.forwardRef<Editor, Props>(({
     return Promise.resolve(newQuery);
   }, [name, onChange]);
 
+  useShowHotkeysInOverview();
   useImperativeHandle(outerRef, () => innerRef.current, []);
 
   return (

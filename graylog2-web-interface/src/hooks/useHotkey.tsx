@@ -56,7 +56,7 @@ const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, s
 
 export type HotkeysProps = {
   actionKey: string,
-  callback: (event: KeyboardEvent, handler: HotkeysEvent) => unknown,
+  callback?: (event: KeyboardEvent, handler: HotkeysEvent) => unknown,
   scope: ScopeName,
   options?: Options,
   dependencies?: Array<unknown>,

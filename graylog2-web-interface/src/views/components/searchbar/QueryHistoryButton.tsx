@@ -20,7 +20,6 @@ import styled from 'styled-components';
 import { SearchSuggestions } from '@graylog/server-api';
 import IconButton from 'components/common/IconButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
-import useHotkey from 'hooks/useHotkey';
 import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';
 
 const QUERY_HISTORY_LIMIT = 100;
@@ -58,12 +57,6 @@ const QueryHistoryButton = ({ editorRef }: Props) => {
       startAutocomplete(editorRef.current, { matches: await fetchQueryHistory() });
     }
   };
-
-  useHotkey({
-    actionKey: 'show-query-history',
-    callback: () => showQueryHistory(),
-    scope: 'search',
-  });
 
   return (
     <ButtonContainer>
