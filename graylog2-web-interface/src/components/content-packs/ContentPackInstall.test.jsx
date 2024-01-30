@@ -17,6 +17,7 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
+import { act } from 'react-dom/test-utils';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
@@ -68,7 +69,10 @@ describe('<ContentPackInstall />', () => {
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
 
     wrapper.find('input#comment').simulate('change', { target: { value: 'Test' } });
-    wrapper.instance().onInstall();
+
+    act(() => {
+      wrapper.instance().onInstall();
+    });
 
     expect(installFn.mock.calls.length).toBe(1);
   });
@@ -79,7 +83,10 @@ describe('<ContentPackInstall />', () => {
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
 
     wrapper.find('input').at(1).simulate('change', { target: { value: '' } });
-    wrapper.instance().onInstall();
+
+    act(() => {
+      wrapper.instance().onInstall();
+    });
 
     expect(installFn.mock.calls.length).toBe(0);
   });
