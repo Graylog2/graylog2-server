@@ -171,6 +171,13 @@ its code needs to be adjusted to also use the new package names.
 | `javax.validation.*`        | `jakarta.validation.*`        |
 | `javax.ws.rs.*`             | `jakarta.ws.rs.*`             |
 
+### Removal of Mongojack 2 dependency
+
+The Java dependency on the Mongojack 2 library was removed and replaced with a
+compatibility layer. Plugins that interact with MongoDB might need to be
+modified if they use Mongojack functionality that is not commonly used
+throughout the Graylog core code base.
+
 ## REST API Endpoint Changes
 
 The following REST API changes have been made.
