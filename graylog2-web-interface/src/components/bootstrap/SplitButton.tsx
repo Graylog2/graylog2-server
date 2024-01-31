@@ -30,10 +30,10 @@ type Props = {
   width?: number,
 } & Pick<React.ComponentProps<typeof Button>, 'bsStyle' | 'bsSize' | 'children' | 'id' | 'onClick'>;
 const SplitButton = React.forwardRef<HTMLButtonElement, Props>(
-  ({ children, title, open, onMenuChange, width, ...props }, ref) => (
+  ({ children, title, open, onMenuChange, width, onClick, ...props }, ref) => (
     <Menu opened={open} onChange={onMenuChange} width={width}>
       <ButtonGroup>
-        <Button {...props}>
+        <Button {...props} onClick={onClick}>
           {title}
         </Button>
         <Menu.Target>
