@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
@@ -24,7 +24,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppConfig from 'util/AppConfig';
 import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
-import useIndexDefaults from 'pages/useIndexDefaults';
+import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col, Row, Input, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
@@ -43,6 +43,7 @@ import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionPr
 import useHistory from 'routing/useHistory';
 import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
 import useFeature from 'hooks/useFeature';
+import useIndexSet from 'components/indices/hooks/useIndexSet';
 
 type Props = {
   cancelLink: string,
@@ -186,34 +187,10 @@ const IndexSetConfigurationForm = ({
   submitLoadingText,
 } : Props) => {
   const history = useHistory();
-  const [indexSet, setIndexSet] = useState(initialIndexSet);
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
-
-  useEffect(() => {
-    if (loadingIndexDefaultsConfig || !indexDefaultsConfig) return;
-
-    const defaultIndexSet: IndexSet = {
-      title: '',
-      description: '',
-      index_prefix: indexDefaultsConfig.index_prefix,
-      writable: true,
-      can_be_default: true,
-      shards: indexDefaultsConfig.shards,
-      replicas: indexDefaultsConfig.replicas,
-      rotation_strategy_class: indexDefaultsConfig.rotation_strategy_class,
-      rotation_strategy: indexDefaultsConfig.rotation_strategy_config as RotationStrategyConfig,
-      retention_strategy_class: indexDefaultsConfig.retention_strategy_class,
-      retention_strategy: indexDefaultsConfig.retention_strategy_config as RetentionStrategyConfig,
-      index_analyzer: indexDefaultsConfig.index_analyzer,
-      index_optimization_max_num_segments: indexDefaultsConfig.index_optimization_max_num_segments,
-      index_optimization_disabled: indexDefaultsConfig.index_optimization_disabled,
-      field_type_refresh_interval: moment.duration(indexDefaultsConfig.field_type_refresh_interval, indexDefaultsConfig.field_type_refresh_interval_unit).asMilliseconds(),
-    };
-
-    setIndexSet({ ...defaultIndexSet, ...initialIndexSet });
-  }, [loadingIndexDefaultsConfig, indexDefaultsConfig, initialIndexSet]);
+  const [indexSet] = useIndexSet(initialIndexSet, loadingIndexDefaultsConfig, indexDefaultsConfig);
 
   const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
     { value: 'data_tiering', label: 'Data Tiering' },

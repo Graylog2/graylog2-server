@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
-import useIndexDefaults from 'pages/useIndexDefaults';
+import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
 
@@ -232,7 +232,7 @@ const indexDefaultsConfig = {
 };
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
-jest.mock('pages/useIndexDefaults', () => jest.fn());
+jest.mock('components/indices/hooks/useIndexDefaults', () => jest.fn());
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
