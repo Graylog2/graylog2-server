@@ -31,8 +31,9 @@ const CaStep = ({ onStepComplete }: Props) => {
 
   return (
     <>
-      {step === MIGRATION_STEP.CA_CONFIGURATION.key && <CAConfiguration />}
-      {step === MIGRATION_STEP.RENEWAL_POLICY_CONFIGURATION.key && <CertificateRenewalPolicyConfig />}
+      {step === MIGRATION_STEP.CA_CONFIGURATION.key
+        ? <CAConfiguration />
+        : <CertificateRenewalPolicyConfig />}
       <br />
       <Button bsStyle="success" onClick={() => onStepComplete()}>
         Next

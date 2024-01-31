@@ -25,14 +25,14 @@ import UserNotification from 'util/UserNotification';
 const queryKey = ['config', 'certificate-renewal-policy'];
 const fetchCurrentConfig = () => ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
 
-const UseRenewalPolicy = (): {
+const UseRenewalPolicy = (refetchInterval: number | false = 3000): {
   data: RenewalPolicy,
   isInitialLoading: boolean,
   error: FetchError | null,
 } => {
   const { data, isInitialLoading, error } = useQuery<RenewalPolicy, FetchError>(queryKey, fetchCurrentConfig, {
     initialData: undefined,
-    refetchInterval: 3000,
+    refetchInterval,
     retry: false,
     onError: (newError) => {
       UserNotification.error(`Loading Data Nodes failed with status: ${newError}`,

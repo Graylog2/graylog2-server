@@ -18,11 +18,15 @@ import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import { Migration } from '@graylog/server-api';
+import type { MigrationState } from 'components/datanode/Types';
 
 export const MIGRATION_STATE_QUERY_KEY = ['migration-state'];
 
-const useMigrationState = () => {
-  const { data, isLoading } = useQuery<any, Error>(
+const useMigrationState = () : {
+  currentStep: MigrationState,
+  isLoading: boolean,
+} => {
+  const { data, isLoading } = useQuery<MigrationState, Error>(
     MIGRATION_STATE_QUERY_KEY,
     () => Migration.status(),
     {
@@ -32,7 +36,7 @@ const useMigrationState = () => {
   );
 
   return {
-    data,
+    currentStep: data,
     isLoading,
   };
 };

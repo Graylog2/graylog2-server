@@ -76,6 +76,7 @@ const CompatibilityStatus = ({ opensearchVersion, nodeInfo }: Props) => {
                   {node.indices.map((indice) => (
                     <tr key={indice.index_id}>
                       <td>{indice.index_name}</td>
+                      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
                       <td><Timestamp dateTime={indice.creation_date} /></td>
                       <td>{indice.index_version_created}</td>
                       <td>{indice.shards.length} <Pluralize singular="shard" plural="shards" value={indice.shards.length} /> </td>

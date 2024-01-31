@@ -19,10 +19,11 @@ import { useMemo } from 'react';
 import type { DataNodes, DataNodesCA, RenewalPolicy } from 'preflight/types';
 import { MIGRATION_STEP } from 'components/datanode/Constants';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
-import type { CompatibilityResponseType } from 'components/datanode/Types';
+import type { CompatibilityResponseType, MigrationState } from 'components/datanode/Types';
 import useCompatibilityCheck from 'components/datanode/hooks/useCompatibilityCheck';
 import useDataNodesCA from 'components/datanode/hooks/useDataNodesCA';
 import useRenewalPolicy from 'components/datanode/hooks/useRenewalPolicy';
+import useMigrationState from 'components/datanode/hooks/useMigrationState';
 
 export const STEP_KEYS = ['welcome', 'compatibility-check', 'ca-configuration', 'manual-migration'];
 
@@ -31,6 +32,7 @@ const migrationStep = (
   _: DataNodes,
   dataNodesCA: DataNodesCA,
   renewalPolicy: RenewalPolicy,
+  currentStep: MigrationState,
 ) => {
   if (compatibilityResult) {
     return { step: MIGRATION_STEP.COMPATIBILITY_CHECK.key, wizardStep: STEP_KEYS[1] };
@@ -44,16 +46,20 @@ const migrationStep = (
     return { step: MIGRATION_STEP.RENEWAL_POLICY_CONFIGURATION.key, wizardStep: STEP_KEYS[2] };
   }
 
-  return { step: MIGRATION_STEP.MIGRATION_FINISHED.key, wizardStep: STEP_KEYS[3] };
+  if (currentStep) {
+    return { step: MIGRATION_STEP.MANUAL_MIGRATION_STEP.key, wizardStep: STEP_KEYS[3] };
+  }
+
+  return { step: MIGRATION_STEP.MIGRATION_FINISHED.key, wizardStep: STEP_KEYS[0] };
 };
 
 const useMigrationStep = () => {
   const { data: dataNodes, isInitialLoading: isLoadingDataNodes, error: dataNodesError } = useDataNodes(undefined, undefined, false);
-  const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus, error: caError } = useDataNodesCA();
-  const { data: renewalPolicy, isInitialLoading: isLoadingRenewalPolicy, error: renewalPolicyError } = useRenewalPolicy();
+  const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus, error: caError } = useDataNodesCA(false);
+  const { data: renewalPolicy, isInitialLoading: isLoadingRenewalPolicy, error: renewalPolicyError } = useRenewalPolicy(false);
   const { data: compatibilityResult, isInitialLoading: isLoadingCompatibility, error: compatibilityCheckError } = useCompatibilityCheck({ enabled: false });
-
-  const { step, wizardStep } = migrationStep(compatibilityResult, dataNodes.elements, dataNodesCA, renewalPolicy);
+  const { currentStep } = useMigrationState();
+  const { step, wizardStep } = migrationStep(compatibilityResult, dataNodes.elements, dataNodesCA, renewalPolicy, currentStep);
 
   return useMemo(() => {
     if (dataNodesError || caError || compatibilityCheckError || renewalPolicyError) {

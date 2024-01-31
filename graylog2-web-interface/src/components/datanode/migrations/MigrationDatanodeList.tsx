@@ -37,7 +37,7 @@ const MigrationDatanodeList = ({ dataNodes } : Props) => (
           </thead>
           <tbody>
             {dataNodes.elements.map((datanode) => (
-              <tr>
+              <tr key={datanode.id}>
                 <td>{datanode.hostname}</td>
                 <td>{datanode.transport_address}</td>
                 <td>{datanode.status}</td>

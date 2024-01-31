@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { DataNodeStatus } from 'preflight/types';
+import type { MIGRATION_STATE } from 'components/datanode/Constants';
 
 type Shard = {
   documents_count: number,
@@ -68,4 +69,21 @@ export type DataNodesCA = {
 export type RenewalPolicy = {
   mode: 'AUTOMATIC' | 'MANUAL',
   certificate_lifetime: string,
+}
+
+export type MigrationActions = 'SELECT_ROLLING_UPGRADE_MIGRATION' | 'SELECT_REMOTE_REINDEX_MIGRATION' | 'DISCOVER_NEW_DATANODES' | 'START_DATANODE_CLUSTER' | 'MIGRATE_INDEX_TEMPLATES' | 'MIGRATE_EXISTING_DATA' | 'SKIP_EXISTING_DATA_MIGRATION' | 'MIGRATE_CLUSTER_WITH_DOWNTIME' | 'MIGRATE_CLUSTER_WITHOUT_DOWNTIME' | 'INSTALL_DATANODES_ON_EVERY_NODE' | 'DIRECTORY_COMPATIBILITY_CHECK_OK' | 'CONFIRM_OLD_CLUSTER_STOPPED' | 'CALCULATE_JOURNAL_SIZE' | 'CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED';
+
+type RemoveDescriptionField<T> = {
+  [K in keyof T as Exclude<K, 'description'>]: T[K]
+};
+
+type ExtractKeyValues<T extends object> = {
+  [K in keyof T ]: T[K] extends object ? ExtractKeyValues<RemoveDescriptionField<T[K]>> : T[K];
+}[keyof T];
+
+export type MigrationStateItem = ExtractKeyValues<typeof MIGRATION_STATE>
+
+export type MigrationState = {
+  state: MigrationStateItem,
+  next_steps: Array<MigrationActions>,
 }

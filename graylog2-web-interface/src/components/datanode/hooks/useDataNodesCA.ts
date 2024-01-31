@@ -28,7 +28,7 @@ const fetchDataNodesCA = (): Promise<DataNodesCA> => (
   fetch('GET', qualifyUrl('ca'), undefined, false)
 );
 
-const useDataNodesCA = (): {
+const useDataNodesCA = (refetchInterval: number | false = 3000): {
   data: DataNodesCA,
   isFetching: boolean,
   error: FetchError,
@@ -48,7 +48,7 @@ const useDataNodesCA = (): {
     queryKey: QUERY_KEY,
     queryFn: fetchDataNodesCA,
     initialData: undefined,
-    refetchInterval: 3000,
+    refetchInterval,
     retry: false,
     onError: (newError) => {
       setMetaData({
