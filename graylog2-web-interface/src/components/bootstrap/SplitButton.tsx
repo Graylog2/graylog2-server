@@ -23,6 +23,7 @@ import { ButtonGroup } from 'components/bootstrap/index';
 import Icon from '../common/Icon';
 
 type Props = {
+  disabled?: boolean,
   title: React.ComponentProps<typeof Button>['children'],
   open?: boolean,
   onMenuChange?: (newState: boolean) => void,
@@ -47,6 +48,7 @@ const SplitButton = React.forwardRef<HTMLButtonElement, Props>(
 );
 
 SplitButton.defaultProps = {
+  disabled: false,
   open: undefined,
   onMenuChange: undefined,
   width: undefined,
