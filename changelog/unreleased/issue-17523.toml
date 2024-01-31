@@ -2,4 +2,4 @@ type = "c"
 message = "Ensure password secret meets the minimum length requirement if using/for the DataNode."
 
 issues = ["17523"]
-pulls = ["17719"]
+pulls = ["17719", "18111"]
