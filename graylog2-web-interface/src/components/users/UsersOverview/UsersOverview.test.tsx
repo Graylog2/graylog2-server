@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen, within, act } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import userEvent from '@testing-library/user-event';
 
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
@@ -44,7 +45,7 @@ jest.mock('stores/users/UsersStore', () => ({
 const clickMoreActions = async (username: string) => {
   const actions = await screen.findByRole('cell', { name: new RegExp(`edit user ${username}`, 'i') });
 
-  fireEvent.click(await within(actions).findByRole('button', { name: /more actions/i }));
+  await userEvent.click(await within(actions).findByRole('button', { name: /more actions/i }));
 
   await screen.findByRole('menu');
 };
@@ -128,7 +129,12 @@ describe('UsersOverview', () => {
 
       await clickMoreActions(modifiableUser.fullName);
       const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.fullName}`);
-      fireEvent.click(deleteButton);
+
+      // eslint-disable-next-line testing-library/no-unnecessary-act
+      await act(async () => {
+        await userEvent.click(deleteButton);
+      });
+
       await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
 
       await waitFor(() => {

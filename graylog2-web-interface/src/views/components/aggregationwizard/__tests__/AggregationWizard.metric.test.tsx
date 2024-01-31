@@ -174,9 +174,7 @@ describe('AggregationWizard', () => {
 
     await userEvent.type(nameInput, 'New name');
 
-    await act(async () => {
-      await selectMetric('Count', 'http_method');
-    });
+    await selectMetric('Count', 'http_method');
 
     await submitWidgetConfigForm();
 
@@ -234,6 +232,7 @@ describe('AggregationWizard', () => {
     renderSUT({ config, onChange: onChangeMock });
 
     const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
+
     await userEvent.click(addMetricButton);
 
     await waitFor(() => expect(screen.getAllByLabelText('Select a function')).toHaveLength(2));
@@ -241,9 +240,7 @@ describe('AggregationWizard', () => {
 
     await userEvent.type(newNameInput, 'New function');
 
-    await act(async () => {
-      await selectMetric('Minimum', 'http_method', 1);
-    });
+    await selectMetric('Minimum', 'http_method', 1);
 
     await act(async () => {
       await submitWidgetConfigForm();
