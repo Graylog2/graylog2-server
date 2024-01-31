@@ -14,9 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog.datanode.process;
 
-import java.util.List;
+import jakarta.inject.Provider;
+import jakarta.inject.Inject;
 
-public record RemoteReindexResult(List<ReindexResult> results) {
+public class ProcessStateMachineProvider implements Provider<ProcessStateMachine> {
+    private final ProcessStateMachine processStateMachine;
+
+    @Inject
+    public ProcessStateMachineProvider() {
+        this.processStateMachine = ProcessStateMachine.createNew();
+    }
+
+    @Override
+    public ProcessStateMachine get() {
+        return processStateMachine;
+    }
 }
