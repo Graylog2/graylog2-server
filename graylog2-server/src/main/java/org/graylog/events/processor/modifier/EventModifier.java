@@ -17,6 +17,7 @@
 package org.graylog.events.processor.modifier;
 
 import org.graylog.events.event.EventWithContext;
+import org.graylog.events.processor.EventDefinition;
 
 /**
  * Event modifiers can modify events before notifications and storage handlers run.
@@ -26,7 +27,8 @@ public interface EventModifier {
      * Performs modification operations on the given {@link EventWithContext}.
      *
      * @param eventWithContext the event with context
+     * @param eventDefinition  the event definition for the event with context
      * @throws EventModifierException when the modification fails
      */
-    void accept(EventWithContext eventWithContext) throws EventModifierException;
+    void accept(EventWithContext eventWithContext, EventDefinition eventDefinition) throws EventModifierException;
 }

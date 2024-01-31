@@ -145,7 +145,7 @@ public class EventProcessorEngine {
                 // Event modifiers should run after fields have been set.
                 for (final EventModifier eventModifier : eventModifiers) {
                     try {
-                        eventModifier.accept(eventWithContext);
+                        eventModifier.accept(eventWithContext, eventDefinition);
                     } catch (EventModifierException e) {
                         if (e.isSkip()) {
                             if (LOG.isDebugEnabled()) {
