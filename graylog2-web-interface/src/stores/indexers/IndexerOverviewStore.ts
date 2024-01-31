@@ -18,7 +18,7 @@ import Reflux from 'reflux';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type IndexerOverviewActionsType = {
@@ -88,7 +88,7 @@ export const IndexerOverviewStore = singletonStore(
 
     list(indexSetId: string) {
       const url = qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url);
-      const promise = fetch('GET', url);
+      const promise = fetchPeriodically('GET', url);
 
       promise.then(
         (response: IndexerOverview) => {
