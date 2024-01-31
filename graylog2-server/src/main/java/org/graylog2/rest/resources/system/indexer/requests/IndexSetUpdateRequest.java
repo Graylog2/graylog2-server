@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -51,7 +52,7 @@ public record IndexSetUpdateRequest(@JsonProperty("title") @NotBlank String titl
                                     @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                     @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
                                     @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
-                                    @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
+                                    @JsonProperty(FIELD_PROFILE_ID) @Pattern(regexp = "^[a-fA-F\\d]{24}$") @Nullable String fieldTypeProfile,
                                     @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
                                     @JsonProperty(FIELD_USE_LEGACY_ROTATION) Boolean useLegacyRotation) {
 

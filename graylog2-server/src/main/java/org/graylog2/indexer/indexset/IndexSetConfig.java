@@ -22,6 +22,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
 import org.graylog2.datatiering.DataTieringConfig;
@@ -34,12 +38,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -91,7 +89,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
                                         @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
-                                        @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
+                                        @JsonProperty(FIELD_PROFILE_ID) @Pattern(regexp = "^[a-fA-F\\d]{24}$") @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering
     ) {
 
