@@ -24,7 +24,7 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalLong;
+import java.util.OptionalDouble;
 
 public interface Event extends Indexable {
     @Override
@@ -102,9 +102,9 @@ public interface Event extends Indexable {
 
     EventReplayInfo getReplayInfo();
 
-    OptionalLong getScore(String name);
+    OptionalDouble getScore(String name);
 
-    void setScore(String name, long riskScore);
+    void setScore(String name, double riskScore);
 
     EventDto toDto();
 

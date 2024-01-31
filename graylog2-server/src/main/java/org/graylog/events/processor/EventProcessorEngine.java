@@ -143,7 +143,7 @@ public class EventProcessorEngine {
                 eventWithContext.event().setKeyTuple(keyTuple);
 
                 // Event modifiers should run after fields have been set.
-                for (EventModifier eventModifier : eventModifiers) {
+                for (final EventModifier eventModifier : eventModifiers) {
                     try {
                         eventModifier.accept(eventWithContext);
                     } catch (EventModifierException e) {

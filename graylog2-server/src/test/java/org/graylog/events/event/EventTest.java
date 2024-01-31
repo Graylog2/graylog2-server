@@ -54,7 +54,7 @@ public class EventTest {
                 .priority(4)
                 .alert(false)
                 .fields(ImmutableMap.of("hello", "world"))
-                .scores(ImmutableMap.of("test", 1L))
+                .scores(ImmutableMap.of("test", 1.0D))
                 .build();
 
         assertThat(Event.fromDto(eventDto)).satisfies(event -> {

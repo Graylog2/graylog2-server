@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.OptionalLong;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -59,7 +59,7 @@ public class EventImpl implements Event {
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
-    private Map<String, Long> scores = new HashMap<>();
+    private final Map<String, Double> scores = new HashMap<>();
     private EventReplayInfo replayInfo;
 
     EventImpl(String eventId,
@@ -242,13 +242,13 @@ public class EventImpl implements Event {
     }
 
     @Override
-    public OptionalLong getScore(String name) {
-        final Long value = scores.get(name);
-        return value == null ? OptionalLong.empty() : OptionalLong.of(value);
+    public OptionalDouble getScore(String name) {
+        final Double value = scores.get(name);
+        return value == null ? OptionalDouble.empty() : OptionalDouble.of(value);
     }
 
     @Override
-    public void setScore(String name, long riskScore) {
+    public void setScore(String name, double riskScore) {
         if (isNullOrEmpty(name)) {
             throw new IllegalArgumentException("Score name cannot be null or empty");
         }

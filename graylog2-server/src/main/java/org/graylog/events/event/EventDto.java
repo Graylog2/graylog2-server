@@ -102,7 +102,7 @@ public abstract class EventDto {
     public abstract long priority();
 
     @JsonProperty(FIELD_SCORES)
-    public abstract Map<String, Long> scores();
+    public abstract Map<String, Double> scores();
 
     @JsonProperty(FIELD_ALERT)
     public abstract boolean alert();
@@ -184,7 +184,7 @@ public abstract class EventDto {
         public abstract Builder priority(long priority);
 
         @JsonProperty(FIELD_SCORES)
-        public abstract Builder scores(Map<String, Long> scores);
+        public abstract Builder scores(Map<String, Double> scores);
 
         @JsonProperty(FIELD_ALERT)
         public abstract Builder alert(boolean alert);
