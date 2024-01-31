@@ -78,7 +78,13 @@ class MigrationStateMachineTest {
         Assertions.assertThat(capturedArgs.get())
                 .isNotNull()
                 .containsEntry("foo", "bar");
+    }
 
-
+    @Test
+    void testSerialization() {
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), new MigrationActionsAdapter()).get();
+        final String serialized = migrationStateMachine.serialize();
+        //System.out.println(serialized);
+        Assertions.assertThat(serialized).isNotEmpty().startsWith("digraph G {");
     }
 }
