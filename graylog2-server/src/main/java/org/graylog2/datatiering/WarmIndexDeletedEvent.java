@@ -14,10 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog2.datatiering;
 
-import java.util.concurrent.TimeUnit;
-
-public record ReindexResult(String index, TimeUnit took,
-                            long created, int batches) {
+public record WarmIndexDeletedEvent(WarmIndexInfo warmIndexInfo) {
 }

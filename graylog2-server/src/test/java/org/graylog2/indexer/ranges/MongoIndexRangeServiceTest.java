@@ -306,4 +306,17 @@ public class MongoIndexRangeServiceTest {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
         assertThat(indexRanges).isEmpty();
     }
+
+    @Test
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
+    public void testIndexRename() {
+        assertThat(indexRangeService.renameIndex("graylog_2", "graylog_warm_2")).isTrue();
+
+        final SortedSet<IndexRange> indexRange = indexRangeService.findAll();
+        assertThat(indexRange).satisfies(r -> {
+            assertThat(r.stream().anyMatch(s -> s.indexName().equals("graylog_1"))).isTrue();
+            assertThat(r.stream().anyMatch(s -> s.indexName().equals("graylog_2"))).isFalse();
+            assertThat(r.stream().anyMatch(s -> s.indexName().equals("graylog_warm_2"))).isTrue();
+        });
+    }
 }

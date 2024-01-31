@@ -35,6 +35,7 @@ import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.events.processor.SearchFilterableConfig;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -70,7 +71,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     private static final String FIELD_FILTERS = "filters";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_GROUP_BY = "group_by";
-    private static final String FIELD_SERIES = "series";
+    static final String FIELD_SERIES = "series";
     private static final String FIELD_CONDITIONS = "conditions";
     private static final String FIELD_SEARCH_WITHIN_MS = "search_within_ms";
     private static final String FIELD_EXECUTE_EVERY_MS = "execute_every_ms";
@@ -218,6 +219,16 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         if (!series().isEmpty() && isConditionsEmpty()) {
             validationResult.addError(FIELD_CONDITIONS, "Aggregation with series must also contain conditions");
         }
+
+        series().stream()
+                .filter(ser -> ser instanceof HasField)
+                .forEach(ser -> {
+                    final String field = ((HasField) ser).field();
+                    if (field == null || field.isEmpty()) {
+                        validationResult.addError(FIELD_SERIES, "Aggregation's series of type " + ser.type() + " must contain non-empty value for field");
+                    }
+                });
+
         return validationResult;
     }
 

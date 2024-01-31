@@ -24,6 +24,7 @@ import omit from 'lodash/omit';
 import { Alert, Col, Row } from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import type User from 'logic/users/User';
+import HoverForHelp from 'components/common/HoverForHelp';
 
 import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
@@ -33,7 +34,6 @@ import './field-value-providers';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
-import HoverForHelp from 'components/common/HoverForHelp';
 
 type Props = {
   currentUser: User,
