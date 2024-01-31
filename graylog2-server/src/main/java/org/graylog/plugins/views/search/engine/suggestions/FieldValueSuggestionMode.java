@@ -19,15 +19,5 @@ package org.graylog.plugins.views.search.engine.suggestions;
 public enum FieldValueSuggestionMode {
     ON,
     TEXTUAL_ONLY,
-    OFF;
-
-    public static FieldValueSuggestionMode fromString(final String stringValue) {
-        if (ON.toString().equalsIgnoreCase(stringValue)) {
-            return ON;
-        }
-        if (TEXTUAL_ONLY.toString().equalsIgnoreCase(stringValue)) {
-            return TEXTUAL_ONLY;
-        }
-        return OFF;
-    }
+    OFF
 }

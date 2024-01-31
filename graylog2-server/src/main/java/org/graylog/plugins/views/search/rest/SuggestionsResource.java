@@ -59,6 +59,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -99,7 +100,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
         this.entityTitleService = entityTitleService;
         this.nodeService = nodeService;
         this.lastUsedQueryStringsService = lastUsedQueryStringsService;
-        this.fieldValueSuggestionMode = FieldValueSuggestionMode.fromString(configuration.getFieldValueSuggestionMode());
+        this.fieldValueSuggestionMode = FieldValueSuggestionMode.valueOf(configuration.getFieldValueSuggestionMode().toUpperCase(Locale.ROOT));
     }
 
     @GET

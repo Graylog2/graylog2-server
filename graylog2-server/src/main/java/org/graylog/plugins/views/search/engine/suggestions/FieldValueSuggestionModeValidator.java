@@ -31,9 +31,9 @@ public class FieldValueSuggestionModeValidator implements Validator<String> {
             throw new ValidationException("Required parameter " + name + " not found");
         }
 
-        if (Arrays.stream(FieldValueSuggestionMode.values())
-                .map(mode -> mode.toString().toLowerCase(Locale.ROOT))
-                .noneMatch(x -> x.equals(value))) {
+        try {
+            FieldValueSuggestionMode.valueOf(value.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException iex) {
             throw new ValidationException("Parameter " + name + " should have one of the allowed values: " + Arrays.toString(FieldValueSuggestionMode.values()) + " (found: " + value + ")");
         }
     }
