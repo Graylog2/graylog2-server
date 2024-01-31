@@ -25,7 +25,11 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateM
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,6 +37,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 class MigrationStateMachineTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MigrationStateMachineTest.class);
 
     @Test
     void testPersistence() {
@@ -84,7 +90,8 @@ class MigrationStateMachineTest {
     void testSerialization() {
         final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), new MigrationActionsAdapter()).get();
         final String serialized = migrationStateMachine.serialize();
-        //System.out.println(serialized);
         Assertions.assertThat(serialized).isNotEmpty().startsWith("digraph G {");
+        final String fragment = URLEncoder.encode(serialized, StandardCharsets.UTF_8).replace("+", "%20");
+        LOG.info("Render state machine on " + "https://dreampuf.github.io/GraphvizOnline/#" + fragment);
     }
 }
