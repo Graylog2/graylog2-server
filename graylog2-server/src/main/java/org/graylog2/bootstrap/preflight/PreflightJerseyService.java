@@ -165,9 +165,10 @@ public class PreflightJerseyService extends AbstractIdleService {
                 been started. You must log in to it to perform the initial configuration and continue.
 
                 Initial configuration is accessible at %s, with username '%s' and password '%s'.
+                Try clicking on http://%s:%s@%s
 
                 ========================================================================================================
-                """.formatted(bindAddress, username, preflightPassword);
+                """.formatted(bindAddress, username, preflightPassword, username, preflightPassword, bindAddress);
 
         LOG.info(banner);
     }
