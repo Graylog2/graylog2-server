@@ -119,7 +119,8 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
                             options={options}
                             value={profile}
                             onChange={onChangeProfile}
-                            placeholder="Select profile"
+                            inputProps={{ 'aria-label': 'Select index set profile' }}
+                            placeholder="Select index set profile"
                             disabled={profileOptionsIsLoading}
                             required />
             </Input>
