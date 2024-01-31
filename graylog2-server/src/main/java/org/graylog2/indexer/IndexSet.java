@@ -164,6 +164,16 @@ public interface IndexSet extends Comparable<IndexSet> {
     Optional<Integer> extractIndexNumber(String index);
 
     /**
+     * A {@link Comparator} that uses the index numbers for comparison.
+     *
+     * @return The Comparator
+     */
+    default Comparator<String> indexComparator() {
+        return (indexName1, indexName2) -> extractIndexNumber(indexName2).orElse(0)
+                .compareTo(extractIndexNumber(indexName1).orElse(0));
+    }
+
+    /**
      * The configuration for this index set.
      *
      * @return index set configuration object
