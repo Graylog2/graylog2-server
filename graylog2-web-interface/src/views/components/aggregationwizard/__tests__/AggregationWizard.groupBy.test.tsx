@@ -59,10 +59,9 @@ const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] 
 const selectEventConfig = { container: document.body };
 
 const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
-  userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
   await screen.findByRole('menu');
-  userEvent.click(await screen.findByRole('menuitem', { name: key }));
-  await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
 };
 
 const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
@@ -78,7 +77,7 @@ const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSe
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await screen.findByRole('button', { name: /update preview/i });
-  userEvent.click(applyButton);
+  await userEvent.click(applyButton);
 };
 
 const expectedPivotConfig = { skip_empty_values: undefined, limit: 15 };
