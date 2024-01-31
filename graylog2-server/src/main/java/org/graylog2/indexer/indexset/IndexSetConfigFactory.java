@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -31,12 +32,19 @@ public class IndexSetConfigFactory {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetConfigFactory.class);
     private final IndexSetsDefaultConfigurationFactory indexSetsDefaultConfigurationFactory;
     private final ClusterConfigService clusterConfigService;
+    private final boolean isCloud;
 
     @Inject
     public IndexSetConfigFactory(IndexSetsDefaultConfigurationFactory indexSetsDefaultConfigurationFactory,
-                                 ClusterConfigService clusterConfigService) {
+                                 ClusterConfigService clusterConfigService,
+                                 @Named("is_cloud") boolean isCloud) {
         this.indexSetsDefaultConfigurationFactory = indexSetsDefaultConfigurationFactory;
         this.clusterConfigService = clusterConfigService;
+        this.isCloud = isCloud;
+    }
+
+    private static ZonedDateTime getCreationDate() {
+        return ZonedDateTime.now(ZoneOffset.UTC);
     }
 
     public IndexSetConfig.Builder createDefault() {
@@ -60,11 +68,6 @@ public class IndexSetConfigFactory {
                 .rotationStrategy(defaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())
                 .retentionStrategy(defaultConfig.retentionStrategyConfig())
-                .dataTiering(defaultConfig.dataTiering())
-                ;
-    }
-
-    private static ZonedDateTime getCreationDate() {
-        return ZonedDateTime.now(ZoneOffset.UTC);
+                .dataTiering(isCloud ? null : defaultConfig.dataTiering());
     }
 }
