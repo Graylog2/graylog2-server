@@ -34,19 +34,10 @@ public class MigrationActionsImpl implements MigrationActions {
         clusterConfigService.remove(DatanodeMigrationConfiguration.class);
     }
 
-    @Override
-    public void migrateIndexTemplates() {
-        // TODO!
-    }
 
     @Override
-    public void migrateWithoutDowntime() {
-        // TODO!
-    }
-
-    @Override
-    public void migrateWithDowntime() {
-        // TODO!
+    public boolean runDirectoryCompatibilityCheck() {
+        return false;
     }
 
     @Override
@@ -57,5 +48,50 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public void rollingUpgradeSelected() {
 
+    }
+
+    @Override
+    public boolean directoryCompatibilityCheckOk() {
+        return false;
+    }
+
+    @Override
+    public void reindexUpgradeSelected() {
+
+    }
+
+    @Override
+    public boolean reindexingFinished() {
+        return false;
+    }
+
+    @Override
+    public void reindexOldData() {
+
+    }
+
+    @Override
+    public void stopMessageProcessing() {
+
+    }
+
+    @Override
+    public void startMessageProcessing() {
+
+    }
+
+    @Override
+    public boolean caDoesNotExist() {
+        return false;
+    }
+
+    @Override
+    public boolean removalPolicyDoesNotExist() {
+        return false;
+    }
+
+    @Override
+    public boolean caAndRemovalPolicyExist() {
+        return false;
     }
 }
