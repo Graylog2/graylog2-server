@@ -54,7 +54,7 @@ public class EventTest {
                 .priority(4)
                 .alert(false)
                 .fields(ImmutableMap.of("hello", "world"))
-                .scores(ImmutableMap.of("test", 1.0D))
+                .scores(ImmutableMap.of("test", 1.2D))
                 .build();
 
         assertThat(Event.fromDto(eventDto)).satisfies(event -> {
@@ -75,7 +75,7 @@ public class EventTest {
             assertThat(event.getAlert()).isFalse();
             assertThat(event.getField("hello").dataType()).isEqualTo(FieldValueType.STRING);
             assertThat(event.getField("hello").value()).isEqualTo("world");
-            assertThat(event.getScore("test")).isPresent().hasValue(1L);
+            assertThat(event.getScore("test")).isPresent().hasValue(1.2D);
         });
     }
 }
