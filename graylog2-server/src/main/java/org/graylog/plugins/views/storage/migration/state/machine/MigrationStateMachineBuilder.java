@@ -81,9 +81,9 @@ public class MigrationStateMachineBuilder {
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME)
-                .permit(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, () -> LOG.info("Showing directory compatibility check page"));
+                .permit(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2, () -> LOG.info("Showing directory compatibility check page"));
 
-        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
+        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2)
                 .permit(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, migrationActions::directoryCompatibilityCheckOk);
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES)
