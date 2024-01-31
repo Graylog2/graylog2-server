@@ -217,7 +217,7 @@ const indexDefaultsConfig = {
   index_optimization_max_num_segments: 1,
   index_optimization_disabled: true,
   field_type_refresh_interval: 30,
-  field_type_refresh_interval_unit: 'minutes',
+  field_type_refresh_interval_unit: 'minutes' as 'minutes' | 'seconds',
   rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy',
   rotation_strategy_config: {
     type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig',
