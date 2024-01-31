@@ -19,6 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
+import useIndexDefaults from 'pages/useIndexDefaults';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
 
@@ -208,11 +209,35 @@ const rotationStrategies = [
   },
 ];
 
+const indexDefaultsConfig = {
+  index_prefix: 'default_index_prefix',
+  index_analyzer: 'default_index_analyser',
+  shards: 1,
+  replicas: 1,
+  index_optimization_max_num_segments: 1,
+  index_optimization_disabled: true,
+  field_type_refresh_interval: 30,
+  field_type_refresh_interval_unit: 'minutes',
+  rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy',
+  rotation_strategy_config: {
+    type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig',
+    max_size: 12,
+  },
+  retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
+  retention_strategy_config: {
+    type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
+    max_number_of_indices: 10,
+    index_action: 'foo',
+  },
+};
+
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
+jest.mock('pages/useIndexDefaults', () => jest.fn());
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
     asMock(useProfileOptions).mockReturnValue(({ isLoading: false, options: [], refetch: () => {} }));
+    asMock(useIndexDefaults).mockReturnValue(({ loadingIndexDefaultsConfig: false, indexDefaultsConfig }));
   });
 
   const onSave = jest.fn();
