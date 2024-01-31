@@ -32,7 +32,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type View from 'views/logic/views/View';
 import useElementDimensions from 'hooks/useElementDimensions';
-import { fetchQueryHistory } from 'views/components/searchbar/QueryHistoryButton';
+import { displayHistoryCompletions } from 'views/components/searchbar/QueryHistoryButton';
 import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';
 import useHotkey from 'hooks/useHotkey';
 
@@ -282,18 +282,22 @@ const QueryInput = React.forwardRef<Editor, Props>(({
       name: 'Show completions',
       bindKey: { win: 'Alt-Space', mac: 'Alt-Space' },
       exec: async (editor: Editor) => {
-        const args = editor.getValue()
-          ? undefined
-          : { matches: await fetchQueryHistory() };
+        console.log('test', editor.getValue());
 
-        startAutocomplete(editor, args);
+        if (editor.getValue()) {
+          startAutocomplete(editor);
+
+          return;
+        }
+
+        await displayHistoryCompletions(editor);
       },
     },
     {
       name: 'Show query history',
       bindKey: { win: 'Alt-Shift-H', mac: 'Alt-Shift-H' },
       exec: async (editor: Editor) => {
-        startAutocomplete(editor, { matches: await fetchQueryHistory() });
+        displayHistoryCompletions(editor);
       },
     },
     // The following will disable the mentioned hotkeys.

@@ -31,7 +31,7 @@ const ButtonContainer = styled.div`
   margin-left: 6px;
 `;
 
-export const fetchQueryHistory = () => SearchSuggestions.suggestQueryStrings(QUERY_HISTORY_LIMIT).then((response) => (
+const fetchQueryHistoryCompletions = () => SearchSuggestions.suggestQueryStrings(QUERY_HISTORY_LIMIT).then((response) => (
   response.sort((
     { last_used: lastUsedA }, { last_used: lastUsedB }) => new Date(lastUsedB).getTime() - new Date(lastUsedA).getTime(),
   ).map((entry, index) => ({
@@ -48,6 +48,14 @@ export const fetchQueryHistory = () => SearchSuggestions.suggestQueryStrings(QUE
     },
   }))));
 
+export const displayHistoryCompletions = async (editor: Editor) => {
+  const historyCompletions = await fetchQueryHistoryCompletions();
+
+  if (historyCompletions?.length) {
+    startAutocomplete(editor, { matches: historyCompletions });
+  }
+};
+
 type Props = {
   editorRef: React.MutableRefObject<Editor>
 }
@@ -57,7 +65,7 @@ const QueryHistoryButton = ({ editorRef }: Props) => {
     if (editorRef.current) {
       editorRef.current.focus();
 
-      startAutocomplete(editorRef.current, { matches: await fetchQueryHistory() });
+      displayHistoryCompletions(editorRef.current);
     }
   };
 
