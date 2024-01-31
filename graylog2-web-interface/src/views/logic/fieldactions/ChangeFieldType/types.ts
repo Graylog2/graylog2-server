@@ -16,6 +16,7 @@
  */
 
 import type { Attribute, PaginatedListJSON } from 'stores/PaginationTypes';
+import type { IndexSetFieldType, IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 
 export type TypeHistoryItem = string;
 
@@ -60,3 +61,6 @@ export type OnSubmitCallbackProps = {
   rotated: boolean,
   field: string,
 }
+
+export type FieldTypePutResponseJson = Record<string, IndexSetFieldTypeJson>
+export type FieldTypePutResponse = Record<string, IndexSetFieldType>

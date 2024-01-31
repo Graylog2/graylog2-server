@@ -28,24 +28,20 @@ import useHistory from 'routing/useHistory';
 import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
-import useSelectedEntitiesData from 'components/common/EntityDataTable/hooks/useSelectedEntitiesData';
-import useNormalizedFieldTypesCacheData
-  from 'components/indices/IndexSetFieldTypes/hooks/useNormalizedFieldTypesCacheData';
 
 type Props = {
   indexSetId: string,
+  selectedEntitiesData: Record<string, IndexSetFieldType>
 }
 
 const StyledMenuItem = styled(MenuItem)`
   pointer-events: all;
 `;
 
-const BulkActions = ({ indexSetId }: Props) => {
+const BulkActions = ({ indexSetId, selectedEntitiesData }: Props) => {
   const { pushWithState } = useHistory();
-  const normalizedCacheData = useNormalizedFieldTypesCacheData();
-  const selectedEntitiesData = useSelectedEntitiesData<IndexSetFieldType>(normalizedCacheData);
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
-  const customFieldMappings: Array<CustomFieldMapping> = selectedEntitiesData.map(({ fieldName, type }) => ({
+  const customFieldMappings: Array<CustomFieldMapping> = Object.values(selectedEntitiesData).map(({ fieldName, type }) => ({
     field: fieldName,
     type,
   }));
@@ -61,7 +57,7 @@ const BulkActions = ({ indexSetId }: Props) => {
     );
   }, [customFieldMappings, pushWithState]);
 
-  const removableFields = useMemo(() => selectedEntitiesData.filter(hasOverride).map(({ fieldName }) => fieldName), [selectedEntitiesData]);
+  const removableFields = useMemo(() => Object.values(selectedEntitiesData).filter(hasOverride).map(({ fieldName }) => fieldName), [selectedEntitiesData]);
 
   return (
     <>

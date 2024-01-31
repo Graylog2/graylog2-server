@@ -23,12 +23,12 @@ import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetField
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
-import type { OnSubmitCallbackProps } from 'views/logic/fieldactions/ChangeFieldType/types';
+import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
-  onSubmitCallback: (props: OnSubmitCallbackProps) => void,
+  onSubmitCallback: (props: FieldTypePutResponse) => void,
 }
 
 const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) => {
