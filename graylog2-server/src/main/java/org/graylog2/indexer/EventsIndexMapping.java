@@ -64,7 +64,7 @@ public abstract class EventsIndexMapping implements IndexMappingTemplate {
                                 .put("scores", map()
                                         .put("path_match", "scores.*")
                                         .put("mapping", map()
-                                                .put("type", "long")
+                                                .put("type", "double")
                                                 .put("doc_values", true)
                                                 .put("index", true)
                                                 .build())
