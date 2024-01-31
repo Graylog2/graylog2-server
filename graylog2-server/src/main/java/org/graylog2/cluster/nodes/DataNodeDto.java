@@ -24,9 +24,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.security.certutil.CertRenewalService;
+import org.graylog2.datanode.DataNodeLifecycleTrigger;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Objects;
 
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -46,15 +48,28 @@ public abstract class DataNodeDto extends NodeDto {
     public abstract DataNodeStatus getDataNodeStatus();
 
     @Nullable
+    @JsonProperty("action_queue")
+    public abstract DataNodeLifecycleTrigger getActionQueue();
+
+    @Nullable
     @JsonUnwrapped
     public abstract CertRenewalService.ProvisioningInformation getProvisioningInformation();
 
     @Override
     public Map<String, Object> toEntityParameters() {
         final Map<String, Object> params = super.toEntityParameters();
-        params.put("cluster_address", getClusterAddress());
-        params.put("rest_api_address", getRestApiAddress());
-        params.put("datanode_status", getDataNodeStatus());
+        if (Objects.nonNull(getClusterAddress())) {
+            params.put("cluster_address", getClusterAddress());
+        }
+        if (Objects.nonNull(getClusterAddress())) {
+            params.put("rest_api_address", getRestApiAddress());
+        }
+        if (Objects.nonNull(getClusterAddress())) {
+            params.put("datanode_status", getDataNodeStatus());
+        }
+        if (Objects.nonNull(getClusterAddress())) {
+            params.put("action_queue", getActionQueue());
+        }
         return params;
     }
 
@@ -78,7 +93,11 @@ public abstract class DataNodeDto extends NodeDto {
         @JsonProperty("datanode_status")
         public abstract Builder setDataNodeStatus(DataNodeStatus dataNodeStatus);
 
+        @JsonProperty("action_queue")
+        public abstract Builder setActionQueue(DataNodeLifecycleTrigger trigger);
+
         public abstract Builder setProvisioningInformation(CertRenewalService.ProvisioningInformation provisioningInformation);
+
 
         public abstract DataNodeDto build();
 

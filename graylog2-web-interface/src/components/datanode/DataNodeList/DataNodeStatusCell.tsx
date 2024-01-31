@@ -37,7 +37,7 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
     <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
                  title={dataNode.data_node_status}
                  aria-label={dataNode.data_node_status}>
-      {dataNode.data_node_status}
+      {dataNode.data_node_status}{dataNode.action_queue}
     </StatusLabel>
   );
 };

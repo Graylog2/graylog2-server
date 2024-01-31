@@ -64,7 +64,7 @@ public class OpensearchRemovalTracerTest {
     public void setUp() {
         when(process.restClient()).thenReturn(Optional.of(restClient));
         when(restClient.cluster()).thenReturn(clusterClient);
-        this.classUnderTest = new OpensearchRemovalTracer(process, NODENAME);
+        this.classUnderTest = new OpensearchRemovalTracer(process, NODENAME, nodeId, eventBus);
     }
 
     @Test

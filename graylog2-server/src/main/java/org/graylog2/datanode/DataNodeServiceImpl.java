@@ -16,6 +16,8 @@
  */
 package org.graylog2.datanode;
 
+import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
@@ -23,8 +25,6 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 public class DataNodeServiceImpl implements DataNodeService {
 
@@ -37,6 +37,7 @@ public class DataNodeServiceImpl implements DataNodeService {
     public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService) {
         this.clusterEventBus = clusterEventBus;
         this.nodeService = nodeService;
+        clusterEventBus.registerClusterEventSubscriber(this);
     }
 
     @Override
@@ -45,15 +46,21 @@ public class DataNodeServiceImpl implements DataNodeService {
         if (nodeService.allActive().size() <= 1) {
             throw new IllegalArgumentException("Cannot remove last data node in the cluster.");
         }
-        if (nodeService.allActive().values().stream().anyMatch(n -> n.getDataNodeStatus() == DataNodeStatus.REMOVING)) {
-            throw new IllegalArgumentException("Only one data node can be removed at a time.");
-        }
         if (node.getDataNodeStatus() != DataNodeStatus.AVAILABLE) {
             throw new IllegalArgumentException("Only running data nodes can be removed from the cluster.");
+        }
+        if (otherNodeHasStatus(DataNodeStatus.REMOVING)) {
+            nodeService.update(node.toBuilder()
+                    .setActionQueue(DataNodeLifecycleTrigger.REMOVE)
+                    .build());
         }
         DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE);
         clusterEventBus.post(e);
         return node;
+    }
+
+    private boolean otherNodeHasStatus(DataNodeStatus status) {
+        return nodeService.allActive().values().stream().anyMatch(n -> n.getDataNodeStatus() == status);
     }
 
     @Override
@@ -87,6 +94,18 @@ public class DataNodeServiceImpl implements DataNodeService {
         DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.START);
         clusterEventBus.post(e);
         return node;
+    }
+
+    @Subscribe
+    public void handleDataNodeLifeCycleEvent(DataNodeLifecycleEvent event) {
+        if (event.trigger() == DataNodeLifecycleTrigger.REMOVED) {
+            nodeService.allActive().values().stream()
+                    .filter(node -> node.getActionQueue() == DataNodeLifecycleTrigger.REMOVE)
+                    .findFirst().ifPresent(node -> {
+                        nodeService.update(node.toBuilder().setActionQueue(null).build());
+                        clusterEventBus.post(DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE));
+                    });
+        }
     }
 
 }
