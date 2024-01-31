@@ -28,6 +28,7 @@ import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -37,27 +38,47 @@ class MigrationStateMachineTest {
     void testPersistence() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
 
-
-        final AtomicReference<Map<String, Object>> providedArgs = new AtomicReference<>();
+        AtomicBoolean directoryCheckTriggered = new AtomicBoolean(false);
+        AtomicReference<Map<String, Object>> capturedArgs = new AtomicReference<>();
 
         final MigrationActionsAdapter migrationActions = new MigrationActionsAdapter() {
+
             @Override
-            public void rollingUpgradeSelected() {
-                providedArgs.set(args());
+            public boolean runDirectoryCompatibilityCheck() {
+                capturedArgs.set(args());
+                return true;
+            }
+
+            @Override
+            public boolean directoryCompatibilityCheckOk() {
+                directoryCheckTriggered.set(true);
+                return true;
             }
         };
 
         final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, migrationActions).get();
-        migrationStateMachine.trigger(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, Collections.singletonMap("foo", "bar"));
+        migrationStateMachine.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
+        migrationStateMachine.trigger(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, Collections.singletonMap("foo", "bar"));
+        migrationStateMachine.trigger(MigrationStep.SHOW_CA_CREATION, Collections.emptyMap());
+
 
         Assertions.assertThat(persistence.getConfiguration())
                 .isPresent()
                 .hasValueSatisfying(configuration -> {
-                    Assertions.assertThat(configuration.currentState()).isEqualTo(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME);
+                    Assertions.assertThat(configuration.currentState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
                 });
 
-        Assertions.assertThat(providedArgs.get())
+        Assertions.assertThat(directoryCheckTriggered.get())
+                .as("Directory check should be triggered during the migration process")
+                .isEqualTo(true);
+
+        System.out.println(migrationStateMachine.serialize());
+
+
+        Assertions.assertThat(capturedArgs.get())
                 .isNotNull()
                 .containsEntry("foo", "bar");
+
+
     }
 }
