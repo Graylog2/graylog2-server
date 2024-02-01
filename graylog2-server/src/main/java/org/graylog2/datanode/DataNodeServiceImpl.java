@@ -16,6 +16,7 @@
  */
 package org.graylog2.datanode;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -34,33 +35,27 @@ public class DataNodeServiceImpl implements DataNodeService {
     private final NodeService<DataNodeDto> nodeService;
 
     @Inject
-    public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService) {
+    public DataNodeServiceImpl(ClusterEventBus clusterEventBus, NodeService<DataNodeDto> nodeService, EventBus eventBus) {
         this.clusterEventBus = clusterEventBus;
         this.nodeService = nodeService;
-        clusterEventBus.registerClusterEventSubscriber(this);
+        eventBus.register(this);
     }
 
     @Override
     public DataNodeDto removeNode(String nodeId) throws NodeNotFoundException {
         final DataNodeDto node = nodeService.byNodeId(nodeId);
-        if (nodeService.allActive().size() <= 1) {
-            throw new IllegalArgumentException("Cannot remove last data node in the cluster.");
-        }
         if (node.getDataNodeStatus() != DataNodeStatus.AVAILABLE) {
             throw new IllegalArgumentException("Only running data nodes can be removed from the cluster.");
         }
-        if (otherNodeHasStatus(DataNodeStatus.REMOVING)) {
-            nodeService.update(node.toBuilder()
-                    .setActionQueue(DataNodeLifecycleTrigger.REMOVE)
-                    .build());
+        if (nodeService.allActive().values().stream()
+                .filter(n -> n.getDataNodeStatus() == DataNodeStatus.AVAILABLE && n.getActionQueue() == null)
+                .count() <= 1) {
+            throw new IllegalArgumentException("Cannot remove last data node in the cluster.");
         }
-        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE);
-        clusterEventBus.post(e);
+        DataNodeLifecycleTrigger trigger = DataNodeLifecycleTrigger.REMOVE;
+        DataNodeStatus lockingStatus = DataNodeStatus.REMOVING;
+        addToQueue(node, trigger, lockingStatus);
         return node;
-    }
-
-    private boolean otherNodeHasStatus(DataNodeStatus status) {
-        return nodeService.allActive().values().stream().anyMatch(n -> n.getDataNodeStatus() == status);
     }
 
     @Override
@@ -96,16 +91,39 @@ public class DataNodeServiceImpl implements DataNodeService {
         return node;
     }
 
-    @Subscribe
-    public void handleDataNodeLifeCycleEvent(DataNodeLifecycleEvent event) {
-        if (event.trigger() == DataNodeLifecycleTrigger.REMOVED) {
-            nodeService.allActive().values().stream()
-                    .filter(node -> node.getActionQueue() == DataNodeLifecycleTrigger.REMOVE)
-                    .findFirst().ifPresent(node -> {
-                        nodeService.update(node.toBuilder().setActionQueue(null).build());
-                        clusterEventBus.post(DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE));
-                    });
+    private void addToQueue(DataNodeDto node, DataNodeLifecycleTrigger trigger, DataNodeStatus lockingStatus) {
+        nodeService.update(node.toBuilder()
+                .setActionQueue(trigger)
+                .build());
+        if (!otherNodeHasStatus(node.getNodeId(), lockingStatus, trigger)) { // post event to bus if no other node is currently performing or waiting
+            DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), trigger);
+            clusterEventBus.post(e);
         }
+    }
+
+    private boolean otherNodeHasStatus(String nodeId, DataNodeStatus status, DataNodeLifecycleTrigger trigger) {
+        return nodeService.allActive().values().stream()
+                .anyMatch(n ->
+                        !n.getNodeId().equals(nodeId) &&
+                                (n.getDataNodeStatus() == status || n.getActionQueue() == trigger)
+                );
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleDataNodeLifeCycleEvent(DataNodeLifecycleEvent event) {
+        switch (event.trigger()) {
+            case REMOVED -> handleNextNode(DataNodeLifecycleTrigger.REMOVE);
+            case STOPPED -> handleNextNode(DataNodeLifecycleTrigger.STOP);
+        }
+    }
+
+    private void handleNextNode(DataNodeLifecycleTrigger trigger) {
+        nodeService.allActive().values().stream()
+                .filter(node -> node.getActionQueue() == trigger)
+                .findFirst().ifPresent(node -> {
+                    clusterEventBus.post(DataNodeLifecycleEvent.create(node.getNodeId(), trigger));
+                });
     }
 
 }

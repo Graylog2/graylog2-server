@@ -17,5 +17,5 @@
 package org.graylog2.datanode;
 
 public enum DataNodeLifecycleTrigger {
-    REMOVE, RESET, STOP, START, REMOVED, STOPPED, STARTED
+    REMOVE, RESET, STOP, START, REMOVED, STOPPED, STARTED, CLEAR
 }

@@ -230,8 +230,9 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
 
     @Override
     public void update(NodeDto dto) {
-        BasicDBObject query = new BasicDBObject("node_id", dto.getId());
+        BasicDBObject query = new BasicDBObject("node_id", dto.getNodeId());
         final BasicDBObject update = new BasicDBObject(Map.of("$set", dto.toEntityParameters()));
         super.collection(nodeClass).update(query, update);
     }
+
 }

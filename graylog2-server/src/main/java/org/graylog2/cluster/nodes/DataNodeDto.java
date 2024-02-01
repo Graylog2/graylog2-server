@@ -61,14 +61,18 @@ public abstract class DataNodeDto extends NodeDto {
         if (Objects.nonNull(getClusterAddress())) {
             params.put("cluster_address", getClusterAddress());
         }
-        if (Objects.nonNull(getClusterAddress())) {
+        if (Objects.nonNull(getRestApiAddress())) {
             params.put("rest_api_address", getRestApiAddress());
         }
-        if (Objects.nonNull(getClusterAddress())) {
+        if (Objects.nonNull(getDataNodeStatus())) {
             params.put("datanode_status", getDataNodeStatus());
         }
-        if (Objects.nonNull(getClusterAddress())) {
-            params.put("action_queue", getActionQueue());
+        if (Objects.nonNull(getActionQueue())) {
+            if (getActionQueue() == DataNodeLifecycleTrigger.CLEAR) {
+                params.put("action_queue", null);
+            } else {
+                params.put("action_queue", getActionQueue());
+            }
         }
         return params;
     }

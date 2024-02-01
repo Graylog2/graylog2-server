@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.management;
 
+import com.google.common.eventbus.EventBus;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -26,6 +27,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,12 +56,15 @@ public class OpensearchRemovalTracerTest {
 
     private OpensearchRemovalTracer classUnderTest;
     private final String NODENAME = "datanode1";
+    private final NodeId nodeId = new SimpleNodeId(NODENAME);
     @Mock
     private OpensearchProcess process;
     @Mock
     RestHighLevelClient restClient;
     @Mock
     ClusterClient clusterClient;
+    @Mock
+    EventBus eventBus;
 
     @Before
     public void setUp() {

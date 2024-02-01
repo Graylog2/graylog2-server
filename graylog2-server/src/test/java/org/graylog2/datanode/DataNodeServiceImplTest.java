@@ -16,6 +16,7 @@
  */
 package org.graylog2.datanode;
 
+import com.google.common.eventbus.EventBus;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
@@ -38,6 +39,8 @@ public class DataNodeServiceImplTest {
 
     @Mock
     private ClusterEventBus clusterEventBus;
+    @Mock
+    private EventBus eventBus;
     private NodeService<DataNodeDto> nodeService;
 
     private DataNodeServiceImpl classUnderTest;
@@ -45,7 +48,7 @@ public class DataNodeServiceImplTest {
     @Before
     public void setUp() {
         this.nodeService = new TestDataNodeNodeClusterService();
-        this.classUnderTest = new DataNodeServiceImpl(clusterEventBus, nodeService);
+        this.classUnderTest = new DataNodeServiceImpl(clusterEventBus, nodeService, eventBus);
     }
 
     private DataNodeDto buildTestNode(String nodeId, DataNodeStatus status) {
