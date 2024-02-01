@@ -25,7 +25,7 @@ import java.util.Locale;
 public class FieldValueSuggestionModeConverter implements Converter<FieldValueSuggestionMode> {
 
     @Override
-    public FieldValueSuggestionMode convertFrom(String value) {
+    public FieldValueSuggestionMode convertFrom(final String value) {
         try {
             return FieldValueSuggestionMode.valueOf(value.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
@@ -34,7 +34,7 @@ public class FieldValueSuggestionModeConverter implements Converter<FieldValueSu
     }
 
     @Override
-    public String convertTo(FieldValueSuggestionMode value) {
+    public String convertTo(final FieldValueSuggestionMode value) {
         return value.name();
     }
 }
