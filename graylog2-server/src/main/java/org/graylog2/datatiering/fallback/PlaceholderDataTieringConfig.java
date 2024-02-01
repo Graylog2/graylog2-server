@@ -14,9 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog2.datatiering.fallback;
 
-import java.util.List;
+import org.graylog2.datatiering.DataTieringConfig;
+import org.joda.time.Period;
 
-public record RemoteReindexResult(List<ReindexResult> results) {
+
+public class PlaceholderDataTieringConfig implements DataTieringConfig {
+
+    @Override
+    public String type() {
+        return "placeholder";
+    }
+
+    @Override
+    public Period indexLifetimeMin() {
+        return Period.ZERO;
+    }
+
+    @Override
+    public Period indexLifetimeMax() {
+        return Period.ZERO;
+    }
 }
