@@ -22,16 +22,25 @@ import java.util.Map;
  * Set of callbacks used during the migration in different states.
  */
 public interface MigrationActions extends WithArgs {
-
-    void resetMigration();
-
-    void migrateIndexTemplates();
-
-    void migrateWithoutDowntime();
-
-    void migrateWithDowntime();
+    boolean runDirectoryCompatibilityCheck();
 
     boolean isOldClusterStopped();
 
     void rollingUpgradeSelected();
+
+    boolean directoryCompatibilityCheckOk();
+
+    void reindexUpgradeSelected();
+
+    boolean reindexingFinished();
+
+    void reindexOldData();
+
+    void stopMessageProcessing();
+
+    void startMessageProcessing();
+    boolean caDoesNotExist();
+    boolean removalPolicyDoesNotExist();
+    boolean caAndRemovalPolicyExist();
+    void resetMigration();
 }
