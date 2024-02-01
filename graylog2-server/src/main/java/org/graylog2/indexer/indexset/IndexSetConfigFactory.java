@@ -17,9 +17,9 @@
 package org.graylog2.indexer.indexset;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
+import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -32,15 +32,15 @@ public class IndexSetConfigFactory {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetConfigFactory.class);
     private final IndexSetsDefaultConfigurationFactory indexSetsDefaultConfigurationFactory;
     private final ClusterConfigService clusterConfigService;
-    private final boolean isCloud;
+    private final DataTieringChecker dataTieringChecker;
 
     @Inject
     public IndexSetConfigFactory(IndexSetsDefaultConfigurationFactory indexSetsDefaultConfigurationFactory,
                                  ClusterConfigService clusterConfigService,
-                                 @Named("is_cloud") boolean isCloud) {
+                                 DataTieringChecker dataTieringChecker) {
         this.indexSetsDefaultConfigurationFactory = indexSetsDefaultConfigurationFactory;
         this.clusterConfigService = clusterConfigService;
-        this.isCloud = isCloud;
+        this.dataTieringChecker = dataTieringChecker;
     }
 
     private static ZonedDateTime getCreationDate() {
@@ -68,6 +68,6 @@ public class IndexSetConfigFactory {
                 .rotationStrategy(defaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())
                 .retentionStrategy(defaultConfig.retentionStrategyConfig())
-                .dataTiering(isCloud ? null : defaultConfig.dataTiering());
+                .dataTiering(dataTieringChecker.isEnabled() ? defaultConfig.dataTiering() : null);
     }
 }
