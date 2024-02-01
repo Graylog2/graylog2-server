@@ -69,11 +69,7 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
               rotated,
             },
       });
-    }).then(() => {
-      onClose();
-
-      return IndexSetsActions.get(indexSetId);
-    });
+    }).then(() => IndexSetsActions.get(indexSetId)).then(() => onClose());
   }, [setIndexSetFieldTypeProfile, indexSetId, rotated, profile, sendTelemetry, telemetryPathName, onClose]);
 
   const onRemoveProfileFromIndex = useCallback(() => {
