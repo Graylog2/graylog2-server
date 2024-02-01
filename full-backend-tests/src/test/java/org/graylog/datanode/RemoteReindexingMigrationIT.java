@@ -16,7 +16,9 @@
  */
 package org.graylog.datanode;
 
+import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
@@ -68,24 +70,11 @@ public class RemoteReindexingMigrationIT {
     }
 
     @ContainerMatrixTest
-    void testRemoteReindexing() throws ExecutionException, RetryException {
-
-        final String indexName = RandomStringUtils.randomAlphanumeric(15).toLowerCase(Locale.ROOT);
-
-        final String messageContent = RandomStringUtils.randomAlphanumeric(20);
-
-        final CreateIndexResponse indexCreationResponse = openSearchInstance.openSearchClient().execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().create(new CreateIndexRequest(indexName), requestOptions));
-        LOG.info("Index {} created in old Opensearch cluster", indexCreationResponse.index());
-
-        final IndexResponse response = openSearchInstance.openSearchClient().execute((restHighLevelClient, requestOptions) -> {
-            final IndexRequest req = new IndexRequest();
-            req.index(indexName);
-            req.source(Map.of("message", messageContent));
-            return restHighLevelClient.index(req, requestOptions);
-        });
-
-
-        LOG.info("Document indexed: " + response);
+    void testRemoteReindexingSync() throws ExecutionException, RetryException {
+        final String indexName = createRandomIndex();
+        final String indexName2 = createRandomIndex();
+        final String messageContent = ingestRandomMessage(indexName);
+        final String messageContent2 = ingestRandomMessage(indexName2);
 
         // flush the newly created document
         openSearchInstance.client().refreshNode();
@@ -93,9 +82,10 @@ public class RemoteReindexingMigrationIT {
         final String request = """
                 {
                     "hostname": "%s",
-                    "indices": ["%s"]
+                    "indices": ["%s", "%s"],
+                    "synchronous": true
                 }
-                """.formatted(openSearchInstance.internalUri(), indexName);
+                """.formatted(openSearchInstance.internalUri(), indexName, indexName2);
 
 
         LOG.info("Requesting remote reindex: " + request);
@@ -103,15 +93,77 @@ public class RemoteReindexingMigrationIT {
         final ValidatableResponse migrationResponse = apis.post("/remote-reindex-migration/remoteReindex", request, 200);
 
         // one document migrated
-        migrationResponse.assertThat().body("results.created", Matchers.hasSize(1));
-        migrationResponse.assertThat().body("results.created", Matchers.contains(1));
+        migrationResponse.assertThat().body("indices", Matchers.hasSize(2));
+        migrationResponse.assertThat().body("indices[0].status", Matchers.equalTo("FINISHED"));
+        migrationResponse.assertThat().body("indices[1].status", Matchers.equalTo("FINISHED"));
 
-        /*
+        Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
+        Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
+    }
 
-        ValidatableResponse status = RetryerBuilder.<ValidatableResponse>newBuilder()
+    @ContainerMatrixTest
+    void testRemoteAsyncReindexing() throws ExecutionException, RetryException {
+
+        final String indexName = createRandomIndex();
+        final String indexName2 = createRandomIndex();
+
+        final String messageContent = ingestRandomMessage(indexName);
+        final String messageContent2 = ingestRandomMessage(indexName2);
+
+        // flush the newly created document
+        openSearchInstance.client().refreshNode();
+
+        final String request = """
+                {
+                    "hostname": "%s",
+                    "indices": ["%s", "%s"],
+                    "synchronous": false
+                }
+                """.formatted(openSearchInstance.internalUri(), indexName, indexName2);
+
+
+        final ValidatableResponse migrationResponse = apis.post("/remote-reindex-migration/remoteReindex", request, 200);
+        final String migrationID = migrationResponse.extract().body().jsonPath().get("id");
+
+        ValidatableResponse response = waitForMigrationFinished(migrationID);
+
+        final String status = response.extract().body().jsonPath().get("status");
+        Assertions.assertThat(status).isEqualTo("FINISHED");
+
+        Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
+        Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
+
+    }
+
+    /**
+     * @return name of the newly created index
+     */
+    private String createRandomIndex() {
+        String indexName = RandomStringUtils.randomAlphanumeric(15).toLowerCase(Locale.ROOT);
+        final CreateIndexResponse response = openSearchInstance.openSearchClient().execute((restHighLevelClient, requestOptions) -> restHighLevelClient.indices().create(new CreateIndexRequest(indexName), requestOptions));
+        return response.index();
+    }
+
+    /**
+     * @return content of the created message. Useful for later verification that the message has been successfully
+     * transferred from old to new cluster.
+     */
+    private String ingestRandomMessage(String indexName) {
+        String messageContent = RandomStringUtils.randomAlphanumeric(20);
+        final IndexResponse response = openSearchInstance.openSearchClient().execute((restHighLevelClient, requestOptions) -> {
+            final IndexRequest req = new IndexRequest();
+            req.index(indexName);
+            req.source(Map.of("message", messageContent));
+            return restHighLevelClient.index(req, requestOptions);
+        });
+        return messageContent;
+    }
+
+    private ValidatableResponse waitForMigrationFinished(String migrationID) throws ExecutionException, RetryException {
+        return RetryerBuilder.<ValidatableResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
-                .retryIfResult(r -> !r.extract().body().asString().equals("FINISHED"))
+                .retryIfResult(r -> !r.extract().body().jsonPath().get("status").equals("FINISHED"))
                 .withRetryListener(new RetryListener() {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
@@ -121,20 +173,15 @@ public class RemoteReindexingMigrationIT {
                         }
                     }
                 }).build()
-                .call(() -> apis.get("/migration/remoteReindex", 200));
+                .call(() -> apis.get("/remote-reindex-migration/status/" + migrationID, 200));
+    }
 
-        Assertions.assertThat(status).isEqualTo("FINISHED");
-
-         */
-
-        final Optional<Map<String, Object>> transferedMessage = RetryerBuilder.<Optional<Map<String, Object>>>newBuilder()
+    private Map<String, Object> waitForMessage(String indexName, String messageContent) throws ExecutionException, RetryException {
+        return RetryerBuilder.<Optional<Map<String, Object>>>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                 .retryIfResult(Optional::isEmpty)
-                .build().call(() -> apis.backend().searchServerInstance().client().findMessage(indexName, "message:" + messageContent));
-
-        Assertions.assertThat(transferedMessage)
-                .isPresent()
-                .hasValueSatisfying(message -> Assertions.assertThat(message.get("message")).isEqualTo(messageContent));
+                .build().call(() -> apis.backend().searchServerInstance().client().findMessage(indexName, "message:" + messageContent))
+                .orElseThrow(() -> new IllegalStateException("Message should be present!"));
     }
 }

@@ -16,8 +16,7 @@
  */
 package org.graylog.plugins.views.storage.migration;
 
-import java.util.concurrent.TimeUnit;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 
-public record ReindexResult(String index, TimeUnit took,
-                            long created, int batches) {
+public record RemoteReindexIndexFinishedEvent(String index, RemoteReindexingMigrationAdapter.Status status) {
 }

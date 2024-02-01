@@ -17,6 +17,7 @@
 package org.graylog2.configuration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -24,6 +25,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.datatiering.fallback.PlaceholderDataTieringConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -39,7 +41,7 @@ import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
  */
 @JsonAutoDetect
 @AutoValue
-@JsonDeserialize(builder = AutoValue_IndexSetsDefaultConfiguration.Builder.class)
+@JsonDeserialize(builder = IndexSetsDefaultConfiguration.Builder.class)
 public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean {
 
     public static final String INDEX_ANALYZER = "index_analyzer";
@@ -57,7 +59,7 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     public static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
 
     public static Builder builder() {
-        return new AutoValue_IndexSetsDefaultConfiguration.Builder();
+        return Builder.create();
     }
 
     @NotBlank
@@ -128,6 +130,13 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
 
     @AutoValue.Builder
     public abstract static class Builder {
+
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_IndexSetsDefaultConfiguration.Builder()
+                    .dataTiering(new PlaceholderDataTieringConfig());
+        }
+
         @JsonProperty(INDEX_ANALYZER)
         public abstract Builder indexAnalyzer(String indexAnalyzer);
 
