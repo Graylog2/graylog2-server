@@ -16,14 +16,14 @@
  */
 package org.graylog2.migrations;
 
+import jakarta.inject.Inject;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
+import org.graylog2.datatiering.fallback.PlaceholderDataTieringConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 
@@ -54,7 +54,7 @@ public class V202211021200_CreateDefaultIndexDefaultsConfig extends Migration {
 
         if (indexSetsDefaultConfiguration == null) {
             indexSetsDefaultConfiguration = factory.create();
-        } else if (indexSetsDefaultConfiguration.dataTiering() == null) {
+        } else if (indexSetsDefaultConfiguration.dataTiering() instanceof PlaceholderDataTieringConfig) {
             LOG.info("Applying data tiering to Indexset defaults");
             indexSetsDefaultConfiguration = factory.addDataTieringDefaults(indexSetsDefaultConfiguration);
         } else {
