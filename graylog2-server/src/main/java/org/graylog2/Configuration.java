@@ -28,6 +28,8 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.collect.Sets;
+import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode;
+import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionModeConverter;
 import org.graylog.security.certutil.CaConfiguration;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
@@ -221,6 +223,9 @@ public class Configuration extends CaConfiguration {
 
     @Parameter(value = "minimum_auto_refresh_interval", required = true)
     private Period minimumAutoRefreshInterval = Period.seconds(1);
+
+    @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
+    private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
@@ -443,6 +448,10 @@ public class Configuration extends CaConfiguration {
 
     public Period getMinimumAutoRefreshInterval() {
         return minimumAutoRefreshInterval;
+    }
+
+    public FieldValueSuggestionMode getFieldValueSuggestionMode() {
+        return fieldValueSuggestionMode;
     }
 
     /**
