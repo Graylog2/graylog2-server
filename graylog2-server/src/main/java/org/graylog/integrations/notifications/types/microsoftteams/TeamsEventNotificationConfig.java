@@ -33,7 +33,9 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.NotBlank;
+
 import java.net.URI;
 import java.util.Locale;
 import java.util.regex.Pattern;

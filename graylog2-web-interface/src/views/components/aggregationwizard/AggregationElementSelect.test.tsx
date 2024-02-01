@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import AggregationElementSelect from './AggregationElementSelect';
@@ -54,6 +54,10 @@ describe('AggregationElementSelect', () => {
 
     expect(onSelectMock).toHaveBeenCalledTimes(1);
     expect(onSelectMock).toHaveBeenCalledWith('metrics');
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: 'Metric' })).not.toBeInTheDocument();
+    });
   });
 
   it('should not list already configured aggregation elements which can not be configured multiple times', async () => {
@@ -63,7 +67,8 @@ describe('AggregationElementSelect', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
 
+    await screen.findByRole('menuitem', { name: 'Metric' });
+
     expect(screen.queryByText('Sort')).not.toBeInTheDocument();
-    expect(screen.getByText('Metric')).toBeInTheDocument();
   });
 });

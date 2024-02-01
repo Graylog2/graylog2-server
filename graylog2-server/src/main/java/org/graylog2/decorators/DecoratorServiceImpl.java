@@ -25,7 +25,8 @@ import org.graylog2.database.NotFoundException;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,8 +52,8 @@ public class DecoratorServiceImpl implements DecoratorService {
     @Override
     public List<Decorator> findForGlobal() {
         return toInterfaceList(coll.find(DBQuery.or(
-            DBQuery.notExists(DecoratorImpl.FIELD_STREAM),
-            DBQuery.is(DecoratorImpl.FIELD_STREAM, Optional.empty())
+                DBQuery.notExists(DecoratorImpl.FIELD_STREAM),
+                DBQuery.is(DecoratorImpl.FIELD_STREAM, Optional.empty())
         )).toArray());
     }
 
@@ -85,7 +86,7 @@ public class DecoratorServiceImpl implements DecoratorService {
     public Decorator save(Decorator decorator) {
         checkArgument(decorator instanceof DecoratorImpl, "Argument must be an instance of DecoratorImpl, not %s", decorator.getClass());
         if (!Strings.isNullOrEmpty(decorator.id())) {
-            this.coll.updateById(decorator.id(), (DecoratorImpl)decorator);
+            this.coll.updateById(decorator.id(), (DecoratorImpl) decorator);
             return this.coll.findOneById(decorator.id());
         }
         return this.coll.save((DecoratorImpl) decorator).getSavedObject();

@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve migration and error handling for event definitions that are missing a field value."
+
+issues = ["17367"]
+pulls = [""]

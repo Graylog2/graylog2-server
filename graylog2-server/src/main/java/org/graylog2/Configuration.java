@@ -28,6 +28,8 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.collect.Sets;
+import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode;
+import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionModeConverter;
 import org.graylog.security.certutil.CaConfiguration;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
@@ -35,6 +37,7 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
+import org.graylog2.plugin.Tools;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
@@ -64,7 +67,7 @@ public class Configuration extends CaConfiguration {
 
     /**
      * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
-     * use @{@link javax.inject.Named} injection but the getter isLeader() instead.
+     * use @{@link jakarta.inject.Named} injection but the getter isLeader() instead.
      **/
     @Parameter(value = "is_leader")
     private Boolean isLeader;
@@ -79,7 +82,7 @@ public class Configuration extends CaConfiguration {
     private int outputFlushInterval = 1;
 
     @Parameter(value = "outputbuffer_processors", required = true, validators = PositiveIntegerValidator.class)
-    private int outputBufferProcessors = 3;
+    private int outputBufferProcessors = defaultNumberOfOutputBufferProcessors();
 
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
@@ -134,7 +137,7 @@ public class Configuration extends CaConfiguration {
     private int staleMasterTimeout = 2000;
 
     /**
-     * Don't use @{@link javax.inject.Named} injection but the getter getStaleLeaderTimeout() instead.
+     * Don't use @{@link jakarta.inject.Named} injection but the getter getStaleLeaderTimeout() instead.
      **/
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout;
@@ -227,6 +230,9 @@ public class Configuration extends CaConfiguration {
 
     @Parameter(value = "minimum_auto_refresh_interval", required = true)
     private Period minimumAutoRefreshInterval = Period.seconds(1);
+
+    @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
+    private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
@@ -451,6 +457,10 @@ public class Configuration extends CaConfiguration {
         return minimumAutoRefreshInterval;
     }
 
+    public FieldValueSuggestionMode getFieldValueSuggestionMode() {
+        return fieldValueSuggestionMode;
+    }
+
     /**
      * This is needed for backwards compatibility. The setting in TLSProtocolsConfiguration should be used instead.
      */
@@ -562,4 +572,34 @@ public class Configuration extends CaConfiguration {
             throw new ValidationException("Node ID file at path " + path + " isn't " + b + ". Please specify the correct path or change the permissions");
         }
     }
+
+    /**
+     * Calculate the default number of output buffer processors as a linear function of available CPU cores.
+     * The function is designed to yield predetermined values for the following select numbers of CPU cores that
+     * have proven to work well in real-world production settings:
+     * <table>
+     *     <tr>
+     *         <th># CPU cores</th><th># buffer processors</th>
+     *     </tr>
+     *     <tr>
+     *         <td>2</td><td>1</td>
+     *     </tr>
+     *     <tr>
+     *         <td>4</td><td>1</td>
+     *     </tr>
+     *     <tr>
+     *         <td>8</td><td>2</td>
+     *     </tr>
+     *     <tr>
+     *         <td>12</td><td>3</td>
+     *     </tr>
+     *     <tr>
+     *         <td>16</td><td>3</td>
+     *     </tr>
+     * </table>
+     */
+    private static int defaultNumberOfOutputBufferProcessors() {
+        return Math.round(Tools.availableProcessors() * 0.162f + 0.625f);
+    }
+
 }

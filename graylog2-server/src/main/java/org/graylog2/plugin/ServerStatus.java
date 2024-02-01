@@ -30,9 +30,10 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -160,6 +161,7 @@ public class ServerStatus {
      * Blocks until the server enters the RUNNING state and then executes the given Runnable.
      * <p>
      * <b>This method is not interruptible while waiting for the server to enter the RUNNING state.</b>
+     *
      * @deprecated Preferably use {@link #awaitRunning()} instead, which is interruptible.
      */
     @Deprecated
@@ -178,8 +180,9 @@ public class ServerStatus {
 
     /**
      * Blocks until the server enters the RUNNING state.
+     *
      * @throws InterruptedException if the thread is interrupted while waiting for the server to enter the RUNNING
-     * state.
+     *                              state.
      */
     public void awaitRunning() throws InterruptedException {
         runningLatch.await();

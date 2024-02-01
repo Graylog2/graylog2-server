@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
@@ -27,8 +28,9 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,14 +45,17 @@ public class SearchRequestFactory {
     private final SortOrderMapper sortOrderMapper;
     private final boolean allowHighlighting;
     private final boolean allowLeadingWildcardSearches;
+    private final UsedSearchFiltersToQueryStringsMapper searchFiltersMapper;
 
     @Inject
     public SearchRequestFactory(SortOrderMapper sortOrderMapper,
                                 @Named("allow_highlighting") boolean allowHighlighting,
-                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcardSearches) {
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcardSearches,
+                                UsedSearchFiltersToQueryStringsMapper searchFiltersMapper) {
         this.sortOrderMapper = sortOrderMapper;
         this.allowHighlighting = allowHighlighting;
         this.allowLeadingWildcardSearches = allowLeadingWildcardSearches;
+        this.searchFiltersMapper = searchFiltersMapper;
     }
 
     public SearchSourceBuilder create(SearchesConfig config) {
@@ -87,6 +92,11 @@ public class SearchRequestFactory {
 
         applyStreamsFilter(filteredQueryBuilder, searchCommand);
 
+        searchFiltersMapper.map(searchCommand.filters())
+                .stream()
+                .map(this::translateQueryString)
+                .forEach(filteredQueryBuilder::filter);
+
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filteredQueryBuilder)
                 .trackTotalHits(true);
@@ -98,6 +108,12 @@ public class SearchRequestFactory {
         applyHighlighting(searchSourceBuilder, searchCommand);
 
         return searchSourceBuilder;
+    }
+
+    private QueryBuilder translateQueryString(String queryString) {
+        return (queryString.isEmpty() || queryString.trim().equals("*"))
+                ? QueryBuilders.matchAllQuery()
+                : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcardSearches);
     }
 
     private void applyHighlighting(SearchSourceBuilder searchSourceBuilder, SearchCommand searchCommand) {

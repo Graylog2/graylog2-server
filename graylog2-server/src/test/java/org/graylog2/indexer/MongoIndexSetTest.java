@@ -64,21 +64,7 @@ public class MongoIndexSetTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
-
-    @Mock
-    private Indices indices;
-    @Mock
-    private AuditEventSender auditEventSender;
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-    @Mock
-    private IndexRangeService indexRangeService;
-    @Mock
-    private SystemJobManager systemJobManager;
-    @Mock
-    private SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
-    @Mock
-    private ActivityWriter activityWriter;
-
     private final IndexSetConfig config = IndexSetConfig.create(
             "Test",
             "Test",
@@ -97,7 +83,18 @@ public class MongoIndexSetTest {
             1,
             false
     );
-
+    @Mock
+    private Indices indices;
+    @Mock
+    private AuditEventSender auditEventSender;
+    @Mock
+    private IndexRangeService indexRangeService;
+    @Mock
+    private SystemJobManager systemJobManager;
+    @Mock
+    private SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
+    @Mock
+    private ActivityWriter activityWriter;
     private MongoIndexSet mongoIndexSet;
 
     @Before
@@ -110,6 +107,7 @@ public class MongoIndexSetTest {
         assertThat(mongoIndexSet.extractIndexNumber("graylog_0")).contains(0);
         assertThat(mongoIndexSet.extractIndexNumber("graylog_4")).contains(4);
         assertThat(mongoIndexSet.extractIndexNumber("graylog_52")).contains(52);
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_warm_1")).contains(1);
     }
 
     @Test

@@ -26,7 +26,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -61,7 +62,7 @@ public class V20230531135500_MigrateRemoveObsoleteItemsFromGrantsCollection exte
         final Set<String> names = new HashSet();
         mongoConnection.getMongoDatabase().listCollectionNames().forEach(names::add);
 
-        if(names.contains(DBGrantService.COLLECTION_NAME)) {
+        if (names.contains(DBGrantService.COLLECTION_NAME)) {
             var query = new BasicDBObject("target", Pattern.compile("^grn::::favorite:"));
             mongoConnection.getMongoDatabase().getCollection(DBGrantService.COLLECTION_NAME).deleteMany(query);
             query = new BasicDBObject("target", Pattern.compile("^grn::::last_opened:"));

@@ -24,8 +24,9 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 

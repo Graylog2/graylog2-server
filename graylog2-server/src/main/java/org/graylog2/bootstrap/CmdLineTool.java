@@ -45,6 +45,8 @@ import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
+import com.unboundid.util.ssl.SSLUtil;
+import com.unboundid.util.ssl.TLSCipherSuiteSelector;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.apache.logging.log4j.Level;
@@ -221,7 +223,7 @@ public abstract class CmdLineTool implements CliCommand {
         final Set<String> tlsProtocols = configuration.getConfiguredTlsProtocols();
         final List<String> disabledAlgorithms = Stream.of(Security.getProperty("jdk.tls.disabledAlgorithms").split(",")).map(String::trim).collect(Collectors.toList());
 
-        // Only restrict ciphers if insecure TLS protocols are explicitly enabled.
+        // Only restrict ciphers if weak / insecure TLS protocols are explicitly enabled.
         // c.f. https://github.com/Graylog2/graylog2-server/issues/10944
         if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1"))) {
             disabledAlgorithms.addAll(ImmutableSet.of("CBC", "3DES"));
@@ -238,7 +240,11 @@ public abstract class CmdLineTool implements CliCommand {
                     .filter(p -> !reEnabledTLSProtocols.contains(p))
                     .collect(Collectors.toList());
 
+            // This is only effective when it is set before the static initializer of sun.security.ssl.Ciphersuite is executed.
             Security.setProperty("jdk.tls.disabledAlgorithms", String.join(", ", updatedProperties));
+
+            // https://github.com/pingidentity/ldapsdk/commit/837b8f0fe2947e64fcee0209e9b8ef713028515e
+            SSLUtil.setEnabledSSLCipherSuites(TLSCipherSuiteSelector.getSupportedCipherSuites());
         }
 
         // Explicitly register Bouncy Castle as security provider.

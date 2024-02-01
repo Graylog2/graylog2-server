@@ -17,16 +17,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { OrderedSet } from 'immutable';
 
 import UserNotification from 'util/UserNotification';
-import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, MenuItem } from 'components/bootstrap';
+import { Nav, NavItem, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
@@ -73,6 +72,10 @@ const CLASS_HIDDEN = 'hidden';
 const CLASS_LOCKED = 'locked';
 const CLASS_ACTIVE = 'active';
 const NAV_PADDING = 15;
+const TAB_MENU_ITEM_CLASS = 'tab-menu-item';
+const MORE_TABS_BUTTON_CLASS = 'query-tabs-more';
+const MORE_TABS_LI_CLASS = 'query-tabs-more-li';
+const NEW_TAB_BUTTON_CLASS = 'query-tab-create';
 
 const Container = styled.div`
   display: flex;
@@ -126,22 +129,48 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
       }
     }
 
-    > li.query-tabs-more,
-    > li.query-tabs-more a {
+    > li.${MORE_TABS_BUTTON_CLASS},
+    > li.${MORE_TABS_BUTTON_CLASS} a {
       cursor: pointer;
     }
   }
 `);
 
-const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
+const QueryTab = styled(NavItem)`
+  &&&&.active > a {
+    padding: 6px 15px 9px;
+  }
+`;
+
+const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
+  <li className={MORE_TABS_LI_CLASS}>
+    <DropdownButton title={<Icon name="ellipsis-h" />}
+                    className={MORE_TABS_BUTTON_CLASS}
+                    id="query-tabs-more"
+                    aria-label="More Dashboard Pages"
+                    noCaret
+                    bsStyle="link"
+                    keepMounted
+                    pullRight>
+      {menuItems.toArray()}
+    </DropdownButton>
+  </li>
+);
+
+const adjustTabsVisibility = (
+  maxWidth: number,
+  lockedTab: string | undefined,
+  setLockedTab: React.Dispatch<React.SetStateAction<string>>,
+  queriesConfigBtn: HTMLElement | null,
+) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
-  const tabItems = dashboardTabs.querySelectorAll(':scope > li:not(.dropdown):not(.query-tabs-new)') as NodeListOf<HTMLElement>;
-  const moreItems = dashboardTabs.querySelectorAll('li.dropdown .dropdown-menu li') as NodeListOf<HTMLElement>;
-  const moreBtn = dashboardTabs.querySelector('li.query-tabs-more') as HTMLElement;
-  const newBtn = dashboardTabs.querySelector('li.query-tabs-new') as HTMLElement;
+  const tabItems = dashboardTabs.querySelectorAll(`:scope > li:not(.${MORE_TABS_LI_CLASS}):not(.${NEW_TAB_BUTTON_CLASS})`) as NodeListOf<HTMLElement>;
+  const moreItems = dashboardTabs.querySelectorAll(`li.${MORE_TABS_LI_CLASS} [role="menu"] a.${TAB_MENU_ITEM_CLASS}`) as NodeListOf<HTMLElement>;
+  const moreBtn = dashboardTabs.querySelector(`.${MORE_TABS_BUTTON_CLASS}`) as HTMLElement;
+  const newBtn = dashboardTabs.querySelector(`.${NEW_TAB_BUTTON_CLASS}`) as HTMLElement;
   const hiddenItems = [];
 
-  let buttonsWidth = moreBtn.offsetWidth + newBtn.offsetWidth + NAV_PADDING;
+  let buttonsWidth = moreBtn.offsetWidth + newBtn.offsetWidth + (queriesConfigBtn?.offsetWidth ?? 0) + NAV_PADDING;
   let topTabsWidth = 0;
 
   tabItems.forEach((tabItem) => {
@@ -181,8 +210,7 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
       tabItem.classList.add(CLASS_HIDDEN);
       tabItem.setAttribute('aria-hidden', 'true');
     } else if (tabItem.classList.contains(CLASS_ACTIVE)) {
-      const { tabId } = tabItem.querySelector('a').dataset;
-
+      const { tabId } = tabItem.dataset;
       setLockedTab(tabId);
     }
   });
@@ -244,7 +272,6 @@ const AdaptableQueryTabs = ({
   maxWidth,
   queries,
   titles,
-  activeQueryId,
   onRemove,
   onSelect,
   queryTitleEditModal,
@@ -252,14 +279,14 @@ const AdaptableQueryTabs = ({
 }: Props) => {
   const view = useView();
   const isNew = useIsNew();
-  const queryId = useCurrentQueryId();
-  const [openedMore, setOpenedMore] = useState<boolean>(false);
+  const activeQueryId = useCurrentQueryId();
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
+  const queriesConfigBtn = useRef(null);
 
   const toggleCopyToDashboardModal = useCallback(() => {
     setShowCopyToDashboardModal((cur) => !cur);
@@ -271,7 +298,7 @@ const AdaptableQueryTabs = ({
       UserNotification.error(`Copying dashboard page failed with error ${error}`);
     }), [dispatch, history]);
 
-  const onCreateNewDashboard = () => _onCreateNewDashboard(view, queryId, history);
+  const onCreateNewDashboard = () => _onCreateNewDashboard(view, activeQueryId, history);
 
   const openTitleEditModal = useCallback((activeQueryTitle: string) => {
     if (queryTitleEditModal) {
@@ -298,20 +325,22 @@ const AdaptableQueryTabs = ({
       );
 
       navItems = navItems.add(lockedTab === id ? null : (
-        <NavItem eventKey={id}
-                 key={id}
-                 data-tab-id={id}
-                 onClick={() => {
-                   setLockedTab(undefined);
-                   onSelect(id);
-                 }}>
+        <QueryTab eventKey={id}
+                  key={id}
+                  data-tab-id={id}
+                  onClick={() => {
+                    setLockedTab(undefined);
+                    onSelect(id);
+                  }}>
           {tabTitle}
-        </NavItem>
+        </QueryTab>
       ));
 
       menuItems = menuItems.add(lockedTab === id ? null : (
         <MenuItem eventKey={id}
                   key={id}
+                  component="a"
+                  className={`${TAB_MENU_ITEM_CLASS} ${activeQueryId === id ? CLASS_ACTIVE : ''}`}
                   data-tab-id={id}
                   onClick={() => {
                     setLockedTab(id);
@@ -322,13 +351,13 @@ const AdaptableQueryTabs = ({
       ));
 
       lockedItems = lockedItems.add(lockedTab !== id ? null : (
-        <NavItem eventKey={id}
-                 key={id}
-                 data-tab-id={id}
-                 onClick={() => onSelect(id)}
-                 className={CLASS_LOCKED}>
+        <QueryTab eventKey={id}
+                  key={id}
+                  data-tab-id={id}
+                  onClick={() => onSelect(id)}
+                  className={CLASS_LOCKED}>
           {tabTitle}
-        </NavItem>
+        </QueryTab>
       ));
 
       queriesList = queriesList.add({ id, title });
@@ -338,7 +367,7 @@ const AdaptableQueryTabs = ({
   }, [queries, titles, activeQueryId, openTitleEditModal, toggleCopyToDashboardModal, lockedTab, onRemove, onSelect]);
 
   useEffect(() => {
-    adjustTabsVisibility(maxWidth, lockedTab, setLockedTab);
+    adjustTabsVisibility(maxWidth, lockedTab, setLockedTab, queriesConfigBtn.current);
   }, [maxWidth, lockedTab, activeQueryId]);
 
   return (
@@ -346,39 +375,30 @@ const AdaptableQueryTabs = ({
       <StyledQueryNav bsStyle="tabs" activeKey={activeQueryId} id="dashboard-tabs">
         {currentTabs.navItems.toArray()}
 
-        <NavDropdown eventKey="more"
-                     title={<Icon name="ellipsis-h" />}
-                     className="query-tabs-more"
-                     id="query-tabs-more"
-                     aria-label="More Dashboard Pages"
-                     noCaret
-                     pullRight
-                     active={openedMore}
-                     open={openedMore}
-                     onToggle={(isOpened) => setOpenedMore(isOpened)}>
-          {currentTabs.menuItems.toArray()}
-        </NavDropdown>
+        <MoreTabsLi menuItems={currentTabs.menuItems} />
 
         {currentTabs.lockedItems.toArray()}
 
-        <NavItem key="new"
-                 eventKey="new"
-                 title="Create New Page"
-                 onClick={() => {
-                   sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
-                     app_pathname: 'dashboard',
-                     app_section: 'dashboard',
-                     app_action_value: 'dashboard-create-page-button',
-                   });
+        <QueryTab key="new"
+                  eventKey="new"
+                  title="Create New Page"
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
+                      app_pathname: 'dashboard',
+                      app_section: 'dashboard',
+                      app_action_value: 'dashboard-create-page-button',
+                    });
 
-                   onSelect('new');
-                 }}
-                 className="query-tabs-new">
+                    onSelect('new');
+                  }}
+                  className={NEW_TAB_BUTTON_CLASS}>
           <Icon name="plus" />
-        </NavItem>
+        </QueryTab>
       </StyledQueryNav>
       <IconButton title="Open pages configuration"
                   name="cog"
+                  ref={queriesConfigBtn}
+                  className="query-config-btn"
                   onClick={() => {
                     sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION, {
                       app_pathname: 'dashboard',
@@ -411,7 +431,6 @@ AdaptableQueryTabs.propTypes = {
   maxWidth: PropTypes.number.isRequired,
   queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   titles: PropTypes.object.isRequired,
-  activeQueryId: PropTypes.string.isRequired,
   onRemove: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   queryTitleEditModal: PropTypes.oneOfType([

@@ -34,7 +34,7 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
-import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
 
@@ -58,6 +58,7 @@ public class ElasticsearchConfiguration {
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE = "time_size_optimizing_rotation_min_shard_size";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE = "time_size_optimizing_rotation_max_shard_size";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_PERIOD = "time_size_optimizing_rotation_period";
+    public static final String ALLOW_FLEXIBLE_RETENTION_PERIOD = "allow_flexible_retention_period";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String defaultIndexPrefix = "graylog";
@@ -129,13 +130,16 @@ public class ElasticsearchConfiguration {
     private Size timeSizeOptimizingRotationMaxShardSize = Size.gigabytes(50);
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME)
-    private Period timeSizeOptimizingRetentionMinLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MIN;
+    private Period timeSizeOptimizingRetentionMinLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MIN;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME)
-    private Period timeSizeOptimizingRetentionMaxLifeTime = TimeBasedSizeOptimizingStrategyConfig.DEFAULT_LIFETIME_MAX;
+    private Period timeSizeOptimizingRetentionMaxLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MAX;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY)
     private Period timeSizeOptimizingRetentionFixedLeeway;
+
+    @Parameter(value = ALLOW_FLEXIBLE_RETENTION_PERIOD)
+    private boolean allowFlexibleRetentionPeriod = false;
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -163,17 +167,15 @@ public class ElasticsearchConfiguration {
      */
     @Parameter(value = MAX_INDEX_RETENTION_PERIOD)
     private Period maxIndexRetentionPeriod = null;
+    @Parameter(value = "elasticsearch_index_optimization_timeout", validators = DurationCastedToIntegerValidator.class)
+    private Duration indexOptimizationTimeout = Duration.hours(1L);
+    @Parameter(value = "elasticsearch_index_optimization_jobs", validators = PositiveIntegerValidator.class)
+    private int indexOptimizationJobs = 10;
 
     @Nullable
     public Period getMaxIndexRetentionPeriod() {
         return maxIndexRetentionPeriod;
     }
-
-    @Parameter(value = "elasticsearch_index_optimization_timeout", validators = DurationCastedToIntegerValidator.class)
-    private Duration indexOptimizationTimeout = Duration.hours(1L);
-
-    @Parameter(value = "elasticsearch_index_optimization_jobs", validators = PositiveIntegerValidator.class)
-    private int indexOptimizationJobs = 10;
 
     public String getDefaultIndexPrefix() {
         return defaultIndexPrefix.toLowerCase(Locale.ENGLISH);
@@ -296,6 +298,10 @@ public class ElasticsearchConfiguration {
 
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
+    }
+
+    public boolean allowFlexibleRetentionPeriod() {
+        return allowFlexibleRetentionPeriod;
     }
 
     @ValidatorMethod

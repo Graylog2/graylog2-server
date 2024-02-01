@@ -26,9 +26,11 @@ import freemarker.template.TemplateExceptionHandler;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 
-import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -119,6 +121,7 @@ public class SystemNotificationRenderService {
     public class RenderResponse {
         public String title;
         public String description;
+
         public RenderResponse(String title, String description) {
             this.title = title;
             this.description = description;

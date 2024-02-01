@@ -24,6 +24,8 @@ import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
@@ -37,6 +39,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin.INDEX;
+import static org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin.OVERRIDDEN_INDEX;
+import static org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin.PROFILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -54,10 +59,17 @@ class IndexFieldTypesListServiceTest {
     IndexSetService indexSetService;
     @Mock
     MongoIndexSet.Factory indexSetFactory;
+    @Mock
+    IndexFieldTypeProfileService profileService;
 
     @BeforeEach
     void setUp() {
-        toTest = new IndexFieldTypesListService(indexFieldTypesService, indexSetService, indexSetFactory, new FieldTypeDTOsMerger(), new InMemoryFilterExpressionParser());
+        toTest = new IndexFieldTypesListService(indexFieldTypesService,
+                indexSetService,
+                indexSetFactory,
+                new FieldTypeDTOsMerger(),
+                new InMemoryFilterExpressionParser(),
+                profileService);
     }
 
     @Test
@@ -119,10 +131,19 @@ class IndexFieldTypesListServiceTest {
     void testMergesFieldsFromAllSourcesWhenRetrievingPage() {
         IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         doReturn(Optional.of(indexSetConfig)).when(indexSetService).get("I_am_fine!");
+        doReturn("profile_id").when(indexSetConfig).fieldTypeProfile();
+
         final CustomFieldMappings customFieldMappings = new CustomFieldMappings(
                 List.of(new CustomFieldMapping("field_1", "ip"))
         );
         doReturn(customFieldMappings).when(indexSetConfig).customFieldMappings();
+
+        final CustomFieldMappings profileMappings = new CustomFieldMappings(
+                List.of(new CustomFieldMapping("field_2", "date"))
+        );
+        final IndexFieldTypeProfile profile = new IndexFieldTypeProfile("profile_id", "profile_name", "profile_descr", profileMappings);
+        doReturn(Optional.of(profile)).when(profileService).get("profile_id");
+
         MongoIndexSet indexSet = mock(MongoIndexSet.class);
         doReturn("graylog_42").when(indexSet).getActiveWriteIndex();
         doReturn("graylog_41").when(indexSet).getNthIndexBeforeActiveIndexSet(1);
@@ -151,35 +172,35 @@ class IndexFieldTypesListServiceTest {
         PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "", List.of(), 0, 2, "field_name", Sorting.Direction.ASC);
         assertThat(response.elements())
                 .containsExactly(
-                        new IndexSetFieldType("field_1", "ip", true, false),
-                        new IndexSetFieldType("field_2", "long", false, false)
+                        new IndexSetFieldType("field_1", "ip", OVERRIDDEN_INDEX, false),
+                        new IndexSetFieldType("field_2", "date", PROFILE, false)
                 );
         List<IndexSetFieldType> allResponse = toTest.getIndexSetFieldTypesList("I_am_fine!", "", List.of(), "field_name", Sorting.Direction.ASC);
         assertThat(allResponse)
                 .containsExactly(
-                        new IndexSetFieldType("field_1", "ip", true, false),
-                        new IndexSetFieldType("field_2", "long", false, false),
-                        new IndexSetFieldType("field_3", "ip", false, false),
-                        new IndexSetFieldType("field_4", "string", false, false),
-                        new IndexSetFieldType("field_5", "string_fts", false, false)
+                        new IndexSetFieldType("field_1", "ip", OVERRIDDEN_INDEX, false),
+                        new IndexSetFieldType("field_2", "date", PROFILE, false),
+                        new IndexSetFieldType("field_3", "ip", INDEX, false),
+                        new IndexSetFieldType("field_4", "string", INDEX, false),
+                        new IndexSetFieldType("field_5", "string_fts", INDEX, false)
                 );
 
 
-        response = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "", List.of(), 0, 2, "field_name", Sorting.Direction.DESC);
-        assertThat(response.elements())
+        PageListResponse<IndexSetFieldType> descendingResponse = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "", List.of(), 0, 2, "field_name", Sorting.Direction.DESC);
+        assertThat(descendingResponse.elements())
                 .containsExactly(
-                        new IndexSetFieldType("field_5", "string_fts", false, false),
-                        new IndexSetFieldType("field_4", "string", false, false)
+                        new IndexSetFieldType("field_5", "string_fts", INDEX, false),
+                        new IndexSetFieldType("field_4", "string", INDEX, false)
                 );
 
-        allResponse = toTest.getIndexSetFieldTypesList("I_am_fine!", "", List.of(), "field_name", Sorting.Direction.DESC);
-        assertThat(allResponse)
+        List<IndexSetFieldType> descendingAllResponse = toTest.getIndexSetFieldTypesList("I_am_fine!", "", List.of(), "field_name", Sorting.Direction.DESC);
+        assertThat(descendingAllResponse)
                 .containsExactly(
-                        new IndexSetFieldType("field_5", "string_fts", false, false),
-                        new IndexSetFieldType("field_4", "string", false, false),
-                        new IndexSetFieldType("field_3", "ip", false, false),
-                        new IndexSetFieldType("field_2", "long", false, false),
-                        new IndexSetFieldType("field_1", "ip", true, false)
+                        new IndexSetFieldType("field_5", "string_fts", INDEX, false),
+                        new IndexSetFieldType("field_4", "string", INDEX, false),
+                        new IndexSetFieldType("field_3", "ip", INDEX, false),
+                        new IndexSetFieldType("field_2", "date", PROFILE, false),
+                        new IndexSetFieldType("field_1", "ip", OVERRIDDEN_INDEX, false)
                 );
 
 
@@ -210,11 +231,11 @@ class IndexFieldTypesListServiceTest {
                 .when(indexFieldTypesService)
                 .findOneByIndexName("graylog_0");
 
-        PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "field", List.of("type:long", "is_custom:false"), 0, 50, "field_name", Sorting.Direction.ASC);
+        PageListResponse<IndexSetFieldType> response = toTest.getIndexSetFieldTypesListPage("I_am_fine!", "field", List.of("type:long", "origin:INDEX"), 0, 50, "field_name", Sorting.Direction.ASC);
         assertThat(response.elements())
                 .containsExactly(
-                        new IndexSetFieldType("field_1", "long", false, false),
-                        new IndexSetFieldType("field_2", "long", false, false)
+                        new IndexSetFieldType("field_1", "long", INDEX, false),
+                        new IndexSetFieldType("field_2", "long", INDEX, false)
                 );
 
     }

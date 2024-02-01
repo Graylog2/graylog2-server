@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import React from 'react';
 import Immutable, { Map } from 'immutable';
 import userEvent from '@testing-library/user-event';
@@ -23,9 +23,13 @@ import userEvent from '@testing-library/user-event';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
+import { asMock } from 'helpers/mocking';
 
 import OriginalAdaptableQueryTabs from './AdaptableQueryTabs';
 import type QueryTitleEditModal from './queries/QueryTitleEditModal';
+
+jest.mock('views/logic/queries/useCurrentQueryId');
 
 jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
   data: {
@@ -49,14 +53,13 @@ Object.defineProperties(window.HTMLElement.prototype, {
 });
 
 const DEFAULT_PROPS = {
-  maxWidth: 500,
+  maxWidth: 600,
   queries: Immutable.OrderedSet(['query-id-1', 'query-id-2', 'query-id-3', 'query-id-4']),
   titles: Immutable.Map<string, string>([['query-id-1', 'Tab 1'], ['query-id-2', 'Tab 2'], ['query-id-3', 'Tab 3'], ['query-id-4', 'Tab 4']]),
   onRemove: () => Promise.resolve(),
   onTitleChange: () => Promise.resolve(Map(['tab', Map(['query-id-1', 'Tab 1'])]) as TitlesMap),
   onSelect: (id: string) => Promise.resolve(id),
   queryTitleEditModal: React.createRef<QueryTitleEditModal>(),
-  activeQueryId: 'query-id-1',
   dashboardId: 'dashboard-id',
 };
 
@@ -70,6 +73,16 @@ describe('AdaptableQueryTabs', () => {
   const mainTabRole = 'button';
   const dropdownTabRole = 'menuitem';
 
+  const openMoreTabsDropdown = async () => {
+    await userEvent.click(await screen.findByRole('button', { name: /more dashboard pages/i }));
+    await screen.findByRole('menu');
+  };
+
+  const closeMoreTabsDropdown = async () => {
+    userEvent.keyboard('{esc}');
+    await waitFor(() => expect(screen.getByRole('menu')).not.toBeVisible());
+  };
+
   const finishInitialRender = async () => {
     await screen.findByRole('menuitem', {
       name: 'Tab 4',
@@ -78,6 +91,10 @@ describe('AdaptableQueryTabs', () => {
   };
 
   beforeAll(loadViewsPlugin);
+
+  beforeEach(() => {
+    asMock(useCurrentQueryId).mockReturnValue('query-id-1');
+  });
 
   afterAll(unloadViewsPlugin);
 
@@ -92,6 +109,7 @@ describe('AdaptableQueryTabs', () => {
       const dropdownTabs = [3, 4];
 
       await finishInitialRender();
+      await openMoreTabsDropdown();
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
@@ -100,10 +118,9 @@ describe('AdaptableQueryTabs', () => {
         })).toBeInTheDocument();
 
         // Does not display main tabs in dropdown
-        expect(screen.getByRole(dropdownTabRole, {
+        expect(screen.queryByRole(dropdownTabRole, {
           name: `Tab ${tabNr}`,
-          hidden: true,
-        })).toBeInTheDocument();
+        })).not.toBeInTheDocument();
       });
 
       // Displays dropdown tabs
@@ -113,11 +130,12 @@ describe('AdaptableQueryTabs', () => {
         })).toBeInTheDocument();
 
         // Does not display tabs in dropdown as main tabs
-        expect(screen.getByRole(mainTabRole, {
+        expect(screen.queryByRole(mainTabRole, {
           name: `Tab ${tabNr}`,
-          hidden: true,
-        })).toBeInTheDocument();
+        })).not.toBeInTheDocument();
       });
+
+      await closeMoreTabsDropdown();
     });
 
     it('displays all tabs as main tabs if they fit in container row', async () => {
@@ -129,6 +147,8 @@ describe('AdaptableQueryTabs', () => {
         name: /Tab 4/i,
       });
 
+      await openMoreTabsDropdown();
+
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
         expect(screen.getByRole(mainTabRole, {
@@ -136,11 +156,12 @@ describe('AdaptableQueryTabs', () => {
         })).toBeInTheDocument();
 
         // Does not display main tabs in dropdown
-        expect(screen.getByRole(dropdownTabRole, {
+        expect(screen.queryByRole(dropdownTabRole, {
           name: `Tab ${tabNr}`,
-          hidden: true,
-        })).toBeInTheDocument();
+        })).not.toBeInTheDocument();
       });
+
+      await closeMoreTabsDropdown();
     });
 
     it('displays all tabs as main tabs if they fit in container row after resizing', async () => {
@@ -161,21 +182,15 @@ describe('AdaptableQueryTabs', () => {
         expect(screen.getByRole(mainTabRole, {
           name: `Tab ${tabNr}`,
         })).toBeInTheDocument();
-
-        // Does not display main tabs in dropdown
-        expect(screen.getByRole(dropdownTabRole, {
-          name: `Tab ${tabNr}`,
-          hidden: true,
-        })).toBeInTheDocument();
       });
     });
 
     it('tab in dropdown is being displayed as main tab after selection', async () => {
       const { rerender } = render(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
-
       await finishInitialRender();
 
-      rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} activeQueryId="query-id-4" />);
+      asMock(useCurrentQueryId).mockReturnValue('query-id-4');
+      rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
 
       const newActiveTab = await screen.findByRole(mainTabRole, {
         name: 'Tab 4',
@@ -192,22 +207,17 @@ describe('AdaptableQueryTabs', () => {
 
       const newQueries = DEFAULT_PROPS.queries.add('query-id-5');
       rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} queries={newQueries} />);
+      await openMoreTabsDropdown();
 
-      await screen.findByRole(dropdownTabRole, {
-        name: 'Page#5',
-      });
-
-      await screen.findByRole(mainTabRole, {
-        name: 'Page#5',
-        hidden: true,
-      });
+      await screen.findByRole(dropdownTabRole, { name: 'Page#5' });
     });
   });
 
-  it('displays active tab', () => {
-    render(<AdaptableQueryTabs {...DEFAULT_PROPS} activeQueryId="query-id-2" />);
+  it('displays active tab', async () => {
+    asMock(useCurrentQueryId).mockReturnValue('query-id-2');
+    render(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
 
-    const tab2 = screen.getByRole(mainTabRole, {
+    const tab2 = await screen.findByRole(mainTabRole, {
       name: 'Tab 2',
     });
 
@@ -235,24 +245,22 @@ describe('AdaptableQueryTabs', () => {
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
 
     await finishInitialRender();
+    await openMoreTabsDropdown();
 
-    const tab4 = screen.getByRole(dropdownTabRole, {
-      name: 'Tab 4',
-      hidden: true,
-    });
-    userEvent.click(tab4);
+    userEvent.click(await screen.findByRole(dropdownTabRole, { name: 'Tab 4' }));
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
     expect(onSelectStub).toHaveBeenCalledWith('query-id-4');
+
+    await closeMoreTabsDropdown();
   });
 
   it('creates new tab', async () => {
     const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
 
-    const createTabButton = await screen.findByTitle('Create New Page');
-    userEvent.click(createTabButton);
+    userEvent.click(await screen.findByTitle('Create New Page'));
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
@@ -260,10 +268,10 @@ describe('AdaptableQueryTabs', () => {
   });
 
   it('should show copy page to dashboard modal', async () => {
-    render(<AdaptableQueryTabs {...DEFAULT_PROPS} activeQueryId="query-id-1" />);
+    render(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
 
-    userEvent.click((await screen.findAllByTitle(/page actions/i))[0]);
-    userEvent.click(await screen.findByRole('menuitem', { name: /copy to dashboard/i }));
+    userEvent.click((await screen.findAllByRole('button', { name: /page actions/i }))[0]);
+    userEvent.click(await screen.findByRole('menuitem', { name: /copy to dashboard/i, hidden: true }));
 
     await screen.findByRole('button', {
       name: /copy page/i,

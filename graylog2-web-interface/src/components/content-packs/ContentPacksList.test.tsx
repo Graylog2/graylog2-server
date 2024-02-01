@@ -74,7 +74,9 @@ describe('<ContentPacksList />', () => {
     const deleteFn = jest.fn();
     render(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
 
-    userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
+    userEvent.click((await screen.findAllByRole('button', { name: /more actions/i }))[0]);
+
+    userEvent.click(await screen.findByRole('menuitem', { name: 'Delete All Versions' }));
 
     expect(deleteFn).toHaveBeenCalledTimes(1);
   });

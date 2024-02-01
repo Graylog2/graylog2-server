@@ -31,8 +31,10 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.Persisted;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.List;
 

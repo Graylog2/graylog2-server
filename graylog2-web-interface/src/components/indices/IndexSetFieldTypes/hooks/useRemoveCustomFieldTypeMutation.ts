@@ -19,20 +19,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
+import type { RemoveFieldTypeBody, RemoveFieldTypeBodyJson } from 'components/indices/IndexSetFieldTypes/types';
 
 export const urlPrefix = '/system/indices/mappings/remove_mapping';
-
-export type RemoveFieldTypeBody = {
-  indexSets: Array<string>,
-  fields: Array<string>,
-  rotated: boolean,
-}
-
-export type RemoveFieldTypeBodyJson = {
-  index_sets: Array<string>,
-  fields: Array<string>,
-  rotate: boolean,
-}
 
 const putFieldType = async ({
   indexSets,
