@@ -107,3 +107,15 @@ export const timeRangeFromQueryParameter = (range: TimeRangeQueryParameter): Tim
       return assertUnreachable(range, 'Unsupported range type in range: ');
   }
 };
+
+/**
+ * Creates an absolute time range that can be used to look up recently received messages.
+ * It accomodates for the eventuality that messages can have timestamps from the future due to wrong system clocks.
+ */
+export const recentMessagesTimeRange = (): AbsoluteRangeQueryParameter => {
+  const now = Date.now();
+  const fromDate = new Date(now - 5 * 60000).toISOString();
+  const toDate = new Date(now +  60 * 60000).toISOString();
+
+  return { rangetype: 'absolute', from: fromDate, to: toDate };
+};
