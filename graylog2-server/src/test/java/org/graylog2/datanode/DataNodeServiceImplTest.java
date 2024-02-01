@@ -75,7 +75,7 @@ public class DataNodeServiceImplTest {
     }
 
     @Test
-    public void removeNodeFailsWhenRemovingAnother() throws NodeNotFoundException {
+    public void removeNodeFailsWhenRemovingAllSequentially() throws NodeNotFoundException {
         final String testNodeId = "node";
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
         nodeService.registerServer(buildTestNode("othernode", DataNodeStatus.REMOVING));
@@ -83,7 +83,7 @@ public class DataNodeServiceImplTest {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             classUnderTest.removeNode(testNodeId);
         });
-        assertEquals("Only one data node can be removed at a time.", e.getMessage());
+        assertEquals("Cannot remove last data node in the cluster.", e.getMessage());
         verifyNoMoreInteractions(clusterEventBus);
     }
 
