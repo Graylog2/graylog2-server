@@ -60,14 +60,14 @@ const Thumb = (props: React.ComponentProps<typeof StyledThumb>, state: { valueNo
   </StyledThumb>
 );
 
-const StyledTrack = styled.div(({ theme }) => css`
+const StyledTrack = styled.div<{ $index: number }>(({ theme, $index }) => css`
   top: ${theme.spacings.xxs};
   bottom: 0;
-  background: ${(props: any) => (props.index === 1 ? '#5082bc' : theme.colors.variant.default)};
+  background: ${$index === 1 ? '#5082bc' : theme.colors.variant.default};
   border-radius: 999px;
 `);
 
-const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
+const Track = (props, state) => <StyledTrack {...props} $index={state.index} />;
 
 const RangeInput = ({
   id,
