@@ -37,6 +37,8 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
 
+import QueryHelper from '../common/QueryHelper';
+
 const GrokPatternsList = styled(DataTable)`
   th.name {
     min-width: 200px;
@@ -198,11 +200,7 @@ class GrokPatterns extends React.Component {
     const { pagination, patterns } = this.state;
 
     const queryHelperComponent = (
-      <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={<GrokPatternQueryHelper />}>
-        <Button bsStyle="link" className="archive-search-help-button">
-          <Icon name="question-circle" fixedWidth />
-        </Button>
-      </OverlayTrigger>
+      <GrokPatternQueryHelper />
     );
 
     return (

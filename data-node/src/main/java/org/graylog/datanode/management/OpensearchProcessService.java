@@ -27,8 +27,11 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
@@ -51,8 +54,10 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final EventBus eventBus;
     private final NodeId nodeId;
+    private final DataNodeProvisioningService dataNodeProvisioningService;
     private final IndexFieldTypesService indexFieldTypesService;
     private final ObjectMapper objectMapper;
+    private final ProcessStateMachine processStateMachine;
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
@@ -61,21 +66,25 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final CustomCAX509TrustManager trustManager,
                                     final NodeService<DataNodeDto> nodeService,
                                     final Configuration configuration,
+                                    final DataNodeProvisioningService dataNodeProvisioningService,
                                     final NodeId nodeId,
                                     final IndexFieldTypesService indexFieldTypesService,
-                                    final ObjectMapper objectMapper) {
+                                    final ObjectMapper objectMapper,
+                                    final ProcessStateMachine processStateMachine) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
         this.nodeId = nodeId;
+        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.objectMapper = objectMapper;
         this.indexFieldTypesService = indexFieldTypesService;
-        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper);
+        this.processStateMachine = processStateMachine;
+        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
         eventBus.register(this);
     }
 
     private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration,
-                                                      final NodeService<DataNodeDto> nodeService, final ObjectMapper objectMapper) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService, objectMapper);
+                                                      final NodeService<DataNodeDto> nodeService, final ObjectMapper objectMapper, final ProcessStateMachine processStateMachine) {
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService, objectMapper, processStateMachine);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
@@ -88,9 +97,16 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
-            case ADD ->
-                    startWithConfig(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
-            case REMOVE -> startWithConfig();
+            case ADD -> {
+                this.process.stop();
+                configure(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
+                this.process.start();
+            }
+            case REMOVE -> {
+                this.process.stop();
+                configure();
+                this.process.start();
+            }
         }
     }
 
@@ -98,7 +114,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STORED -> startWithConfig();
+            case STARTUP_REQUESTED -> startUp();
+            case STORED -> {
+                configure();
+                dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
+            }
         }
     }
 
@@ -117,14 +137,28 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Override
     protected void startUp() {
-        startWithConfig();
+        final OpensearchConfiguration config = configurationProvider.get();
+        if (config.securityConfigured()) {
+            this.configure();
+            this.process.start();
+        } else {
+            String noConfigMessage = """
+                    \n
+                    ========================================================================================================
+                    It seems you are starting Data node for the first time. The current configuration is not sufficient to
+                    start the indexer process because a security configuration is missing. You have to either provide http
+                    and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
+                    ========================================================================================================
+                    """;
+            LOG.info(noConfigMessage);
+        }
     }
 
-    private void startWithConfig() {
-        this.startWithConfig(Map.of());
+    protected void configure() {
+        this.configure(Map.of());
     }
 
-    private void startWithConfig(Map<String, String> additionalConfig) {
+    private void configure(Map<String, String> additionalConfig) {
         final OpensearchConfiguration original = configurationProvider.get();
 
         final var finalAdditionalConfig = new HashMap<String, String>();
@@ -146,9 +180,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 finalAdditionalConfig);
 
         if (config.securityConfigured()) {
-            this.process.startWithConfig(config);
+            this.process.configure(config);
         } else {
-
             String noConfigMessage = """
                     \n
                     ========================================================================================================

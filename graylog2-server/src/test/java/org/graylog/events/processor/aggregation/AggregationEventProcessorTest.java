@@ -23,6 +23,7 @@ import org.graylog.events.conditions.Expr;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
 import org.graylog.events.event.EventWithContext;
+import org.graylog.events.event.RiskScoreCalculator;
 import org.graylog.events.event.TestEvent;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventProcessorStateService;
@@ -99,6 +100,8 @@ public class AggregationEventProcessorTest {
     @Mock
     private NotificationService notificationService;
     @Mock
+    private RiskScoreCalculator riskScoreCalculator;
+    @Mock
     private StreamService streamService;
 
     private PermittedStreams permittedStreams;
@@ -138,7 +141,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(
-                eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams);
+                eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams, riskScoreCalculator);
 
         final AggregationResult result = AggregationResult.builder()
                 .effectiveTimerange(timerange)
@@ -234,7 +237,8 @@ public class AggregationEventProcessorTest {
                 .timerange(timerange)
                 .build();
 
-        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams);
+        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams, riskScoreCalculator);
 
         final AggregationResult result = AggregationResult.builder()
                 .effectiveTimerange(timerange)
@@ -337,7 +341,8 @@ public class AggregationEventProcessorTest {
                 .timerange(timerange)
                 .build();
 
-        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams);
+        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams, riskScoreCalculator);
 
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {})).doesNotThrowAnyException();
 
@@ -372,7 +377,8 @@ public class AggregationEventProcessorTest {
                 .timerange(timerange)
                 .build();
 
-        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams);
+        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams, riskScoreCalculator);
 
         // If the dependency check returns true, there should be no exception raised and the state service should be called
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(true);
@@ -431,7 +437,8 @@ public class AggregationEventProcessorTest {
                 .timerange(timerange)
                 .build();
 
-        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams);
+        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams, riskScoreCalculator);
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
         final ImmutableList<EventWithContext> eventsWithContext = eventProcessor.eventsFromAggregationResult(eventFactory, parameters, result);
 
@@ -476,7 +483,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch,
-                eventStreamService, messages, notificationService, permittedStreams);
+                eventStreamService, messages, notificationService, permittedStreams, riskScoreCalculator);
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
         final ImmutableList<EventWithContext> eventsWithContext = eventProcessor.eventsFromAggregationResult(eventFactory, parameters, result);
 
@@ -580,7 +587,8 @@ public class AggregationEventProcessorTest {
                 .build();
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(series), null, filters);
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(
-                eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams);
+                eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch,
+                eventStreamService, messages, notificationService, permittedStreams, riskScoreCalculator);
 
         eventProcessor.sourceMessagesForEvent(event, messageConsumer, batchLimit);
     }

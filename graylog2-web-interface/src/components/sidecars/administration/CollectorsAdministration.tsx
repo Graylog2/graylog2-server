@@ -340,7 +340,7 @@ const CollectorsAdministration = ({
     );
   };
 
-  const handleSearch = (_query: string, callback: () => void) => {
+  const handleSearch = (_query?: string, callback?: () => void) => {
     onQueryChange(_query, callback);
   };
 

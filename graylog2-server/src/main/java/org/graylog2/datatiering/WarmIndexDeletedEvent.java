@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog2.datatiering;
 
-import java.util.List;
-
-public record RemoteReindexResult(List<ReindexResult> results) {
+public record WarmIndexDeletedEvent(WarmIndexInfo warmIndexInfo) {
 }

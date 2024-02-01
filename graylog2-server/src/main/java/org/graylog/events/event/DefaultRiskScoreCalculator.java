@@ -14,10 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog.events.event;
 
-import java.util.concurrent.TimeUnit;
+public class DefaultRiskScoreCalculator implements RiskScoreCalculator {
 
-public record ReindexResult(String index, TimeUnit took,
-                            long created, int batches) {
+    @Override
+    public void assignRiskScore(Event event) {
+        event.setRiskScore(0);
+    }
 }

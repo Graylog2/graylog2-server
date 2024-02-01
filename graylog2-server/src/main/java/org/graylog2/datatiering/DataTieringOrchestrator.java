@@ -14,10 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-:local(.overlay) {
-    max-width: 400px;
-}
+package org.graylog2.datatiering;
 
-:local(.trigger) {
-    margin-right: 5px;
+import jakarta.validation.constraints.NotNull;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetValidator;
+
+import java.util.Optional;
+
+public interface DataTieringOrchestrator {
+
+    void rotate(IndexSet indexSet);
+
+    void retain(IndexSet indexSet);
+
+    Optional<IndexSetValidator.Violation> validate(@NotNull DataTieringConfig config);
 }
