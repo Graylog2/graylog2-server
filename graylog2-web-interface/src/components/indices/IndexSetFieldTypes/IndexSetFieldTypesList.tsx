@@ -124,9 +124,9 @@ const IndexSetFieldTypesList = () => {
   const customColumnRenderers = useCustomColumnRenderers(attributes);
 
   const onSubmitCallback = useCallback((response: FieldTypePutResponse) => {
-    const newEntityFieldName = response[indexSetId].fieldName;
+    const newEntityFieldName = response?.[indexSetId]?.fieldName;
 
-    if (selectedEntitiesData[newEntityFieldName]) {
+    if (newEntityFieldName && selectedEntitiesData[newEntityFieldName]) {
       setSelectedEntitiesData({ ...selectedEntitiesData, [newEntityFieldName]: response[indexSetId] });
     }
 
