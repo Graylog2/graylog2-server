@@ -33,6 +33,12 @@ Because of an error in HttpCore 4.4.12, which is required by Elasticsearch and o
 The Reactor was stopped, which prevented proper Graylog operation and the reason (OutOfMemoryError) was not clearly visible.
 From now on, Graylog will shutdown on OutOfMemoryError, trying to log some basic information about the thread and memory consumption during this event.
 
+## Configuration File Changes
+| Option                           | Action    | Description                                                                                                                                                                                                                                             |
+|----------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `field_value_suggestion_mode`    | **added** | Allows controlling field value suggestions, turning them on, off, or allowing them only for textual fields.                                                                                                                                             |
+
+
 ## Input log parsing changes
 
 Log parsing changes have been made several inputs in preparation for Illuminate parsing content. Note that additional 
