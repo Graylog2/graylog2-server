@@ -68,6 +68,8 @@ public class DataNodeManagementResource extends RestResource {
     private final NodeService<DataNodeDto> nodeService;
     private final CertRenewalService certRenewalService;
     private final BulkExecutor<DataNodeDto, UserContext> bulkRemovalExecutor;
+    private final BulkExecutor<DataNodeDto, UserContext> bulkStopExecutor;
+    private final BulkExecutor<DataNodeDto, UserContext> bulkStartExecutor;
 
     @Inject
     protected DataNodeManagementResource(DataNodeService dataNodeService,
@@ -77,6 +79,8 @@ public class DataNodeManagementResource extends RestResource {
         this.nodeService = nodeService;
         this.certRenewalService = certRenewalService;
         bulkRemovalExecutor = new SequentialBulkExecutor<>(this::removeNode, auditEventSender, objectMapper);
+        bulkStopExecutor = new SequentialBulkExecutor<>(this::stopNode, auditEventSender, objectMapper);
+        bulkStartExecutor = new SequentialBulkExecutor<>(this::startNode, auditEventSender, objectMapper);
     }
 
     @GET
@@ -140,7 +144,8 @@ public class DataNodeManagementResource extends RestResource {
     @ApiOperation("Stop the OpenSearch process of a data node")
     @AuditEvent(type = DATANODE_STOP)
     @RequiresPermissions(RestPermissions.DATANODE_STOP)
-    public DataNodeDto stopNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+    public DataNodeDto stopNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
+                                @Context UserContext userContext) {
         try {
             return dataNodeService.stopNode(nodeId);
         } catch (NodeNotFoundException e) {
@@ -148,16 +153,55 @@ public class DataNodeManagementResource extends RestResource {
         }
     }
 
+
+    @POST
+    @Path("/bulk_stop")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Stop multiple nodes in the cluster", response = BulkOperationResponse.class)
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkStop(@ApiParam(name = "Entities to stop", required = true) final BulkOperationRequest bulkOperationRequest,
+                             @Context UserContext userContext) {
+
+        final BulkOperationResponse response = bulkStopExecutor.executeBulkOperation(bulkOperationRequest,
+                userContext,
+                new AuditParams(DATANODE_STOP, "nodeId", DataNodeDto.class));
+
+        return Response.status(Response.Status.OK)
+                .entity(response)
+                .build();
+    }
+
     @POST
     @Path("{nodeId}/start")
     @ApiOperation("Start the OpenSearch process of a data node")
     @AuditEvent(type = DATANODE_START)
     @RequiresPermissions(RestPermissions.DATANODE_START)
-    public DataNodeDto startNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+    public DataNodeDto startNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
+                                 @Context UserContext userContext) {
         try {
             return dataNodeService.startNode(nodeId);
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }
     }
+
+    @POST
+    @Path("/bulk_start")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Start multiple nodes in the cluster", response = BulkOperationResponse.class)
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkStart(@ApiParam(name = "Entities to start", required = true) final BulkOperationRequest bulkOperationRequest,
+                              @Context UserContext userContext) {
+
+        final BulkOperationResponse response = bulkStartExecutor.executeBulkOperation(bulkOperationRequest,
+                userContext,
+                new AuditParams(DATANODE_START, "nodeId", DataNodeDto.class));
+
+        return Response.status(Response.Status.OK)
+                .entity(response)
+                .build();
+    }
+
 }
