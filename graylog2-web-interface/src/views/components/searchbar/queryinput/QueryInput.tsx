@@ -30,7 +30,6 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type View from 'views/logic/views/View';
-import useView from 'views/hooks/useView';
 
 import type { AutoCompleter, Editor, Command } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
@@ -151,7 +150,7 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
   }
 };
 
-const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory'> & { userTimezone: string }) => {
+const useCompleter = ({ streams, timeRange, completerFactory, userTimezone, view }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory' | 'view'> & { userTimezone: string }) => {
   const completers = usePluginEntities('views.completers');
   const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
   const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
@@ -161,7 +160,6 @@ const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pi
 
     return { all: allFieldsByName, query: queryFieldsByName };
   }, [allFields, queryFields]);
-  const view = useView();
 
   return useMemo(() => completerFactory(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
     [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
@@ -175,7 +173,7 @@ type Props = BaseProps & {
     streams: Array<string>,
     fieldTypes: FieldTypes,
     userTimezone: string,
-    view: View,
+    view: View | undefined,
   ) => AutoCompleter,
   disableExecution?: boolean,
   isValidating?: boolean,
@@ -186,6 +184,7 @@ type Props = BaseProps & {
   streams?: Array<string> | undefined,
   timeRange?: TimeRange | NoTimeRangeOverride | undefined,
   validate: () => Promise<FormikErrors<{}>>,
+  view?: View
 };
 
 const QueryInput = ({
@@ -209,11 +208,12 @@ const QueryInput = ({
   warning,
   wrapEnabled,
   name,
+  view,
 }: Props) => {
   const { userTimezone } = useUserDateTime();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
-  const completer = useCompleter({ streams, timeRange, completerFactory, userTimezone });
+  const completer = useCompleter({ streams, timeRange, completerFactory, userTimezone, view });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
   const onExecute = useCallback((editor: Editor) => handleExecution({
     editor,
@@ -293,6 +293,7 @@ QueryInput.defaultProps = {
   value: '',
   warning: undefined,
   wrapEnabled: undefined,
+  view: undefined,
 };
 
 export default QueryInput;

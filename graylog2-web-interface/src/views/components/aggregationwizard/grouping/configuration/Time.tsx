@@ -21,7 +21,7 @@ import { Field } from 'formik';
 import { Icon, HoverForHelp } from 'components/common';
 import { TimeUnits } from 'views/Constants';
 import { FormControl, Checkbox, MenuItem, InputGroup, Input } from 'components/bootstrap';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import DropdownButton from 'components/bootstrap/DropdownButton';
 
 const RangeSelect = styled.div`
   display: flex;
@@ -43,7 +43,7 @@ const IntervalCheckboxDescWithHelp = styled.div`
   align-items: center;
 `;
 
-const IntervalHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
+const IntervalHoverForHelp = styled(HoverForHelp)`
   margin-left: 5px;
 `;
 
@@ -121,14 +121,14 @@ const Time = ({ index }: Props) => (
                        min="1"
                        onChange={(e) => onChange({ target: { name, value: { ...value, value: (e.target as HTMLInputElement).value } } })} />
           <InputGroup.Button>
-            <OverlayDropdownButton title={TimeUnits[value.unit] || ''}>
+            <DropdownButton title={TimeUnits[value.unit] || ''}>
               {Object.keys(TimeUnits).map((unit) => (
                 <MenuItem key={unit}
                           onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>
                   {TimeUnits[unit]}
                 </MenuItem>
               ))}
-            </OverlayDropdownButton>
+            </DropdownButton>
           </InputGroup.Button>
         </InputGroup>
         )}

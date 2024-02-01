@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.graylog2.inputs.transports.HttpPollTransport.CK_CONTENT_TYPE;
 import static org.graylog2.inputs.transports.HttpPollTransport.CK_HTTP_BODY;
 import static org.graylog2.inputs.transports.HttpPollTransport.CK_HTTP_METHOD;
@@ -56,7 +56,7 @@ public class HttpPollTransportTest {
     @Mock
     private OkHttpClient httpClient;
     @Mock
-    private  EncryptedValueService encryptedValueService;
+    private EncryptedValueService encryptedValueService;
 
     @Test
     public void testParseHeaders() throws Exception {

@@ -30,14 +30,14 @@ import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +46,6 @@ import java.util.function.Supplier;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
-    private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
     private final Supplier<RestHighLevelClient> clientSupplier;
     private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
 
@@ -84,11 +83,11 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                     maxTotalConnectionsPerRoute,
                     useExpectContinue,
                     muteOpenSearchDeprecationWarnings,
-                credentialsProvider,
+                    credentialsProvider,
                     runsWithDataNode || indexerUseJwtAuthentication,
                     indexerJwtAuthTokenProvider);
 
-            var sniffer = SnifferWrapper.create(
+            var sniffer = LegacySnifferWrapper.create(
                     client.getLowLevelClient(),
                     TimeUnit.SECONDS.toMillis(5),
                     discoveryFrequency,
@@ -96,10 +95,10 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             );
 
             if (discoveryEnabled) {
-                sniffer.add(FilteredOpenSearchNodesSniffer.create(discoveryFilter));
+                sniffer.add(LegacyFilteredOpenSearchNodesSniffer.create(discoveryFilter));
             }
-            if(nodeActivity) {
-                sniffer.add(NodeListSniffer.create());
+            if (nodeActivity) {
+                sniffer.add(LegacyNodeListSniffer.create());
             }
 
             sniffer.build().ifPresent(s -> shutdownService.register(s::close));
@@ -110,9 +109,12 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
 
     private OpenSearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
         switch (defaultSchemeForDiscoveredNodes.toUpperCase(Locale.ENGLISH)) {
-            case "HTTP": return OpenSearchNodesSniffer.Scheme.HTTP;
-            case "HTTPS": return OpenSearchNodesSniffer.Scheme.HTTPS;
-            default: throw new IllegalArgumentException("Invalid default scheme for discovered OS nodes: " + defaultSchemeForDiscoveredNodes);
+            case "HTTP":
+                return OpenSearchNodesSniffer.Scheme.HTTP;
+            case "HTTPS":
+                return OpenSearchNodesSniffer.Scheme.HTTPS;
+            default:
+                throw new IllegalArgumentException("Invalid default scheme for discovered OS nodes: " + defaultSchemeForDiscoveredNodes);
         }
     }
 
@@ -148,20 +150,20 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 )
                 .setHttpClientConfigCallback(httpClientConfig -> {
                     httpClientConfig
-                        .setMaxConnTotal(maxTotalConnections)
-                        .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
+                            .setMaxConnTotal(maxTotalConnections)
+                            .setMaxConnPerRoute(maxTotalConnectionsPerRoute);
 
-                    if(isJwtAuthentication) {
+                    if (isJwtAuthentication) {
                         httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", indexerJwtAuthTokenProvider.get()));
                     } else {
                         httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
                     }
 
-                    if(muteElasticsearchDeprecationWarnings) {
-                        httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
+                    if (muteElasticsearchDeprecationWarnings) {
+                        httpClientConfig.addInterceptorFirst(new LegacyOpenSearchFilterDeprecationWarningsInterceptor());
                     }
 
-                    if(hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
+                    if (hosts.stream().anyMatch(host -> host.getScheme().equalsIgnoreCase("https"))) {
                         httpClientConfig.setSSLContext(trustManagerAndSocketFactoryProvider.getSslContext());
                     }
 

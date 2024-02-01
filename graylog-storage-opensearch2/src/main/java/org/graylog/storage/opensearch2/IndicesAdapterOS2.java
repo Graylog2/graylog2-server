@@ -45,6 +45,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsR
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.BulkByScrollResponse;
@@ -61,6 +62,7 @@ import org.graylog.storage.opensearch2.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch2.stats.StatsApi;
+import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
@@ -78,7 +80,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -580,5 +584,25 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + index);
         return response.getSetting(index, "index.uuid");
+    }
+
+    @Override
+    public Optional<WarmIndexInfo> getWarmIndexInfo(String index) {
+        final GetSettingsResponse settingsResponse = client.execute((c, options) ->
+                c.indices().getSettings(new GetSettingsRequest().indices(index), options));
+        Map<String, Settings> indexToSettings = settingsResponse.getIndexToSettings();
+
+        return Optional.ofNullable(indexToSettings.get(index))
+                .filter(settings -> "remote_snapshot".equals(settings.get("index.store.type")))
+                .map(settings -> mapIndexSettingsToSearchableSnapshot(index, settings));
+    }
+
+    private WarmIndexInfo mapIndexSettingsToSearchableSnapshot(String index, Settings settings) {
+        String initialIndexName = settings.get("index.provided_name");
+        Settings searchableSnapshotSettings = settings.getAsSettings("index.searchable_snapshot");
+        String repository = searchableSnapshotSettings.get("repository");
+        String snapshotName = searchableSnapshotSettings.get("snapshot_id.name");
+
+        return new WarmIndexInfo(index, initialIndexName, repository, snapshotName);
     }
 }

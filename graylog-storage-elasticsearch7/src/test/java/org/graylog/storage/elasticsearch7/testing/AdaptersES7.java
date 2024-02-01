@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7.testing;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.elasticsearch7.ComposableIndexTemplateAdapter;
 import org.graylog.storage.elasticsearch7.CountsAdapterES7;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
@@ -94,7 +95,7 @@ public class AdaptersES7 implements Adapters {
         final boolean allowHighlighting = true;
         final boolean allowLeadingWildcardSearches = true;
 
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches);
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         final Scroll scroll = new Scroll(client, scrollResultFactory, searchRequestFactory);
         return new SearchesAdapterES7(client, scroll, searchRequestFactory);
     }

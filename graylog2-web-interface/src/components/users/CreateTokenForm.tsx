@@ -41,7 +41,7 @@ type Props = {
 const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
 
-  const createToken = (event) => {
+  const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
     onCreate(tokenName);
     setTokenName('');

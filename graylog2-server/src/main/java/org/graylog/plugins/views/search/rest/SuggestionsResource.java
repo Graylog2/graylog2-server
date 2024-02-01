@@ -20,12 +20,22 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionFieldType;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
+import org.graylog.plugins.views.search.querystrings.QueryString;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionEntryDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsErrorDTO;
@@ -45,23 +55,19 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleR
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService.DEFAULT_LIMIT;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Api(value = "Search/Suggestions", tags = {CLOUD_VISIBLE})
 @Path("/search/suggest")
+@Produces(MediaType.APPLICATION_JSON)
 public class SuggestionsResource extends RestResource implements PluginRestResource {
 
     public static final int SUGGESTIONS_COUNT_MAX = 100;
@@ -72,18 +78,29 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
     private final EntityTitleService entityTitleService;
     private final NodeService nodeService;
+    private final LastUsedQueryStringsService lastUsedQueryStringsService;
 
     @Inject
-    public SuggestionsResource(PermittedStreams permittedStreams, QuerySuggestionsService querySuggestionsService, MappedFieldTypesService mappedFieldTypesService, EntityTitleService entityTitleService, NodeService nodeService) {
+    public SuggestionsResource(PermittedStreams permittedStreams, QuerySuggestionsService querySuggestionsService,
+                               MappedFieldTypesService mappedFieldTypesService, EntityTitleService entityTitleService,
+                               NodeService nodeService, LastUsedQueryStringsService lastUsedQueryStringsService) {
         this.permittedStreams = permittedStreams;
         this.querySuggestionsService = querySuggestionsService;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.entityTitleService = entityTitleService;
         this.nodeService = nodeService;
+        this.lastUsedQueryStringsService = lastUsedQueryStringsService;
+    }
+
+    @GET
+    @Path("/query_strings")
+    @ApiOperation("Suggest last used query strings")
+    public List<QueryString> suggestQueryStrings(@Context SearchUser searchUser,
+                                                 @ApiParam("limit") @QueryParam("limit") Integer limit) {
+        return lastUsedQueryStringsService.get(searchUser.getUser(), Optional.ofNullable(limit).orElse(DEFAULT_LIMIT));
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Suggest field value")
     @NoAuditEvent("Only suggesting field value for query, not changing any data")
     public SuggestionsDTO suggestFieldValue(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,

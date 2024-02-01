@@ -21,10 +21,9 @@ import { LinkContainer } from 'components/common/router';
 import { NavDropdown } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
-import { SessionActions } from 'stores/sessions/SessionStore';
-import useHistory from 'routing/useHistory';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Menu from 'components/bootstrap/Menu';
+import useLogout from 'hooks/useLogout';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -35,7 +34,6 @@ const FullName = styled.span`
 
 const UserMenu = () => {
   const { fullName, readOnly, id: userId } = useCurrentUser();
-  const history = useHistory();
   const route = readOnly
     ? Routes.SYSTEM.USERS.show(userId)
     : Routes.SYSTEM.USERS.edit(userId);
@@ -43,14 +41,7 @@ const UserMenu = () => {
     ? 'Show profile'
     : 'Edit profile';
 
-  const onLogoutClicked = () => {
-    SessionActions.logout().then(() => {
-      /* In some cases, when the authentication info is set externally (e.g. trusted headers), we need to retrigger a
-         session validation, so we are not stuck at the login screen. */
-      SessionActions.validate();
-      history.push(Routes.STARTPAGE);
-    });
-  };
+  const onLogoutClicked = useLogout();
 
   return (
     <NavDropdown title={<Icon name="user" size="lg" />}

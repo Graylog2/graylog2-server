@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
@@ -26,8 +27,6 @@ import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     private static final Logger LOG = LoggerFactory.getLogger(SetIndexReadOnlyAndCalculateRangeJob.class);
@@ -85,7 +84,8 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     }
 
     @Override
-    public void requestCancel() {}
+    public void requestCancel() {
+    }
 
     @Override
     public int getProgress() {
@@ -110,6 +110,11 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     @Override
     public String getDescription() {
         return "Makes index " + indexName + " read only and calculates and adds its index range afterwards.";
+    }
+
+    @Override
+    public String getInfo() {
+        return "Make index <%s> read only and calculate ranges".formatted(indexName);
     }
 
     @Override

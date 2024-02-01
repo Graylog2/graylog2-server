@@ -25,8 +25,9 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.net.URI;
 import java.util.List;
 import java.util.function.Supplier;

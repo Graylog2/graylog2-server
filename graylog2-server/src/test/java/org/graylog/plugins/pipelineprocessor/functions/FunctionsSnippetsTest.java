@@ -175,7 +175,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -1616,6 +1617,10 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getField("contains_string")).isEqualTo(true);
             assertThat(message.getField("contains_string_case_insensitive")).isEqualTo(true);
             assertThat(message.getField("contains_string_case_sensitive")).isEqualTo(false);
+            assertThat(message.getField("contains_null_array")).isEqualTo(false);
+            assertThat(message.getField("contains_null_value")).isEqualTo(false);
+            assertThat(message.getField("contains_null_json_value_in_array_string")).isEqualTo(true);
+            assertThat(message.getField("contains_null_json_value_in_array_int")).isEqualTo(true);
 
             assertThat(message.getField("path_array_strings_contains")).isEqualTo(true);
             assertThat(message.getField("path_array_numbers_contains")).isEqualTo(true);

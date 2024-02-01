@@ -54,12 +54,14 @@ import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ServerErrorException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

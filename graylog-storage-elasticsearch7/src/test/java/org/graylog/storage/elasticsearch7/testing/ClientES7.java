@@ -36,6 +36,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.WriteRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
@@ -56,6 +58,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Comp
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.compress.CompressedXContent;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
@@ -65,9 +70,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -85,6 +92,19 @@ public class ClientES7 implements Client {
         this.client = client;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
+    }
+
+    public Optional<Map<String, Object>> findMessage(String index, String query) {
+        return client.execute((restHighLevelClient, requestOptions) -> {
+            final SearchRequest searchRequest = new SearchRequest();
+            searchRequest.indices(index);
+            final SearchSourceBuilder source = new SearchSourceBuilder();
+            source.query(QueryBuilders.queryStringQuery(query));
+            source.size(1);
+            searchRequest.source(source);
+            final SearchResponse response = restHighLevelClient.search(searchRequest, requestOptions);
+            return Arrays.stream(response.getHits().getHits()).map(SearchHit::getSourceAsMap).findFirst();
+        });
     }
 
     @Override

@@ -25,7 +25,7 @@ import TableCell from './TableCell';
 import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
-const ActionsCell = styled.th`
+const ActionsCell = styled.td`
   float: right;
   text-align: right;
 

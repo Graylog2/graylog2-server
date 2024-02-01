@@ -19,12 +19,14 @@ package org.graylog2.bootstrap.preflight;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.base.JsonMappingExceptionMapper;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -46,9 +48,8 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -165,9 +166,10 @@ public class PreflightJerseyService extends AbstractIdleService {
                 been started. You must log in to it to perform the initial configuration and continue.
 
                 Initial configuration is accessible at %s, with username '%s' and password '%s'.
+                Try clicking on http://%s:%s@%s
 
                 ========================================================================================================
-                """.formatted(bindAddress, username, preflightPassword);
+                """.formatted(bindAddress, username, preflightPassword, username, preflightPassword, bindAddress);
 
         LOG.info(banner);
     }
@@ -178,7 +180,7 @@ public class PreflightJerseyService extends AbstractIdleService {
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
                 .registerClasses(
-                        JacksonJaxbJsonProvider.class,
+                        JacksonXmlBindJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
                         JacksonPropertyExceptionMapper.class,

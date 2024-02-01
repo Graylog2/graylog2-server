@@ -245,8 +245,8 @@ describe('<EntityDataTable />', () => {
                             onColumnsChange={onColumnsChange}
                             columnDefinitions={columnDefinitions} />);
 
-    userEvent.click(screen.getByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(screen.getByRole('menuitem', { name: /show title/i }));
+    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /show title/i }));
 
     expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);
   });

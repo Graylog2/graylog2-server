@@ -48,7 +48,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -159,6 +160,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .searchTypes(ImmutableSet.of(MessageList.builder().id("1").build()))
                 .build();
     }
+
     private Search dummySearch(Query... queries) {
         return Search.builder()
                 .id("search1")

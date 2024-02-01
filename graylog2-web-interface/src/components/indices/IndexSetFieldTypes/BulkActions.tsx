@@ -31,18 +31,21 @@ type Props = {
 const BulkActions = ({ indexSetId }: Props) => {
   const { selectedEntities } = useSelectedEntities();
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
+
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
 
   return (
-    <BulkActionsDropdown>
-      <MenuItem onSelect={toggleResetModal}>Reset</MenuItem>
+    <>
+      <BulkActionsDropdown>
+        <MenuItem onSelect={toggleResetModal}>Reset</MenuItem>
+      </BulkActionsDropdown>
       {showResetModal && (
-        <IndexSetCustomFieldTypeRemoveModal show
-                                            fields={selectedEntities}
-                                            onClose={toggleResetModal}
-                                            indexSetIds={[indexSetId]} />
+      <IndexSetCustomFieldTypeRemoveModal show
+                                          fields={selectedEntities}
+                                          onClose={toggleResetModal}
+                                          indexSetIds={[indexSetId]} />
       )}
-    </BulkActionsDropdown>
+    </>
   );
 };
 

@@ -17,6 +17,9 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import asMock from 'helpers/mocking/AsMock';
+import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
+
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
 
 const indexSet = {
@@ -42,6 +45,7 @@ const indexSet = {
   index_optimization_max_num_segments: 1,
   index_optimization_disabled: true,
   field_type_refresh_interval: 5000,
+  field_type_profile: null,
   index_template_type: null,
   writable: true,
   default: false,
@@ -204,7 +208,13 @@ const rotationStrategies = [
   },
 ];
 
+jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
+
 describe('IndexSetConfigurationForm', () => {
+  beforeEach(() => {
+    asMock(useProfileOptions).mockReturnValue(({ isLoading: false, options: [], refetch: () => {} }));
+  });
+
   const onSave = jest.fn();
   const cancelLink = '/cancelLink';
 

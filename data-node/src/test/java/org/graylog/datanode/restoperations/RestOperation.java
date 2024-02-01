@@ -27,7 +27,8 @@ import org.bson.assertions.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.HttpMethod;
+import jakarta.ws.rs.HttpMethod;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,9 +88,11 @@ public abstract class RestOperation {
 
     String serializeResponse(ExtractableResponse<Response> extract) {
         final String body = extract.body().asString();
+        final int statusCode = extract.statusCode();
+        final String statusLine = extract.statusLine();
         final String contentType = extract.contentType();
         final String headers = extract.headers().toString();
-        return String.format(Locale.ROOT, "\nContent-type: %s\nheaders: %s\nbody: %s", contentType, headers, body);
+        return String.format(Locale.ROOT, "\nstatus code: %d\nstatus line: %s\n\nContent-type: %s\nheaders: %s\nbody: %s", statusCode, statusLine, contentType, headers, body);
     }
 
     String formatUrl(int port, String url) {

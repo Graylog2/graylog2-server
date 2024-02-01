@@ -23,26 +23,22 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Projections;
+import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBUpsertRetryer;
-import org.graylog2.streams.StreamService;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -63,15 +59,12 @@ public class IndexFieldTypesService {
     private static final String FIELDS_FIELD_NAMES = String.format(Locale.US, "%s.%s", FIELD_FIELDS, FIELD_NAME);
 
     private final JacksonDBCollection<IndexFieldTypesDTO, ObjectId> db;
-    private final StreamService streamService;
     private final MongoCollection<Document> mongoCollection;
 
 
     @Inject
     public IndexFieldTypesService(final MongoConnection mongoConnection,
-                                  final StreamService streamService,
                                   final MongoJackObjectMapperProvider objectMapperProvider) {
-        this.streamService = streamService;
         this.mongoCollection = mongoConnection.getMongoDatabase().getCollection("index_field_types");
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("index_field_types"),
                 IndexFieldTypesDTO.class,
@@ -188,16 +181,6 @@ public class IndexFieldTypesService {
         );
 
         return findByQuery(query);
-    }
-
-    public Collection<IndexFieldTypesDTO> findForStreamIds(Collection<String> streamIds) {
-        final Set<String> indexSetIds = streamService.loadByIds(streamIds)
-                .stream()
-                .filter(Objects::nonNull)
-                .map(stream -> stream.getIndexSet().getConfig().id())
-                .collect(Collectors.toSet());
-
-        return findForIndexSets(indexSetIds);
     }
 
     public Collection<IndexFieldTypesDTO> findAll() {
