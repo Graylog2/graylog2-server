@@ -44,6 +44,7 @@ describe('RuleBuilder', () => {
   });
 
   afterEach(() => {
+    // eslint-disable-next-line no-console
     console.error = originalConsoleError;
     jest.restoreAllMocks();
   });
