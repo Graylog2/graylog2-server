@@ -32,7 +32,7 @@ public class KafkaJournalConfiguration extends PathConfiguration {
     public KafkaJournalConfiguration() {
     }
 
-    @Parameter(value = MESSAGE_JOURNAL_DIR, required = true)
+    @Parameter(value = MESSAGE_JOURNAL_DIR)
     private Path messageJournalDir;
 
     @Parameter("message_journal_segment_size")
