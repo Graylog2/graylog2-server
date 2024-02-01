@@ -50,6 +50,7 @@ const RedBadge = styled(Badge)(({ theme }) => css`
 const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
 
 const failureStreamId = '000000000000000000000004';
+const allEventsId = '000000000000000000000002';
 
 type Props = {
   show: boolean,
@@ -63,6 +64,15 @@ type Props = {
     fieldName?: string
   }
 }
+
+const FailureStreamLink = () => {
+  const { data: failureStream, isFetching: isFetchingFailureStream, isError: isErrorFailureStream } = useStream(failureStreamId);
+  const { data: allEventStream, isFetching: isFetchingAllEventStream, isError: isErrorAllEventStream } = useStream(allEventsId, { enabled: isErrorFailureStream });
+  if (isErrorFailureStream && isErrorAllEventStream) return <span>Processing and Indexing Failures</span>;
+  if (isFetchingFailureStream || isFetchingAllEventStream) return <Spinner />;
+
+  return <StreamLink stream={isErrorFailureStream ? allEventStream : failureStream} />;
+};
 
 const ChangeFieldTypeModal = ({
   show,
@@ -83,7 +93,6 @@ const ChangeFieldTypeModal = ({
       value,
       label,
     })), [fieldTypes]);
-  const { data: failureStream, isFetching: failureStreamLoading } = useStream(failureStreamId);
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
@@ -149,7 +158,7 @@ const ChangeFieldTypeModal = ({
           Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
-          the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
+          the <FailureStreamLink /> stream closely afterwards.
         </Alert>
         <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
         <Input id="field_type">
