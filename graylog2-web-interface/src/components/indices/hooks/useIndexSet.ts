@@ -16,15 +16,18 @@
  */
 
 import { useEffect, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import moment from 'moment';
 
+import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
 } from 'components/indices/Types';
 
-const useIndexSet = (initialIndexSet, loadingIndexDefaultsConfig, indexDefaultsConfig) => {
+const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAction<IndexSet>>] => {
+  const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
   const [indexSet, setIndexSet] = useState(initialIndexSet);
 
   useEffect(() => {
@@ -48,7 +51,11 @@ const useIndexSet = (initialIndexSet, loadingIndexDefaultsConfig, indexDefaultsC
       field_type_refresh_interval: moment.duration(indexDefaultsConfig.field_type_refresh_interval, indexDefaultsConfig.field_type_refresh_interval_unit).asMilliseconds(),
     };
 
-    setIndexSet({ ...defaultIndexSet, ...initialIndexSet });
+    if (initialIndexSet) {
+      setIndexSet({ ...defaultIndexSet, ...initialIndexSet });
+    } else {
+      setIndexSet({ ...defaultIndexSet });
+    }
   }, [loadingIndexDefaultsConfig, indexDefaultsConfig, initialIndexSet]);
 
   return [indexSet, setIndexSet];

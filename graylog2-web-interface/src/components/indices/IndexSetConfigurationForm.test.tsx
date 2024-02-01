@@ -25,7 +25,7 @@ import IndexSetConfigurationForm from './IndexSetConfigurationForm';
 
 const indexSet = {
   id: '62665eb0526719678ed3719f',
-  title: 'anotyher',
+  title: 'Foo Title',
   description: 'test',
   can_be_default: true,
   index_prefix: 'another',
@@ -244,8 +244,7 @@ describe('IndexSetConfigurationForm', () => {
   const cancelLink = '/cancelLink';
 
   const SUT = (props: Partial<React.ComponentProps<typeof IndexSetConfigurationForm>>) => (
-    <IndexSetConfigurationForm indexSet={indexSet}
-                               retentionStrategiesContext={retentionStrategiesContext}
+    <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
                                rotationStrategies={rotationStrategies}
                                retentionStrategies={retentionStrategies}
                                cancelLink={cancelLink}
@@ -256,9 +255,9 @@ describe('IndexSetConfigurationForm', () => {
   );
 
   it('Should render IndexSetConfigurationForm', () => {
-    render(<SUT />);
+    render(<SUT indexSet={indexSet} />);
 
-    const titleText = screen.getByText(/title/i);
+    const titleText = screen.getByDisplayValue(/Foo Title/i);
 
     expect(titleText).toBeInTheDocument();
   });
@@ -266,7 +265,7 @@ describe('IndexSetConfigurationForm', () => {
   it('Should render create IndexSetConfigurationForm', () => {
     render(<SUT create />);
 
-    const indexPrefix = screen.getByText(/index prefix/i);
+    const indexPrefix = screen.getByDisplayValue(/default_index_prefix/i);
 
     expect(indexPrefix).toBeInTheDocument();
   });

@@ -190,7 +190,7 @@ const IndexSetConfigurationForm = ({
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
-  const [indexSet] = useIndexSet(initialIndexSet, loadingIndexDefaultsConfig, indexDefaultsConfig);
+  const [indexSet] = useIndexSet(initialIndexSet);
 
   const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
     { value: 'data_tiering', label: 'Data Tiering' },
@@ -198,7 +198,7 @@ const IndexSetConfigurationForm = ({
   ];
 
   const initialSegment = () : RetentionConfigSegment => {
-    if (indexSet.use_legacy_rotation) return 'legacy';
+    if (indexSet?.use_legacy_rotation) return 'legacy';
 
     return 'data_tiering';
   };
@@ -237,6 +237,10 @@ const IndexSetConfigurationForm = ({
     setFieldTypeRefreshIntervalUnit(unit);
   };
 
+  const enableDataTieringCloud = useFeature('data_tiering_cloud');
+
+  if (!indexSet) return null;
+
   const {
     rotation_strategy: indexSetRotationStrategy,
     rotation_strategy_class: indexSetRotationStrategyClass,
@@ -247,7 +251,6 @@ const IndexSetConfigurationForm = ({
   const onCancel = () => history.push(cancelLink);
 
   const isCloud = AppConfig.isCloud();
-  const enableDataTieringCloud = useFeature('data_tiering_cloud');
 
   if (loadingIndexDefaultsConfig) return (<Spinner />);
 
@@ -399,8 +402,8 @@ IndexSetConfigurationForm.propTypes = {
 };
 
 IndexSetConfigurationForm.defaultProps = {
-  indexSet: {},
   create: false,
+  indexSet: undefined,
 };
 
 export default IndexSetConfigurationForm;
