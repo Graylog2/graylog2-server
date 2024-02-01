@@ -25,6 +25,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public void setAuthorizationToken(String authorizationToken) {
+
+    }
+
+    @Override
     public boolean runDirectoryCompatibilityCheck() {
         return false;
     }

@@ -14,18 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration.state.machine;
+package org.graylog2.system.processing.control;
 
-import java.util.List;
-import java.util.Map;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 
-public interface MigrationStateMachine {
-    MigrationState trigger(MigrationStep step, Map<String, Object> args);
-    MigrationState getState();
+import java.util.HashMap;
 
-    List<MigrationStep> nextSteps();
+public interface RemoteProcessingControlResource extends ControlResource {
+    @PUT("system/processing/pause")
+    Call<Void> pauseProcessing();
 
-    String serialize();
+    @PUT("system/processing/resume")
+    Call<Void> resumeProcessing();
 
-    void setAuthorizationToken(String authorizationToken);
+    @GET("system/metrics/{metricName}")
+    Call<HashMap> getMetric(@Path("metricName") String metricName);
 }

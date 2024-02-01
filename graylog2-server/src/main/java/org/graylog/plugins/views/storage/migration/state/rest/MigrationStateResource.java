@@ -26,12 +26,15 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
 
 @Path("/migration")
@@ -44,8 +47,10 @@ public class MigrationStateResource {
     private final MigrationStateMachine stateMachine;
 
     @Inject
-    public MigrationStateResource(MigrationStateMachine stateMachine) {
+    public MigrationStateResource(MigrationStateMachine stateMachine,
+                                  @Context HttpHeaders httpHeaders) {
         this.stateMachine = stateMachine;
+        this.stateMachine.setAuthorizationToken(ProxiedResource.authenticationToken(httpHeaders));
     }
 
     @POST

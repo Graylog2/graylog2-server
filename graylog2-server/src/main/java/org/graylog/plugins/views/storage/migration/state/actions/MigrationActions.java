@@ -43,4 +43,6 @@ public interface MigrationActions extends WithArgs {
     boolean removalPolicyDoesNotExist();
     boolean caAndRemovalPolicyExist();
     void resetMigration();
+
+    void setAuthorizationToken(String authorizationToken);
 }
