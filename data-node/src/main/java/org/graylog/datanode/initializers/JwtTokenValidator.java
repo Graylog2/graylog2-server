@@ -43,7 +43,7 @@ public class JwtTokenValidator implements AuthTokenValidator {
     public void verifyToken(String token) throws TokenVerificationException {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         Key signingKey = new SecretKeySpec(this.signingKey.getBytes(StandardCharsets.UTF_8), signatureAlgorithm.getJcaName());
-        final JwtParser parser = Jwts.parserBuilder()
+        final JwtParser parser = Jwts.parser()
                 .setSigningKey(signingKey)
                 .requireSubject(REQUIRED_SUBJECT)
                 .requireIssuer(REQUIRED_ISSUER)
