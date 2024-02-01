@@ -23,6 +23,66 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, PaginatedListJSON, SearchParams } from 'stores/PaginationTypes';
 
+export const bulkRemoveDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
+  try {
+    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_remove'), { entity_ids });
+
+    if (failures?.length) {
+      selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
+    }
+
+    if (failures?.length === entity_ids.length) {
+      UserNotification.error(`Removing Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not remove Datanodes.');
+    }
+
+    if (successfully_performed) {
+      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} removed successfully`);
+    }
+  } catch (errorThrown) {
+    UserNotification.error(`Removing Data Node failed with status: ${errorThrown}`, 'Could not remove some Datanodes.');
+  }
+};
+
+export const bulkStartDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
+  try {
+    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_start'), { entity_ids });
+
+    if (failures?.length) {
+      selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
+    }
+
+    if (failures?.length === entity_ids.length) {
+      UserNotification.error(`Starting Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not start Datanodes.');
+    }
+
+    if (successfully_performed) {
+      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} started successfully`);
+    }
+  } catch (errorThrown) {
+    UserNotification.error(`Starting Data Node failed with status: ${errorThrown}`, 'Could not start Datanodes.');
+  }
+};
+
+export const bulkStopDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
+  try {
+    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_stop'), { entity_ids });
+
+    if (failures?.length) {
+      selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
+    }
+
+    if (failures?.length === entity_ids.length) {
+      UserNotification.error(`Stopping Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not stop Datanodes.');
+    }
+
+    if (successfully_performed) {
+      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} stopped successfully`);
+    }
+  } catch (errorThrown) {
+    UserNotification.error(`Stopping Data Node failed with status: ${errorThrown}`, 'Could not stop Datanodes.');
+  }
+};
+
 export const removeDataNode = async (datanodeId: string) => {
   try {
     await fetch('DELETE', qualifyUrl(`/datanode/${datanodeId}`));
