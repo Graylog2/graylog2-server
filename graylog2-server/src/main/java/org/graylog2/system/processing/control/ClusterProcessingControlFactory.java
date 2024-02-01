@@ -47,9 +47,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.graylog2.configuration.ClusterProcessingConfiguration.INSTALL_HTTP_CONNECTION_TIMEOUT;
-import static org.graylog2.configuration.ClusterProcessingConfiguration.INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL;
-import static org.graylog2.configuration.ClusterProcessingConfiguration.INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES;
+import static org.graylog2.Configuration.INSTALL_HTTP_CONNECTION_TIMEOUT;
+import static org.graylog2.Configuration.INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL;
+import static org.graylog2.Configuration.INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class ClusterProcessingControlFactory {
