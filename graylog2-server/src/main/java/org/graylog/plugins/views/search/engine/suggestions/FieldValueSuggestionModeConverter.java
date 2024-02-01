@@ -16,25 +16,25 @@
  */
 package org.graylog.plugins.views.search.engine.suggestions;
 
-import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.Validator;
+import com.github.joschi.jadconfig.Converter;
+import com.github.joschi.jadconfig.ParameterException;
 
 import java.util.Arrays;
 import java.util.Locale;
 
-public class FieldValueSuggestionModeValidator implements Validator<String> {
+public class FieldValueSuggestionModeConverter implements Converter<FieldValueSuggestionMode> {
 
     @Override
-    public void validate(final String name,
-                         final String value) throws ValidationException {
-        if (value == null || value.isEmpty()) {
-            throw new ValidationException("Required parameter " + name + " not found");
-        }
-
+    public FieldValueSuggestionMode convertFrom(String value) {
         try {
-            FieldValueSuggestionMode.valueOf(value.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException iex) {
-            throw new ValidationException("Parameter " + name + " should have one of the allowed values: " + Arrays.toString(FieldValueSuggestionMode.values()) + " (found: " + value + ")");
+            return FieldValueSuggestionMode.valueOf(value.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new ParameterException("Parameter should have one of the allowed values: " + Arrays.toString(FieldValueSuggestionMode.values()) + " (found: " + value + ")");
         }
+    }
+
+    @Override
+    public String convertTo(FieldValueSuggestionMode value) {
+        return value.name();
     }
 }

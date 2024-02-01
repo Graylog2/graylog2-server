@@ -100,7 +100,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
         this.entityTitleService = entityTitleService;
         this.nodeService = nodeService;
         this.lastUsedQueryStringsService = lastUsedQueryStringsService;
-        this.fieldValueSuggestionMode = FieldValueSuggestionMode.valueOf(configuration.getFieldValueSuggestionMode().toUpperCase(Locale.ROOT));
+        this.fieldValueSuggestionMode = configuration.getFieldValueSuggestionMode();
     }
 
     @GET
