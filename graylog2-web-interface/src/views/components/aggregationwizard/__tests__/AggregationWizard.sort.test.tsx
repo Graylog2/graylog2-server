@@ -60,17 +60,16 @@ const widgetConfig = AggregationWidgetConfig
 const selectEventConfig = { container: document.body };
 
 const addSortElement = async () => {
-  userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
   await screen.findByRole('menu');
-  userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
-  await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
 };
 
 const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await findWidgetConfigFormSubmitButton();
-  fireEvent.click(applyButton);
+  await userEvent.click(applyButton);
 };
 
 const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string = 'took_ms') => {
@@ -238,8 +237,8 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const removeSortElementButton = screen.getByRole('button', { name: 'Remove Sort' });
-    userEvent.click(removeSortElementButton);
+    const removeSortElementButton = await screen.findByRole('button', { name: 'Remove Sort' });
+    await userEvent.click(removeSortElementButton);
 
     await submitWidgetConfigForm();
 

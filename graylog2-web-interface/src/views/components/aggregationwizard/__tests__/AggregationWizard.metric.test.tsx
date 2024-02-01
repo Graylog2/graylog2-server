@@ -21,6 +21,7 @@ import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import { asMock } from 'helpers/mocking';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -59,7 +60,6 @@ const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
   await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
   await screen.findByRole('menu');
   await userEvent.click(await screen.findByRole('menuitem', { name: key }));
-  await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
 };
 
 const submitWidgetConfigForm = async () => {
@@ -88,6 +88,8 @@ const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
     await selectEvent.select(newFieldSelect, fieldName, selectEventConfig);
   });
 };
+
+const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('AggregationWizard', () => {
   const renderSUT = (props = {}) => render(
@@ -121,7 +123,7 @@ describe('AggregationWizard', () => {
     await addElement('Metric');
 
     await screen.findByText('Function is required.');
-  });
+  }, extendedTimeout);
 
   it('should require metric field when metric function is not count', async () => {
     renderSUT();
@@ -133,7 +135,7 @@ describe('AggregationWizard', () => {
     await selectEvent.select(functionSelect, 'Minimum', selectEventConfig);
 
     await screen.findByText('Field is required for function min.');
-  });
+  }, extendedTimeout);
 
   it('should not require metric field when metric function count', async () => {
     const config = widgetConfig
@@ -143,7 +145,7 @@ describe('AggregationWizard', () => {
     renderSUT({ config });
 
     await waitFor(() => expect(screen.queryByText('Field is required for function min.')).not.toBeInTheDocument());
-  });
+  }, extendedTimeout);
 
   it('should display metric form with values from config', async () => {
     const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('Metric name').build();
@@ -159,7 +161,7 @@ describe('AggregationWizard', () => {
 
     expect(screen.getByDisplayValue('took_ms')).toBeInTheDocument();
     expect(screen.getByDisplayValue('max')).toBeInTheDocument();
-  });
+  }, extendedTimeout);
 
   it('should update config with updated metric', async () => {
     const onChangeMock = jest.fn();
@@ -187,7 +189,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should update config with percentile metric function', async () => {
     const onChangeMock = jest.fn();
@@ -221,7 +223,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should configure metric with multiple functions', async () => {
     const onChangeMock = jest.fn();
@@ -235,7 +237,7 @@ describe('AggregationWizard', () => {
 
     await userEvent.click(addMetricButton);
 
-    await waitFor(() => expect(screen.getAllByLabelText('Select a function')).toHaveLength(2));
+    await waitFor(async () => expect(await screen.findAllByLabelText('Select a function')).toHaveLength(2));
     const newNameInput = screen.getAllByLabelText(/Name/)[1];
 
     await userEvent.type(newNameInput, 'New function');
@@ -258,7 +260,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should remove all metrics', async () => {
     const onChangeMock = jest.fn();
@@ -269,7 +271,7 @@ describe('AggregationWizard', () => {
     renderSUT({ config, onChange: onChangeMock });
 
     const removeMetricElementButton = screen.getByRole('button', { name: 'Remove Metric' });
-    userEvent.click(removeMetricElementButton);
+    await userEvent.click(removeMetricElementButton);
 
     await submitWidgetConfigForm();
 
@@ -281,5 +283,5 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 });

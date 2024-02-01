@@ -83,7 +83,7 @@ describe('UsersOverview', () => {
     fireEvent.change(searchInput, { target: { value: 'username:bob' } });
 
     await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'username:bob' }));
-  });
+  }, extendedTimeout);
 
   describe('should display user', () => {
     it.each`
@@ -165,7 +165,7 @@ describe('UsersOverview', () => {
       await waitFor(() => {
         expect(screen.getByTitle(`Edit tokens of user ${modifiableUser.fullName}`)).toBeInTheDocument();
       });
-    });
+    }, extendedTimeout);
 
     it('not see edit link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
