@@ -325,6 +325,18 @@ public class MessageTest {
     }
 
     @Test
+    public void testProcessingAndReceiveTimestoESObject() {
+        final DateTime dateTime = Tools.nowUTC();
+
+        message.setReceiveTime(dateTime);
+        message.setProcessingTime(dateTime);
+        final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
+
+        assertThat(elasticSearchObject.get(Message.FIELD_GL2_RECEIVE_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(dateTime));
+        assertThat(elasticSearchObject.get(Message.FIELD_GL2_PROCESSING_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(dateTime));
+    }
+
+    @Test
     public void testGetMessage() throws Exception {
         assertEquals("foo", message.getMessage());
     }
