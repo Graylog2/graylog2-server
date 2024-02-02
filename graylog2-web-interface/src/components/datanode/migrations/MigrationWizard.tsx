@@ -40,7 +40,6 @@ const MigrationWizard = () => {
   };
 
   const { state: activeStep, next_steps: nextSteps } = currentStep;
-  console.log(currentStep);
 
   const steps = [
     {
@@ -68,6 +67,16 @@ const MigrationWizard = () => {
       key: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,
       title: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.description,
       component: <ManualMigrationStep />,
+    },
+    {
+      key: MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key,
+      title: MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.description,
+      component: <>Shut down cluster</>,
+    },
+    {
+      key: MIGRATION_STATE.FINISHED.key,
+      title: MIGRATION_STATE.FINISHED.description,
+      component: <>Finished</>,
     },
   ];
 

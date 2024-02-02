@@ -72,11 +72,11 @@ const MigrateExistingCluster = ({ currentStep, onTriggerNextStep }: Props) => {
 
   const steps = [
     {
-      key: MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME.key,
+      key: MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key,
       component: <Welcome onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
     },
     {
-      key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key,
+      key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key,
       component: <DirectoryCompatibilityCheck onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
     },
     {
@@ -85,11 +85,11 @@ const MigrateExistingCluster = ({ currentStep, onTriggerNextStep }: Props) => {
     },
     {
       key: MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key,
-      component: <JournalDowntimeWarning onStepComplete={() => setActiveStep('MIGRATE')} nextSteps={currentStep.next_steps} />,
+      component: <JournalDowntimeWarning onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
     },
     {
-      key: MIGRATION_STATE.MIGRATE.key,
-      component: <MigrateActions onStepComplete={onTriggerNextStep} nextSteps={['CONFIRM_OLD_CLUSTER_STOPPED']} />,
+      key: MIGRATION_STATE.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART.key,
+      component: <MigrateActions onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
     },
     {
       key: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key,
@@ -114,7 +114,7 @@ const MigrateExistingCluster = ({ currentStep, onTriggerNextStep }: Props) => {
             <Panel eventKey={rollingUpgradeStep} key={rollingUpgradeStep} collapsible={false}>
               <Panel.Heading>
                 <Panel.Title>
-                  <Panel.Toggle tabIndex={index}>{`${index}. ${description}`}</Panel.Toggle>
+                  <Panel.Toggle tabIndex={index}>{`${index + 1}. ${description}`}</Panel.Toggle>
                 </Panel.Title>
               </Panel.Heading>
               <Panel.Collapse>

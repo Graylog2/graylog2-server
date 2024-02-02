@@ -29,7 +29,7 @@ const migrationStep = (
     return currentStep;
   }
 
-  return { state: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.key, next_steps: ['SELECT_ROLLING_UPGRADE_MIGRATION', 'SELECT_REMOTE_REINDEX_MIGRATION'] } as MigrationState;
+  return { state: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key, next_steps: ['SELECT_ROLLING_UPGRADE_MIGRATION', 'SELECT_REMOTE_REINDEX_MIGRATION'] } as MigrationState;
 };
 
 const useMigrationWizardStep = () => {

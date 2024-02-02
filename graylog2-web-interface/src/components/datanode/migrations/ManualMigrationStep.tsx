@@ -23,7 +23,11 @@ import MigrateExistingCluster from 'components/datanode/migrations/MigrateExisti
 import useMigrationState from 'components/datanode/hooks/useMigrationState';
 import type { MigrationActions } from 'components/datanode/Types';
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
-import { MIGRATION_STATE, ROLLING_UPGRADE_MIGRATION_STEPS } from 'components/datanode/Constants';
+import {
+  MIGRATION_STATE,
+  REMOTE_REINDEXING_MIGRATION_STEPS,
+  ROLLING_UPGRADE_MIGRATION_STEPS,
+} from 'components/datanode/Constants';
 import RemoteReindexingMigration from 'components/datanode/migrations/RemoteReindexingMigration';
 
 type MigrationTypeSteps = Extract<MigrationActions, 'SELECT_ROLLING_UPGRADE_MIGRATION'|'SELECT_REMOTE_REINDEX_MIGRATION'>
@@ -33,14 +37,16 @@ const ManualMigrationStep = () => {
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
 
-  const onMigrationStepchange = async (type: MigrationTypeSteps) => {
+  const onMigrationStepChange = async (type: MigrationTypeSteps) => {
     await onTriggerNextState({ step: type });
   };
 
+  console.log(currentStep);
+
   return (
     <>
-      {currentStep?.state === MIGRATION_STATE.NEW.key && (
-        <Col>
+      {currentStep?.state === MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key && (
+        <Col md={8}>
           <form className="form form-horizontal" onSubmit={() => {}}>
             <Input id="datanode-migration-type-select"
                    label="Migration type"
@@ -53,14 +59,14 @@ const ManualMigrationStep = () => {
                       clearable={false}
                       options={migrationTypeOptions}
                       matchProp="label"
-                      onChange={onMigrationStepchange}
+                      onChange={onMigrationStepChange}
                       value={null} />
             </Input>
           </form>
         </Col>
       )}
       {(currentStep && ROLLING_UPGRADE_MIGRATION_STEPS.includes(currentStep.state)) && <MigrateExistingCluster onTriggerNextStep={onTriggerNextState} currentStep={currentStep} />}
-      {(currentStep?.state === 'REMOTE_REINDEX_WELCOME') && <RemoteReindexingMigration />}
+      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration />}
     </>
   );
 };
