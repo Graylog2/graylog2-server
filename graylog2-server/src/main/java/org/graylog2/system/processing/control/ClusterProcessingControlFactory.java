@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,7 +51,7 @@ import static org.graylog2.Configuration.INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL
 import static org.graylog2.Configuration.INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class ClusterProcessingControlFactory {
+public class ClusterProcessingControlFactory<I extends ClusterProcessingControlFactory.ClusterProcessingControl> {
     private static final String OUTPUT_RATE_METRIC_NAME = "org.graylog2.throughput.output.1-sec-rate";
     protected final RemoteInterfaceProvider remoteInterfaceProvider;
     protected final NodeService nodeService;
@@ -73,7 +72,7 @@ public class ClusterProcessingControlFactory {
         this.maxBufferDrainRetries = maxBufferDrainRetries;
     }
 
-    public ClusterProcessingControl create(String authorizationToken) {
+    public ClusterProcessingControlFactory<I>.ClusterProcessingControl create(String authorizationToken) {
         return new ClusterProcessingControl(authorizationToken);
     }
 
