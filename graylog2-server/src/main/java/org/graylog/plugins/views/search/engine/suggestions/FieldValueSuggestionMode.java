@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.event;
+package org.graylog.plugins.views.search.engine.suggestions;
 
-public class DefaultRiskScoreCalculator implements RiskScoreCalculator {
-
-    @Override
-    public void assignRiskScore(Event event) {
-        event.setRiskScore(0);
-    }
+public enum FieldValueSuggestionMode {
+    ON,
+    TEXTUAL_ONLY,
+    OFF
 }
