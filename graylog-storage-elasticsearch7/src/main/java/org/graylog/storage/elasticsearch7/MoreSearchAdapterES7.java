@@ -18,6 +18,8 @@ package org.graylog.storage.elasticsearch7;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Streams;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
@@ -41,9 +43,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
@@ -62,7 +61,7 @@ import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.Qu
 
 public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES7.class);
-    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(false, false, true, false);
+    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(true, false, true, false);
     private final ElasticsearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
