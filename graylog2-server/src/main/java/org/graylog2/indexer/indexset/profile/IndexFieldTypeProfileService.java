@@ -96,7 +96,18 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
         this.indexFieldTypeProfileUsagesService = indexFieldTypeProfileUsagesService;
     }
 
+    @Override
+    public Optional<IndexFieldTypeProfile> get(final String profileId) {
+        if (!ObjectId.isValid(profileId)) {
+            return Optional.empty();
+        }
+        return super.get(profileId);
+    }
+
     public Optional<IndexFieldTypeProfileWithUsages> getWithUsages(final String profileId) {
+        if (!ObjectId.isValid(profileId)) {
+            return Optional.empty();
+        }
         final Optional<IndexFieldTypeProfile> indexFieldTypeProfile = this.get(profileId);
 
         return indexFieldTypeProfile.map(profile ->
@@ -115,12 +126,18 @@ public class IndexFieldTypeProfileService extends PaginatedDbService<IndexFieldT
 
     @Override
     public int delete(final String id) {
+        if (!ObjectId.isValid(id)) {
+            return 0;
+        }
         int numRemoved = super.delete(id);
         indexSetService.removeReferencesToProfile(id);
         return numRemoved;
     }
 
     public boolean update(final String profileId, final IndexFieldTypeProfile updatedProfile) {
+        if (!ObjectId.isValid(profileId)) {
+            return false;
+        }
         updatedProfile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
         final WriteResult<IndexFieldTypeProfile, ObjectId> writeResult = db.updateById(new ObjectId(profileId), updatedProfile);
         return writeResult.getN() > 0;
