@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -80,9 +81,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -140,8 +138,8 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public void delete(String index) {
         final DeleteIndexRequest request = new DeleteIndexRequest(index);
-
-        client.execute((c, requestOptions) -> c.indices().delete(request, requestOptions));
+        client.execute((c, requestOptions) ->
+                c.indices().delete(request.indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED), requestOptions));
     }
 
     @Override
