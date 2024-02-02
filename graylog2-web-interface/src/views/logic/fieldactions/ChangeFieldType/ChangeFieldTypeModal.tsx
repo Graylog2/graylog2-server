@@ -73,7 +73,7 @@ const FailureStreamLink = () => {
   return (
     <span>
       <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } : failureStream} />
-      <i> (<Link to={Routes.SYSTEM.ENTERPRISE}>enterprise plugin</Link> required)</i>
+      <i> (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)</i>
     </span>
   );
 };
