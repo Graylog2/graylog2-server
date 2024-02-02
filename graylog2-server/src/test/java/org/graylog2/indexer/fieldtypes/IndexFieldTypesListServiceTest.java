@@ -129,9 +129,10 @@ class IndexFieldTypesListServiceTest {
 
     @Test
     void testMergesFieldsFromAllSourcesWhenRetrievingPage() {
+        final String profileId = "12345678901234567890abcd";
         IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         doReturn(Optional.of(indexSetConfig)).when(indexSetService).get("I_am_fine!");
-        doReturn("profile_id").when(indexSetConfig).fieldTypeProfile();
+        doReturn(profileId).when(indexSetConfig).fieldTypeProfile();
 
         final CustomFieldMappings customFieldMappings = new CustomFieldMappings(
                 List.of(new CustomFieldMapping("field_1", "ip"))
@@ -141,8 +142,8 @@ class IndexFieldTypesListServiceTest {
         final CustomFieldMappings profileMappings = new CustomFieldMappings(
                 List.of(new CustomFieldMapping("field_2", "date"))
         );
-        final IndexFieldTypeProfile profile = new IndexFieldTypeProfile("profile_id", "profile_name", "profile_descr", profileMappings);
-        doReturn(Optional.of(profile)).when(profileService).get("profile_id");
+        final IndexFieldTypeProfile profile = new IndexFieldTypeProfile(profileId, "profile_name", "profile_descr", profileMappings);
+        doReturn(Optional.of(profile)).when(profileService).get(profileId);
 
         MongoIndexSet indexSet = mock(MongoIndexSet.class);
         doReturn("graylog_42").when(indexSet).getActiveWriteIndex();
