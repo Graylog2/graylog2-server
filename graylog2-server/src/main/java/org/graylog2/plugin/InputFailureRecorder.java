@@ -51,6 +51,7 @@ public class InputFailureRecorder {
      * @param e the exception leading to the error
      */
     public void setFailing(Class<?> loggingClass, String error, @Nullable Throwable e) {
+        LoggerFactory.getLogger(loggingClass).warn(error, e);
         if (inputState.getState().equals(IOState.Type.FAILING)) {
             return;
         }
@@ -59,7 +60,6 @@ public class InputFailureRecorder {
         } else {
             inputState.setState(IOState.Type.FAILING, error);
         }
-        LoggerFactory.getLogger(loggingClass).warn(error, e);
     }
 
     /**
