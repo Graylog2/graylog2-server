@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Service returning usages of profiles - documents in Mongo that reference profiles.
@@ -66,7 +65,7 @@ public class IndexFieldTypeProfileUsagesService {
                 .find(Filters.in(IndexSetConfig.FIELD_PROFILE_ID,
                         profilesIds.stream()
                                 .filter(ObjectId::isValid)
-                                .collect(Collectors.toList())))
+                                .toList()))
                 .projection(Projections.include(INDEX_SET_ID, IndexSetConfig.FIELD_PROFILE_ID))
                 .forEach(document -> {
                     final String indexSetId = document.getObjectId(INDEX_SET_ID).toString();
