@@ -28,7 +28,6 @@ import { ConfigurationWell } from 'components/configurationforms';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 import { recentMessagesTimeRange } from 'views/logic/TimeRange';
-
 import {
   InputForm,
   InputStateBadge,

@@ -110,12 +110,17 @@ export const timeRangeFromQueryParameter = (range: TimeRangeQueryParameter): Tim
 
 /**
  * Creates an absolute time range that can be used to look up recently received messages.
- * It accomodates for the eventuality that messages can have timestamps from the future due to wrong system clocks.
+ * It accommodates for the eventuality that messages can have timestamps from the future
+ * due to wrong timezone parsing or wrong system clocks.
  */
 export const recentMessagesTimeRange = (): AbsoluteRangeQueryParameter => {
   const now = Date.now();
-  const fromDate = new Date(now - 5 * 60000).toISOString();
-  const toDate = new Date(now +  60 * 60000).toISOString();
+  // The biggest possible time difference on earth is 26 hours.
+  // It's between Kiribati is UTC+14 and the Howland Islands UTC-12
+  // So we are going to create an absolute range
+  // from 26 hours in the past to 26 hours into the future.
+  const fromDate = new Date(now - 26 * 60 * 60000).toISOString();
+  const toDate = new Date(now + 26 * 60 * 60000).toISOString();
 
   return { rangetype: 'absolute', from: fromDate, to: toDate };
 };
