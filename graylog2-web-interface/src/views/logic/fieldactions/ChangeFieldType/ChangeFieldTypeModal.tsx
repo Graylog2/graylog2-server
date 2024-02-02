@@ -32,6 +32,8 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -64,6 +66,18 @@ type Props = {
   }
 }
 
+const FailureStreamLink = () => {
+  const { data: failureStream, isFetching: isFetchingFailureStream, isError: isErrorFailureStream } = useStream(failureStreamId);
+  if (isFetchingFailureStream) return <Spinner />;
+
+  return (
+    <span>
+      <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } : failureStream} />
+      <i> (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)</i>
+    </span>
+  );
+};
+
 const ChangeFieldTypeModal = ({
   show,
   onSubmitCallback,
@@ -83,7 +97,6 @@ const ChangeFieldTypeModal = ({
       value,
       label,
     })), [fieldTypes]);
-  const { data: failureStream, isFetching: failureStreamLoading } = useStream(failureStreamId);
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
@@ -149,7 +162,7 @@ const ChangeFieldTypeModal = ({
           Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
-          the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
+          the <FailureStreamLink /> stream closely afterwards.
         </Alert>
         <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
         <Input id="field_type">
