@@ -16,20 +16,23 @@
  */
 package org.graylog.datanode.initializers;
 
-import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Optional;
 
 @Singleton
 public class JwtTokenValidator implements AuthTokenValidator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JwtTokenValidator.class);
 
     public static final String REQUIRED_SUBJECT = "admin";
     public static final String REQUIRED_ISSUER = "graylog";
@@ -49,22 +52,12 @@ public class JwtTokenValidator implements AuthTokenValidator {
                 .requireIssuer(REQUIRED_ISSUER)
                 .build();
         try {
-            final Jwt parsed = parser.parse(token);
-            verifySignature(parsed, signatureAlgorithm);
+            parser.parse(token);
+        } catch (UnsupportedJwtException e) {
+            LOG.warn("Token format/configuration is not supported", e);
+            throw new TokenVerificationException("Token format/configuration is not supported");
         } catch (Exception e) {
             throw new TokenVerificationException(e);
-        }
-    }
-
-    private void verifySignature(Jwt token, SignatureAlgorithm expectedAlgorithm) {
-        final SignatureAlgorithm usedAlgorithm = Optional.of(token.getHeader())
-                .map(h -> h.get("alg"))
-                .map(Object::toString)
-                .map(SignatureAlgorithm::forName)
-                .orElseThrow(() -> new IllegalArgumentException("Token doesn't provide valid signature algorithm"));
-
-        if (expectedAlgorithm != usedAlgorithm) {
-            throw new IllegalArgumentException("Token is using unsupported signature algorithm :" + usedAlgorithm);
         }
     }
 }

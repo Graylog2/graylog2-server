@@ -57,6 +57,6 @@ class JwtTokenVerifierTest {
 
         Assertions.assertThatThrownBy(() -> tokenVerifier.verifyToken(insecureToken))
                 .isInstanceOf(TokenVerificationException.class)
-                .hasMessageContaining("Token is using unsupported signature algorithm :NONE");
+                .hasMessageContaining("Token format/configuration is not supported");
     }
 }
