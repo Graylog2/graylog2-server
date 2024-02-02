@@ -33,6 +33,7 @@ import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.validation.SizeInBytes;
+import org.graylog2.validation.ValidObjectId;
 import org.joda.time.Duration;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -89,7 +90,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
                                         @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
-                                        @JsonProperty(FIELD_PROFILE_ID) @Pattern(regexp = "^[a-fA-F\\d]{24}$") @Nullable String fieldTypeProfile,
+                                        @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering
     ) {
 
