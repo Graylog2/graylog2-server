@@ -14,23 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
+package org.graylog.plugins.views.search.engine.suggestions;
 
-import { NAV_BAR_WIDTH } from './SideNav';
-
-const ContentArea = styled.div<{ $sideNavIsOpen: boolean; $isSecurityPerspective?: boolean; }>(({ $sideNavIsOpen, $isSecurityPerspective, theme }) => css`
-  display: flex;
-  flex-direction: column;
-  padding-left: ${$sideNavIsOpen ? `${NAV_BAR_WIDTH}px` : '0px'};
-  padding-top: ${$isSecurityPerspective ? '0px' : '15px'};
-  transition: all 0.33s ease-in-out;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  z-index: 10;
-  top: 0;
-  background: ${theme.colors.global.background};
-`);
-
-export default ContentArea;
+public enum FieldValueSuggestionMode {
+    ON,
+    TEXTUAL_ONLY,
+    OFF
+}

@@ -42,7 +42,7 @@ const KeysList = styled.div`
   display: inline-flex;
   gap: 5px;
   justify-content: right;
-  flex-wrap: wrap;
+  height: fit-content;
 `;
 
 const KeySeparator = styled.div`

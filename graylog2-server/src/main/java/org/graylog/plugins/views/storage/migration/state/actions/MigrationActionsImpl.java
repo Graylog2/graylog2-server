@@ -18,15 +18,21 @@ package org.graylog.plugins.views.storage.migration.state.actions;
 
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
+import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 public class MigrationActionsImpl implements MigrationActions {
 
     private final ClusterConfigService clusterConfigService;
+    private final CaService caService;
 
     @Inject
-    public MigrationActionsImpl(ClusterConfigService clusterConfigService) {
+    public MigrationActionsImpl(final ClusterConfigService clusterConfigService,
+                                final CaService caService) {
         this.clusterConfigService = clusterConfigService;
+        this.caService = caService;
     }
 
     @Override
@@ -37,12 +43,14 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean runDirectoryCompatibilityCheck() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
     public boolean isOldClusterStopped() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
@@ -52,7 +60,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean directoryCompatibilityCheckOk() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
@@ -62,7 +71,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean reindexingFinished() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
@@ -82,16 +92,20 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean caDoesNotExist() {
-        return false;
+        try {
+            return this.caService.get() == null;
+        } catch (KeyStoreStorageException e) {
+            return true;
+        }
     }
 
     @Override
     public boolean removalPolicyDoesNotExist() {
-        return false;
+        return this.clusterConfigService.get(RenewalPolicy.class) == null;
     }
 
     @Override
     public boolean caAndRemovalPolicyExist() {
-        return false;
+        return !caDoesNotExist() && !removalPolicyDoesNotExist();
     }
 }

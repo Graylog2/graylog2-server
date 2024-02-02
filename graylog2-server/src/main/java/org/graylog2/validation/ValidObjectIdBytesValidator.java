@@ -14,8 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.event;
+package org.graylog2.validation;
 
-public interface RiskScoreCalculator {
-    void assignRiskScore(Event event);
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import org.bson.types.ObjectId;
+
+public class ValidObjectIdBytesValidator implements ConstraintValidator<ValidObjectId, String> {
+
+    @Override
+    public boolean isValid(final String value, final ConstraintValidatorContext context) {
+        if (value == null) {
+            return true;
+        }
+        return ObjectId.isValid(value);
+    }
 }
