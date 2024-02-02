@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
@@ -59,8 +60,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -157,6 +156,17 @@ public class PivotAggregationSearch implements AggregationSearch {
             // If we have only EmptyParameterErrors, just return an empty Result
             if (errors.stream().allMatch(e -> e instanceof EmptyParameterError)) {
                 return AggregationResult.empty();
+            }
+
+            // If we have only missing index errors, just return an empty Result
+            // Graylog2/graylog2-server/issues/18127
+            if (errors.stream().allMatch(e -> e instanceof QueryError)) {
+                if (errors.stream()
+                        .filter(error -> !error.description().contains("index_not_found_exception"))
+                        .findAny()
+                        .isEmpty()) {
+                    return AggregationResult.empty();
+                }
             }
 
             final String description = f("Event definition %s (%s) failed: %s",
