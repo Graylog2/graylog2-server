@@ -1,4 +1,0 @@
-type = "c"
-message = "Enable condition form in event definitions for Illuminate events"
-
-pulls = ["18130"]
