@@ -37,12 +37,14 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean runDirectoryCompatibilityCheck() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
     public boolean isOldClusterStopped() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
@@ -52,7 +54,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean directoryCompatibilityCheckOk() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
@@ -62,7 +65,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean reindexingFinished() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
@@ -82,16 +86,19 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean caDoesNotExist() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
     public boolean removalPolicyDoesNotExist() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 
     @Override
     public boolean caAndRemovalPolicyExist() {
-        return false;
+        // TODO: add real test
+        return true;
     }
 }
