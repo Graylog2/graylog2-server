@@ -27,6 +27,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
+import org.graylog.shaded.kafka09.joptsimple.internal.Strings;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
@@ -43,6 +44,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -50,9 +52,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV)
-public class MigrationStateMachineRemoteReindexingIT implements MigrationITTools {
+public class MigrationStateMachineInPlaceMigrationIT implements MigrationITTools {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MigrationStateMachineRemoteReindexingIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MigrationStateMachineInPlaceMigrationIT.class);
 
     private GraylogApis apis;
     private OpenSearchInstance openSearchInstance;
