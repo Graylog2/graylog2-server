@@ -32,6 +32,8 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -50,7 +52,6 @@ const RedBadge = styled(Badge)(({ theme }) => css`
 const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
 
 const failureStreamId = '000000000000000000000004';
-const allEventsId = '000000000000000000000002';
 
 type Props = {
   show: boolean,
@@ -67,11 +68,14 @@ type Props = {
 
 const FailureStreamLink = () => {
   const { data: failureStream, isFetching: isFetchingFailureStream, isError: isErrorFailureStream } = useStream(failureStreamId);
-  const { data: allEventStream, isFetching: isFetchingAllEventStream, isError: isErrorAllEventStream } = useStream(allEventsId, { enabled: isErrorFailureStream });
-  if (isErrorFailureStream && isErrorAllEventStream) return <span>Processing and Indexing Failures</span>;
-  if (isFetchingFailureStream || isFetchingAllEventStream) return <Spinner />;
+  if (isFetchingFailureStream) return <Spinner />;
 
-  return <StreamLink stream={isErrorFailureStream ? allEventStream : failureStream} />;
+  return (
+    <span>
+      <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } : failureStream} />
+      <i> (<Link to={Routes.SYSTEM.ENTERPRISE}>enterprise plugin</Link> required)</i>
+    </span>
+  );
 };
 
 const ChangeFieldTypeModal = ({
