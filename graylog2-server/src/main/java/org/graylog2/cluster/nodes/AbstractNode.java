@@ -64,10 +64,6 @@ public abstract class AbstractNode<DTO extends NodeDto> extends PersistedImpl im
         if (rawLastSeen instanceof BSONTimestamp) {
             return new DateTime(((BSONTimestamp) rawLastSeen).getTime() * 1000L, DateTimeZone.UTC);
         }
-        // TODO: do we need this?
-//        if (rawLastSeen instanceof Timestamp ts) {
-//            return new DateTime(ts.getTime() * 1000L, DateTimeZone.UTC);
-//        }
         return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
     }
 
