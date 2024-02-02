@@ -16,40 +16,19 @@
  */
 package org.graylog.datanode;
 
-import com.github.rholder.retry.Attempt;
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.RetryListener;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
-import org.apache.commons.lang.RandomStringUtils;
-import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
-import org.graylog.shaded.kafka09.joptsimple.internal.Strings;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexResponse;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV)
 public class MigrationStateMachineInPlaceMigrationIT implements MigrationITTools {
