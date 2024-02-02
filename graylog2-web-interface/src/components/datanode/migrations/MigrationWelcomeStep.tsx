@@ -46,7 +46,7 @@ const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const MigrationHelpStep = ({ onStepComplete, onSkipCompatibilityCheck }: Props) => {
+const MigrationWelcomeStep = ({ onStepComplete, onSkipCompatibilityCheck }: Props) => {
   const { data: dataNodes } = useDataNodes();
 
   return (
@@ -90,4 +90,4 @@ const MigrationHelpStep = ({ onStepComplete, onSkipCompatibilityCheck }: Props) 
   );
 };
 
-export default MigrationHelpStep;
+export default MigrationWelcomeStep;

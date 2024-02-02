@@ -15,47 +15,58 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
-import { Wizard } from 'components/common';
-import MigrationHelpStep from 'components/datanode/migrations/MigrationHelpStep';
+import { Spinner, Wizard } from 'components/common';
 import CAStep from 'components/datanode/migrations/CAStep';
-import useMigrationStep, { STEP_KEYS } from 'components/datanode/hooks/useMigrationStep';
 import ManualMigrationStep from 'components/datanode/migrations/ManualMigrationStep';
+import { MIGRATION_STATE } from 'components/datanode/Constants';
+import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
+import type { MigrationActions } from 'components/datanode/Types';
+import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizardStep';
+import MigrationWelcomeStep from 'components/datanode/migrations/MigrationWelcomeStep';
+import CertificateRenewalStep from 'components/datanode/migrations/CertificateRenewalStep';
 
 const MigrationWizard = () => {
-  const [activeStep, setActiveStep] = useState(null);
-  const { wizardStep } = useMigrationStep();
+  const { step: currentStep, isLoading } = useMigrationWizardStep();
+  const { onTriggerNextState } = useTriggerMigrationState();
 
-  useEffect(() => {
-    setActiveStep(wizardStep);
-  }, [wizardStep]);
+  if (isLoading) {
+    return <Spinner text="Loading ..." />;
+  }
 
-  const onWizardStepChange = (step: string) => {
-    setActiveStep(step);
+  const onWizardStepChange = async (step: MigrationActions) => {
+    await onTriggerNextState({ step, args: {} });
   };
+
+  const { state: activeStep, next_steps: nextSteps } = currentStep;
+  console.log(currentStep);
 
   const steps = [
     {
-      key: 'welcome',
-      title: (<>Welcome</>),
-      component: <MigrationHelpStep onStepComplete={() => onWizardStepChange(STEP_KEYS[1])}
-                                    onSkipCompatibilityCheck={() => onWizardStepChange(STEP_KEYS[2])} />,
+      key: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.key,
+      title: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.description,
+      component: <MigrationWelcomeStep onStepComplete={() => onWizardStepChange(nextSteps[0])}
+                                       onSkipCompatibilityCheck={() => onWizardStepChange(nextSteps[1])} />,
     },
     {
-      key: 'compatibility-check',
-      title: (<>Compatibitlity Check</>),
-      component: <CompatibilityCheckStep onStepComplete={() => onWizardStepChange(STEP_KEYS[2])} />,
+      key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key,
+      title: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.description,
+      component: <CompatibilityCheckStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
     },
     {
-      key: 'ca-configuration',
-      title: (<>CA Configuration</>),
-      component: <CAStep onStepComplete={() => onWizardStepChange(STEP_KEYS[3])} />,
+      key: MIGRATION_STATE.CA_CREATION_PAGE.key,
+      title: MIGRATION_STATE.CA_CREATION_PAGE.description,
+      component: <CAStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
     },
     {
-      key: 'manual-migration',
-      title: (<>Migration Steps</>),
+      key: MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.key,
+      title: MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.description,
+      component: <CertificateRenewalStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
+    },
+    {
+      key: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,
+      title: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.description,
       component: <ManualMigrationStep />,
     },
   ];
@@ -63,7 +74,7 @@ const MigrationWizard = () => {
   return (
     <Wizard steps={steps}
             activeStep={activeStep}
-            onStepChange={onWizardStepChange}
+            onStepChange={() => {}}
             horizontal
             justified
             containerClassName=""

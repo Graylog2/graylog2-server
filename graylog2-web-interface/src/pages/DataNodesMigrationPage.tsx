@@ -14,32 +14,46 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import MigrationWizard from 'components/datanode/migrations/MigrationWizard';
+import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizardStep';
+import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
+import { MIGRATION_STATE } from 'components/datanode/Constants';
 
-const DataNodesMigrationPage = () => (
-  <DocumentTitle title="Data Nodes Migration">
-    <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes Migration"
-                documentationLink={{
-                  title: 'Data Nodes documentation',
-                  path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-                }}>
-      <span>
-        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
-      </span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <MigrationWizard />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+const DataNodesMigrationPage = () => {
+  const { step: currentStep, isLoading } = useMigrationWizardStep();
+  const { onTriggerNextState } = useTriggerMigrationState();
+
+  useEffect(() => {
+    if (!isLoading && currentStep.state === MIGRATION_STATE.NEW.key) {
+      onTriggerNextState({ step: currentStep.next_steps[0], args: {} });
+    }
+  }, [currentStep.next_steps, currentStep.state, isLoading, onTriggerNextState]);
+
+  return (
+    <DocumentTitle title="Data Nodes Migration">
+      <DataNodesPageNavigation />
+      <PageHeader title="Data Nodes Migration"
+                  documentationLink={{
+                    title: 'Data Nodes documentation',
+                    path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+                  }}>
+        <span>
+          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
+        </span>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          <MigrationWizard />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default DataNodesMigrationPage;

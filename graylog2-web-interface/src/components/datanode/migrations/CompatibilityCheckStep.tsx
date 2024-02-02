@@ -31,28 +31,34 @@ const CompatibilityAlert = styled(Alert)`
 `;
 
 const CompatibilityCheckStep = ({ onStepComplete }: Props) => {
-  const { isError, data } = useCompatibilityCheck();
+  const { error: requestError, data, isInitialLoading, isError } = useCompatibilityCheck();
 
-  if (isError) {
-    return <Spinner text="Loading..." />;
+  if (isInitialLoading) {
+    return <Spinner text="Loading compatibility check results..." />;
   }
 
   const isCompatible = data?.compatibility_errors.length === 0;
 
   return (
     <>
-      <CompatibilityAlert bsStyle={isCompatible ? 'success' : 'danger'}>
+      <CompatibilityAlert bsStyle={(!isError && isCompatible) ? 'success' : 'danger'}>
         {isCompatible && <h4>Your existing opensearch data can be migrated to Datanode.</h4>}
-        {!isCompatible && (
+        {!isError && !isCompatible && (
           <>
             <h4>Your existing opensearch data cannot be migrated to Datanode.</h4>
             <br />
             Error: {data?.compatibility_errors.map((error) => <dd key={error}>{error}</dd>)}
           </>
         )}
+        {isError && (
+          <>
+            <h4>There was an error checking the compatibility</h4>
+            <p>{requestError.message}</p>
+          </>
+        )}
       </CompatibilityAlert>
       {isCompatible && <CompatibilityStatus opensearchVersion={data.opensearch_version} nodeInfo={data.info} />}
-      <Button bsStyle="success" onClick={() => onStepComplete()} disabled={!isCompatible}>
+      <Button bsStyle="success" onClick={() => onStepComplete()}>
         Next
       </Button>
     </>

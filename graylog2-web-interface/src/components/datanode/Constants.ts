@@ -41,7 +41,27 @@ export const MIGRATION_STEP = {
 export const MIGRATION_STATE = {
   NEW: {
     key: 'NEW',
+    description: 'Migration',
+  },
+  MIGRATION_WELCOME_PAGE: {
+    key: 'MIGRATION_WELCOME_PAGE',
     description: 'Welcome',
+  },
+  // DIRECTORY_COMPATIBILITY_CHECK_PAGE: {
+  //   key: 'DIRECTORY_COMPATIBILITY_CHECK_PAGE',
+  //   description: 'Compatibility check',
+  // },
+  CA_CREATION_PAGE: {
+    key: 'CA_CREATION_PAGE',
+    description: 'Certificate autority',
+  },
+  RENEWAL_POLICY_CREATION_PAGE: {
+    key: 'RENEWAL_POLICY_CREATION_PAGE',
+    description: 'Certificate renewal policy',
+  },
+  MIGRATION_SELECTION_PAGE: {
+    key: 'MIGRATION_SELECTION_PAGE',
+    description: 'Migration steps',
   },
   ROLLING_UPGRADE_MIGRATION_WELCOME: {
     key: 'ROLLING_UPGRADE_MIGRATION_WELCOME',
@@ -116,4 +136,12 @@ export const REMOTE_REINDEXING_MIGRATION_STEPS = [
   MIGRATION_STATE.FINISHED.key,
 ];
 
+export const MIGRATION_WIZARD_STEPS = [
+  MIGRATION_STATE.NEW.key,
+  MIGRATION_STATE.MIGRATION_WELCOME_PAGE.key,
+  MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key,
+  MIGRATION_STATE.CA_CREATION_PAGE.key,
+  MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.key,
+  MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,
+];
 export default MIGRATION_STEP;
