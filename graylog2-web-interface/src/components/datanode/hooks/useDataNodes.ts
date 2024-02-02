@@ -164,11 +164,43 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
     },
   );
 
+  const elements = [{
+    cert_valid_until: '2053-11-02T13:20:58',
+    error_msg: null,
+    hostname: 'datanode1',
+    node_id: '3af165ef-87a9-467f-b7db-435f4748eb75',
+    short_node_id: '3af165ef',
+    status: 'CONNECTED' as any,
+    transport_address: 'http://datanode1:9200',
+    type: 'DATANODE',
+    id: '1',
+    is_leader: true,
+    is_master: true,
+    last_seen: '2053-11-02T13:20:58',
+    data_node_status: 'AVAILABLE',
+    action_queue: 'STOP',
+  }, {
+    cert_valid_until: '2053-11-02T13:20:58',
+    error_msg: null,
+    hostname: 'datanode2',
+    node_id: '9597fd2f-9c44-466b-ae47-e49ba54d3aeb',
+    short_node_id: '9597fd2f',
+    status: 'CONNECTED' as any,
+    transport_address: 'http://datanode2:9200',
+    type: 'DATANODE',
+    id: '2',
+    is_leader: false,
+    is_master: false,
+    last_seen: '2053-11-02T13:20:58',
+    data_node_status: 'AVAILABLE',
+    action_queue: 'STOP',
+  }];
+
   return ({
-    data: data || {
+    data: {
       attributes: [],
-      elements: [],
-      pagination: { total: 0 },
+      elements,
+      pagination: { total: 0 } as any,
     },
     refetch,
     isInitialLoading,
