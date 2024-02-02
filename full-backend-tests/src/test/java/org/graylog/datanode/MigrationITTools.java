@@ -19,7 +19,6 @@ package org.graylog.datanode;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
-import org.graylog.shaded.kafka09.joptsimple.internal.Strings;
 import org.hamcrest.Matchers;
 
 import java.util.Map;
@@ -35,7 +34,7 @@ public interface MigrationITTools {
 
     // TODO: replace with jackson!
     default String format(final Map<String, Object> args) {
-        return Strings.join(args.entrySet().stream().map((entry) -> "\"" + entry.getKey() + "\": \"" + entry.getValue() + "\"\n").toList(), ",");
+        return String.join(",", args.entrySet().stream().map((entry) -> "\"" + entry.getKey() + "\": \"" + entry.getValue() + "\"\n").toList());
     }
 
     default String request(final MigrationStep step, final Map<String, Object> args) {
