@@ -32,6 +32,8 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -52,6 +54,18 @@ type Props = {
   onClose: () => void
 }
 
+const FailureStreamLink = () => {
+  const { data: failureStream, isFetching: isFetchingFailureStream, isError: isErrorFailureStream } = useStream(failureStreamId);
+  if (isFetchingFailureStream) return <Spinner />;
+
+  return (
+    <span>
+      <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } : failureStream} />
+      <i> (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)</i>
+    </span>
+  );
+};
+
 const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(false);
@@ -63,7 +77,6 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
       value,
       label,
     })), [fieldTypes]);
-  const { data: failureStream, isFetching: failureStreamLoading } = useStream(failureStreamId);
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
@@ -119,7 +132,7 @@ const ChangeFieldTypeModal = ({ show, onClose, field }: Props) => {
           Changing the type of the field can have a significant impact on the ingestion of future log messages.
           If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
           ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
-          the {failureStreamLoading ? <Spinner /> : <StreamLink stream={failureStream} />} stream closely afterwards.
+          the <FailureStreamLink /> stream closely afterwards.
         </Alert>
         <Input label="New Field Type:" id="new-field-type">
           <StyledSelect inputId="field_type"
