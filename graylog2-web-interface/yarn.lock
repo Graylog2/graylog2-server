@@ -6384,22 +6384,22 @@ elementary-circuits-directed-graph@^1.0.4:
     strongly-connected-components "^1.0.1"
 
 embla-carousel-react@^8.0.0-rc11:
-  version "8.0.0-rc19"
-  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-8.0.0-rc19.tgz#50a9c1206c996bf83c27dc9f081105bbe6ea552e"
-  integrity sha512-4BBj1HvlUqhWXFyDJOL/JbQ74jtekfdH646B1wQzM9QmWn6CEcbD/SmovKqc6B5jYTKaaGEGEEw7bpUJRajA8w==
+  version "8.0.0-rc22"
+  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-8.0.0-rc22.tgz#cc017e5c370663a9517fa46fba55ea7ad1df5e17"
+  integrity sha512-NwmISV0Cw9XVo76Vquz3hJaeZe7qoCRtrzStxlEY7qfZD8WR/f4JlQAso35URTs1BeYVhcuClflelioo+Zmidg==
   dependencies:
-    embla-carousel "8.0.0-rc19"
-    embla-carousel-reactive-utils "8.0.0-rc19"
+    embla-carousel "8.0.0-rc22"
+    embla-carousel-reactive-utils "8.0.0-rc22"
 
-embla-carousel-reactive-utils@8.0.0-rc19:
-  version "8.0.0-rc19"
-  resolved "https://registry.yarnpkg.com/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.0.0-rc19.tgz#6604f9c9f3a07f13734ca0af7c19310c1adc1f7e"
-  integrity sha512-ed9NppY0OxTtrSIwTCYNcMLlQfSNcNy8Zsw8uIG0te3qrhvQ2ePPsbcElK2SRAV8VMU6G7JQweQIb6amzYMDXA==
+embla-carousel-reactive-utils@8.0.0-rc22:
+  version "8.0.0-rc22"
+  resolved "https://registry.yarnpkg.com/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.0.0-rc22.tgz#de40e32d684487b4635bd9cdef23b3c5c7c599d6"
+  integrity sha512-K4b8QhQGXYW5wr4l+U6XryhafsFV5c/IyohDnZN3MGoYIB9xY7qpjUWAcs5bTDjAD+qCZPOuXre0D3IVa28mqw==
 
-embla-carousel@8.0.0-rc19:
-  version "8.0.0-rc19"
-  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-8.0.0-rc19.tgz#f0d8dbf54f2f8f2cdfe0697f371fe5d5fd4e2dac"
-  integrity sha512-PAChVyYoVZo8subkBN8LjZ7+0vk4CmVvMnxH0Y2ux76VUEUBl1wk5xDo8+MUhH5MXU6ZrgkBpMe++bKob1Z+2g==
+embla-carousel@8.0.0-rc22:
+  version "8.0.0-rc22"
+  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-8.0.0-rc22.tgz#f5e4447636dce317ae066138a45abe77e08bae4a"
+  integrity sha512-MeXnPT1LShfgAu8qXj3CskayV0R6OkHx7w3cPTx+Q5ZWKyShKpIuu7qVQJ5BoFegalE4n6yxqoQaRuGFbK9pYw==
 
 emittery@^0.13.1:
   version "0.13.1"
@@ -6981,7 +6981,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-8de2ad5f-3196-4071-ad84-1f676ffbfa11-1706789281534/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.6.3"
     eslint-plugin-jest-dom "5.1.0"
@@ -8411,13 +8411,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.7"
     "@types/jquery" "3.5.29"
     "@types/react" "18.2.20"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-4f8d2819-85fb-44b3-8bb7-91a5cd25cb13-1706789281043/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-4f8d2819-85fb-44b3-8bb7-91a5cd25cb13-1706789281043/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-4f8d2819-85fb-44b3-8bb7-91a5cd25cb13-1706789281043/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.44"
@@ -12536,9 +12536,9 @@ react-grid-layout@^1.3.0:
     resize-observer-polyfill "^1.5.1"
 
 react-hotkeys-hook@^4.4.1:
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-4.4.1.tgz#1f7a7a1c9c21d4fa3280bf340fcca8fd77d81994"
-  integrity sha512-sClBMBioFEgFGYLTWWRKvhxcCx1DRznd+wkFHwQZspnRBkHTgruKIHptlK/U/2DPX8BhHoRGzpMVWUXMmdZlmw==
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-4.5.0.tgz#807b389b15256daf6a813a1ec09e6698064fe97f"
+  integrity sha512-Samb85GSgAWFQNvVt3PS90LPPGSf9mkH/r4au81ZP1yOIFayLC3QAvqTgGtJ8YEDMXtPmaVBs6NgipHO6h4Mug==
 
 react-immutable-proptypes@^2.1.0:
   version "2.2.0"
