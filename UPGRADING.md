@@ -144,6 +144,16 @@ Removed fields:
 - `service`
 - `vendor_event_description`
 
+## Newly stored Message Fields
+
+The following fields will be added to every Message.
+The data of the fields is *not* accounted as outgoing traffic.
+
+ - `gl2_receive_timestamp` - The time the Message was received
+ - `gl2_processing_timestamp` - The time the Message was processed and will be sent to an Output
+ - `gl2_processing_duration_ms` - The duration between the receive and processing times
+
+
 ## Java API Changes
 
 The following Java Code API changes have been made.
