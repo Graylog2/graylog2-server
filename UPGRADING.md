@@ -144,7 +144,7 @@ Removed fields:
 - `service`
 - `vendor_event_description`
 
-## Newly stored Message Fields
+## Newly Stored Message Fields
 
 The following fields will be added to every Message.
 The data of the fields is *not* accounted as outgoing traffic.
