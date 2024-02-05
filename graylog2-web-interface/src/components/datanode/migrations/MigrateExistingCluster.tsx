@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -15,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import styled from 'styled-components';
 
 import { Col, Panel, PanelGroup } from 'components/bootstrap';
@@ -25,8 +24,7 @@ import Welcome from 'components/datanode/migrations/rollingUpgrade/Welcome';
 import DirectoryCompatibilityCheck from 'components/datanode/migrations/rollingUpgrade/DirectoryCompatibilityCheck';
 import CertificatesProvisioning from 'components/datanode/migrations/rollingUpgrade/CertificatesProvisioning';
 import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
-import ConnectionStringRemoval from 'components/datanode/migrations/rollingUpgrade/ConnectionStringRemoval';
-import MigrationFinished from 'components/datanode/migrations/rollingUpgrade/MigrationFinished';
+import ConnectionStringRemovalStep from 'components/datanode/migrations/ConnectionStringRemovalStep';
 import MigrateActions from 'components/datanode/migrations/rollingUpgrade/MigrateActions';
 
 type Props = {
@@ -64,41 +62,39 @@ const StyledPanelGroup = styled(PanelGroup)`
 `;
 
 const MigrateExistingCluster = ({ currentStep, onTriggerNextStep }: Props) => {
-  const [activeStep, setActiveStep] = useState(currentStep.state);
+  const { next_steps: nextSteps, state: activeStep } = currentStep;
 
-  useEffect(() => {
-    setActiveStep(currentStep.state);
-  }, [currentStep]);
+  const onStepComplete = () => {
+    onTriggerNextStep({ step: nextSteps[0] });
+  };
 
   const steps = [
     {
       key: MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key,
-      component: <Welcome onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
+      component: <Welcome onStepComplete={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key,
-      component: <DirectoryCompatibilityCheck onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
+      component: <DirectoryCompatibilityCheck onStepComplete={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key,
-      component: <CertificatesProvisioning onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
+      component: <CertificatesProvisioning onStepComplete={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key,
-      component: <JournalDowntimeWarning onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
+      component: <JournalDowntimeWarning onStepComplete={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART.key,
-      component: <MigrateActions onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
+      component: <MigrateActions onStepComplete={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key,
-      component: <ConnectionStringRemoval onStepComplete={onTriggerNextStep} nextSteps={currentStep.next_steps} />,
-    }, {
-      key: MIGRATION_STATE.FINISHED.key,
-      component: <MigrationFinished />,
+      component: <ConnectionStringRemovalStep onStepComplete={onStepComplete} />,
     },
   ];
+  console.log(currentStep);
 
   return (
     <Col>
@@ -106,7 +102,7 @@ const MigrateExistingCluster = ({ currentStep, onTriggerNextStep }: Props) => {
       <p>Follow these steps to migrate your existing migrating an existing OpenSearch 2.x or 1.3.x cluster to Data
         Node
       </p>
-      <StyledPanelGroup accordion id="first" activeKey={activeStep}>
+      <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
         {ROLLING_UPGRADE_MIGRATION_STEPS.map((rollingUpgradeStep, index) => {
           const { description } = MIGRATION_STATE[rollingUpgradeStep];
 

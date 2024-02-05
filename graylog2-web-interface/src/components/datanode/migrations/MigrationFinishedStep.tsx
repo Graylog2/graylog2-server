@@ -16,17 +16,7 @@
  */
 import * as React from 'react';
 
-import { Button } from 'components/bootstrap';
-
-type Props = {
-  onStepComplete: () => void,
-};
-
-const MigrateActions = ({ onStepComplete }: Props) => (
-  <>
-    Migrations Steps
-    <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Next</Button>
-  </>
-
+const MigrationFinishedStep = () => (
+  <p>The migration is finished !</p>
 );
-export default MigrateActions;
+export default MigrationFinishedStep;

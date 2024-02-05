@@ -26,6 +26,9 @@ import type { MigrationActions } from 'components/datanode/Types';
 import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizardStep';
 import MigrationWelcomeStep from 'components/datanode/migrations/MigrationWelcomeStep';
 import CertificateRenewalStep from 'components/datanode/migrations/CertificateRenewalStep';
+import ShutdownClusterStep from 'components/datanode/migrations/ShutdownClusterStep';
+import MigrationFinishedStep from 'components/datanode/migrations/MigrationFinishedStep';
+import ConnectionStringRemovalStep from 'components/datanode/migrations/ConnectionStringRemovalStep';
 
 const MigrationWizard = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
@@ -71,14 +74,20 @@ const MigrationWizard = () => {
     {
       key: MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key,
       title: MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.description,
-      component: <>Shut down cluster</>,
+      component: <ShutdownClusterStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
+    },
+    {
+      key: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key,
+      title: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.description,
+      component: <ConnectionStringRemovalStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
     },
     {
       key: MIGRATION_STATE.FINISHED.key,
       title: MIGRATION_STATE.FINISHED.description,
-      component: <>Finished</>,
+      component: <MigrationFinishedStep />,
     },
   ];
+  console.log(currentStep);
 
   return (
     <Wizard steps={steps}

@@ -15,7 +15,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
 import { Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -40,8 +40,6 @@ const ManualMigrationStep = () => {
   const onMigrationStepChange = async (type: MigrationTypeSteps) => {
     await onTriggerNextState({ step: type });
   };
-
-  console.log(currentStep);
 
   return (
     <>

@@ -15,32 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-import { Alert, Button } from 'components/bootstrap';
+import { Button } from 'components/bootstrap';
 
 type Props = {
   onStepComplete: () => void,
 };
 
-const DownsizeWarning = styled(Alert)`
-  margin-top: 10px;
-  margin-bottom: 5px;
-`;
-
-const JournalDowntimeWarning = ({ onStepComplete }: Props) => (
+const ConnectionStringRemovalStep = ({ onStepComplete }: Props) => (
   <>
-    <DownsizeWarning bsStyle="danger">
-      <h4>During the next step the journal size will increase because of stopping the processing.</h4>
-      <ul>
-        <li>Current journal size: 1Go</li>
-        <li>Messages: 10 000</li>
-        <li>Volume size:  2Go</li>
-        <li><b>Estimated down time: 5mn</b></li>
-      </ul>
-      <p>Please increase you journal volume size before proceeding.</p>
-    </DownsizeWarning>
+    <p>Please remove the <code>elasticsearch_hosts</code> line from you graylog</p>
+    <p>Ex. <code>elasticsearch_hosts = https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200</code></p>
     <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Next</Button>
   </>
 );
-export default JournalDowntimeWarning;
+export default ConnectionStringRemovalStep;

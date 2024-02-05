@@ -21,12 +21,11 @@ import { Button } from 'components/bootstrap';
 type Props = {
   onStepComplete: () => void,
 };
-
-const MigrateActions = ({ onStepComplete }: Props) => (
+const ShutdownClusterStep = ({ onStepComplete }: Props) => (
   <>
-    Migrations Steps
-    <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Next</Button>
+    <p>Please shut down you <code>Opensearch</code> before continuing. </p>
+    <Button bsStyle="success" onClick={() => onStepComplete()}>Next</Button>
   </>
 
 );
-export default MigrateActions;
+export default ShutdownClusterStep;
