@@ -1,0 +1,4 @@
+type = "changed"
+message = "Restrict classes allowed for cluster config and event types."
+
+pulls = ["18165"]
