@@ -22,7 +22,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
-import org.mongojack.internal.MongoJackModule;
 
 @Singleton
 public class MongoCollections {
@@ -34,8 +33,6 @@ public class MongoCollections {
     public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
-
-        MongoJackModule.configure(this.objectMapper);
     }
 
     /**
