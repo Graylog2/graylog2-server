@@ -32,12 +32,13 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.migrations.V20170110150100_FixAlertConditionsMigration.MigrationCompleted;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -74,7 +75,9 @@ public class V20170110150100_FixAlertConditionsMigrationTest {
     public void setUp() throws Exception {
         this.clusterConfigService = spy(new ClusterConfigServiceImpl(objectMapperProvider,
                 mongodb.mongoConnection(), nodeId,
-                new ChainingClassLoader(getClass().getClassLoader()), new ClusterEventBus()));
+                new RestrictedChainingClassLoader(
+                        new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
+                new ClusterEventBus()));
 
         final MongoConnection mongoConnection = spy(mongodb.mongoConnection());
         final MongoDatabase mongoDatabase = spy(mongoConnection.getMongoDatabase());
