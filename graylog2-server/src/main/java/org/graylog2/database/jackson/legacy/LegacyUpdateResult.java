@@ -18,7 +18,6 @@ package org.graylog2.database.jackson.legacy;
 
 import com.google.common.primitives.Ints;
 import com.mongodb.client.result.UpdateResult;
-import org.mongojack.JacksonMongoCollection;
 import org.mongojack.WriteResult;
 
 /**
@@ -28,11 +27,9 @@ import org.mongojack.WriteResult;
  */
 @Deprecated
 public class LegacyUpdateResult<T, K> implements WriteResult<T, K> {
-    protected final JacksonMongoCollection<T> collection;
     private final UpdateResult updateResult;
 
-    public LegacyUpdateResult(JacksonMongoCollection<T> collection, UpdateResult updateResult) {
-        this.collection = collection;
+    public LegacyUpdateResult(UpdateResult updateResult) {
         this.updateResult = updateResult;
     }
 

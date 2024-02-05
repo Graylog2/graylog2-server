@@ -203,7 +203,7 @@ public class JacksonDBCollection<T, K> {
         final var coll = concern == null ? delegate : delegate.withWriteConcern(concern);
         final var options = new ReplaceOptions().upsert(upsert);
         try {
-            return new LegacyUpdateResult<>(coll, coll.replaceOne(filter, object, options));
+            return new LegacyUpdateResult<>(coll.replaceOne(filter, object, options));
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
         }
@@ -212,11 +212,9 @@ public class JacksonDBCollection<T, K> {
     public WriteResult<T, K> update(Bson filter, Bson update, boolean upsert, boolean multi) {
         try {
             if (multi) {
-                return new LegacyUpdateResult<>(delegate,
-                        delegate.updateMany(filter, update, new UpdateOptions().upsert(upsert)));
+                return new LegacyUpdateResult<>(delegate.updateMany(filter, update, new UpdateOptions().upsert(upsert)));
             } else {
-                return new LegacyUpdateResult<>(delegate,
-                        delegate.updateOne(filter, update, new UpdateOptions().upsert(upsert)));
+                return new LegacyUpdateResult<>(delegate.updateOne(filter, update, new UpdateOptions().upsert(upsert)));
             }
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
@@ -245,7 +243,7 @@ public class JacksonDBCollection<T, K> {
 
     public WriteResult<T, K> updateById(K id, T update) {
         try {
-            return new LegacyUpdateResult<>(delegate, delegate.replaceOneById(id, update));
+            return new LegacyUpdateResult<>(delegate.replaceOneById(id, update));
         } catch (MongoServerException e) {
             throw possiblyAsDuplicateKeyError(e);
         }
