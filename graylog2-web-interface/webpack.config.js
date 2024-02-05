@@ -20,10 +20,10 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
+const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 
 const supportedBrowsers = require('./supportedBrowsers');
 const core = require('./webpack/core');
-const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
