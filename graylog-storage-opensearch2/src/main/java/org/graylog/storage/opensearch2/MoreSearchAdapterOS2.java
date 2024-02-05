@@ -61,7 +61,7 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 
 public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS2.class);
-    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(true, false, true, false);
+    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(true, true, true, false);
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;

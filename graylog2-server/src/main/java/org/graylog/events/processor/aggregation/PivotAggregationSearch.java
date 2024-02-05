@@ -158,17 +158,6 @@ public class PivotAggregationSearch implements AggregationSearch {
                 return AggregationResult.empty();
             }
 
-            // If we have only missing index errors, just return an empty Result
-            // Graylog2/graylog2-server/issues/18127
-            if (errors.stream().allMatch(e -> e instanceof QueryError)) {
-                if (errors.stream()
-                        .filter(error -> !error.description().contains("index_not_found_exception"))
-                        .findAny()
-                        .isEmpty()) {
-                    return AggregationResult.empty();
-                }
-            }
-
             final String description = f("Event definition %s (%s) failed: %s",
                     eventDefinition.title(), eventDefinition.id(),
                     errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
