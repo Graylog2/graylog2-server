@@ -1,4 +1,4 @@
-type = "fixed"
+type = "added"
 message = "Datanode Cluster Management UI"
 
 issues = ["17704"]
