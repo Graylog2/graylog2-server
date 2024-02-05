@@ -55,6 +55,6 @@ public class Scroll implements MultiChunkResultRetriever {
         return new SearchRequest(indices.toArray(new String[0]))
                 .source(query)
                 .scroll(DEFAULT_SCROLLTIME)
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
     }
 }

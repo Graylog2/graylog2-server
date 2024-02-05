@@ -50,6 +50,6 @@ public class PaginationOS2 implements MultiChunkResultRetriever {
                                              final Set<String> indices) {
         return new SearchRequest(indices.toArray(new String[0]))
                 .source(query)
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
     }
 }

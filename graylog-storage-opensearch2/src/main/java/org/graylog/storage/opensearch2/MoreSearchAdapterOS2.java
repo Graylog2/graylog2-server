@@ -115,7 +115,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
-            LOG.debug("Execute search: {}", searchRequest.toString());
+            LOG.debug("Execute search: {}", searchRequest);
         }
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
