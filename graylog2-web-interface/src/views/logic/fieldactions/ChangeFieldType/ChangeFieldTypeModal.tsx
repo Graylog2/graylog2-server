@@ -40,7 +40,6 @@ import type {
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
-
 const StyledSelect = styled(Select)`
   width: 400px;
   margin-bottom: 20px;
