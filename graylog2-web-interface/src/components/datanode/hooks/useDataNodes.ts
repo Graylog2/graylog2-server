@@ -32,14 +32,14 @@ export const bulkRemoveDataNode = async (entity_ids: string[], selectBackFailedE
     }
 
     if (failures?.length === entity_ids.length) {
-      UserNotification.error(`Removing Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not remove Datanodes.');
+      UserNotification.error(`Removing Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not remove Data Nodes.');
     }
 
     if (successfully_performed) {
-      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} removed successfully`);
+      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} removed successfully.`);
     }
   } catch (errorThrown) {
-    UserNotification.error(`Removing Data Node failed with status: ${errorThrown}`, 'Could not remove some Datanodes.');
+    UserNotification.error(`Removing Data Node failed with status: ${errorThrown}`, 'Could not remove Data Nodes.');
   }
 };
 
@@ -52,14 +52,14 @@ export const bulkStartDataNode = async (entity_ids: string[], selectBackFailedEn
     }
 
     if (failures?.length === entity_ids.length) {
-      UserNotification.error(`Starting Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not start Datanodes.');
+      UserNotification.error(`Starting Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not start Data Nodes.');
     }
 
     if (successfully_performed) {
-      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} started successfully`);
+      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} started successfully.`);
     }
   } catch (errorThrown) {
-    UserNotification.error(`Starting Data Node failed with status: ${errorThrown}`, 'Could not start Datanodes.');
+    UserNotification.error(`Starting Data Node failed with status: ${errorThrown}`, 'Could not start Data Nodes.');
   }
 };
 
@@ -72,14 +72,14 @@ export const bulkStopDataNode = async (entity_ids: string[], selectBackFailedEnt
     }
 
     if (failures?.length === entity_ids.length) {
-      UserNotification.error(`Stopping Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not stop Datanodes.');
+      UserNotification.error(`Stopping Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not stop Data Nodes.');
     }
 
     if (successfully_performed) {
-      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} stopped successfully`);
+      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} stopped successfully.`);
     }
   } catch (errorThrown) {
-    UserNotification.error(`Stopping Data Node failed with status: ${errorThrown}`, 'Could not stop Datanodes.');
+    UserNotification.error(`Stopping Data Node failed with status: ${errorThrown}`, 'Could not stop Data Nodes.');
   }
 };
 
@@ -87,7 +87,7 @@ export const removeDataNode = async (datanodeId: string) => {
   try {
     await fetch('DELETE', qualifyUrl(`/datanode/${datanodeId}`));
 
-    UserNotification.success(`Data Node "${datanodeId}" removed successfully`);
+    UserNotification.success(`Data Node "${datanodeId}" removed successfully.`);
   } catch (errorThrown) {
     UserNotification.error(`Removing Data Node failed with status: ${errorThrown}`, 'Could not remove the Data Node.');
   }
@@ -97,7 +97,7 @@ export const startDataNode = async (datanodeId: string) => {
   try {
     await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/start`));
 
-    UserNotification.success(`Data Node "${datanodeId}" started successfully`);
+    UserNotification.success(`Data Node "${datanodeId}" started successfully.`);
   } catch (errorThrown) {
     UserNotification.error(`Starting Data Node failed with status: ${errorThrown}`, 'Could not start the Data Node.');
   }
@@ -107,7 +107,7 @@ export const stopDataNode = async (datanodeId: string) => {
   try {
     await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/stop`));
 
-    UserNotification.success(`Data Node "${datanodeId}" stopped successfully`);
+    UserNotification.success(`Data Node "${datanodeId}" stopped successfully.`);
   } catch (errorThrown) {
     UserNotification.error(`Stopping Data Node failed with status: ${errorThrown}`, 'Could not stop the Data Node.');
   }
@@ -117,7 +117,7 @@ export const rejoinDataNode = async (datanodeId: string) => {
   try {
     await fetch('POST', qualifyUrl(`/datanode/${datanodeId}/reset`));
 
-    UserNotification.success(`Data Node "${datanodeId}" rejoined successfully`);
+    UserNotification.success(`Data Node "${datanodeId}" rejoined successfully.`);
   } catch (errorThrown) {
     UserNotification.error(`Rejoining Data Node failed with status: ${errorThrown}`, 'Could not rejoin the Data Node.');
   }
@@ -129,7 +129,7 @@ type Options = {
 
 export const renewDatanodeCertificate = (nodeId: string) => fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
   .then(() => {
-    UserNotification.success('Certificate renewed successfully');
+    UserNotification.success('Certificate renewed successfully.');
   })
   .catch((error) => {
     UserNotification.error(`Certificate renewal failed with error: ${error}`);
@@ -156,7 +156,7 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`,
-          'Could not load Data Nodes');
+          'Could not load Data Nodes.');
       },
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval: 5000,
