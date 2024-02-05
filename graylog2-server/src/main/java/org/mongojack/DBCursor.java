@@ -51,16 +51,19 @@ public class DBCursor<T> implements Closeable, Iterator<T>, Iterable<T> {
 
     public DBCursor<T> sort(Bson sort) {
         findIterable.sort(sort);
+        refreshCursor();
         return this;
     }
 
     public DBCursor<T> limit(int limit) {
         findIterable.limit(limit);
+        refreshCursor();
         return this;
     }
 
     public DBCursor<T> skip(int skip) {
         findIterable.skip(skip);
+        refreshCursor();
         return this;
     }
 
@@ -92,6 +95,13 @@ public class DBCursor<T> implements Closeable, Iterator<T>, Iterable<T> {
         return cursor;
     }
 
+    private void refreshCursor() {
+        if (this.cursor != null) {
+            cursor.close();
+            cursor = null;
+        }
+    }
+
     public int count() {
         return Ints.saturatedCast(collection.countDocuments(filter));
     }
@@ -99,7 +109,7 @@ public class DBCursor<T> implements Closeable, Iterator<T>, Iterable<T> {
     @NotNull
     @Override
     public Iterator<T> iterator() {
-        return this;
+        return new DBCursor<>(collection, filter, () -> findIterable);
     }
 
     public Document explain() {

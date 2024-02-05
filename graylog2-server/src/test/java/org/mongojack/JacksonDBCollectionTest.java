@@ -110,6 +110,63 @@ class JacksonDBCollectionTest {
     }
 
     @Test
+    void findWithIterator() {
+        final var collection = jacksonCollection("simple", Simple.class);
+        final Simple c = new Simple("000000000000000000000001", "c");
+        final Simple a = new Simple("000000000000000000000002", "a");
+        final Simple b = new Simple("000000000000000000000003", "b");
+        final Simple d = new Simple("000000000000000000000004", "d");
+
+        collection.insert(List.of(c, a, b, d));
+
+        try (final DBCursor<Simple> cursor = collection.find()) {
+            assertThat(cursor.count()).isEqualTo(4);
+
+            assertThat(cursor.toArray()).isEqualTo(List.of(c, a, b, d));
+            assertThat(cursor.iterator()).toIterable().isEqualTo(List.of(c, a, b, d));
+
+            var iterator = cursor.iterator();
+            assertThat(iterator).hasNext();
+            assertThat(iterator.next()).isEqualTo(c);
+            assertThat(iterator.next()).isEqualTo(a);
+            assertThat(iterator.next()).isEqualTo(b);
+            assertThat(iterator.next()).isEqualTo(d);
+            assertThat(iterator).isExhausted();
+
+            assertThat(cursor.sort(DBSort.asc("name")).skip(1).limit(2).toArray()).containsExactly(b, c);
+            assertThat(cursor.sort(DBSort.asc("name")).skip(1).limit(2).iterator()).toIterable()
+                    .containsExactly(b, c);
+        }
+
+        try (final DBCursor<Simple> cursor = collection.find(DBQuery.in("name", "a", "b", "c"))) {
+            assertThat(cursor.count()).isEqualTo(3);
+            assertThat(cursor.toArray()).containsExactly(c, a, b);
+            assertThat(cursor.iterator()).toIterable().containsExactly(c, a, b);
+
+            cursor.sort(DBSort.asc("name"));
+            assertThat(cursor.toArray()).containsExactly(a, b, c);
+            assertThat(cursor.iterator()).toIterable().containsExactly(a, b, c);
+
+            cursor.skip(2);
+            assertThat(cursor.toArray()).containsExactly(c);
+            assertThat(cursor.iterator()).toIterable().containsExactly(c);
+
+            cursor.skip(1);
+            assertThat(cursor.toArray()).containsExactly(b, c);
+            assertThat(cursor.iterator()).toIterable().containsExactly(b, c);
+
+            cursor.skip(0);
+            cursor.limit(1);
+            assertThat(cursor.toArray()).containsExactly(a);
+            assertThat(cursor.iterator()).toIterable().containsExactly(a);
+
+            cursor.limit(2);
+            assertThat(cursor.toArray()).containsExactly(a, b);
+            assertThat(cursor.iterator()).toIterable().containsExactly(a, b);
+        }
+    }
+
+    @Test
     void findOneById() {
         final var collection = jacksonCollection("simple", Simple.class);
         final List<Simple> items = List.of(
