@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing UI failour when getting Processing and Indexing Failures stream name for non enterprise version"
+
+issues = ["17743"]
+pulls = ["18143"]
