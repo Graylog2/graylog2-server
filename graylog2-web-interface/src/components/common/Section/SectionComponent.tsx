@@ -39,7 +39,7 @@ const Header = styled.div`
 `;
 
 export const Headline = styled.h2`
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   display: inline;
 `;
 

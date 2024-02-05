@@ -18,7 +18,6 @@ package org.graylog.storage.opensearch2.blocks;
 
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.common.collect.ImmutableOpenMap;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 
 import java.util.Set;
@@ -30,8 +29,8 @@ public class BlockSettingsParser {
 
     public static IndicesBlockStatus parseBlockSettings(final GetSettingsResponse settingsResponse) {
         IndicesBlockStatus result = new IndicesBlockStatus();
-        final ImmutableOpenMap<String, Settings> indexToSettingsMap = settingsResponse.getIndexToSettings();
-        final String[] indicesInResponse = indexToSettingsMap.keys().toArray(String.class);
+        final var indexToSettingsMap = settingsResponse.getIndexToSettings();
+        final String[] indicesInResponse = indexToSettingsMap.keySet().toArray(new String[0]);
         for (String index : indicesInResponse) {
             final Settings blockSettings = indexToSettingsMap.get(index).getByPrefix(BLOCK_SETTINGS_PREFIX);
 

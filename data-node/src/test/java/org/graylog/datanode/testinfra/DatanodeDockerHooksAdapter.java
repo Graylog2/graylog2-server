@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.testinfra;
 
+import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.testcontainers.containers.GenericContainer;
 
 public class DatanodeDockerHooksAdapter implements DatanodeDockerHooks {

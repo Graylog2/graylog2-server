@@ -16,13 +16,10 @@
  */
 package org.graylog.plugins.map.geoip;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.primitives.Longs;
+import com.maxmind.db.MaxMindDbConstructor;
+import com.maxmind.db.MaxMindDbParameter;
 
 import javax.annotation.Nullable;
 
@@ -35,62 +32,63 @@ import javax.annotation.Nullable;
 //   "asn" : "AS13335",
 //   "domain" : "cloudflare.com"
 // }
-@AutoValue
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonDeserialize(builder = IPinfoASN.Builder.class)
-public abstract class IPinfoASN {
+public class IPinfoASN {
+    private final String name;
+    private final String route;
+    private final String type;
+    private final String asn;
+    private final String domain;
+
+    @MaxMindDbConstructor
+    public IPinfoASN(@MaxMindDbParameter(name = "name") String name,
+                     @MaxMindDbParameter(name = "route") String route,
+                     @MaxMindDbParameter(name = "type") String type,
+                     @MaxMindDbParameter(name = "asn") String asn,
+                     @MaxMindDbParameter(name = "domain") String domain) {
+        this.name = name;
+        this.route = route;
+        this.type = type;
+        this.asn = asn;
+        this.domain = domain;
+    }
+
     @JsonProperty("name")
     @Nullable
-    public abstract String name();
+    public String name() {
+        return name;
+    }
 
     @JsonProperty("route")
     @Nullable
-    public abstract String route();
+    public String route() {
+        return route;
+    }
 
     @JsonProperty("type")
     @Nullable
-    public abstract String type();
+    public String type() {
+        return type;
+    }
 
     @JsonProperty("asn")
     @Nullable
-    public abstract String asn();
+    public String asn() {
+        return asn;
+    }
 
-    @Memoized
     @JsonProperty("asn_numeric")
     @Nullable
     public Long asnNumeric() {
-        if (asn() == null) {
+        final String asnValue = asn();
+        if (asnValue == null) {
             return null;
         }
-        return Longs.tryParse(asn().replace("AS", ""));
+        return Longs.tryParse(asnValue.replace("AS", ""));
     }
 
     @JsonProperty("domain")
     @Nullable
-    public abstract String domain();
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-        @JsonCreator
-        public static Builder create() {
-            return new AutoValue_IPinfoASN.Builder();
-        }
-
-        @JsonProperty("name")
-        public abstract Builder name(String name);
-
-        @JsonProperty("route")
-        public abstract Builder route(String route);
-
-        @JsonProperty("type")
-        public abstract Builder type(String type);
-
-        @JsonProperty("asn")
-        public abstract Builder asn(String asn);
-
-        @JsonProperty("domain")
-        public abstract Builder domain(String domain);
-
-        public abstract IPinfoASN build();
+    public String domain() {
+        return domain;
     }
 }

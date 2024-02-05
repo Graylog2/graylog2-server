@@ -22,7 +22,7 @@ import { StaticColor } from 'views/logic/views/formatting/highlighting/Highlight
 import { ColorPickerPopover, Icon } from 'components/common';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { conditionToExprMapper, exprToConditionMapper } from 'hooks/useHighlightValuesForEventDefinition';
+import { conditionToExprMapper, exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
 import useAppSelector from 'stores/useAppSelector';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';

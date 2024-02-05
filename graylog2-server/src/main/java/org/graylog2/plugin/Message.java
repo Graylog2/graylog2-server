@@ -38,6 +38,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.utilities.date.DateTimeConverter;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -83,6 +85,7 @@ import static org.joda.time.DateTimeZone.UTC;
 @NotThreadSafe
 public class Message implements Messages, Indexable {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
+    private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(LOG, 3, Duration.ofMinutes(1));
 
     /**
      * The "_id" is used as document ID to address the document in Elasticsearch.
@@ -200,7 +203,11 @@ public class Message implements Messages, Indexable {
     @Deprecated
     public static final String FIELD_GL2_SOURCE_RADIO_INPUT = "gl2_source_radio_input";
 
+    // Matches whole field names containing a-z, A-Z, 0-9, period char, -, or @.
     private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
+    // Same as above, but matches only the invalid (non-indicated) characters.
+    // [^ ... ] around the pattern inverts the match.
+    private static final Pattern INVALID_KEY_CHARS = Pattern.compile("[^\\w\\.\\-@]");
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
@@ -257,6 +264,11 @@ public class Message implements Messages, Indexable {
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = new ImmutableSet.Builder<String>()
             .addAll(GRAYLOG_FIELDS)
             .addAll(CORE_MESSAGE_FIELDS)
+            .build();
+    public static final ImmutableSet<String> FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS = new ImmutableSet.Builder<String>()
+            .addAll(RESERVED_SETTABLE_FIELDS)
+            .add(FIELD_GL2_MESSAGE_ID)
+            .add(FIELD_STREAMS)
             .build();
 
     public static final ImmutableSet<String> RESERVED_FIELDS = new ImmutableSet.Builder<String>()
@@ -369,21 +381,6 @@ public class Message implements Messages, Indexable {
         }
 
         return true;
-    }
-
-    @Deprecated
-    public String getValidationErrors() {
-        final StringBuilder sb = new StringBuilder();
-
-        for (String key : REQUIRED_FIELDS) {
-            final Object field = getField(key);
-            if (field == null) {
-                sb.append(key).append(" is missing, ");
-            } else if (field instanceof String && ((String) field).isEmpty()) {
-                sb.append(key).append(" is empty, ");
-            }
-        }
-        return sb.toString();
     }
 
     @Override
@@ -563,6 +560,8 @@ public class Message implements Messages, Indexable {
         if ((RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey)) || !validKey(trimmedKey)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
+            } else {
+                RATE_LIMITED_LOG.info("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             }
             return;
         }
@@ -638,45 +637,16 @@ public class Message implements Messages, Indexable {
         return VALID_KEY_CHARS.matcher(key).matches();
     }
 
+    public static String cleanKey(final String key) {
+        return INVALID_KEY_CHARS.matcher(key).replaceAll(String.valueOf(KEY_REPLACEMENT_CHAR));
+    }
+
     public void addFields(final Map<String, Object> fields) {
         if (fields == null) {
             return;
         }
 
         for (Map.Entry<String, Object> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
-    @Deprecated
-    public void addStringFields(final Map<String, String> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, String> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
-    @Deprecated
-    public void addLongFields(final Map<String, Long> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, Long> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
-    @Deprecated
-    public void addDoubleFields(final Map<String, Double> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, Double> field : fields.entrySet()) {
             addField(field.getKey(), field.getValue());
         }
     }

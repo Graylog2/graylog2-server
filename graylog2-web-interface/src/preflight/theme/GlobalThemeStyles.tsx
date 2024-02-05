@@ -24,7 +24,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 }
 
 html {
-  font-size: ${theme.fonts.size.root.px};
+  font-size: ${theme.fonts.size.root};
 }
   
 body {
@@ -68,27 +68,27 @@ h6 {
 }
 
 h1 {
-  font-size: ${theme.fonts.size.h1.rem};
+  font-size: ${theme.fonts.size.h1};
 }
 
 h2 {
-  font-size: ${theme.fonts.size.h2.rem};
+  font-size: ${theme.fonts.size.h2};
 }
 
 h3 {
-  font-size: ${theme.fonts.size.h3.rem};
+  font-size: ${theme.fonts.size.h3};
 }
 
 h4 {
-  font-size: ${theme.fonts.size.h4.rem};
+  font-size: ${theme.fonts.size.h4};
 }
 
 h5 {
-  font-size: ${theme.fonts.size.h5.rem};
+  font-size: ${theme.fonts.size.h5};
 }
 
 h6 {
-  font-size: ${theme.fonts.size.h6.rem};
+  font-size: ${theme.fonts.size.h6};
   font-weight: bold;
 }
 

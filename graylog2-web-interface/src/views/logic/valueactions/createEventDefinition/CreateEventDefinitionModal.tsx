@@ -90,7 +90,7 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   }), [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
 
   const onContinueConfigurationClick = useCallback(() => {
-    Store.set(sessionId, JSON.stringify(localStorageConfig));
+    Store.set(sessionId, localStorageConfig);
     onClose();
   }, [sessionId, localStorageConfig, onClose]);
 

@@ -21,6 +21,7 @@ import { CONFIGURATION_STEPS, DATA_NODES_STATUS } from 'preflight/Constants';
 import type { DataNodes, ConfigurationStep, DataNodesCA, RenewalPolicy } from 'preflight/types';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import useRenewalPolicy from 'preflight/hooks/useRenewalPolicy';
+import type FetchError from 'logic/errors/FetchError';
 
 import useDataNodesCA from './useDataNodesCA';
 
@@ -38,7 +39,7 @@ const configurationStep = (
     return CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key;
   }
 
-  const finishedProvisioning = !!dataNodes?.length && !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED.key);
+  const finishedProvisioning = !!dataNodes?.length && !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED);
 
   if (!finishedProvisioning && !isSkippingProvisioning) {
     return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
@@ -51,23 +52,47 @@ type Props = {
   isSkippingProvisioning: boolean
 }
 
-const useConfigurationStep = ({ isSkippingProvisioning }: Props): { step: ConfigurationStep | undefined, isLoading: boolean } => {
-  const { data: dataNodes, isInitialLoading: isLoadingDataNodes } = useDataNodes();
-  const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus } = useDataNodesCA();
-  const { data: renewalPolicy, isInitialLoading: isLoadingRenewalPolicy } = useRenewalPolicy();
+type Result = {
+  step: ConfigurationStep | null,
+  isLoading: boolean,
+  errors: Array<{ entityName: string, error: FetchError}> | null
+}
+
+const useConfigurationStep = ({ isSkippingProvisioning }: Props): Result => {
+  const { data: dataNodes, isInitialLoading: isLoadingDataNodes, error: dataNodesError } = useDataNodes();
+  const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus, error: caError } = useDataNodesCA();
+  const { data: renewalPolicy, isInitialLoading: isLoadingRenewalPolicy, error: renewalPolicyError } = useRenewalPolicy();
   const step = configurationStep(dataNodes, dataNodesCA, renewalPolicy, isSkippingProvisioning);
 
   return useMemo(() => {
+    if (dataNodesError || caError || renewalPolicyError) {
+      const errors = [
+        { entityName: 'data nodes', error: dataNodesError },
+        { entityName: 'certificate authority', error: caError },
+        { entityName: 'renewal policy', error: renewalPolicyError },
+      ].filter(({ error }) => !!error);
+
+      return ({ isLoading: false, step: null, errors });
+    }
+
     if (isLoadingDataNodes || isLoadingCAStatus || isLoadingRenewalPolicy) {
-      return ({ isLoading: true, step: undefined });
+      return ({ isLoading: true, step: null, errors: null });
     }
 
     return ({
-
       isLoading: false,
       step,
+      errors: null,
     });
-  }, [isLoadingCAStatus, isLoadingDataNodes, isLoadingRenewalPolicy, step]);
+  }, [
+    caError,
+    dataNodesError,
+    isLoadingCAStatus,
+    isLoadingDataNodes,
+    isLoadingRenewalPolicy,
+    renewalPolicyError,
+    step,
+  ]);
 };
 
 export default useConfigurationStep;

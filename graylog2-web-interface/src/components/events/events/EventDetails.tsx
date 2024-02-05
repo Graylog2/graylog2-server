@@ -27,6 +27,18 @@ import EventFields from 'components/events/events/EventFields';
 import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 
+const usePluggableEventActions = (event: Event) => {
+  const pluggableEventActions = usePluginEntities('views.components.eventActions');
+
+  return pluggableEventActions.filter(
+    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+  ).map(
+    ({ component: PluggableEventAction, key }) => (
+      <PluggableEventAction key={key} event={event} />
+    ),
+  );
+};
+
 type Props = {
   event: Event,
   eventDefinitionContext: EventDefinitionContext,
@@ -34,12 +46,7 @@ type Props = {
 
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
-  const pluggableEventActions = usePluginEntities('views.components.eventActions');
-  const eventActions = useMemo(() => pluggableEventActions.map(
-    ({ component: PluggableEventAction, key }) => (
-      <PluggableEventAction key={key} event={event} />
-    ),
-  ), [pluggableEventActions, event]);
+  const pluggableActions = usePluggableEventActions(event);
 
   const plugin = useMemo(() => {
     if (event.event_definition_type === undefined) {
@@ -69,13 +76,13 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
             ({(plugin && plugin.displayName) || event.event_definition_type})
           </dd>
           {event.replay_info && (
-          <>
-            <dt>Actions</dt>
-            <dd>
-              <LinkToReplaySearch id={event.id} isEvent />
-            </dd>
-            {eventActions}
-          </>
+            <>
+              <dt>Actions</dt>
+              <dd>
+                <LinkToReplaySearch id={event.id} isEvent />
+              </dd>
+              {pluggableActions}
+            </>
           )}
         </dl>
       </Col>

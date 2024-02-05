@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7.events.search;
 
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.MoreSearchAdapterIT;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.MoreSearchAdapterES7;
 import org.graylog.storage.elasticsearch7.PaginationES7;
@@ -43,7 +44,7 @@ public class MoreSearchAdapterES7UsingPaginationIT extends MoreSearchAdapterIT {
         final ElasticsearchClient client = elasticsearch.elasticsearchClient();
         return new MoreSearchAdapterES7(client, true, sortOrderMapper,
                 new PaginationES7(client,
-                        new SearchRequestFactory(sortOrderMapper, false, true)
+                        new SearchRequestFactory(sortOrderMapper, false, true, new IgnoreSearchFilters())
                 )
 
         );

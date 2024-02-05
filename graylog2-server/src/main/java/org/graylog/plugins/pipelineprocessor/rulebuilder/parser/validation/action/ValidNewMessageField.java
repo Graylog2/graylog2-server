@@ -19,14 +19,14 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.acti
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
-import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidationResult;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.Validator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,10 +51,6 @@ public class ValidNewMessageField implements Validator {
             return validateSetField(step.parameters());
         }
 
-        if (functionName.equals(SetFields.NAME)) {
-            return validateSetFields(step.parameters());
-        }
-
         return new ValidationResult(false, "");
     }
 
@@ -69,16 +65,4 @@ public class ValidNewMessageField implements Validator {
         return new ValidationResult(false, "");
     }
 
-    private ValidationResult validateSetFields(Map<String, Object> parameters) {
-        Map<String, Object> values = (Map<String, Object>) parameters.get("fields");
-
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            String key = entry.getKey();
-            if (StringUtils.containsWhitespace(key)) {
-               return new ValidationResult(true, f(ERROR_MSG, key));
-            }
-        }
-
-        return new ValidationResult(false, "");
-    }
 }

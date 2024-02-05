@@ -19,16 +19,15 @@ import PropTypes from 'prop-types';
 
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
-import StringUtils from 'util/StringUtils';
 
 type Props = {
   show?: boolean,
   onConfirm: (event) => void,
   onCancel?: () => void,
-  title: string|React.ReactNode,
+  title: string | React.ReactNode,
   children: React.ReactNode,
   btnConfirmDisabled?: boolean,
-  btnConfirmText?: string|React.ReactNode,
+  btnConfirmText?: React.ReactNode,
   hideCancelButton?: boolean,
 };
 
@@ -45,14 +44,12 @@ const ConfirmDialog = ({
   btnConfirmDisabled,
   btnConfirmText,
   hideCancelButton,
-  ...restProps
 }: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
   return (
     <Modal show={show}
-           onHide={onHide}
-           data-event-element={restProps['data-telemetry-title'] || StringUtils.getRecursiveChildText(title)}>
+           onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -112,7 +109,8 @@ ConfirmDialog.defaultProps = {
   btnConfirmDisabled: false,
   show: false,
   hideCancelButton: false,
-  onCancel: () => {},
+  onCancel: () => {
+  },
 };
 
 export default ConfirmDialog;

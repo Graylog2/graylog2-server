@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -143,19 +142,17 @@ class SystemNotificationRenderServiceTest {
 
     @Test
     void missingTemplates() {
-        for (SystemNotificationRenderService.Format f: SystemNotificationRenderService.Format.values()) {
+        for (SystemNotificationRenderService.Format f : SystemNotificationRenderService.Format.values()) {
             String basePath = TEMPLATE_BASE_PATH + f.toString() + "/";
             Arrays.stream(Notification.Type.values())
                     // deprecated notification types from pre-5.0.
                     .filter(t -> t != Notification.Type.MULTI_MASTER && t != Notification.Type.NO_MASTER)
-                    .map(t -> {
+                    .forEach(t -> {
                         String templateFile = basePath + t.toString().toLowerCase(Locale.ENGLISH) + ".ftl";
                         if (SystemNotificationRenderServiceTest.class.getResource(templateFile) == null) {
                             fail("Missing template: " + templateFile);
                         }
-                        return t;
-                    })
-                    .collect(Collectors.toList());
-       }
-   }
+                    });
+        }
+    }
 }

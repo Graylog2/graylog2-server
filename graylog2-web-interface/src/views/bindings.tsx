@@ -43,7 +43,7 @@ import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHandler';
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
@@ -98,6 +98,11 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import Icon from 'components/common/Icon';
 import viewsReducers from 'views/viewsReducers';
 import CreateEventDefinition from 'views/logic/valueactions/createEventDefinition/CreateEventDefinition';
+import ChangeFieldType, {
+  ChangeFieldTypeHelp,
+  isChangeFieldTypeEnabled,
+  isChangeFieldTypeHidden,
+} from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -290,6 +295,15 @@ const exports: PluginExports = {
       handler: CopyFieldToClipboard,
       isEnabled: () => true,
       resetFocus: false,
+    },
+    {
+      type: 'change-field-type',
+      title: 'Change field type',
+      isEnabled: isChangeFieldTypeEnabled,
+      isHidden: isChangeFieldTypeHidden,
+      resetFocus: false,
+      component: ChangeFieldType,
+      help: ChangeFieldTypeHelp,
     },
   ],
   valueActions: filterCloudValueActions([

@@ -16,9 +16,7 @@
  */
 package org.graylog2.cluster.leader;
 
-import com.google.common.util.concurrent.Service;
 import com.google.inject.Scopes;
-import com.google.inject.name.Names;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
 
@@ -37,11 +35,9 @@ public class LeaderElectionModule extends PluginModule {
         switch (mode) {
             case STATIC:
                 bind(LeaderElectionService.class).to(StaticLeaderElectionService.class).in(Scopes.SINGLETON);
-                bind(Service.class).annotatedWith(Names.named("LeaderElectionService")).to(StaticLeaderElectionService.class);
                 break;
             case AUTOMATIC:
                 bind(LeaderElectionService.class).to(AutomaticLeaderElectionService.class).in(Scopes.SINGLETON);
-                bind(Service.class).annotatedWith(Names.named("LeaderElectionService")).to(AutomaticLeaderElectionService.class);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown leader election mode \"" + mode + "\".");

@@ -22,35 +22,38 @@ import { useQueryClient } from '@tanstack/react-query';
 import ApiRoutes from 'routing/ApiRoutes';
 import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { getPathnameWithoutId, qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useLocation from 'routing/useLocation';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
-  selectedNotificationsIds: Array<string>,
-  setSelectedNotificationsIds: (definitionIds: Array<string>) => void,
   refetchEventNotifications: () => void,
 };
 
-const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, refetchEventNotifications }: Props) => {
+const BulkActions = ({ refetchEventNotifications }: Props) => {
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry();
-  const selectedItemsAmount = selectedNotificationsIds?.length;
+  const { pathname } = useLocation();
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const selectedItemsAmount = selectedEntities?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event notification', 'event notifications');
 
   const onDelete = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: 'event-notification',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.BULK_ACTION_DELETE_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-notification-bulk',
-      app_action_value: 'delete-button',
+      app_action_value: 'bulk-delete-button',
     });
 
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
-      const deleteCalls = selectedNotificationsIds.map((notificationId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(() => notificationId));
+      const deleteCalls = selectedEntities.map((notificationId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(() => notificationId));
 
       Promise.allSettled(deleteCalls).then((result) => {
         const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{
@@ -58,7 +61,7 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
           value: string
         }>;
         const deletedNotificationIds = fulfilledRequests.map(({ value }) => value);
-        const notDeletedNotificationIds = selectedNotificationsIds?.filter((streamId) => !deletedNotificationIds.includes(streamId));
+        const notDeletedNotificationIds = selectedEntities?.filter((streamId) => !deletedNotificationIds.includes(streamId));
 
         if (notDeletedNotificationIds.length) {
           const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{
@@ -67,25 +70,25 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
           }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
-          if (notDeletedNotificationIds.length !== selectedNotificationsIds.length) {
+          if (notDeletedNotificationIds.length !== selectedEntities.length) {
             queryClient.invalidateQueries(['eventNotifications', 'overview']);
           }
 
-          UserNotification.error(`${notDeletedNotificationIds.length} out of ${selectedNotificationsIds} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
+          UserNotification.error(`${notDeletedNotificationIds.length} out of ${selectedEntities} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
 
           return;
         }
 
         queryClient.invalidateQueries(['eventNotifications', 'overview']);
-        setSelectedNotificationsIds(notDeletedNotificationIds);
+        setSelectedEntities(notDeletedNotificationIds);
         refetchEventNotifications();
         UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
       });
     }
-  }, [sendTelemetry, selectedItemsAmount, descriptor, selectedNotificationsIds, queryClient, setSelectedNotificationsIds, refetchEventNotifications]);
+  }, [sendTelemetry, pathname, selectedItemsAmount, descriptor, selectedEntities, queryClient, setSelectedEntities, refetchEventNotifications]);
 
   return (
-    <BulkActionsDropdown selectedEntities={selectedNotificationsIds} setSelectedEntities={setSelectedNotificationsIds}>
+    <BulkActionsDropdown>
       <MenuItem onSelect={() => onDelete()}>Delete</MenuItem>
     </BulkActionsDropdown>
   );

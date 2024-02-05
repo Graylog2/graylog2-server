@@ -48,15 +48,11 @@ public abstract class TrafficDto {
     public abstract Map<String, Long> decoded();
 
     public static Builder builder() {
-        return new AutoValue_TrafficDto.Builder();
+        return new AutoValue_TrafficDto.Builder().decoded(Collections.emptyMap());
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
-
-        public Builder() {
-            decoded(Collections.emptyMap());
-        }
 
         @Id
         @ObjectId

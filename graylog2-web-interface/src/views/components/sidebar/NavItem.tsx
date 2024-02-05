@@ -81,7 +81,7 @@ const Container = styled.button<ContainerProps>(({ theme: { colors, fonts }, $is
       transform: skewY(45deg);
       bottom: calc(50% - 12px);
     }
-  `}
+`}
   /* stylelint-enable selector-max-empty-lines, indentation */
 `);
 
@@ -131,7 +131,7 @@ const Title = styled.div(({ theme: { colors, fonts } }) => css`
   padding: 0 10px;
   left: 100%;
   top: calc(50% - 13px);
-  height: 25px;
+  height: 26px;
   background-color: ${colors.variant.lightest.info};
   border: 1px solid ${colors.variant.light.info};
   border-left: none;

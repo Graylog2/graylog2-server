@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
 
+import useView from 'views/hooks/useView';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
@@ -65,6 +66,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { updateQuery } from 'views/logic/slices/viewSlice';
 import useHandlerContext from 'views/components/useHandlerContext';
+import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -104,7 +107,10 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const useInitialFormValues = ({ currentQuery, queryFilters }: { currentQuery: Query | undefined, queryFilters: Immutable.Map<QueryId, FilterType> }) => {
+const useInitialFormValues = ({ currentQuery, queryFilters }: {
+  currentQuery: Query | undefined,
+  queryFilters: Immutable.Map<QueryId, FilterType>
+}) => {
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
@@ -129,7 +135,12 @@ type Props = {
 };
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
-  const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({ key: stream.title, value: stream.id })));
+  const editorRef = useRef<Editor>(null);
+  const view = useView();
+  const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({
+    key: stream.title,
+    value: stream.id,
+  })));
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
@@ -158,7 +169,17 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                            limitDuration={limitDuration}
                            onSubmit={_onSubmit}
                            validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)}>
-              {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
+              {({
+                dirty,
+                errors,
+                isSubmitting,
+                isValid,
+                isValidating,
+                handleSubmit,
+                values,
+                setFieldValue,
+                validateForm,
+              }) => {
                 const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
                 return (
@@ -200,6 +221,8 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                                     <PluggableCommands usage="search_query">
                                       {(customCommands) => (
                                         <QueryInput value={value}
+                                                    ref={editorRef}
+                                                    view={view}
                                                     timeRange={values.timerange}
                                                     streams={values.streams}
                                                     name={name}
@@ -220,6 +243,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                             </Field>
 
                             <QueryValidation />
+                            <QueryHistoryButton editorRef={editorRef} />
                           </SearchInputAndValidationContainer>
                         </SearchButtonAndQuery>
                         {!editing && <SearchActionsMenu />}

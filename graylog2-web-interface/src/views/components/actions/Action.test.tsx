@@ -27,17 +27,26 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import useAppDispatch from 'stores/useAppDispatch';
 import mockDispatch from 'views/test/mockDispatch';
 import { createSearch } from 'fixtures/searches';
+import useExternalValueActions from 'views/hooks/useExternalValueActions';
 
 import Action from './Action';
 
 jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
 jest.mock('stores/useAppDispatch');
 
+jest.mock('views/hooks/useExternalValueActions');
+
 describe('Action', () => {
   beforeEach(() => {
     const view = createSearch();
     const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
     asMock(useAppDispatch).mockReturnValue(dispatch);
+
+    asMock(useExternalValueActions).mockReturnValue({
+      isLoading: false,
+      externalValueActions: [],
+      isError: false,
+    });
   });
 
   afterEach(() => {
@@ -121,14 +130,11 @@ describe('Action', () => {
     const simpleExternalAction = createSimpleExternalValueAction({ title: 'External value action', linkTarget });
     const externalValueActions = [simpleExternalAction];
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      useExternalActions: [() => ({
-        externalValueActions,
-        isLoading: false,
-        isError: false,
-        error: null,
-      })],
-    }[entityKey]));
+    asMock(useExternalValueActions).mockReturnValue({
+      externalValueActions,
+      isLoading: false,
+      isError: false,
+    });
 
     render(
       <SimpleAction type="value" />,
@@ -136,7 +142,7 @@ describe('Action', () => {
 
     await openDropdown();
 
-    const actionMenuItem = await screen.findByText('External value action') as HTMLAnchorElement;
+    const actionMenuItem = await screen.findByRole('menuitem', { name: /external value action/i }) as HTMLAnchorElement;
 
     expect(actionMenuItem.href).toContain('the-link-to-field1');
   });

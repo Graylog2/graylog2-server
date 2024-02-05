@@ -56,8 +56,9 @@ public class DSVParser {
         this.valueColumn = valueColumn.orElse(0);
 
         if (!keyOnly) {
-            //noinspection ResultOfMethodCallIgnored
-            valueColumn.orElseThrow(() -> new IllegalStateException("No value column and not key only parsing specified!"));
+            if (valueColumn.isEmpty()) {
+                throw new IllegalStateException("No value column and not key only parsing specified!");
+            }
         }
 
         if (Strings.isNullOrEmpty(quoteChar)) {

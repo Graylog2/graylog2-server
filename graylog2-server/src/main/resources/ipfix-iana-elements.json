@@ -1,0 +1,2307 @@
+{
+  "enterprise_number": 0,
+  "information_elements": [
+    {
+      "element_id": 1,
+      "name": "octetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 2,
+      "name": "packetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 3,
+      "name": "deltaFlowCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 4,
+      "name": "protocolIdentifier",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 5,
+      "name": "ipClassOfService",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 6,
+      "name": "tcpControlBits",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 7,
+      "name": "sourceTransportPort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 8,
+      "name": "sourceIPv4Address",
+      "data_type": "ipv4Address"
+    },
+    {
+      "element_id": 9,
+      "name": "sourceIPv4PrefixLength",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 10,
+      "name": "ingressInterface",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 11,
+      "name": "destinationTransportPort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 12,
+      "name": "destinationIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 13,
+      "name": "destinationIPv4PrefixLength",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 14,
+      "name": "egressInterface",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 15,
+      "name": "ipNextHopIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 16,
+      "name": "bgpSourceAsNumber",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 17,
+      "name": "bgpDestinationAsNumber",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 18,
+      "name": "bgpNextHopIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 19,
+      "name": "postMCastPacketDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 20,
+      "name": "postMCastOctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 21,
+      "name": "flowEndSysUpTime",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 22,
+      "name": "flowStartSysUpTime",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 23,
+      "name": "postOctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 24,
+      "name": "postPacketDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 25,
+      "name": "minimumIpTotalLength",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 26,
+      "name": "maximumIpTotalLength",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 27,
+      "name": "sourceIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 28,
+      "name": "destinationIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 29,
+      "name": "sourceIPv6PrefixLength",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 30,
+      "name": "destinationIPv6PrefixLength",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 31,
+      "name": "flowLabelIPv6",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 32,
+      "name": "icmpTypeCodeIPv4",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 33,
+      "name": "igmpType",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 34,
+      "name": "samplingInterval",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 35,
+      "name": "samplingAlgorithm",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 36,
+      "name": "flowActiveTimeout",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 37,
+      "name": "flowIdleTimeout",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 38,
+      "name": "engineType",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 39,
+      "name": "engineId",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 40,
+      "name": "exportedOctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 41,
+      "name": "exportedMessageTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 42,
+      "name": "exportedFlowRecordTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 43,
+      "name": "ipv4RouterSc",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 44,
+      "name": "sourceIPv4Prefix",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 45,
+      "name": "destinationIPv4Prefix",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 46,
+      "name": "mplsTopLabelType",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 47,
+      "name": "mplsTopLabelIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 48,
+      "name": "samplerId",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 49,
+      "name": "samplerMode",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 50,
+      "name": "samplerRandomInterval",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 51,
+      "name": "classId",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 52,
+      "name": "minimumTTL",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 53,
+      "name": "maximumTTL",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 54,
+      "name": "fragmentIdentification",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 55,
+      "name": "postIpClassOfService",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 56,
+      "name": "sourceMacAddress",
+      "data_type": "macaddress"
+    },
+    {
+      "element_id": 57,
+      "name": "postDestinationMacAddress",
+      "data_type": "macaddress"
+    },
+    {
+      "element_id": 58,
+      "name": "vlanId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 59,
+      "name": "postVlanId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 60,
+      "name": "ipVersion",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 61,
+      "name": "flowDirection",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 62,
+      "name": "ipNextHopIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 63,
+      "name": "bgpNextHopIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 64,
+      "name": "ipv6ExtensionHeaders",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 70,
+      "name": "mplsTopLabelStackSection",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 71,
+      "name": "mplsLabelStackSection2",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 72,
+      "name": "mplsLabelStackSection3",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 73,
+      "name": "mplsLabelStackSection4",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 74,
+      "name": "mplsLabelStackSection5",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 75,
+      "name": "mplsLabelStackSection6",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 76,
+      "name": "mplsLabelStackSection7",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 77,
+      "name": "mplsLabelStackSection8",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 78,
+      "name": "mplsLabelStackSection9",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 79,
+      "name": "mplsLabelStackSection10",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 80,
+      "name": "destinationMacAddress",
+      "data_type": "macaddress"
+    },
+    {
+      "element_id": 81,
+      "name": "postSourceMacAddress",
+      "data_type": "macaddress"
+    },
+    {
+      "element_id": 82,
+      "name": "interfaceName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 83,
+      "name": "interfaceDescription",
+      "data_type": "string"
+    },
+    {
+      "element_id": 84,
+      "name": "samplerName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 85,
+      "name": "octetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 86,
+      "name": "packetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 87,
+      "name": "flagsAndSamplerId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 88,
+      "name": "fragmentOffset",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 89,
+      "name": "forwardingStatus",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 90,
+      "name": "mplsVpnRouteDistinguisher",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 91,
+      "name": "mplsTopLabelPrefixLength",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 92,
+      "name": "srcTrafficIndex",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 93,
+      "name": "dstTrafficIndex",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 94,
+      "name": "applicationDescription",
+      "data_type": "string"
+    },
+    {
+      "element_id": 95,
+      "name": "applicationId",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 96,
+      "name": "applicationName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 98,
+      "name": "postIpDiffServCodePoint",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 99,
+      "name": "multicastReplicationFactor",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 100,
+      "name": "className",
+      "data_type": "string"
+    },
+    {
+      "element_id": 101,
+      "name": "classificationEngineId",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 102,
+      "name": "layer2packetSectionOffset",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 103,
+      "name": "layer2packetSectionSize",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 104,
+      "name": "layer2packetSectionData",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 128,
+      "name": "bgpNextAdjacentAsNumber",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 129,
+      "name": "bgpPrevAdjacentAsNumber",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 130,
+      "name": "exporterIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 131,
+      "name": "exporterIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 132,
+      "name": "droppedOctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 133,
+      "name": "droppedPacketDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 134,
+      "name": "droppedOctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 135,
+      "name": "droppedPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 136,
+      "name": "flowEndReason",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 137,
+      "name": "commonPropertiesId",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 138,
+      "name": "observationPointId",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 139,
+      "name": "icmpTypeCodeIPv6",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 140,
+      "name": "mplsTopLabelIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 141,
+      "name": "lineCardId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 142,
+      "name": "portId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 143,
+      "name": "meteringProcessId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 144,
+      "name": "exportingProcessId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 145,
+      "name": "templateId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 146,
+      "name": "wlanChannelId",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 147,
+      "name": "wlanSSID",
+      "data_type": "string"
+    },
+    {
+      "element_id": 148,
+      "name": "flowId",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 149,
+      "name": "observationDomainId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 150,
+      "name": "flowStartSeconds",
+      "data_type": "datetimeseconds"
+    },
+    {
+      "element_id": 151,
+      "name": "flowEndSeconds",
+      "data_type": "datetimeseconds"
+    },
+    {
+      "element_id": 152,
+      "name": "flowStartMilliseconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 153,
+      "name": "flowEndMilliseconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 154,
+      "name": "flowStartMicroseconds",
+      "data_type": "datetimemicroseconds"
+    },
+    {
+      "element_id": 155,
+      "name": "flowEndMicroseconds",
+      "data_type": "datetimemicroseconds"
+    },
+    {
+      "element_id": 156,
+      "name": "flowStartNanoseconds",
+      "data_type": "datetimenanoseconds"
+    },
+    {
+      "element_id": 157,
+      "name": "flowEndNanoseconds",
+      "data_type": "datetimenanoseconds"
+    },
+    {
+      "element_id": 158,
+      "name": "flowStartDeltaMicroseconds",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 159,
+      "name": "flowEndDeltaMicroseconds",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 160,
+      "name": "systemInitTimeMilliseconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 161,
+      "name": "flowDurationMilliseconds",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 162,
+      "name": "flowDurationMicroseconds",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 163,
+      "name": "observedFlowTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 164,
+      "name": "ignoredPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 165,
+      "name": "ignoredOctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 166,
+      "name": "notSentFlowTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 167,
+      "name": "notSentPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 168,
+      "name": "notSentOctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 169,
+      "name": "destinationIPv6Prefix",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 170,
+      "name": "sourceIPv6Prefix",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 171,
+      "name": "postOctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 172,
+      "name": "postPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 173,
+      "name": "flowKeyIndicator",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 174,
+      "name": "postMCastPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 175,
+      "name": "postMCastOctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 176,
+      "name": "icmpTypeIPv4",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 177,
+      "name": "icmpCodeIPv4",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 178,
+      "name": "icmpTypeIPv6",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 179,
+      "name": "icmpCodeIPv6",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 180,
+      "name": "udpSourcePort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 181,
+      "name": "udpDestinationPort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 182,
+      "name": "tcpSourcePort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 183,
+      "name": "tcpDestinationPort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 184,
+      "name": "tcpSequenceNumber",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 185,
+      "name": "tcpAcknowledgementNumber",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 186,
+      "name": "tcpWindowSize",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 187,
+      "name": "tcpUrgentPointer",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 188,
+      "name": "tcpHeaderLength",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 189,
+      "name": "ipHeaderLength",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 190,
+      "name": "totalLengthIPv4",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 191,
+      "name": "payloadLengthIPv6",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 192,
+      "name": "ipTTL",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 193,
+      "name": "nextHeaderIPv6",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 194,
+      "name": "mplsPayloadLength",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 195,
+      "name": "ipDiffServCodePoint",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 196,
+      "name": "ipPrecedence",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 197,
+      "name": "fragmentFlags",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 198,
+      "name": "octetDeltaSumOfSquares",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 199,
+      "name": "octetTotalSumOfSquares",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 200,
+      "name": "mplsTopLabelTTL",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 201,
+      "name": "mplsLabelStackLength",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 202,
+      "name": "mplsLabelStackDepth",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 203,
+      "name": "mplsTopLabelExp",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 204,
+      "name": "ipPayloadLength",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 205,
+      "name": "udpMessageLength",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 206,
+      "name": "isMulticast",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 207,
+      "name": "ipv4IHL",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 208,
+      "name": "ipv4Options",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 209,
+      "name": "tcpOptions",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 210,
+      "name": "paddingOctets",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 211,
+      "name": "collectorIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 212,
+      "name": "collectorIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 213,
+      "name": "exportInterface",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 214,
+      "name": "exportProtocolVersion",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 215,
+      "name": "exportTransportProtocol",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 216,
+      "name": "collectorTransportPort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 217,
+      "name": "exporterTransportPort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 218,
+      "name": "tcpSynTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 219,
+      "name": "tcpFinTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 220,
+      "name": "tcpRstTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 221,
+      "name": "tcpPshTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 222,
+      "name": "tcpAckTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 223,
+      "name": "tcpUrgTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 224,
+      "name": "ipTotalLength",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 225,
+      "name": "postNATSourceIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 226,
+      "name": "postNATDestinationIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 227,
+      "name": "postNAPTSourceTransportPort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 228,
+      "name": "postNAPTDestinationTransportPort",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 229,
+      "name": "natOriginatingAddressRealm",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 230,
+      "name": "natEvent",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 231,
+      "name": "initiatorOctets",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 232,
+      "name": "responderOctets",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 233,
+      "name": "firewallEvent",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 234,
+      "name": "ingressVRFID",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 235,
+      "name": "egressVRFID",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 236,
+      "name": "VRFname",
+      "data_type": "string"
+    },
+    {
+      "element_id": 237,
+      "name": "postMplsTopLabelExp",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 238,
+      "name": "tcpWindowScale",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 239,
+      "name": "biflowDirection",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 240,
+      "name": "ethernetHeaderLength",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 241,
+      "name": "ethernetPayloadLength",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 242,
+      "name": "ethernetTotalLength",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 243,
+      "name": "dot1qVlanId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 244,
+      "name": "dot1qPriority",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 245,
+      "name": "dot1qCustomerVlanId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 246,
+      "name": "dot1qCustomerPriority",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 247,
+      "name": "metroEvcId",
+      "data_type": "string"
+    },
+    {
+      "element_id": 248,
+      "name": "metroEvcType",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 249,
+      "name": "pseudoWireId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 250,
+      "name": "pseudoWireType",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 251,
+      "name": "pseudoWireControlWord",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 252,
+      "name": "ingressPhysicalInterface",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 253,
+      "name": "egressPhysicalInterface",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 254,
+      "name": "postDot1qVlanId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 255,
+      "name": "postDot1qCustomerVlanId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 256,
+      "name": "ethernetType",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 257,
+      "name": "postIpPrecedence",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 258,
+      "name": "collectionTimeMilliseconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 259,
+      "name": "exportSctpStreamId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 260,
+      "name": "maxExportSeconds",
+      "data_type": "datetimeseconds"
+    },
+    {
+      "element_id": 261,
+      "name": "maxFlowEndSeconds",
+      "data_type": "datetimeseconds"
+    },
+    {
+      "element_id": 262,
+      "name": "messageMD5Checksum",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 263,
+      "name": "messageScope",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 264,
+      "name": "minExportSeconds",
+      "data_type": "datetimeseconds"
+    },
+    {
+      "element_id": 265,
+      "name": "minFlowStartSeconds",
+      "data_type": "datetimeseconds"
+    },
+    {
+      "element_id": 266,
+      "name": "opaqueOctets",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 267,
+      "name": "sessionScope",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 268,
+      "name": "maxFlowEndMicroseconds",
+      "data_type": "datetimemicroseconds"
+    },
+    {
+      "element_id": 269,
+      "name": "maxFlowEndMilliseconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 270,
+      "name": "maxFlowEndNanoseconds",
+      "data_type": "datetimenanoseconds"
+    },
+    {
+      "element_id": 271,
+      "name": "minFlowStartMicroseconds",
+      "data_type": "datetimemicroseconds"
+    },
+    {
+      "element_id": 272,
+      "name": "minFlowStartMilliseconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 273,
+      "name": "minFlowStartNanoseconds",
+      "data_type": "datetimenanoseconds"
+    },
+    {
+      "element_id": 274,
+      "name": "collectorCertificate",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 275,
+      "name": "exporterCertificate",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 276,
+      "name": "dataRecordsReliability",
+      "data_type": "boolean"
+    },
+    {
+      "element_id": 277,
+      "name": "observationPointType",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 278,
+      "name": "newConnectionDeltaCount",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 279,
+      "name": "connectionSumDurationSeconds",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 280,
+      "name": "connectionTransactionId",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 281,
+      "name": "postNATSourceIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 282,
+      "name": "postNATDestinationIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 283,
+      "name": "natPoolId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 284,
+      "name": "natPoolName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 285,
+      "name": "anonymizationFlags",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 286,
+      "name": "anonymizationTechnique",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 287,
+      "name": "informationElementIndex",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 288,
+      "name": "p2pTechnology",
+      "data_type": "string"
+    },
+    {
+      "element_id": 289,
+      "name": "tunnelTechnology",
+      "data_type": "string"
+    },
+    {
+      "element_id": 290,
+      "name": "encryptedTechnology",
+      "data_type": "string"
+    },
+    {
+      "element_id": 291,
+      "name": "basicList",
+      "data_type": "basiclist"
+    },
+    {
+      "element_id": 292,
+      "name": "subTemplateList",
+      "data_type": "subtemplatelist"
+    },
+    {
+      "element_id": 293,
+      "name": "subTemplateMultiList",
+      "data_type": "subtemplatemultilist"
+    },
+    {
+      "element_id": 294,
+      "name": "bgpValidityState",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 295,
+      "name": "IPSecSPI",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 296,
+      "name": "greKey",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 297,
+      "name": "natType",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 298,
+      "name": "initiatorPackets",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 299,
+      "name": "responderPackets",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 300,
+      "name": "observationDomainName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 301,
+      "name": "selectionSequenceId",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 302,
+      "name": "selectorId",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 303,
+      "name": "informationElementId",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 304,
+      "name": "selectorAlgorithm",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 305,
+      "name": "samplingPacketInterval",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 306,
+      "name": "samplingPacketSpace",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 307,
+      "name": "samplingTimeInterval",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 308,
+      "name": "samplingTimeSpace",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 309,
+      "name": "samplingSize",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 310,
+      "name": "samplingPopulation",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 311,
+      "name": "samplingProbability",
+      "data_type": "float64"
+    },
+    {
+      "element_id": 312,
+      "name": "dataLinkFrameSize",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 313,
+      "name": "ipHeaderPacketSection",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 314,
+      "name": "ipPayloadPacketSection",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 315,
+      "name": "dataLinkFrameSection",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 316,
+      "name": "mplsLabelStackSection",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 317,
+      "name": "mplsPayloadPacketSection",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 318,
+      "name": "selectorIdTotalPktsObserved",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 319,
+      "name": "selectorIdTotalPktsSelected",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 320,
+      "name": "absoluteError",
+      "data_type": "float64"
+    },
+    {
+      "element_id": 321,
+      "name": "relativeError",
+      "data_type": "float64"
+    },
+    {
+      "element_id": 322,
+      "name": "observationTimeSeconds",
+      "data_type": "datetimeseconds"
+    },
+    {
+      "element_id": 323,
+      "name": "observationTimeMilliseconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 324,
+      "name": "observationTimeMicroseconds",
+      "data_type": "datetimemicroseconds"
+    },
+    {
+      "element_id": 325,
+      "name": "observationTimeNanoseconds",
+      "data_type": "datetimenanoseconds"
+    },
+    {
+      "element_id": 326,
+      "name": "digestHashValue",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 327,
+      "name": "hashIPPayloadOffset",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 328,
+      "name": "hashIPPayloadSize",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 329,
+      "name": "hashOutputRangeMin",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 330,
+      "name": "hashOutputRangeMax",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 331,
+      "name": "hashSelectedRangeMin",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 332,
+      "name": "hashSelectedRangeMax",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 333,
+      "name": "hashDigestOutput",
+      "data_type": "boolean"
+    },
+    {
+      "element_id": 334,
+      "name": "hashInitialiserValue",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 335,
+      "name": "selectorName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 336,
+      "name": "upperCILimit",
+      "data_type": "float64"
+    },
+    {
+      "element_id": 337,
+      "name": "lowerCILimit",
+      "data_type": "float64"
+    },
+    {
+      "element_id": 338,
+      "name": "confidenceLevel",
+      "data_type": "float64"
+    },
+    {
+      "element_id": 339,
+      "name": "informationElementDataType",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 340,
+      "name": "informationElementDescription",
+      "data_type": "string"
+    },
+    {
+      "element_id": 341,
+      "name": "informationElementName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 342,
+      "name": "informationElementRangeBegin",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 343,
+      "name": "informationElementRangeEnd",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 344,
+      "name": "informationElementSemantics",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 345,
+      "name": "informationElementUnits",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 346,
+      "name": "privateEnterpriseNumber",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 347,
+      "name": "virtualStationInterfaceId",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 348,
+      "name": "virtualStationInterfaceName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 349,
+      "name": "virtualStationUUID",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 350,
+      "name": "virtualStationName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 351,
+      "name": "layer2SegmentId",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 352,
+      "name": "layer2OctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 353,
+      "name": "layer2OctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 354,
+      "name": "ingressUnicastPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 355,
+      "name": "ingressMulticastPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 356,
+      "name": "ingressBroadcastPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 357,
+      "name": "egressUnicastPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 358,
+      "name": "egressBroadcastPacketTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 359,
+      "name": "monitoringIntervalStartMilliSeconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 360,
+      "name": "monitoringIntervalEndMilliSeconds",
+      "data_type": "datetimemilliseconds"
+    },
+    {
+      "element_id": 361,
+      "name": "portRangeStart",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 362,
+      "name": "portRangeEnd",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 363,
+      "name": "portRangeStepSize",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 364,
+      "name": "portRangeNumPorts",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 365,
+      "name": "staMacAddress",
+      "data_type": "macaddress"
+    },
+    {
+      "element_id": 366,
+      "name": "staIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 367,
+      "name": "wtpMacAddress",
+      "data_type": "macaddress"
+    },
+    {
+      "element_id": 368,
+      "name": "ingressInterfaceType",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 369,
+      "name": "egressInterfaceType",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 370,
+      "name": "rtpSequenceNumber",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 371,
+      "name": "userName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 372,
+      "name": "applicationCategoryName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 373,
+      "name": "applicationSubCategoryName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 374,
+      "name": "applicationGroupName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 375,
+      "name": "originalFlowsPresent",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 376,
+      "name": "originalFlowsInitiated",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 377,
+      "name": "originalFlowsCompleted",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 378,
+      "name": "distinctCountOfSourceIPAddress",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 379,
+      "name": "distinctCountOfDestinationIPAddress",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 380,
+      "name": "distinctCountOfSourceIPv4Address",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 381,
+      "name": "distinctCountOfDestinationIPv4Address",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 382,
+      "name": "distinctCountOfSourceIPv6Address",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 383,
+      "name": "distinctCountOfDestinationIPv6Address",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 384,
+      "name": "valueDistributionMethod",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 385,
+      "name": "rfc3550JitterMilliseconds",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 386,
+      "name": "rfc3550JitterMicroseconds",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 387,
+      "name": "rfc3550JitterNanoseconds",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 388,
+      "name": "dot1qDEI",
+      "data_type": "boolean"
+    },
+    {
+      "element_id": 389,
+      "name": "dot1qCustomerDEI",
+      "data_type": "boolean"
+    },
+    {
+      "element_id": 390,
+      "name": "flowSelectorAlgorithm",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 391,
+      "name": "flowSelectedOctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 392,
+      "name": "flowSelectedPacketDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 393,
+      "name": "flowSelectedFlowDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 394,
+      "name": "selectorIDTotalFlowsObserved",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 395,
+      "name": "selectorIDTotalFlowsSelected",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 396,
+      "name": "samplingFlowInterval",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 397,
+      "name": "samplingFlowSpacing",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 398,
+      "name": "flowSamplingTimeInterval",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 399,
+      "name": "flowSamplingTimeSpacing",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 400,
+      "name": "hashFlowDomain",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 401,
+      "name": "transportOctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 402,
+      "name": "transportPacketDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 403,
+      "name": "originalExporterIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 404,
+      "name": "originalExporterIPv6Address",
+      "data_type": "ipv6address"
+    },
+    {
+      "element_id": 405,
+      "name": "originalObservationDomainId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 406,
+      "name": "intermediateProcessId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 407,
+      "name": "ignoredDataRecordTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 408,
+      "name": "dataLinkFrameType",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 409,
+      "name": "sectionOffset",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 410,
+      "name": "sectionExportedOctets",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 411,
+      "name": "dot1qServiceInstanceTag",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 412,
+      "name": "dot1qServiceInstanceId",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 413,
+      "name": "dot1qServiceInstancePriority",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 414,
+      "name": "dot1qCustomerSourceMacAddress",
+      "data_type": "macaddress"
+    },
+    {
+      "element_id": 415,
+      "name": "dot1qCustomerDestinationMacAddress",
+      "data_type": "macaddress"
+    },
+    {
+      "element_id": 417,
+      "name": "postLayer2OctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 418,
+      "name": "postMCastLayer2OctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 420,
+      "name": "postLayer2OctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 421,
+      "name": "postMCastLayer2OctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 422,
+      "name": "minimumLayer2TotalLength",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 423,
+      "name": "maximumLayer2TotalLength",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 424,
+      "name": "droppedLayer2OctetDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 425,
+      "name": "droppedLayer2OctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 426,
+      "name": "ignoredLayer2OctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 427,
+      "name": "notSentLayer2OctetTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 428,
+      "name": "layer2OctetDeltaSumOfSquares",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 429,
+      "name": "layer2OctetTotalSumOfSquares",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 430,
+      "name": "layer2FrameDeltaCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 431,
+      "name": "layer2FrameTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 432,
+      "name": "pseudoWireDestinationIPv4Address",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 433,
+      "name": "ignoredLayer2FrameTotalCount",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 434,
+      "name": "mibObjectValueInteger",
+      "data_type": "signed32"
+    },
+    {
+      "element_id": 435,
+      "name": "mibObjectValueOctetString",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 436,
+      "name": "mibObjectValueOID",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 437,
+      "name": "mibObjectValueBits",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 438,
+      "name": "mibObjectValueIPAddress",
+      "data_type": "ipv4address"
+    },
+    {
+      "element_id": 439,
+      "name": "mibObjectValueCounter",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 440,
+      "name": "mibObjectValueGauge",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 441,
+      "name": "mibObjectValueTimeTicks",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 442,
+      "name": "mibObjectValueUnsigned",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 443,
+      "name": "mibObjectValueTable",
+      "data_type": "subtemplatelist"
+    },
+    {
+      "element_id": 444,
+      "name": "mibObjectValueRow",
+      "data_type": "subtemplatelist"
+    },
+    {
+      "element_id": 445,
+      "name": "mibObjectIdentifier",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 446,
+      "name": "mibSubIdentifier",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 447,
+      "name": "mibIndexIndicator",
+      "data_type": "unsigned64"
+    },
+    {
+      "element_id": 448,
+      "name": "mibCaptureTimeSemantics",
+      "data_type": "unsigned8"
+    },
+    {
+      "element_id": 449,
+      "name": "mibContextEngineID",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 450,
+      "name": "mibContextName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 451,
+      "name": "mibObjectName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 452,
+      "name": "mibObjectDescription",
+      "data_type": "string"
+    },
+    {
+      "element_id": 453,
+      "name": "mibObjectSyntax",
+      "data_type": "string"
+    },
+    {
+      "element_id": 454,
+      "name": "mibModuleName",
+      "data_type": "string"
+    },
+    {
+      "element_id": 455,
+      "name": "mobileIMSI",
+      "data_type": "string"
+    },
+    {
+      "element_id": 456,
+      "name": "mobileMSISDN",
+      "data_type": "string"
+    },
+    {
+      "element_id": 457,
+      "name": "httpStatusCode",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 458,
+      "name": "sourceTransportPortsLimit",
+      "data_type": "unsigned16"
+    },
+    {
+      "element_id": 459,
+      "name": "httpRequestMethod",
+      "data_type": "string"
+    },
+    {
+      "element_id": 460,
+      "name": "httpRequestHost",
+      "data_type": "string"
+    },
+    {
+      "element_id": 461,
+      "name": "httpRequestTarget",
+      "data_type": "string"
+    },
+    {
+      "element_id": 462,
+      "name": "httpMessageVersion",
+      "data_type": "string"
+    },
+    {
+      "element_id": 463,
+      "name": "natInstanceID",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 464,
+      "name": "internalAddressRealm",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 465,
+      "name": "externalAddressRealm",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 466,
+      "name": "natQuotaExceededEvent",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 467,
+      "name": "natThresholdEvent",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 468,
+      "name": "httpUserAgent",
+      "data_type": "string"
+    },
+    {
+      "element_id": 469,
+      "name": "httpContentType",
+      "data_type": "string"
+    },
+    {
+      "element_id": 470,
+      "name": "httpReasonPhrase",
+      "data_type": "string"
+    },
+    {
+      "element_id": 471,
+      "name": "maxSessionEntries",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 472,
+      "name": "maxBIBEntries",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 473,
+      "name": "maxEntriesPerUser",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 474,
+      "name": "maxSubscribers",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 475,
+      "name": "maxFragmentsPendingReassembly",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 476,
+      "name": "addressPoolHighThreshold",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 477,
+      "name": "addressPoolLowThreshold",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 478,
+      "name": "addressPortMappingHighThreshold",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 479,
+      "name": "addressPortMappingLowThreshold",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 480,
+      "name": "addressPortMappingPerUserHighThreshold",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 481,
+      "name": "globalAddressMappingHighThreshold",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 482,
+      "name": "vpnIdentifier",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 483,
+      "name": "bgpCommunity",
+      "data_type": "unsigned32"
+    },
+    {
+      "element_id": 484,
+      "name": "bgpSourceCommunityList",
+      "data_type": "basiclist"
+    },
+    {
+      "element_id": 485,
+      "name": "bgpDestinationCommunityList",
+      "data_type": "basiclist"
+    },
+    {
+      "element_id": 486,
+      "name": "bgpExtendedCommunity",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 487,
+      "name": "bgpSourceExtendedCommunityList",
+      "data_type": "basiclist"
+    },
+    {
+      "element_id": 488,
+      "name": "bgpDestinationExtendedCommunityList",
+      "data_type": "basiclist"
+    },
+    {
+      "element_id": 489,
+      "name": "bgpLargeCommunity",
+      "data_type": "octetarray"
+    },
+    {
+      "element_id": 490,
+      "name": "bgpSourceLargeCommunityList",
+      "data_type": "basiclist"
+    },
+    {
+      "element_id": 491,
+      "name": "bgpDestinationLargeCommunityList",
+      "data_type": "basiclist"
+    }
+  ]
+}
+
+

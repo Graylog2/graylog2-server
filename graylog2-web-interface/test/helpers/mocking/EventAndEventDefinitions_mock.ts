@@ -31,7 +31,11 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import { allMessagesTable, resultHistogram } from 'views/logic/Widgets';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
+const mock_color = StaticColor.create('#ffffff');
 export const mockEventData = {
   event: {
     alert: true,
@@ -99,6 +103,7 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
         field: 'field2',
       },
     ],
+    filters: [],
     conditions: {
       expression: {
         expr: '||',
@@ -332,6 +337,10 @@ export const mockedViewWithTwoAggregations = View.create()
         'allm-widget-id': new WidgetPosition(1, 12, 6, Infinity),
         'summary-widget-id': new WidgetPosition(1, 1, 3, Infinity),
       })
+      .formatting(FormattingSettings.create([
+        HighlightingRule.create('count(field1)', 500, 'greater', mock_color),
+        HighlightingRule.create('count(field2)', 8000, 'less', mock_color),
+      ]))
       .build(),
   })
   .search(searchTwoAggregations)
@@ -366,6 +375,9 @@ export const mockedViewWithOneAggregation = View.create()
         'mc-widget-id': new WidgetPosition(1, 4, 2, Infinity),
         'allm-widget-id': new WidgetPosition(1, 6, 6, Infinity),
       })
+      .formatting(FormattingSettings.create([
+        HighlightingRule.create('count(field1)', 500, 'greater', mock_color),
+      ]))
       .build(),
   })
   .search(searchOneAggregation)
@@ -394,6 +406,9 @@ export const mockedViewWithOneAggregationNoField = View.create()
         'mc-widget-id': new WidgetPosition(1, 4, 2, Infinity),
         'allm-widget-id': new WidgetPosition(1, 6, 6, Infinity),
       })
+      .formatting(FormattingSettings.create([
+        HighlightingRule.create('count()', 500, 'greater', mock_color),
+      ]))
       .build(),
   })
   .search(searchOneAggregation)

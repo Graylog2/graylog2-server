@@ -60,8 +60,7 @@ class MaxmindAdapterDocumentation extends React.Component {
       <div>
         <p>The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.</p>
 
-        <Alert style={{ marginBottom: 10 }} bsStyle="info">
-          <h4 style={{ marginBottom: 10 }}>Limitations</h4>
+        <Alert style={{ marginBottom: 10 }} bsStyle="info" title="Limitations">
           <p>Currently the ASN, city and country databases are supported.</p>
           <p>For support of additional database types, please visit our support channels.</p>
         </Alert>

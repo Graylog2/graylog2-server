@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';
-import { DataTable, ExternalLink, Spinner, Icon } from 'components/common';
+import { DataTable, ExternalLink, Spinner } from 'components/common';
 
 class InputTypesDataTable extends React.Component {
   static propTypes = {
@@ -46,7 +46,7 @@ class InputTypesDataTable extends React.Component {
     if (Object.keys(this.props.inputDescriptions).length === 0) {
       return (
         <Alert bsStyle="warning">
-          <Icon name="exclamation-triangle" />&nbsp; Input types are unavailable.
+          Input types are unavailable.
         </Alert>
       );
     }

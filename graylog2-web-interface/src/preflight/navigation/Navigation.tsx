@@ -38,7 +38,7 @@ const NavigationContainer = styled.div`
   align-items: center;
 `;
 const StyledText = styled(Text)<StyledMantineTextProps>(({ theme }) => css`
-  color: ${theme.mode === 'teint' ? theme.colors.brand.concrete : 'white'};
+  color: ${theme.mode === 'light' ? theme.colors.brand.concrete : 'white'};
 `);
 const Navigation = () => (
   <GraylogHeader height={80}>

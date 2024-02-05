@@ -18,11 +18,6 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.graylog2.indexer.IndexToolsAdapter;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.streams.Stream;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -37,8 +32,14 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog2.indexer.IndexToolsAdapter;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.streams.Stream;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -89,12 +90,12 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
         final ParsedDateHistogram dateHistogram = filterAggregation.getAggregations().get(AGG_DATE_HISTOGRAM);
 
 
-        final List<ParsedDateHistogram.ParsedBucket> histogramBuckets = (List<ParsedDateHistogram.ParsedBucket>)dateHistogram.getBuckets();
+        final List<ParsedDateHistogram.ParsedBucket> histogramBuckets = (List<ParsedDateHistogram.ParsedBucket>) dateHistogram.getBuckets();
         final Map<DateTime, Map<String, Long>> result = Maps.newHashMapWithExpectedSize(histogramBuckets.size());
 
         for (ParsedDateHistogram.ParsedBucket bucket : histogramBuckets) {
             final ZonedDateTime zonedDateTime = (ZonedDateTime) bucket.getKey();
-            final DateTime date = new DateTime(zonedDateTime.toInstant().toEpochMilli()).toDateTime(DateTimeZone.UTC);
+            final DateTime date = new DateTime(zonedDateTime.toInstant().toEpochMilli(), DateTimeZone.UTC);
 
             final Terms sourceFieldAgg = bucket.getAggregations().get(AGG_MESSAGE_FIELD);
             final List<? extends Terms.Bucket> termBuckets = sourceFieldAgg.getBuckets();

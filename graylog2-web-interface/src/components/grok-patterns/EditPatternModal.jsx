@@ -18,6 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { BootstrapModalForm, Input, Panel, Button } from 'components/bootstrap';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import GrokPatternInput from './GrokPatternInput';
 
@@ -32,6 +34,7 @@ class EditPatternModal extends React.Component {
     savePattern: PropTypes.func.isRequired,
     testPattern: PropTypes.func.isRequired,
     validPatternName: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func,
   };
 
   static defaultProps = {
@@ -41,6 +44,7 @@ class EditPatternModal extends React.Component {
     patterns: [],
     create: false,
     sampleData: '',
+    sendTelemetry: () => {},
   };
 
   constructor(props) {
@@ -93,7 +97,12 @@ class EditPatternModal extends React.Component {
   };
 
   _saved = () => {
-    const { create } = this.props;
+    const { create, sendTelemetry } = this.props;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN[create ? 'CREATED' : 'UPDATED'], {
+      app_pathname: 'grokpatterns',
+      app_section: 'grokpatterns',
+    });
 
     this._closeModal();
 
@@ -111,6 +120,13 @@ class EditPatternModal extends React.Component {
     }
   };
 
+  _sendTelemetry = () => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.TESTED, {
+      app_pathname: 'grokpatterns',
+      app_section: 'grokpatterns',
+    });
+  };
+
   _testPattern = () => {
     const { name, pattern } = this.state;
     const { testPattern } = this.props;
@@ -125,8 +141,10 @@ class EditPatternModal extends React.Component {
 
     testPattern(this.state, (response) => {
       this.setState({ test_result: JSON.stringify(response, null, 2), test_error: undefined });
+      this._sendTelemetry();
     }, (errMessage) => {
       this.setState({ test_result: '', test_error: errMessage });
+      this._sendTelemetry();
     });
   };
 
@@ -207,4 +225,4 @@ class EditPatternModal extends React.Component {
   }
 }
 
-export default EditPatternModal;
+export default withTelemetry(EditPatternModal);

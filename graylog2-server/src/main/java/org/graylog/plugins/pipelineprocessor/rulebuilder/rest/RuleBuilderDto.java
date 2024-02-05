@@ -45,6 +45,10 @@ public abstract class RuleBuilderDto {
     public abstract String description();
 
     @JsonProperty
+    @Nullable
+    public abstract String source();
+
+    @JsonProperty
     public abstract RuleBuilder ruleBuilder();
 
     @JsonProperty
@@ -55,21 +59,29 @@ public abstract class RuleBuilderDto {
     @Nullable
     public abstract DateTime modifiedAt();
 
+    @JsonProperty
+    @Nullable
+    public abstract String simulatorMessage();
+
     @JsonCreator
     public static RuleBuilderDto create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
+                                        @JsonProperty("source") @Nullable String source,
                                         @JsonProperty("rule_builder") RuleBuilder ruleBuilder,
                                         @JsonProperty("created_at") @Nullable DateTime createdAt,
                                         @JsonProperty("modified_at") @Nullable DateTime modifiedAt,
-                                        @JsonProperty("errors") @Nullable List<String> errors) {
+                                        @JsonProperty("errors") @Nullable List<String> errors,
+                                        @JsonProperty("simulator_message") @Nullable String simulatorMessage) {
         return builder()
                 .id(id)
                 .title(title)
                 .description(description)
+                .source(source)
                 .ruleBuilder(ruleBuilder)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
+                .simulatorMessage(simulatorMessage)
                 .build();
     }
 
@@ -87,11 +99,15 @@ public abstract class RuleBuilderDto {
 
         public abstract Builder description(String description);
 
+        public abstract Builder source(String source);
+
         public abstract Builder ruleBuilder(RuleBuilder ruleBuilder);
 
         public abstract Builder createdAt(DateTime createdAt);
 
         public abstract Builder modifiedAt(DateTime modifiedAt);
+
+        public abstract Builder simulatorMessage(String simulatorMessage);
 
         public abstract RuleBuilderDto build();
     }

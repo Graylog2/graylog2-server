@@ -28,6 +28,7 @@ type MetricError = {
   function?: string,
   field?: string,
   percentile?: string,
+  name?: string,
 };
 
 const hasErrors = <T extends {}> (errors: Array<T>): boolean => errors.filter((error) => Object.keys(error).length > 0).length > 0;
@@ -54,6 +55,10 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
 
     if (metric.function === 'percentile' && !metric.percentile) {
       metricError.percentile = 'Percentile is required.';
+    }
+
+    if (metric.name && values.metrics.filter(({ name }) => name === metric.name).length > 1) {
+      metricError.name = 'Name must be unique.';
     }
 
     return metricError;

@@ -24,6 +24,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Injector;
 import org.apache.commons.io.FileUtils;
 import org.graylog2.plugin.Plugin;
+import org.graylog2.plugin.PluginBootstrapConfig;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.PreflightCheckModule;
@@ -37,13 +38,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.requireNonNull;
@@ -53,36 +52,44 @@ public class PluginLoader {
     private static final String[] PLUGIN_FILE_EXTENSIONS = {"jar", "JAR"};
 
     private final File pluginDir;
-    private final ChainingClassLoader classLoader;
-    private final Injector coreConfigInjector;
+    protected final ChainingClassLoader classLoader;
 
-    public PluginLoader(File pluginDir, ChainingClassLoader classLoader, Injector coreConfigInjector) {
+    public PluginLoader(File pluginDir, ChainingClassLoader classLoader) {
         this.pluginDir = requireNonNull(pluginDir);
         this.classLoader = requireNonNull(classLoader);
-        this.coreConfigInjector = coreConfigInjector;
+
+        loadPluginJars();
     }
 
-    public Set<Plugin> loadPlugins() {
+    public Set<PluginBootstrapConfig> loadPluginBootstrapConfigs() {
+        return ImmutableSet.copyOf(ServiceLoader.load(PluginBootstrapConfig.class, classLoader));
+    }
+
+    public Set<Plugin> loadPlugins(Injector injector) {
         return ImmutableSortedSet.orderedBy(new PluginComparator())
-                .addAll(Iterables.transform(loadJarPlugins(), new PluginAdapterFunction()))
-                .addAll(Iterables.transform(loadClassPathPlugins(), new PluginAdapterFunction()))
+                .addAll(Iterables.transform(loadJarPlugins(), new PluginAdapterFunction(injector)))
+                .addAll(Iterables.transform(loadClassPathPlugins(), new PluginAdapterFunction(injector)))
                 .build();
     }
 
-    private Iterable<Plugin> loadClassPathPlugins() {
+    protected Iterable<Plugin> loadClassPathPlugins() {
         return ServiceLoader.load(Plugin.class);
     }
 
+    protected Iterable<Plugin> loadJarPlugins() {
+        return ImmutableSet.copyOf(ServiceLoader.load(Plugin.class, classLoader));
+    }
+
     @SuppressForbidden("Deliberate invocation of URL#getFile()")
-    private Iterable<Plugin> loadJarPlugins() {
+    private void loadPluginJars() {
         if (!pluginDir.exists()) {
             LOG.warn("Plugin directory {} does not exist, not loading plugins.", pluginDir.getAbsolutePath());
-            return Collections.emptySet();
+            return;
         }
 
         if (!pluginDir.isDirectory()) {
             LOG.warn("Path {} is not a directory, cannot load plugins.", pluginDir);
-            return Collections.emptySet();
+            return;
         }
 
         LOG.debug("Scanning directory <{}> for plugins...", pluginDir.getAbsolutePath());
@@ -102,7 +109,7 @@ public class PluginLoader {
                     }
                 })
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         final List<URL> sharedClassLoaderUrls = new ArrayList<>();
         urls.forEach(url -> {
@@ -125,10 +132,6 @@ public class PluginLoader {
             LOG.debug("Creating shared class loader for {} plugins: {}", sharedClassLoaderUrls.size(), sharedClassLoaderUrls);
             classLoader.addClassLoader(URLClassLoader.newInstance(sharedClassLoaderUrls.toArray(new URL[0])));
         }
-
-        final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, classLoader);
-
-        return ImmutableSet.copyOf(pluginServiceLoader);
     }
 
     public static class PluginComparator implements Comparator<Plugin> {
@@ -201,10 +204,16 @@ public class PluginLoader {
         }
     }
 
-    private class PluginAdapterFunction implements Function<Plugin, Plugin> {
+    protected class PluginAdapterFunction implements Function<Plugin, Plugin> {
+        private final Injector injector;
+
+        public PluginAdapterFunction(Injector injector) {
+            this.injector = injector;
+        }
+
         @Override
         public Plugin apply(Plugin input) {
-            coreConfigInjector.injectMembers(input);
+            injector.injectMembers(input);
             return new PluginAdapter(input);
         }
     }

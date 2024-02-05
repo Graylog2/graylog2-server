@@ -126,11 +126,14 @@ const ViewHeader = () => {
 
   const { alertId, definitionId, definitionTitle, isAlert, isEventDefinition, isEvent } = useAlertAndEventDefinitionData();
   const dispatch = useAppDispatch();
-  const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
+  const _onSaveView = useCallback(async (updatedView: View) => {
+    await dispatch(onSaveView(updatedView));
+    await dispatch(updateView(updatedView));
+  }, [dispatch]);
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
-  const onChangeFavorite = useCallback((newValue) => dispatch(updateView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
+  const onChangeFavorite = useCallback((newValue: boolean) => dispatch(updateView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
 
   const breadCrumbs = useMemo(() => {
     if (isAlert || isEvent) return links.alert({ id: alertId });

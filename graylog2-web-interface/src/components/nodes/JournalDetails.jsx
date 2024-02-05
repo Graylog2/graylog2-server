@@ -26,7 +26,7 @@ import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
 import { Row, Col, Alert } from 'components/bootstrap';
-import { Spinner, RelativeTime, Icon } from 'components/common';
+import { Spinner, RelativeTime } from 'components/common';
 import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import NumberUtils from 'util/NumberUtils';
@@ -112,7 +112,7 @@ const JournalDetails = createReactClass({
     if (!journalInformation.enabled) {
       return (
         <Alert bsStyle="warning">
-          <Icon name="exclamation-triangle" />&nbsp; The disk journal is disabled on this node.
+          The disk journal is disabled on this node.
         </Alert>
       );
     }
@@ -122,7 +122,7 @@ const JournalDetails = createReactClass({
     if (Object.keys(metrics).length === 0) {
       return (
         <Alert bsStyle="warning">
-          <Icon name="exclamation-triangle" />&nbsp; Journal metrics unavailable.
+          Journal metrics unavailable.
         </Alert>
       );
     }

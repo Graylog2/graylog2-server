@@ -16,16 +16,21 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public abstract class MongoDBPreflightCheckTest {
+public class MongoDBPreflightCheckTest {
+    @RegisterExtension
+    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO5);
 
     private MongoDBPreflightCheck mongoDBPreflightCheck;
 

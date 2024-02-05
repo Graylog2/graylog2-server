@@ -45,7 +45,7 @@ const Background = styled.div<{ trend: TrendDirection | undefined }>(({ theme, t
       background-color: ${bgColor} !important; /* Needed for report generation */
       color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
       color-adjust: exact !important; /* Needed for report generation */
-    `}
+`}
 `;
 });
 

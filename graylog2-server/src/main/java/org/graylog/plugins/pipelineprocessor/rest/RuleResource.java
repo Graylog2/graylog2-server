@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -53,20 +54,24 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -100,7 +105,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
     private final PipelineServiceHelper pipelineServiceHelper;
-    private final StreamService streamService;
+    private final RuleBuilderService ruleBuilderService;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -110,7 +115,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
                         PaginatedRuleService paginatedRuleService,
                         FunctionRegistry functionRegistry,
                         PipelineServiceHelper pipelineServiceHelper,
-                        StreamService streamService) {
+                        StreamService streamService,
+                        RuleBuilderService ruleBuilderService) {
         this.ruleService = ruleService;
         this.ruleSimulator = ruleSimulator;
         this.pipelineService = pipelineService;
@@ -119,7 +125,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
         this.pipelineServiceHelper = pipelineServiceHelper;
-        this.streamService = streamService;
+        this.ruleBuilderService = ruleBuilderService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -135,10 +141,12 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
                 .description(ruleSource.description())
-                .source(ruleSource.source())
+                .source(ruleSource.source()
+                )
                 .createdAt(now)
                 .modifiedAt(now)
                 .ruleBuilder(ruleSource.ruleBuilder())
+                .simulatorMessage(ruleSource.simulatorMessage())
                 .build();
 
         final RuleDao save;
@@ -176,7 +184,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("only used to test a rule, no changes made in the system")
     public Message simulate(
             @ApiParam(name = "request", required = true) @NotNull SimulateRuleRequest request
-    ) throws NotFoundException {
+    ) {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(request.ruleSource().id(), request.ruleSource().source(), true);
         Message message = ruleSimulator.createMessage(request.message());
         return ruleSimulator.simulate(rule, message);
@@ -253,7 +261,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
     }
 
 
-
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @GET
@@ -291,6 +298,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .ruleBuilder(update.ruleBuilder())
+                .simulatorMessage(update.simulatorMessage())
                 .build();
 
         final RuleDao savedRule;

@@ -19,11 +19,13 @@ package org.graylog.plugins.views.search.rest.scriptingapi.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.NoClass;
 import com.github.rvesse.airline.annotations.restrictions.NotBlank;
 import org.apache.commons.lang.StringUtils;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,7 +46,8 @@ public class Metric implements Sortable {
     @JsonProperty("configuration")
     @JsonTypeInfo(include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
                   use = JsonTypeInfo.Id.NAME,
-                  property = "function")
+                  property = "function",
+                  defaultImpl = NoClass.class)
     @JsonSubTypes({
             @JsonSubTypes.Type(name = "percentile", value = PercentileConfiguration.class),
             @JsonSubTypes.Type(name = "percentage", value = PercentageConfiguration.class)
@@ -71,7 +74,7 @@ public class Metric implements Sortable {
      * @param metricString String representation in the form of "function:field", i.e. "avg:took_ms" or "latest:source" (you can ommit field for count function : "count" or "count:")
      * @return new Metric, or null if metricString input string is blank
      */
-    public static Optional<Metric>  fromStringRepresentation(final String metricString) {
+    public static Optional<Metric> fromStringRepresentation(final String metricString) {
         if (StringUtils.isBlank(metricString)) {
             return Optional.empty();
         }

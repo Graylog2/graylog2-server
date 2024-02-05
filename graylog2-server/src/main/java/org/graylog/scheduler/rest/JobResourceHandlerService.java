@@ -20,11 +20,15 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.security.UserContext;
 import org.graylog2.rest.models.system.SystemJobSummary;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -39,13 +43,21 @@ public class JobResourceHandlerService {
 
     private final Map<String, JobResourceHandler> resourceHandlers;
 
+    private Set<JobResourceHandler> allResourceHandlers() {
+        // Return a Set of all resource handlers, but remove duplicates by class name
+        // This is needed because the identical handler might be registered multiple
+        // times but under a different names.
+        return new HashSet<>(resourceHandlers.values().stream()
+                .collect(Collectors.toMap((r -> r.getClass().getName()), r -> r, (a, b) -> a)).values());
+    }
+
     @Inject
     public JobResourceHandlerService(Map<String, JobResourceHandler> resourceHandlers) {
         this.resourceHandlers = resourceHandlers;
     }
 
     public List<JobTriggerDto> listJobs(UserContext userContext) {
-        return resourceHandlers.values().stream().flatMap(h -> h.listAllJobs(userContext).stream()).collect(Collectors.toList());
+        return allResourceHandlers().stream().flatMap(h -> h.listAllJobs(userContext).stream()).collect(Collectors.toList());
     }
 
     public List<SystemJobSummary> listJobsAsSystemJobSummary(UserContext userContext) {
@@ -53,7 +65,7 @@ public class JobResourceHandlerService {
     }
 
     public Optional<JobTriggerDto> getJob(UserContext userContext, String jobId) {
-        return resourceHandlers.values().stream().map(h -> h.getJob(userContext, jobId)).filter(Optional::isPresent).map(Optional::get).findFirst();
+        return allResourceHandlers().stream().map(h -> h.getJob(userContext, jobId)).filter(Optional::isPresent).map(Optional::get).findFirst();
     }
 
     public Optional<SystemJobSummary> getJobAsSystemJobSummery(UserContext userContext, String jobId) {
@@ -61,7 +73,7 @@ public class JobResourceHandlerService {
     }
 
     public Optional<JobTriggerDto> cancelJob(UserContext userContext, String jobId) {
-        return resourceHandlers.values().stream().map(h -> h.cancelJob(userContext, jobId)).filter(Optional::isPresent).map(Optional::get).findFirst();
+        return allResourceHandlers().stream().map(h -> h.cancelJob(userContext, jobId)).filter(Optional::isPresent).map(Optional::get).findFirst();
     }
 
     public Optional<SystemJobSummary> cancelJobWithSystemJobSummary(UserContext userContext, String jobId) {
@@ -69,7 +81,7 @@ public class JobResourceHandlerService {
     }
 
     public int acknowledgeJob(UserContext userContext, String jobId) {
-        return resourceHandlers.values().stream().map(h -> h.acknowledgeJob(userContext, jobId)).reduce(0, Integer::sum);
+        return allResourceHandlers().stream().map(h -> h.acknowledgeJob(userContext, jobId)).reduce(0, Integer::sum);
     }
 
     public SystemJobSummary jobSummaryFromTrigger(JobTriggerDto trigger) {
@@ -88,6 +100,7 @@ public class JobResourceHandlerService {
                 details.info(),
                 Objects.toString(trigger.lock().lastOwner(), ""),
                 trigger.triggeredAt().orElse(null),
+                Duration.ofMillis(trigger.executionDurationMs().orElse(0L)),
                 trigger.lock().progress(),
                 details.isCancellable(),
                 true,

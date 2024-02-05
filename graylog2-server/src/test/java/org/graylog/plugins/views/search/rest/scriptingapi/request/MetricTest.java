@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -46,4 +48,21 @@ class MetricTest {
                 .hasValue(new Metric("avg", "salary"));
     }
 
+    @Test
+    void unknownJsonSubtypeParsesAsNullConfiguration() throws JsonProcessingException {
+        // This test ensures that we can parse a Metric where the "function" is not a known JsonSubType for
+        // MetricConfiguration. The behavior for handling this changed in Jackson 2.14. We need to use a defaultImpl
+        // of NoClass for the JsonTypeInfo since then. (see https://github.com/FasterXML/jackson-databind/issues/3533)
+        final var json = """
+                {
+                  "function": "count",
+                  "field": "test"
+                }
+                """;
+        final var metric = new ObjectMapperProvider().get().readValue(json, Metric.class);
+
+        assertThat(metric.functionName()).isEqualTo("count");
+        assertThat(metric.fieldName()).isEqualTo("test");
+        assertThat(metric.configuration()).isNull();
+    }
 }

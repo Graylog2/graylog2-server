@@ -48,8 +48,10 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -150,6 +152,14 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mongoVersions()));
     }
 
+    private Map<String, String> getAdditionalConfigurationParameters(Set<Class<?>> annotatedClasses) {
+        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.additionalConfigurationParameters()))
+                .stream().collect(Collectors.toMap(
+                        ContainerMatrixTestsConfiguration.ConfigurationParameter::key,
+                        ContainerMatrixTestsConfiguration.ConfigurationParameter::value
+                ));
+    }
+
     private Set<Integer> getExtraPorts(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.extraPorts()).boxed());
     }
@@ -190,7 +200,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     private List<String> getEnabledFeatureFlags(Lifecycle lifecycle, Set<Class<?>> annotatedClasses) {
         return annotatedClasses.stream()
                 .map(zclass -> getEnabledFeatureFlags(lifecycle, zclass))
-                .flatMap(list -> list.stream())
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 
@@ -225,6 +235,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         final Set<Integer> extraPorts = getExtraPorts(annotatedClasses);
         final List<URL> mongoDBFixtures = getMongoDBFixtures(annotatedClasses);
         final boolean withMailServerEnabled = isMailServerRequired(annotatedClasses);
+        final Map<String, String> additionalConfig = getAdditionalConfigurationParameters(annotatedClasses);
 
         if (testAgainstRunningESMongoDB()) {
             // if you test from inside an IDE against running containers
@@ -256,7 +267,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                             extraPorts,
                                                             mongoDBFixtures,
                                                             getEnabledFeatureFlags(Lifecycle.VM, annotatedClasses),
-                                                            withMailServerEnabled);
+                                                            withMailServerEnabled, additionalConfig);
                                                     new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                     engineDescriptor.addChild(testsDescriptor);
                                                 })
@@ -275,7 +286,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                                     mongoVersion,
                                                                     extraPorts,
                                                                     new ArrayList<>(),
-                                                                    getEnabledFeatureFlags(Lifecycle.CLASS, annotatedClasses), withMailServerEnabled);
+                                                                    getEnabledFeatureFlags(Lifecycle.CLASS, annotatedClasses), withMailServerEnabled, additionalConfig);
                                                             new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                             engineDescriptor.addChild(testsDescriptor);
                                                         })

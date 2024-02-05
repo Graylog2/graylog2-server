@@ -18,7 +18,7 @@ package org.graylog.enterprise;
 
 import org.graylog2.database.MongoConnection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class EnterpriseService {
     private final MongoConnection mongoConnection;
@@ -29,7 +29,7 @@ public class EnterpriseService {
     }
 
 
-    private boolean hasLicenseInstalled() {
+    public boolean hasLicenseInstalled() {
         return mongoConnection.getMongoDatabase().getCollection("licenses").countDocuments() > 0;
     }
 

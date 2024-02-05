@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Input } from 'components/bootstrap';
+import { Input, Row, Col } from 'components/bootstrap';
 
 import type { RuleBuilderRule } from './types';
 
@@ -38,21 +38,27 @@ const RuleBuilderForm = ({ rule, onChange }: Props) => {
 
   return (
     <fieldset>
-      <Input type="text"
-             id="title"
-             label="Title"
-             value={rule.title}
-             onChange={handleTitleChange}
-             autoFocus
-             required
-             help="Rule title." />
-
-      <Input type="textarea"
-             id="description"
-             label="Description"
-             value={rule.description}
-             onChange={handleDescriptionChange}
-             help="Rule description (optional)." />
+      <Row>
+        <Col xs={6}>
+          <Input type="text"
+                 id="title"
+                 label="Title"
+                 value={rule.title}
+                 onChange={handleTitleChange}
+                 autoFocus
+                 required
+                 help="Rule title." />
+        </Col>
+        <Col xs={6}>
+          <Input type="textarea"
+                 id="description"
+                 label="Description"
+                 value={rule.description}
+                 onChange={handleDescriptionChange}
+                 rows={1}
+                 help="Rule description (optional)." />
+        </Col>
+      </Row>
 
       <PipelinesUsingRule create={Boolean(rule)} />
     </fieldset>

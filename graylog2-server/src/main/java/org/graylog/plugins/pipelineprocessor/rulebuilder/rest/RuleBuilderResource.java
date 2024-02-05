@@ -29,6 +29,7 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRuleService;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
@@ -41,17 +42,20 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -98,11 +102,10 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
             throw new BadRequestException(exception.getMessage());
         }
 
-        RuleSource ruleSource = toRuleSource(ruleBuilderDto);
+        RuleSource ruleSource = toRuleSource(ruleBuilderDto, false);
         final RuleSource stored = ruleResource.createFromParser(ruleSource);
         return ruleBuilderDto.toBuilder()
                 .id(stored.id())
-                .ruleBuilder(ruleBuilderParser.generateTitles(ruleBuilderDto.ruleBuilder()))
                 .build();
     }
 
@@ -113,11 +116,10 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleBuilderDto updateFromBuilder(@ApiParam(name = "id") @PathParam("id") String id,
                                             @ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) throws NotFoundException {
-        RuleSource ruleSource = toRuleSource(ruleBuilderDto);
+        RuleSource ruleSource = toRuleSource(ruleBuilderDto, false);
         final RuleSource stored = ruleResource.update(id, ruleSource);
         return ruleBuilderDto.toBuilder()
                 .id(stored.id())
-                .ruleBuilder(ruleBuilderParser.generateTitles(ruleBuilderDto.ruleBuilder()))
                 .build();
     }
 
@@ -128,7 +130,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return ruleBuilderRegistry.actions()
                 .values().stream()
                 .map(RuleFragment::descriptor)
-                .sorted(Comparator.comparing(FunctionDescriptor::name))
+                .sorted(Comparator.comparing(FunctionDescriptor::ruleBuilderName))
                 .collect(Collectors.toList());
     }
 
@@ -139,7 +141,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         return ruleBuilderRegistry.conditions()
                 .values().stream()
                 .map(RuleFragment::descriptor)
-                .sorted(Comparator.comparing(FunctionDescriptor::name))
+                .sorted(Comparator.comparing(FunctionDescriptor::ruleBuilderName))
                 .collect(Collectors.toList());
     }
 
@@ -158,20 +160,32 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
     @Path("/simulate")
     @POST
     @NoAuditEvent("Only used to simulate a rule builder")
-    public Message simulate(@ApiParam(name = "rule", required = true) @NotNull SimulateRuleBuilderRequest simulateRuleBuilderRequest) {
-        RuleSource ruleSource = toRuleSource(simulateRuleBuilderRequest.ruleBuilderDto());
-        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
+    public RuleBuilderSimulatorResponse simulate(@ApiParam(name = "rule", required = true) @NotNull SimulateRuleBuilderRequest simulateRuleBuilderRequest) {
         Message message = ruleSimulator.createMessage(simulateRuleBuilderRequest.message());
 
-        return ruleSimulator.simulate(rule, message);
+        RuleSource ruleSourceConditions = RuleSource.builder()
+                .source(ruleBuilderParser.generateSimulatorRuleSourceEvaluatingConditions(simulateRuleBuilderRequest.ruleBuilderDto().ruleBuilder()))
+                .build();
+        final Rule rule1 = pipelineRuleService.parseRuleOrThrow(ruleSourceConditions.id(), ruleSourceConditions.source(), true);
+        final Message conditionResult = ruleSimulator.simulate(rule1, message);
+
+        RuleSource ruleSource = toRuleSource(simulateRuleBuilderRequest.ruleBuilderDto(), true);
+        final Rule rule2 = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
+
+        final Message result = ruleSimulator.simulate(rule2, conditionResult);
+
+        return new RuleBuilderSimulatorResponse(result);
     }
 
-    private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto) {
+    private RuleSource toRuleSource(RuleBuilderDto ruleBuilderDto, boolean generateSimulatorFields) {
+        final RuleBuilder ruleBuilder = (generateSimulatorFields) ? ruleBuilderDto.ruleBuilder() :
+                ruleBuilderDto.ruleBuilder().normalize();
         return RuleSource.builder()
                 .title(ruleBuilderDto.title())
                 .description(ruleBuilderDto.description())
-                .ruleBuilder(ruleBuilderDto.ruleBuilder())
-                .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilderDto.ruleBuilder(), false))
+                .ruleBuilder(ruleBuilderParser.generateTitles(ruleBuilder))
+                .source(ruleBuilderParser.generateRuleSource(ruleBuilderDto.title(), ruleBuilder, generateSimulatorFields))
+                .simulatorMessage(ruleBuilderDto.simulatorMessage())
                 .build();
     }
 

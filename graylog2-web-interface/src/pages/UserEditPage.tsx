@@ -43,7 +43,7 @@ const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
   </>
 );
 
-const _updateUserOnLoad = (setLoadedUser) => UsersActions.load.completed.listen(setLoadedUser);
+const _updateUserOnLoad = (setLoadedUser: (value: User) => void) => UsersActions.load.completed.listen(setLoadedUser);
 
 const UserEditPage = ({ params }: Props) => {
   const [loadedUser, setLoadedUser] = useState<User | undefined>();

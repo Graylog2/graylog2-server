@@ -22,6 +22,8 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesBatchIT;
 import org.junit.Rule;
 
+import java.util.Collections;
+
 public class MessagesBatchES7IT extends MessagesBatchIT {
     @Rule
     public final ElasticsearchInstanceES7 elasticsearch = (ElasticsearchInstanceES7)Elasticsearch7InstanceBuilder.builder().heapSize("256m").build();

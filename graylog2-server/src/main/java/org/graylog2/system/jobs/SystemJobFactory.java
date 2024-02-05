@@ -19,7 +19,8 @@ package org.graylog2.system.jobs;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Locale;
 
 public class SystemJobFactory {

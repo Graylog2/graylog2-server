@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
@@ -27,6 +27,14 @@ import TimeRangePresetDropdown from './TimeRangePresetDropdown';
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 
 describe('TimeRangePresetDropdown', () => {
+  const openTimeRangePresetSelect = async () => {
+    userEvent.click(await screen.findByRole('button', {
+      name: /open time range preset select/i,
+    }));
+
+    await screen.findByRole('menu');
+  };
+
   it('should not call onChange prop when selecting "Configure Ranges" option.', async () => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchClusterConfig,
@@ -36,10 +44,7 @@ describe('TimeRangePresetDropdown', () => {
     const onSelectOption = jest.fn();
     render(<TimeRangePresetDropdown onChange={onSelectOption} />);
 
-    const timeRangePresetButton = screen.getByRole('button', {
-      name: /open time range preset select/i,
-    });
-    userEvent.click(timeRangePresetButton);
+    await openTimeRangePresetSelect();
     await screen.findByRole('menuitem', { name: /15 minutes/i });
 
     const rangePresetOption = screen.getByRole('menuitem', {
@@ -47,7 +52,13 @@ describe('TimeRangePresetDropdown', () => {
     });
     userEvent.click(rangePresetOption);
 
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+
     expect(onSelectOption).not.toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: /configure preset/i })).not.toBeInTheDocument();
+    });
   });
 
   it('filtrate options by limit', async () => {
@@ -82,11 +93,9 @@ describe('TimeRangePresetDropdown', () => {
 
     render(<TimeRangePresetDropdown onChange={onSelectOption} />);
 
-    const timeRangePresetButton = await screen.findByRole('button', {
-      name: /open time range preset select/i,
-    });
-    userEvent.click(timeRangePresetButton);
+    await openTimeRangePresetSelect();
 
+    await screen.findByRole('menu');
     await screen.findByRole('menuitem', { name: /5 minutes/i });
 
     expect(screen.queryByText('Keyword ten min')).not.toBeInTheDocument();

@@ -25,8 +25,7 @@ const SimulationPreview = ({ simulationResults, streams }) => {
 
   if (messages.length === 0) {
     return (
-      <Alert bsStyle="info">
-        <p><strong>Message would be dropped</strong></p>
+      <Alert bsStyle="info" title="Message would be dropped">
         <p>
           The pipeline processor would drop such a message. That means that the message
           <strong>would not be stored</strong>, and would not be available for searches, alerts, outputs, or dashboards.

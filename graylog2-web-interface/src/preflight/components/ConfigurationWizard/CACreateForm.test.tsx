@@ -45,11 +45,6 @@ describe('CACreateForm', () => {
     asMock(fetch).mockReturnValue(Promise.resolve());
   });
 
-  const fillOutForm = async () => {
-    userEvent.type(await screen.findByRole('textbox', { name: /input 1/i }), 'input 1 content');
-    userEvent.type(await screen.findByRole('textbox', { name: /input 2/i }), 'input 2 content');
-  };
-
   const submitForm = async () => {
     userEvent.click(await screen.findByRole('button', { name: /Create CA/i }));
   };
@@ -57,16 +52,12 @@ describe('CACreateForm', () => {
   it('should create CA', async () => {
     renderPreflight(<CACreateForm />);
 
-    await fillOutForm();
     await submitForm();
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
       expect.stringContaining('/api/ca/create'),
-      {
-        'input-1': 'input 1 content',
-        'input-2': 'input 2 content',
-      },
+      { organization: 'Graylog CA' },
       false,
     ));
 
@@ -82,16 +73,12 @@ describe('CACreateForm', () => {
       </DefaultQueryClientProvider>
     ));
 
-    await fillOutForm();
     await submitForm();
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
       expect.stringContaining('/api/ca/create'),
-      {
-        'input-1': 'input 1 content',
-        'input-2': 'input 2 content',
-      },
+      { organization: 'Graylog CA' },
       false,
     ));
 

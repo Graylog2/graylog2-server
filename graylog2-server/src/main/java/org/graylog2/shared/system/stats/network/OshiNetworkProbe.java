@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.system.stats.network;
 
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.shared.system.stats.OshiService;
 import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
@@ -25,7 +25,8 @@ import oshi.hardware.NetworkIF;
 import oshi.software.os.InternetProtocolStats;
 import oshi.software.os.NetworkParams;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -52,7 +53,7 @@ public class OshiNetworkProbe implements NetworkProbe {
 
         Map<String, NetworkStats.Interface> ifaces = new HashMap<>();
         for (NetworkIF it : service.getHal().getNetworkIFs()) {
-            if (Strings.isNotBlank(defaultGateway)) {
+            if (StringUtils.isNotBlank(defaultGateway)) {
                 for (InterfaceAddress that : it.queryNetworkInterface().getInterfaceAddresses()) {
                     try {
                         final IpSubnet ipSubnet = new IpSubnet(that.getAddress().getHostAddress() + "/" + that.getNetworkPrefixLength());

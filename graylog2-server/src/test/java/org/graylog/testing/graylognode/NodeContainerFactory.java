@@ -52,14 +52,12 @@ public class NodeContainerFactory {
     @SuppressWarnings("OctalInteger")
     private static final int EXECUTABLE_MODE = 0100755;
     // sha2 for password "admin"
-    private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-
     private static final String GRAYLOG_HOME = "/usr/share/graylog";
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
         checkBinaries(config);
         if (!config.skipPackaging) {
-            MavenPackager.packageJarIfNecessary(config);
+            MavenPackager.packageJarIfNecessary(config.mavenProjectDirProvider);
         } else {
             LOG.info("Skipping packaging");
         }
@@ -127,10 +125,11 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
                 // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode())
-                .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?")
+                .withEnv("GRAYLOG_ELASTICSEARCH_VERSION_PROBE_DELAY", "500ms")
+                .withEnv("GRAYLOG_PASSWORD_SECRET", config.passwordSecret)
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
                 .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:" + API_PORT)
-                .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
+                .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", config.rootPasswordSha2)
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
                 .withEnv("GRAYLOG_VERSIONCHECKS", "false")
 
@@ -142,6 +141,7 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL", "developers@graylog.com")
 
                 .withEnv("GRAYLOG_ENABLE_DEBUG_RESOURCES", "true") // see RestResourcesModule#addDebugResources
+                .withEnv(config.configParams)
 
                 .waitingFor(new WaitAllStrategy()
                         .withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(

@@ -41,21 +41,24 @@ import org.graylog2.users.UserOverviewDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotAllowedException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotAllowedException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,9 +114,9 @@ public class AuthzRolesResource extends RestResource {
             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
             @ApiParam(name = "sort",
-                    value = "The field to sort the result on",
-                    required = true,
-                    allowableValues = "name,description")
+                      value = "The field to sort the result on",
+                      required = true,
+                      allowableValues = "name,description")
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
             @DefaultValue("asc") @QueryParam("order") String order) {
@@ -126,7 +129,7 @@ public class AuthzRolesResource extends RestResource {
         }
 
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginated(
-                searchQuery, page, perPage,sort, order);
+                searchQuery, page, perPage, sort, order);
         final Map<String, Set<Map<String, String>>> userRoleMap = userRoleContext(result);
 
         return PaginatedResponse.create("roles", result, query, ImmutableMap.of("users", userRoleMap));
@@ -143,9 +146,9 @@ public class AuthzRolesResource extends RestResource {
             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
             @ApiParam(name = "sort",
-                    value = "The field to sort the result on",
-                    required = true,
-                    allowableValues = "username,full_name,email")
+                      value = "The field to sort the result on",
+                      required = true,
+                      allowableValues = "username,full_name,email")
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
             @DefaultValue("asc") @QueryParam("order") String order) {
@@ -158,10 +161,10 @@ public class AuthzRolesResource extends RestResource {
         }
 
         final PaginatedList<UserOverviewDTO> result = paginatedUserService.findPaginatedByRole(
-                searchQuery, page, perPage,sort, order, ImmutableSet.of(roleId));
+                searchQuery, page, perPage, sort, order, ImmutableSet.of(roleId));
         final Set<String> roleIds = result.stream().flatMap(u -> u.roles().stream()).collect(Collectors.toSet());
         final Map<String, String> rolesMap = authzRolesService.findPaginatedByIds(
-                new SearchQuery(""), 0, 0, AuthzRoleDTO.FIELD_NAME, "asc", roleIds)
+                        new SearchQuery(""), 0, 0, AuthzRoleDTO.FIELD_NAME, "asc", roleIds)
                 .stream().collect(Collectors.toMap(AuthzRoleDTO::id, AuthzRoleDTO::name));
         final List<UserOverviewDTO> users = result.stream().map(u -> {
             final Set<String> roleNames = u.roles().stream().map(rolesMap::get).collect(Collectors.toSet());
@@ -188,17 +191,17 @@ public class AuthzRolesResource extends RestResource {
     @Path("/user/{username}")
     @RequiresPermissions(RestPermissions.ROLES_READ)
     public PaginatedResponse<AuthzRoleDTO> getListForUser(
-        @ApiParam(name = "username") @PathParam("username") @NotEmpty String username,
-        @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-        @ApiParam(name = "sort",
-                value = "The field to sort the result on",
-                required = true,
-                allowableValues = "name,description")
-        @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
-        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-        @DefaultValue("asc") @QueryParam("order") String order) {
+            @ApiParam(name = "username") @PathParam("username") @NotEmpty String username,
+            @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @ApiParam(name = "sort",
+                      value = "The field to sort the result on",
+                      required = true,
+                      allowableValues = "name,description")
+            @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
+            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+            @DefaultValue("asc") @QueryParam("order") String order) {
 
         SearchQuery searchQuery;
         try {
@@ -211,7 +214,7 @@ public class AuthzRolesResource extends RestResource {
                 .orElseThrow(() -> new NotFoundException("Couldn't find user: " + username));
 
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedByIds(
-                searchQuery, page, perPage,sort, order, user.getRoleIds());
+                searchQuery, page, perPage, sort, order, user.getRoleIds());
         return PaginatedResponse.create("roles", result, query);
     }
 
@@ -248,7 +251,9 @@ public class AuthzRolesResource extends RestResource {
             if (user == null) {
                 throw new NotFoundException("Cannot find user with name: " + username);
             }
-            authzRolesService.get(roleId).orElseThrow(() -> new NotFoundException("Cannot find role with id: " + roleId));
+            if (authzRolesService.get(roleId).isEmpty()) {
+                throw new NotFoundException("Cannot find role with id: " + roleId);
+            }
             Set<String> roles = user.getRoleIds();
             rolesUpdater.update(roles, roleId);
             user.setRoleIds(roles);
@@ -278,7 +283,7 @@ public class AuthzRolesResource extends RestResource {
 
     private Map<String, Set<Map<String, String>>> userRoleContext(PaginatedList<AuthzRoleDTO> roles) {
         final PaginatedList<UserOverviewDTO> users = paginatedUserService.findPaginatedByRole(new SearchQuery(""),
-                1,0, UserOverviewDTO.FIELD_USERNAME, "asc",
+                1, 0, UserOverviewDTO.FIELD_USERNAME, "asc",
                 roles.stream().map(AuthzRoleDTO::id).collect(Collectors.toSet()));
         final Map<String, Set<Map<String, String>>> userRoleMap = new HashMap<>(roles.size());
         roles.forEach(authzRoleDTO -> {

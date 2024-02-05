@@ -1,0 +1,9 @@
+type = "added"
+message = "DataNode: if you use the DataNode, the nodes system clocks have to be synchronized for JWT usage."
+
+pulls = ["16334"]
+
+details.user = """
+JWT usage over several systems/nodes requires clock synchronization to prevent errors with expiration time and
+clock skew between client/server.
+"""

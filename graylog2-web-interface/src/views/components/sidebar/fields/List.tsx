@@ -19,10 +19,10 @@ import { FixedSizeList } from 'react-window';
 import type { List as ImmutableList } from 'immutable';
 import styled from 'styled-components';
 
-import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import isFilteredField from 'views/logic/IsFilteredField';
 
 import ListItem from './ListItem';
 
@@ -39,19 +39,17 @@ type Props = {
   filter: string | undefined | null,
 };
 
-const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
-
-const _fieldsToShow = (fields, allFields, currentGroup = 'all'): ImmutableList<FieldTypeMapping> => {
-  const isNotReservedField = (f) => !isReservedField(f.name);
+const _fieldsToShow = (fields: ImmutableList<FieldTypeMapping>, allFields: ImmutableList<FieldTypeMapping>, currentGroup: string = 'all'): ImmutableList<FieldTypeMapping> => {
+  const isNotReservedField = (f: FieldTypeMapping) => !isFilteredField(f.name);
 
   switch (currentGroup) {
     case 'all':
-      return allFields.filter(isNotReservedField);
+      return allFields.filter(isNotReservedField).toList();
     case 'allreserved':
       return allFields;
     case 'current':
     default:
-      return fields.filter(isNotReservedField);
+      return fields.filter(isNotReservedField).toList();
   }
 };
 

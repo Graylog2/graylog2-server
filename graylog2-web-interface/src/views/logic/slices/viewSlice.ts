@@ -16,7 +16,7 @@
  */
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type * as Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { ViewState, RootState, GetState } from 'views/types';
@@ -161,8 +161,13 @@ export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async 
     .build();
 
   const searchAfterSave = await createSearch(newSearch);
+  const newViewState = view.state.filter((_state, queryId) => (
+    !!newQueries.find((query) => query.id === queryId)),
+  ).toMap();
+
   const newView = view.toBuilder()
     .search(searchAfterSave)
+    .state(newViewState)
     .build();
 
   return dispatch(updateView(newView));
@@ -181,7 +186,7 @@ export const addQuery = (query: Query, viewState: ViewStateType) => async (dispa
     .state(newViewStates)
     .build();
 
-  return dispatch(updateView(newView, true)).then(() => dispatch(selectQuery(query.id)));
+  return dispatch(updateView(newView, true)).then(() => dispatch(selectQuery(query.id))).then(() => query.id);
 };
 
 export const updateQuery = (queryId: QueryId, query: Query) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -212,7 +217,7 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
     .build();
 
   const indexedQueryIds = search.queries.map((query) => query.id).toList();
-  const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
+  const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery, Immutable.List([queryId]));
 
   await dispatch(selectQuery(newActiveQuery));
   await dispatch(updateView(newView, true));

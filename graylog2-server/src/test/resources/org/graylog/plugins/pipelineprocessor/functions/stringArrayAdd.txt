@@ -1,0 +1,36 @@
+rule "string_array_add"
+when
+    true
+then
+    set_field("add_to_number_array", string_array_add([1, 2], 3));
+    set_field("add_number_to_string_array_converted", string_array_add(["1", "2"], 3));
+    set_field("add_number_array_to_string_array_converted", string_array_add(["1", "2"], [3, 4]));
+    set_field("add_string", string_array_add(["one", "two"], "three"));
+    set_field("keep_duplicates", string_array_add(["one", "two"], "two"));
+    set_field("only_unique", string_array_add(["one", "two"], "two", true));
+    set_field("add_to_empty_array", string_array_add([], "from-empty-array"));
+    set_field("empty_array_field", []);
+    set_field("add_to_empty_array_from_message", string_array_add($message.empty_array_field, "from-empty-on-message", true));
+    set_field("add_array_to_array", string_array_add(["one", "two"], ["three", "four"]));
+    set_field("add_array_to_array_empty_source", string_array_add([], ["three", "four"]));
+    set_field("add_array_to_array_empty_value", string_array_add(["one", "two"], []));
+
+    let json = parse_json(to_string($message.json_with_arrays));
+        let selectedPath = select_jsonpath(json: json,
+            paths: { logged_on_users: "$.loggedOnUsers[*].accountName",
+                     accounts_evidence: "$.evidence[*].accountName",
+                     mixed_types: "$.mixedTypes[*].value"});
+    set_field (field: "combined_json_array",
+        value: string_array_add (
+            elements: selectedPath.accounts_evidence,
+            value: selectedPath.logged_on_users,
+            only_unique: false));
+    set_field (field: "mixed_types_json_array",
+            value: string_array_add (
+                elements: [],
+                value: selectedPath.mixed_types,
+                only_unique: false));
+
+    trigger_test();
+end
+"""

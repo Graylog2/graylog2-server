@@ -1,0 +1,4 @@
+type = "d"
+message = "Adding REST endpoint to create custom field type mappings for index sets."
+
+pulls = ["16241"]

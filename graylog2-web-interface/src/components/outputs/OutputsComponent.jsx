@@ -26,6 +26,9 @@ import Spinner from 'components/common/Spinner';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { OutputsStore } from 'stores/outputs/OutputsStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
@@ -40,6 +43,7 @@ const OutputsComponent = createReactClass({
     streamId: PropTypes.string.isRequired,
     permissions: PropTypes.array.isRequired,
     sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   },
 
   mixins: [PermissionsMixin],
@@ -79,8 +83,8 @@ const OutputsComponent = createReactClass({
   },
 
   _handleCreateOutput(data) {
-    this.props.sendTelemetry('form_submit', {
-      app_pathname: 'outputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_CREATED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'create-output',
     });
 
@@ -111,8 +115,8 @@ const OutputsComponent = createReactClass({
   },
 
   _handleAssignOutput(outputId) {
-    this.props.sendTelemetry('form_submit', {
-      app_pathname: 'outputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_ASSIGNED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'assign-output',
     });
 
@@ -124,8 +128,8 @@ const OutputsComponent = createReactClass({
   },
 
   _removeOutputGlobally(outputId) {
-    this.props.sendTelemetry('form_submit', {
-      app_pathname: 'outputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_GLOBALLY_REMOVED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'globally-remove-output',
     });
 
@@ -141,8 +145,8 @@ const OutputsComponent = createReactClass({
   },
 
   _removeOutputFromStream(outputId, streamId) {
-    this.props.sendTelemetry('form_submit', {
-      app_pathname: 'outputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_FROM_STREAM_REMOVED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'remove-output-from-stream',
     });
 
@@ -158,8 +162,8 @@ const OutputsComponent = createReactClass({
   },
 
   _handleOutputUpdate(output, deltas) {
-    this.props.sendTelemetry('form_submit', {
-      app_pathname: 'outputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_UPDATED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'output-update',
     });
 
@@ -213,4 +217,4 @@ const OutputsComponent = createReactClass({
   },
 });
 
-export default withTelemetry(OutputsComponent);
+export default withLocation(withTelemetry(OutputsComponent));

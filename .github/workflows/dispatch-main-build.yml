@@ -1,0 +1,29 @@
+name: Request a dispatched main branch build
+
+on:
+  push:
+    branches: [ master, main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dispatchedMainBuild:
+    name: Dispatch build
+    runs-on: ubuntu-latest
+
+    steps:
+      # TODO remove later
+      - name: Debug event
+        run: jq . "$GITHUB_EVENT_PATH"
+
+      - name: Dispatch build to graylog-project-internal
+        run: >
+          gh workflow run -R Graylog2/graylog-project-internal main-build.yml --ref master
+          -f caller_repo=${{ github.repository }}
+          -f caller_branch=${{ github.base_ref || github.ref_name }}
+          -f head_sha=${{ github.sha }}
+          -f initial_actor="${{ github.actor }}/${{ github.triggering_actor }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}

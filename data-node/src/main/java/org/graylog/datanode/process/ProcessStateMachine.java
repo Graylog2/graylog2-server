@@ -18,9 +18,9 @@ package org.graylog.datanode.process;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
+import org.graylog.datanode.management.StateMachineTracerAggregator;
 
-public class ProcessStateMachine {
-
+public class ProcessStateMachine extends StateMachine<ProcessState, ProcessEvent> {
     /**
      * How many times can the OS rest api call fail before we switch to the failed state
      */
@@ -28,7 +28,14 @@ public class ProcessStateMachine {
     public static final int MAX_REST_STARTUP_FAILURES = 5;
     public static final int MAX_REBOOT_FAILURES = 3;
 
-    public static StateMachine<ProcessState, ProcessEvent> createNew() {
+    StateMachineTracerAggregator tracerAggregator = new StateMachineTracerAggregator();
+
+    public ProcessStateMachine(ProcessState initialState, StateMachineConfig<ProcessState, ProcessEvent> config) {
+        super(initialState, config);
+        setTrace(tracerAggregator);
+    }
+
+    public static ProcessStateMachine createNew() {
 
         final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
@@ -38,6 +45,12 @@ public class ProcessStateMachine {
 
         // Freshly created process, it hasn't started yet and doesn't have any pid.
         config.configure(ProcessState.WAITING_FOR_CONFIGURATION)
+                .permit(ProcessEvent.PROCESS_PREPARED, ProcessState.PREPARED)
+                // jump to started only allowed to facilitate startup with insecure config
+                .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING)
+                .ignore(ProcessEvent.HEALTH_CHECK_FAILED);
+
+        config.configure(ProcessState.PREPARED)
                 .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
@@ -62,6 +75,7 @@ public class ProcessStateMachine {
                 .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.NOT_RESPONDING)
                 .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.TERMINATED)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED)
+                .permit(ProcessEvent.PROCESS_REMOVE, ProcessState.REMOVING)
                 .ignore(ProcessEvent.PROCESS_STARTED);
 
         // if the REST api is not responding, we'll jump to this state and count how many times the failure
@@ -90,6 +104,19 @@ public class ProcessStateMachine {
                 .ignore(ProcessEvent.PROCESS_STOPPED)
                 .ignore(ProcessEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
 
-        return new StateMachine<>(ProcessState.WAITING_FOR_CONFIGURATION, config);
+        config.configure(ProcessState.REMOVING)
+                .ignore(ProcessEvent.HEALTH_CHECK_OK)
+                .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.FAILED)
+                .permit(ProcessEvent.PROCESS_STOPPED, ProcessState.REMOVED);
+
+        config.configure(ProcessState.REMOVED)
+                .permit(ProcessEvent.RESET, ProcessState.WAITING_FOR_CONFIGURATION)
+                .ignore(ProcessEvent.PROCESS_STOPPED);
+
+        return new ProcessStateMachine(ProcessState.WAITING_FOR_CONFIGURATION, config);
+    }
+
+    public StateMachineTracerAggregator getTracerAggregator() {
+        return tracerAggregator;
     }
 }

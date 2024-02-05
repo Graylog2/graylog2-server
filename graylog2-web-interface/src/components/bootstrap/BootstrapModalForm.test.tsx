@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import BootstrapModalForm from './BootstrapModalForm';
 
@@ -35,40 +35,46 @@ describe('BootstrapModalForm', () => {
     </BootstrapModalForm>
   );
 
-  it('does not show modal form when show property is false', () => {
-    const wrapper = mount(renderModalForm(false));
+  it('does not show modal form when show property is false', async () => {
+    render(renderModalForm(false));
 
-    expect(wrapper).not.toContainReact(children);
+    expect(screen.queryByTitle('Sample Form')).not.toBeInTheDocument();
+    expect(screen.queryByText('42')).not.toBeInTheDocument();
   });
 
-  it('shows modal form when show property is true', () => {
-    const wrapper = mount(renderModalForm(true));
+  it('shows modal form when show property is true', async () => {
+    render(renderModalForm(true));
 
-    expect(wrapper).toContainReact(children);
+    await screen.findByTitle('Sample Form');
+    await screen.findByText('42');
   });
 
-  it('calls onSubmit when form is submitted', () => {
+  it('calls onSubmit when form is submitted', async () => {
     const onCancel = jest.fn();
     const onSubmit = jest.fn();
-    const wrapper = mount(
-      renderModalForm(true, onSubmit, onCancel),
-    );
-    const form = wrapper.find('form');
 
-    form.simulate('submit');
+    render(renderModalForm(true, onSubmit, onCancel));
+
+    (await screen.findByRole('button', { name: 'Submit', hidden: true })).click();
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalled();
+    });
 
     expect(onCancel).not.toHaveBeenCalled();
   });
 
-  it('calls onCancel when form is cancelled', () => {
+  it('calls onCancel when form is cancelled', async () => {
     const onCancel = jest.fn();
     const onSubmit = jest.fn();
-    const wrapper = mount(
-      renderModalForm(true, onSubmit, onCancel),
-    );
-    const cancel = wrapper.find('button[children="Cancel"]');
 
-    cancel.simulate('click');
+    render(renderModalForm(true, onSubmit, onCancel));
+
+    (await screen.findByRole('button', { name: 'Cancel', hidden: true })).click();
+
+    await waitFor(() => {
+      expect(onCancel).toHaveBeenCalled();
+    });
 
     expect(onSubmit).not.toHaveBeenCalled();
   });

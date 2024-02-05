@@ -22,19 +22,29 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { escape } from 'views/logic/queries/QueryHelper';
+import {
+  getFieldNameForFieldValueInBrackets,
+  isCompleteFieldName,
+  isTypeString,
+  isTypeTerm, isKeywordOperator, isSpace, isTypeNumber, removeFinalColon,
+} from 'views/components/searchbar/completions/token-helper';
 
 import type { Completer, CompleterContext, FieldTypes } from '../SearchBarAutocompletions';
-import type { Token, Line, CompletionResult } from '../queryinput/ace-types';
+import type { Token, CompletionResult } from '../queryinput/ace-types';
 
 const SUGGESTIONS_PAGE_SIZE = 50;
 
 const unquote = (s: string) => s.replace(/^"(.*(?="$))"$/, '$1');
 
 const formatValue = (value: string, type: string) => {
+  const trimmedValue = value?.trim();
+
   switch (type) {
-    case 'constant.numeric': return Number(value);
-    case 'string': return unquote(value);
-    default: return value;
+    case 'constant.numeric': return Number(trimmedValue);
+    case 'string': return unquote(trimmedValue);
+    case 'keyword.operator': return '';
+    case 'paren.lparen': return '';
+    default: return trimmedValue;
   }
 };
 
@@ -48,22 +58,42 @@ const completionCaption = (fieldValue: string, input: string | number, isQuoted:
   return `${fieldValue} ⭢ ${input}`;
 };
 
-const isValueToken = (token: Line) => ['term', 'string'].includes(token?.type);
+const getFieldNameAndInput = ({
+  tokens,
+  currentToken,
+  prevToken,
+  currentTokenIdx,
+}: {
+  tokens: Array<Token>,
+  currentToken: Token | undefined | null,
+  prevToken: Token | undefined | null,
+  currentTokenIdx: number
+}) => {
+  const nextToken = tokens[currentTokenIdx + 1] ?? null;
 
-const getFieldNameAndInput = (currentToken: Token | undefined | null, lastToken: Token | undefined | null) => {
-  if (currentToken?.type === 'keyword' && currentToken?.value.endsWith(':')) {
+  if (isCompleteFieldName(currentToken) && !nextToken) {
     return {
-      fieldName: currentToken.value.slice(0, -1),
+      fieldName: removeFinalColon(currentToken.value),
       input: '',
       isQuoted: false,
     };
   }
 
-  if (isValueToken(currentToken) && lastToken?.type === 'keyword') {
+  if ((isTypeTerm(currentToken) || isTypeString(currentToken) || isKeywordOperator(currentToken)) && isCompleteFieldName(prevToken)) {
     return {
-      fieldName: lastToken.value.slice(0, -1),
+      fieldName: removeFinalColon(prevToken.value),
       input: formatValue(currentToken.value, currentToken.type),
-      isQuoted: currentToken?.type === 'string',
+      isQuoted: isTypeString(currentToken),
+    };
+  }
+
+  const fieldNameFromForValueInBrackets = getFieldNameForFieldValueInBrackets(tokens, currentTokenIdx);
+
+  if (fieldNameFromForValueInBrackets && !(isSpace(currentToken) && (isTypeTerm(prevToken) || isTypeNumber(prevToken)))) {
+    return {
+      fieldName: fieldNameFromForValueInBrackets,
+      input: formatValue(currentToken.value, currentToken.type),
+      isQuoted: false,
     };
   }
 
@@ -145,14 +175,25 @@ class FieldValueCompletion implements Completer {
   }
 
   getCompletions = ({
+    tokens,
     currentToken,
-    lastToken,
+    currentTokenIdx,
+    prevToken,
     timeRange,
     streams,
     fieldTypes,
     userTimezone,
   }: CompleterContext) => {
-    const { fieldName, input, isQuoted } = getFieldNameAndInput(currentToken, lastToken);
+    const { fieldName, input, isQuoted } = getFieldNameAndInput({
+      tokens,
+      currentToken,
+      currentTokenIdx,
+      prevToken,
+    });
+
+    if (!fieldName) {
+      return [];
+    }
 
     if (!this.shouldFetchCompletions(fieldName, fieldTypes)) {
       return [];
@@ -190,26 +231,6 @@ class FieldValueCompletion implements Completer {
 
       return suggestions.map(({ value, occurrence, title }: any) => formatSuggestion(value, occurrence, input, isQuoted, title));
     });
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
-    const currentLineTokens = lines[currentLine - 1];
-    const currentTokenIndex = currentLineTokens.findIndex((token) => token?.start !== undefined);
-    const currentToken = currentLineTokens[currentTokenIndex];
-
-    if (!currentToken) {
-      return false;
-    }
-
-    const previousToken = currentLineTokens[currentTokenIndex - 1];
-    const nextToken = currentLineTokens[currentTokenIndex + 1];
-
-    const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
-    const currentTokenIsFieldValue = isValueToken(currentToken) && previousToken?.type === 'keyword';
-    const nextTokenIsTerm = nextToken?.type === 'term';
-
-    return (currentTokenIsFieldName || currentTokenIsFieldValue) && !nextTokenIsTerm;
   };
 
   public identifierRegexps = [/[a-zA-Z_0-9$\\/\-\u00A2-\u2000\u2070-\uFFFF]/];

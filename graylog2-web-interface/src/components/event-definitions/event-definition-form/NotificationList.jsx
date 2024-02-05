@@ -21,20 +21,20 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';
 
+const getNotificationPlugin = (type) => {
+  if (type === undefined) {
+    return {};
+  }
+
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
+};
+
 class NotificationList extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
     onAddNotificationClick: PropTypes.func.isRequired,
     onRemoveNotificationClick: PropTypes.func.isRequired,
-  };
-
-  getNotificationPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-
-    return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
   handleRemoveClick = (notificationId) => () => {
@@ -50,23 +50,23 @@ class NotificationList extends React.Component {
         <tr>
           <td colSpan={2}>Could not find information for Notification <em>{notification.title}</em></td>
           <td className="actions">
-            <Button bsStyle="info" bsSize="xsmall" onClick={this.handleRemoveClick(notification.title)}>
-              Remove from Event
+            <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(notification.title)}>
+              Delete
             </Button>
           </td>
         </tr>
       );
     }
 
-    const plugin = this.getNotificationPlugin(notification.config.type);
+    const plugin = getNotificationPlugin(notification.config.type);
 
     return (
       <tr key={notification.id}>
         <td>{notification.title}</td>
         <td>{plugin.displayName || notification.config.type}</td>
         <td className="actions">
-          <Button bsStyle="info" bsSize="xsmall" onClick={this.handleRemoveClick(notification.id)}>
-            Remove from Event
+          <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(notification.id)}>
+            Delete
           </Button>
         </td>
       </tr>
@@ -83,7 +83,7 @@ class NotificationList extends React.Component {
       });
     const addNotificationButton = (
       <Button bsStyle="success" onClick={onAddNotificationClick}>
-        Add Notification
+        Add notification
       </Button>
     );
 

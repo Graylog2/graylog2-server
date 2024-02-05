@@ -27,7 +27,7 @@ import AbsoluteTimeInput from './AbsoluteTimeInput';
 type Props = {
   startDate?: Date,
   range: 'to' | 'from',
-  nextTimeRange: AbsoluteTimeRange,
+  timeRange: AbsoluteTimeRange,
 };
 
 const ErrorMessage = styled.span(({ theme }) => css`
@@ -38,11 +38,11 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteCalendar = ({ startDate, nextTimeRange, range }: Props) => (
-  <Field name={`nextTimeRange[${range}]`}>
+const AbsoluteCalendar = ({ startDate, timeRange, range }: Props) => (
+  <Field name={`timeRangeTabs.absolute.${range}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => {
       const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-      const dateTime = error ? nextTimeRange[range] : value || nextTimeRange[range];
+      const dateTime = error ? timeRange[range] : value || timeRange[range];
 
       return (
         <>
@@ -62,7 +62,7 @@ const AbsoluteCalendar = ({ startDate, nextTimeRange, range }: Props) => (
 );
 
 AbsoluteCalendar.propTypes = {
-  nextTimeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
+  timeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
   startDate: PropTypes.instanceOf(Date),
   range: PropTypes.oneOf(['to', 'from']).isRequired,
 };

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, within } from 'wrappedTestingLibrary';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { Notifications } from 'theme/types';
@@ -37,7 +37,7 @@ const mockedNotifications = {
     isDismissible: false,
   },
   '6075a2999f4efa083977b75b': {
-    title: 'Danger Alert 🔥',
+    title: 'Danger Alert',
     shortMessage: 'xcvbxcvb',
     longMessage: 'xcvbxcvbxcvbxcvbxcvbxcvb',
     atLogin: true,
@@ -116,9 +116,11 @@ describe('PublicNotifications', () => {
 
   it('should dismiss notification', () => {
     render(<PublicNotifications />);
-
     const dismissedId = Object.keys(mockedNotifications)[1];
-    const dismissBtn = screen.getByRole('button', {
+
+    const alert = screen.getByRole('alert', { name: /Danger Alert/i });
+
+    const dismissBtn = within(alert).getByRole('button', {
       name: /close alert/i,
     });
 

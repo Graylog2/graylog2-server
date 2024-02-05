@@ -23,8 +23,9 @@ import { Link } from 'components/common/router';
 import { ListGroupItem, Label } from 'components/bootstrap';
 import getTitleForEntityType from 'util/getTitleForEntityType';
 import { RelativeTime } from 'components/common';
-import { getShowRouteFromGRN, getValuesFromGRN } from 'logic/permissions/GRN';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
+import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
 const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
@@ -52,7 +53,7 @@ const EntityItem = ({ title, grn, timestamp }: Props) => {
   const { id, type } = getValuesFromGRN(grn);
   const hasReadPermission = useHasEntityPermissionByGRN(grn, 'read');
   const entityTypeTitle = useMemo(() => getTitleForEntityType(type, false) ?? 'unknown', [type]);
-  const entityLink = getShowRouteFromGRN(grn);
+  const entityLink = useShowRouteFromGRN(grn);
   const entityTitle = title || id;
   const showLink = !!entityLink && hasReadPermission;
 

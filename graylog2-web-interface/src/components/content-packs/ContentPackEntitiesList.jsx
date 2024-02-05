@@ -48,8 +48,10 @@ class ContentPackEntitiesList extends React.Component {
 
   static defaultProps = {
     appliedParameter: {},
-    onParameterClear: () => {},
-    onParameterApply: () => {},
+    onParameterClear: () => {
+    },
+    onParameterApply: () => {
+    },
     readOnly: false,
   };
 
@@ -100,8 +102,12 @@ class ContentPackEntitiesList extends React.Component {
       <ContentPackApplyParameter parameters={contentPack.parameters}
                                  entity={entity}
                                  appliedParameter={appliedParameter[entity.id]}
-                                 onParameterApply={(key, value) => { onParameterApply(entity.id, key, value); }}
-                                 onParameterClear={(key) => { onParameterClear(entity.id, key); }} />
+                                 onParameterApply={(key, value) => {
+                                   onParameterApply(entity.id, key, value);
+                                 }}
+                                 onParameterClear={(key) => {
+                                   onParameterClear(entity.id, key);
+                                 }} />
     );
 
     const closeModal = () => {
@@ -115,9 +121,7 @@ class ContentPackEntitiesList extends React.Component {
     const applyModal = (
       <BootstrapModalWrapper showModal={this.state.showApplyConfigModal}
                              onHide={closeModal}
-                             bsSize="large"
-                             data-app-section="content_pack_entity_list"
-                             data-event-element="Edit">
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
@@ -147,9 +151,7 @@ class ContentPackEntitiesList extends React.Component {
     const showModal = this.state.showConfigModalId && (
       <BootstrapModalWrapper showModal={entity.id === this.state.showConfigModalId}
                              onHide={closeShowModal}
-                             bsSize="large"
-                             data-app-section="content_pack_entity_list"
-                             data-event-element="Entity Config">
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Entity Config</Modal.Title>
         </Modal.Header>
@@ -175,18 +177,20 @@ class ContentPackEntitiesList extends React.Component {
         <td>
           <ButtonToolbar>
             {!readOnly
-            && (
-            <Button bsStyle="primary"
-                    bsSize="xs"
-                    disabled={disableBtn}
-                    onClick={() => {
-                      open();
-                    }}>
-              Edit
-            </Button>
-            )}
+              && (
+                <Button bsStyle="primary"
+                        bsSize="xs"
+                        disabled={disableBtn}
+                        onClick={() => {
+                          open();
+                        }}>
+                  Edit
+                </Button>
+              )}
             <Button bsSize="xs"
-                    onClick={() => { openShowModal(entity.id); }}>
+                    onClick={() => {
+                      openShowModal(entity.id);
+                    }}>
               Show
             </Button>
           </ButtonToolbar>
@@ -210,7 +214,9 @@ class ContentPackEntitiesList extends React.Component {
         <h2>Entity list</h2>
         <br />
         <SearchForm onSearch={this._filterEntities}
-                    onReset={() => { this._filterEntities(''); }} />
+                    onReset={() => {
+                      this._filterEntities('');
+                    }} />
         <DataTable id="entity-list"
                    headers={headers}
                    className={ContentPackEntitiesListStyle.scrollable}

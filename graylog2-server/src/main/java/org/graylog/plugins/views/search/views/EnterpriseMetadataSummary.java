@@ -18,8 +18,10 @@ package org.graylog.plugins.views.search.views;
 
 import com.github.zafarkhaja.semver.Version;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.net.URI;
+import java.util.Objects;
 
 @Singleton
 public class EnterpriseMetadataSummary extends PluginMetadataSummary {
@@ -55,6 +57,22 @@ public class EnterpriseMetadataSummary extends PluginMetadataSummary {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof EnterpriseMetadataSummary;
+        if (this == obj) return true;
+
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        final EnterpriseMetadataSummary that = (EnterpriseMetadataSummary) obj;
+
+        return Objects.equals(uniqueId(), that.uniqueId())
+                && Objects.equals(name(), that.name())
+                && Objects.equals(author(), that.author())
+                && Objects.equals(url(), that.url())
+                && Objects.equals(version(), that.version())
+                && Objects.equals(description(), that.description());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uniqueId(), name(), author(), url(), version(), description());
     }
 }

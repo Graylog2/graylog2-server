@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix blocked system events index preventing node registration and leader election."
+
+issues = ["Graylog2/graylog-plugin-enterprise#5750"]
+pulls = ["16407"]

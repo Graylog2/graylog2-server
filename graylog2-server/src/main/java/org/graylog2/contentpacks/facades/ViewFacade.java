@@ -48,7 +48,8 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -57,6 +58,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
 
 public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, ViewSummaryDTO> {
     private static final Logger LOG = LoggerFactory.getLogger(ViewFacade.class);
@@ -111,7 +114,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
 
     public abstract ModelType getModelType();
 
-    protected void  ensureV1(Entity entity) {
+    protected void ensureV1(Entity entity) {
         if (!(entity instanceof EntityV1)) {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
@@ -128,8 +131,8 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     }
 
     protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
-                                         Map<String, ValueReference> parameters,
-                                         Map<EntityDescriptor, Object> nativeEntities, User user) {
+                                           Map<String, ValueReference> parameters,
+                                           Map<EntityDescriptor, Object> nativeEntities, User user) {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
         final Map<String, ViewStateDTO> viewStateMap = new LinkedHashMap<>(viewEntity.state().size());
         for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {
@@ -188,7 +191,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                 orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
         final Search search = searchDbService.get(viewSummaryDTO.searchId()).
                 orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewSummaryDTO.searchId()));
-        search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
+        search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_REF_V1))
                 .forEach(streamDescriptor -> mutableGraph.putEdge(entityDescriptor, streamDescriptor));
         return ImmutableGraph.copyOf(mutableGraph);
     }
@@ -216,8 +219,13 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
         viewEntity.search().usedStreamIds().stream()
-                .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
-                .map(entities::get)
+                .map(id -> resolveStreamEntity(id, entities))
+                .filter(Objects::nonNull)
+                .forEach(stream -> mutableGraph.putEdge(entity, stream));
+        viewEntity.state().values().stream()
+                .flatMap(s -> s.widgets().stream())
+                .flatMap(w -> w.streams().stream())
+                .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> mutableGraph.putEdge(entity, stream));
         return ImmutableGraph.copyOf(mutableGraph);

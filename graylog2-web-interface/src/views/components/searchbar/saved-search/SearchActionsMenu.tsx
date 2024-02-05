@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { useTheme } from 'styled-components';
-import { useCallback, useState, useContext, useRef, useMemo } from 'react';
+import styled from 'styled-components';
+import { useCallback, useState, useContext, useRef } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -47,9 +47,11 @@ import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
+import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
+import SaveViewButton from 'views/components/searchbar/SaveViewButton';
+import useHotkey from 'hooks/useHotkey';
 
 import SavedSearchForm from './SavedSearchForm';
-import SavedSearchesModal from './SavedSearchesModal';
 
 const Container = styled(ButtonGroup)`
   display: flex;
@@ -66,8 +68,44 @@ const _extractErrorMessage = (error: FetchError) => ((error
     && error.additional.body
     && error.additional.body.message) ? error.additional.body.message : error);
 
+const usePluggableSearchAction = (loaded: boolean, view: View) => {
+  const modalRefs = useRef({});
+  const pluggableSearchActions = usePluginEntities('views.components.searchActions');
+
+  const actions = pluggableSearchActions
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .map(({ component: PluggableSearchAction, key, modals }) => {
+      if (modals) {
+        const refs = modals
+          .map(({ key: modalKey }) => modalKey)
+          .reduce((acc, mKey: string) => {
+            acc[mKey] = () => modalRefs.current[mKey];
+
+            return acc;
+          }, {});
+
+        return (
+          <PluggableSearchAction key={key}
+                                 loaded={loaded}
+                                 search={view}
+                                 modalRefs={refs} />
+        );
+      }
+
+      return <PluggableSearchAction key={key} loaded={loaded} search={view} />;
+    });
+
+  const actionModals = pluggableSearchActions
+    .filter(({ modals }) => !!modals)
+    .flatMap(({ modals }) => modals)
+    .map(({ key, component: ActionModal }) => (
+      <ActionModal key={key} search={view} ref={(r) => { modalRefs.current[key] = r; }} />
+    ));
+
+  return ({ actions, actionModals });
+};
+
 const SearchActionsMenu = () => {
-  const theme = useTheme();
   const dirty = useIsDirty();
   const view = useView();
   const isNew = useIsNew();
@@ -86,7 +124,6 @@ const SearchActionsMenu = () => {
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
 
   const loaded = isNew === false;
-  const savedSearchColor = dirty ? theme.colors.variant.dark.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
@@ -94,17 +131,13 @@ const SearchActionsMenu = () => {
   const history = useHistory();
 
   const toggleFormModal = useCallback(() => setShowForm((cur) => !cur), []);
+  const closeFormModal = useCallback(() => setShowForm(false), []);
+  const openFormModal = useCallback(() => setShowForm(true), []);
   const toggleListModal = useCallback(() => setShowList((cur) => !cur), []);
   const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
-
-  const pluggableSearchActions = usePluginEntities('views.components.searchActions');
-  const searchActions = useMemo(() => pluggableSearchActions.map(
-    ({ component: PluggableSearchAction, key }) => (
-      <PluggableSearchAction key={key} loaded={loaded} view={view} />
-    ),
-  ), [pluggableSearchActions, loaded, view]);
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableSearchAction(loaded, view);
 
   const saveSearch = useCallback(async (newTitle: string) => {
     if (!view.id) {
@@ -117,9 +150,9 @@ const SearchActionsMenu = () => {
       .build();
 
     await dispatch(onSaveView(newView));
-    toggleFormModal();
+    closeFormModal();
     await dispatch(loadView(newView));
-  }, [dispatch, toggleFormModal, view]);
+  }, [closeFormModal, dispatch, view]);
 
   const saveAsSearch = useCallback(async (newTitle: string) => {
     if (!newTitle || newTitle === '') {
@@ -148,7 +181,7 @@ const SearchActionsMenu = () => {
   }, [currentUser.permissions, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc]);
 
   const deleteSavedSearch = useCallback((deletedView: View) => ViewManagementActions.delete(deletedView)
-    .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
+    .then(() => UserNotification.success(`Deleting saved search "${deletedView.title}" was successful!`, 'Success!'))
     .then(() => {
       if (deletedView.id === view.id) {
         loadNewSearch(history);
@@ -156,25 +189,37 @@ const SearchActionsMenu = () => {
 
       return Promise.resolve();
     })
-    .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!')), [history, view.id]);
+    .catch((error) => UserNotification.error(`Deleting saved search failed: ${_extractErrorMessage(error)}`, 'Error!')), [history, view.id]);
 
   const _loadAsDashboard = useCallback(() => {
     loadAsDashboard(history, view);
   }, [history, view]);
 
+  useHotkey({
+    actionKey: 'save',
+    callback: () => (loaded ? saveSearch(title) : openFormModal()),
+    scope: 'search',
+    dependencies: [loaded, saveSearch, title],
+  });
+
+  useHotkey({
+    actionKey: 'save-as',
+    callback: () => openFormModal(),
+    scope: 'search',
+  });
+
   return (
     <Container aria-label="Search Meta Buttons">
-      <Button title={title} ref={formTarget} onClick={toggleFormModal}>
-        <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="floppy-disk" type={loaded ? 'solid' : 'regular'} /> Save
-      </Button>
-      {showForm && (
-        <SavedSearchForm target={formTarget.current}
-                         saveSearch={saveSearch}
-                         saveAsSearch={saveAsSearch}
-                         isCreateNew={isNew || !isAllowedToEdit}
-                         toggleModal={toggleFormModal}
-                         value={currentTitle} />
-      )}
+      <SavedSearchForm show={showForm}
+                       saveSearch={saveSearch}
+                       saveAsSearch={saveAsSearch}
+                       isCreateNew={isNew || !isAllowedToEdit}
+                       toggleModal={toggleFormModal}
+                       value={currentTitle}>
+        <SaveViewButton title={title}
+                        ref={formTarget}
+                        onClick={toggleFormModal} />
+      </SavedSearchForm>
       <Button title="Load a previously saved search"
               onClick={toggleListModal}>
         <Icon name="folder" type="regular" /> Load
@@ -204,10 +249,10 @@ const SearchActionsMenu = () => {
         <MenuItem disabled={disableReset} onSelect={loadNewView} icon="eraser">
           Reset search
         </MenuItem>
-        {searchActions.length > 0 ? (
+        {pluggableActions.length ? (
           <>
             <MenuItem divider />
-            {searchActions}
+            {pluggableActions}
           </>
         ) : null}
       </DropdownButton>
@@ -227,6 +272,7 @@ const SearchActionsMenu = () => {
                           description="Search for a User or Team to add as collaborator on this saved search."
                           onClose={toggleShareSearch} />
       )}
+      {pluggableActionModals}
     </Container>
   );
 };

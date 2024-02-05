@@ -30,6 +30,7 @@ export type RuleBuilderRule = {
   source?: string,
   title: string,
   modified_at?: string,
+  simulator_message?: string,
 }
 
 export type RuleBlockField = {
@@ -48,6 +49,7 @@ export interface RuleBlock extends ObjectWithErrors {
 
 export interface RuleBuilderType extends ObjectWithErrors {
   errors?: Array<string>,
+  operator?: 'AND'|'OR',
   conditions: Array<RuleBlock>,
   actions: Array<RuleBlock>
 }
@@ -78,7 +80,7 @@ export type BlockFieldDict = {
   transformed_type: RuleBuilderTypes,
   name: string,
   optional: boolean,
-  primary: boolean,
+  rule_builder_variable: boolean,
   allow_negatives: boolean,
   description: string | null
 }
@@ -90,8 +92,26 @@ export type BlockDict = {
   params: Array<BlockFieldDict>,
   description: string | null,
   rule_builder_enabled: boolean,
+  rule_builder_function_group: string,
+  rule_builder_name: string,
   rule_builder_title: string | null
 }
+
+export type OutputVariables = Array<{
+  variableName: string,
+  variableType?: RuleBuilderTypes,
+  stepOrder: number,
+  blockId: string
+}>
+
+export const outputVariablesPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    variableName: PropTypes.string.isRequired,
+    variableType: PropTypes.string,
+    stepOrder: PropTypes.number.isRequired,
+    blockId: PropTypes.string,
+  }),
+);
 
 export const ruleBlockPropType = PropTypes.shape({
   function: PropTypes.string.isRequired,
@@ -109,7 +129,7 @@ export const blockDictPropType = PropTypes.shape({
     transformed_type: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     optional: PropTypes.bool.isRequired,
-    primary: PropTypes.bool.isRequired,
+    rule_builder_variable: PropTypes.bool.isRequired,
     description: PropTypes.string,
   })).isRequired,
   description: PropTypes.string,

@@ -74,7 +74,6 @@ if (mode === 'development') {
       hot: false,
       liveReload: true,
       compress: true,
-      historyApiFallback: true,
       proxy: {
         '/api': {
           target: apiUrl,

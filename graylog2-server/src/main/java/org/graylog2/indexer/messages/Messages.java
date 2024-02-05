@@ -24,28 +24,25 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
-import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import org.graylog.failure.FailureSubmissionService;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.plugin.Message;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -54,6 +51,7 @@ import java.util.stream.Collectors;
 public class Messages {
     public interface IndexingListener {
         void onRetry(long attemptNumber);
+
         void onSuccess(long delaySinceFirstAttempt);
     }
 
@@ -73,8 +71,8 @@ public class Messages {
     static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
 
     @SuppressWarnings("UnstableApiUsage")
-    private RetryerBuilder<List<IndexingError>> createBulkRequestRetryerBuilder() {
-        return RetryerBuilder.<List<IndexingError>>newBuilder()
+    private RetryerBuilder<IndexingResults> createBulkRequestRetryerBuilder() {
+        return RetryerBuilder.<IndexingResults>newBuilder()
                 .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class)
                         || t instanceof InvalidWriteTargetException
                         || t instanceof MasterNotDiscoveredException)
@@ -115,53 +113,52 @@ public class Messages {
         return messagesAdapter.analyze(toAnalyze, index, analyzer);
     }
 
-    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
+    public IndexingResults bulkIndex(final List<MessageWithIndex> messageList) {
         return bulkIndex(messageList, false, null);
     }
 
-    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, IndexingListener indexingListener) {
+    public IndexingResults bulkIndex(final List<MessageWithIndex> messageList, IndexingListener indexingListener) {
         return bulkIndex(messageList, false, indexingListener);
     }
 
-    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic) {
+    public IndexingResults bulkIndex(final List<MessageWithIndex> messageList, boolean isSystemTraffic) {
         return bulkIndex(messageList, isSystemTraffic, null);
     }
 
-    public Set<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic, IndexingListener indexingListener) {
+    public IndexingResults bulkIndex(final List<MessageWithIndex> messageList, boolean isSystemTraffic, IndexingListener indexingListener) {
         if (messageList.isEmpty()) {
-            return Set.of();
+            return IndexingResults.empty();
         }
 
         final List<IndexingRequest> indexingRequestList = messageList.stream()
-                .map(entry -> IndexingRequest.create(entry.getKey(), entry.getValue()))
+                .map(entry -> IndexingRequest.create(entry.indexSet(), entry.message()))
                 .collect(Collectors.toList());
 
         return bulkIndexRequests(indexingRequestList, isSystemTraffic, indexingListener);
     }
 
-    public Set<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic) {
+    public IndexingResults bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic) {
         return bulkIndexRequests(indexingRequestList, isSystemTraffic, null);
     }
 
-    public Set<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic, IndexingListener indexingListener) {
-        final List<IndexingError> indexingErrors = runBulkRequest(indexingRequestList, indexingRequestList.size(), indexingListener);
+    public IndexingResults bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic, IndexingListener indexingListener) {
+        final IndexingResults indexingResults = runBulkRequest(indexingRequestList, indexingRequestList.size(), indexingListener);
 
-        final Set<IndexingError> remainingErrors = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingErrors, indexingListener);
+        final IndexingResults retryBlockResults = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingResults.errors(), indexingListener);
 
-        final Set<String> failedIds = remainingErrors.stream()
-                .map(indexingError -> indexingError.message().getId())
-                .collect(Collectors.toSet());
-        final List<IndexingRequest> successfulRequests = indexingRequestList.stream()
-                .filter(indexingRequest -> !failedIds.contains(indexingRequest.message().getId()))
-                .collect(Collectors.toList());
+        final IndexingResults finalResults = retryBlockResults.mergeWith(indexingResults.successes(), List.of());
 
-        recordTimestamp(successfulRequests);
-        accountTotalMessageSizes(indexingRequestList, isSystemTraffic);
+        recordTimestamp(finalResults.successes());
+        accountTotalMessageSizes(finalResults.successes(), isSystemTraffic);
 
-        return propagateFailure(remainingErrors);
+        if (!finalResults.errors().isEmpty()) {
+            failureSubmissionService.submitIndexingErrors(finalResults.errors());
+        }
+
+        return finalResults;
     }
 
-    private Set<IndexingError> retryOnlyIndexBlockItemsForever(List<IndexingRequest> messages, List<IndexingError> allFailedItems, IndexingListener indexingListener) {
+    private IndexingResults retryOnlyIndexBlockItemsForever(List<IndexingRequest> messages, List<IndexingError> allFailedItems, IndexingListener indexingListener) {
         Set<IndexingError> indexBlocks = indexBlocksFrom(allFailedItems);
         final Set<IndexingError> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
         List<IndexingRequest> blockedMessages = messagesForResultItems(messages, indexBlocks);
@@ -172,11 +169,14 @@ public class Messages {
 
         long attempt = 1;
 
+        final IndexingResults.Builder builder = IndexingResults.Builder.create();
         while (!indexBlocks.isEmpty()) {
             waitBeforeRetrying(attempt++);
 
-            final List<Messages.IndexingError> failedItems = runBulkRequest(blockedMessages, messages.size(), indexingListener);
+            final IndexingResults indexingResults = runBulkRequest(blockedMessages, messages.size(), indexingListener);
 
+            builder.addSuccesses(indexingResults.successes());
+            final var failedItems = indexingResults.errors();
             indexBlocks = indexBlocksFrom(failedItems);
             blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
 
@@ -188,7 +188,8 @@ public class Messages {
             }
         }
 
-        return otherFailures;
+        builder.addErrors(otherFailures.stream().toList());
+        return builder.build();
     }
 
     private List<IndexingRequest> messagesForResultItems(List<IndexingRequest> chunk, Set<IndexingError> indexBlocks) {
@@ -202,7 +203,7 @@ public class Messages {
     }
 
     private boolean hasFailedDueToBlockedIndex(IndexingError indexingError) {
-        return indexingError.errorType().equals(IndexingError.ErrorType.IndexBlocked);
+        return indexingError.error().type().equals(IndexingError.Type.IndexBlocked);
     }
 
     private void waitBeforeRetrying(long attempt) {
@@ -215,8 +216,8 @@ public class Messages {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private List<IndexingError> runBulkRequest(List<IndexingRequest> indexingRequestList, int count, @Nullable IndexingListener indexingListener) {
-        final Retryer<List<IndexingError>> bulkRequestRetryer = indexingListener == null
+    private IndexingResults runBulkRequest(List<IndexingRequest> indexingRequestList, int count, @Nullable IndexingListener indexingListener) {
+        final Retryer<IndexingResults> bulkRequestRetryer = indexingListener == null
                 ? createBulkRequestRetryerBuilder().build()
                 : createBulkRequestRetryerBuilder().withRetryListener(retryListenerFor(indexingListener)).build();
 
@@ -246,9 +247,9 @@ public class Messages {
         };
     }
 
-    private void accountTotalMessageSizes(List<IndexingRequest> requests, boolean isSystemTraffic) {
+    private void accountTotalMessageSizes(List<IndexingSuccess> requests, boolean isSystemTraffic) {
         final long totalSizeOfIndexedMessages = requests.stream()
-                .map(IndexingRequest::message)
+                .map(IndexingSuccess::message)
                 .mapToLong(Indexable::getSize)
                 .sum();
 
@@ -259,44 +260,11 @@ public class Messages {
         }
     }
 
-    private void recordTimestamp(List<IndexingRequest> messageList) {
-        for (final IndexingRequest entry : messageList) {
+    private void recordTimestamp(List<IndexingSuccess> messageList) {
+        for (final IndexingSuccess entry : messageList) {
             final Indexable message = entry.message();
 
             processingStatusRecorder.updatePostIndexingReceiveTime(message.getReceiveTime());
-        }
-    }
-
-    private Set<String> propagateFailure(Collection<IndexingError> indexingErrors) {
-        if (indexingErrors.isEmpty()) {
-            return Set.of();
-        }
-
-        failureSubmissionService.submitIndexingErrors(indexingErrors);
-
-        return indexingErrors.stream()
-                .map(IndexingError::message).map(Indexable::getId)
-                .collect(Collectors.toSet());
-    }
-
-    @AutoValue
-    public abstract static class IndexingError {
-        public enum ErrorType {
-            IndexBlocked,
-            MappingError,
-            Unknown;
-        }
-        public abstract Indexable message();
-        public abstract String index();
-        public abstract ErrorType errorType();
-        public abstract String errorMessage();
-
-        public static IndexingError create(Indexable message, String index, ErrorType errorType, String errorMessage) {
-            return new AutoValue_Messages_IndexingError(message, index, errorType, errorMessage);
-        }
-
-        public static IndexingError create(Indexable message, String index) {
-            return create(message, index, ErrorType.Unknown, "");
         }
     }
 }

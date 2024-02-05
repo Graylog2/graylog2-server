@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
-import { Icon, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import { DocumentationLink } from 'components/support';
@@ -38,14 +38,6 @@ const formatTextForFailureCount = (count) => {
   }
 
   return <strong>There were {numeral(count).format('0,0')} failed indexing attempts in the last 24 hours.</strong>;
-};
-
-const iconForFailureCount = (count) => {
-  if (count === 0) {
-    return 'check-circle';
-  }
-
-  return 'ambulance';
 };
 
 class IndexerFailuresComponent extends React.Component {
@@ -65,7 +57,7 @@ class IndexerFailuresComponent extends React.Component {
 
   _formatFailuresSummary = () => (
     <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
-      <Icon name={iconForFailureCount(this.state.total)} /> {formatTextForFailureCount(this.state.total)}
+      {formatTextForFailureCount(this.state.total)}
 
       <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
         <Button bsStyle="info" bsSize="xs" className="pull-right">

@@ -1,0 +1,5 @@
+type = "added"
+message = "Added remove custom field type bulk action to index set field type page"
+
+issues = ["17286"]
+pulls = ["17429"]

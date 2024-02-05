@@ -31,9 +31,7 @@ import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.journal.LocalKafkaJournalModule;
-import org.graylog2.shared.plugins.ChainingClassLoader;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +77,7 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
     }
 
     @Override
-    protected Set<Plugin> loadPlugins(Path pluginPath, ChainingClassLoader chainingClassLoader) {
+    protected Set<Plugin> loadPlugins() {
         // these commands do not need plugins, which could cause problems because of not loaded config beans
         return Collections.emptySet();
     }

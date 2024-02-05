@@ -29,7 +29,7 @@ jest.mock('stores/tools/ToolsStore', () => ({
 }));
 
 const TabKeywordTimeRange = ({ defaultValue, ...props }: { defaultValue: string } & React.ComponentProps<typeof TabKeywordTimeRange>) => (
-  <Formik initialValues={{ nextTimeRange: { type: 'keyword', keyword: defaultValue } }}
+  <Formik initialValues={{ timeRangeTabs: { keyword: { type: 'keyword', keyword: defaultValue } }, activeTab: 'keyword' }}
           onSubmit={() => {}}
           validateOnMount>
     <Form>

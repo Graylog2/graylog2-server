@@ -71,7 +71,7 @@ public class RawMessage implements Serializable {
     private Configuration codecConfig;
 
     public RawMessage(@Nonnull byte[] payload) {
-        this(payload, (ResolvableInetSocketAddress)null);
+        this(payload, (ResolvableInetSocketAddress) null);
     }
 
     public RawMessage(@Nonnull byte[] payload, @Nullable InetSocketAddress remoteAddress) {
@@ -92,9 +92,9 @@ public class RawMessage implements Serializable {
         sequenceNr = 0;
         if (payload.length == 0 && log.isTraceEnabled()) {
             log.trace("The message payload should not be empty, message {} from {} will be discarded.",
-                      id,
-                      remoteAddress == null ? "unknown" : remoteAddress,
-                      new Throwable());
+                    id,
+                    remoteAddress == null ? "unknown" : remoteAddress,
+                    new Throwable());
         }
 
         msgBuilder = JournalMessage.newBuilder();
@@ -116,10 +116,9 @@ public class RawMessage implements Serializable {
 
     public void addSourceNode(String sourceInputId, NodeId nodeId) {
         msgBuilder.addSourceNodesBuilder()
-                  .setInputId(sourceInputId)
-                  .setId(nodeId.getNodeId())
-                  .setType(JournalMessages.SourceNode.Type.SERVER)
-                  .build();
+                .setInputId(sourceInputId)
+                .setId(nodeId.getNodeId())
+                .setType(JournalMessages.SourceNode.Type.SERVER);
     }
 
     public RawMessage(JournalMessage journalMessage, Object messageQueueId) {
@@ -218,7 +217,7 @@ public class RawMessage implements Serializable {
                 inetAddr = InetAddress.getByAddress(address.getResolved(), address.getAddress().toByteArray());
             } catch (UnknownHostException e) {
                 log.warn("Malformed InetAddress for message {}, expected 4 or 16 bytes, but got {} bytes",
-                         id, address.getAddress().toByteArray());
+                        id, address.getAddress().toByteArray());
                 return null;
             }
 
@@ -271,6 +270,7 @@ public class RawMessage implements Serializable {
         this.sequenceNr = sequenceNr;
         msgBuilder.setSequenceNr(sequenceNr);
     }
+
     public int getSequenceNr() {
         return sequenceNr;
     }

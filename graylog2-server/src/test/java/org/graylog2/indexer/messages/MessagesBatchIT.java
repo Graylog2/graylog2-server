@@ -17,7 +17,6 @@
 package org.graylog2.indexer.messages;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
@@ -33,8 +32,6 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -72,12 +69,12 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
         // This will trigger the circuit breaker when we are trying to index large batches
         final int MESSAGECOUNT = 50;
         // Each Message is about 1 MB
-        final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
-        final Set<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
+        final List<MessageWithIndex> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
+        var results = this.messages.bulkIndex(largeMessageBatch);
 
         client().refreshNode(); // wait for ES to finish indexing
 
-        assertThat(failedItems).isEmpty();
+        assertThat(results.errors()).isEmpty();
         assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT);
     }
 
@@ -89,12 +86,12 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
         return DateTime.now(DateTimeZone.UTC);
     }
 
-    private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
-        final ArrayList<Map.Entry<IndexSet, Message>> messageList = new ArrayList<>();
+    private ArrayList<MessageWithIndex> createMessageBatch(int size, int count) {
+        final ArrayList<MessageWithIndex> messageList = new ArrayList<>();
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", now())));
+            messageList.add(new MessageWithIndex(new Message(i + message, "source", now()), indexSet));
         }
         return messageList;
     }

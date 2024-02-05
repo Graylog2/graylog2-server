@@ -27,6 +27,9 @@ class ProcessStateMachineTest {
         final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
         Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
 
+        machine.fire(ProcessEvent.PROCESS_PREPARED);
+        Assertions.assertEquals(ProcessState.PREPARED, machine.getState());
+
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
@@ -41,6 +44,9 @@ class ProcessStateMachineTest {
     void testRestFailing() {
         final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
         Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
+
+        machine.fire(ProcessEvent.PROCESS_PREPARED);
+        Assertions.assertEquals(ProcessState.PREPARED, machine.getState());
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
@@ -67,6 +73,9 @@ class ProcessStateMachineTest {
         final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
         Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
 
+        machine.fire(ProcessEvent.PROCESS_PREPARED);
+        Assertions.assertEquals(ProcessState.PREPARED, machine.getState());
+
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
@@ -86,6 +95,9 @@ class ProcessStateMachineTest {
         final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
         Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
 
+        machine.fire(ProcessEvent.PROCESS_PREPARED);
+        Assertions.assertEquals(ProcessState.PREPARED, machine.getState());
+
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
@@ -99,4 +111,49 @@ class ProcessStateMachineTest {
         // succeeded just in time before we give up
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
     }
+
+    @Test
+    void testSuccessfullRemoval() {
+        final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
+        Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
+
+        machine.fire(ProcessEvent.PROCESS_PREPARED);
+        Assertions.assertEquals(ProcessState.PREPARED, machine.getState());
+
+        machine.fire(ProcessEvent.PROCESS_STARTED);
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
+
+        machine.fire(ProcessEvent.HEALTH_CHECK_OK);
+        Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
+
+        machine.fire(ProcessEvent.PROCESS_REMOVE);
+        Assertions.assertEquals(ProcessState.REMOVING, machine.getState());
+
+        machine.fire(ProcessEvent.PROCESS_STOPPED);
+        Assertions.assertEquals(ProcessState.REMOVED, machine.getState());
+
+    }
+
+    @Test
+    void testFailingRemoval() {
+        final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
+        Assertions.assertEquals(machine.getState(), ProcessState.WAITING_FOR_CONFIGURATION);
+
+        machine.fire(ProcessEvent.PROCESS_PREPARED);
+        Assertions.assertEquals(ProcessState.PREPARED, machine.getState());
+
+        machine.fire(ProcessEvent.PROCESS_STARTED);
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
+
+        machine.fire(ProcessEvent.HEALTH_CHECK_OK);
+        Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
+
+        machine.fire(ProcessEvent.PROCESS_REMOVE);
+        Assertions.assertEquals(ProcessState.REMOVING, machine.getState());
+
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        Assertions.assertEquals(ProcessState.FAILED, machine.getState());
+
+    }
+
 }

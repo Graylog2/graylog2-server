@@ -22,10 +22,11 @@ export const ENTITY_TABLE_ID = 'event_definitions';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'priority', 'scheduling', 'status'],
-  columnsOrder: ['title', 'description', 'priority', 'status', 'scheduling'],
+  displayedColumns: ['title', 'description', 'priority', 'scheduling', 'status', 'matched_at'],
+  columnsOrder: ['title', 'description', 'priority', 'matched_at', 'status', 'scheduling'],
 };
 
 export const ADDITIONAL_ATTRIBUTES = [
   { id: 'scheduling', title: 'Scheduling', sortable: false },
+  { id: 'matched_at', title: 'Last Matched', sortable: true },
 ];

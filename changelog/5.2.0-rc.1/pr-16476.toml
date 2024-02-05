@@ -1,0 +1,22 @@
+type = "security"
+message = "Update various third-party libraries to address vulnerabilites."
+
+pulls = ["16476"]
+
+details.user = """
+Updates third-party libraries to address the following vulnerabilities:
+
+  - [CVE-2022-36944](https://www.cve.org/CVERecord?id=CVE-2022-36944)
+  - [CVE-2023-34455](https://www.cve.org/CVERecord?id=CVE-2023-34455)
+  - [CVE-2021-22569](https://www.cve.org/CVERecord?id=CVE-2021-22569)
+  - [CVE-2019-10086](https://www.cve.org/CVERecord?id=CVE-2019-10086)
+  - [CVE-2021-28170](https://www.cve.org/CVERecord?id=CVE-2021-28170)
+  - [CVE-2021-29425](https://www.cve.org/CVERecord?id=CVE-2021-29425)
+  - [CVE-2023-3635](https://www.cve.org/CVERecord?id=CVE-2023-3635)
+  - [CVE-2022-25647](https://www.cve.org/CVERecord?id=CVE-2022-25647)
+  - [CVE-2023-34462](https://www.cve.org/CVERecord?id=CVE-2023-34462)
+  - [CVE-2023-33201](https://www.cve.org/CVERecord?id=CVE-2023-33201)
+  - [CVE-2020-10693](https://www.cve.org/CVERecord?id=CVE-2020-10693)
+  - [CVE-2021-37533](https://www.cve.org/CVERecord?id=CVE-2021-37533)
+  - [CVE-2023-2976](https://www.cve.org/CVERecord?id=CVE-2023-2976)
+"""

@@ -17,45 +17,30 @@
 import * as React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { defaultTimezone, defaultUser } from 'defaultMockValues';
+import { COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
+import SawmillSC from '@graylog/sawmill/styled-components';
+import SawmillMantine from '@graylog/sawmill/mantine';
+import { MantineProvider } from '@mantine/core';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
-import { colors, utils, breakpoints, fonts, spacings } from 'theme';
-import { THEME_MODE_LIGHT } from 'theme/constants';
-import buttonStyles from 'components/bootstrap/styles/buttonStyles';
-import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
 
-const themeColors = colors[THEME_MODE_LIGHT];
-const formattedUtils = {
-  ...utils,
-  colorLevel: utils.colorLevel(themeColors),
-  readableColor: utils.readableColor(themeColors),
-};
-
-const theme = {
-  mode: THEME_MODE_LIGHT,
-  changeMode: () => {},
-  breakpoints,
-  colors: themeColors,
-  fonts,
-  spacings,
-  components: {
-    button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
-    aceEditor: aceEditorStyles({ colors: themeColors }),
-  },
-  utils: formattedUtils,
-};
+const scTheme = SawmillSC({ colorScheme: COLOR_SCHEME_LIGHT });
+const mantineTheme = SawmillMantine({ colorScheme: COLOR_SCHEME_LIGHT });
 
 type Props = {
   children: React.ReactNode,
 }
+
 const DefaultProviders = ({ children }: Props) => (
   <CurrentUserContext.Provider value={defaultUser}>
-    <ThemeProvider theme={theme}>
-      <UserDateTimeProvider tz={defaultTimezone}>
-        {children}
-      </UserDateTimeProvider>
-    </ThemeProvider>
+    <MantineProvider theme={mantineTheme}>
+      <ThemeProvider theme={{ ...scTheme, changeMode: () => {}, mantine: mantineTheme }}>
+        <UserDateTimeProvider tz={defaultTimezone}>
+          {children}
+        </UserDateTimeProvider>
+      </ThemeProvider>
+    </MantineProvider>
   </CurrentUserContext.Provider>
 );
 

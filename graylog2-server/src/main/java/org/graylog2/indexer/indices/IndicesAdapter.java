@@ -18,6 +18,7 @@ package org.graylog2.indexer.indices;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
+import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
@@ -58,7 +59,7 @@ public interface IndicesAdapter {
     void updateIndexMetaData(@Nonnull String indexName, @Nonnull Map<String, Object> metaData, boolean mergeExisting);
     Map<String, Object> getIndexMetaData(@Nonnull String indexName);
 
-    boolean ensureIndexTemplate(String templateName, Map<String, Object> template);
+    boolean ensureIndexTemplate(String templateName, Template template);
 
     boolean indexTemplateExists(String templateName);
 
@@ -124,4 +125,6 @@ public interface IndicesAdapter {
     String getIndexId(String index);
 
     void refresh(String... indices);
+
+    Optional<WarmIndexInfo> getWarmIndexInfo(String indexOrAlias);
 }

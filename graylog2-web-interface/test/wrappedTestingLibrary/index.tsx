@@ -18,7 +18,7 @@ import * as React from 'react';
 import type { RenderOptions } from '@testing-library/react';
 import { render } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom/jest-globals';
 import '@testing-library/jest-dom';
 import 'jest-styled-components';
 import DefaultProviders from 'DefaultProviders';

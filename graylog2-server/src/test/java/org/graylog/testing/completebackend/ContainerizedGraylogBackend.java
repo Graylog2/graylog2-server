@@ -16,11 +16,13 @@
  */
 package org.graylog.testing.completebackend;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider.Services;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog.testing.graylognode.ExecutableNotFoundException;
+import org.graylog.testing.graylognode.MavenPackager;
+import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.storage.SearchVersion;
@@ -31,78 +33,81 @@ import org.testcontainers.containers.Network;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
-    private Network network;
-    private SearchServerInstance searchServer;
-    private MongoDBInstance mongodb;
-    private MailServerContainer emailServerInstance;
+    private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackend.class);
+    public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdranHasToBeAtLeastSixtyFourCharactersInLength";
+    public static final String ROOT_PASSWORD_PLAINTEXT = "admin";
+    public static final String ROOT_PASSWORD_SHA_2 = DigestUtils.sha256Hex(ROOT_PASSWORD_PLAINTEXT);
+
+    private Services services;
     private NodeInstance node;
 
     private ContainerizedGraylogBackend() {
     }
 
-    public static ContainerizedGraylogBackend createStarted(SearchVersion version, MongodbServer mongodbVersion,
-                                                            int[] extraPorts, List<URL> mongoDBFixtures,
-                                                            PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
-                                                            final List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
+    public synchronized static ContainerizedGraylogBackend createStarted(ContainerizedGraylogBackendServicesProvider servicesProvider,
+                                                                         final SearchVersion version,
+                                                                         final MongodbServer mongodbVersion,
+                                                                         final int[] extraPorts,
+                                                                         final List<URL> mongoDBFixtures,
+                                                                         final PluginJarsProvider pluginJarsProvider,
+                                                                         final MavenProjectDirProvider mavenProjectDirProvider,
+                                                                         final List<String> enabledFeatureFlags,
+                                                                         final boolean preImportLicense,
+                                                                         final boolean withMailServerEnabled,
+                                                                         Map<String, String> configParams) {
 
-        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend();
-        backend.create(version, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withMailServerEnabled);
-        return backend;
+        LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
+        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, enabledFeatureFlags);
+        LOG.debug("Done creating backend services");
+
+        return new ContainerizedGraylogBackend().create(services, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
     }
 
-    private void create(final SearchVersion version, MongodbServer mongodbVersion,
-                        int[] extraPorts, List<URL> mongoDBFixtures,
-                        PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
-                        List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
+    private ContainerizedGraylogBackend create(Services services,
+                                               final int[] extraPorts,
+                                               final List<URL> mongoDBFixtures,
+                                               final PluginJarsProvider pluginJarsProvider,
+                                               final MavenProjectDirProvider mavenProjectDirProvider,
+                                               final List<String> enabledFeatureFlags,
+                                               final boolean preImportLicense,
+                                               Map<String, String> configParams) {
+        this.services = services;
 
-        final var network = Network.newNetwork();
-        final var builder = SearchServerInstanceProvider.getBuilderFor(version).orElseThrow(() -> new UnsupportedOperationException("Search version " + version + " not supported."));
-
-        MongoDBInstance mongoDB = MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion);
-        if(withMailServerEnabled) {
-            this.emailServerInstance = MailServerContainer.createStarted(network);
-        }
-        mongoDB.dropDatabase();
+        var mongoDB = services.getMongoDBInstance();
         mongoDB.importFixtures(mongoDBFixtures);
 
-        SearchServerInstance searchServer = builder.network(network).featureFlags(enabledFeatureFlags).build();
+        MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
 
-        if(preImportLicense) {
+        if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
-        NodeInstance node = NodeInstance.createStarted(
-                network,
-                MongoDBInstance.internalUri(),
-                searchServer.internalUri(),
-                searchServer.version(),
-                extraPorts,
-                pluginJarsProvider, mavenProjectDirProvider,
-                enabledFeatureFlags);
-        this.network = network;
-        this.searchServer = searchServer;
-        this.mongodb = mongoDB;
-        this.node = node;
+        var searchServer = services.getSearchServerInstance();
+        try {
+            var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
+            this.node = NodeInstance.createStarted(nodeContainerConfig);
 
-        // ensure that all containers and networks will be removed after all tests finish
-        // We can't close the resources in an afterAll callback, as the instances are cached and reused
-        // so we need a solution that will be triggered only once after all test classes
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+            // ensure that all containers and networks will be removed after all tests finish
+            // We can't close the resources in an afterAll callback, as the instances are cached and reused
+            // so we need a solution that will be triggered only once after all test classes
+            Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        } catch (Exception ex) {
+            // if the graylog Node is not coming up (because OpenSearch hangs?) it fails here. So in this case, we also log the search server logs
+            LOG.error("------------------------------ Search Server logs: --------------------------------------\n{}", searchServer.getLogs());
+            throw ex;
+        }
+        return this;
     }
 
     private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {
         final List<String> licenses = Arrays.stream(licenseStrs).map(System::getenv).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-        if(!licenses.isEmpty()) {
+        if (!licenses.isEmpty()) {
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
             loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
         }
@@ -110,12 +115,12 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
     @Override
     public void importElasticsearchFixture(String resourcePath, Class<?> testClass) {
-        searchServer.importFixtureResource(resourcePath, testClass);
+        services.getSearchServerInstance().importFixtureResource(resourcePath, testClass);
     }
 
     @Override
     public void importMongoDBFixture(String resourcePath, Class<?> testClass) {
-        mongodb.importFixture(resourcePath, testClass);
+        services.getMongoDBInstance().importFixture(resourcePath, testClass);
     }
 
     @Override
@@ -140,33 +145,27 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
     @Override
     public Network network() {
-        return this.network;
+        return services.getNetwork();
     }
 
     public Optional<MailServerInstance> getEmailServerInstance() {
-        return Optional.ofNullable(emailServerInstance);
+        return Optional.ofNullable(services.getMailServerContainer());
     }
 
     @Override
     public String getSearchLogs() {
-        return searchServer.getLogs();
+        return services.getSearchServerInstance().getLogs();
     }
 
     @Override
     public void close() {
         node.close();
-        mongodb.close();
-        searchServer.close();
-
-        if (emailServerInstance != null) {
-            emailServerInstance.close();
-        }
-
-        network.close();
+        // Wipe SearchDB and MongoDB for next test run
+        services.cleanUp();
     }
 
     @Override
     public SearchServerInstance searchServerInstance() {
-        return searchServer;
+        return services.getSearchServerInstance();
     }
 }

@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Enable/Disable EventDefinition status when clicking on status badge."
+
+issues = ["15095"]
+pulls = ["16203"]
+

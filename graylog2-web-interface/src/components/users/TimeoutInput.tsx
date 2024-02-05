@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 
 import { Row, Col, HelpBlock, Input, Alert } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
-import { Icon } from 'components/common';
 
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
@@ -29,7 +28,7 @@ type Props = {
   onChange: (value: number) => void;
 };
 
-const _estimateUnit = (value) => {
+const _estimateUnit = (value: number): number => {
   if (value === 0) {
     return MS_SECOND;
   }
@@ -54,7 +53,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
 
-  const _onClick = (evt) => {
+  const _onClick = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setSessionTimeoutNever(evt.target.checked);
 
     if (onChange && evt.target.checked) {
@@ -62,15 +61,15 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
     }
   };
 
-  const _onChangeValue = (evt) => {
-    setValue(evt.target.value);
+  const _onChangeValue = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(Number(evt.target.value));
 
     if (onChange) {
-      onChange(evt.target.value * Number(unit));
+      onChange(Number(evt.target.value) * Number(unit));
     }
   };
 
-  const _onChangeUnit = (newUnit: string) => {
+  const _onChangeUnit = (newUnit: number) => {
     setUnit(newUnit);
 
     if (onChange) {
@@ -85,8 +84,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
            label="Sessions Timeout">
       <Row className="no-bm">
         <Col xs={12}>
-          <Alert bsStyle="info">
-            <Icon name="info-circle" />{' '}<b>Changing the session timeout</b><br />
+          <Alert bsStyle="info" title="Changing the session timeout">
             Changing the timeout setting for sessions will log the user out of Graylog and will invalidate all their
             current sessions. If you are changing the setting for your own user, you will be logged out at the moment
             of saving the setting. In that case, make sure to save any pending changes before changing the timeout.
@@ -117,7 +115,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
           </Col>
           <Col xs={4}>
             <TimeoutUnitSelect disabled={sessionTimeoutNever}
-                               value={unit}
+                               value={String(unit)}
                                onChange={_onChangeUnit} />
           </Col>
           <Row className="no-bm">

@@ -54,7 +54,7 @@ public class JobWorkerPoolTest {
 
         // Execute the first task
         assertThat(pool.execute(() -> {
-            Uninterruptibles.awaitUninterruptibly(task1Latch, 60, TimeUnit.SECONDS);
+            var ignored = Uninterruptibles.awaitUninterruptibly(task1Latch, 60, TimeUnit.SECONDS);
             latch1.countDown();
         })).isTrue();
 
@@ -64,7 +64,7 @@ public class JobWorkerPoolTest {
 
         // Execute the second task
         assertThat(pool.execute(() -> {
-            Uninterruptibles.awaitUninterruptibly(task2Latch, 60, TimeUnit.SECONDS);
+            var ignored = Uninterruptibles.awaitUninterruptibly(task2Latch, 60, TimeUnit.SECONDS);
             latch2.countDown();
         })).isTrue();
 

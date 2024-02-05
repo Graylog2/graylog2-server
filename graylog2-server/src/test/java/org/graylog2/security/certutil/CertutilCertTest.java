@@ -41,6 +41,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import static org.graylog.security.certutil.CertConstants.DATANODE_KEY_ALIAS;
+
 class CertutilCertTest {
 
     @TempDir
@@ -53,15 +55,16 @@ class CertutilCertTest {
         final Path nodePath = tempDir.resolve("test-node.p12");
 
         final TestableConsole inputCa = TestableConsole.empty()
-                .register("Enter CA password", "password");
+                .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, "password");
         final CertutilCa certutilCa = new CertutilCa(caPath.toAbsolutePath().toString(), inputCa);
         certutilCa.run();
 
         // now we have a ROOT + CA keypair in the keystore, let's use it to generate node keypair
 
         TestableConsole inputCert = TestableConsole.empty()
-                .register("Enter CA password", "password")
-                .register("Enter datanode certificate password", "changeme");
+                .register(CertutilCert.PROMPT_ENTER_CA_PASSWORD, "password")
+                .register(CertutilCert.PROMPT_ENTER_CERTIFICATE_PASSWORD, "changeme")
+                .register(CertutilCert.PROMPT_ENTER_CERT_ALTERNATIVE_NAMES, "");
 
         CertutilCert certutilCert = new CertutilCert(
                 caPath.toAbsolutePath().toString(),
@@ -74,18 +77,18 @@ class CertutilCertTest {
 
         KeyStore nodeKeyStore = KeyStore.getInstance("PKCS12");
         nodeKeyStore.load(new FileInputStream(nodePath.toFile()), "changeme".toCharArray());
-        final Key nodeKey = nodeKeyStore.getKey(CertutilCert.DATANODE_KEY_ALIAS, "changeme".toCharArray());
+        final Key nodeKey = nodeKeyStore.getKey(DATANODE_KEY_ALIAS, "changeme".toCharArray());
         Assertions.assertThat(nodeKey).isNotNull();
 
-        Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(CertutilCert.DATANODE_KEY_ALIAS).verify(caKeyStore.getCertificate("ca").getPublicKey()))
+        Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(DATANODE_KEY_ALIAS).verify(caKeyStore.getCertificate("ca").getPublicKey()))
                 .doesNotThrowAnyException();
 
         var hostname = Tools.getLocalCanonicalHostname();
-        final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(CertutilCert.DATANODE_KEY_ALIAS);
+        final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(DATANODE_KEY_ALIAS);
         Assertions.assertThat(certificateChain)
-                .hasSize(3)
-                .extracting(c ->(X509Certificate)c)
+                .hasSize(2)
+                .extracting(c -> (X509Certificate) c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=root", "CN=ca", "CN=" + hostname);
+                .contains("CN=Graylog CA", "CN=" + hostname);
     }
 }

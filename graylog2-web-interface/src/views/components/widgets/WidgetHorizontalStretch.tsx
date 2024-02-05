@@ -25,6 +25,7 @@ import { Position } from 'views/components/widgets/WidgetPropTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type PositionType = {
   col: number,
@@ -52,7 +53,7 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
       id: widgetId, col, row, height, width: width === Infinity ? defaultWidth : Infinity,
     });
 
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_HORIZONTAL_STRETCH, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-stretch-button',

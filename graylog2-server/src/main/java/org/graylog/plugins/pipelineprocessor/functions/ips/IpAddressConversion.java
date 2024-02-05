@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.net.InetAddress;
 import java.util.IllegalFormatException;
@@ -38,7 +39,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
     private final ParameterDescriptor<String, String> defaultParam;
 
     public IpAddressConversion() {
-        ipParam = ParameterDescriptor.object("ip").description("Value to convert").build();
+        ipParam = ParameterDescriptor.object("ip").ruleBuilderVariable().description("Value to convert").build();
         defaultParam = ParameterDescriptor.string("default").optional().description("Used when 'ip' is null or malformed, defaults to '0.0.0.0'").build();
     }
 
@@ -76,6 +77,10 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
                         defaultParam
                 ))
                 .description("Converts a value to an IPAddress using its string representation")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Convert to IP")
+                .ruleBuilderTitle("Convert '${ip}' to an IP address")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.CONVERSION)
                 .build();
     }
 }

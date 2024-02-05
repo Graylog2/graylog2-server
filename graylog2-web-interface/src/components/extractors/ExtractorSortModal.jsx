@@ -74,9 +74,7 @@ class ExtractorSortModal extends React.Component {
 
     return (
       <BootstrapModalWrapper showModal
-                             onHide={this._cancel}
-                             data-app-section="sort_extractors"
-                             data-event-element={`Sort extractors for ${input.title}`}>
+                             onHide={this._cancel}>
         <Modal.Header closeButton>
           <Modal.Title>
             <span>Sort extractors for <em>{input.title}</em></span>

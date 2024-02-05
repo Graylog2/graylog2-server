@@ -17,8 +17,8 @@
 package org.graylog2.security.certutil;
 
 import org.assertj.core.api.Assertions;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertutilCa;
-import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog2.plugin.Tools;
@@ -44,6 +44,8 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
 
+import static org.graylog.security.certutil.CertConstants.DATANODE_KEY_ALIAS;
+
 class CertutilHttpTest {
 
     @TempDir
@@ -56,18 +58,18 @@ class CertutilHttpTest {
         final Path nodePath = tempDir.resolve("test-node.p12");
 
         final TestableConsole inputCa = TestableConsole.empty()
-                .register("Enter CA password", "password");
+                .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, "password");
         final CertutilCa certutilCa = new CertutilCa(caPath.toAbsolutePath().toString(), inputCa);
         certutilCa.run();
 
         // now we have a ROOT + CA keypair in the keystore, let's use it to generate node keypair
 
         TestableConsole inputHttp = TestableConsole.empty()
-                .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
-                .register("Enter CA password", "password")
-                .register("Enter certificate validity in days", "90")
-                .register("Enter alternative names (addresses) of this node [comma separated]", "example.com")
-                .register("Enter HTTP certificate password", "changeme");
+                .register(CertutilHttp.PROMPT_USE_OWN_CERTIFICATE_AUTHORITY, "n")
+                .register(CertutilHttp.PROMPT_ENTER_CA_PASSWORD, "password")
+                .register(CertutilHttp.PROMPT_ENTER_CERTIFICATE_VALIDITY_IN_DAYS, "90")
+                .register(CertutilHttp.PROMPT_ENTER_CERTIFICATE_ALTERNATIVE_NAMES, "example.com")
+                .register(CertutilHttp.PROMPT_ENTER_HTTP_CERTIFICATE_PASSWORD, "changeme");
 
         CertutilHttp certutilCert = new CertutilHttp(
                 caPath.toAbsolutePath().toString(),
@@ -80,11 +82,11 @@ class CertutilHttpTest {
 
         KeyStore nodeKeyStore = KeyStore.getInstance("PKCS12");
         nodeKeyStore.load(new FileInputStream(nodePath.toFile()), "changeme".toCharArray());
-        final Key nodeKey = nodeKeyStore.getKey(CertutilCert.DATANODE_KEY_ALIAS, "changeme".toCharArray());
+        final Key nodeKey = nodeKeyStore.getKey(DATANODE_KEY_ALIAS, "changeme".toCharArray());
         Assertions.assertThat(nodeKey).isNotNull();
 
-        final Certificate nodeCertificate = nodeKeyStore.getCertificate(CertutilCert.DATANODE_KEY_ALIAS);
-        Assertions.assertThatCode(() -> nodeCertificate.verify(caKeyStore.getCertificate("ca").getPublicKey()))
+        final Certificate nodeCertificate = nodeKeyStore.getCertificate(DATANODE_KEY_ALIAS);
+        Assertions.assertThatCode(() -> nodeCertificate.verify(caKeyStore.getCertificate(CertConstants.CA_KEY_ALIAS).getPublicKey()))
                 .doesNotThrowAnyException();
 
         final Collection<List<?>> alternativeNames = ((X509Certificate) nodeCertificate).getSubjectAlternativeNames();
@@ -94,11 +96,11 @@ class CertutilHttpTest {
                 .contains("localhost", "example.com");
 
         var hostname = Tools.getLocalCanonicalHostname();
-        final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(CertutilCert.DATANODE_KEY_ALIAS);
+        final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(DATANODE_KEY_ALIAS);
         Assertions.assertThat(certificateChain)
-                .hasSize(3)
-                .extracting(c ->(X509Certificate)c)
+                .hasSize(2)
+                .extracting(c -> (X509Certificate) c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=root", "CN=ca", "CN=" + hostname);
+                .contains("CN=Graylog CA", "CN=" + hostname);
     }
 }

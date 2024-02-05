@@ -1,0 +1,5 @@
+type = "a"
+message = "Add pipeline name and stage to log output when an exception occurs during pipeline processing."
+
+issues = ["8627"]
+pulls = ["16161"]

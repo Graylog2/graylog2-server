@@ -48,8 +48,9 @@ const StyledIcon = styled(Icon)`
 `;
 
 const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { values: { nextTimeRange }, setFieldValue } = useFormikContext<TimeRangePickerFormValues>();
-  const disableUntil = disabled || (isTypeRelativeWithEnd(nextTimeRange) && nextTimeRange.from === RELATIVE_ALL_TIME);
+  const { values: { timeRangeTabs }, setFieldValue } = useFormikContext<TimeRangePickerFormValues>();
+  const activeTabTimeRange = timeRangeTabs.relative;
+  const disableUntil = disabled || (isTypeRelativeWithEnd(activeTabTimeRange) && activeTabTimeRange.from === RELATIVE_ALL_TIME);
 
   return (
     <div>
@@ -60,7 +61,7 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
                                disabled={disabled}
                                fieldName="from"
                                limitDuration={limitDuration}
-                               onUnsetRange={() => { setFieldValue('nextTimeRange.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
+                               onUnsetRange={() => { setFieldValue('timeRangeTabs.relative.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
                                title="From:"
                                unsetRangeLabel="All Time" />
           <StyledIcon name="arrow-right" />

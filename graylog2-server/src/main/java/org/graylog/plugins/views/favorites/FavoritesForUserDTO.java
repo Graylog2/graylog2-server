@@ -46,13 +46,12 @@ public record FavoritesForUserDTO(
          * always have at least an empty list, avoid null
          * @Nullable is necessary to reduce problems if someone manually edits in MongoDB
          */
-        if(items == null) {
+        if (items == null) {
             items = new ArrayList<>();
         }
     }
 
-    public FavoritesForUserDTO(@JsonProperty(FIELD_USER_ID) String userId,
-                               @Nullable @JsonProperty(FIELD_ITEMS) List<GRN> items) {
+    public FavoritesForUserDTO(String userId, @Nullable List<GRN> items) {
         this(null, userId, items);
     }
 }

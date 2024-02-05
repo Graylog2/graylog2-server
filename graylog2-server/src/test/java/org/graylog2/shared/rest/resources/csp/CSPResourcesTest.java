@@ -32,7 +32,7 @@ class CSPResourcesTest {
     @Test
     void loadPropertiesTest() {
         assertThat(cspResources.cspString("default")).isEqualTo(
-                "connect-src url1.com:9999 url2.com;default-src 'self';img-src https://url3.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'");
+                "connect-src url1.com:9999 url2.com;default-src 'self';img-src https://url3.com:9999 https://url4.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'");
         assertThat(cspResources.cspString("swagger")).isEqualTo(
                 "connect-src url4.com;img-src https://url5.com:9999;script-src 'self' 'unsafe-eval' 'unsafe-inline';style-src 'self' 'unsafe-inline'");
     }
@@ -41,7 +41,7 @@ class CSPResourcesTest {
     void updateTest() {
         cspResources.updateAll("default-src", "xxx xxx yyy yyy");
         assertThat(cspResources.cspString("default")).isEqualTo(
-                "connect-src url1.com:9999 url2.com;default-src 'self' xxx yyy;img-src https://url3.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'");
+                "connect-src url1.com:9999 url2.com;default-src 'self' xxx yyy;img-src https://url3.com:9999 https://url4.com:9999;script-src 'self' 'unsafe-eval';style-src 'self' 'unsafe-inline'");
         assertThat(cspResources.cspString("swagger")).isEqualTo(
                 "connect-src url4.com;default-src xxx yyy;img-src https://url5.com:9999;script-src 'self' 'unsafe-eval' 'unsafe-inline';style-src 'self' 'unsafe-inline'");
     }

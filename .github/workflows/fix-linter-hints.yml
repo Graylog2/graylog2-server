@@ -2,7 +2,7 @@ name: Fix linter hints
 
 on:
   schedule:
-    - cron: '0 */8 * * *'
+    - cron: '0 */8 * * MON-FRI'
 
   workflow_dispatch:
 
@@ -18,20 +18,13 @@ jobs:
         run: |
           sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
           sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
           cache: maven
-      - name: Set up Yarn cache
-        uses: actions/cache@v2
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('graylog2-web-interface/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-          path: ~/.cache/yarn
       - name: Build with Maven
         run: mvn -B --fail-fast -Pedantic -Dspotbugs.skip -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -DskipTests compile
         env:
@@ -51,26 +44,10 @@ jobs:
         continue-on-error: true
         working-directory: graylog2-web-interface
         run: |
-          PROBLEM_COUNT=`jq '. | map(.errorCount + .warningCount)|add' /tmp/report.json`
-          PROBLEM_COUNT_STYLELINT=`jq '. | map(.warnings | length)|add' /tmp/report-stylelint.json`
-          CURRENT_REF=`git rev-parse HEAD`
-          TIMESTAMP=`git show --format=%at $CURRENT_REF|head -1`
-          PAYLOAD=$(cat <<- EOF
-            {
-              "version": "1.1",
-              "host": "developermetrics",
-              "job": "fix-linter-hints",
-              "short_message": "Found ${PROBLEM_COUNT} ESLint and ${PROBLEM_COUNT_STYLELINT} Stylelint problems in commit ${CURRENT_REF}",
-              "_problems": ${PROBLEM_COUNT},
-              "_problems_stylelint": ${PROBLEM_COUNT_STYLELINT},
-              "_current_ref": "${CURRENT_REF}",
-              "timestamp": ${TIMESTAMP}
-             }
-          EOF
-          )
-          curl -X POST -H 'Content-Type: application/json' -d "$PAYLOAD" ${{ secrets.DEV_METRICS_URL }}
+          /bin/sh ../.github/scripts/web-code-quality.sh | curl -X POST -H 'Content-Type: application/json' -d @- ${{ secrets.DEV_METRICS_URL }}
       - name: Create/Update Pull Request
-        uses: Graylog2/create-pull-request@7380612b49221684fefa025244f2ef4008ae50ad
+        id: pr-create
+        uses: Graylog2/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38
         with:
           title: Fixing linter hints automatically
           body: This PR was created by a job that is running periodically to find and fix linter hints.
@@ -79,3 +56,26 @@ jobs:
           committer: Dr. Lint-a-lot <garybot2@graylog.com>
           commit-message: Running lint --fix
           delete-branch: true
+
+      - name: Get headRef and SHA of PR
+        id: pr-infos
+        if: ${{ steps.pr-create.outputs.pull-request-number && steps.pr-create.outputs.pull-request-operation != 'closed' }}
+        run: |
+          HEADREF=$(gh pr view ${{ steps.pr-create.outputs.pull-request-number }} --json headRefName --template '{{.headRefName}}')
+          echo "sha=$(git rev-parse origin/$HEADREF)" >> $GITHUB_OUTPUT
+          echo "headref=$HEADREF" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Request dispatched PR build
+        if: ${{ steps.pr-create.outputs.pull-request-number && steps.pr-create.outputs.pull-request-operation != 'closed' }}
+        run: >
+          gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
+          -f caller_repo=${{ github.repository }}
+          -f caller_pr_nr=${{ steps.pr-create.outputs.pull-request-number }}
+          -f caller_base_branch=master
+          -f caller_head_branch=${{ steps.pr-infos.outputs.headref }}
+          -f head_sha=${{ steps.pr-infos.outputs.sha }}
+          -f initial_actor="Dr. Lint-a-lot"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}

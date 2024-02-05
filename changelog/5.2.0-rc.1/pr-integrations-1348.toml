@@ -1,0 +1,5 @@
+type = "a"
+message = "Include link to replay an alert in teams and slack notification template."
+
+issues = ["Graylog2/graylog-server#15678"]
+pulls = ["Graylog2/graylog-plugin-integrations#1348"]

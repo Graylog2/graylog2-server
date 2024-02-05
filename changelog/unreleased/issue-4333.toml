@@ -1,0 +1,7 @@
+type = "fixed"
+message = "Error page was shown when navigating to search page with permissions to some streams (usually non-mesage streams, like events), but no permission for default stream. It has been fixed."
+
+issues = ["Graylog2/graylog-plugin-enterprise#4333"]
+pulls = ["17548","Graylog2/graylog-plugin-enterprise#6245"]
+
+

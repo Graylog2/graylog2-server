@@ -38,9 +38,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+
+import jakarta.inject.Inject;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -68,9 +71,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Inject
     public RoleServiceImpl(MongoConnection mongoConnection,
-                              MongoJackObjectMapperProvider mapper,
-                              Permissions permissions,
-                              Validator validator) {
+                           MongoJackObjectMapperProvider mapper,
+                           Permissions permissions,
+                           Validator validator) {
         this.validator = validator;
 
         dbCollection = JacksonDBCollection.wrap(
@@ -83,9 +86,9 @@ public class RoleServiceImpl implements RoleService {
 
         // make sure the two built-in roles actually exist
         adminRoleObjectId = checkNotNull(ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
-                                                           "Grants all permissions for Graylog administrators (built-in)"));
+                "Grants all permissions for Graylog administrators (built-in)"));
         readerRoleObjectId = checkNotNull(ensureBuiltinRole(READER_ROLENAME, permissions.readerBasePermissions(), "Reader",
-                          "Grants basic permissions for every Graylog user (built-in)"));
+                "Grants basic permissions for every Graylog user (built-in)"));
 
     }
 
@@ -96,7 +99,7 @@ public class RoleServiceImpl implements RoleService {
         RoleImpl previousRole = null;
         try {
             previousRole = load(roleName);
-            if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions()))  {
+            if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions())) {
                 final String msg = "Invalid role '" + roleName + "', fixing it.";
                 log.error(msg);
                 throw new IllegalArgumentException(msg); // jump to fix code

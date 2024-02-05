@@ -79,30 +79,30 @@ public class PipelineInterpreterTest {
             "rule \"true\"\n" +
                     "when true\n" +
                     "then\n" +
-                    "end", null, null, null);
+                    "end", null, null, null, null);
     private static final RuleDao RULE_FALSE = RuleDao.create("false", "false", "false",
             "rule \"false\"\n" +
                     "when false\n" +
                     "then\n" +
-                    "end", null, null, null);
+                    "end", null, null, null, null);
     private static final RuleDao RULE_ADD_FOOBAR = RuleDao.create("add_foobar", "add_foobar", "add_foobar",
             "rule \"add_foobar\"\n" +
                     "when true\n" +
                     "then\n" +
                     "  set_field(\"foobar\", \"covfefe\");\n" +
-                    "end", null, null, null);
+                    "end", null, null, null, null);
     private static final java.util.function.Function<String, RuleDao> RULE_SET_FIELD = (name) -> RuleDao.create("false", "false", "false",
             "rule \"" + name + "\"\n" +
                     "when true\n" +
                     "then\n" +
                     "  set_field(\"" + name + "\", \"value\");" +
-                    "end", null, null, null);
+                    "end", null, null, null, null);
     private static final RuleDao RULE_DROP_MESSAGE = RuleDao.create("false", "false", "false",
             "rule \"drop_message\"\n" +
                     "when true\n" +
                     "then\n" +
                     "  drop_message();" +
-                    "end", null, null, null);
+                    "end", null, null, null, null);
     private final MessageQueueAcknowledger messageQueueAcknowledger = mock(MessageQueueAcknowledger.class);
 
     private final RuleService ruleService = Mockito.mock(RuleService.class);
@@ -121,7 +121,7 @@ public class PipelineInterpreterTest {
                                 "  create_message(\"derived message\");\n" +
                                 "end",
                         Tools.nowUTC(),
-                        null, null)
+                        null, null, null)
         ));
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
@@ -436,7 +436,7 @@ public class PipelineInterpreterTest {
                         "then\n" +
                         "end",
                 Tools.nowUTC(),
-                null, null)
+                null, null, null)
         );
 
         final PipelineService pipelineService = new InMemoryPipelineService(new ClusterEventBus());
@@ -529,7 +529,7 @@ public class PipelineInterpreterTest {
                         "    to_double($message.num * $message.num) > 0.0\n" +
                         "then\n" +
                         "    set_field(\"num_sqr\", $message.num * $message.num);\n" +
-                        "end", null, null, null)));
+                        "end", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", "title", "description",
@@ -574,7 +574,7 @@ public class PipelineInterpreterTest {
                         "    has_field(\"num\")\n" +
                         "then\n" +
                         "    set_field(\"num_sqr\", $message.num * $message.num);\n" +
-                        "end", null, null, null)));
+                        "end", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", "title", "description",
@@ -620,7 +620,7 @@ public class PipelineInterpreterTest {
                         "    has_field(\"num\")\n" +
                         "then\n" +
                         "    set_field(\"num_sqr\", to_double($message.num) * to_double($message.num));\n" +
-                        "end", null, null, null)));
+                        "end", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("p1", "title", "description",

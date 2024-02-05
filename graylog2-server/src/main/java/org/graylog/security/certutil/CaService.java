@@ -31,7 +31,9 @@ public interface CaService {
     int DEFAULT_VALIDITY = 10 * 365;
 
     CA get() throws KeyStoreStorageException;
-    void create(final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException;
+
+    void create(String organization, final Integer daysValid, char[] password) throws CACreationException, KeyStoreStorageException, KeyStoreException;
+
     void upload(String pass, List<FormDataBodyPart> parts) throws CACreationException;
     void startOver();
     Optional<KeyStore> loadKeyStore() throws KeyStoreException, KeyStoreStorageException, NoSuchAlgorithmException;

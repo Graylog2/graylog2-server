@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix description for the scenario that one term or value has multiple matching highlighting rules."
+
+pulls = ["16668"]

@@ -24,9 +24,11 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -59,15 +61,23 @@ public class RuleBuilderService {
         this.actionParser = actionParser;
         this.freemarkerConfiguration = secureFreemarkerConfigProvider.get();
         StringTemplateLoader templateLoader = new StringTemplateLoader();
-        actionParser.getActions().entrySet().stream().forEach(f -> templateLoader.putTemplate(f.getKey(), f.getValue().descriptor().ruleBuilderTitle()));
+        conditionParser.getConditions().forEach((key, value) -> templateLoader.putTemplate(key, value.descriptor().ruleBuilderTitle()));
+        actionParser.getActions().forEach((key, value) -> templateLoader.putTemplate(key, value.descriptor().ruleBuilderTitle()));
         freemarkerConfiguration.setTemplateLoader(templateLoader);
     }
 
     public String generateRuleSource(String title, RuleBuilder ruleBuilder, boolean generateSimulatorFields) {
-        //TODO: possible injection here, sanitize input!
         final String rule = String.format(Locale.ROOT, RULE_TEMPLATE, title,
-                conditionParser.generate(ruleBuilder.conditions()),
+                conditionParser.generate(ruleBuilder.conditions(), ruleBuilder.operator(), 1),
                 actionParser.generate(ruleBuilder.actions(), generateSimulatorFields));
+        log.debug(rule);
+        return rule;
+    }
+
+    public String generateSimulatorRuleSourceEvaluatingConditions(RuleBuilder ruleBuilder) {
+        final String rule = String.format(Locale.ROOT, RULE_TEMPLATE, "condition_evaluation",
+                conditionParser.generate(new ArrayList<>(), RuleBuilderStep.Operator.AND, 1),
+                conditionParser.generateConditionVariables(ruleBuilder.conditions()));
         log.debug(rule);
         return rule;
     }

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
-import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
+import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, RelativeTime, SearchForm, Spinner } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import 'components/event-definitions/event-definition-types';
@@ -26,6 +26,10 @@ import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import SchedulingCell from './SchedulingCell';
@@ -36,11 +40,16 @@ import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
 import { ENTITY_TABLE_ID, DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from '../constants';
 
-const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
+const customColumnRenderers = (refetchEventDefinitions: () => void): ColumnRenderers<EventDefinition> => ({
   attributes: {
     title: {
       renderCell: (title: string, eventDefinition) => (
         <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{title}</Link>
+      ),
+    },
+    matched_at: {
+      renderCell: (_matched_at: string, eventDefinition) => (
+        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never'
       ),
     },
     scheduling: {
@@ -50,7 +59,7 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     },
     status: {
       renderCell: (_status: string, eventDefinition) => (
-        <StatusCell status={eventDefinition?.state} />
+        <StatusCell eventDefinition={eventDefinition} refetchEventDefinitions={refetchEventDefinitions} />
       ),
       staticWidth: 100,
     },
@@ -76,11 +85,14 @@ const EventDefinitionsContainer = () => {
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
   });
-  const columnRenderers = customColumnRenderers();
+  const columnRenderers = customColumnRenderers(refetchEventDefinitions);
   const columnDefinitions = useMemo(
     () => ([...(paginatedEventDefinitions?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
     [paginatedEventDefinitions?.attributes],
   );
+
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -92,30 +104,43 @@ const EventDefinitionsContainer = () => {
   }, [onSearch]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.COLUMNS_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-list',
+      app_action_value: 'columns-select',
+      columns: displayedAttributes,
+    });
+
     updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  }, [pathname, sendTelemetry, updateTableLayout]);
 
   const onPageSizeChange = useCallback((newPageSize: number) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.PAGE_SIZE_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-list',
+      app_action_value: 'page-size-select',
+      page_size: newPageSize,
+    });
+
     paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
     updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
+  }, [paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.SORT_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-list',
+      app_action_value: 'sort-select',
+      sort: newSort,
+    });
+
     paginationQueryParameter.resetPage();
     updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
+  }, [paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
 
   const renderEventDefinitionActions = useCallback((listItem: EventDefinition) => (
     <EventDefinitionActions eventDefinition={listItem} refetchEventDefinitions={refetchEventDefinitions} />
   ), [refetchEventDefinitions]);
-
-  const renderBulkActions = (
-    selectedEventDefinitionsIds: Array<string>,
-    setSelectedEventDefinitionsIds: (eventDefinitionsId: Array<string>) => void,
-  ) => (
-    <BulkActions selectedDefinitionsIds={selectedEventDefinitionsIds}
-                 setSelectedEventDefinitionsIds={setSelectedEventDefinitionsIds} />
-  );
 
   if (isLoadingLayoutPreferences || isLoadingEventDefinitions) {
     return <Spinner />;
@@ -143,7 +168,7 @@ const EventDefinitionsContainer = () => {
                                             onSortChange={onSortChange}
                                             onPageSizeChange={onPageSizeChange}
                                             pageSize={layoutConfig.pageSize}
-                                            bulkActions={renderBulkActions}
+                                            bulkSelection={{ actions: <BulkActions /> }}
                                             activeSort={layoutConfig.sort}
                                             actionsCellWidth={160}
                                             rowActions={renderEventDefinitionActions}

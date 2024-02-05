@@ -28,20 +28,17 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.rest.models.Collector;
-import org.graylog.plugins.sidecar.rest.models.CollectorUpload;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationSummary;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationPreviewRequest;
-import org.graylog.plugins.sidecar.rest.responses.CollectorUploadListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationSidecarsResponse;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
-import org.graylog.plugins.sidecar.services.ImportService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -56,27 +53,30 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -101,7 +101,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     private final ConfigurationService configurationService;
     private final SidecarService sidecarService;
     private final EtagService etagService;
-    private final ImportService importService;
     private final CollectorService collectorService;
     private final SearchQueryParser searchQueryParser;
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
@@ -114,12 +113,10 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     public ConfigurationResource(ConfigurationService configurationService,
                                  SidecarService sidecarService,
                                  EtagService etagService,
-                                 ImportService importService,
                                  CollectorService collectorService) {
         this.configurationService = configurationService;
         this.sidecarService = sidecarService;
         this.etagService = etagService;
-        this.importService = importService;
         this.collectorService = collectorService;
         this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
@@ -132,12 +129,12 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                         @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                         @ApiParam(name = "sort",
-                                                                         value = "The field to sort the result on",
-                                                                         required = true,
-                                                                         allowableValues = "name,id,collector_id")
-                                                                     @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
+                                                                  value = "The field to sort the result on",
+                                                                  required = true,
+                                                                  allowableValues = "name,id,collector_id")
+                                                        @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                                     @DefaultValue("asc") @QueryParam("order") String order) {
+                                                        @DefaultValue("asc") @QueryParam("order") String order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Configuration> configurations = this.configurationService.findPaginated(searchQuery, page, perPage, sort, order);
         final long total = this.configurationService.count();
@@ -146,20 +143,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                 .collect(Collectors.toList());
 
         return ConfigurationListResponse.create(query, configurations.pagination(), total, sort, order, result);
-    }
-
-    @GET
-    @Path("/uploads")
-    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "List all uploaded configurations")
-    public CollectorUploadListResponse listImports(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page) {
-        // sort by creation date, latest on top of the list
-        final PaginatedList<CollectorUpload> uploads = this.importService.findPaginated(page, 10, "created", "desc");
-        final long total = this.importService.count();
-        final List<CollectorUpload> result = new ArrayList<>(uploads);
-
-        return CollectorUploadListResponse.create(uploads.pagination(), total, result);
     }
 
     @GET
@@ -182,7 +165,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Show sidecars using the given configuration")
     public ConfigurationSidecarsResponse getConfigurationSidecars(@ApiParam(name = "id", required = true)
-                                                                      @PathParam("id") String id) {
+                                                                  @PathParam("id") String id) {
         final Configuration configuration = this.configurationService.find(id);
         if (configuration == null) {
             throw new NotFoundException("Could not find Configuration <" + id + ">.");
@@ -280,7 +263,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @ApiOperation(value = "Create new configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CREATE)
     public Response createConfiguration(@ApiParam(name = "JSON body", required = true)
-                                             @Valid @NotNull Configuration request) {
+                                        @Valid @NotNull Configuration request) {
         final Configuration configuration = configurationFromRequest(null, request);
         final ValidationResult validationResult = validate(configuration);
         if (validationResult.failed()) {
@@ -323,9 +306,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @ApiOperation(value = "Update a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_UPDATE)
     public Response updateConfiguration(@ApiParam(name = "id", required = true)
-                                             @PathParam("id") String id,
-                                             @ApiParam(name = "JSON body", required = true)
-                                             @Valid @NotNull Configuration request) {
+                                        @PathParam("id") String id,
+                                        @ApiParam(name = "JSON body", required = true)
+                                        @Valid @NotNull Configuration request) {
         final Configuration previousConfiguration = configurationService.find(id);
         if (previousConfiguration == null) {
             throw new NotFoundException("Could not find Configuration <" + id + ">.");
@@ -345,7 +328,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         }
         etagService.invalidateAllConfigurations();
 
-        if (! previousConfiguration.tags().equals(updatedConfiguration.tags())) {
+        if (!previousConfiguration.tags().equals(updatedConfiguration.tags())) {
             final Set<String> tags = Sets.symmetricDifference(previousConfiguration.tags(), updatedConfiguration.tags());
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
@@ -394,7 +377,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (toValidate.name().isEmpty()) {
             validation.addError("name", "Configuration name cannot be empty.");
         } else if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
-                validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &");
+            validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &");
         }
 
         if (toValidate.collectorId().isEmpty()) {

@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.utilities.StringUtils;
 
@@ -67,7 +68,7 @@ public class CloneMessage extends AbstractFunction<Message> {
             }
 
             if (preventLoops.isEmpty() && cloneNumber >= MAX_CLONES) {
-               throw new IllegalStateException(
+                throw new IllegalStateException(
                         StringUtils.f("Message was cloned more than %d times by rule '%s'. Not allowing any more " +
                                         "clones to prevent a potential endless loop. If this was intentional, please " +
                                         "explicitly set the 'preventLoops' parameter to 'false'.",
@@ -95,7 +96,11 @@ public class CloneMessage extends AbstractFunction<Message> {
                 .name(NAME)
                 .params(ImmutableList.of(messageParam, loopDetectionParam))
                 .returnType(Message.class)
-                .description("Clones a message")
+                .description("Clones a message. If no specific message is provided, it clones the currently processed message")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Clone message")
+                .ruleBuilderTitle("Clone message")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

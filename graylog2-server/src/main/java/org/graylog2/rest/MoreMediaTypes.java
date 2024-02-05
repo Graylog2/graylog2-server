@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 public abstract class MoreMediaTypes {
     /**
@@ -71,4 +71,12 @@ public abstract class MoreMediaTypes {
      * A {@link MediaType} constant representing {@value #APPLICATION_JSON} media type.
      */
     public final static MediaType TEXT_PLAIN_TYPE = new MediaType("text", "plain");
+    /**
+     * A {@code String} constant representing {@value #APPLICATION_NDGELF} media type.
+     */
+    public final static String APPLICATION_NDGELF = "application/gelf+x-ndjson";
+    /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_NDGELF} media type.
+     */
+    public final static MediaType APPLICATION_NDGELF_TYPE = new MediaType("application", "gelf+x-ndjson");
 }

@@ -22,7 +22,6 @@ import Timestamp from './Timestamp';
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.useFakeTimers()
-  // @ts-expect-error
   .setSystemTime(mockedUnixTime);
 
 describe('Timestamp', () => {

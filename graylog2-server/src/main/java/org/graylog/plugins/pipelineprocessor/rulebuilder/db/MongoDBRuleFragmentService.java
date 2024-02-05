@@ -28,8 +28,9 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -74,6 +75,17 @@ public class MongoDBRuleFragmentService implements RuleFragmentService {
     @Override
     public void delete(String name) {
         dbCollection.remove(DBQuery.is("name", name));
+    }
+
+    @Override
+    public void deleteAll() {
+        dbCollection.remove(DBQuery.empty());
+    }
+
+
+    @Override
+    public long count(String name) {
+        return dbCollection.getCount(DBQuery.is("name", name));
     }
 
     @Override

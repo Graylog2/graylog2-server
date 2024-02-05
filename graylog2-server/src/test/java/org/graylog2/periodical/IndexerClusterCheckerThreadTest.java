@@ -51,7 +51,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class IndexerClusterCheckerThreadTest {
@@ -79,7 +78,7 @@ public class IndexerClusterCheckerThreadTest {
 
         verify(notificationService, times(1)).isFirst(Notification.Type.ES_OPEN_FILES);
         verifyNoMoreInteractions(notificationService);
-        verifyZeroInteractions(cluster);
+        verifyNoMoreInteractions(cluster);
     }
 
     @Test

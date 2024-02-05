@@ -172,8 +172,8 @@ const MessageProcessorsConfig = () => {
             </tbody>
           </Table>
           {hasNoActiveProcessor() && (
-          <Alert bsStyle="danger">
-            <strong>ERROR:</strong> No active message processor!
+          <Alert bsStyle="danger" title="Error">
+            No active message processor!
           </Alert>
           )}
         </>

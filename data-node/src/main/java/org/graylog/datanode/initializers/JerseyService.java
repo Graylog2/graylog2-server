@@ -19,14 +19,21 @@ package org.graylog.datanode.initializers;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.base.JsonMappingExceptionMapper;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
@@ -42,23 +49,20 @@ import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.CertConstants;
+import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -110,18 +114,20 @@ public class JerseyService extends AbstractIdleService {
 
     @Subscribe
     public synchronized void handleOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) throws Exception {
-        LOG.info("Opensearch config changed, restarting jersey service to apply security changes");
+        if (apiHttpServer == null) {
+            // this is the very first start of the jersey service
+            LOG.info("Starting Data node REST API");
+        } else {
+            // jersey service has been running for some time, now we received new configuration. We'll reboot the service
+            LOG.info("Server configuration changed, restarting Data node REST API to apply security changes");
+        }
         shutDown();
         doStartup(extractSslConfiguration(event.config()));
     }
 
-    /**
-     * TODO: replace this map magic with proper types in OpensearchConfiguration
-     */
     private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) throws GeneralSecurityException, IOException {
         final OpensearchSecurityConfiguration securityConfiguration = config.opensearchSecurityConfiguration();
-        if (securityConfiguration.securityEnabled()) {
-            // caution, this path is relative to the opensearch config directory!
+        if (securityConfiguration != null && securityConfiguration.securityEnabled()) {
             return buildSslEngineConfigurator(securityConfiguration.getHttpCertificate());
         } else {
             return null;
@@ -143,7 +149,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void shutDown() {
-        shutdownHttpServer(apiHttpServer, configuration.getHttpBindAddress());
+        shutdownHttpServer(apiHttpServer, HostAndPort.fromParts(configuration.getBindAddress(), configuration.getDatanodeHttpPort()));
     }
 
     private void shutdownHttpServer(HttpServer httpServer, HostAndPort bindAddress) {
@@ -154,13 +160,12 @@ public class JerseyService extends AbstractIdleService {
     }
 
     private void startUpApi(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
-        final HostAndPort bindAddress = configuration.getHttpBindAddress();
         final String contextPath = configuration.getHttpPublishUri().getPath();
         final URI listenUri = new URI(
                 configuration.getUriScheme(),
                 null,
-                bindAddress.getHost(),
-                bindAddress.getPort(),
+                configuration.getBindAddress(),
+                configuration.getDatanodeHttpPort(),
                 isNullOrEmpty(contextPath) ? "/" : contextPath,
                 null,
                 null
@@ -177,7 +182,7 @@ public class JerseyService extends AbstractIdleService {
 
         apiHttpServer.start();
 
-        LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
+        LOG.info("Started REST API at <{}:{}>", configuration.getBindAddress(), configuration.getDatanodeHttpPort());
     }
 
     private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {
@@ -186,7 +191,7 @@ public class JerseyService extends AbstractIdleService {
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
                 .registerClasses(
-                        JacksonJaxbJsonProvider.class,
+                        JacksonXmlBindJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
                         JacksonPropertyExceptionMapper.class)
@@ -223,11 +228,18 @@ public class JerseyService extends AbstractIdleService {
                              int maxHeaderSize,
                              boolean enableGzip,
                              Set<Resource> additionalResources) {
+        final boolean isSecuredInstance = sslEngineConfigurator != null;
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
+
+        if (isSecuredInstance) {
+            resourceConfig.register(createAuthFilter(configuration));
+        }
+        resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));
+
         final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(
                 listenUri,
                 resourceConfig,
-                sslEngineConfigurator != null,
+                isSecuredInstance,
                 sslEngineConfigurator,
                 false);
 
@@ -252,6 +264,13 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return httpServer;
+    }
+
+    @NotNull
+    private ContainerRequestFilter createAuthFilter(Configuration configuration) {
+        final ContainerRequestFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
+        final AuthTokenValidator tokenVerifier = new JwtTokenValidator(configuration.getPasswordSecret());
+        return new DatanodeAuthFilter(basicAuthFilter, tokenVerifier);
     }
 
     private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation)

@@ -24,11 +24,14 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { keySeparator } from 'views/Constants';
+import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import asMock from 'helpers/mocking/AsMock';
 
 import ChartColorContext from './ChartColorContext';
 
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
 jest.mock('stores/useAppDispatch');
+jest.mock('views/hooks/useExternalValueActions');
 
 const colors = ColorMapper.create();
 const setColor = jest.fn();
@@ -49,6 +52,7 @@ const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false
     unsetWidgetEditing: jest.fn(),
     setWidgetEditing: jest.fn(),
   }}>
+
     <ChartColorContext.Provider value={{ colors, setColor }}>
       <PlotLegend config={plotConfig} chartData={chartDataProp} neverHide={neverHide}>
         <div>Plot</div>
@@ -58,6 +62,14 @@ const SUT = ({ chartDataProp = chartData, plotConfig = config, neverHide = false
 );
 
 describe('PlotLegend', () => {
+  beforeEach(() => {
+    asMock(useExternalValueActions).mockReturnValue({
+      isLoading: false,
+      externalValueActions: [],
+      isError: false,
+    });
+  });
+
   it('should render the plot legend', async () => {
     render(<SUT />);
     await screen.findByText('name1');

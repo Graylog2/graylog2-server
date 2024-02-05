@@ -18,18 +18,17 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
-import java.util.Objects;
-import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -38,12 +37,10 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 public class V20230613154400_AddImplicitToStringFragments extends Migration {
     private static final Logger log = LoggerFactory.getLogger(V20230613154400_AddImplicitToStringFragments.class);
     private final RuleFragmentService ruleFragmentService;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V20230613154400_AddImplicitToStringFragments(RuleFragmentService ruleFragmentService, ClusterConfigService clusterConfigService) {
+    public V20230613154400_AddImplicitToStringFragments(RuleFragmentService ruleFragmentService) {
         this.ruleFragmentService = ruleFragmentService;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -54,15 +51,10 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
     @Override
     public void upgrade() {
         log.debug("Adding implicit to_string fragments via migration");
-        if (Objects.nonNull(clusterConfigService.get(MigrationCompleted.class))) {
-            log.debug("Migration already completed!");
-//            return;
-        }
 
-        addFragment(createSubstringFragment());
-        addFragment(createDateFragment());
+        ruleFragmentService.upsert(createSubstringFragment());
+        ruleFragmentService.upsert(createDateFragment());
 
-        clusterConfigService.write(new MigrationCompleted());
         log.debug("implicit to_string fragments were successfully added");
     }
 
@@ -77,14 +69,16 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                 .descriptor(FunctionDescriptor.builder()
                         .name("get_substring")
                         .params(ImmutableList.of(
-                                object("value").primary().description("The string to extract from").primary().build(),
+                                object("value").ruleBuilderVariable().description("The string to extract from").ruleBuilderVariable().build(),
                                 integer("start").allowNegatives(true).description("The position to start from, negative means count back from the end of the String by this many characters").build(),
                                 integer("end").optional().allowNegatives(true).description("The position to end at (exclusive), negative means count back from the end of the String by this many characters, defaults to length of the input string").build()
                         ))
                         .returnType(String.class)
                         .description("Get substring of value")
-                        .ruleBuilderEnabled()
+                        .ruleBuilderEnabled(false)
+                        .ruleBuilderName("Substring")
                         .ruleBuilderTitle("Get substring from '${start}' to '${end!\"end\"}' of value")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                         .build())
                 .fragmentOutputVariable("gl2_fragment_substring_results")
                 .build();
@@ -97,30 +91,25 @@ public class V20230613154400_AddImplicitToStringFragments extends Migration {
                           value: to_string(${value}),
                           pattern: ${pattern}<#if locale??>,
                           locale: ${locale}</#if><#if timezone??>,
-                          locale: ${timezone}</#if>
+                          timezone: ${timezone}</#if>
                         );""")
                 .descriptor(FunctionDescriptor.builder()
                         .name("get_date")
                         .params(ImmutableList.of(
-                                object("value").primary().description("Date string to parse").build(),
+                                object("value").ruleBuilderVariable().description("Date string to parse").build(),
                                 string("pattern").description("The pattern to parse the date with, see http://www.joda.org/joda-time/apidocs/org/joda/time/format/DateTimeFormat.html").build(),
                                 string("locale").optional().description("The locale to parse the date with, see https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html").build(),
                                 string("timezone").optional().description("The timezone to apply to the date, defaults to UTC").build()
                         ))
                         .returnType(DateTime.class)
                         .description("Parses a value using the given date format")
-                        .ruleBuilderEnabled()
+                        .ruleBuilderEnabled(false)
+                        .ruleBuilderName("Parse date")
                         .ruleBuilderTitle("Parse date from value")
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)
                         .build())
                 .fragmentOutputVariable("gl2_fragment_date_results")
                 .build();
     }
 
-    private void addFragment(RuleFragment ruleFragment) {
-        Optional<RuleFragment> existingFragment = ruleFragmentService.get(ruleFragment.getName());
-        existingFragment.ifPresent(fragment -> ruleFragmentService.delete(fragment.getName()));
-        ruleFragmentService.save(ruleFragment);
-    }
-
-    public record MigrationCompleted() {}
 }

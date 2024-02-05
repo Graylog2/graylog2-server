@@ -40,11 +40,11 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,6 +60,7 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamEntityIdOrThrow;
 
 @AutoValue
 @JsonAutoDetect
@@ -89,10 +90,25 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
     @JsonIgnore
     public abstract Optional<GlobalOverride> globalOverride();
 
+    @Deprecated
+    /**
+     * @deprecated {@link Query#effectiveTimeRange(SearchType, DateTime)} is preferred, as it prevents problems with slight time differences between different search types.
+     */
     public TimeRange effectiveTimeRange(SearchType searchType) {
         return searchType.timerange()
                 .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
                 .orElse(this.timerange());
+    }
+
+    public TimeRange effectiveTimeRange(final SearchType searchType, final DateTime nowUTC) {
+        final TimeRange effectiveTimeRange = searchType.timerange()
+                .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
+                .orElse(this.timerange());
+
+        if (effectiveTimeRange instanceof RelativeRange) {
+            return ((RelativeRange) effectiveTimeRange).toBuilder().nowUTC(nowUTC).build();
+        }
+        return effectiveTimeRange;
     }
 
     public Set<String> effectiveStreams(SearchType searchType) {
@@ -290,8 +306,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                             .map(filter -> {
                                 if (filter.type().equals(StreamFilter.NAME)) {
                                     final StreamFilter streamFilter = (StreamFilter) filter;
-                                    final String streamId = entityDescriptorIds.
-                                            getOrThrow(streamFilter.streamId(), ModelTypes.STREAM_V1);
+                                    final String streamId = getStreamEntityIdOrThrow(streamFilter.streamId(), entityDescriptorIds);
                                     return streamFilter.toBuilder().streamId(streamId).build();
                                 }
                                 return filter;

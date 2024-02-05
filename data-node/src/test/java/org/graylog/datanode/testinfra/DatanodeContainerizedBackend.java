@@ -16,149 +16,98 @@
  */
 package org.graylog.datanode.testinfra;
 
+import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
-import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.graylog.testing.graylognode.MavenPackager;
-import org.graylog.testing.graylognode.NodeContainerConfig;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.images.builder.ImageFromDockerfile;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.Properties;
 
 public class DatanodeContainerizedBackend {
-
-    public static final int DATANODE_REST_PORT = 8999;
-    public static final int DATANODE_OPENSEARCH_PORT = 9200;
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
+    static public final String SIGNING_SECRET = ContainerizedGraylogBackend.PASSWORD_SECRET;
+    public static final int DATANODE_REST_PORT = 8999;
+    public static final int DATANODE_OPENSEARCH_HTTP_PORT = 9200;
+    public static final int DATANODE_OPENSEARCH_TRANSPORT_PORT = 9300;
+
     private final Network network;
-    private final GenericContainer<?> mongodbContainer;
+    private boolean shouldCloseNetwork = false;
+    private final MongoDBTestService mongoDBTestService;
+    private boolean shouldCloseMongodb = false;
     private final GenericContainer<?> datanodeContainer;
+    private String nodeName;
 
     public DatanodeContainerizedBackend() {
         this(new DatanodeDockerHooksAdapter());
     }
 
-
     public DatanodeContainerizedBackend(DatanodeDockerHooks hooks) {
-        this.network = Network.newNetwork();
-        this.mongodbContainer = createMongodbContainer();
-        this.datanodeContainer = createDatanodeContainer(
-                "node1",
-                hooks, createDockerImageFile(getOpensearchVersion()),
-                getDatanodeVersion());
+        this("node1", hooks);
     }
 
-    public DatanodeContainerizedBackend(Network network, GenericContainer<?> mongodbContainer, String nodeName, DatanodeDockerHooks hooks) {
-        this.network = network;
-        this.mongodbContainer = mongodbContainer;
+    public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
+
+        this.network = Network.newNetwork();
+        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, this.network);
+        this.mongoDBTestService.start();
+
+        // we have created these resources, we have to close them.
+        this.shouldCloseNetwork = true;
+        this.shouldCloseMongodb = true;
+
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
-                hooks,
-                createDockerImageFile(getOpensearchVersion()),
-                getDatanodeVersion());
+                hooks);
     }
 
-    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion) {
-
-        MavenPackager.packageJarIfNecessary(createConfig());
-
-        GenericContainer<?> container = new GenericContainer<>(image)
-                .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
-                .withNetwork(network)
-
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")
-                .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/bin/config")
-
-                .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb/graylog")
-                .withEnv("GRAYLOG_DATANODE_NODE_NAME", nodeName)
-
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_HTTP_PORT", "" + DATANODE_OPENSEARCH_PORT)
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_TRANSPORT_PORT", "9300")
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", "node1:9300")
-
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
-
-                .withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin")
-                .withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin")
-                .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", "this_is_not_used_but_required")
-
-                .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
-                .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + DATANODE_REST_PORT)
-                .withNetworkAliases(nodeName)
-                .dependsOn(mongodbContainer)
-                .waitingFor(new LogMessageWaitStrategy()
-                        .withRegEx(".*Graylog DataNode datanode up and running.\n")
-                        .withStartupTimeout(Duration.ofSeconds(60)));
-        container.withFileSystemBind("target/graylog-datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
-                .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
-        customizer.onContainer(container);
-        return container;
+    public DatanodeContainerizedBackend(Network network, MongoDBTestService mongoDBTestService, String nodeName, DatanodeDockerHooks hooks) {
+        this.network = network;
+        this.mongoDBTestService = mongoDBTestService;
+        this.datanodeContainer = createDatanodeContainer(
+                nodeName,
+                hooks);
     }
 
-    private NodeContainerConfig createConfig() {
-        return new NodeContainerConfig(this.network, this.mongodbContainer.getHost(), null, null, new int[]{}, new DefaultPluginJarsProvider(),new DefaultMavenProjectDirProvider(), Collections.emptyList());
-    }
+    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer) {
+        this.nodeName = nodeName;
+        MavenPackager.packageJarIfNecessary(new DefaultMavenProjectDirProvider());
 
-    private static ImageFromDockerfile createDockerImageFile(String opensearchVersion) {
-        final String opensearchTarArchive = "opensearch-" + opensearchVersion + "-linux-x64.tar.gz";
-        return new ImageFromDockerfile("local/graylog-datanode:latest", false)
-                // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
-                // be later used by the ADD command
-                .withFileFromPath(opensearchTarArchive, Path.of("target", "downloads", opensearchTarArchive))
-                .withDockerfileFromBuilder(builder ->
-                        builder.from("eclipse-temurin:17-jre-jammy")
-                                .workDir(IMAGE_WORKING_DIR)
-                                .run("mkdir -p config")
-                                .run("mkdir -p config/opensearch")
-                                .run("mkdir -p bin")
-                                .run("mkdir -p bin/config")
-                                .run("mkdir -p data")
-                                .run("mkdir -p logs")
-                                .add(opensearchTarArchive, ".") // this will automatically extract the tar
-                                .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
-                                .run("useradd opensearch")
-                                .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
-                                .user("opensearch")
-                                .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
-                                .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
-                                .build());
+        return new DatanodeDevContainerBuilder()
+                .restPort(DATANODE_REST_PORT)
+                .openSearchHttpPort(DATANODE_OPENSEARCH_HTTP_PORT)
+                .openSearchTransportPort(DATANODE_OPENSEARCH_TRANSPORT_PORT)
+                .mongoDbUri(mongoDBTestService.internalUri())
+                .nodeName(nodeName)
+                .network(network)
+                .passwordSecret(ContainerizedGraylogBackend.PASSWORD_SECRET)
+                .rootPasswordSha2(ContainerizedGraylogBackend.ROOT_PASSWORD_SHA_2)
+                .customizer(customizer)
+                .build();
     }
-
-    private GenericContainer<?> createMongodbContainer() {
-        return new GenericContainer<>("mongo:5.0")
-                .withNetwork(network)
-                .withNetworkAliases("mongodb")
-                .withExposedPorts(27017);
-    }
-
 
     public DatanodeContainerizedBackend start() {
-        mongodbContainer.start();
         datanodeContainer.start();
         return this;
     }
 
     public void stop() {
         datanodeContainer.stop();
-        mongodbContainer.stop();
-        network.close();
+        if (shouldCloseMongodb) {
+            mongoDBTestService.close();
+        }
+        if (shouldCloseNetwork) {
+            network.close();
+        }
     }
 
     public Network getNetwork() {
         return network;
     }
 
-    public GenericContainer<?> getMongodbContainer() {
-        return mongodbContainer;
+    public MongoDBTestService getMongoDb() {
+        return mongoDBTestService;
     }
 
     public String getLogs() {
@@ -171,26 +120,14 @@ public class DatanodeContainerizedBackend {
 
 
     public Integer getOpensearchRestPort() {
-        return datanodeContainer.getMappedPort(DATANODE_OPENSEARCH_PORT);
+        return datanodeContainer.getMappedPort(DATANODE_OPENSEARCH_HTTP_PORT);
     }
 
-    private String getDatanodeVersion() {
-        try {
-            final Properties props = new Properties();
-            props.load(getClass().getResourceAsStream("/version.properties"));
-            return props.getProperty("project.version");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public Integer getOpensearchTransportPort() {
+        return datanodeContainer.getMappedPort(DATANODE_OPENSEARCH_TRANSPORT_PORT);
     }
 
-    private String getOpensearchVersion() {
-        try {
-            final Properties props = new Properties();
-            props.load(getClass().getResourceAsStream("/opensearch.properties"));
-            return props.getProperty("opensearchVersion");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public String getNodeName() {
+        return nodeName;
     }
 }

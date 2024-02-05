@@ -98,8 +98,8 @@ config:
           type: noop
       basic_internal_auth_domain:
         description: "Authenticate via HTTP Basic against internal users database"
-        http_enabled: true
-        transport_enabled: true
+        http_enabled: false
+        transport_enabled: false
         order: 4
         http_authenticator:
           type: basic
@@ -121,8 +121,8 @@ config:
           type: noop
       jwt_auth_domain:
         description: "Authenticate via Json Web Token"
-        http_enabled: false
-        transport_enabled: false
+        http_enabled: true
+        transport_enabled: true
         order: 0
         http_authenticator:
           type: jwt
@@ -131,7 +131,7 @@ config:
             signing_key: "base64 encoded HMAC key or public RSA/ECDSA pem key"
             jwt_header: "Authorization"
             jwt_url_parameter: null
-            roles_key: null
+            roles_key: "os_roles"
             subject_key: null
         authentication_backend:
           type: noop

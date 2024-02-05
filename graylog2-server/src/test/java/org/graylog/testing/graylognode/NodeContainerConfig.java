@@ -25,6 +25,7 @@ import org.testcontainers.containers.Network;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class NodeContainerConfig {
@@ -35,6 +36,8 @@ public class NodeContainerConfig {
 
     public final Network network;
     public final String mongoDbUri;
+    public final String passwordSecret;
+    public final String rootPasswordSha2;
     public final SearchVersion elasticsearchVersion;
     public final String elasticsearchUri;
     public final int[] extraPorts;
@@ -44,17 +47,23 @@ public class NodeContainerConfig {
     public final MavenProjectDirProvider mavenProjectDirProvider;
     private final List<String> enabledFeatureFlags;
     public final Optional<String> proxiedRequestsTimeout;
+    public final Map<String, String> configParams;
 
     public NodeContainerConfig(Network network,
                                String mongoDbUri,
+                               final String passwordSecret,
+                               final String rootPasswordSha2,
                                String elasticsearchUri,
                                SearchVersion elasticsearchVersion,
                                int[] extraPorts,
                                PluginJarsProvider pluginJarsProvider,
                                MavenProjectDirProvider mavenProjectDirProvider,
-                               List<String> enabledFeatureFlags) {
+                               List<String> enabledFeatureFlags,
+                               Map<String, String> configParams) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
+        this.passwordSecret = passwordSecret;
+        this.rootPasswordSha2 = rootPasswordSha2;
         this.elasticsearchUri = elasticsearchUri;
         this.elasticsearchVersion = elasticsearchVersion;
         this.extraPorts = extraPorts == null ? new int[0] : extraPorts;
@@ -64,6 +73,7 @@ public class NodeContainerConfig {
         this.mavenProjectDirProvider = mavenProjectDirProvider;
         this.enabledFeatureFlags = enabledFeatureFlags == null ? Collections.emptyList() : enabledFeatureFlags;
         this.proxiedRequestsTimeout = stringFromEnvVar("GRAYLOG_IT_PROXIED_REQUESTS_TIMEOUT");
+        this.configParams = configParams;
     }
 
     private static boolean flagFromEnvVar(String flagName) {

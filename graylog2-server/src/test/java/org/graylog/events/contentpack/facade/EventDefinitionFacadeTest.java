@@ -43,6 +43,7 @@ import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.scheduler.DBJobDefinitionService;
@@ -149,7 +150,7 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, entityOwnershipService, new EntityScopeService(ENTITY_SCOPES));
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, entityOwnershipService, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
         eventDefinitionHandler = new EventDefinitionHandler(
                 eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
@@ -355,7 +356,7 @@ public class EventDefinitionFacadeTest {
         EntityDescriptor eventDescriptor = EntityDescriptor
                 .create("5d4032513d2746703d1467f6", ModelTypes.EVENT_DEFINITION_V1);
         EntityDescriptor streamDescriptor = EntityDescriptor
-                .create("5cdab2293d27467fbe9e8a72", ModelTypes.STREAM_V1);
+                .create("5cdab2293d27467fbe9e8a72", ModelTypes.STREAM_REF_V1);
         Set<EntityDescriptor> expectedNodes = ImmutableSet.of(eventDescriptor, streamDescriptor);
         Graph<EntityDescriptor> graph = facade.resolveNativeEntity(eventDescriptor);
         assertThat(graph).isNotNull();

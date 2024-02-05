@@ -171,48 +171,6 @@ public class MessageTest {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
-    public void testAddStringFields() throws Exception {
-        final Map<String, String> map = Maps.newHashMap();
-
-        map.put("field1", "Foo");
-        map.put("field2", "Bar");
-
-        message.addStringFields(map);
-
-        assertEquals("Foo", message.getField("field1"));
-        assertEquals("Bar", message.getField("field2"));
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testAddLongFields() throws Exception {
-        final Map<String, Long> map = Maps.newHashMap();
-
-        map.put("field1", 10L);
-        map.put("field2", 230L);
-
-        message.addLongFields(map);
-
-        assertEquals(10L, message.getField("field1"));
-        assertEquals(230L, message.getField("field2"));
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testAddDoubleFields() throws Exception {
-        final Map<String, Double> map = Maps.newHashMap();
-
-        map.put("field1", 10.0d);
-        map.put("field2", 230.2d);
-
-        message.addDoubleFields(map);
-
-        assertEquals(10.0d, message.getField("field1"));
-        assertEquals(230.2d, message.getField("field2"));
-    }
-
-    @Test
     public void testRemoveField() throws Exception {
         message.addField("foo", "bar");
 
@@ -357,13 +315,13 @@ public class MessageTest {
         final DateTime dateTime = new DateTime(2015, 9, 8, 0, 0, DateTimeZone.UTC);
 
         message.addField(Message.FIELD_TIMESTAMP,
-                         dateTime.toDate());
+                dateTime.toDate());
 
         final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
         assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
-                     Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
+                Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
     }
 
     @Test
@@ -390,6 +348,26 @@ public class MessageTest {
         assertFalse(Message.validKey("foo+bar"));
         assertFalse(Message.validKey("foo$bar"));
         assertFalse(Message.validKey(" "));
+    }
+
+    @Test
+    public void testCleanKey() throws Exception {
+        // Valid keys
+        assertEquals("foo123", Message.cleanKey("foo123"));
+        assertEquals("foo-bar123", Message.cleanKey("foo-bar123"));
+        assertEquals("foo_bar123", Message.cleanKey("foo_bar123"));
+        assertEquals("foo.bar123", Message.cleanKey("foo.bar123"));
+        assertEquals("foo@bar", Message.cleanKey("foo@bar"));
+        assertEquals("123", Message.cleanKey("123"));
+        assertEquals("", Message.cleanKey(""));
+
+        assertEquals("foo_bar", Message.cleanKey("foo bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo+bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo$bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo{bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo,bar"));
+        assertEquals("foo_bar", Message.cleanKey("foo?bar"));
+        assertEquals("_", Message.cleanKey(" "));
     }
 
     @Test
@@ -510,22 +488,6 @@ public class MessageTest {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
-    public void testGetValidationErrorsWithEmptyMessage() throws Exception {
-        final Message message = new Message("", "source", Tools.nowUTC());
-
-        assertEquals("message is empty, ", message.getValidationErrors());
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testGetValidationErrorsWithNullMessage() throws Exception {
-        final Message message = new Message(null, "source", Tools.nowUTC());
-
-        assertEquals("message is missing, ", message.getValidationErrors());
-    }
-
-    @Test
     public void testGetFields() throws Exception {
         final Map<String, Object> fields = message.getFields();
 
@@ -604,9 +566,9 @@ public class MessageTest {
     @Test
     public void fieldTest() {
         assertThat(Message.sizeForField("", true)).isEqualTo(4);
-        assertThat(Message.sizeForField("", (byte)1)).isEqualTo(1);
-        assertThat(Message.sizeForField("", (char)1)).isEqualTo(2);
-        assertThat(Message.sizeForField("", (short)1)).isEqualTo(2);
+        assertThat(Message.sizeForField("", (byte) 1)).isEqualTo(1);
+        assertThat(Message.sizeForField("", (char) 1)).isEqualTo(2);
+        assertThat(Message.sizeForField("", (short) 1)).isEqualTo(2);
         assertThat(Message.sizeForField("", 1)).isEqualTo(4);
         assertThat(Message.sizeForField("", 1L)).isEqualTo(8);
         assertThat(Message.sizeForField("", 1.0f)).isEqualTo(4);

@@ -58,6 +58,7 @@ public interface Notification extends Persisted {
     Notification addNode(String nodeId);
 
     enum Type {
+        DATA_NODE_NEEDS_PROVISIONING,
         DEFLECTOR_EXISTS_AS_INDEX,
         @Deprecated MULTI_MASTER, // use MULTI_LEADER instead
         @Deprecated NO_MASTER, // use NO_LEADER instead
@@ -80,6 +81,7 @@ public interface Notification extends Persisted {
         OUTPUT_FAILING,
         INDEX_RANGES_RECALCULATION,
         GENERIC,
+        GENERIC_WITH_LINK,
         ES_INDEX_BLOCKED,
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
@@ -89,7 +91,10 @@ public interface Notification extends Persisted {
         MULTI_LEADER,
         NO_LEADER,
         ARCHIVING_SUMMARY,
-        SEARCH_ERROR
+        SEARCH_ERROR,
+        SIDECAR_STATUS_UNKNOWN,
+        CERTIFICATE_NEEDS_RENEWAL,
+        EVENT_LIMIT_REACHED
     }
 
     enum Severity {

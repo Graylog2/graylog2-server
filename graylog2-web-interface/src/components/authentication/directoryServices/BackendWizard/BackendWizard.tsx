@@ -55,8 +55,7 @@ const FORMS_VALIDATION = {
 const SubmitAllError = ({ error, backendId }: { error: FetchError, backendId: string | null | undefined }) => (
   <Row>
     <Col xs={9} xsOffset={3}>
-      <Alert bsStyle="danger" style={{ wordBreak: 'break-word' }}>
-        <b>Failed to {backendId ? 'edit' : 'create'} authentication service</b><br />
+      <Alert bsStyle="danger" style={{ wordBreak: 'break-word' }} title={`Failed to ${backendId ? 'edit' : 'create'} authentication service`}>
         {error?.message && <>{error.message}<br /><br /></>}
         {error?.additional?.res?.text}
       </Alert>

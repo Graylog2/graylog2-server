@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
-import org.apache.logging.log4j.util.Strings;
+import jakarta.inject.Inject;
 import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
@@ -44,12 +44,15 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.HasOptionalField;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -58,19 +61,21 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.graylog.events.search.MoreSearch.luceneEscape;
+import static org.graylog2.notifications.Notification.Type.EVENT_LIMIT_REACHED;
 
 public class AggregationEventProcessor implements EventProcessor {
     public interface Factory extends EventProcessor.Factory<AggregationEventProcessor> {
@@ -88,6 +93,8 @@ public class AggregationEventProcessor implements EventProcessor {
     private final MoreSearch moreSearch;
     private final EventStreamService eventStreamService;
     private final Messages messages;
+    private final NotificationService notificationService;
+    private final PermittedStreams permittedStreams;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -96,7 +103,8 @@ public class AggregationEventProcessor implements EventProcessor {
                                      DBEventProcessorStateService stateService,
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
-                                     Messages messages) {
+                                     Messages messages, NotificationService notificationService,
+                                     PermittedStreams permittedStreams) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -105,6 +113,8 @@ public class AggregationEventProcessor implements EventProcessor {
         this.moreSearch = moreSearch;
         this.eventStreamService = eventStreamService;
         this.messages = messages;
+        this.notificationService = notificationService;
+        this.permittedStreams = permittedStreams;
     }
 
     @Override
@@ -183,7 +193,8 @@ public class AggregationEventProcessor implements EventProcessor {
             LOG.debug("scrollQueryString: {}", scrollQueryString);
 
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
-            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
+            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.filters(),
+                    config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
         }
     }
 
@@ -214,8 +225,12 @@ public class AggregationEventProcessor implements EventProcessor {
 
     private void filterSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                               EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
-        final Set<String> streams = getStreams(parameters);
+        Set<String> streams = getStreams(parameters);
+        if (streams.isEmpty()) {
+            streams = new HashSet<>(permittedStreams.loadAllMessageStreams(streamId -> true));
+        }
 
+        final AtomicInteger messageCount = new AtomicInteger(0);
         final MoreSearch.ScrollCallback callback = (messages, continueScrolling) -> {
             final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
 
@@ -236,12 +251,31 @@ public class AggregationEventProcessor implements EventProcessor {
                         .build());
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
+                if (config.eventLimit() != 0) {
+                    if (messageCount.incrementAndGet() >= config.eventLimit()) {
+                        eventsConsumer.accept(eventsWithContext.build());
+                        throw new EventLimitReachedException();
+                    }
+                }
             }
-
             eventsConsumer.accept(eventsWithContext.build());
         };
 
-        moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+        try {
+            moreSearch.scrollQuery(config.query(), streams, config.filters(), config.queryParameters(),
+                    parameters.timerange(), parameters.batchSize(), callback);
+        } catch (EventLimitReachedException e) {
+            notificationService.publishIfFirst(notificationService.buildNow()
+                    .addType(EVENT_LIMIT_REACHED)
+                    .addKey(eventDefinition.id())
+                    .addDetail("event_definition_title", eventDefinition.title())
+                    .addDetail("event_definition_id", eventDefinition.id())
+                    .addDetail("event_limit", config.eventLimit())
+                    .addSeverity(Notification.Severity.NORMAL)
+            );
+
+            LOG.debug("Event limit reached at {} for '{}/{}' event definition.", config.eventLimit(), eventDefinition.title(), eventDefinition.id());
+        }
     }
 
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
@@ -291,7 +325,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 continue;
             }
 
-            final String keyString = Strings.join(keyResult.key(), '|');
+            final String keyString = String.join("|", keyResult.key());
             final String eventMessage = createEventMessageString(keyString, keyResult);
 
             // Extract event time and range from the key result or use query time range as fallback.
@@ -400,5 +434,8 @@ public class AggregationEventProcessor implements EventProcessor {
 
     private String formatSeriesValue(AggregationSeriesValue seriesValue) {
         return String.format(Locale.ROOT, "%s=%s", seriesValue.series().literal(), seriesValue.value());
+    }
+
+    private static class EventLimitReachedException extends RuntimeException {
     }
 }

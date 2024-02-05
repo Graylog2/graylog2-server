@@ -27,13 +27,22 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { useStore } from 'stores/connect';
-
-const onSave = (stream: Stream) => StreamsStore.save(stream, () => {
-  UserNotification.success('Stream has been successfully created.', 'Success');
-});
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
+  const sendTelemetry = useSendTelemetry();
+
+  const onSave = (stream: Stream) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
+      app_pathname: 'streams',
+    });
+
+    return StreamsStore.save(stream, () => {
+      UserNotification.success('Stream has been successfully created.', 'Success');
+    });
+  };
 
   useEffect(() => {
     IndexSetsActions.list(false);
@@ -58,7 +67,7 @@ const StreamsPage = () => {
                                           onCreate={onSave}
                                           indexSets={indexSets} />
                     </IfPermitted>
-          )}>
+                  )}>
         <span>
           You can route incoming messages into streams by applying rules against them. Messages matching
           the rules of a stream are routed into it. A message can also be routed into multiple streams.

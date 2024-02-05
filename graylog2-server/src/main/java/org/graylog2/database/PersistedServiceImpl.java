@@ -22,6 +22,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.Persisted;
@@ -99,23 +101,29 @@ public class PersistedServiceImpl implements PersistedService {
     }
 
     protected <T extends Persisted> DBCollection collection(Class<T> modelClass) {
+        return collection(collectionName(modelClass));
+    }
+
+    protected <T extends Persisted> String collectionName(final Class<T> modelClass) {
         DbEntity dbEntityAnnotation = modelClass.getAnnotation(DbEntity.class);
         if (dbEntityAnnotation == null) {
             CollectionName collectionNameAnnotation = modelClass.getAnnotation(CollectionName.class);
             if (collectionNameAnnotation == null) {
                 throw new RuntimeException("Unable to determine collection for class " + modelClass.getCanonicalName());
             } else {
-                final String collectionName = collectionNameAnnotation.value();
-                return collection(collectionName);
+                return collectionNameAnnotation.value();
             }
         } else {
-            final String collectionName = dbEntityAnnotation.collection();
-            return collection(collectionName);
+            return dbEntityAnnotation.collection();
         }
     }
 
     protected <T extends Persisted> DBCollection collection(T model) {
         return collection(model.getClass());
+    }
+
+    protected <T extends Persisted> MongoCollection<Document> mongoCollection(final Class<T> modelClass) {
+        return mongoConnection.getMongoDatabase().getCollection(collectionName(modelClass));
     }
 
     protected List<DBObject> cursorToList(DBCursor cursor) {

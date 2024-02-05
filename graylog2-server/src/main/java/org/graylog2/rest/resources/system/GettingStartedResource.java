@@ -28,12 +28,14 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.DisplayGettingStarted;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
 import java.util.Locale;
 
 @RequiresAuthentication
@@ -54,7 +56,7 @@ public class GettingStartedResource extends RestResource {
     public DisplayGettingStarted displayGettingStarted() {
         final GettingStartedState gettingStartedState = clusterConfigService.get(GettingStartedState.class);
         if (gettingStartedState == null) {
-            return  DisplayGettingStarted.create(true);
+            return DisplayGettingStarted.create(true);
         }
         final boolean isDismissed = gettingStartedState.dismissedInVersions().contains(currentMinorVersionString());
         return DisplayGettingStarted.create(!isDismissed);
@@ -66,7 +68,7 @@ public class GettingStartedResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
     public void dismissGettingStarted() {
         final GettingStartedState gettingStartedState = clusterConfigService.getOrDefault(GettingStartedState.class,
-                                                                                GettingStartedState.create(Sets.<String>newHashSet()));
+                GettingStartedState.create(Sets.<String>newHashSet()));
         gettingStartedState.dismissedInVersions().add(currentMinorVersionString());
         clusterConfigService.write(gettingStartedState);
 
@@ -74,7 +76,7 @@ public class GettingStartedResource extends RestResource {
 
     private static String currentMinorVersionString() {
         return String.format(Locale.ENGLISH, "%d.%d",
-                             Version.CURRENT_CLASSPATH.getVersion().getMajorVersion(),
-                             Version.CURRENT_CLASSPATH.getVersion().getMinorVersion());
+                Version.CURRENT_CLASSPATH.getVersion().getMajorVersion(),
+                Version.CURRENT_CLASSPATH.getVersion().getMinorVersion());
     }
 }

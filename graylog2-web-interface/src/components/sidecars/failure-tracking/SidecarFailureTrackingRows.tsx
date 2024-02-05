@@ -28,8 +28,7 @@ import type { Collector, SidecarSummary } from '../types';
 
 const VerboseMessageContainer = styled.div`
   height: 80px;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  overflow: hidden scroll;
   white-space: pre-wrap;
   margin-bottom: 6px;
 `;

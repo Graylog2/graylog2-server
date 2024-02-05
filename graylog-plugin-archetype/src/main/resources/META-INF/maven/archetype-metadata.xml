@@ -64,6 +64,13 @@
             </includes>
         </fileSet>
 
+        <fileSet filtered="true"  encoding="UTF-8">
+            <directory>.mvn</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
         <fileSet filtered="true" encoding="UTF-8">
             <directory></directory>
             <includes>

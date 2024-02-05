@@ -28,6 +28,10 @@ public abstract class Migration implements Comparable<Migration> {
 
     public abstract void upgrade();
 
+    public MigrationType migrationType() {
+        return MigrationType.STANDARD;
+    }
+
     @Override
     public int compareTo(Migration that) {
         return COMPARATOR.compare(this, that);

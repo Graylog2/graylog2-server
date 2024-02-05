@@ -22,6 +22,7 @@ import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export type GeoVendorType = 'MAXMIND' | 'IPINFO'
 export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS'
@@ -74,13 +75,12 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   };
 
   const handleSubmit = (values: GeoIpConfigType) => {
-    sendTelemetry('form_submit', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.GEOLOCATION_CONFIGURATION_UPDATED, {
       app_pathname: 'configurations',
       app_section: 'geolocation-processor',
-      app_action_value: 'configuration-save',
     });
 
-    updateConfig(values)
+    return updateConfig(values)
       .then((value: GeoIpConfigType) => {
         if ('enabled' in value) {
           setShowModal(false);
@@ -140,9 +140,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       <Modal show={showModal}
              onHide={resetConfig}
              aria-modal="true"
-             aria-labelledby="dialog_label"
-             data-app-section="configurations_geolocation_processor"
-             data-event-element={modalTitle}>
+             aria-labelledby="dialog_label">
         <Formik onSubmit={handleSubmit} initialValues={curConfig}>
           {({ values, setFieldValue, isSubmitting }) => (
             <Form>

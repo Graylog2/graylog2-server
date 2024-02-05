@@ -16,21 +16,15 @@
  */
 import * as React from 'react';
 import { renderWithDataRouter } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
 
 import RulesPage from './RulesPage';
 
 describe('RulesPage', () => {
-  it('should show 2 options on create rule: Rule Bulder and Source Code', () => {
-    const { getByRole, getByText } = renderWithDataRouter(<RulesPage />);
+  it('should show create rule button', () => {
+    const { getByRole } = renderWithDataRouter(<RulesPage />);
 
     const createRuleButton = getByRole('button', { name: 'Create Rule' });
-    userEvent.click(createRuleButton);
 
-    const useRuleBuilderButton = getByText('Use Rule Builder');
-    const useSourceCodeButton = getByText('Use Source Code');
-
-    expect(useRuleBuilderButton).toBeInTheDocument();
-    expect(useSourceCodeButton).toBeInTheDocument();
+    expect(createRuleButton).toBeInTheDocument();
   });
 });

@@ -20,10 +20,11 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.messages.IndexingResults;
+import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.journal.Journal;
@@ -31,12 +32,11 @@ import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,7 +64,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     private final int shutdownTimeoutMs;
     private final ScheduledExecutorService daemonScheduler;
 
-    private volatile List<Map.Entry<IndexSet, Message>> buffer;
+    private volatile List<MessageWithIndex> buffer;
 
     private static final AtomicInteger activeFlushThreads = new AtomicInteger(0);
     private final AtomicLong lastFlushTime = new AtomicLong();
@@ -97,12 +97,12 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     @Override
     public void write(Message message) throws Exception {
         for (IndexSet indexSet : message.getIndexSets()) {
-            writeMessageEntry(Maps.immutableEntry(indexSet, message));
+            writeMessageEntry(new MessageWithIndex(message, indexSet));
         }
     }
 
-    public void writeMessageEntry(Map.Entry<IndexSet, Message> entry) throws Exception {
-        List<Map.Entry<IndexSet, Message>> flushBatch = null;
+    public void writeMessageEntry(MessageWithIndex entry) throws Exception {
+        List<MessageWithIndex> flushBatch = null;
         synchronized (this) {
             buffer.add(entry);
 
@@ -119,7 +119,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         }
     }
 
-    private void flush(List<Map.Entry<IndexSet, Message>> messages) {
+    private void flush(List<MessageWithIndex> messages) {
         // never try to flush an empty buffer
         if (messages.isEmpty()) {
             return;
@@ -135,7 +135,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         try {
             indexMessageBatch(messages);
             // This does not exclude failedMessageIds, because we don't know if ES is ever gonna accept these messages.
-            acknowledger.acknowledge(messages.stream().map(Map.Entry::getValue).collect(Collectors.toList()));
+            acknowledger.acknowledge(messages.stream().map(MessageWithIndex::message).collect(Collectors.toList()));
         } catch (Exception e) {
             log.error("Unable to flush message buffer", e);
             bufferFlushFailures.mark();
@@ -144,13 +144,13 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         log.debug("Flushing {} messages completed", messages.size());
     }
 
-    protected Set<String> indexMessageBatch(List<Map.Entry<IndexSet, Message>> messages) throws Exception {
+    protected IndexingResults indexMessageBatch(List<MessageWithIndex> messages) throws Exception {
         try (Timer.Context ignored = processTime.time()) {
             lastFlushTime.set(System.nanoTime());
-            final Set<String> failedMessageIds = writeMessageEntries(messages);
+            final IndexingResults indexingResults = writeMessageEntries(messages);
             batchSize.update(messages.size());
             bufferFlushes.mark();
-            return failedMessageIds;
+            return indexingResults;
         }
     }
 
@@ -166,7 +166,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
 
     private void forceFlush() {
         // flip buffer quickly and initiate flush
-        final List<Map.Entry<IndexSet, Message>> flushBatch;
+        final List<MessageWithIndex> flushBatch;
         synchronized (this) {
             flushBatch = buffer;
             buffer = new ArrayList<>(maxBufferSize);

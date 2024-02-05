@@ -38,8 +38,10 @@ class ContentPackParameterList extends React.Component {
 
   static defaultProps = {
     readOnly: false,
-    onDeleteParameter: () => {},
-    onAddParameter: () => {},
+    onDeleteParameter: () => {
+    },
+    onAddParameter: () => {
+    },
     appliedParameter: {},
   };
 
@@ -92,19 +94,21 @@ class ContentPackParameterList extends React.Component {
         <td>{ContentPackUtils.convertToString(parameter)}</td>
         <td><Badge className={bsStyle}><Icon name={icon} /></Badge></td>
         {!readOnly
-        && (
-        <td>
-          <ButtonToolbar>
-            <Button bsStyle="primary"
-                    bsSize="xs"
-                    title={buttonTitle}
-                    disabled={parameterApplied}
-                    onClick={() => { onDeleteParameter(parameter); }}>
-              Delete
-            </Button>{this._parameterModal(parameter)}
-          </ButtonToolbar>
-        </td>
-        )}
+          && (
+            <td>
+              <ButtonToolbar>
+                <Button bsStyle="primary"
+                        bsSize="xs"
+                        title={buttonTitle}
+                        disabled={parameterApplied}
+                        onClick={() => {
+                          onDeleteParameter(parameter);
+                        }}>
+                  Delete
+                </Button>{this._parameterModal(parameter)}
+              </ButtonToolbar>
+            </td>
+          )}
       </tr>
     );
   };
@@ -150,14 +154,14 @@ class ContentPackParameterList extends React.Component {
     const modal = (
       <BootstrapModalWrapper showModal={showModal}
                              onHide={closeModal}
-                             bsSize="large"
-                             data-app-section="content_pack_parameter_list"
-                             data-event-element="Parameter">
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ContentPackEditParameter ref={(node) => { editParameter = node; }}
+          <ContentPackEditParameter ref={(node) => {
+            editParameter = node;
+          }}
                                     parameters={contentPack.parameters}
                                     onUpdateParameter={(newParameter) => {
                                       onAddParameter(newParameter, parameter);
@@ -201,7 +205,9 @@ class ContentPackParameterList extends React.Component {
         {!readOnly && this._parameterModal()}
         {!readOnly && (<span><br /><br /></span>)}
         <SearchForm onSearch={this._filterParameters}
-                    onReset={() => { this._filterParameters(''); }} />
+                    onReset={() => {
+                      this._filterParameters('');
+                    }} />
         <DataTable id="parameter-list"
                    headers={headers}
                    className={ContentPackParameterListStyle.scrollable}

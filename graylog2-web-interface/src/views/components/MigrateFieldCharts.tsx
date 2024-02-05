@@ -226,8 +226,7 @@ const MigrateFieldCharts = () => {
   return (
     <Row>
       <Col>
-        <Alert bsStyle="warning">
-          <h2>Migrate existing search page charts</h2>
+        <Alert bsStyle="warning" title="Migrate existing search page charts">
           {/* Should we inform the user here about the backend migrations? */}
           <br />
           We found {chartAmount} chart(s), created for an older version of the search.

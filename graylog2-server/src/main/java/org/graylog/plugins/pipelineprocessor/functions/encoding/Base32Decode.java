@@ -38,6 +38,16 @@ public class Base32Decode extends BaseEncodingSingleArgStringFunction {
     }
 
     @Override
+    protected String getRuleBuilderName() {
+        return "Decode " + ENCODING_NAME;
+    }
+
+    @Override
+    protected String getRuleBuilderTitle() {
+        return ENCODING_NAME + " decoding of '${value}'";
+    }
+
+    @Override
     protected String getName() {
         return NAME;
     }

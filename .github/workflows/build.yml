@@ -3,31 +3,25 @@ name: Build the repository
 on: 
   pull_request:
 
+# Cancel running build when new ref gets pushed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest-4-cores-public
     strategy:
       matrix:
         java-version: [ 17 ]
     steps:
-      - name: Freeing up more disk space
-        run: |
-          sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
-          sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
           cache: maven
-      - name: Set up Yarn cache
-        uses: actions/cache@v2
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('graylog2-web-interface/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-          path: ~/.cache/yarn
       - name: License check
         run: mvn -B --fail-fast license:check
       - name: Build with Maven

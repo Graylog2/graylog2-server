@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
@@ -35,7 +36,7 @@ public class GetField extends AbstractFunction<Object> {
 
     public GetField() {
         fieldParam = ParameterDescriptor.string(FIELD).description("The field to get").build();
-        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").primary().build();
+        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").ruleBuilderVariable().build();
     }
 
     @Override
@@ -54,7 +55,9 @@ public class GetField extends AbstractFunction<Object> {
                 .params(ImmutableList.of(fieldParam, messageParam))
                 .description("Retrieves the value for a field")
                 .ruleBuilderEnabled()
+                .ruleBuilderName("Get field value")
                 .ruleBuilderTitle("Retrieve value for field '${field}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

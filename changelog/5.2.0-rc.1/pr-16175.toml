@@ -1,0 +1,6 @@
+type = "f"
+message = "Fix possible NullPointerExceptions when writing pipeline rules with maps."
+
+pulls = ["16175"]
+issues = ["14818"]
+

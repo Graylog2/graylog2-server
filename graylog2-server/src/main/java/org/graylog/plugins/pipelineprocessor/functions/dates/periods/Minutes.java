@@ -41,4 +41,17 @@ public class Minutes extends AbstractPeriodComponentFunction {
     protected String getDescription() {
         return "Create a period with a specified number of minutes.";
     }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Create period (minutes)";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Create a time period of '${value}' minutes";
+    }
+
 }

@@ -21,6 +21,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -40,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,18 +57,13 @@ import static org.graylog2.audit.AuditEventTypes.ES_WRITE_INDEX_UPDATE;
 import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
 
 public class MongoIndexSet implements IndexSet {
-    private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
-
     public static final String SEPARATOR = "_";
     public static final String DEFLECTOR_SUFFIX = "deflector";
-
     // TODO: Hardcoded archive suffix. See: https://github.com/Graylog2/graylog2-server/issues/2058
     // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
-    public interface Factory {
-        MongoIndexSet create(IndexSetConfig config);
-    }
-
+    public static final String WARM_INDEX_INFIX = "warm_";
+    private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
     private final IndexSetConfig config;
     private final String writeIndexAlias;
     private final Indices indices;
@@ -107,8 +102,8 @@ public class MongoIndexSet implements IndexSet {
                 ? Pattern.quote(config.indexPrefix())
                 : config.indexMatchPattern();
 
-        this.indexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
-        this.deflectorIndexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "\\d+");
+        this.indexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "(?:" + WARM_INDEX_INFIX + ")?" + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+        this.deflectorIndexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "(?:" + WARM_INDEX_INFIX + ")?" + "\\d+");
 
         // The index wildcard can be configured in IndexSetConfig. If not set we use a default one based on the index
         // prefix.
@@ -174,7 +169,7 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public Optional<Integer> extractIndexNumber(final String indexName) {
-        final int beginIndex = config.indexPrefix().length() + 1;
+        final int beginIndex = indexPrefixLength(indexName);
         if (indexName.length() < beginIndex) {
             return Optional.empty();
         }
@@ -185,6 +180,14 @@ public class MongoIndexSet implements IndexSet {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    private int indexPrefixLength(String indexName) {
+        int length = config.indexPrefix().length() + 1;
+        if (indexName.contains("_" + WARM_INDEX_INFIX)) {
+            length += WARM_INDEX_INFIX.length();
+        }
+        return length;
     }
 
     @VisibleForTesting
@@ -393,5 +396,9 @@ public class MongoIndexSet implements IndexSet {
     @Override
     public String toString() {
         return "MongoIndexSet{" + "config=" + config + '}';
+    }
+
+    public interface Factory {
+        MongoIndexSet create(IndexSetConfig config);
     }
 }

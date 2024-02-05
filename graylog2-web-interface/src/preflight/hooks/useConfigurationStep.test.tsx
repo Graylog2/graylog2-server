@@ -91,6 +91,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CA_CONFIGURATION.key,
       isLoading: false,
+      errors: null,
     }));
   });
 
@@ -105,6 +106,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key,
       isLoading: false,
+      errors: null,
     }));
   });
 
@@ -127,6 +129,7 @@ describe('useConfigurationStep', () => {
         transport_address: 'http://localhost:9200',
         type: 'DATANODE',
         status: 'UNCONFIGURED',
+        cert_valid_until: '2020-02-10T20:40:00.000Z',
       }],
     });
 
@@ -143,6 +146,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
       isLoading: false,
+      errors: null,
     }));
   });
 
@@ -165,6 +169,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
       isLoading: false,
+      errors: null,
     }));
   });
 
@@ -187,6 +192,7 @@ describe('useConfigurationStep', () => {
         transport_address: 'http://localhost:9200',
         type: 'DATANODE',
         status: 'CONNECTED',
+        cert_valid_until: '2020-02-10T20:40:00.000Z',
       }],
     });
 
@@ -203,6 +209,7 @@ describe('useConfigurationStep', () => {
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
       isLoading: false,
+      errors: null,
     }));
   });
 });

@@ -17,12 +17,16 @@
 package org.graylog2.security;
 
 import com.google.common.collect.Iterables;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CertificateAuthorityChangedEvent;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
@@ -40,9 +44,16 @@ public class CustomCAX509TrustManager implements X509TrustManager {
     private List<X509TrustManager> trustManagers = new ArrayList<>();
 
     @Inject
-    public CustomCAX509TrustManager(CaService caService) {
+    public CustomCAX509TrustManager(CaService caService, EventBus serverEventBus) {
         this.caService = caService;
+        serverEventBus.register(this);
         this.refresh();
+    }
+
+    @Subscribe
+    public void handleCertificateAuthorityChange(CertificateAuthorityChangedEvent event) {
+        LOG.info("CA changed, refreshing trust manager");
+        refresh();
     }
 
     public void refresh() {
@@ -61,7 +72,8 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             try {
                 trustManager.checkClientTrusted(chain, authType);
                 return;
-            } catch (CertificateException e) {}
+            } catch (CertificateException e) {
+            }
         }
         throw new CertificateException("None of the TrustManagers trust this certificate chain.");
     }
@@ -72,7 +84,8 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             try {
                 trustManager.checkServerTrusted(chain, authType);
                 return;
-            } catch (CertificateException e) {}
+            } catch (CertificateException e) {
+            }
         }
         throw new CertificateException("None of the TrustManagers trust this certificate chain.");
     }
@@ -97,5 +110,5 @@ public class CustomCAX509TrustManager implements X509TrustManager {
             LOG.error("Could not create TrustManager: {}", e.getMessage(), e);
         }
         return null;
-     }
+    }
 }

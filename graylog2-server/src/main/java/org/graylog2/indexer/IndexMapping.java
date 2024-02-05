@@ -18,12 +18,15 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.Message;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 
 /**
  * Representing the message type mapping in Elasticsearch. This is giving ES more
@@ -33,8 +36,12 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     public static final String TYPE_MESSAGE = "message";
 
     @Override
-    public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
-        return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order);
+    public Template toTemplate(final TemplateIndexSetConfig indexSetConfig,
+                               final Long order) {
+        return messageTemplate(indexSetConfig.indexWildcard(),
+                indexSetConfig.indexAnalyzer(),
+                order,
+                indexSetConfig.customFieldMappings());
     }
 
     protected Map<String, Object> analyzerKeyword() {
@@ -43,31 +50,33 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "filter", "lowercase"));
     }
 
-    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
-        final Map<String, Object> settings = Collections.singletonMap(
-                "analysis", Collections.singletonMap("analyzer", analyzerKeyword())
-                );
-        final Map<String, Object> mappings = mapping(analyzer);
+    public Template messageTemplate(final String indexPattern,
+                                               final String analyzer,
+                                               final Long order,
+                                               final CustomFieldMappings customFieldMappings) {
+        var settings = new Template.Settings(Map.of(
+                "index", Map.of(
+                        "analysis", Map.of("analyzer", analyzerKeyword())
+        )
+        ));
+        var mappings = mapping(analyzer, customFieldMappings);
 
-        return createTemplate(template, order, settings, mappings);
+        return createTemplate(indexPattern, order, settings, mappings);
     }
 
-    Map<String, Object> createTemplate(String template, int order, Map<String, Object> settings, Map<String, Object> mappings) {
+    Template createTemplate(String indexPattern, Long order, Template.Settings settings, Template.Mappings mappings) {
+        return Template.create(indexPattern, mappings, order, settings);
+    }
+
+    protected Template.Mappings mapping(final String analyzer,
+                                          final CustomFieldMappings customFieldMappings) {
+        return new Template.Mappings(ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer, customFieldMappings)));
+    }
+
+    protected Map<String, Object> messageMapping(final String analyzer,
+                                                 final CustomFieldMappings customFieldMappings) {
         return ImmutableMap.of(
-                "template", template,
-                "order", order,
-                "settings", settings,
-                "mappings", mappings
-        );
-    }
-
-    protected Map<String, Object> mapping(String analyzer) {
-        return ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
-    }
-
-    protected Map<String, Object> messageMapping(final String analyzer) {
-        return ImmutableMap.of(
-                "properties", fieldProperties(analyzer),
+                "properties", fieldProperties(analyzer, customFieldMappings),
                 "dynamic_templates", dynamicTemplate(),
                 "_source", enabled());
     }
@@ -91,21 +100,34 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     abstract Map<String, Object> dynamicStrings();
 
-    protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
-        return ImmutableMap.<String, Map<String, Object>>builder()
-                .put("message", analyzedString(analyzer, false))
-                .put("full_message", analyzedString(analyzer, false))
+    protected Map<String, Map<String, Object>> fieldProperties(final String analyzer,
+                                                               final CustomFieldMappings customFieldMappings) {
+        final ImmutableMap.Builder<String, Map<String, Object>> builder = ImmutableMap.<String, Map<String, Object>>builder()
+                .put(Message.FIELD_MESSAGE, analyzedString(analyzer, false))
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
-                .put("timestamp", typeTimeWithMillis())
+                .put(Message.FIELD_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_MESSAGE_ID, notAnalyzedString())
+                .put(Message.FIELD_STREAMS, notAnalyzedString())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
-                .put("source", analyzedString("analyzer_keyword", true))
-                .put("streams", notAnalyzedString())
-                .build();
+                .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true));
+
+
+        if (customFieldMappings != null) {
+            customFieldMappings.stream()
+                    .filter(customMapping -> !FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(customMapping.fieldName())) //someone might have hardcoded reserved field mapping on MongoDB level, bypassing checks
+                    .forEach(customMapping -> builder.put(customMapping.fieldName(), type(customMapping.toPhysicalType())));
+        }
+
+        //those FIELD_FULL_MESSAGE field have not been yet made reserved, so it can be added to ImmutableMap only if they do not exist in Custom Mapping
+        if (customFieldMappings == null || !customFieldMappings.containsCustomMappingForField(Message.FIELD_FULL_MESSAGE)) {
+            builder.put(Message.FIELD_FULL_MESSAGE, analyzedString(analyzer, false));
+        }
+
+        return builder.build();
     }
 
     Map<String, Object> notAnalyzedString() {
@@ -126,6 +148,10 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     protected Map<String, Object> typeLong() {
         return ImmutableMap.of("type", "long");
+    }
+
+    protected Map<String, Object> type(final String type) {
+        return ImmutableMap.of("type", type);
     }
 
     private Map<String, Boolean> enabled() {

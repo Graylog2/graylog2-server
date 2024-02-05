@@ -1,0 +1,5 @@
+type = "a"
+message = "Mark users synced froma a deactivated authorization backend in user overview list and on user detail page."
+
+issues = ["13823"]
+pulls = ["16134"]

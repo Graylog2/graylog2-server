@@ -20,27 +20,28 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.Duration;
 
-import javax.inject.Inject;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -59,6 +60,10 @@ public class IndexSetDefaultsResource extends RestResource {
         this.indexSetValidator = indexSetValidator;
         this.clusterConfigService = clusterConfigService;
         this.validator = validator;
+    }
+
+    private static String buildFieldError(String field, String message) {
+        return f("Invalid value for field [%s]: %s", field, message);
     }
 
     /**
@@ -98,12 +103,12 @@ public class IndexSetDefaultsResource extends RestResource {
             throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.RETENTION_STRATEGY_CONFIG, violation.message()));
         }
 
+        violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
+        if (violation != null) {
+            throw new BadRequestException(buildFieldError(IndexSetConfig.FIELD_DATA_TIERING, violation.message()));
+        }
 
         clusterConfigService.write(config);
         return Response.ok(config).build();
-    }
-
-    private static String buildFieldError(String field, String message) {
-        return f("Invalid value for field [%s]: %s", field, message);
     }
 }

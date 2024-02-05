@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
+import URI from 'urijs';
 
 import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 import { useStore } from 'stores/connect';
@@ -23,9 +25,32 @@ import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { getConfig } from 'components/configurations/helpers';
-import { PluginConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
+import { LinkContainer } from 'components/common/router';
+import useLocation from 'routing/useLocation';
+import type { SelectCallback } from 'components/bootstrap/types';
+
+type PluginSectionLinkProps = {
+  configType: string,
+  displayName: string,
+}
+
+const PluginSectionLink = ({ configType, displayName }: PluginSectionLinkProps) => {
+  const absolutePath = useResolvedPath(configType);
+  const location = useLocation();
+
+  const isActive = URI(location.pathname).equals(absolutePath.pathname)
+    || location.pathname.startsWith(absolutePath.pathname);
+
+  return (
+    <LinkContainer key={`plugin-nav-${configType}`} to={configType}>
+      <NavItem title={displayName} active={isActive}>
+        {displayName}
+      </NavItem>
+    </LinkContainer>
+  );
+};
 
 const PluginsConfig = () => {
   const [activeSectionKey, setActiveSectionKey] = useState(1);
@@ -42,36 +67,11 @@ const PluginsConfig = () => {
     });
   }, [configuration, pluginSystemConfigs]);
 
-  const pluginDisplayNames = [
-    {
-      configType: PluginConfigurationType.COLLECTORS_SYSTEM,
-      displayName: 'Collectors System',
-    },
-    {
-      configType: PluginConfigurationType.AWS,
-      displayName: 'AWS',
-    },
-    {
-      configType: PluginConfigurationType.THREAT_INTEL,
-      displayName: 'Threat Intelligence Lookup',
-    },
-    {
-      configType: PluginConfigurationType.FAILURE_PROCESSING,
-      displayName: 'Failure Processing',
-    },
-    {
-      configType: PluginConfigurationType.TRAFFIC_LIMIT_VIOLATION,
-      displayName: 'Traffic Limit Violation',
-    },
-    {
-      configType: PluginConfigurationType.GEO_LOCATION,
-      displayName: 'Geo-Location Processor',
-    },
-  ];
-
   const onUpdate = (configType: string) => (config) => ConfigurationsActions.update(configType, config);
 
-  if (!isLoaded || !pluginSystemConfigs) { return <Spinner />; }
+  if (!isLoaded || !pluginSystemConfigs) {
+    return <Spinner />;
+  }
 
   return (
     <>
@@ -79,29 +79,30 @@ const PluginsConfig = () => {
         <Nav bsStyle="pills"
              stacked
              activeKey={activeSectionKey}
-             onSelect={setActiveSectionKey}>
-          {pluginSystemConfigs.map(({ configType }, index) => {
-            const { displayName } = pluginDisplayNames.find((entry) => entry.configType === configType);
+             onSelect={setActiveSectionKey as SelectCallback}>
+          {pluginSystemConfigs.map(({ displayName, configType }) => {
+            const name = displayName || configType;
 
-            return (
-              <NavItem key={`plugin-nav-${configType}`} eventKey={index + 1} title={displayName}>
-                {displayName}
-              </NavItem>
-            );
+            return <PluginSectionLink key={configType} configType={configType} displayName={name} />;
           })}
         </Nav>
       </Col>
       <Col md={8} lg={5}>
-        {pluginSystemConfigs
-          .map(({ component: SystemConfigComponent, configType }, index) => (
-            (index + 1 === activeSectionKey) && (
-            <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
-              <SystemConfigComponent key={`system-configuration-${configType}`}
-                                     config={getConfig(configType, configuration) ?? undefined}
-                                     updateConfig={onUpdate(configType)} />
-            </ConfigletContainer>
-            )
-          ))}
+        <Routes>
+          <Route path="/" element={<Navigate to={pluginSystemConfigs[0].configType} replace />} />
+          {pluginSystemConfigs
+            .map(({ component: SystemConfigComponent, configType }) => (
+              <Route path={configType}
+                     key={configType}
+                     element={(
+                       <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
+                         <SystemConfigComponent key={`system-configuration-${configType}`}
+                                                config={getConfig(configType, configuration) ?? undefined}
+                                                updateConfig={onUpdate(configType)} />
+                       </ConfigletContainer>
+              )} />
+            ))}
+        </Routes>
       </Col>
     </>
   );

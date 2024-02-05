@@ -20,11 +20,12 @@ import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import normalizeViewState from 'views/logic/views/normalizeViewState';
 
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
-import GenerateNextPosition from './GenerateNextPosition';
+import { ConcatPositions } from './GenerateNextPosition';
 
 import type Widget from '../widgets/Widget';
 
@@ -57,7 +58,7 @@ const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: V
     .build();
 
   return dashboard.toBuilder()
-    .state(dashboard.state.set(queryId, newViewState))
+    .state(dashboard.state.set(queryId, normalizeViewState(newViewState)))
     .build();
 };
 
@@ -77,11 +78,9 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
   const newWidget = widget?.id ? widget : widget.toBuilder().newId().build();
   const newWidgets = viewState.widgets.push(newWidget);
   const { widgetPositions } = viewState;
-  const widgetPositionsMap = oldPosition ? {
-    ...widgetPositions,
-    [newWidget.id]: oldPosition.toBuilder().row(0).col(0).build(),
-  } : widgetPositions;
-  const newWidgetPositions = GenerateNextPosition(Immutable.Map(widgetPositionsMap), newWidgets.toArray());
+  const newWidgetPositions = oldPosition
+    ? ConcatPositions(Immutable.Map({ [newWidget.id]: oldPosition.toBuilder().row(1).col(1).build() }), Immutable.Map(widgetPositions))
+    : Immutable.Map(widgetPositions);
   const newTitleMap = _setWidgetTitle(viewState.titles, newWidget.id, widgetTitle);
   const newViewState = viewState.toBuilder()
     .widgets(newWidgets)

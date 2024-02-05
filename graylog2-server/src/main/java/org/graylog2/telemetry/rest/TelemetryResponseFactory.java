@@ -39,6 +39,7 @@ class TelemetryResponseFactory {
     private static final String LICENSE = "license";
     private static final String PLUGIN = "plugin";
     private static final String SEARCH_CLUSTER = "search_cluster";
+    private static final String DATA_NODES = "data_nodes";
 
     private static boolean isLeader(Map<String, Object> n) {
         if (n.get(FIELD_IS_LEADER) instanceof Boolean isLeader) {
@@ -52,7 +53,8 @@ class TelemetryResponseFactory {
                                                 Map<String, Object> pluginInfo,
                                                 Map<String, Object> searchClusterInfo,
                                                 List<TelemetryLicenseStatus> licenseStatuses,
-                                                TelemetryUserSettings telemetryUserSettings) {
+                                                TelemetryUserSettings telemetryUserSettings,
+                                                Map<String, Object> dataNodeInfo) {
         Map<String, Object> telemetryResponse = new LinkedHashMap<>();
         telemetryResponse.put(CURRENT_USER, userInfo);
         telemetryResponse.put(USER_TELEMETRY_SETTINGS, telemetryUserSettings);
@@ -60,6 +62,7 @@ class TelemetryResponseFactory {
         telemetryResponse.put(LICENSE, createLicenseInfo(licenseStatuses));
         telemetryResponse.put(PLUGIN, pluginInfo);
         telemetryResponse.put(SEARCH_CLUSTER, searchClusterInfo);
+        telemetryResponse.put(DATA_NODES, dataNodeInfo);
         return telemetryResponse;
     }
 

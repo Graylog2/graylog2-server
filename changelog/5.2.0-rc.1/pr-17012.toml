@@ -1,0 +1,5 @@
+type = "f"
+message = "Change loggers in indexer subsystem to output all messages related to indexing/searching."
+
+issues = ["17011"]
+pulls = ["17012"]

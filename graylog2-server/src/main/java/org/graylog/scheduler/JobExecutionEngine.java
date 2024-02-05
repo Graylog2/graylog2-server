@@ -22,7 +22,6 @@ import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
-import net.fortuna.ical4j.util.Strings;
 import org.graylog.scheduler.eventbus.JobCompletedEvent;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
@@ -31,7 +30,8 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -177,7 +177,7 @@ public class JobExecutionEngine {
         Span.current().setAttribute(SCHEDULER_JOB_CLASS, job.getClass().getSimpleName())
                 .setAttribute(SCHEDULER_JOB_DEFINITION_TYPE, jobDefinition.config().type())
                 .setAttribute(SCHEDULER_JOB_DEFINITION_TITLE, jobDefinition.title())
-                .setAttribute(SCHEDULER_JOB_DEFINITION_ID, Strings.valueOf(jobDefinition.id()));
+                .setAttribute(SCHEDULER_JOB_DEFINITION_ID, String.valueOf(jobDefinition.id()));
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Execute job: {}/{}/{} (job-class={} trigger={} config={})", jobDefinition.title(), jobDefinition.id(),

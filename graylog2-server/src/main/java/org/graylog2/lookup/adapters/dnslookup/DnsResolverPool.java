@@ -173,9 +173,9 @@ public class DnsResolverPool {
                         iterator.add(new ResolverLease(resolverFactory.create()));
                     } else {
                         LOG.warn("Lease for resolver [{}] is in-use. Skipping refresh. This will be attempted again in [{}] seconds. " +
-                                        "If this happens frequently for high message rates, consider increasing the [dns_lookup_adapter_resolver_pool_size = 10] " +
+                                        "If this happens frequently for high message rates, consider increasing the [dns_lookup_adapter_resolver_pool_size = {}] " +
                                         "server configuration property to allow more DNS resolvers.",
-                                lease.getId(), poolRefreshSeconds);
+                                lease.getId(), poolRefreshSeconds, resolverPool.size());
                     }
                 }
             }

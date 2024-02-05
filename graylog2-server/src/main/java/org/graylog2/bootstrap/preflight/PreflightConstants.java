@@ -19,4 +19,6 @@ package org.graylog2.bootstrap.preflight;
 public class PreflightConstants {
     public static final String API_PREFIX = "/api/";
     public static final String ASSETS_RESOURCE_DIR = "/preflight/assets/";
+
+    public static final int INITIAL_PASSWORD_LENGTH = 10;
 }

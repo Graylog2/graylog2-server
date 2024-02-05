@@ -19,6 +19,10 @@ package org.graylog.datanode.configuration.variants;
 import java.nio.file.Path;
 
 public record KeystoreInformation(Path location, char[] password) {
+    public KeystoreInformation(Path location, String password) {
+        this(location, password.toCharArray());
+    }
+
     public String passwordAsString() {
         return new String(password());
     }

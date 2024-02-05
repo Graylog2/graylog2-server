@@ -20,13 +20,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.plugin.rest.ValidationResult;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,6 +56,19 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
     @JsonIgnore
     default Optional<EventProcessorSchedulerConfig> toJobSchedulerConfig(EventDefinition eventDefinition, JobSchedulerClock clock) {
         return Optional.empty();
+    }
+
+    /**
+     * Validates the event processor configuration.
+     *
+     * @param oldEventProcessorConfig      the old event config if exists
+     * @param eventDefinitionConfiguration the event definition configuration
+     * @return the validation result
+     */
+    @JsonIgnore
+    default ValidationResult validate(@Nullable EventProcessorConfig oldEventProcessorConfig,
+                                      EventDefinitionConfiguration eventDefinitionConfiguration) {
+        return new ValidationResult();
     }
 
     /**
@@ -94,6 +110,10 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
     @JsonIgnore
     default boolean isUserPresentable() {
         return true;
+    }
+
+    default EventProcessorConfig updateFilters(List<UsedSearchFilter> filters) {
+        return null;
     }
 
     interface Builder<SELF> {

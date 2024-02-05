@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -87,166 +87,168 @@
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
-        <airline.version>2.7.2</airline.version>
-        <amqp-client.version>5.8.0</amqp-client.version>
-        <antlr.version>4.8-1</antlr.version>
+        <opensearch.shaded.version>2.11.0-1</opensearch.shaded.version>
+        <airline.version>3.0.0</airline.version>
+        <amqp-client.version>5.20.0</amqp-client.version>
+        <antlr.version>4.13.1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
-        <apache-httpasyncclient.version>4.1.4</apache-httpasyncclient.version>
-        <apache-httpclient.version>4.5.13</apache-httpclient.version>
-        <apache-httpcore.version>4.4.14</apache-httpcore.version>
-        <asm.version>9.5</asm.version>
-        <auto-value.version>1.7.4</auto-value.version>
+        <apache-httpclient.version>4.5.14</apache-httpclient.version>
+        <apache-httpcore.version>4.4.16</apache-httpcore.version>
+        <asm.version>9.6</asm.version>
+        <auto-service.version>1.1.1</auto-service.version>
+        <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <aws-java-sdk-1.version>1.12.412</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.20.61</aws-java-sdk-2.version>
-        <aws-msk-iam-auth.version>1.1.7</aws-msk-iam-auth.version>
-        <bouncycastle.version>1.69</bouncycastle.version>
-        <caffeine.version>2.8.1</caffeine.version>
+        <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
+        <aws-java-sdk-2.version>2.23.4</aws-java-sdk-2.version>
+        <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
+        <aws-msk-iam-auth.version>2.0.2</aws-msk-iam-auth.version>
+        <bouncycastle.version>1.77</bouncycastle.version>
+        <byte-buddy.version>1.14.11</byte-buddy.version>
+        <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.157</classgraph.version>
-        <commons-codec.version>1.14</commons-codec.version>
-        <commons-email.version>1.5</commons-email.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
-        <commons-validator.version>1.6</commons-validator.version>
-        <commons-io.version>2.6</commons-io.version>
-        <disruptor.version>3.4.2</disruptor.version>
-        <freemarker.version>2.3.31</freemarker.version>
-        <gelfclient.version>1.5.0</gelfclient.version>
-        <geoip2.version>2.12.0</geoip2.version>
+        <classgraph.version>4.8.165</classgraph.version>
+        <commons-codec.version>1.16.0</commons-codec.version>
+        <commons-csv.version>1.10.0</commons-csv.version>
+        <commons-email.version>1.6.0</commons-email.version>
+        <commons-lang3.version>3.14.0</commons-lang3.version>
+        <commons-net.version>3.10.0</commons-net.version>
+        <commons-validator.version>1.8.0</commons-validator.version>
+        <commons-io.version>2.15.1</commons-io.version>
+        <disruptor.version>4.0.0</disruptor.version>
+        <error-prone.version>2.24.1</error-prone.version>
+        <freemarker.version>2.3.32</freemarker.version>
+        <gelfclient.version>1.5.1</gelfclient.version>
+        <geoip2.version>4.2.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
-        <grpc.version>1.48.1</grpc.version>
+        <grpc.version>1.61.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>31.0.1-jre</guava.version>
-        <guice.version>5.0.1</guice.version>
+        <guava.version>33.0.0-jre</guava.version>
+        <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
-        <hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
-        <hk2.version>2.6.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.13.4.20221013</jackson.version>
+        <hamcrest.version>2.2</hamcrest.version>
+        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <hk2.version>3.0.6</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
+        <jackson.version>2.15.3</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
-        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
-        <javax.el-api.version>3.0.0</javax.el-api.version>
-        <javax.inject.version>1</javax.inject.version>
-        <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
-        <jaxb-api.version>2.3.0</jaxb-api.version>
+        <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
+        <jakarta.inject.version>2.0.1</jakarta.inject.version>
+        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>2.37</jersey.version>
+        <jersey.version>3.1.5</jersey.version>
         <jmte.version>5.0.0</jmte.version>
-        <joda-time.version>2.10.6</joda-time.version>
-        <jool.version>0.9.14</jool.version>
-        <json-path.version>2.8.0</json-path.version>
-        <kafka.version>3.4.0</kafka.version>
-        <kafka09.version>0.9.0.1-6</kafka09.version>
-        <log4j.version>2.17.1</log4j.version>
-        <lucene.version>9.1.0</lucene.version>
+        <joda-time.version>2.12.7</joda-time.version>
+        <jool.version>0.9.15</jool.version>
+        <json-path.version>2.9.0</json-path.version>
+        <kafka.version>3.6.1</kafka.version>
+        <kafka09.version>0.9.0.1-7</kafka09.version>
+        <log4j.version>2.22.1</log4j.version>
+        <lucene.version>9.9.2</lucene.version>
         <metrics.version>4.1.9</metrics.version>
-        <mongodb-driver.version>4.8.1</mongodb-driver.version>
-        <mongojack.version>2.10.1.2</mongojack.version>
-        <mongojack4.version>4.8.0-0</mongojack4.version>
+        <mongodb-driver.version>4.11.1</mongodb-driver.version>
+        <mongojack.version>2.10.1.4</mongojack.version>
+        <mongojack4.version>4.8.1-1</mongojack4.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.91.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.59.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>3.14.6</okhttp.version>
-        <okta-sdk.version>8.2.1</okta-sdk.version>
+        <netty.version>4.1.106.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
+        <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.24.0</opentelemetry.version>
-        <opentelemetry-semconv.version>1.24.0-alpha</opentelemetry-semconv.version>
+        <opentelemetry.version>1.32.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
-        <pkts.version>3.0.5</pkts.version>
-        <prometheus-client.version>0.11.0</prometheus-client.version>
-        <protobuf.version>3.17.3</protobuf.version>
+        <pkts.version>3.0.10</pkts.version>
+        <prometheus-client.version>0.16.0</prometheus-client.version>
+        <protobuf.version>3.25.2</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
-        <scala.version>2.13.4</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>1.12.0</shiro.version>
-        <oshi.version>5.3.7</oshi.version>
-        <siv-mode.version>1.4.1</siv-mode.version>
-        <slf4j.version>1.7.30</slf4j.version>
-        <streamex.version>0.7.2</streamex.version>
-        <swagger.version>1.5.13</swagger.version>
+        <shiro.version>1.13.0</shiro.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
+        <snappy-java.version>1.1.10.5</snappy-java.version>
+        <oshi.version>6.4.11</oshi.version>
+        <siv-mode.version>1.5.0</siv-mode.version>
+        <slf4j.version>2.0.11</slf4j.version>
+        <streamex.version>0.8.2</streamex.version>
+        <swagger.version>1.6.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
-        <ulid.version>8.2.0</ulid.version>
-        <unboundid-ldap.version>5.1.1</unboundid-ldap.version>
+        <ulid.version>8.3.0</ulid.version>
+        <unboundid-ldap.version>6.0.11</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
-        <validation-api.version>2.0.1.Final</validation-api.version>
-        <zkclient.version>0.11</zkclient.version>
-        <zookeeper.version>3.5.7</zookeeper.version>
-        <zstd.version>1.5.4-1</zstd.version>
-        <cron-utils.version>9.1.6</cron-utils.version>
+        <validation-api.version>3.0.2</validation-api.version>
+        <zstd.version>1.5.5-11</zstd.version>
+        <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
-        <commons-net.version>3.6</commons-net.version>
+        <jjwt.version>0.11.5</jjwt.version>
+        <stateless4j.version>2.6.0</stateless4j.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
-        <assertj-core.version>3.24.2</assertj-core.version>
+        <assertj-core.version>3.25.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
-        <awaitility.version>3.1.3</awaitility.version>
-        <equalsverifier.version>3.10</equalsverifier.version>
+        <awaitility.version>4.2.0</awaitility.version>
+        <equalsverifier.version>3.15.6</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
-        <junit.version>4.13.1</junit.version>
-        <junit-jupiter.version>5.9.1</junit-jupiter.version>
-        <mockito.version>3.4.4</mockito.version>
-        <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
-        <restassured.version>4.3.2</restassured.version>
+        <junit.version>4.13.2</junit.version>
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <mockito.version>5.10.0</mockito.version>
+        <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.17.6</testcontainers.version>
-        <testcontainers.opensearch.version>2.0.0</testcontainers.opensearch.version>
+        <testcontainers.version>1.19.4</testcontainers.version>
+        <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v16.13.0</nodejs.version>
-        <yarn.version>v1.22.17</yarn.version>
+        <nodejs.version>v18.18.0</nodejs.version>
+        <yarn.version>v1.22.19</yarn.version>
 
         <!-- Plugin versions -->
-        <license-maven.version>4.0.rc2</license-maven.version>
-        <download-maven-plugin.version>1.6.8</download-maven-plugin.version>
+        <license-maven.version>4.3</license-maven.version>
+        <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
     </properties>
 
-    <repositories>
-        <!-- to make our snapshot releases work with Travis et al -->
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-nexus-releases</id>
-            <name>Sonatype Nexus Releases</name>
-            <url>https://oss.sonatype.org/content/repositories/releases</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
+    <!-- Ensure consistent versions across dependencies and transitive dependencies -->
     <dependencyManagement>
         <dependencies>
-            <!-- Ensure consistent httpclient/httpcore versions across dependencies and transitive dependencies -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-bom</artifactId>
+                <version>${log4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${apache-httpclient.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
                 <version>${apache-httpclient.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpasyncclient</artifactId>
-                <version>${apache-httpasyncclient.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -258,7 +260,6 @@
                 <artifactId>httpcore-nio</artifactId>
                 <version>${apache-httpcore.version}</version>
             </dependency>
-            <!-- Ensure consistent Netty versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
@@ -274,6 +275,13 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>${aws-java-sdk-1.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-tcnative-boringssl-static</artifactId>
                 <version>${netty-tcnative-boringssl-static.version}</version>
@@ -285,25 +293,21 @@
                 <version>${netty-tcnative-boringssl-static.version}</version>
                 <classifier>linux-x86_64</classifier>
             </dependency>
-            <!-- Ensure consistent commons-lang3 versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
-            <!-- Ensure consistent zstd-jni versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>com.github.luben</groupId>
                 <artifactId>zstd-jni</artifactId>
                 <version>${zstd.version}</version>
             </dependency>
-            <!-- Ensure consistent json-path versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
             </dependency>
-            <!-- Ensure consistent asm versions across dependencies and transitive dependencies -->
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
@@ -314,6 +318,139 @@
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xerial.snappy</groupId>
+                <artifactId>snappy-java</artifactId>
+                <version>${snappy-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-bom</artifactId>
+                <version>${protobuf.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>${grpc.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.cronutils</groupId>
+                <artifactId>cron-utils</artifactId>
+                <version>${cron-utils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-tls</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <!-- Explicitly manage avro to fix CVE-2023-39410. We are using this only as a transitive dependency in
+                 plugins. Remove once its usages are updated and the fixed version is pulled in automatically. -->
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>1.11.3</version>
+            </dependency>
+            <!-- Explicitly manage commons-compress to fix CVE-2023-42503. We are using this only as a transitive
+                 dependency in plugins. Remove once its usages are updated and the fixed version is pulled in
+                 automatically. -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.25.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commons-net.version}</version>
+            </dependency>
+
+            <!-- test -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-bom</artifactId>
+                <version>${mockito.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>${hamcrest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service-annotations</artifactId>
+                <version>${auto-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value-annotations</artifactId>
+                <version>${auto-value.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog.autovalue</groupId>
+                <artifactId>auto-value-javabean</artifactId>
+                <version>${auto-value-javabean.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -323,12 +460,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>3.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.12.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -338,85 +480,77 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.6.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.4</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
+                    <version>3.0.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.17.0</version>
+                    <version>3.21.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.11.0</version>
+                    <version>2.16.2</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.7.1.1</version>
+                    <version>4.8.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.3</version>
+                    <version>3.6</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.9.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.alexcojocaru</groupId>
-                    <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>6.17</version>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
+                    <version>1.15.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.antlr</groupId>
@@ -431,7 +565,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.4.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -484,6 +618,17 @@
                                         <exclude>org.slf4j:slf4j-simple</exclude>
                                         <!-- Newer asm versions are published under the org.ow2.asm groupId. Avoid conflicts by banning the old one.  -->
                                         <exclude>asm:asm</exclude>
+                                        <!-- Mockito should by now have all the features we need. -->
+                                        <exclude>org.powermock</exclude>
+                                        <!-- Ban AWS SDK bundle dependencies for v1 and v2. These would add hundreds of
+                                             megabytes to our production artifacts and must be avoided. -->
+                                        <exclude>com.amazonaws:aws-java-sdk-bundle</exclude>
+                                        <exclude>software.amazon.awssdk:bundle</exclude>
+                                        <!-- Ban some javax dependencies after the move to jakarta -->
+                                        <exclude>javax.inject:*</exclude>
+                                        <exclude>javax.validation:*</exclude>
+                                        <exclude>javax.ws.rs:javax.*</exclude>
+                                        <exclude>com.fasterxml.jackson.jaxrs:*</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
@@ -502,31 +647,256 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+                <configuration>
+                    <suppressAnnotations>
+                        <suppressAnnotation>org.graylog2.shared.SuppressForbidden</suppressAnnotation>
+                    </suppressAnnotations>
+                    <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                    <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                    <failOnViolation>true</failOnViolation>
+                    <bundledSignatures>
+                        <!-- We want to allow String#formatted without charset. -->
+                        <bundledSignature>jdk-unsafe-14</bundledSignature>
+                        <!-- This will automatically choose the right signatures based on 'maven.compiler.target': -->
+                        <bundledSignature>jdk-deprecated</bundledSignature>
+                        <bundledSignature>jdk-reflection</bundledSignature>
+                        <!-- disallow undocumented classes like sun.misc.Unsafe: -->
+                        <bundledSignature>jdk-non-portable</bundledSignature>
+                        <!-- Workaround until signatures for ${commons-io.version} are released: -->
+                        <bundledSignature>commons-io-unsafe-2.14.0</bundledSignature>
+                    </bundledSignatures>
+                    <signatures>
+                        <![CDATA[
+                            org.jboss.netty.** @ Migrate to Netty 4.x
+
+                            @defaultMessage Use a custom thread factory to ensure proper thread naming.
+                            java.util.concurrent.Executors#defaultThreadFactory()
+                            java.util.concurrent.Executors#newCachedThreadPool()
+                            java.util.concurrent.Executors#newFixedThreadPool(int)
+                            java.util.concurrent.Executors#newScheduledThreadPool(int)
+                            java.util.concurrent.Executors#newSingleThreadExecutor()
+                            java.util.concurrent.Executors#newSingleThreadScheduledExecutor()
+                            java.util.concurrent.Executors#privilegedThreadFactory()
+
+                            @defaultMessage Constructing a DateTime without a time zone is dangerous
+                            org.joda.time.DateTime#<init>()
+                            org.joda.time.DateTime#<init>(long)
+                            org.joda.time.DateTime#<init>(int, int, int, int, int)
+                            org.joda.time.DateTime#<init>(int, int, int, int, int, int)
+                            org.joda.time.DateTime#<init>(int, int, int, int, int, int, int)
+                            org.joda.time.DateTime#now()
+                            org.joda.time.DateTimeZone#getDefault()
+
+                            @defaultMessage Please do not try to stop the world
+                            java.lang.System#gc()
+
+                            java.lang.Character#codePointBefore(char[],int) @ Implicit start offset is error-prone when the char[] is a buffer and the first chars are random chars
+                            java.lang.Character#codePointAt(char[],int) @ Implicit end offset is error-prone when the char[] is a buffer and the last chars are random chars
+
+                            @defaultMessage Only use wait / notify when really needed try to use concurrency primitives, latches or callbacks instead.
+                            java.lang.Object#wait()
+                            java.lang.Object#wait(long)
+                            java.lang.Object#wait(long,int)
+                            java.lang.Object#notify()
+                            java.lang.Object#notifyAll()
+
+                            @defaultMessage Beware of the behavior of this method on MIN_VALUE
+                            java.lang.Math#abs(int)
+                            java.lang.Math#abs(long)
+
+                            @defaultMessage Use Channels.* methods to write to channels. Do not read/write directly.
+                            java.nio.channels.WritableByteChannel#write(java.nio.ByteBuffer)
+                            java.nio.channels.FileChannel#write(java.nio.ByteBuffer, long)
+                            java.nio.channels.GatheringByteChannel#write(java.nio.ByteBuffer[], int, int)
+                            java.nio.channels.GatheringByteChannel#write(java.nio.ByteBuffer[])
+                            java.nio.channels.ReadableByteChannel#read(java.nio.ByteBuffer)
+                            java.nio.channels.ScatteringByteChannel#read(java.nio.ByteBuffer[])
+                            java.nio.channels.ScatteringByteChannel#read(java.nio.ByteBuffer[], int, int)
+                            java.nio.channels.FileChannel#read(java.nio.ByteBuffer, long)
+
+                            @defaultMessage Convert to URI
+                            java.net.URL#getPath()
+                            java.net.URL#getFile()
+
+                            @defaultMessage Use java.nio.file instead of java.io.File API
+                            # java.util.jar.JarFile
+                            # java.util.zip.ZipFile
+                            # java.io.File
+                            # java.io.FileInputStream
+                            # java.io.FileOutputStream
+                            java.io.PrintStream#<init>(java.lang.String,java.lang.String)
+                            java.io.PrintWriter#<init>(java.lang.String,java.lang.String)
+                            java.util.Formatter#<init>(java.lang.String,java.lang.String,java.util.Locale)
+                            java.io.RandomAccessFile
+                            # java.nio.file.Path#toFile()
+
+                            @defaultMessage Specify a location for the temp file/directory instead.
+                            java.nio.file.Files#createTempDirectory(java.lang.String,java.nio.file.attribute.FileAttribute[])
+                            java.nio.file.Files#createTempFile(java.lang.String,java.lang.String,java.nio.file.attribute.FileAttribute[])
+
+                            com.google.common.collect.Iterators#emptyIterator() @ Use Collections.emptyIterator instead
+
+                            @defaultMessage Don't use java serialization - this can break BWC without noticing it
+                            java.io.ObjectOutputStream
+                            java.io.ObjectOutput
+                            java.io.ObjectInputStream
+                            java.io.ObjectInput
+
+                            @defaultMessage avoid DNS lookups by accident: if you have a valid reason, then use SuppressWarnings with that reason so its completely clear
+                            java.net.InetAddress#getHostName()
+                            java.net.InetAddress#getCanonicalHostName()
+
+                            java.net.InetSocketAddress#getHostName() @ Use getHostString() instead, which avoids a DNS lookup
+
+                            @defaultMessage Avoid unchecked warnings by using Collections#empty(List|Map|Set) methods
+                            java.util.Collections#EMPTY_LIST
+                            java.util.Collections#EMPTY_MAP
+                            java.util.Collections#EMPTY_SET
+
+                            java.util.Collections#shuffle(java.util.List) @ Use java.util.Collections#shuffle(java.util.List, java.util.Random) with a reproducible source of randomness
+
+                            com.google.common.base.Charsets @ Use java.nio.charset.StandardCharsets
+
+                            @defaultMessage Don't use imports from shaded or denied dependencies
+                            joptsimple.internal.**
+                            org.testcontainers.shaded.**
+                            edu.emory.mathcs.backport.java.util.**
+                            org.apache.directory.api.util.**
+                            org.apache.groovy.util.**
+                            org.apache.logging.log4j.util.Strings
+                            org.graylog.shaded.kafka09.joptsimple.**
+                            org.assertj.core.util.**
+                            org.bouncycastle.util.Strings
+                            org.junit.jupiter.params.shadow.**
+                            org.apache.http.util.**
+
+                            @defaultMessage Use jakarta.inject.
+                            com.google.inject.Inject
+                            com.google.inject.Scope
+                            com.google.inject.Singleton
+                            com.google.inject.Provider
+                            com.google.inject.name.Named
+                            javax.inject.**
+
+                            javax.persistence.** @ Use jakarta.persistence.
+
+                            @defaultMessage Use jakarta.annotation.
+                            javax.annotation.sql.**
+                            javax.annotation.security.**
+                            javax.annotation.Resources
+                            javax.annotation.Resource
+                            javax.annotation.Resource$AuthenticationType
+                            javax.annotation.ManagedBean
+                            javax.annotation.Generated
+                            javax.annotation.PreDestroy
+                            javax.annotation.Priority
+                            javax.annotation.PostConstruct
+                        ]]>
+
+                    </signatures>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>forbidden-apis-src</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>forbidden-apis-test</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCheck</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
                 <configuration>
                     <release>17</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
-                    <compilerId>javac-with-errorprone</compilerId>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                    <annotationProcessors>
-                        <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
-                    </annotationProcessors>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <!--
+                          We disabled checks that don't apply to us because we either don't use the platform or
+                          library. (e.g., Android, Flogger) Disabling those checks improves compile times.
+                          See available bug patterns: https://errorprone.info/bugpatterns
+                        -->
+                        <arg>
+                            -Xplugin:ErrorProne
+                            -Xep:DoNotMock:WARN
+                            -XepDisableWarningsInGeneratedCode
+                            -XepExcludedPaths:.*/target/generated-sources/.*
+                            -Xep:AndroidInjectionBeforeSuper:OFF
+                            -Xep:BugPatternNaming:OFF
+                            -Xep:BundleDeserializationCast:OFF
+                            -Xep:DaggerProvidesNull:OFF
+                            -Xep:FloggerArgumentToString:OFF
+                            -Xep:FloggerFormatString:OFF
+                            -Xep:FloggerLogString:OFF
+                            -Xep:FloggerLogVarargs:OFF
+                            -Xep:FloggerLogWithCause:OFF
+                            -Xep:FloggerMessageFormat:OFF
+                            -Xep:FloggerRedundantIsEnabled:OFF
+                            -Xep:FloggerRequiredModifiers:OFF
+                            -Xep:FloggerSplitLogStatement:OFF
+                            -Xep:FloggerStringConcatenation:OFF
+                            -Xep:FloggerWithCause:OFF
+                            -Xep:FloggerWithoutCause:OFF
+                            -Xep:FragmentInjection:OFF
+                            -Xep:FragmentNotInstantiable:OFF
+                            -Xep:ICCProfileGetInstance:OFF
+                            -Xep:IsLoggableTagLength:OFF
+                            -Xep:JUnit3FloatingPointComparisonWithoutDelta:OFF
+                            -Xep:JUnit3TestNotRun:OFF
+                            -Xep:JUnit4ClassUsedInJUnit3:OFF
+                            -Xep:JUnitAmbiguousTestClass:OFF
+                            -Xep:MislabeledAndroidString:OFF
+                            -Xep:MissingRefasterAnnotation:OFF
+                            -Xep:OutlineNone:OFF
+                            -Xep:ParcelableCreator:OFF
+                            -Xep:RectIntersectReturnValueIgnored:OFF
+                            -Xep:RobolectricShadowDirectlyOn:OFF
+                            -Xep:StringCaseLocaleUsage:OFF
+                            -Xep:SwigMemoryLeak:OFF
+                            -Xep:DefaultCharset:ERROR
+                            -Xep:DoubleCheckedLocking:ERROR
+                            -Xep:InconsistentHashCode:ERROR
+                            -Xep:IncrementInForLoopAndHeader:ERROR
+                            -Xep:NonAtomicVolatileUpdate:ERROR
+                            -Xep:PrimitiveAtomicReference:ERROR
+                        </arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error-prone.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto-service.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.value</groupId>
+                            <artifactId>auto-value</artifactId>
+                            <version>${auto-value.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.graylog.autovalue</groupId>
+                            <artifactId>auto-value-javabean</artifactId>
+                            <version>${auto-value-javabean.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.11.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_core</artifactId>
-                        <version>2.13.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -551,7 +921,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <groupId>org.graylog.repackaged</groupId>
                 <artifactId>download-maven-plugin</artifactId>
                 <version>${download-maven-plugin.version}</version>
                 <configuration>
@@ -576,7 +946,7 @@
                         <licenseSet>
                             <header>com/mycila/maven/plugin/license/templates/SSPL-1.txt</header>
                             <properties>
-                                <project.inceptionYear>2020</project.inceptionYear>
+                                <year>2020</year>
                                 <owner>Graylog, Inc.</owner>
                             </properties>
                             <keywords>

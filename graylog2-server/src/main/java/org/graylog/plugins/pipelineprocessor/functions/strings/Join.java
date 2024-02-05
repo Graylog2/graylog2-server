@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,6 +40,7 @@ public class Join extends AbstractFunction<String> {
 
     public Join() {
         elementsParam = ParameterDescriptor.type("elements", Object.class, List.class)
+                .ruleBuilderVariable()
                 .transform(Join::toList)
                 .description("The list of strings to join together, may be null")
                 .build();
@@ -83,6 +85,10 @@ public class Join extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(ImmutableList.of(elementsParam, delimiterParam, startIndexParam, endIndexParam))
                 .description("Joins the elements of the provided array into a single String")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Join array to string")
+                .ruleBuilderTitle("Join '${elements}' into a single string, <#if start??>starting with ${start} </#if><#if indexEnd??>and ending with ${indexEnd} <#/if>using '${delimiter!' '} as separator.")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

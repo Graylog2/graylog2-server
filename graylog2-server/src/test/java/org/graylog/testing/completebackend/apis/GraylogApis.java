@@ -37,7 +37,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.CoreMatchers.not;
 
-public class GraylogApis {
+public class GraylogApis implements GraylogRestApi {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogApis.class);
 
     ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
@@ -140,13 +140,13 @@ public class GraylogApis {
     }
 
     public ValidatableResponse post(final String url, final Users.User user, final String body, final int expectedResult) {
-        var response = prefix(user);
+        var request = prefix(user);
 
         if(body != null) {
-            response = response.body(body);
+            request = request.body(body);
         }
 
-        return response
+        return request
                 .post(url)
                 .then()
                 .log().ifStatusCodeMatches(not(expectedResult))
@@ -158,13 +158,13 @@ public class GraylogApis {
     }
 
     public ValidatableResponse put(final String url, final Users.User user, final String body, final int expectedResult) {
-        var response = prefix(user);
+        var request = prefix(user);
 
         if(body != null) {
-            response = response.body(body);
+            request = request.body(body);
         }
 
-        return response
+        return request
                 .put(url)
                 .then()
                 .log().ifStatusCodeMatches(not(expectedResult))

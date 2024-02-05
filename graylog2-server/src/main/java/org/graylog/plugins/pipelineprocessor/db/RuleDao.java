@@ -35,6 +35,7 @@ public abstract class RuleDao {
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_MODFIED_AT = "modfied_at";
     public static final String FIELD_RULEBUILDER = "rulebuilder";
+    public static final String FIELD_SIMULATOR_MESSAGE = "simulator_message";
 
     @JsonProperty(FIELD_ID)
     @Nullable
@@ -64,6 +65,10 @@ public abstract class RuleDao {
     @Nullable
     public abstract RuleBuilder ruleBuilder();
 
+    @JsonProperty
+    @Nullable
+    public abstract String simulatorMessage();
+
     public static Builder builder() {
         return new AutoValue_RuleDao.Builder();
     }
@@ -77,7 +82,8 @@ public abstract class RuleDao {
                                  @JsonProperty(FIELD_SOURCE) String source,
                                  @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
                                  @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt,
-                                 @JsonProperty(FIELD_RULEBUILDER) @Nullable RuleBuilder ruleBuilder) {
+                                 @JsonProperty(FIELD_RULEBUILDER) @Nullable RuleBuilder ruleBuilder,
+                                 @JsonProperty(FIELD_SIMULATOR_MESSAGE) @Nullable String simulatorMessage) {
         return builder()
                 .id(id)
                 .source(source)
@@ -86,6 +92,7 @@ public abstract class RuleDao {
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
                 .ruleBuilder(ruleBuilder)
+                .simulatorMessage(simulatorMessage)
                 .build();
     }
 
@@ -106,5 +113,7 @@ public abstract class RuleDao {
         public abstract Builder modifiedAt(DateTime modifiedAt);
 
         public abstract Builder ruleBuilder(RuleBuilder ruleBuilder);
+
+        public abstract Builder simulatorMessage(String simulatorMessage);
     }
 }

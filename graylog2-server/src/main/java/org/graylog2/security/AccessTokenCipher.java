@@ -19,7 +19,7 @@ package org.graylog2.security;
 import com.google.common.hash.Hashing;
 import org.graylog2.Configuration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

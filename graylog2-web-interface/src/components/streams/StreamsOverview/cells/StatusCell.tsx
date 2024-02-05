@@ -22,8 +22,10 @@ import { Icon } from 'components/common';
 import { Label } from 'components/bootstrap';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 import type { Stream } from 'stores/streams/StreamsStore';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StatusLabel = styled(Label)(({ $clickable }: { $clickable: boolean }) => css`
+const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
   cursor: ${$clickable ? 'pointer' : 'default'};
   display: inline-flex;
   justify-content: center;
@@ -51,8 +53,17 @@ const StatusCell = ({ stream }: Props) => {
   const disableChange = stream.is_default || !stream.is_editable;
   const description = stream.disabled ? 'Paused' : 'Running';
   const title = _title(stream.disabled, disableChange, description);
+  const sendTelemetry = useSendTelemetry();
 
   const toggleStreamStatus = useCallback(async () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_STATUS_TOGGLED, {
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-status',
+      event_details: {
+        enabled: !stream.disabled,
+      },
+    });
+
     if (stream.disabled) {
       await StreamsStore.resume(stream.id, (response) => response);
     }
@@ -61,7 +72,7 @@ const StatusCell = ({ stream }: Props) => {
     if (!stream.disabled && window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
       await StreamsStore.pause(stream.id, (response) => response);
     }
-  }, [stream.disabled, stream.id, stream.title]);
+  }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
 
   return (
     <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'}

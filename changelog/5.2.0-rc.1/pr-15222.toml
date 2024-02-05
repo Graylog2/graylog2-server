@@ -1,0 +1,5 @@
+type = "a"
+message = "Create message in system notification stream when sidecar becomes inactive"
+
+pulls = ["15222"]
+issues = ["6697"]

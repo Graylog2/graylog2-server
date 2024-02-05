@@ -1,0 +1,5 @@
+type = "added"
+message = "Add sidecar graylog_host variable, Auditbeat collector for Linux and default configurations."
+
+issues = ["15570"]
+pulls = ["15571"]

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixes failure to delete indices with time/size optimizing strategy, when write block is not present."
+
+issues = ["Graylog2/graylog-plugin-enterprise#5722"]
+pulls = ["16503"]

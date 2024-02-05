@@ -41,7 +41,7 @@ jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
   EventDefinitionsActions: {
-    get: mockAction(jest.fn(() => Promise.resolve({ event_definition: mockEventDefinition, context: { scheduler: { is_scheduled: true } } }))),
+    get: mockAction(jest.fn(() => Promise.resolve({ event_definition: mockEventDefinition, context: { scheduler: { is_scheduled: true } }, is_mutable: true }))),
   },
 }));
 

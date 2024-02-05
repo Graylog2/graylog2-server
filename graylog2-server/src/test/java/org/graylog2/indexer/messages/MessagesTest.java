@@ -33,16 +33,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.messages.IndexingError.Type.IndexBlocked;
+import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -66,7 +65,7 @@ public class MessagesTest {
     private FailureSubmissionService failureSubmissionService;
 
     @Captor
-    private ArgumentCaptor<Collection<Messages.IndexingError>> indexingErrorsArgumentCaptor;
+    private ArgumentCaptor<Collection<IndexingError>> indexingErrorsArgumentCaptor;
 
     private Messages messages;
 
@@ -77,23 +76,24 @@ public class MessagesTest {
 
     @Test
     public void bulkIndexingShouldNotDoAnythingForEmptyList() throws Exception {
-        final Set<String> result = messages.bulkIndex(Collections.emptyList());
+        final IndexingResults indexingResults = messages.bulkIndex(Collections.emptyList());
 
-        assertThat(result).isNotNull()
-                .isEmpty();
+        assertThat(indexingResults).isNotNull();
+        assertThat(indexingResults.allResults()).isEmpty();
 
         verify(messagesAdapter, never()).bulkIndex(any());
     }
 
     @Test
     public void bulkIndexingShouldAccountMessageSizes() throws IOException {
-        when(messagesAdapter.bulkIndex(any())).thenReturn(Collections.emptyList());
+        when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.empty());
         final IndexSet indexSet = mock(IndexSet.class);
-        final List<Map.Entry<IndexSet, Message>> messageList = ImmutableList.of(
-                createMessageListEntry(indexSet, messageWithSize(17)),
-                createMessageListEntry(indexSet, messageWithSize(23)),
-                createMessageListEntry(indexSet, messageWithSize(42))
+        final List<MessageWithIndex> messageList = List.of(
+                new MessageWithIndex(messageWithSize(17), indexSet),
+                new MessageWithIndex(messageWithSize(23), indexSet),
+                new MessageWithIndex(messageWithSize(42), indexSet)
         );
+        when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 
         messages.bulkIndex(messageList);
 
@@ -103,13 +103,13 @@ public class MessagesTest {
 
     @Test
     public void bulkIndexingShouldAccountMessageSizesForSystemTrafficSeparately() throws IOException {
-        when(messagesAdapter.bulkIndex(any())).thenReturn(Collections.emptyList());
         final IndexSet indexSet = mock(IndexSet.class);
-        final List<Map.Entry<IndexSet, Message>> messageList = ImmutableList.of(
-                createMessageListEntry(indexSet, messageWithSize(17)),
-                createMessageListEntry(indexSet, messageWithSize(23)),
-                createMessageListEntry(indexSet, messageWithSize(42))
+        final List<MessageWithIndex> messageList = List.of(
+                new MessageWithIndex(messageWithSize(17), indexSet),
+                new MessageWithIndex(messageWithSize(23), indexSet),
+                new MessageWithIndex(messageWithSize(42), indexSet)
         );
+        when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 
         messages.bulkIndex(messageList, true);
 
@@ -133,18 +133,23 @@ public class MessagesTest {
                 IndexingRequest.create(indexSet, message3));
 
         when(messagesAdapter.bulkIndex(indexingRequest)).thenReturn(
-                ImmutableList.of(
-                        Messages.IndexingError.create(message2, "msg-index", Messages.IndexingError.ErrorType.MappingError, "Some error message"),
-                        Messages.IndexingError.create(message3, "msg-index", Messages.IndexingError.ErrorType.MappingError, "Some error message"),
-                        Messages.IndexingError.create(message4, "msg-index", Messages.IndexingError.ErrorType.IndexBlocked, "Index blocked error message")
+                IndexingResults.create(List.of(),
+                        List.of(
+                                IndexingError.create(message2, "msg-index", MappingError, "Some error message"),
+                                IndexingError.create(message3, "msg-index", MappingError, "Some error message"),
+                                IndexingError.create(message4, "msg-index", IndexBlocked, "Index blocked error message")
+                        )
                 )
         );
+        when(messagesAdapter.bulkIndex(List.of())).thenReturn(IndexingResults.empty());
 
         // when
-        final Set<String> failureIds = messages.bulkIndexRequests(indexingRequest, false);
+        final IndexingResults indexingResults = messages.bulkIndexRequests(indexingRequest, false);
 
         // then
-        assertThat(failureIds).hasSize(2)
+        assertThat(indexingResults.errors()).hasSize(2)
+                .map(IndexingResult::message)
+                .map(Indexable::getId)
                 .containsExactlyInAnyOrder("msg-2", "msg-3");
 
         verify(failureSubmissionService, times(1)).submitIndexingErrors(indexingErrorsArgumentCaptor.capture());
@@ -155,12 +160,12 @@ public class MessagesTest {
                 .collect(Collectors.toList())
         ).satisfies(indexingErrors -> {
             assertThat(indexingErrors.get(0)).satisfies(indexingError -> {
-                assertThat(indexingError.errorType()).isEqualTo(Messages.IndexingError.ErrorType.MappingError);
+                assertThat(indexingError.error().type()).isEqualTo(MappingError);
                 assertThat(indexingError.message()).isEqualTo(message2);
             });
 
             assertThat(indexingErrors.get(1)).satisfies(indexingError -> {
-                assertThat(indexingError.errorType()).isEqualTo(Messages.IndexingError.ErrorType.MappingError);
+                assertThat(indexingError.error().type()).isEqualTo(MappingError);
                 assertThat(indexingError.message()).isEqualTo(message3);
             });
         });
@@ -178,15 +183,19 @@ public class MessagesTest {
                 IndexingRequest.create(indexSet, message1),
                 IndexingRequest.create(indexSet, message2));
 
-        when(messagesAdapter.bulkIndex(indexingRequest)).thenReturn(ImmutableList.of());
+        when(messagesAdapter.bulkIndex(indexingRequest)).thenReturn(IndexingResults.empty());
 
         // when
-        final Set<String> failureIds = messages.bulkIndexRequests(indexingRequest, false);
+        final IndexingResults indexingResults = messages.bulkIndexRequests(indexingRequest, false);
 
         // then
-        assertThat(failureIds).isEmpty();
+        assertThat(indexingResults.errors()).isEmpty();
 
         verifyNoInteractions(failureSubmissionService);
+    }
+
+    private List<IndexingSuccess> createSuccessFromMessages(List<MessageWithIndex> messageList) {
+        return messageList.stream().map(m -> new IndexingSuccess(m.message(), "index_2")).collect(Collectors.toList());
     }
 
     private Message message(String msgId, DateTime ts) {
@@ -195,10 +204,6 @@ public class MessagesTest {
         when(mock.getMessageId()).thenReturn(msgId);
         when(mock.getTimestamp()).thenReturn(ts);
         return mock;
-    }
-
-    private Map.Entry<IndexSet, Message> createMessageListEntry(IndexSet indexSet, Message message) {
-        return new AbstractMap.SimpleEntry<>(indexSet, message);
     }
 
     private Message messageWithSize(long size) {

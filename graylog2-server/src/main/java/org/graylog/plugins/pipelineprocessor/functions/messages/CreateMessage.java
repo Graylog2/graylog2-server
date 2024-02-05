@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -76,7 +77,11 @@ public class CreateMessage extends AbstractFunction<Message> {
                         sourceParam,
                         timestampParam
                 ))
-                .description("Creates a new message")
+                .description("Creates a new message which will be evaluated by the entire processing pipeline. Any omitted parameters (message, source, timestamp) will inherit their values from the currently processed message. The timestamp will inherit the current timestamp.")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Create message")
+                .ruleBuilderTitle("Create a new message")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

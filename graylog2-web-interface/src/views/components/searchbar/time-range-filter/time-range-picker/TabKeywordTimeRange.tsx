@@ -67,12 +67,12 @@ type Props = {
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
-  const [nextRangeProps, , nextRangeHelpers] = useField('nextTimeRange');
+  const [nextRangeProps, , nextRangeHelpers] = useField('timeRangeTabs.keyword');
   const mounted = useRef(true);
   const keywordRef = useRef<string>();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
 
-  const _setSuccessfullPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
+  const _setSuccessfulPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
     setValidatingKeyword(false);
 
     return setKeywordPreview(_parseKeywordPreview(response, formatTime));
@@ -99,13 +99,13 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
         ? Promise.resolve('Keyword must not be empty!')
         : ToolsStore.testNaturalDate(keyword, userTimezone)
           .then((response) => {
-            if (mounted.current) _setSuccessfullPreview(response);
+            if (mounted.current) _setSuccessfulPreview(response);
           })
           .catch(_setFailedPreview);
     }
 
     return undefined;
-  }, [_setFailedPreview, _setSuccessfullPreview, setValidatingKeyword, userTimezone]);
+  }, [_setFailedPreview, _setSuccessfulPreview, setValidatingKeyword, userTimezone]);
 
   useEffect(() => () => {
     mounted.current = false;
@@ -134,7 +134,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     <Row className="no-bm">
       <Col sm={5}>
         <Headline>Time range:</Headline>
-        <Field name="nextTimeRange.keyword" validate={_validateKeyword}>
+        <Field name="timeRangeTabs.keyword.keyword" validate={_validateKeyword}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
@@ -155,7 +155,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
           )}
         </Field>
 
-        Preview
+        <b>Preview</b>
         <EffectiveTimeRangeTable>
           <tbody>
             <tr>

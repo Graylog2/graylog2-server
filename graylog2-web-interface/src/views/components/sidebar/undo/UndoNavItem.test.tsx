@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -26,8 +27,10 @@ import type { RootState } from 'views/types';
 import useAppDispatch from 'stores/useAppDispatch';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import HotkeysProvider from 'contexts/HotkeysProvider';
 
 jest.mock('stores/useAppDispatch');
+jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('views/logic/slices/undoRedoActions', () => ({
   ...jest.requireActual('views/logic/slices/undoRedoActions'),
@@ -37,7 +40,9 @@ jest.mock('views/logic/slices/undoRedoActions', () => ({
 describe('<UndoNavItem />', () => {
   const RedoNavItemComponent = () => (
     <TestStoreProvider undoRedoState={undoRedoTestStore}>
-      <UndoNavItem sidebarIsPinned={false} />
+      <HotkeysProvider>
+        <UndoNavItem sidebarIsPinned={false} />
+      </HotkeysProvider>
     </TestStoreProvider>
   );
 
@@ -45,6 +50,7 @@ describe('<UndoNavItem />', () => {
 
   beforeEach(() => {
     asMock(useAppDispatch).mockReturnValue(dispatch);
+    jest.clearAllMocks();
   });
 
   useViewsPlugin();
@@ -54,8 +60,12 @@ describe('<UndoNavItem />', () => {
     const undoButton = await screen.findByLabelText('Undo');
     fireEvent.click(undoButton);
 
-    await waitFor(() => {
-      expect(undo).toHaveBeenCalled();
-    });
+    await waitFor(() => expect(undo).toHaveBeenCalled());
+  });
+
+  it('Call redo action when pressing related keyboard shortcut', async () => {
+    render(<RedoNavItemComponent />);
+    userEvent.keyboard('{Meta>}{Shift>}z{/Shift}{/Meta}');
+    await waitFor(() => expect(undo).toHaveBeenCalledTimes(1));
   });
 });

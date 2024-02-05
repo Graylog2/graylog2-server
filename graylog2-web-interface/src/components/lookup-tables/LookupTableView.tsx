@@ -50,7 +50,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
     newValue.valid = event.target.value
                   && event.target.value.replace(/\s/g, '').length > 0;
 
-    newValue.value = event.target.value.toLowerCase();
+    newValue.value = event.target.value;
 
     switch (event.target.name) {
       case 'purgekey':

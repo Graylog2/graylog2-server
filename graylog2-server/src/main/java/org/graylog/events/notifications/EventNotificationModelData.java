@@ -33,29 +33,37 @@ import java.util.Optional;
 @AutoValue
 public abstract class EventNotificationModelData {
     private static final String UNKNOWN = "<unknown>";
+    public static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
+    public static final String FIELD_EVENT_DEFINITION_TYPE = "event_definition_type";
+    public static final String FIELD_EVENT_DEFINITION_TITLE = "event_definition_title";
+    public static final String FIELD_EVENT_DEFINITION_DESCRIPTION = "event_definition_description";
+    public static final String FIELD_JOB_DEFINITION_ID = "job_definition_id";
+    public static final String FIELD_JOB_TRIGGER_ID = "job_trigger_id";
+    public static final String FIELD_EVENT = "event";
+    public static final String FIELD_BACKLOG = "backlog";
 
-    @JsonProperty("event_definition_id")
+    @JsonProperty(FIELD_EVENT_DEFINITION_ID)
     public abstract String eventDefinitionId();
 
-    @JsonProperty("event_definition_type")
+    @JsonProperty(FIELD_EVENT_DEFINITION_TYPE)
     public abstract String eventDefinitionType();
 
-    @JsonProperty("event_definition_title")
+    @JsonProperty(FIELD_EVENT_DEFINITION_TITLE)
     public abstract String eventDefinitionTitle();
 
-    @JsonProperty("event_definition_description")
+    @JsonProperty(FIELD_EVENT_DEFINITION_DESCRIPTION)
     public abstract String eventDefinitionDescription();
 
-    @JsonProperty("job_definition_id")
+    @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
 
-    @JsonProperty("job_trigger_id")
+    @JsonProperty(FIELD_JOB_TRIGGER_ID)
     public abstract String jobTriggerId();
 
-    @JsonProperty("event")
+    @JsonProperty(FIELD_EVENT)
     public abstract EventDto event();
 
-    @JsonProperty("backlog")
+    @JsonProperty(FIELD_BACKLOG)
     public abstract ImmutableList<MessageSummary> backlog();
 
     public static Builder builder() {

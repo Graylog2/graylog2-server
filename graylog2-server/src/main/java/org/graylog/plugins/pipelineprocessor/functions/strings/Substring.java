@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -34,7 +35,7 @@ public class Substring extends AbstractFunction<String> {
     private final ParameterDescriptor<Long, Long> endParam;
 
     public Substring() {
-        valueParam = ParameterDescriptor.string("value").description("The string to extract from").primary().build();
+        valueParam = ParameterDescriptor.string("value").description("The string to extract from").ruleBuilderVariable().build();
         startParam = ParameterDescriptor.integer("start").allowNegatives(true).description("The position to start from, negative means count back from the end of the String by this many characters").build();
         endParam = ParameterDescriptor.integer("indexEnd").optional().allowNegatives(true).description("The position to end at (exclusive), negative means count back from the end of the String by this many characters, defaults to length of the input string").build();
     }
@@ -63,6 +64,10 @@ public class Substring extends AbstractFunction<String> {
                         endParam
                 ))
                 .description("Extract a substring from a string")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Substring")
+                .ruleBuilderTitle("Get substring from '${start}' to '${indexEnd!\"end\"}' of '${value}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

@@ -17,11 +17,15 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import asMock from 'helpers/mocking/AsMock';
+import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
+import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
+
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
 
 const indexSet = {
   id: '62665eb0526719678ed3719f',
-  title: 'anotyher',
+  title: 'Foo Title',
   description: 'test',
   can_be_default: true,
   index_prefix: 'another',
@@ -42,6 +46,7 @@ const indexSet = {
   index_optimization_max_num_segments: 1,
   index_optimization_disabled: true,
   field_type_refresh_interval: 5000,
+  field_type_profile: null,
   index_template_type: null,
   writable: true,
   default: false,
@@ -204,13 +209,42 @@ const rotationStrategies = [
   },
 ];
 
+const indexDefaultsConfig = {
+  index_prefix: 'default_index_prefix',
+  index_analyzer: 'default_index_analyser',
+  shards: 1,
+  replicas: 1,
+  index_optimization_max_num_segments: 1,
+  index_optimization_disabled: true,
+  field_type_refresh_interval: 30,
+  field_type_refresh_interval_unit: 'minutes' as 'minutes' | 'seconds',
+  rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy',
+  rotation_strategy_config: {
+    type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig',
+    max_size: 12,
+  },
+  retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
+  retention_strategy_config: {
+    type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
+    max_number_of_indices: 10,
+    index_action: 'foo',
+  },
+};
+
+jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
+jest.mock('components/indices/hooks/useIndexDefaults', () => jest.fn());
+
 describe('IndexSetConfigurationForm', () => {
+  beforeEach(() => {
+    asMock(useProfileOptions).mockReturnValue(({ isLoading: false, options: [], refetch: () => {} }));
+    asMock(useIndexDefaults).mockReturnValue(({ loadingIndexDefaultsConfig: false, indexDefaultsConfig }));
+  });
+
   const onSave = jest.fn();
   const cancelLink = '/cancelLink';
 
   const SUT = (props: Partial<React.ComponentProps<typeof IndexSetConfigurationForm>>) => (
-    <IndexSetConfigurationForm indexSet={indexSet}
-                               retentionStrategiesContext={retentionStrategiesContext}
+    <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
                                rotationStrategies={rotationStrategies}
                                retentionStrategies={retentionStrategies}
                                cancelLink={cancelLink}
@@ -221,9 +255,9 @@ describe('IndexSetConfigurationForm', () => {
   );
 
   it('Should render IndexSetConfigurationForm', () => {
-    render(<SUT />);
+    render(<SUT indexSet={indexSet} />);
 
-    const titleText = screen.getByText(/title/i);
+    const titleText = screen.getByDisplayValue(/Foo Title/i);
 
     expect(titleText).toBeInTheDocument();
   });
@@ -231,7 +265,7 @@ describe('IndexSetConfigurationForm', () => {
   it('Should render create IndexSetConfigurationForm', () => {
     render(<SUT create />);
 
-    const indexPrefix = screen.getByText(/index prefix/i);
+    const indexPrefix = screen.getByDisplayValue(/default_index_prefix/i);
 
     expect(indexPrefix).toBeInTheDocument();
   });

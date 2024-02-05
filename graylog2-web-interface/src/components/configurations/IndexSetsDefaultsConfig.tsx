@@ -33,8 +33,12 @@ import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMai
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
+import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import FormikInput from '../common/FormikInput';
 
@@ -77,6 +81,7 @@ const IndexSetsDefaultsConfig = () => {
   );
 
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG).then(() => {
@@ -105,8 +110,8 @@ const IndexSetsDefaultsConfig = () => {
     delete defaultIndexValues?.rotation_strategy;
     delete defaultIndexValues?.retention_strategy;
 
-    sendTelemetry('form_submit', {
-      app_pathname: 'configurations',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.INDEX_SETS_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'index-default',
       app_action_value: 'configuration-save',
     });
@@ -139,12 +144,12 @@ const IndexSetsDefaultsConfig = () => {
     strategy: configToUse.retention_strategy_class,
   });
 
-  const getRotationConfigState = (strategy: string, data: string) => ({
+  const getRotationConfigState = (strategy: string, data: RotationStrategyConfig) => ({
     rotation_strategy_config: data,
     rotation_strategy_class: strategy,
   });
 
-  const getRetentionConfigState = (strategy: string, data: string) => ({
+  const getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig) => ({
     retention_strategy_class: strategy,
     retention_strategy_config: data,
   });
@@ -152,119 +157,119 @@ const IndexSetsDefaultsConfig = () => {
   const modalTitle = 'Configure Index Set Defaults';
 
   return (
-    <div>
-      <h2>Index Set Defaults Configuration</h2>
-      <p>Defaults for newly created index sets.</p>
-      {!viewConfig || !formConfig ? <Spinner /> : (
-        <>
-          <StyledDefList>
-            <dt>Index analyzer:</dt>
-            <dd>{viewConfig.index_analyzer}</dd>
-            <dt>Shards per Index:</dt>
-            <dd>{viewConfig.shards}</dd>
-            <dt>Replicas per Index:</dt>
-            <dd>{viewConfig.replicas}</dd>
-            <dt>Index optimization disabled:</dt>
-            <dd>{viewConfig.index_optimization_disabled ? 'Yes' : 'No'}</dd>
-            <dt>Max. Number of Segments:</dt>
-            <dd>{viewConfig.index_optimization_max_num_segments}</dd>
-            <dt>Field type refresh interval:</dt>
-            <dd>{viewConfig.field_type_refresh_interval} {capitalize(viewConfig.field_type_refresh_interval_unit)}</dd>
-            <br />
-            <IndexMaintenanceStrategiesSummary config={rotationConfig(viewConfig)}
-                                               pluginExports={PluginStore.exports('indexRotationConfig')} />
-            <IndexMaintenanceStrategiesSummary config={retentionConfig(viewConfig)}
-                                               pluginExports={PluginStore.exports('indexRetentionConfig')} />
-          </StyledDefList>
+    <IndexRetentionProvider>
+      <div>
+        <h2>Index Set Defaults Configuration</h2>
+        <p>Defaults for newly created index sets.</p>
+        {!viewConfig || !formConfig ? <Spinner /> : (
+          <>
+            <StyledDefList>
+              <dt>Index analyzer:</dt>
+              <dd>{viewConfig.index_analyzer}</dd>
+              <dt>Shards per Index:</dt>
+              <dd>{viewConfig.shards}</dd>
+              <dt>Replicas per Index:</dt>
+              <dd>{viewConfig.replicas}</dd>
+              <dt>Index optimization disabled:</dt>
+              <dd>{viewConfig.index_optimization_disabled ? 'Yes' : 'No'}</dd>
+              <dt>Max. Number of Segments:</dt>
+              <dd>{viewConfig.index_optimization_max_num_segments}</dd>
+              <dt>Field type refresh interval:</dt>
+              <dd>{viewConfig.field_type_refresh_interval} {capitalize(viewConfig.field_type_refresh_interval_unit)}</dd>
+              <br />
+              <IndexMaintenanceStrategiesSummary config={rotationConfig(viewConfig)}
+                                                 pluginExports={PluginStore.exports('indexRotationConfig')} />
+              <IndexMaintenanceStrategiesSummary config={retentionConfig(viewConfig)}
+                                                 pluginExports={PluginStore.exports('indexRetentionConfig')} />
+            </StyledDefList>
 
-          <p>
-            <IfPermitted permissions="indices:changestate">
-              <Button bsStyle="info"
-                      bsSize="xs"
-                      onClick={() => {
-                        setShowModal(true);
-                      }}>Edit configuration
-              </Button>
-            </IfPermitted>
-          </p>
+            <p>
+              <IfPermitted permissions="indices:changestate">
+                <Button bsStyle="info"
+                        bsSize="xs"
+                        onClick={() => {
+                          setShowModal(true);
+                        }}>Edit configuration
+                </Button>
+              </IfPermitted>
+            </p>
 
-          <Modal show={showModal}
-                 onHide={resetConfig}
-                 aria-modal="true"
-                 aria-labelledby="dialog_label"
-                 data-app-section="configurations_index_defaults"
-                 data-event-element={modalTitle}>
-            <Formik onSubmit={saveConfig} initialValues={formConfig}>
-              {({ values, setFieldValue, isSubmitting }) => (
-                <Form>
-                  <Modal.Header closeButton>
-                    <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
-                  </Modal.Header>
+            <Modal show={showModal}
+                   onHide={resetConfig}
+                   aria-modal="true"
+                   aria-labelledby="dialog_label">
+              <Formik onSubmit={saveConfig} initialValues={formConfig}>
+                {({ values, setFieldValue, isSubmitting }) => (
+                  <Form>
+                    <Modal.Header closeButton>
+                      <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                    </Modal.Header>
 
-                  <Modal.Body>
-                    <div>
-                      <Row>
-                        <Col md={12}>
-                          <FormikInput label="Index Analyzer"
-                                       name="index_analyzer"
-                                       id="index_analyzer" />
-                          <FormikInput label="Shards per Index"
-                                       name="shards"
-                                       id="shards" />
-                          <FormikInput label="Replicas"
-                                       name="replicas"
-                                       id="replicas" />
-                          <FormikInput label="Index Optimization Disabled"
-                                       type="checkbox"
-                                       name="index_optimization_disabled"
-                                       id="index_optimization_disabled" />
-                          <FormikInput label="Max. Number of Segments"
-                                       name="index_optimization_max_num_segments"
-                                       id="index_optimization_max_num_segments" />
-                          <TimeUnitInput label="Field type refresh interval"
-                                         update={(value, unit) => {
-                                           setFieldValue('field_type_refresh_interval', value);
-                                           setFieldValue('field_type_refresh_interval_unit', unit);
-                                         }}
-                                         value={values.field_type_refresh_interval}
-                                         unit={values.field_type_refresh_interval_unit}
-                                         enabled
-                                         hideCheckbox
-                                         units={TIME_UNITS} />
-                          <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                                   name="rotation"
-                                                                   selectPlaceholder="Select rotation strategy"
-                                                                   pluginExports={PluginStore.exports('indexRotationConfig')}
-                                                                   strategies={rotationStrategies.strategies}
-                                                                   activeConfig={rotationConfig(formConfig)}
-                                                                   getState={getRotationConfigState} />
+                    <Modal.Body>
+                      <div>
+                        <Row>
+                          <Col md={12}>
+                            <FormikInput label="Index Analyzer"
+                                         name="index_analyzer"
+                                         id="index_analyzer" />
+                            <FormikInput label="Shards per Index"
+                                         name="shards"
+                                         id="shards" />
+                            <FormikInput label="Replicas"
+                                         name="replicas"
+                                         id="replicas" />
+                            <FormikInput label="Index Optimization Disabled"
+                                         type="checkbox"
+                                         name="index_optimization_disabled"
+                                         id="index_optimization_disabled" />
+                            <FormikInput label="Max. Number of Segments"
+                                         name="index_optimization_max_num_segments"
+                                         id="index_optimization_max_num_segments" />
+                            <TimeUnitInput label="Field type refresh interval"
+                                           update={(value, unit) => {
+                                             setFieldValue('field_type_refresh_interval', value);
+                                             setFieldValue('field_type_refresh_interval_unit', unit);
+                                           }}
+                                           value={values.field_type_refresh_interval}
+                                           unit={values.field_type_refresh_interval_unit}
+                                           enabled
+                                           hideCheckbox
+                                           units={TIME_UNITS} />
+                            <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
+                                                                     name="rotation"
+                                                                     selectPlaceholder="Select rotation strategy"
+                                                                     pluginExports={PluginStore.exports('indexRotationConfig')}
+                                                                     strategies={rotationStrategies.strategies}
+                                                                     activeConfig={rotationConfig(formConfig)}
+                                                                     getState={getRotationConfigState} />
 
-                          <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                                   name="retention"
-                                                                   selectPlaceholder="Select rotation strategy"
-                                                                   pluginExports={PluginStore.exports('indexRetentionConfig')}
-                                                                   strategies={retentionStrategies.strategies}
-                                                                   activeConfig={retentionConfig(formConfig)}
-                                                                   getState={getRetentionConfigState} />
-                        </Col>
-                      </Row>
-                    </div>
-                  </Modal.Body>
+                            <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
+                                                                     name="retention"
+                                                                     selectPlaceholder="Select rotation strategy"
+                                                                     pluginExports={PluginStore.exports('indexRetentionConfig')}
+                                                                     strategies={retentionStrategies.strategies}
+                                                                     activeConfig={retentionConfig(formConfig)}
+                                                                     getState={getRetentionConfigState} />
+                          </Col>
+                        </Row>
+                      </div>
+                    </Modal.Body>
 
-                  <Modal.Footer>
-                    <Button type="button" onClick={resetConfig}>Cancel</Button>
-                    <Button type="submit"
-                            bsStyle="success"
-                            disabled={isSubmitting}>{isSubmitting ? 'Updating configuration' : 'Update configuration'}
-                    </Button>
-                  </Modal.Footer>
-                </Form>
-              )}
-            </Formik>
-          </Modal>
-        </>
-      )}
-    </div>
+                    <Modal.Footer>
+                      <Button type="button" onClick={resetConfig}>Cancel</Button>
+                      <Button type="submit"
+                              bsStyle="success"
+                              disabled={isSubmitting}>{isSubmitting ? 'Updating configuration' : 'Update configuration'}
+                      </Button>
+                    </Modal.Footer>
+                  </Form>
+                )}
+              </Formik>
+            </Modal>
+          </>
+        )}
+      </div>
+    </IndexRetentionProvider>
   );
 };
 

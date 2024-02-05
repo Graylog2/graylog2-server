@@ -26,27 +26,82 @@ const EmailNotificationSummary = ({ notification, ...otherProps }) => (
   <CommonNotificationSummary notification={notification} {...otherProps}>
     <>
       <tr>
-        <td>Sender</td>
-        <td>{notification.config.sender}</td>
+        <td>Use Lookup Table for Sender</td>
+        <td>{notification.config.lookup_sender_email ? 'Yes' : 'No'}</td>
       </tr>
+      {notification.config.lookup_sender_email ? (
+        <>
+          <tr>
+            <td>Sender Email Lookup Table Name</td>
+            <td>{notification.config.sender_lut_name}</td>
+          </tr>
+          <tr>
+            <td>Sender Email Lookup Table Key</td>
+            <td>{notification.config.sender_lut_key}</td>
+          </tr>
+        </>
+      )
+        : (
+          <tr>
+            <td>Sender</td>
+            <td>{notification.config.sender}</td>
+          </tr>
+        )}
       <tr>
         <td>Subject</td>
         <td>{notification.config.subject}</td>
       </tr>
       <tr>
-        <td>Reply-To</td>
-        <td>{notification.config.reply_to}</td>
+        <td>Use Lookup Table for Reply-To</td>
+        <td>{notification.config.lookup_reply_to_email ? 'Yes' : 'No'}</td>
       </tr>
+      {notification.config.lookup_reply_to_email ? (
+        <>
+          <tr>
+            <td>Reply-To Email Lookup Table Name</td>
+            <td>{notification.config.reply_to_lut_name}</td>
+          </tr>
+          <tr>
+            <td>Reply-To Email Lookup Table Key</td>
+            <td>{notification.config.reply_to_lut_key}</td>
+          </tr>
+        </>
+      )
+        : (
+          <tr>
+            <td>Reply-To</td>
+            <td>{notification.config.reply_to}</td>
+          </tr>
+        )}
+
       <tr>
-        <td>User recipients</td>
+        <td>User Recipients</td>
         <td>{notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}</td>
       </tr>
       <tr>
-        <td>Email recipients</td>
-        <td>
-          {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
-        </td>
+        <td>Use Lookup Table for Email Recipients</td>
+        <td>{notification.config.lookup_recipient_emails ? 'Yes' : 'No'}</td>
       </tr>
+      {notification.config.lookup_recipient_emails ? (
+        <>
+          <tr>
+            <td>Email Recipients Lookup Table Name</td>
+            <td>{notification.config.recipients_lut_name}</td>
+          </tr>
+          <tr>
+            <td>Email Recipients Lookup Table Key</td>
+            <td>{notification.config.recipients_lut_key}</td>
+          </tr>
+        </>
+      )
+        : (
+          <tr>
+            <td>Email Recipients</td>
+            <td>
+              {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
+            </td>
+          </tr>
+        )}
       <tr>
         <td>Email Body</td>
         <td>

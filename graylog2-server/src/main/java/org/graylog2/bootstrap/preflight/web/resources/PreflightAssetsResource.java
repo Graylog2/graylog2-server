@@ -26,18 +26,21 @@ import org.graylog2.bootstrap.preflight.PreflightConstants;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
+
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -56,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-@Path("")
+@Path("/")
 public class PreflightAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final LoadingCache<URI, FileSystem> fileSystemCache;
@@ -82,7 +85,6 @@ public class PreflightAssetsResource {
                 });
     }
 
-    @Path("/")
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response index(@Context Request request) {
@@ -120,7 +122,7 @@ public class PreflightAssetsResource {
             }
             case "jar" -> {
                 final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
-                path = fileSystem.getPath(filename);
+                path = fileSystem.getPath(PreflightConstants.ASSETS_RESOURCE_DIR + filename);
                 fileContents = Resources.toByteArray(resourceUrl);
             }
             default -> throw new IllegalArgumentException("Not a JAR or local file: " + resourceUrl);

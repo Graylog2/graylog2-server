@@ -18,7 +18,7 @@
 import React from 'react';
 import find from 'lodash/find';
 import type { IconName } from '@fortawesome/fontawesome-common-types';
-import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
+import type { SizeProp, RotateProp } from '@fortawesome/fontawesome-svg-core';
 
 import deprecationNotice from 'util/deprecationNotice';
 import loadAsync from 'routing/loadAsync';
@@ -69,6 +69,7 @@ type Props = {
   'data-testid'?: string,
   /** Name of Font Awesome 5 Icon without `fa-` prefix */
   name: IconName,
+  rotation?: RotateProp,
   size?: SizeProp,
   spin?: boolean,
   /**
@@ -101,6 +102,7 @@ const Icon = ({
   type,
   size,
   className,
+  rotation,
   spin,
   fixedWidth,
   inverse,
@@ -122,6 +124,7 @@ const Icon = ({
                            fixedWidth={fixedWidth}
                            icon={{ prefix, iconName }}
                            inverse={inverse}
+                           rotation={rotation}
                            size={size}
                            spin={spin}
                            style={style}
@@ -139,6 +142,7 @@ Icon.defaultProps = {
   'data-testid': undefined,
   fixedWidth: false,
   inverse: false,
+  rotation: undefined,
   size: undefined,
   spin: false,
   style: undefined,

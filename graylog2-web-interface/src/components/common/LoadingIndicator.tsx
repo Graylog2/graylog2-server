@@ -16,24 +16,29 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
 import Delayed from './Delayed';
 
-const StyledAlert = styled(Alert)`
+const Container = styled.div(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
   position: fixed;
-  height: 32px;
   min-width: 200px;
   top: 60px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 5px 20px;
-  text-align: center;
   box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
   z-index: 2000;
+`);
+
+const StyledAlert = styled(Alert)`
+  margin: 0;
+  height: 32px;
+  padding: 5px 20px;
+  text-align: center;
 `;
 
 type Props = {
@@ -49,9 +54,11 @@ type Props = {
  */
 const LoadingIndicator = ({ text }: Props) => (
   <Delayed delay={500}>
-    <StyledAlert bsStyle="info">
-      <Spinner delay={0} text={text} />
-    </StyledAlert>
+    <Container>
+      <StyledAlert bsStyle="info">
+        <Spinner delay={0} text={text} />
+      </StyledAlert>
+    </Container>
   </Delayed>
 );
 

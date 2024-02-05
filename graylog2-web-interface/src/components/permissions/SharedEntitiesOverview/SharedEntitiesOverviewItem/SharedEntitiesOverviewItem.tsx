@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { Link } from 'components/common/router';
 import type SharedEntity from 'logic/permissions/SharedEntity';
-import { getShowRouteFromGRN } from 'logic/permissions/GRN';
+import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
 import OwnersCell from './OwnersCell';
 
@@ -35,15 +35,19 @@ const SharedEntitiesOverviewItem = ({
     type,
     id,
   },
-}: Props) => (
-  <tr key={title + type}>
-    <td className="limited">
-      <Link to={getShowRouteFromGRN(id)}>{title}</Link>
-    </td>
-    <td className="limited">{type}</td>
-    <OwnersCell owners={owners} />
-    <td className="limited">{capabilityTitle}</td>
-  </tr>
-);
+}: Props) => {
+  const entityRoute = useShowRouteFromGRN(id);
+
+  return (
+    <tr key={title + type}>
+      <td className="limited">
+        <Link to={entityRoute}>{title}</Link>
+      </td>
+      <td className="limited">{type}</td>
+      <OwnersCell owners={owners} />
+      <td className="limited">{capabilityTitle}</td>
+    </tr>
+  );
+};
 
 export default SharedEntitiesOverviewItem;

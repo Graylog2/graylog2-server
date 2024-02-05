@@ -32,7 +32,7 @@ class PrivateKeyEncryptedFileStorageTest {
 
     @Test
     void testKeyStorageSaveAndRetrieve(@TempDir Path tmpDir) throws Exception {
-        PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage(tmpDir.resolve("temp.key").toString());
+        PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage(tmpDir.resolve("temp.key"));
         char[] passwd = "password".toCharArray();
 
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
@@ -47,7 +47,7 @@ class PrivateKeyEncryptedFileStorageTest {
 
     @Test
     void testKeyStorageThrowsExceptionWhenUsingWrongPasswordDuringRead(@TempDir Path tmpDir) throws Exception {
-        PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage(tmpDir.resolve("temp.key").toString());
+        PrivateKeyEncryptedFileStorage privateKeyEncryptedFileStorage = new PrivateKeyEncryptedFileStorage(tmpDir.resolve("temp.key"));
         char[] passwd = "password".toCharArray();
 
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);

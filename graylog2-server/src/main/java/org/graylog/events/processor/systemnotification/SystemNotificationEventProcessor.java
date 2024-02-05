@@ -27,16 +27,19 @@ import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
+import org.graylog2.Configuration;
 import org.graylog2.plugin.MessageSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class SystemNotificationEventProcessor implements EventProcessor {
+
     public interface Factory extends EventProcessor.Factory<SystemNotificationEventProcessor> {
         @Override
         SystemNotificationEventProcessor create(EventDefinition eventDefinition);
@@ -45,10 +48,12 @@ public class SystemNotificationEventProcessor implements EventProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(SystemNotificationEventProcessor.class);
 
     private final EventDefinition eventDefinition;
+    private final Configuration configuration;
 
     @Inject
-    public SystemNotificationEventProcessor(@Assisted EventDefinition eventDefinition) {
+    public SystemNotificationEventProcessor(@Assisted EventDefinition eventDefinition, Configuration configuration) {
         this.eventDefinition = eventDefinition;
+        this.configuration = configuration;
     }
 
     @Override
@@ -57,14 +62,16 @@ public class SystemNotificationEventProcessor implements EventProcessor {
         LOG.debug("Creating system event for notification: {}", eventParameters.notificationType());
 
         String message = eventParameters.notificationType().name();
-        if (eventParameters.notificationMessage() != null) {
-            message += ": " + eventParameters.notificationMessage();
+        if (!configuration.getSystemEventExcludedTypes().contains(message)) {
+            if (eventParameters.notificationMessage() != null) {
+                message += ": " + eventParameters.notificationMessage();
+            }
+            final Event event = eventFactory.createEvent(eventDefinition, eventParameters.timestamp(), message);
+            for (Map.Entry<String, Object> entry : eventParameters.notificationDetails().entrySet()) {
+                event.setField(entry.getKey(), FieldValue.builder().dataType(FieldValueType.STRING).value(entry.getValue().toString()).build());
+            }
+            eventsConsumer.accept(List.of(EventWithContext.create(event)));
         }
-        final Event event = eventFactory.createEvent(eventDefinition, eventParameters.timestamp(), message);
-        for (Map.Entry<String, Object> entry: eventParameters.notificationDetails().entrySet()) {
-            event.setField(entry.getKey(), FieldValue.builder().dataType(FieldValueType.STRING).value(entry.getValue().toString()).build());
-        }
-        eventsConsumer.accept(List.of(EventWithContext.create(event)));
     }
 
     @Override

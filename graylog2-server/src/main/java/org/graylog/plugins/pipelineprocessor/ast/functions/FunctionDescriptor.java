@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import javax.annotation.Nullable;
 
@@ -58,9 +59,30 @@ public abstract class FunctionDescriptor<T> {
     @JsonProperty
     public abstract boolean ruleBuilderEnabled();
 
+    @JsonIgnore
+    @Nullable
+    public abstract String ruleBuilderName();
+
+    /**
+     * default to function name
+     *
+     * @return function name, if rule builder is enabled and no name is explicitly set
+     */
+    @JsonProperty("rule_builder_name")
+    public String getRuleBuilderName() {
+        if (ruleBuilderEnabled() && ruleBuilderName() == null) {
+            return name();
+        }
+        return ruleBuilderName();
+    }
+
     @JsonProperty
     @Nullable
     public abstract String ruleBuilderTitle();
+
+    @JsonIgnore
+    @Nullable
+    public abstract RuleBuilderFunctionGroup ruleBuilderFunctionGroup();
 
     public static <T> Builder<T> builder() {
         //noinspection unchecked
@@ -88,7 +110,11 @@ public abstract class FunctionDescriptor<T> {
             return ruleBuilderEnabled(true);
         }
 
+        public abstract Builder<T> ruleBuilderName(String ruleBuilderName);
+
         public abstract Builder<T> ruleBuilderTitle(String ruleBuilderTitle);
+
+        public abstract Builder<T> ruleBuilderFunctionGroup(RuleBuilderFunctionGroup ruleBuilderFunctionGroup);
 
         public Builder<T> params(ParameterDescriptor... params) {
             return params(ImmutableList.<ParameterDescriptor>builder().add(params).build());
@@ -109,14 +135,18 @@ public abstract class FunctionDescriptor<T> {
             @JsonProperty("return_type") Class<? extends T> returnType,
             @JsonProperty("params") @Nullable ImmutableList<ParameterDescriptor> params,
             @JsonProperty("description") @Nullable String description,
-            @JsonProperty("rule_builder_title") @Nullable String ruleBuilderTitle) {
+            @JsonProperty("rule_builder_name") @Nullable String ruleBuilderName,
+            @JsonProperty("rule_builder_title") @Nullable String ruleBuilderTitle,
+            @JsonProperty("rule_builder_group") @Nullable RuleBuilderFunctionGroup ruleBuilderFunctionGroup) {
         return FunctionDescriptor.<T>builder()
                 .name(name)
                 .returnType(returnType)
                 .params(params)
                 .description(description)
                 .ruleBuilderEnabled()
+                .ruleBuilderName(ruleBuilderName)
                 .ruleBuilderTitle(ruleBuilderTitle)
+                .ruleBuilderFunctionGroup(ruleBuilderFunctionGroup)
                 .build();
     }
 

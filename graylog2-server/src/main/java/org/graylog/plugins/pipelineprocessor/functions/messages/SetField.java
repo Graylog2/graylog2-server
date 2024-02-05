@@ -22,11 +22,13 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
@@ -41,14 +43,16 @@ public class SetField extends AbstractFunction<Void> {
     private final ParameterDescriptor<String, String> suffixParam;
     private final ParameterDescriptor<Message, Message> messageParam;
     private final ParameterDescriptor<Object, Object> defaultParam;
+    private final ParameterDescriptor<Boolean, Boolean> cleanField;
 
     public SetField() {
         fieldParam = string("field").description("The new field name").build();
-        valueParam = object("value").description("The new field value").primary().build();
+        valueParam = object("value").description("The new field value").ruleBuilderVariable().build();
         prefixParam = string("prefix").optional().description("The prefix for the field name").build();
         suffixParam = string("suffix").optional().description("The suffix for the field name").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
         defaultParam = object("default").optional().description("Used when value not available").build();
+        cleanField = bool("clean_field").optional().description("Substitute invalid field name characters with underscores").build();
     }
 
     @Override
@@ -62,8 +66,7 @@ public class SetField extends AbstractFunction<Void> {
             if (!args.isPresent("default")) {
                 throw e;
             }
-        }
-        finally {
+        } finally {
             if (value == null) {
                 value = defaultParam.optional(args, context).orElse(null);
             }
@@ -80,6 +83,9 @@ public class SetField extends AbstractFunction<Void> {
             if (suffix.isPresent()) {
                 field = field + suffix.get();
             }
+            if (cleanField.optional(args, context).orElse(false)) {
+                field = Message.cleanKey(field);
+            }
             message.addField(field, value);
         }
         return null;
@@ -95,10 +101,13 @@ public class SetField extends AbstractFunction<Void> {
                         prefixParam,
                         suffixParam,
                         messageParam,
-                        defaultParam))
-                .description("Sets a new field in a message")
+                        defaultParam,
+                        cleanField))
+                .description("Sets the given value to the named field. If no specific message is provided, it sets the field in the currently processed message.")
                 .ruleBuilderEnabled()
-                .ruleBuilderTitle("Set value to field '${field}'")
+                .ruleBuilderName("Set field")
+                .ruleBuilderTitle("Set '${value}' to field '${field}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

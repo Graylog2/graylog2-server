@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class InputEventListenerTest {
@@ -79,14 +79,15 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(inputId));
 
-        verifyZeroInteractions(inputLauncher, inputRegistry);
+        verifyNoMoreInteractions(inputLauncher, inputRegistry);
     }
 
     @Test
     public void inputCreatedStopsInputIfItIsRunning() throws Exception {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
+        @SuppressWarnings("unchecked")
+        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputService.find(inputId)).thenReturn(input);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
 
@@ -163,14 +164,15 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(inputId));
 
-        verifyZeroInteractions(inputLauncher, inputRegistry);
+        verifyNoMoreInteractions(inputLauncher, inputRegistry);
     }
 
     @Test
     public void inputUpdatedStopsInputIfItIsRunning() throws Exception {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
+        @SuppressWarnings("unchecked")
+        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputService.find(inputId)).thenReturn(input);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
 
@@ -196,7 +198,8 @@ public class InputEventListenerTest {
     public void inputUpdatedRestartsGlobalInputOnAnyNode() throws Exception {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
+        @SuppressWarnings("unchecked")
+        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
         when(inputService.find(inputId)).thenReturn(input);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
@@ -215,7 +218,8 @@ public class InputEventListenerTest {
     public void inputUpdatedDoesNotStartLocalInputOnOtherNode() throws Exception {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
+        @SuppressWarnings("unchecked")
+        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
         when(inputService.find(inputId)).thenReturn(input);
         when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
@@ -233,7 +237,8 @@ public class InputEventListenerTest {
     public void inputUpdatedRestartsLocalInputOnLocalNode() throws Exception {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
+        @SuppressWarnings("unchecked")
+        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
         when(inputService.find(inputId)).thenReturn(input);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
@@ -252,7 +257,8 @@ public class InputEventListenerTest {
     public void inputUpdatedDoesNotStartLocalInputOnLocalNodeIfItWasNotRunning() throws Exception {
         final String inputId = "input-id";
         final Input input = mock(Input.class);
-        @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
+        @SuppressWarnings("unchecked")
+        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.STOPPED);
         when(inputService.find(inputId)).thenReturn(input);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
@@ -270,7 +276,8 @@ public class InputEventListenerTest {
     @Test
     public void inputDeletedStopsInputIfItIsRunning() throws Exception {
         final String inputId = "input-id";
-        @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
+        @SuppressWarnings("unchecked")
+        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(IOState.Type.RUNNING);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
 
@@ -282,7 +289,8 @@ public class InputEventListenerTest {
     @Test
     public void inputDeletedDoesNothingIfInputIsNotRunning() throws Exception {
         final String inputId = "input-id";
-        @SuppressWarnings("unchecked") final IOState<MessageInput> inputState = mock(IOState.class);
+        @SuppressWarnings("unchecked")
+        final IOState<MessageInput> inputState = mock(IOState.class);
         when(inputState.getState()).thenReturn(null);
         when(inputRegistry.getInputState(inputId)).thenReturn(inputState);
 

@@ -17,9 +17,9 @@
 package org.graylog2.cluster.leader;
 
 import com.github.joschi.jadconfig.ParameterException;
-import org.apache.directory.api.util.Strings;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public enum LeaderElectionMode {
@@ -28,14 +28,14 @@ public enum LeaderElectionMode {
 
     @Override
     public String toString() {
-        return Strings.lowerCase(super.toString());
+        return super.toString().toLowerCase(Locale.ROOT);
     }
 
     public static class Converter implements com.github.joschi.jadconfig.Converter<LeaderElectionMode> {
         @Override
         public LeaderElectionMode convertFrom(String value) {
             try {
-                return LeaderElectionMode.valueOf(Strings.upperCase(value));
+                return LeaderElectionMode.valueOf(value.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 throw new ParameterException("Unable to parse leader election mode <" + value + ">. Valid modes are: " +
                         Arrays.stream(LeaderElectionMode.values()).map(LeaderElectionMode::toString)

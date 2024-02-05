@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 
@@ -41,12 +41,16 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useIsNew from 'views/hooks/useIsNew';
 import useHistory from 'routing/useHistory';
 import mockHistory from 'helpers/mocking/mockHistory';
+import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
+import HotkeysProvider from 'contexts/HotkeysProvider';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
+jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
+jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),
@@ -62,6 +66,15 @@ jest.mock('views/hooks/useView');
 jest.mock('views/hooks/useIsDirty');
 jest.mock('views/hooks/useIsNew');
 
+jest.mock('views/logic/slices/viewSlice', () => {
+  const originalModule = jest.requireActual('views/logic/slices/viewSlice');
+
+  return {
+    ...originalModule,
+    loadView: jest.fn(() => () => {}),
+  };
+});
+
 describe('SearchActionsMenu', () => {
   const createView = (id: string = undefined) => View.builder()
     .id(id)
@@ -69,7 +82,6 @@ describe('SearchActionsMenu', () => {
     .type(View.Type.Search)
     .description('description')
     .state(Immutable.Map())
-    .search(Search.create().toBuilder().id('id-beef').build())
     .owner('owningUser')
     .build();
 
@@ -91,13 +103,15 @@ describe('SearchActionsMenu', () => {
     ...props
   }: SimpleSearchActionsMenuProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
-        <ViewLoaderContext.Provider value={onLoadView}>
-          <NewViewLoaderContext.Provider value={loadNewView}>
-            <SearchActionsMenu {...props} />
-          </NewViewLoaderContext.Provider>
-        </ViewLoaderContext.Provider>
-      </FieldTypesContext.Provider>
+      <HotkeysProvider>
+        <FieldTypesContext.Provider value={fieldTypes}>
+          <ViewLoaderContext.Provider value={onLoadView}>
+            <NewViewLoaderContext.Provider value={loadNewView}>
+              <SearchActionsMenu {...props} />
+            </NewViewLoaderContext.Provider>
+          </ViewLoaderContext.Provider>
+        </FieldTypesContext.Provider>
+      </HotkeysProvider>
     </TestStoreProvider>
   );
 
@@ -130,7 +144,7 @@ describe('SearchActionsMenu', () => {
       asMock(useHistory).mockReturnValue(history);
     });
 
-    const findTitleInput = () => screen.getByRole('textbox', { name: /title/i });
+    const findTitleInput = () => screen.findByRole('textbox', { name: /title/i });
 
     it('should export current search as dashboard', async () => {
       asMock(useCurrentUser).mockReturnValue(
@@ -140,6 +154,7 @@ describe('SearchActionsMenu', () => {
       );
 
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
       userEvent.click(exportAsDashboardMenuItem);
       await waitFor(() => expect(history.pushWithState).toHaveBeenCalledTimes(1));
@@ -155,6 +170,7 @@ describe('SearchActionsMenu', () => {
       );
 
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       await screen.findByText('Export');
 
@@ -163,6 +179,7 @@ describe('SearchActionsMenu', () => {
 
     it('should open file export modal', async () => {
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const exportMenuItem = await screen.findByText('Export');
       userEvent.click(exportMenuItem);
@@ -179,6 +196,7 @@ describe('SearchActionsMenu', () => {
 
       asMock(useView).mockReturnValue(createView('some-id'));
       render(<SimpleSearchActionsMenu />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportMenuItem = await screen.findByText('Edit metadata');
       userEvent.click(exportMenuItem);
 
@@ -190,6 +208,7 @@ describe('SearchActionsMenu', () => {
       const loadNewView = jest.fn(() => Promise.resolve());
 
       render(<SimpleSearchActionsMenu loadNewView={loadNewView} />);
+      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const resetSearch = await screen.findByText('Reset search');
 
@@ -262,6 +281,15 @@ describe('SearchActionsMenu', () => {
         .build();
 
       await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
+      await waitForElementToBeRemoved(screen.queryByText('Pluggable component!'));
+    });
+
+    it('should save search when pressing related keyboard shortcut', async () => {
+      asMock(useView).mockReturnValue(createView('some-id'));
+      render(<SimpleSearchActionsMenu />);
+      userEvent.keyboard('{Meta>}s{/Meta}');
+
+      await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
     });
 
     describe('has "Share" option', () => {

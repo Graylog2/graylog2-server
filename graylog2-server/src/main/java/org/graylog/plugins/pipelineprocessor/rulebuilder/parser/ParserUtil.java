@@ -20,6 +20,7 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateNotFoundException;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
@@ -39,6 +40,10 @@ public class ParserUtil {
 
 
     static final String generateForFunction(RuleBuilderStep step, FunctionDescriptor<?> function) {
+        return generateForFunction(step, function, 1);
+    }
+
+    static final String generateForFunction(RuleBuilderStep step, FunctionDescriptor<?> function, int level) {
         String syntax = function.name() + "(";
         String params = function.params().stream()
                 .map(p -> addFunctionParameter(p, step))
@@ -47,7 +52,7 @@ public class ParserUtil {
         if (StringUtils.isEmpty(params)) {
             return syntax + ")";
         } else {
-            return syntax + ConditionParser.NL + params + ConditionParser.NL + "  )";
+            return syntax + ConditionParser.NL + params + ConditionParser.NL + StringUtils.repeat("  ", level) + ")";
         }
     }
 
@@ -62,10 +67,12 @@ public class ParserUtil {
         if (value == null) {
             return null;
         } else if (value instanceof String valueString) {
-            if (valueString.startsWith("$")) { // value set as variable
-                syntax += ((String) value).substring(1);
+            if (StringUtils.isEmpty(valueString)) {
+                return null;
+            } else if (valueString.startsWith("$")) { // value set as variable
+                syntax += valueString.substring(1);
             } else {
-                syntax += "\"" + value + "\""; // value set as string
+                syntax += "\"" + StringEscapeUtils.escapeJava(valueString) + "\""; // value set as string
             }
         } else {
             syntax += value;

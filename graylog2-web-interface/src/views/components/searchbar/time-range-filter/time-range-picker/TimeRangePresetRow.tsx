@@ -16,15 +16,15 @@
  */
 
 import * as React from 'react';
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
 import TimeRangePresetDropdown from 'views/components/searchbar/time-range-filter/TimeRangePresetDropdown';
 import { isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
 import { IfPermitted } from 'components/common';
-import TimeRangeAddToQuickListButton
-  from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangeAddToQuickListButton';
+import SaveTimeRangeAsPresetButton
+  from 'views/components/searchbar/time-range-filter/time-range-picker/SaveTimeRangeAsPresetButton';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type {
@@ -51,17 +51,25 @@ const normalizePresetTimeRange = (timeRange: TimeRange) => {
 const TimeRangePresetRow = () => {
   const { showAddToQuickListButton } = useContext(TimeRangeInputSettingsContext);
   const { showPresetsButton } = useContext(TimeRangeInputSettingsContext);
-  const { setFieldValue, values } = useFormikContext<TimeRangePickerFormValues>();
+  const { values, setValues } = useFormikContext<TimeRangePickerFormValues>();
+  const { activeTab, timeRangeTabs } = values;
 
-  const onSetPreset = (newTimeRange: TimeRange) => {
-    setFieldValue('nextTimeRange', normalizePresetTimeRange(newTimeRange));
-  };
+  const onSetPreset = useCallback((newTimeRange: TimeRange) => {
+    setValues({
+      ...values,
+      timeRangeTabs: {
+        ...values.timeRangeTabs,
+        [newTimeRange.type]: normalizePresetTimeRange(newTimeRange),
+      },
+      activeTab: newTimeRange.type,
+    });
+  }, [setValues, values]);
 
   return (
     <Container>
-      {showAddToQuickListButton && isTimeRange(values.nextTimeRange) && (
+      {showAddToQuickListButton && isTimeRange(timeRangeTabs[activeTab]) && (
         <IfPermitted permissions="clusterconfigentry:edit">
-          <TimeRangeAddToQuickListButton />
+          <SaveTimeRangeAsPresetButton />
         </IfPermitted>
       )}
       {showPresetsButton && <TimeRangePresetDropdown onChange={onSetPreset} />}

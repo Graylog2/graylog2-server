@@ -22,13 +22,13 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.plugin.streams.StreamRuleType;
 import org.junit.jupiter.api.BeforeAll;
 
 import javax.annotation.Nullable;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
+import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
@@ -37,7 +37,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV})
 public class SuggestionResourceIT {
     private final GraylogApis api;
 
@@ -67,8 +67,8 @@ public class SuggestionResourceIT {
     @BeforeAll
     public void init() {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
-        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
-        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
+        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));
+        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, Streams.StreamRule.exact("stream2", "target_stream", false));
 
         api.gelf().createGelfHttpInput()
                 .postMessage(

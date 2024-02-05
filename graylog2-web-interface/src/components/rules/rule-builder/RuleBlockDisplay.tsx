@@ -14,17 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button, Col, Label, Row, MenuItem } from 'components/bootstrap';
 import { IconButton } from 'components/common';
+import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
-import Errors from './Errors';
-import type { RuleBlock } from './types';
-import { ruleBlockPropType } from './types';
-import { paramValueExists, paramValueIsVariable } from './helpers';
+import type { BlockType, RuleBlock } from './types';
+import { ruleBlockPropType, RuleBuilderTypes } from './types';
+import { useRuleBuilder } from './RuleBuilderContext';
 
 type Props = {
   block: RuleBlock,
@@ -32,83 +33,172 @@ type Props = {
   onDelete: () => void,
   onEdit: () => void,
   onNegate: () => void,
+  onDuplicate: () => void,
+  onInsertAbove: () => void,
+  onInsertBelow: () => void,
+  returnType?: RuleBuilderTypes,
+  type: BlockType,
 }
 
-const BlockInfo = styled(Row)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
+const Highlighted = styled.span(({ theme }) => css`
+  color: ${theme.colors.variant.info};
+  font-weight: bold;
 `);
 
-const ParamsCol = styled(Col)(({ theme }) => css`
+const TypeLabel = styled(Label)(({ theme }) => css`
+  margin-left: ${theme.spacings.xs};
+`);
+
+const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => css`
+  cursor: pointer;
   display: flex;
-  flex-wrap: wrap;
-  gap: ${theme.spacings.sm};
+  align-items: center;
+  margin: 0;
+  height: ${theme.spacings.xl};
+  background-color: ${$hovered ? theme.colors.table.backgroundHover : 'transparent'};
+  border-left: solid 1px ${theme.colors.gray[80]};
 `);
 
-const Param = styled.p`
-  margin-bottom: 0;
-`;
-
-const NegationButton = styled(Button).attrs(({ negate }: { negate: boolean }) => ({
-  negate,
-}))(({ negate, theme }) => css`
-  opacity: ${negate ? '1' : '0.3'};
+type NegationButtonProps = React.ComponentProps<typeof Button> & { $negate: boolean };
+const NegationButton: React.ComponentType<NegationButtonProps> = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
+  opacity: ${$negate ? '1' : '0.3'};
   margin-right: ${theme.spacings.sm};
 `);
 
-const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate } : Props) => {
-  const paramNames = Object.keys(block.params);
+const BlockTitle = styled.h5`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
 
-  const anyParamsSet = () : boolean => (
-    paramNames.some((paramName) => paramValueExists(block.params[paramName]))
-  );
+const ErrorMessage = styled.p(({ theme }) => css`
+  color: ${theme.colors.variant.danger};
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0;
+`);
 
-  const formatParamValue = (value : string | number | boolean) => {
-    if (paramValueIsVariable(value)) {
-      return 'Output of the previous step';
-    }
+const ActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: end;
+`;
 
-    return (value.toString());
+const EditIconButton = styled(IconButton)(({ theme }) => css`
+  margin-right: ${theme.spacings.xs};
+`);
+
+const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
+  const [showActions, setShowActions] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen((prev) => !prev);
+    setShowActions(!isDropdownOpen);
   };
 
+  const readableReturnType = (_type: RuleBuilderTypes): string | undefined => {
+    switch (_type) {
+      case RuleBuilderTypes.Number:
+        return 'Number';
+      default:
+        return _type?.slice((_type?.lastIndexOf('.') || 0) + 1);
+    }
+  };
+
+  const returnTypeLabel = readableReturnType(returnType);
+
+  const highlightedRuleTitle = (termToHighlight: string, title: string = '') => {
+    const parts = title.split(/('\$.*?')/);
+
+    const partsWithHighlight = parts.map((part) => {
+      if (part === `'$${termToHighlight}'`) {
+        return <Highlighted>{part}</Highlighted>;
+      }
+
+      return part;
+    });
+
+    return (
+      partsWithHighlight.map((item, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <React.Fragment key={index}>
+          {item}
+        </React.Fragment>
+      )));
+  };
+
+  const errorMessage = block?.errors?.join(', ');
+
   return (
-    <Row>
+    <StyledRow onMouseEnter={() => setShowActions(true)}
+               onMouseLeave={!isDropdownOpen ? () => setShowActions(false) : undefined}
+               $hovered={showActions}>
       <Col xs={9} md={10}>
-        <BlockInfo>
-          <Col md={12}>
-            <h3>
-              {negatable
-              && <NegationButton bsStyle="primary" negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
-              {block?.step_title}
-            </h3>
-          </Col>
-        </BlockInfo>
-        {anyParamsSet
-        && (
         <Row>
-          <ParamsCol sm={12} md={6}>
-            {paramNames.map((paramName) => {
-              const paramValue = block.params[paramName];
-
-              if (paramValueExists(paramValue)) {
-                return (
-                  <Col key={paramName}>
-                    <Param><strong>{paramName}:</strong> {formatParamValue(paramValue)}</Param>
-                  </Col>
-                );
-              }
-
-              return null;
-            })}
-          </ParamsCol>
+          <Col xs={10} md={9}>
+            <BlockTitle title={block?.step_title}>
+              {negatable
+              && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
+              {highlightedOutput ? (
+                highlightedRuleTitle(highlightedOutput, block?.step_title)
+              ) : block?.step_title}
+              {block?.errors?.length > 0 && (
+                <ErrorMessage title={errorMessage}>{errorMessage}</ErrorMessage>
+              )}
+            </BlockTitle>
+          </Col>
+          {block?.outputvariable && (
+            <Col xs={2} md={3}>
+              <Label bsStyle="primary"
+                     onMouseEnter={() => setHighlightedOutput(block.outputvariable)}
+                     onMouseLeave={() => setHighlightedOutput(undefined)}>
+                {`$${block.outputvariable}`}
+              </Label>
+              {returnTypeLabel && (
+              <TypeLabel bsStyle="default">
+                {returnTypeLabel}
+              </TypeLabel>
+              )}
+            </Col>
+          )}
         </Row>
-        )}
-        <Errors objectWithErrors={block} />
       </Col>
       <Col xs={3} md={2} className="text-right">
-        <IconButton name="edit" onClick={onEdit} title="Edit" />
-        <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
+        {showActions && type === 'condition' && (
+          <ActionsContainer>
+            <IconButton name="edit" onClick={onEdit} title="Edit" />
+            <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
+          </ActionsContainer>
+        )}
+        {showActions && type === 'action' && (
+          <ActionsContainer>
+            <EditIconButton name="edit" onClick={onEdit} title="Edit" />
+            <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
+                                   buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+                                   bsSize="xsmall"
+                                   onToggle={handleDropdownToggle}
+                                   dropdownZIndex={1000}>
+              <MenuItem onClick={onEdit}>Edit</MenuItem>
+              <MenuItem onClick={() => {
+                onDuplicate();
+                handleDropdownToggle();
+              }}>
+                Duplicate
+              </MenuItem>
+              <MenuItem divider />
+              <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
+              <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
+              <MenuItem divider />
+              <MenuItem onClick={onDelete}>Delete</MenuItem>
+            </OverlayDropdownButton>
+          </ActionsContainer>
+        )}
       </Col>
-    </Row>
+    </StyledRow>
   );
 };
 
@@ -123,6 +213,7 @@ RuleBlockDisplay.propTypes = {
 RuleBlockDisplay.defaultProps = {
   block: undefined,
   negatable: false,
+  returnType: undefined,
 };
 
 export default RuleBlockDisplay;

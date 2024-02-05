@@ -36,7 +36,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -127,7 +128,7 @@ public class EventProcessorExecutionJob implements Job {
             // we can't use the catchup mode.
             final long catchUpSize = configurationProvider.get().eventCatchupWindow();
             if (catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
-                config.processingHopSize() <= config.processingWindowSize()) {
+                    config.processingHopSize() <= config.processingWindowSize()) {
                 final long chunkCount = catchUpSize / config.processingWindowSize();
 
                 // Align to multiples of the processingWindowSize

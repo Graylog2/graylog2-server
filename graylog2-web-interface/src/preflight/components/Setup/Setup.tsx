@@ -34,7 +34,7 @@ type Props = {
 
 const Setup = ({ setIsWaitingForStartup }: Props) => (
   <>
-    <Section title="Welcome!" titleOrder={1}>
+    <Section title="Welcome!" titleOrder={1} dataTestid="welcome-section">
       <P>
         It looks like you are starting Graylog for the first time and have not configured a data node.<br />
         Data nodes allow you to index and search through all the messages in your Graylog message database.

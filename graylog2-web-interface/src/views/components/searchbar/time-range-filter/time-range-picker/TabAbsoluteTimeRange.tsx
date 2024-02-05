@@ -22,7 +22,6 @@ import moment from 'moment';
 import { useFormikContext } from 'formik';
 
 import { Icon, Accordion, AccordionItem } from 'components/common';
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 import AbsoluteCalendar from './AbsoluteCalendar';
@@ -76,10 +75,12 @@ const FlexWrap = styled.div`
 `;
 
 const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { values: { nextTimeRange } } = useFormikContext<TimeRangePickerFormValues & { nextTimeRange: AbsoluteTimeRange }>();
+  const { values: { timeRangeTabs } } = useFormikContext<TimeRangePickerFormValues>();
+  const activeTabTimeRange = timeRangeTabs.absolute;
+
   const { toUserTimezone } = useUserDateTime();
   const [activeAccordion, setActiveAccordion] = useState<'Timestamp' | 'Calendar' | undefined>();
-  const toStartDate = moment(nextTimeRange.from).toDate();
+  const toStartDate = moment(activeTabTimeRange.from).toDate();
   const fromStartDate = limitDuration ? toUserTimezone(new Date()).seconds(-limitDuration).toDate() : undefined;
 
   const handleSelect = (nextKey: 'Timestamp' | 'Calendar' | undefined) => {
@@ -97,7 +98,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
         <AccordionItem name="Calendar">
           <RangeWrapper>
             <AbsoluteCalendar startDate={fromStartDate}
-                              nextTimeRange={nextTimeRange}
+                              timeRange={activeTabTimeRange}
                               range="from" />
 
           </RangeWrapper>
@@ -108,7 +109,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
 
           <RangeWrapper>
             <AbsoluteCalendar startDate={toStartDate}
-                              nextTimeRange={nextTimeRange}
+                              timeRange={activeTabTimeRange}
                               range="to" />
           </RangeWrapper>
         </AccordionItem>
@@ -119,7 +120,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
             <FlexWrap>
               <RangeWrapper>
                 <AbsoluteTimestamp disabled={disabled}
-                                   nextTimeRange={nextTimeRange}
+                                   timeRange={activeTabTimeRange}
                                    range="from" />
               </RangeWrapper>
 
@@ -129,7 +130,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
 
               <RangeWrapper>
                 <AbsoluteTimestamp disabled={disabled}
-                                   nextTimeRange={nextTimeRange}
+                                   timeRange={activeTabTimeRange}
                                    range="to" />
               </RangeWrapper>
             </FlexWrap>

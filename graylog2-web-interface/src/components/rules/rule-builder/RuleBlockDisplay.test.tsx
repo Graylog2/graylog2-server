@@ -19,20 +19,20 @@ import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
 import RuleBlockDisplay from './RuleBlockDisplay';
 import { buildRuleBlock } from './fixtures';
+import { RuleBuilderTypes } from './types';
+import RuleBuilderProvider from './RuleBuilderProvider';
 
 const block = buildRuleBlock({
-  params:
-{
-  spell: 'wingardium leviosa',
-  wand_required: true,
-  cast_time: 20,
-  message: '$output_action_1',
-},
+  outputvariable: 'output_5',
 });
 
 const mockDelete = jest.fn();
 const mockEdit = jest.fn();
 const mockNegate = jest.fn();
+const mockDuplicate = jest.fn();
+const mockInsertAbove = jest.fn();
+const mockInsertBelow = jest.fn();
+const type = 'condition';
 
 describe('RuleBlockDisplay', () => {
   afterEach(() => {
@@ -40,29 +40,35 @@ describe('RuleBlockDisplay', () => {
   });
 
   it('uses the step_title', async () => {
-    render(<RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} />);
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+      </RuleBuilderProvider>,
+    );
 
     expect(screen.getByText(/to_long "foo"/i)).toBeInTheDocument();
   });
 
-  it('displays params properly', async () => {
-    render(<RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} />);
+  it('shows the outputvariable and its return type', async () => {
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} returnType={RuleBuilderTypes.Number} type={type} />
+      </RuleBuilderProvider>,
+    );
 
-    expect(screen.getByText((content, _) => content.endsWith('wingardium leviosa')).textContent)
-      .toEqual('spell: wingardium leviosa');
+    expect(screen.getByText(/\$output_5/i)).toBeInTheDocument();
 
-    expect(screen.getByText((content, _) => content.endsWith('true')).textContent)
-      .toEqual('wand_required: true');
-
-    expect(screen.getByText((content, _) => content.endsWith('20')).textContent)
-      .toEqual('cast_time: 20');
-
-    expect(screen.getByText((content, _) => content.endsWith('Output of the previous step')).textContent)
-      .toEqual('message: Output of the previous step');
+    expect(screen.getByText(/number/i)).toBeInTheDocument();
   });
 
   it('calls deleteHandler when clicking the delete button', async () => {
-    render(<RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} />);
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+      </RuleBuilderProvider>,
+    );
+
+    fireEvent.mouseOver(screen.getByText(/\$output_5/i));
 
     const deleteButton = await screen.findByRole('button', { name: 'Delete' });
 
@@ -72,7 +78,13 @@ describe('RuleBlockDisplay', () => {
   });
 
   it('calls editHandler when clicking the edit button', async () => {
-    render(<RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} />);
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+      </RuleBuilderProvider>,
+    );
+
+    fireEvent.mouseOver(screen.getByText(/\$output_5/i));
 
     const editButton = await screen.findByRole('button', { name: 'Edit' });
 
@@ -82,7 +94,11 @@ describe('RuleBlockDisplay', () => {
   });
 
   it('calls negateHandler when clicking the negate button', async () => {
-    render(<RuleBlockDisplay block={block} negatable onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} />);
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={block} negatable onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+      </RuleBuilderProvider>,
+    );
 
     const negationButton = await screen.findByRole('button', { name: 'Not' });
 
@@ -92,9 +108,12 @@ describe('RuleBlockDisplay', () => {
   });
 
   it('displays errors when existing', async () => {
-    render(<RuleBlockDisplay block={{ ...block, errors: ['wrong 1', 'not right 2'] }} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} />);
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={{ ...block, errors: ['wrong 1', 'not right 2'] }} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+      </RuleBuilderProvider>,
+    );
 
-    expect(screen.getByText('wrong 1')).toBeInTheDocument();
-    expect(screen.getByText('not right 2')).toBeInTheDocument();
+    expect(screen.getByText('wrong 1, not right 2')).toBeInTheDocument();
   });
 });

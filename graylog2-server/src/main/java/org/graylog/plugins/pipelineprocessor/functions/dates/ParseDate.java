@@ -25,6 +25,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import javax.annotation.Nonnull;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -40,7 +41,7 @@ public class ParseDate extends TimezoneAwareFunction {
     private final ParameterDescriptor<String, String> localeParam;
 
     public ParseDate() {
-        valueParam = ParameterDescriptor.string(VALUE).description("Date string to parse").build();
+        valueParam = ParameterDescriptor.string(VALUE).ruleBuilderVariable().description("Date string to parse").build();
         patternParam = ParameterDescriptor.string(PATTERN).description("The pattern to parse the date with, see http://www.joda.org/joda-time/apidocs/org/joda/time/format/DateTimeFormat.html").build();
         localeParam = ParameterDescriptor.string(LOCALE).optional().description("The locale to parse the date with, see https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html").build();
     }
@@ -82,5 +83,17 @@ public class ParseDate extends TimezoneAwareFunction {
     @Override
     protected String description() {
         return "Parses a date string using the given date format";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Parse date (pattern)";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Parse '${value}' into a DateTime using '${pattern}' pattern";
     }
 }

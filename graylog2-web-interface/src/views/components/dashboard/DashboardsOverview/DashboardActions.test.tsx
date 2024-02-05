@@ -27,12 +27,14 @@ import DashboardActions from 'views/components/dashboard/DashboardsOverview/Dash
 import { simpleView } from 'views/test/ViewFixtures';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
-    delete: jest.fn(),
+    delete: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -40,16 +42,25 @@ describe('DashboardActions', () => {
   let oldWindowConfirm;
 
   const simpleDashboard = simpleView();
+  const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
   const clickDashboardAction = async (action: string) => {
-    userEvent.click(await screen.findByText('More'));
+    userEvent.click(await screen.findByRole('button', { name: /more/i }));
     userEvent.click(await screen.findByRole('button', { name: action }));
+    await waitFor(() => menuIsHidden());
   };
 
   beforeEach(() => {
     oldWindowConfirm = window.confirm;
     window.confirm = jest.fn();
     asMock(useCurrentUser).mockReturnValue(adminUser);
+
+    asMock(useSelectedEntities).mockReturnValue({
+      selectedEntities: [],
+      setSelectedEntities: () => {},
+      selectEntity: () => {},
+      deselectEntity: () => {},
+    });
   });
 
   afterEach(() => {
@@ -80,15 +91,15 @@ describe('DashboardActions', () => {
     expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
   });
 
-  it('does not offer deletion when user has only read permissions', async () => {
+  it('does not display more actions dropdown when user has no permissions for deletion and there are no pluggable actions', async () => {
     const currentUser = adminUser.toBuilder().permissions(Immutable.List([`view:read:${simpleDashboard.id}`])).build();
     asMock(useCurrentUser).mockReturnValue(currentUser);
 
     render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
-    userEvent.click(await screen.findByText('More'));
+    await screen.findByRole('button', { name: /share/i });
 
-    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /'more'/i })).not.toBeInTheDocument();
   });
 
   describe('supports dashboard deletion hook', () => {

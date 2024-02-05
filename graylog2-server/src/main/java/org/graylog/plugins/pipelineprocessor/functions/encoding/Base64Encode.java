@@ -38,6 +38,15 @@ public class Base64Encode extends BaseEncodingSingleArgStringFunction {
     }
 
     @Override
+    protected String getRuleBuilderName() {
+        return "Encode " + ENCODING_NAME;
+    }
+
+    @Override
+    protected String getRuleBuilderTitle() {
+        return ENCODING_NAME + " encoding of '${value}'";
+    }
+    @Override
     protected String getName() {
         return NAME;
     }

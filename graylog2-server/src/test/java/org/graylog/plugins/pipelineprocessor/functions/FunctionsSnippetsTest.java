@@ -24,11 +24,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.InetAddresses;
+import org.apache.commons.io.IOUtils;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayContains;
+import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayRemove;
+import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
@@ -81,18 +86,25 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IpAnonymize;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.ListCount;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.ListGet;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAll;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
+import org.graylog.plugins.pipelineprocessor.functions.maps.MapGet;
+import org.graylog.plugins.pipelineprocessor.functions.maps.MapRemove;
+import org.graylog.plugins.pipelineprocessor.functions.maps.MapSet;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -152,6 +164,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.BeforeClass;
@@ -162,14 +175,20 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -201,6 +220,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     private static LookupTableService lookupTableService;
     private static LookupTableService.Function lookupServiceFunction;
     private static LookupTable lookupTable;
+    private static Map aMap;
 
     private static Logger loggerMock;
 
@@ -365,8 +385,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         when(grokPatternService.loadByName("GREEDY")).thenReturn(Optional.of(greedyPattern));
         final EventBus clusterBus = new EventBus();
         final GrokPatternRegistry grokPatternRegistry = new GrokPatternRegistry(clusterBus,
-                                                                                grokPatternService,
-                                                                                Executors.newScheduledThreadPool(1));
+                grokPatternService,
+                Executors.newScheduledThreadPool(1));
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
@@ -378,13 +398,27 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupAddStringList.NAME, new LookupAddStringList(lookupTableService));
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
         functions.put(LookupHasValue.NAME, new LookupHasValue(lookupTableService));
-	functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
+        functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
+        functions.put(LookupAll.NAME, new LookupAll(lookupTableService));
+
+        functions.put(MapRemove.NAME, new MapRemove());
+        functions.put(MapSet.NAME, new MapSet());
+        functions.put(MapGet.NAME, new MapGet());
+        functions.put(CsvMapConversion.NAME, new CsvMapConversion());
+
+        functions.put(ListGet.NAME, new ListGet());
+        functions.put(ListCount.NAME, new ListCount());
+        functions.put(IpAnonymize.NAME, new IpAnonymize());
+
+        functions.put(StringArrayAdd.NAME, new StringArrayAdd());
+        functions.put(ArrayContains.NAME, new ArrayContains(objectMapper));
+        functions.put(ArrayRemove.NAME, new ArrayRemove());
 
         functionRegistry = new FunctionRegistry(functions);
     }
 
     @Test
-    public void stringConcat(){
+    public void stringConcat() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
 
@@ -394,6 +428,55 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void jsonpath() {
+        final String json = "{\n" +
+                "    \"store\": {\n" +
+                "        \"book\": [\n" +
+                "            {\n" +
+                "                \"category\": \"reference\",\n" +
+                "                \"author\": \"Nigel Rees\",\n" +
+                "                \"title\": \"Sayings of the Century\",\n" +
+                "                \"price\": 8.95\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"category\": \"fiction\",\n" +
+                "                \"author\": \"Evelyn Waugh\",\n" +
+                "                \"title\": \"Sword of Honour\",\n" +
+                "                \"price\": 12.99\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"category\": \"fiction\",\n" +
+                "                \"author\": \"Herman Melville\",\n" +
+                "                \"title\": \"Moby Dick\",\n" +
+                "                \"isbn\": \"0-553-21311-3\",\n" +
+                "                \"price\": 8.99\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"category\": \"fiction\",\n" +
+                "                \"author\": \"J. R. R. Tolkien\",\n" +
+                "                \"title\": \"The Lord of the Rings\",\n" +
+                "                \"isbn\": \"0-395-19395-8\",\n" +
+                "                \"price\": 22.99\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"bicycle\": {\n" +
+                "            \"color\": \"red\",\n" +
+                "            \"price\": 19.95\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"expensive\": 10\n" +
+                "}";
+
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule, new Message(json, "test", Tools.nowUTC()));
+
+        assertThat(message.hasField("author_first")).isTrue();
+        assertThat(message.getField("author_first")).isEqualTo("Nigel Rees");
+        assertThat(message.hasField("author_last")).isTrue();
+        assertThat(message.hasField("this_should_exist")).isTrue();
+    }
+
+    @Test
+    public void jsonpathFromMessageField() {
         final String json = "{\n" +
                 "    \"store\": {\n" +
                 "        \"book\": [\n" +
@@ -1097,7 +1180,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message).isNotNull();
             assertThat(message.getField("interval"))
                     .isInstanceOf(Duration.class)
-                    .matches(o -> ((Duration)o).isEqual(Duration.standardDays(1)), "Exactly one day difference");
+                    .matches(o -> ((Duration) o).isEqual(Duration.standardDays(1)), "Exactly one day difference");
             assertThat(message.getField("years")).isEqualTo(Period.years(2));
             assertThat(message.getField("months")).isEqualTo(Period.months(2));
             assertThat(message.getField("weeks")).isEqualTo(Period.weeks(2));
@@ -1316,6 +1399,33 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void lookupAll() throws IOException {
+        doReturn(LookupResult.single("val1")).when(lookupTable).lookup("one");
+        doReturn(LookupResult.single("val2")).when(lookupTable).lookup("two");
+        doReturn(LookupResult.single("val3")).when(lookupTable).lookup("three");
+
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = new Message("message", "source", DateTime.now(DateTimeZone.UTC));
+
+        try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
+            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+            message.addField("json_with_arrays", jsonString);
+            evaluateRule(rule, message);
+            assertThat(actionsTriggered.get()).isTrue();
+        }
+
+        verify(lookupTable, times(3)).lookup("one");
+        verify(lookupTable, times(2)).lookup("two");
+        verify(lookupTable, times(2)).lookup("three");
+
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("json_results")).isEqualTo(Arrays.asList("val1", "val2", "val3"));
+        assertThat(message.getField("results")).isEqualTo(Arrays.asList("val1", "val2", "val3"));
+        assertThat(message.getField("single_result")).isEqualTo(Arrays.asList("val1"));
+    }
+
+    @Test
     public void firstNonNull() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule);
@@ -1363,5 +1473,203 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         Long manilaHour = (Long) message.getField("manilaHour");
         assertThat(utcHour).isEqualTo(10);
         assertThat(manilaHour).isEqualTo(18);
+    }
+
+    @Test
+    public void mapSet() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("k1")).isEqualTo("v11");
+        assertThat(message.getField("k3")).isEqualTo(1L);
+    }
+
+    @Test
+    public void mapGet() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("k1")).isEqualTo("v1");
+        assertThat(message.getField("k2")).isEqualTo(2L);
+        assertThat(message.getField("k3")).isNull();
+    }
+
+    @Test
+    public void mapRemove() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("k1")).isNull();
+    }
+
+    @Test
+    public void listGet() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("idx0")).isEqualTo("v1");
+        assertThat(message.getField("idx1")).isNull();
+    }
+
+    @Test
+    public void ipAnonymize() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("ip4").toString()).isEqualTo("111.122.133.0");
+    }
+
+    @Test
+    public void listCount() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("count")).isEqualTo(4L);
+    }
+
+    @Test
+    public void csvMap() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
+
+        IntStream.range(1, 5).forEach(i -> {
+            assertThat(message.getField("test" + i + "_k1")).as("Test%s k1", i).isEqualTo("v1");
+            assertThat(message.getField("test" + i + "_k2")).as("Test%s k1", i).isEqualTo("v2");
+            assertThat(message.getField("test" + i + "_k3")).as("Test%s k1", i).isEqualTo("v3");
+        });
+
+        assertThat(message.getField("test99_k1")).isEqualTo("v1");
+        assertThat(message.getField("test99_k2")).isEqualTo("v,2");
+        assertThat(message.getField("test99_k3")).isEqualTo("v3");
+
+    }
+
+    @Test
+    public void removeField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("i1")).isNull();
+        assertThat(message.getField("i2")).isNull();
+        assertThat(message.getField("f2")).isEqualTo("f2");
+        assertThat(message.getField("f3")).isEqualTo("f3");
+    }
+
+    @Test
+    public void setField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isEqualTo("v1");
+        assertThat(message.getField("f_2")).isEqualTo("v_2");
+        assertThat(message.getField("f 3")).isNull();
+        assertThat(message.getField("f_3")).isNull();
+        assertThat(message.getField("f_4")).isEqualTo("will be added with clean field param");
+    }
+
+    @Test
+    public void setFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        message.addField("json_field_map", "{ " +
+                "  \"k1\": \"v1\", " +
+                "  \"k_2\": \"v_2\", " +
+                "  \"k 3\": \"will be skipped\" " +
+                "}");
+        message.addField("json_clean_field_map", "{ " +
+                "  \"k4\": \"v4\", " +
+                "  \"k_5\": \"v_5\", " +
+                "  \"k 6\": \"will be added with clean_fields param\" " +
+                "}");
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("k1")).isEqualTo("v1");
+        assertThat(message.getField("k_2")).isEqualTo("v_2");
+        assertThat(message.getField("k 3")).isNull();
+        assertThat(message.getField("k_3")).isNull();
+        assertThat(message.getField("k4")).isEqualTo("v4");
+        assertThat(message.getField("k_5")).isEqualTo("v_5");
+        assertThat(message.getField("k_6")).isEqualTo("will be added with clean_fields param");
+    }
+
+    @Test
+    public void arrayContains() throws IOException {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = new Message("message", "source", DateTime.now(DateTimeZone.UTC));
+        try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
+            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+            message.addField("json_with_arrays", jsonString);
+            evaluateRule(rule, message);
+            assertThat(actionsTriggered.get()).isTrue();
+            assertThat(message).isNotNull();
+            assertThat(message.getField("contains_number")).isEqualTo(true);
+            assertThat(message.getField("does_not_contain_number")).isEqualTo(false);
+            assertThat(message.getField("contains_string")).isEqualTo(true);
+            assertThat(message.getField("contains_string_case_insensitive")).isEqualTo(true);
+            assertThat(message.getField("contains_string_case_sensitive")).isEqualTo(false);
+            assertThat(message.getField("contains_null_array")).isEqualTo(false);
+            assertThat(message.getField("contains_null_value")).isEqualTo(false);
+            assertThat(message.getField("contains_null_json_value_in_array_string")).isEqualTo(true);
+            assertThat(message.getField("contains_null_json_value_in_array_int")).isEqualTo(true);
+
+            assertThat(message.getField("path_array_strings_contains")).isEqualTo(true);
+            assertThat(message.getField("path_array_numbers_contains")).isEqualTo(true);
+            assertThat(message.getField("path_array_decimals_contains")).isEqualTo(true);
+            assertThat(message.getField("path_array_booleans_contains")).isEqualTo(true);
+
+            assertThat(message.getField("path_array_not_strings_contains")).isEqualTo(false);
+            assertThat(message.getField("path_array_not_numbers_contains")).isEqualTo(false);
+            assertThat(message.getField("path_array_not_decimals_contains")).isEqualTo(false);
+            assertThat(message.getField("path_array_not_booleans_contains")).isEqualTo(false);
+        }
+    }
+
+    @Test
+    public void stringArrayAdd() throws IOException {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = new Message("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
+            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+            message.addField("json_with_arrays", jsonString);
+            evaluateRule(rule, message);
+            assertThat(actionsTriggered.get()).isTrue();
+            assertThat(message).isNotNull();
+            assertThat(message.getField("add_to_number_array")).isEqualTo(List.of("1", "2", "3"));
+            assertThat(message.getField("add_number_to_string_array_converted")).isEqualTo(List.of("1", "2", "3"));
+            assertThat(message.getField("add_number_array_to_string_array_converted")).isEqualTo(List.of("1", "2", "3", "4"));
+            assertThat(message.getField("add_string")).isEqualTo(List.of("one", "two", "three"));
+            assertThat(message.getField("keep_duplicates")).isEqualTo(List.of("one", "two", "two"));
+            assertThat(message.getField("only_unique")).isEqualTo(List.of("one", "two"));
+            assertThat(message.getField("add_to_empty_array")).isEqualTo(List.of("from-empty-array"));
+            assertThat(message.getField("add_to_empty_array_from_message")).isEqualTo(List.of("from-empty-on-message"));
+            assertThat(message.getField("add_array_to_array")).isEqualTo(List.of("one", "two", "three", "four"));
+            assertThat(message.getField("add_array_to_array_empty_source")).isEqualTo(List.of("three", "four"));
+            assertThat(message.getField("add_array_to_array_empty_value")).isEqualTo(List.of("one", "two"));
+            assertThat(message.getField("combined_json_array")).isEqualTo(List.of("Administrator", "Administrator", "Administrator", "Administrator", "user01"));
+            assertThat(message.getField("mixed_types_json_array")).isEqualTo(List.of("text"));
+        }
+    }
+
+    @Test
+    public void arrayRemove() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("remove_number")).isEqualTo(Arrays.asList(1L, 3L));
+        assertThat(message.getField("remove_string")).isEqualTo(Arrays.asList("one", "three"));
+        assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
+        assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
+        assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
     }
 }

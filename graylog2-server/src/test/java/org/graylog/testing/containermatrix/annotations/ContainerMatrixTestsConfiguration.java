@@ -47,6 +47,13 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestInstance(PER_CLASS)
 @Testable
 public @interface ContainerMatrixTestsConfiguration {
+
+    @interface ConfigurationParameter {
+        String key();
+
+        String value();
+    }
+
     // combination rule
     Lifecycle serverLifecycle() default Lifecycle.VM;
 
@@ -60,7 +67,7 @@ public @interface ContainerMatrixTestsConfiguration {
      * matrix rule
      * If no version is explicitly specified, then {@link SearchServer#DEFAULT_VERSION will be used by the tests}
      */
-    SearchServer[] searchVersions() default {SearchServer.DATANODE_DEV};
+    SearchServer[] searchVersions() default {SearchServer.DATANODE_DEV, SearchServer.OS2_LATEST};
 
     /**
      * matrix rule
@@ -90,4 +97,7 @@ public @interface ContainerMatrixTestsConfiguration {
     boolean importLicenses() default defaultImportLicenses;
 
     boolean withMailServerEnabled() default false;
+
+    ConfigurationParameter[] additionalConfigurationParameters() default {};
+
 }

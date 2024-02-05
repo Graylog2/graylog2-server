@@ -21,22 +21,24 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.shared.buffers.LoggingExceptionHandler;
+import org.graylog2.shared.buffers.PartitioningWorkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -77,18 +79,18 @@ public class OutputBuffer extends Buffer {
         );
         disruptor.setDefaultExceptionHandler(new LoggingExceptionHandler(LOG));
 
-        LOG.info("Initialized OutputBuffer with ring size <{}> and wait strategy <{}>.",
-                ringBufferSize, waitStrategy.getClass().getSimpleName());
-
-        final OutputBufferProcessor[] processors = new OutputBufferProcessor[processorCount];
-
+        final EventHandler<MessageEvent>[] processors = new PartitioningWorkHandler[processorCount];
         for (int i = 0; i < processorCount; i++) {
-            processors[i] = processorProvider.get();
+            processors[i] = new PartitioningWorkHandler<>(processorProvider.get(), i, processorCount);
         }
 
-        disruptor.handleEventsWithWorkerPool(processors);
+        disruptor.handleEventsWith(processors);
 
         ringBuffer = disruptor.start();
+
+        LOG.info("Initialized OutputBuffer with ring size <{}> and wait strategy <{}>, " +
+                        "running {} parallel buffer processors.",
+                ringBufferSize, waitStrategy.getClass().getSimpleName(), processorCount);
     }
 
     private ThreadFactory threadFactory(final MetricRegistry metricRegistry) {

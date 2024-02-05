@@ -17,12 +17,9 @@
 package org.graylog.plugins.map.geoip;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
+import com.maxmind.db.MaxMindDbConstructor;
+import com.maxmind.db.MaxMindDbParameter;
 
 import javax.annotation.Nullable;
 
@@ -37,70 +34,77 @@ import javax.annotation.Nullable;
 //   "lat" : "53.28333",
 //   "geoname_id" : "2821736"
 // }
-@AutoValue
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonDeserialize(builder = IPinfoStandardLocation.Builder.class)
-public abstract class IPinfoStandardLocation {
-    @JsonProperty("city")
-    @Nullable
-    public abstract String city();
+public class IPinfoStandardLocation {
+    private final String city;
+    private final String country;
+    private final String timezone;
+    private final String region;
+    private final Long geoNameId;
+    private final Double latitude;
+    private final Double longitude;
 
-    @JsonProperty("country")
-    @Nullable
-    public abstract String country();
+    @MaxMindDbConstructor
+    public IPinfoStandardLocation(@MaxMindDbParameter(name = "city") String city,
+                                  @MaxMindDbParameter(name = "country") String country,
+                                  @MaxMindDbParameter(name = "timezone") String timezone,
+                                  @MaxMindDbParameter(name = "region") String region,
+                                  @MaxMindDbParameter(name = "geoname_id") String geoNameId,
+                                  @MaxMindDbParameter(name = "lat") String latitude,
+                                  @MaxMindDbParameter(name = "lng") String longitude) {
+        this.city = city;
+        this.country = country;
+        this.timezone = timezone;
+        this.region = region;
+        this.geoNameId = Long.valueOf(geoNameId);
+        this.latitude = Double.valueOf(latitude);
+        this.longitude = Double.valueOf(longitude);
+    }
 
-    @JsonProperty("timezone")
-    @Nullable
-    public abstract String timezone();
-
-    @JsonProperty("region")
-    @Nullable
-    public abstract String region();
-
-    @JsonProperty("geoname_id")
-    @Nullable
-    public abstract Long geoNameId();
-
-    @JsonProperty("lat")
-    public abstract double latitude();
-
-    @JsonProperty("lng")
-    public abstract double longitude();
-
-    @Memoized
     @JsonProperty("coordinates")
+    @Nullable
     public String coordinates() {
         return latitude() + "," + longitude();
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
-        @JsonCreator
-        public static Builder create() {
-            return new AutoValue_IPinfoStandardLocation.Builder();
-        }
+    @JsonProperty("city")
+    @Nullable
+    public String city() {
+        return city;
+    }
 
-        @JsonProperty("city")
-        public abstract Builder city(String city);
+    @JsonProperty("country")
+    @Nullable
+    public String country() {
+        return country;
+    }
 
-        @JsonProperty("country")
-        public abstract Builder country(String country);
+    @JsonProperty("timezone")
+    @Nullable
+    public String timezone() {
+        return timezone;
+    }
 
-        @JsonProperty("timezone")
-        public abstract Builder timezone(String timezone);
+    @JsonProperty("region")
+    @Nullable
+    public String region() {
+        return region;
+    }
 
-        @JsonProperty("region")
-        public abstract Builder region(String region);
+    @JsonProperty("geoname_id")
+    @Nullable
+    public Long geoNameId() {
+        return geoNameId;
+    }
 
-        @JsonProperty("geoname_id")
-        public abstract Builder geoNameId(Long geonameId);
+    @JsonProperty("lat")
+    @Nullable
+    public Double latitude() {
+        return latitude;
+    }
 
-        @JsonProperty("lat")
-        public abstract Builder latitude(double latitude);
-
-        @JsonProperty("lng")
-        public abstract Builder longitude(double longitude);
-
-        public abstract IPinfoStandardLocation build();
+    @JsonProperty("lng")
+    @Nullable
+    public Double longitude() {
+        return longitude;
     }
 }

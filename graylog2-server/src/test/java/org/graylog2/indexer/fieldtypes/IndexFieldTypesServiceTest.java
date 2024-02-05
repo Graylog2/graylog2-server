@@ -20,18 +20,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.streams.StreamService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 public class IndexFieldTypesServiceTest {
     @Rule
@@ -42,8 +41,7 @@ public class IndexFieldTypesServiceTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
-        final StreamService streamService = mock(StreamService.class);
-        this.dbService = new IndexFieldTypesService(mongodb.mongoConnection(), streamService, objectMapperProvider);
+        this.dbService = new IndexFieldTypesService(mongodb.mongoConnection(), objectMapperProvider);
     }
 
     @After
@@ -68,6 +66,44 @@ public class IndexFieldTypesServiceTest {
 
     private IndexFieldTypesDTO createDto(String indexName, Set<FieldTypeDTO> fields) {
         return createDto(indexName, "abc123", fields);
+    }
+
+    @Test
+    public void testTypeHistoryForFieldChangingType() {
+        dbService.save(createDto("graylog_0", "index_set_id", Set.of(FieldTypeDTO.create("field_changing_type", "long"))));
+        dbService.save(createDto("graylog_1", "index_set_id", Set.of(FieldTypeDTO.create("field_changing_type", "text"))));
+        dbService.save(createDto("graylog_2", "index_set_id", Set.of(FieldTypeDTO.create("field_changing_type", "text"))));
+        dbService.save(createDto("graylog_3", "index_set_id", Set.of(FieldTypeDTO.create("field_changing_type", "double"))));
+        dbService.save(createDto("graylog_4", "index_set_id", Set.of(FieldTypeDTO.create("field_changing_type", "long"))));
+        dbService.save(createDto("graylog_5", "index_set_id", Set.of(FieldTypeDTO.create("field_changing_type", "long"))));
+
+        List<String> typeHistory = dbService.fieldTypeHistory("index_set_id", "field_changing_type", true);
+        assertThat(typeHistory).isEqualTo(List.of("long", "string_fts", "double", "long"));
+        typeHistory = dbService.fieldTypeHistory("index_set_id", "field_changing_type", false);
+        assertThat(typeHistory).isEqualTo(List.of("long", "string_fts", "string_fts", "double", "long", "long"));
+
+    }
+
+    @Test
+    public void testTypeHistoryForFieldWithStableType() {
+        dbService.save(createDto("graylog_0", "index_set_id", Set.of()));
+        dbService.save(createDto("graylog_1", "index_set_id", Set.of()));
+
+        List<String> typeHistory = dbService.fieldTypeHistory("index_set_id", "message", true);
+        assertThat(typeHistory).isEqualTo(List.of("string_fts"));
+        typeHistory = dbService.fieldTypeHistory("index_set_id", "message", false);
+        assertThat(typeHistory).isEqualTo(List.of("string_fts", "string_fts"));
+    }
+
+    @Test
+    public void testTypeHistoryForNonExistingField() {
+        dbService.save(createDto("graylog_0", "index_set_id", Set.of()));
+        dbService.save(createDto("graylog_1", "index_set_id", Set.of()));
+
+        List<String> typeHistory = dbService.fieldTypeHistory("index_set_id", "non_existing_field", true);
+        assertThat(typeHistory).isEqualTo(List.of());
+        typeHistory = dbService.fieldTypeHistory("index_set_id", "non_existing_field", false);
+        assertThat(typeHistory).isEqualTo(List.of());
     }
 
     @Test

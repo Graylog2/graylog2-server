@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { useTheme } from 'styled-components';
 
@@ -60,6 +60,8 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
   const theme = useTheme();
 
+  const isPosthogLoaded = useCallback(() => (posthog?.__loaded === true), [posthog]);
+
   const { data: telemetryData, isSuccess: isTelemetryDataLoaded, refetch: refetchTelemetryData } = useTelemetryData();
   const [showTelemetryInfo, setShowTelemetryInfo] = useState<boolean>(false);
   const [globalProps, setGlobalProps] = useState(undefined);
@@ -73,10 +75,11 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
         && telemetryData.user_telemetry_settings?.telemetry_enabled) {
         const {
           cluster: { cluster_id: clusterId, ...clusterDetails },
-          current_user: { user, ...userDetails },
+          current_user: { user },
           license,
           plugin,
           search_cluster: searchCluster,
+          data_nodes: dataNodes,
           user_telemetry_settings: { telemetry_permission_asked: isPermissionAsked },
         } = telemetryData as TelemetryDataType;
         setGlobalProps(getGlobalProps(telemetryData));
@@ -88,21 +91,23 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
           ...license,
           ...plugin,
           ...searchCluster,
+          ...dataNodes,
+          ...getGlobalProps(telemetryData),
         });
 
-        posthog.identify(user, { ...userDetails });
+        posthog.identify(user, { ...getGlobalProps(telemetryData) });
         setShowTelemetryInfo(!isPermissionAsked);
       }
     };
 
-    if (posthog) {
+    if (isPosthogLoaded()) {
       setGroup();
     }
-  }, [posthog, isTelemetryDataLoaded, telemetryData, theme.mode]);
+  }, [posthog, isTelemetryDataLoaded, telemetryData, theme.mode, isPosthogLoaded]);
 
   const TelemetryContextValue = useMemo(() => {
     const sendTelemetry = (eventType: TelemetryEventType, event: TelemetryEvent) => {
-      if (posthog && globalProps) {
+      if (isPosthogLoaded() && globalProps) {
         try {
           posthog.capture(eventType, {
             ...event,
@@ -119,7 +124,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
     return ({
       sendTelemetry,
     });
-  }, [globalProps, posthog, theme.mode]);
+  }, [globalProps, isPosthogLoaded, posthog, theme.mode]);
 
   const handleConfirmTelemetryDialog = () => {
     TelemetrySettingsActions.update({ telemetry_permission_asked: true, telemetry_enabled: true }).then(() => {

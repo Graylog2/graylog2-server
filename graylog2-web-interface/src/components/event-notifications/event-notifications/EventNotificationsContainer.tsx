@@ -26,6 +26,9 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from 'components/event-notifications/event-notifications/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
 import NotificationTitle from './NotificationTitle';
@@ -73,6 +76,7 @@ const EventNotificationsContainer = () => {
   });
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
   const columnRenderers = useMemo(() => customColumnRenderers(testResults), [testResults]);
   const columnDefinitions = useMemo(
     () => ([...(paginatedEventNotifications?.attributes ?? [])]),
@@ -103,15 +107,15 @@ const EventNotificationsContainer = () => {
   }, [paginationQueryParameter, updateTableLayout]);
 
   const handleTest = useCallback((notification: EventNotification) => {
-    sendTelemetry('input_value_change', {
-      app_pathname: 'events',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_TEST_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-notification',
       app_action_value: 'notification-test',
     });
 
     getNotificationTest(notification);
     refetchEventNotifications();
-  }, [getNotificationTest, refetchEventNotifications, sendTelemetry]);
+  }, [getNotificationTest, pathname, refetchEventNotifications, sendTelemetry]);
 
   const renderEventDefinitionActions = useCallback((listItem: EventNotification) => (
     <EventNotificationActions notification={listItem}
@@ -119,15 +123,6 @@ const EventNotificationsContainer = () => {
                               isTestLoading={isLoadingTest}
                               onTest={handleTest} />
   ), [handleTest, isLoadingTest, refetchEventNotifications]);
-
-  const renderBulkActions = (
-    selectedNotificationsIds: Array<string>,
-    setSelectedNotificationsIds: (eventDefinitionsId: Array<string>) => void,
-  ) => (
-    <BulkActions selectedNotificationsIds={selectedNotificationsIds}
-                 setSelectedNotificationsIds={setSelectedNotificationsIds}
-                 refetchEventNotifications={refetchEventNotifications} />
-  );
 
   if (isLoadingLayoutPreferences || isLoadingEventNotifications) {
     return <Spinner />;
@@ -153,7 +148,7 @@ const EventNotificationsContainer = () => {
                                               columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                               onColumnsChange={onColumnsChange}
                                               onSortChange={onSortChange}
-                                              bulkActions={renderBulkActions}
+                                              bulkSelection={{ actions: <BulkActions refetchEventNotifications={refetchEventNotifications} /> }}
                                               activeSort={layoutConfig.sort}
                                               onPageSizeChange={onPageSizeChange}
                                               pageSize={layoutConfig.pageSize}

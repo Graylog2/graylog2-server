@@ -22,34 +22,52 @@ import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const EventDefinitionsPage = () => (
-  <DocumentTitle title="Event Definitions">
-    <EventsPageNavigation />
-    <PageHeader title="Event Definitions"
-                actions={(
-                  <IfPermitted permissions="eventdefinitions:create">
-                    <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                      <Button bsStyle="success">Create event definition</Button>
-                    </LinkContainer>
-                  </IfPermitted>
-                  )}
-                documentationLink={{
-                  title: 'Alerts documentation',
-                  path: DocsHelper.PAGES.ALERTS,
-                }}>
-      <span>
-        Create new Event Definitions that will allow you to search for different Conditions and alert on them.
-      </span>
-    </PageHeader>
+const EventDefinitionsPage = () => {
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
 
-    <Row className="content">
-      <Col md={12}>
-        <EventDefinitionsContainer />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title="Event Definitions">
+      <EventsPageNavigation />
+      <PageHeader title="Event Definitions"
+                  actions={(
+                    <IfPermitted permissions="eventdefinitions:create">
+                      <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                        <Button bsStyle="success"
+                                onClick={() => {
+                                  sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CREATE_BUTTON_CLICKED, {
+                                    app_pathname: getPathnameWithoutId(pathname),
+                                    app_section: 'event-definitions',
+                                    app_action_value: 'create-event-definition-button',
+                                  });
+                                }}>
+                          Create event definition
+                        </Button>
+                      </LinkContainer>
+                    </IfPermitted>
+                    )}
+                  documentationLink={{
+                    title: 'Alerts documentation',
+                    path: DocsHelper.PAGES.ALERTS,
+                  }}>
+        <span>
+          Create new Event Definitions that will allow you to search for different Conditions and alert on them.
+        </span>
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={12}>
+          <EventDefinitionsContainer />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default EventDefinitionsPage;

@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
 import java.util.Locale;
 
 public class Swapcase extends StringUtilsFunction {
@@ -42,5 +43,17 @@ public class Swapcase extends StringUtilsFunction {
     @Override
     protected String apply(String value, Locale unused) {
         return StringUtils.swapCase(value);
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Swap case string";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Swap the case of '${value}'";
     }
 }

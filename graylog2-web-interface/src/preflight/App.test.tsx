@@ -15,17 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { screen, renderPreflight, waitFor } from 'wrappedTestingLibrary';
+import { screen, renderPreflight, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import fetch from 'logic/rest/FetchProvider';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
 import UserNotification from 'preflight/util/UserNotification';
+import suppressConsole from 'helpers/suppressConsole';
 
 import App from './App';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve({})));
 
 jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: () => 'https://example.org/',
@@ -58,6 +59,14 @@ describe('App', () => {
   let windowConfirm;
   let windowLocation;
 
+  const startupButton = async () => {
+    const welcomeSection = await screen.findByTestId('welcome-section');
+
+    return within(welcomeSection).getByRole('button', {
+      name: /resume startup/i,
+    });
+  };
+
   beforeAll(() => {
     windowConfirm = window.confirm;
     window.confirm = jest.fn(() => true);
@@ -86,13 +95,9 @@ describe('App', () => {
   it('should resume startup and display loading page', async () => {
     renderPreflight(<App />);
 
-    const resumeStartupButton = await screen.findByRole('button', {
-      name: /resume startup/i,
-    });
-
+    const resumeStartupButton = await startupButton();
     userEvent.click(resumeStartupButton);
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
     await screen.findByText(/The Graylog server is currently starting./);
   });
 
@@ -106,14 +111,11 @@ describe('App', () => {
 
     renderPreflight(<App />);
 
-    const resumeStartupButton = screen.getByRole('button', {
-      name: /resume startup/i,
-    });
-
+    const resumeStartupButton = await startupButton();
     userEvent.click(resumeStartupButton);
 
-    await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node?'));
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+    await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.'));
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
   });
 
   it('should display error when resuming startup failed', async () => {
@@ -121,13 +123,12 @@ describe('App', () => {
 
     renderPreflight(<App />);
 
-    const resumeStartupButton = screen.getByRole('button', {
-      name: /resume startup/i,
+    suppressConsole(async () => {
+      const resumeStartupButton = await startupButton();
+      userEvent.click(resumeStartupButton);
     });
 
-    userEvent.click(resumeStartupButton);
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/finish-config'), undefined, false));
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
     await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Resuming startup failed with error: Error: Unexpected error!', 'Could not resume startup'));
   });
 });

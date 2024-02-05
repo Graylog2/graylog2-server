@@ -35,22 +35,25 @@ import org.graylog2.rest.resources.system.logs.RemoteLoggersResource;
 import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -63,9 +66,9 @@ import java.util.function.Function;
 public class ClusterLoggersResource extends ProxiedResource {
     @Inject
     public ClusterLoggersResource(NodeService nodeService,
-                                    RemoteInterfaceProvider remoteInterfaceProvider,
-                                    @Context HttpHeaders httpHeaders,
-                                    @Named("proxiedRequestsExecutorService") ExecutorService executorService) throws NodeNotFoundException {
+                                  RemoteInterfaceProvider remoteInterfaceProvider,
+                                  @Context HttpHeaders httpHeaders,
+                                  @Named("proxiedRequestsExecutorService") ExecutorService executorService) throws NodeNotFoundException {
         super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
     }
 
@@ -90,15 +93,15 @@ public class ClusterLoggersResource extends ProxiedResource {
     @Timed
     @Path("/{nodeId}/subsystems/{subsystem}/level/{level}")
     @ApiOperation(value = "Set the loglevel of a whole subsystem",
-        notes = "Provided level is falling back to DEBUG if it does not exist")
+                  notes = "Provided level is falling back to DEBUG if it does not exist")
     @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "No such subsystem.")
+            @ApiResponse(code = 404, message = "No such subsystem.")
     })
     @NoAuditEvent("proxy resource, audit event will be emitted on target nodes")
     public void setSubsystemLoggerLevel(
-        @ApiParam(name = "nodeId", required = true) @PathParam("nodeId") @NotEmpty String nodeId,
-        @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
-        @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) throws NodeNotFoundException, IOException {
+            @ApiParam(name = "nodeId", required = true) @PathParam("nodeId") @NotEmpty String nodeId,
+            @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
+            @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) throws NodeNotFoundException, IOException {
         final Node node = this.nodeService.byNodeId(nodeId);
         final RemoteLoggersResource remoteLoggersResource = this.remoteInterfaceProvider.get(node, getAuthenticationToken(), RemoteLoggersResource.class);
 
@@ -109,7 +112,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @Timed
     @Path("/{loggerName}/level/{level}")
     @ApiOperation(value = "Set the loglevel of a single logger",
-            notes = "Provided level is falling back to DEBUG if it does not exist")
+                  notes = "Provided level is falling back to DEBUG if it does not exist")
     @NoAuditEvent("proxy resource, audit event will be emitted on target nodes")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, CallResult<Void>> setClusterSingleLoggerLevel(
@@ -128,8 +131,8 @@ public class ClusterLoggersResource extends ProxiedResource {
     @Produces(MediaType.TEXT_PLAIN)
     @HideOnCloud
     public Response messages(@ApiParam(name = "nodeId", value = "The nodeId to get logs from") @PathParam("nodeId") @NotEmpty String nodeId,
-            @ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages." +
-            "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",
+                             @ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages." +
+                                     "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",
                                        defaultValue = "1000", allowableValues = "range[0, infinity]")
                              @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) throws IOException {
 

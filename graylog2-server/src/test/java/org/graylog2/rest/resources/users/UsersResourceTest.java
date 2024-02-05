@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
+import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
@@ -47,7 +48,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,6 +98,8 @@ public class UsersResourceTest {
     private UserSessionTerminationService sessionTerminationService;
     @Mock
     private DefaultSecurityManager securityManager;
+    @Mock
+    private GlobalAuthServiceConfig globalAuthServiceConfig;
 
     UserImplFactory userImplFactory;
 
@@ -105,7 +109,7 @@ public class UsersResourceTest {
                 new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
                 roleService, sessionService, new HttpConfiguration(), subject,
-                sessionTerminationService, securityManager);
+                sessionTerminationService, securityManager, globalAuthServiceConfig);
     }
 
     /**
@@ -130,9 +134,9 @@ public class UsersResourceTest {
 
     private CreateUserRequest buildCreateUserRequest() {
         return CreateUserRequest.create(USERNAME, PASSWORD, EMAIL,
-                                        FIRST_NAME, LAST_NAME, Collections.singletonList(""),
-                                        TIMEZONE, SESSION_TIMEOUT,
-                                        startPage, Collections.emptyList(), false);
+                FIRST_NAME, LAST_NAME, Collections.singletonList(""),
+                TIMEZONE, SESSION_TIMEOUT,
+                startPage, Collections.emptyList(), false);
     }
 
     /**
@@ -147,9 +151,9 @@ public class UsersResourceTest {
                                  AccessTokenService accessTokenService, RoleService roleService,
                                  MongoDBSessionService sessionService, HttpConfiguration configuration,
                                  Subject subject, UserSessionTerminationService sessionTerminationService,
-                                 DefaultSecurityManager securityManager) {
+                                 DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig) {
             super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
-                    sessionTerminationService, securityManager);
+                    sessionTerminationService, securityManager, globalAuthServiceConfig);
             this.subject = subject;
             super.configuration = configuration;
         }
@@ -167,7 +171,7 @@ public class UsersResourceTest {
         public UserImplFactory(Configuration configuration, Permissions permissions) {
             this.permissions = permissions;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(),
-                                                                         new SHA1HashPasswordAlgorithm("TESTSECRET"));
+                    new SHA1HashPasswordAlgorithm("TESTSECRET"));
         }
 
         @Override

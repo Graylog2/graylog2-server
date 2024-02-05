@@ -18,12 +18,12 @@ package org.graylog.storage.opensearch2.testing;
 
 import com.google.common.io.Resources;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.common.ParseField;
-import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.ContextParser;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.LoggingDeprecationHandler;
-import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.NamedXContentRegistry;
-import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentParser;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
+import org.graylog.shaded.opensearch2.org.opensearch.core.ParseField;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ContextParser;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.NamedXContentRegistry;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentParser;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.composite.ParsedComposite;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.ParsedFilter;

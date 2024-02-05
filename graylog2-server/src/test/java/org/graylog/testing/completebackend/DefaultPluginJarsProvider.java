@@ -51,11 +51,11 @@ public class DefaultPluginJarsProvider implements PluginJarsProvider {
         return "default";
     }
 
-    protected Path getProjectReposPath() {
+    public static Path getProjectReposPath() {
         return new File(PropertyLoader.get(PROPERTIES_FILE, "project_repos_dir")).toPath();
     }
 
-    protected String getProjectVersion() {
+    public static String getProjectVersion() {
         return PropertyLoader.get(PROPERTIES_FILE, "project_version");
     }
 }

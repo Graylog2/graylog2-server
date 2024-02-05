@@ -23,7 +23,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import type { Message } from 'views/components/messagelist/Types';
 import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 
-const StyledSticky = styled(Sticky)`
+const StyledSticky: typeof Sticky = styled(Sticky)`
   position: static !important;
 `;
 

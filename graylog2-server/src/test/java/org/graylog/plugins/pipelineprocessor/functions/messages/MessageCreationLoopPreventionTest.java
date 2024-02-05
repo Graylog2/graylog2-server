@@ -48,7 +48,8 @@ import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +81,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
                         "description",
                         ruleForTest(),
                         Tools.nowUTC(),
-                        null, null)
+                        null, null, null)
         ));
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);

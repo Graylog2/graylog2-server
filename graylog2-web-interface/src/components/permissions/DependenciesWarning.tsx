@@ -32,11 +32,6 @@ const Container = styled(Alert)`
   overflow: auto;
 `;
 
-const Headline = styled.div`
-  font-weight: bold;
-  margin-bottom: 10px;
-`;
-
 const List = styled.ul`
   list-style: initial;
   padding-left: 20px;
@@ -49,9 +44,7 @@ const List = styled.ul`
 const _cap = StringUtils.capitalizeFirstLetter;
 
 const DependenciesWarning = ({ missingDependencies, availableGrantees }: Props) => (
-  <Container bsStyle="danger">
-    <Headline>There are missing dependencies for the current set of collaborators</Headline>
-
+  <Container bsStyle="danger" title="There are missing dependencies for the current set of collaborators">
     <List>
       {missingDependencies.entrySeq().map(([granteeGRN, dependencyList]) => {
         const grantee = availableGrantees.find((selectedGrantee) => selectedGrantee.id === granteeGRN);

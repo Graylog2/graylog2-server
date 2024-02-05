@@ -26,7 +26,8 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 

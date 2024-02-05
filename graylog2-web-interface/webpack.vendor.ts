@@ -103,7 +103,9 @@ if (TARGET === 'start') {
       hot: false,
       liveReload: true,
       compress: true,
-      historyApiFallback: true,
+      historyApiFallback: {
+        disableDotRule: true,
+      },
       proxy: {
         '/api': {
           target: apiUrl,

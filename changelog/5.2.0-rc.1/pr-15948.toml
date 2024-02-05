@@ -1,0 +1,5 @@
+type = "c" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Using composable index templates instead of legacy templates."
+
+issues = ["15782"]
+pulls = ["15948"]

@@ -22,9 +22,12 @@ import { LinkContainer } from 'components/common/router';
 import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
-import { Button, Tooltip, DropdownButton, MenuItem, ButtonToolbar } from 'components/bootstrap';
+import { Button, DropdownButton, MenuItem, ButtonToolbar } from 'components/bootstrap';
 import { OverlayTrigger, IfPermitted } from 'components/common';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
   user: UserOverview,
@@ -40,7 +43,7 @@ const EditTokensAction = ({
   wrapperComponent: WrapperComponent,
 }: {
   user: UserOverview,
-  wrapperComponent: Button | MenuItem,
+  wrapperComponent: React.ComponentType<any>,
 }) => (
   <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
     <WrapperComponent id={`edit-tokens-${id}`}
@@ -53,14 +56,14 @@ const EditTokensAction = ({
 
 const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
   const tooltip = (
-    <Tooltip id="system-user">System users can only be modified in the Graylog configuration
-      file.
-    </Tooltip>
+    <>
+      System users can only be modified in the Graylog configuration file.
+    </>
   );
 
   return (
     <>
-      <OverlayTrigger placement="left" overlay={tooltip}>
+      <OverlayTrigger placement="left" overlay={tooltip} trigger={['hover']}>
         <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
       </OverlayTrigger>
       <EditTokensAction user={user} wrapperComponent={Button} />
@@ -73,11 +76,12 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
 }) => {
   const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
 
   const _toggleStatus = () => {
     if (accountStatus === 'enabled') {
-      sendTelemetry('click', {
-        app_pathname: 'users',
+      sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_DISABLED, {
+        app_pathname: getPathnameWithoutId(pathname),
         app_action_value: 'user-item-disable',
       });
 
@@ -91,15 +95,15 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
 
     UsersDomain.setStatus(id, 'enabled');
 
-    sendTelemetry('click', {
-      app_pathname: 'users',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_ENABLED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'user-item-enable',
     });
   };
 
   const _deleteUser = () => {
-    sendTelemetry('click', {
-      app_pathname: 'users',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_DELETED, {
+      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'user-item-delete',
     });
 
@@ -131,8 +135,6 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
             </MenuItem>
           )}
           <MenuItem id={`delete-user-${id}`}
-                    bsStyle="primary"
-                    bsSize="xs"
                     title={`Delete user ${fullName}`}
                     onClick={_deleteUser}>
             Delete

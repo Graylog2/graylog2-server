@@ -21,8 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-
-import java.util.Locale;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -32,7 +31,7 @@ abstract class BaseEncodingSingleArgStringFunction extends AbstractFunction<Stri
     private final ParameterDescriptor<Boolean, Boolean> omitPaddingParam;
 
     BaseEncodingSingleArgStringFunction() {
-        valueParam = ParameterDescriptor.string("value").description("The value to encode with " + getEncodingName()).build();
+        valueParam = ParameterDescriptor.string("value").ruleBuilderVariable().description("The value to encode with " + getEncodingName()).build();
         omitPaddingParam = ParameterDescriptor.bool("omit_padding").optional().description("Omit any padding characters as specified by RFC 4648 section 3.2").build();
     }
 
@@ -49,6 +48,10 @@ abstract class BaseEncodingSingleArgStringFunction extends AbstractFunction<Stri
 
     protected abstract String getEncodingName();
 
+    protected abstract String getRuleBuilderName();
+
+    protected abstract String getRuleBuilderTitle();
+
     protected String description() {
         return getEncodingName() + " encoding/decoding of the string";
     }
@@ -60,6 +63,10 @@ abstract class BaseEncodingSingleArgStringFunction extends AbstractFunction<Stri
                 .returnType(String.class)
                 .params(of(valueParam, omitPaddingParam))
                 .description(description())
+                .ruleBuilderEnabled()
+                .ruleBuilderName(getRuleBuilderName())
+                .ruleBuilderTitle(getRuleBuilderTitle())
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.ENCODING)
                 .build();
     }
 }

@@ -22,7 +22,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
+import org.graylog2.plugin.streams.StreamRuleType;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,17 +45,32 @@ public final class Streams implements GraylogRestApi {
     public record StreamRule(@JsonProperty("type") int type,
                              @JsonProperty("value") String value,
                              @JsonProperty("field") String field,
-                             @JsonProperty("inverted") boolean inverted) {}
-    record CreateStreamRequest(@JsonProperty("title") String title,
-                               @JsonProperty("rules") Collection<StreamRule> streamRules,
-                               @JsonProperty("index_set_id") String indexSetId) {}
-
-    public String createStream(String title, String indexSetId, StreamRule... streamRules) {
-        return waitForStreamRouterRefresh(() -> createStream(title, indexSetId, true, streamRules));
+                             @JsonProperty("inverted") boolean inverted) {
+        public static StreamRule exact(String value, String field, boolean inverted) {
+            return new StreamRule(StreamRuleType.EXACT.toInteger(), value, field, inverted);
+        }
     }
 
-    public String createStream(String title, String indexSetId, boolean started, StreamRule... streamRules) {
-        final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId);
+    record CreateStreamRequest(@JsonProperty("title") String title,
+                               @JsonProperty("rules") Collection<StreamRule> streamRules,
+                               @JsonProperty("index_set_id") String indexSetId,
+                               @JsonProperty("remove_matches_from_default_stream") boolean removeMatchesFromDefaultStream) {}
+
+    public String createStream(String title, String indexSetId, boolean started) {
+        return createStream(title,indexSetId, started, DefaultStreamMatches.KEEP);
+    }
+
+    public String createStream(String title, String indexSetId, StreamRule... streamRules) {
+        return createStream(title,indexSetId, true, DefaultStreamMatches.KEEP, streamRules);
+    }
+
+    public String createStream(String title, String indexSetId, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
+        return waitForStreamRouterRefresh(() -> createStream(title, indexSetId, true, defaultStreamMatches, streamRules));
+    }
+
+
+    public String createStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
+        final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId, defaultStreamMatches == DefaultStreamMatches.REMOVE);
         final String streamId = given()
                 .spec(api.requestSpecification())
                 .when()

@@ -23,7 +23,6 @@ import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
 
-import { themePropTypes } from 'theme';
 import CustomMenuList from 'components/common/Select/CustomMenuList';
 import Icon from 'components/common/Icon';
 import { INPUT_BORDER_RADIUS } from 'theme/constants';
@@ -63,13 +62,13 @@ const Control = ({ children, ...props }: React.ComponentProps<typeof Components.
 );
 
 /* eslint-disable react/prop-types */
-const CustomOption = (optionRenderer: (Option) => React.ReactElement) => (
+const CustomOption = (optionRenderer: (option: Option, isSelected: boolean) => React.ReactElement) => (
   (props: React.ComponentProps<typeof Components.Option>): React.ReactElement => {
-    const { data } = props;
+    const { data, isSelected } = props;
 
     return (
       <Components.Option {...props}>
-        {optionRenderer(data)}
+        {optionRenderer(data, isSelected)}
       </Components.Option>
     );
   }
@@ -238,7 +237,7 @@ export type Props<OptionValue> = {
   onChange: (value: OptionValue) => void,
   onReactSelectChange?: (option: Option | Option[]) => void,
   onMenuClose?: () => void,
-  optionRenderer?: (option: Option) => React.ReactElement,
+  optionRenderer?: (option: Option, isSelected?: boolean) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
   persistSelection: boolean,
@@ -349,7 +348,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     /** Size of the select input. */
     size: PropTypes.oneOf(['normal', 'small']),
     /** @ignore */
-    theme: themePropTypes.isRequired,
+    theme: PropTypes.object.isRequired,
     /**
      * Value which can be the selected option or the value of the selected option.
      * If `multi` is enabled, it must be a string containing all values separated by the `delimiter`.

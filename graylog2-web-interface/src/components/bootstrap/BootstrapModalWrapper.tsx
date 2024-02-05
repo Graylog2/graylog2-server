@@ -20,6 +20,7 @@ import React from 'react';
 import Modal from './Modal';
 
 type Props = {
+  title?: string | undefined,
   backdrop: boolean|'static'|undefined,
   bsSize: 'lg'|'large'|'sm'|'small',
   showModal: boolean,
@@ -65,6 +66,7 @@ BootstrapModalWrapper.defaultProps = {
   bsSize: undefined,
   backdrop: 'static',
   role: 'dialog',
+  title: undefined,
 };
 
 export default BootstrapModalWrapper;

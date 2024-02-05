@@ -110,9 +110,7 @@ const ServerUnavailablePage = ({ server }: Props) => {
   return (
     <DocumentTitle title="Server unavailable">
       <LoginChrome>
-        <Modal show
-               data-app-section="server_unavailable"
-               data-event-element={modalTitle}>
+        <Modal show onHide={() => {}}>
           <Modal.Header>
             <Modal.Title><Icon name="exclamation-triangle" /> {modalTitle}</Modal.Title>
           </Modal.Header>
@@ -125,7 +123,9 @@ const ServerUnavailablePage = ({ server }: Props) => {
               <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
               <p>
                 Do you need a hand?{' '}
-                <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
+                <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can
+                  help you
+                </a>.
               </p>
               <div>
                 <Button bsStyle="primary"

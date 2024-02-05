@@ -43,6 +43,10 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import Parameter from 'views/logic/parameters/Parameter';
 import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
+import HighlightingRule, { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
@@ -159,11 +163,14 @@ export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
 export const ViewStateGenerator = async ({ streams, aggregations, groupBy }: {groupBy: Array<string>, streams: string | string[] | undefined, aggregations: Array<any>}) => {
   const { titles, widgets, positions } = await WidgetsGenerator({ streams, aggregations, groupBy });
 
+  const highlightRules = aggregations?.map(({ fnSeries, value, expr }) => HighlightingRule.create(fnSeries, value, exprToConditionMapper[expr] || 'equal', randomColor()));
+
   return ViewState.create()
     .toBuilder()
     .titles(titles)
     .widgets(Immutable.List(widgets))
     .widgetPositions(positions)
+    .formatting(FormattingSettings.create(highlightRules))
     .build();
 };
 
@@ -174,6 +181,7 @@ export const ViewGenerator = async ({
   aggregations,
   groupBy,
   queryParameters,
+  searchFilters,
 }: {
   streams: string | string[] | undefined | null,
   timeRange: AbsoluteTimeRange | RelativeTimeRangeStartOnly,
@@ -181,9 +189,10 @@ export const ViewGenerator = async ({
   aggregations: Array<EventDefinitionAggregation>
   groupBy: Array<string>,
   queryParameters: Array<ParameterJson>,
+  searchFilters?: Array<SearchFilter>,
 },
 ) => {
-  const query = QueryGenerator(streams, undefined, timeRange, queryString);
+  const query = QueryGenerator(streams, undefined, timeRange, queryString, (searchFilters || []));
   const search = Search.create().toBuilder().queries([query]).parameters(queryParameters.map((param) => Parameter.fromJSON(param)))
     .build();
   const viewState = await ViewStateGenerator({ streams, aggregations, groupBy });

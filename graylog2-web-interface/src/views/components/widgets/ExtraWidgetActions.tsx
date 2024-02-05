@@ -22,26 +22,37 @@ import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useAppDispatch from 'stores/useAppDispatch';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 type Props = {
-  onSelect: (eventKey: string, e: MouseEvent) => void,
   widget: Widget,
 };
 
-const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
+const ExtraWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
   const dispatch = useAppDispatch();
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
     .map(({ title, action, type, disabled = () => false }) => {
-      const _onSelect = (eventKey: string, e: MouseEvent) => {
+      const _onSelect = () => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'search-widget',
+          app_action_value: type,
+        });
+
         dispatch(action(widget, { widgetFocusContext }));
-        onSelect(eventKey, e);
       };
 
-      return (<MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
-    }), [dispatch, onSelect, pluginWidgetActions, widget, widgetFocusContext]);
+      return (
+        <MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
+    }), [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext]);
 
   return extraWidgetActions.length > 0
     ? (

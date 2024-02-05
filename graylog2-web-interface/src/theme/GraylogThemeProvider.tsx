@@ -15,106 +15,82 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import type { DefaultTheme } from 'styled-components';
 import { ThemeProvider } from 'styled-components';
+import type { ColorScheme } from '@graylog/sawmill';
+import SawmillSC from '@graylog/sawmill/styled-components';
+import type { MantineTheme } from '@graylog/sawmill/mantine';
+import SawmillMantine from '@graylog/sawmill/mantine';
+import { useMemo } from 'react';
+import { MantineProvider } from '@mantine/core';
 
-import buttonStyles from 'components/bootstrap/styles/buttonStyles';
-import aceEditorStyles from 'components/bootstrap/styles/aceEditorStyles';
 import usePluginEntities from 'hooks/usePluginEntities';
+import type { ThemesColors } from 'theme/theme-types';
 
-import { breakpoints, colors, fonts, utils, spacings } from './index';
-import RegeneratableThemeContext from './RegeneratableThemeContext';
-import ThemeModeContext from './ThemeModeContext';
-import type { Colors } from './colors';
-import type { ThemeMode } from './constants';
-import { THEME_MODES } from './constants';
-import useCurrentThemeMode from './UseCurrentThemeMode';
+import ColorSchemeContext from './ColorSchemeContext';
+import { COLOR_SCHEMES } from './constants';
+import usePreferredColorScheme from './hooks/usePreferredColorScheme';
 
-interface generateCustomThemeColorsType {
-  graylogColors: Colors,
-  mode: ThemeMode,
-  initialLoad: boolean,
+type Props = {
+  children: React.ReactNode,
+  initialThemeModeOverride: ColorScheme
 }
 
-interface generateThemeType {
-  changeMode: (ThemeMode) => void,
-  mode: ThemeMode,
-  initialLoad?: boolean,
-  generateCustomThemeColors: ({ graylogColors, mode, initialLoad }: generateCustomThemeColorsType) => Promise<Colors> | undefined,
-}
+const useSCTheme = (
+  colorScheme: ColorScheme,
+  changeColorScheme: (newColorScheme: ColorScheme) => void,
+  useCustomThemeColors: () => ({ data: ThemesColors }),
+  mantineTheme: MantineTheme,
+) => {
+  const { data: customThemeColors } = useCustomThemeColors?.() ?? {};
 
-function buildTheme(currentThemeColors, changeMode, mode): DefaultTheme {
-  const formattedUtils = {
-    ...utils,
-    colorLevel: utils.colorLevel(currentThemeColors),
-    readableColor: utils.readableColor(currentThemeColors),
-  };
+  return useMemo(() => {
+    const theme = SawmillSC({
+      colorScheme,
+      customColors: customThemeColors?.[colorScheme],
+    });
 
-  return {
-    mode,
-    changeMode,
-    breakpoints,
-    colors: currentThemeColors,
-    fonts,
-    spacings,
-    components: {
-      button: buttonStyles({ colors: currentThemeColors, utils: formattedUtils }),
-      aceEditor: aceEditorStyles({ colors: currentThemeColors }),
-    },
-    utils: formattedUtils,
-  };
-}
-
-const _generateTheme = ({ changeMode, mode, generateCustomThemeColors, initialLoad = false }: generateThemeType) => {
-  if (generateCustomThemeColors) {
-    return generateCustomThemeColors({
-      graylogColors: colors[mode],
-      mode,
-      initialLoad,
-    }).then((currentThemeColors) => buildTheme(currentThemeColors, changeMode, mode));
-  }
-
-  return Promise.resolve(colors[mode]).then((currentThemeColors) => buildTheme(currentThemeColors, changeMode, mode));
+    return ({
+      ...theme,
+      changeMode: changeColorScheme,
+      mantine: mantineTheme,
+    });
+  }, [changeColorScheme, colorScheme, customThemeColors, mantineTheme]);
 };
 
-const GraylogThemeProvider = ({ children, initialThemeModeOverride }) => {
-  const [mode, changeMode] = useCurrentThemeMode(initialThemeModeOverride);
+const useMantineTheme = (
+  colorScheme: ColorScheme,
+  useCustomThemeColors: () => ({ data: ThemesColors }),
+) => {
+  const { data: customThemeColors } = useCustomThemeColors?.() ?? {};
 
+  return useMemo(() => SawmillMantine({
+    colorScheme,
+    customColors: customThemeColors?.[colorScheme],
+  }), [colorScheme, customThemeColors]);
+};
+
+const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => {
+  const [colorScheme, changeColorScheme] = usePreferredColorScheme(initialThemeModeOverride);
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
-  const generateCustomThemeColors = themeCustomizer?.[0]?.actions?.generateCustomThemeColors;
+  const useCustomThemeColors = themeCustomizer?.[0]?.hooks.useCustomThemeColors;
+  const mantineTheme = useMantineTheme(colorScheme, useCustomThemeColors);
+  const scTheme = useSCTheme(colorScheme, changeColorScheme, useCustomThemeColors, mantineTheme);
 
-  const [theme, setTheme] = useState<DefaultTheme>();
-
-  useEffect(() => {
-    _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: true }).then(setTheme);
-  }, [changeMode, generateCustomThemeColors, mode, setTheme]);
-
-  const regeneratableThemeContextValue = useMemo(() => {
-    const regenerateTheme = () => {
-      _generateTheme({ changeMode, mode, generateCustomThemeColors, initialLoad: false }).then(setTheme);
-    };
-
-    return ({ regenerateTheme });
-  }, [changeMode, generateCustomThemeColors, mode]);
-
-  const themeModeContextValue = useMemo(() => mode, [mode]);
-
-  return theme ? (
-    <RegeneratableThemeContext.Provider value={regeneratableThemeContextValue}>
-      <ThemeModeContext.Provider value={themeModeContextValue}>
-        <ThemeProvider theme={theme}>
+  return (
+    <ColorSchemeContext.Provider value={colorScheme}>
+      <MantineProvider theme={mantineTheme}>
+        <ThemeProvider theme={scTheme}>
           {children}
         </ThemeProvider>
-      </ThemeModeContext.Provider>
-    </RegeneratableThemeContext.Provider>
-  ) : null;
+      </MantineProvider>
+    </ColorSchemeContext.Provider>
+  );
 };
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
-  initialThemeModeOverride: PropTypes.oneOf(THEME_MODES),
+  initialThemeModeOverride: PropTypes.oneOf(COLOR_SCHEMES),
 };
 
 GraylogThemeProvider.defaultProps = {

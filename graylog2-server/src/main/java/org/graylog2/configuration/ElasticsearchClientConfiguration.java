@@ -25,12 +25,10 @@ import org.graylog2.configuration.converters.URIListConverter;
 import org.graylog2.configuration.validators.ElasticsearchVersionValidator;
 import org.graylog2.configuration.validators.HttpOrHttpsSchemeValidator;
 import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidator;
-import org.graylog2.configuration.validators.NonEmptyListValidator;
 import org.graylog2.storage.SearchVersion;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ElasticsearchClientConfiguration {
@@ -54,6 +52,20 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
     Duration elasticsearchVersionProbeDelay = Duration.seconds(5L);
+
+    /**
+     * Zero means unlimited attempts, will try until one datanode appears. The elasticsearch_version_probe_attempts
+     * fallback property is used because the
+     */
+    @Parameter(value = "datanode_startup_connection_attempts", fallbackPropertyName = "elasticsearch_version_probe_attempts", validators = {PositiveIntegerValidator.class})
+    int datanodeStartupConnectionAttempts = 0;
+
+    /**
+     * Seconds between each attempt to access datanode. Too long and you'll be waiting unnecessarily, too short and you
+     * will be flooded by error messages in your logs.
+     */
+    @Parameter(value = "datanode_startup_connection_delay", fallbackPropertyName = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
+    Duration datanodeStartupConnectionDelay = Duration.seconds(5L);
 
     @Parameter(value = "elasticsearch_max_total_connections", validators = {PositiveIntegerValidator.class})
     int elasticsearchMaxTotalConnections = 200;
@@ -93,4 +105,19 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
+
+    @Parameter(value = "indexer_use_jwt_authentication")
+    boolean indexerUseJwtAuthentication = false;
+
+    @Parameter(value = "indexer_jwt_auth_token_caching_duration")
+    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
+
+    @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
+    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
+
+    @Parameter(value = "indexer_max_concurrent_searches")
+    Integer indexerMaxConcurrentSearches = null;
+
+    @Parameter(value = "indexer_max_concurrent_shard_requests")
+    Integer indexerMaxConcurrentShardRequests = null;
 }

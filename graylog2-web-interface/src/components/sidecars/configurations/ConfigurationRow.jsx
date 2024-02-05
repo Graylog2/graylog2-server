@@ -22,6 +22,8 @@ import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'components/boot
 import Routes from 'routing/Routes';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import CopyConfigurationModal from './CopyConfigurationModal';
 import styles from './ConfigurationRow.css';
@@ -33,18 +35,25 @@ class ConfigurationRow extends React.Component {
     onCopy: PropTypes.func.isRequired,
     validateConfiguration: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func,
   };
 
   static defaultProps = {
     collector: {},
+    sendTelemetry: () => {},
   };
 
-  _handleDelete = () => {
-    const { configuration, onDelete } = this.props;
+  _handleDelete = async () => {
+    const { configuration, onDelete, sendTelemetry } = this.props;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_DELETED, {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
+    });
 
     // eslint-disable-next-line no-alert
     if (window.confirm(`You are about to delete configuration "${configuration.name}". Are you sure?`)) {
-      onDelete(configuration);
+      await onDelete(configuration);
     }
   };
 
@@ -81,4 +90,4 @@ class ConfigurationRow extends React.Component {
   }
 }
 
-export default ConfigurationRow;
+export default withTelemetry(ConfigurationRow);

@@ -54,6 +54,7 @@ public abstract class StreamDTO {
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
     public static final String FIELD_IS_EDITABLE = "is_editable";
+    public static final Stream.MatchingType DEFAULT_MATCHING_TYPE = Stream.MatchingType.AND;
 
     @JsonProperty("id")
     public abstract String id();
@@ -124,7 +125,7 @@ public abstract class StreamDTO {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
-                    .matchingType(Stream.MatchingType.AND.toString())
+                    .matchingType(DEFAULT_MATCHING_TYPE.toString())
                     .isDefault(false)
                     .isEditable(false)
                     .removeMatchesFromDefaultStream(false);
@@ -195,7 +196,7 @@ public abstract class StreamDTO {
                 .id(document.getObjectId(FIELD_ID).toHexString())
                 .title(document.getString(FIELD_TITLE))
                 .description(document.getString(FIELD_DESCRIPTION))
-                .matchingType(document.getString(FIELD_MATCHING_TYPE))
+                .matchingType(document.get(FIELD_MATCHING_TYPE, DEFAULT_MATCHING_TYPE.toString()))
                 .createdAt(document.getDate(FIELD_CREATED_AT))
                 .contentPack(document.getString(FIELD_CONTENT_PACK))
                 .isEditable(document.getBoolean(FIELD_IS_EDITABLE, true))

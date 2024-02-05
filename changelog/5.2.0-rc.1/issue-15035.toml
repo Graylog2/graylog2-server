@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix heatmap colorbar font color for dark mode."
+
+issues = ["15035"]
+pulls = ["16129"]

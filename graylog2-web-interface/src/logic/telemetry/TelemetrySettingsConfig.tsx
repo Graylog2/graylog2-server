@@ -54,6 +54,7 @@ const TelemetrySettingsConfig = () => {
 
   const updateTelemetryOpt = (data: UserTelemetrySettings) => {
     if (posthog && isTelemetryEnabled && !data.telemetry_enabled) {
+      posthog.capture('$opt_out');
       posthog.opt_out_capturing();
     }
   };

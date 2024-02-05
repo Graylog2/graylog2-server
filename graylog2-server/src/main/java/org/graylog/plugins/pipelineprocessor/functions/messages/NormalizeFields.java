@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
 import java.util.Locale;
@@ -56,6 +57,10 @@ public class NormalizeFields extends AbstractFunction<Void> {
                 .returnType(Void.class)
                 .params(ImmutableList.of(messageParam))
                 .description("Normalizes all field names by setting them to lowercase")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Normalize fields")
+                .ruleBuilderTitle("Normalize field names")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

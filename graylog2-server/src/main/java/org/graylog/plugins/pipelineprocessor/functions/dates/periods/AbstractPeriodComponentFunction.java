@@ -17,12 +17,12 @@
 package org.graylog.plugins.pipelineprocessor.functions.dates.periods;
 
 import com.google.common.primitives.Ints;
-
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.joda.time.Period;
 
 import javax.annotation.Nonnull;
@@ -31,7 +31,7 @@ public abstract class AbstractPeriodComponentFunction extends AbstractFunction<P
 
     private final ParameterDescriptor<Long, Period> value =
             ParameterDescriptor
-                    .integer("value", Period.class)
+                    .integer("value", Period.class).ruleBuilderVariable()
                     .transform(this::getPeriodOfInt)
                     .build();
 
@@ -55,6 +55,10 @@ public abstract class AbstractPeriodComponentFunction extends AbstractFunction<P
                 .pure(true)
                 .returnType(Period.class)
                 .params(value)
+                .ruleBuilderEnabled()
+                .ruleBuilderName(getRuleBuilderName())
+                .ruleBuilderTitle(getRuleBuilderTitle())
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.DATE)
                 .build();
     }
 
@@ -63,4 +67,10 @@ public abstract class AbstractPeriodComponentFunction extends AbstractFunction<P
 
     @Nonnull
     protected abstract String getDescription();
+
+    @Nonnull
+    protected abstract String getRuleBuilderName();
+
+    @Nonnull
+    protected abstract String getRuleBuilderTitle();
 }

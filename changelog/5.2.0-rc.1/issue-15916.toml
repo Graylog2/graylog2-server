@@ -1,0 +1,6 @@
+type = "changed"
+message = "On View Event Definition page added Duplicate button and removed Edit button for definitions that are scoped as immutable."
+
+issues = ["15916"]
+pulls = ["16515"]
+

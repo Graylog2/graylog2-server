@@ -24,6 +24,9 @@ import capitalize from 'lodash/capitalize';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { LoggersActions, LoggersStore } from 'stores/system/LoggersStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 const LogLevelDropdown = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -35,6 +38,7 @@ const LogLevelDropdown = createReactClass({
     nodeId: PropTypes.string.isRequired,
     subsystem: PropTypes.object.isRequired,
     sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(LoggersStore)],
@@ -48,8 +52,8 @@ const LogLevelDropdown = createReactClass({
       event.preventDefault();
       this._changeLoglevel(loglevel);
 
-      this.props.sendTelemetry('input_value_change', {
-        app_pathname: 'logging',
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.LOG_LEVEL_EDITED, {
+        app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_action_value: 'log-level-change',
         event_details: { value: loglevel },
       });
@@ -75,4 +79,4 @@ const LogLevelDropdown = createReactClass({
   },
 });
 
-export default withTelemetry(LogLevelDropdown);
+export default withLocation(withTelemetry(LogLevelDropdown));

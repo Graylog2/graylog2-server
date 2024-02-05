@@ -29,7 +29,7 @@ type Props = {
   disabled?: boolean,
   hasErrorOnMount?: boolean,
   onPresetSelectOpen: () => void,
-  setCurrentTimeRange: (nextTimeRange: TimeRange | NoTimeRangeOverride) => void,
+  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
   toggleShow: () => void,
   showPresetDropdown?: boolean,
 };
@@ -53,12 +53,12 @@ const TimeRangeFilterButtons = ({
 }: Props) => {
   const { submitForm, isValid } = useFormikContext();
 
-  const _onClick = (e) => {
+  const _onClick = (e: React.MouseEvent<HTMLElement>) => {
     e.currentTarget.blur();
     toggleShow();
   };
 
-  const selectRelativeTimeRangePreset = (timerange) => {
+  const selectRelativeTimeRangePreset = (timerange: TimeRange | {}) => {
     setCurrentTimeRange(normalizeIfAllMessagesRange(timerange));
 
     if (isValid) {

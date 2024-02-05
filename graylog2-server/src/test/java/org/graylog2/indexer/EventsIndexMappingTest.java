@@ -19,16 +19,19 @@ package org.graylog2.indexer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.utilities.AssertJsonPath;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 public class EventsIndexMappingTest {
@@ -36,6 +39,7 @@ public class EventsIndexMappingTest {
     private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private static final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+    private static final TemplateIndexSetConfig templateIndexSetConfig = mock(TemplateIndexSetConfig.class);
     public static final String DATE_FORMAT = "uuuu-MM-dd HH:mm:ss.SSS";
 
     @ParameterizedTest
@@ -45,61 +49,64 @@ public class EventsIndexMappingTest {
     })
     void createsValidMappingTemplates(final String versionString) throws Exception {
         final SearchVersion version = SearchVersion.decode(versionString);
-        final IndexMappingTemplate mapping = new EventIndexTemplateProvider().create(version, Mockito.mock(IndexSetConfig.class));
+        final IndexMappingTemplate mapping = new EventIndexTemplateProvider().create(version, indexSetConfig);
+        doReturn("test_*").when(templateIndexSetConfig).indexWildcard();
 
-        assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
-            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
-            at.jsonPathAsInteger("$.order").isEqualTo(-1);
-            assertStandardMappingValues(at);
-        });
+        var template1 = mapping.toTemplate(templateIndexSetConfig);
+        assertThat(template1.indexPatterns()).isEqualTo(List.of("test_*"));
+        assertThat(template1.order()).isEqualTo(-1);
+        assertJsonPath(template1.mappings(), this::assertStandardMappingValues);
+        assertJsonPath(template1.settings(), this::assertStandardSettingsValues);
 
-        assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*", 23), at -> {
-            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
-            at.jsonPathAsInteger("$.order").isEqualTo(23);
-            assertStandardMappingValues(at);
-        });
+        var template2 = mapping.toTemplate(templateIndexSetConfig, 23L);
+        assertThat(template2.indexPatterns()).isEqualTo(List.of("test_*"));
+        assertThat(template2.order()).isEqualTo(23);
+        assertJsonPath(template2.mappings(), this::assertStandardMappingValues);
+        assertJsonPath(template2.settings(), this::assertStandardSettingsValues);
     }
 
     private void assertJsonPath(final Map<String, Object> map, final Consumer<JsonPathAssert> consumer) throws Exception {
         AssertJsonPath.assertJsonPath(objectMapper.writeValueAsString(map), consumer);
     }
 
+    private void assertStandardSettingsValues(JsonPathAssert at) {
+        at.jsonPathAsString("$.['index.refresh_interval']").isEqualTo("1s");
+    }
+
     private void assertStandardMappingValues(JsonPathAssert at) {
-        at.jsonPathAsString("$.settings['index.refresh_interval']").isEqualTo("1s");
+        at.jsonPathAsBoolean("$._source.enabled").isTrue();
+        at.jsonPathAsBoolean("$.dynamic").isFalse();
 
-        at.jsonPathAsBoolean("$.mappings._source.enabled").isTrue();
-        at.jsonPathAsBoolean("$.mappings.dynamic").isFalse();
+        at.jsonPathAsString("$.dynamic_templates[0]fields.path_match").isEqualTo("fields.*");
+        at.jsonPathAsString("$.dynamic_templates[0]fields.mapping.type").isEqualTo("keyword");
+        at.jsonPathAsBoolean("$.dynamic_templates[0]fields.mapping.doc_values").isTrue();
+        at.jsonPathAsBoolean("$.dynamic_templates[0]fields.mapping.index").isTrue();
 
-        at.jsonPathAsString("$.mappings.dynamic_templates[0]fields.path_match").isEqualTo("fields.*");
-        at.jsonPathAsString("$.mappings.dynamic_templates[0]fields.mapping.type").isEqualTo("keyword");
-        at.jsonPathAsBoolean("$.mappings.dynamic_templates[0]fields.mapping.doc_values").isTrue();
-        at.jsonPathAsBoolean("$.mappings.dynamic_templates[0]fields.mapping.index").isTrue();
-
-        at.jsonPathAsString("$.mappings.properties.id.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.event_definition_type.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.event_definition_id.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.origin_context.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.timestamp.type").isEqualTo("date");
-        at.jsonPathAsString("$.mappings.properties.timestamp.format").isEqualTo(DATE_FORMAT);
-        at.jsonPathAsString("$.mappings.properties.timestamp_processing.type").isEqualTo("date");
-        at.jsonPathAsString("$.mappings.properties.timestamp_processing.format").isEqualTo(DATE_FORMAT);
-        at.jsonPathAsString("$.mappings.properties.timerange_start.type").isEqualTo("date");
-        at.jsonPathAsString("$.mappings.properties.timerange_start.format").isEqualTo(DATE_FORMAT);
-        at.jsonPathAsString("$.mappings.properties.timerange_end.type").isEqualTo("date");
-        at.jsonPathAsString("$.mappings.properties.timerange_end.format").isEqualTo(DATE_FORMAT);
-        at.jsonPathAsString("$.mappings.properties.streams.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.source_streams.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.message.type").isEqualTo("text");
-        at.jsonPathAsString("$.mappings.properties.message.analyzer").isEqualTo("standard");
-        at.jsonPathAsBoolean("$.mappings.properties.message.norms").isFalse();
-        at.jsonPathAsString("$.mappings.properties.message.fields.keyword.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.source.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.key.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.key_tuple.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.properties.priority.type").isEqualTo("long");
-        at.jsonPathAsString("$.mappings.properties.alert.type").isEqualTo("boolean");
-        at.jsonPathAsString("$.mappings.properties.fields.type").isEqualTo("object");
-        at.jsonPathAsBoolean("$.mappings.properties.fields.dynamic").isTrue();
-        at.jsonPathAsString("$.mappings.properties.triggered_jobs.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.id.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.event_definition_type.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.event_definition_id.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.origin_context.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.timestamp.type").isEqualTo("date");
+        at.jsonPathAsString("$.properties.timestamp.format").isEqualTo(DATE_FORMAT);
+        at.jsonPathAsString("$.properties.timestamp_processing.type").isEqualTo("date");
+        at.jsonPathAsString("$.properties.timestamp_processing.format").isEqualTo(DATE_FORMAT);
+        at.jsonPathAsString("$.properties.timerange_start.type").isEqualTo("date");
+        at.jsonPathAsString("$.properties.timerange_start.format").isEqualTo(DATE_FORMAT);
+        at.jsonPathAsString("$.properties.timerange_end.type").isEqualTo("date");
+        at.jsonPathAsString("$.properties.timerange_end.format").isEqualTo(DATE_FORMAT);
+        at.jsonPathAsString("$.properties.streams.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.source_streams.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.message.type").isEqualTo("text");
+        at.jsonPathAsString("$.properties.message.analyzer").isEqualTo("standard");
+        at.jsonPathAsBoolean("$.properties.message.norms").isFalse();
+        at.jsonPathAsString("$.properties.message.fields.keyword.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.source.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.key.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.key_tuple.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.priority.type").isEqualTo("long");
+        at.jsonPathAsString("$.properties.alert.type").isEqualTo("boolean");
+        at.jsonPathAsString("$.properties.fields.type").isEqualTo("object");
+        at.jsonPathAsBoolean("$.properties.fields.dynamic").isTrue();
+        at.jsonPathAsString("$.properties.triggered_jobs.type").isEqualTo("keyword");
     }
 }

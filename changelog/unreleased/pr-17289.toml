@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix inputs extractors list not updating after deletion"
+
+issues = ["16858"]
+pulls = ["17289"]

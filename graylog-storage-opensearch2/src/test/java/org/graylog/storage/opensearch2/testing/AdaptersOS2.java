@@ -18,6 +18,8 @@ package org.graylog.storage.opensearch2.testing;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
+import org.graylog.storage.opensearch2.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch2.CountsAdapterOS2;
 import org.graylog.storage.opensearch2.IndexFieldTypePollerAdapterOS2;
 import org.graylog.storage.opensearch2.IndexToolsAdapterOS2;
@@ -64,13 +66,14 @@ public class AdaptersOS2 implements Adapters {
         return new IndicesAdapterOS2(client,
                 new org.graylog.storage.opensearch2.stats.StatsApi(objectMapper, client),
                 new org.graylog.storage.opensearch2.cat.CatApi(objectMapper, client),
-                new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client)
+                new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client),
+                new ComposableIndexTemplateAdapter(client, objectMapper)
         );
     }
 
     @Override
     public NodeAdapter nodeAdapter() {
-        return new NodeAdapterOS2(client, objectMapper);
+        return new NodeAdapterOS2(client);
     }
 
     @Override
@@ -87,7 +90,7 @@ public class AdaptersOS2 implements Adapters {
         final boolean allowHighlighting = true;
         final boolean allowLeadingWildcardSearches = true;
 
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches);
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         return new SearchesAdapterOS2(client,
                 new Scroll(client,
                         scrollResultFactory,

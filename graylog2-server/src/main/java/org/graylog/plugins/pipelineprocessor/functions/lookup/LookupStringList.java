@@ -23,10 +23,12 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -84,6 +86,10 @@ public class LookupStringList extends AbstractFunction<List<String>> {
                 .description("Looks up a string list value in the named lookup table.")
                 .params(lookupTableParam, keyParam, defaultParam)
                 .returnType((Class<? extends List<String>>) new TypeLiteral<List<String>>() {}.getRawType())
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Lookup string list in lookup table")
+                .ruleBuilderTitle("Lookup string list in '${lookup_table}' using key '${key}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
 }

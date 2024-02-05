@@ -14,18 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { createSelector } from '@reduxjs/toolkit';
+
 import useAppSelector from 'stores/useAppSelector';
+import { selectActiveQuery, selectView } from 'views/logic/slices/viewSelectors';
+import type View from 'views/logic/views/View';
 
-const useViewMetadata = () => useAppSelector((state) => {
-  const { view, activeQuery } = state?.view ?? {};
-
-  if (view) {
-    const { id, title, description, summary } = view;
-
-    return { id, title, description, summary, activeQuery };
+const selectViewMetadata = createSelector(selectActiveQuery, selectView, (activeQuery: string, view: View) => (view
+  ? {
+    id: view?.id,
+    title: view?.title,
+    description: view?.description,
+    summary: view?.summary,
+    activeQuery,
   }
+  : {}));
 
-  return {};
-});
+const useViewMetadata = () => useAppSelector(selectViewMetadata);
 
 export default useViewMetadata;

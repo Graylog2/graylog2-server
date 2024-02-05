@@ -16,36 +16,56 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.database.ValidationException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
-public class PreflightConfigServiceImpl extends PersistedServiceImpl implements PreflightConfigService {
+public class PreflightConfigServiceImpl implements PreflightConfigService {
+
+    public static final String COLLECTION_NAME = "preflight";
+
+    private final MongoConnection connection;
 
     @Inject
     public PreflightConfigServiceImpl(MongoConnection connection) {
-        super(connection);
+        this.connection = connection;
+    }
+
+    private DBCollection getCollection() {
+        return this.connection.getDatabase().getCollection(COLLECTION_NAME);
     }
 
     @Override
-    public Optional<PreflightConfig> getPersistedConfig() {
-        final DBObject doc = findOne(PreflightConfigImpl.class, new BasicDBObject());
+    public PreflightConfig setConfigResult(PreflightConfigResult result) {
+        getCollection()
+                .update(new BasicDBObject("type", "preflight_result"),
+                        new BasicDBObject("$set", new BasicDBObject("value", result)),
+                        true,
+                        false
+                );
+        return new PreflightConfig(result);
+    }
+
+    @Override
+    public PreflightConfigResult getPreflightConfigResult() {
+        final DBObject doc = getCollection().findOne(new BasicDBObject("type", "preflight_result"));
         return Optional.ofNullable(doc)
-                .map(o -> new PreflightConfigImpl((ObjectId) o.get("_id"), o.toMap()));
+                .map(d -> (String) d.get("value"))
+                .map(PreflightConfigResult::valueOf)
+                .orElse(PreflightConfigResult.UNKNOWN);
     }
 
     @Override
-    public PreflightConfig saveConfiguration() throws ValidationException {
-        final ImmutableMap<String, Object> fields = ImmutableMap.of("result", PreflightConfigResult.FINISHED);
-        final PreflightConfigImpl config = new PreflightConfigImpl(fields);
-        final String id = save(config);
-        return getPersistedConfig().orElseThrow(() -> new IllegalStateException("Failed to obtain configuration that was just stored"));
+    public String getPreflightPassword() {
+        final DBObject doc = getCollection().findOne(new BasicDBObject("type", "preflight_password"));
+        return Optional.ofNullable(doc)
+                .map(d -> (String) d.get("value"))
+                .orElseThrow(() -> new IllegalStateException("Initial password should be automatically present in the DB, " +
+                        "this is an inconsistent state. Please report the problem to Graylog."));
     }
 }

@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed opensearch configuration sync permissions"
+
+pulls = ["17059"]

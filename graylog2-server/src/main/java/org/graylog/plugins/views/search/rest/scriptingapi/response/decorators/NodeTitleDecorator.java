@@ -24,7 +24,8 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.Message;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
 
 
 public class NodeTitleDecorator implements FieldDecorator {

@@ -22,6 +22,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.primitives.Ints;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -29,9 +30,11 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -66,8 +69,12 @@ public class IndexRangesCleanupPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        if (!cluster.isConnected() || !cluster.isHealthy()) {
-            LOG.info("Skipping index range cleanup because the Elasticsearch cluster is unreachable or unhealthy");
+        if (!cluster.isConnected()) {
+            LOG.info("Skipping index range cleanup because the Elasticsearch cluster is unreachable");
+            return;
+        }
+        if (!cluster.isHealthy()) {
+            LOG.info("Skipping index range cleanup because the Elasticsearch cluster is unhealthy: {}, Index Registry is up: {}", cluster.health().isPresent() ? cluster.health().get() : "unknown", cluster.indexSetRegistryIsUp());
             return;
         }
 

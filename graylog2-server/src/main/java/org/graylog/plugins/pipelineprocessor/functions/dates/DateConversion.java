@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -32,7 +33,7 @@ public class DateConversion extends TimezoneAwareFunction {
     private final ParameterDescriptor<Object, Object> value;
 
     public DateConversion() {
-        value = ParameterDescriptor.object("value").description("The value to convert to a date").build();
+        value = ParameterDescriptor.object("value").ruleBuilderVariable().description("The value to convert to a date").build();
     }
 
     @Override
@@ -58,7 +59,7 @@ public class DateConversion extends TimezoneAwareFunction {
 
     @Override
     protected String description() {
-        return "Converts a type to a date, useful for $message.timestamp or related message fields.";
+        return "Converts a type to a date, useful for $message.timestamp or related message fields. Does not handle date parsing from strings.";
     }
 
     @Override
@@ -69,5 +70,17 @@ public class DateConversion extends TimezoneAwareFunction {
     @Override
     protected ImmutableList<ParameterDescriptor> params() {
         return ImmutableList.of(value);
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderName() {
+        return "Convert to date";
+    }
+
+    @Nonnull
+    @Override
+    protected String getRuleBuilderTitle() {
+        return "Convert '${value}' to a DateTime";
     }
 }

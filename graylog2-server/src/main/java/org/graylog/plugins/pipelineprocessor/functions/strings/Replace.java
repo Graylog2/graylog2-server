@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -34,7 +35,7 @@ public class Replace extends AbstractFunction<String> {
     private final ParameterDescriptor<Long, Integer> maxParam;
 
     public Replace() {
-        valueParam = ParameterDescriptor.string("value").description("The text to search and replace in").build();
+        valueParam = ParameterDescriptor.string("value").ruleBuilderVariable().description("The text to search and replace in").build();
         searchParam = ParameterDescriptor.string("search").description("The string to search for").build();
         replacementParam = ParameterDescriptor.string("replacement").optional()
                 .description("The string to replace it with. Default: \"\"").build();
@@ -60,6 +61,10 @@ public class Replace extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(of(valueParam, searchParam, replacementParam, maxParam))
                 .description("Replaces the first \"max\" or all occurrences of a string within another string")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Replace in string")
+                .ruleBuilderTitle("Replace <#if max??>the first ${max} <#else>all </#if>occurrences of '${search}' within '${value}' with '${replacement!''}'")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.STRING)
                 .build();
     }
 }

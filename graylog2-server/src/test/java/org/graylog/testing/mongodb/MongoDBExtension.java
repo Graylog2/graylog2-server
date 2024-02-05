@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Network;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -52,6 +53,7 @@ import static org.junit.platform.commons.support.AnnotationSupport.findAnnotatio
  */
 public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver, InvocationInterceptor {
     private final MongodbServer version;
+    private Network network;
 
     private enum Lifecycle {
         ALL_TESTS, SINGLE_TEST
@@ -89,13 +91,15 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         }
         return (MongoDBTestService) context.getStore(NAMESPACE).getOrComputeIfAbsent(MongoDBTestService.class, c -> {
             LOG.debug("Starting a new MongoDB service instance with lifecycle {}", lifecycle);
-            return MongoDBTestService.create(version);
+            this.network = Network.newNetwork();
+            return MongoDBTestService.create(version, this.network);
         });
     }
 
     private void closeInstance(ExtensionContext context) {
         context.getStore(NAMESPACE).remove(Lifecycle.class);
         getInstance(context).close();
+        this.network.close();
     }
 
     private void clearInstance(ExtensionContext context) {

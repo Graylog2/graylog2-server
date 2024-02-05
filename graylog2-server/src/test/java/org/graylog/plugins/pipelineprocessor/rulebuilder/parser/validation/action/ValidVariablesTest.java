@@ -103,7 +103,7 @@ class ValidVariablesTest {
         ValidationResult result = classUnderTest.validate(stepWithValidNegation);
 
         assertThat(result.failed()).isTrue();
-        assertThat(result.failureReason()).isEqualTo("Return typ is void. No out put variable allowed");
+        assertThat(result.failureReason()).isEqualTo("Return type is void. No output variable allowed");
     }
 
     @Test

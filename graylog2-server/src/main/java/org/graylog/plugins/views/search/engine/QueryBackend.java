@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
@@ -49,6 +50,8 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * @return a backend specific generated query
      */
     T generate(Query query, Set<SearchError> validationErrors);
+
+    StatsCollector<QueryExecutionStats> getExecutionStatsCollector();
 
     default boolean isAllMessages(TimeRange timeRange) {
         return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();
@@ -83,11 +86,12 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
             //noinspection unchecked
             final QueryResult result = doRun(job, query, (T) generatedQueryContext);
             stopwatch.stop();
+            final QueryExecutionStats stats = statsBuilder.duration(stopwatch.elapsed(TimeUnit.MILLISECONDS))
+                    .effectiveTimeRange(effectiveTimeRangeForResult(query, result))
+                    .build();
+            getExecutionStatsCollector().storeStats(stats);
             return result.toBuilder()
-                    .executionStats(
-                            statsBuilder.duration(stopwatch.elapsed(TimeUnit.MILLISECONDS))
-                                    .effectiveTimeRange(effectiveTimeRangeForResult(query, result))
-                                    .build())
+                    .executionStats(stats)
                     .build();
         } catch (Exception e) {
             // the backend has very likely created a more specific error and added it to the context, but we fall
@@ -105,7 +109,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      *
      * @param job                currently executing job
      * @param query              the individual query to run from the current job
-     * @param queryContext       the generated query by {@link #generate(SearchJob, Query, Set) <SearchError>)}
+     * @param queryContext       the generated query by {@link #generate(Query, Set)}
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */

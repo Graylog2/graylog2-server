@@ -16,55 +16,79 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { Alert as BootstrapAlert } from 'react-bootstrap';
+import type { CSSProperties } from 'react';
+import type { ColorVariant } from '@graylog/sawmill';
+import { Alert as MantineAlert, useMantineTheme } from '@mantine/core';
 
-import type { ColorVariants } from 'theme/colors';
+import Icon from 'components/common/Icon';
 
-interface Props {
-  bsStyle: ColorVariants,
+type Props = {
+  bsStyle?: ColorVariant,
   children: React.ReactNode,
+  className?: string,
   onDismiss?: () => void,
+  style?: CSSProperties,
+  title?: React.ReactNode,
 }
 
-const StyledAlert = styled(BootstrapAlert)<{ bsStyle: ColorVariants }>(({ bsStyle = 'info', theme }) => {
-  const borderColor = theme.colors.variant.lighter[bsStyle];
-  const backgroundColor = theme.colors.variant.lightest[bsStyle];
+const StyledAlert = styled(MantineAlert)(({ theme }) => css`
+  margin: ${theme.mantine.spacing.md} 0;
+`);
 
-  return css`
-    background-color: ${backgroundColor};
-    border-color: ${borderColor};
-    color: ${theme.utils.contrastingColor(backgroundColor)};
+const iconNameForType = (bsStyle: ColorVariant) => {
+  switch (bsStyle) {
+    case 'warning':
+    case 'danger':
+      return 'exclamation-triangle';
+    case 'success':
+      return 'circle-check';
+    default:
+      return 'info-circle';
+  }
+};
 
-    a:not(.btn) {
-      color: ${theme.utils.contrastingColor(backgroundColor, 'AA')};
-      font-weight: bold;
-      text-decoration: underline;
+const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props) => {
+  const theme = useMantineTheme();
+  const displayCloseButton = typeof onDismiss === 'function';
+  const iconName = iconNameForType(bsStyle);
 
-      &:hover,
-      &:focus,
-      &:active {
-        color: ${theme.utils.contrastingColor(backgroundColor)};
-      }
+  const alertStyles = () => ({
+    root: {
+      border: `1px solid ${theme.other.shades.lighter(bsStyle)}`,
+    },
+    message: {
+      fontSize: theme.fontSizes.md,
+    },
+    title: {
+      fontSize: theme.fontSizes.md,
+      color: theme.other.colors.global.textDefault,
+    },
+    closeButton: {
+      color: theme.other.colors.global.textDefault,
+    },
+  });
 
-      &:hover,
-      &:focus {
-        text-decoration: none;
-      }
-    }
-
-    &.alert-dismissible {
-      .close {
-        top: -9px;
-      }
-    }
-`;
-});
-
-const Alert = ({ bsStyle, ...rest }: Props) => <StyledAlert bsStyle={bsStyle} {...rest} />;
+  return (
+    <StyledAlert className={className}
+                 color={bsStyle}
+                 style={style}
+                 styles={alertStyles}
+                 onClose={onDismiss}
+                 title={title}
+                 icon={<Icon name={iconName} />}
+                 closeButtonLabel={displayCloseButton && 'Close alert'}
+                 withCloseButton={displayCloseButton}>
+      {children}
+    </StyledAlert>
+  );
+};
 
 Alert.defaultProps = {
+  className: undefined,
   onDismiss: undefined,
+  style: undefined,
+  title: undefined,
+  bsStyle: 'default',
 };
 
 export default Alert;

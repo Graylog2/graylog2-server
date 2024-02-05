@@ -29,11 +29,11 @@ import java.util.Locale;
 public class SystemConsole implements CommandLineConsole {
 
     @Override
-    public String readLine(String format, Object... args) {
+    public String readLine(CommandLineConsole.Prompt prompt) {
         if (System.console() != null) {
-            return System.console().readLine(format, args);
+            return System.console().readLine(prompt.question());
         } else {
-            printLine(String.format(Locale.ROOT, format, args));
+            printLine(String.format(Locale.ROOT, prompt.question()));
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             try {
                 return reader.readLine();
@@ -44,11 +44,11 @@ public class SystemConsole implements CommandLineConsole {
     }
 
     @Override
-    public char[] readPassword(String format, Object... args) {
+    public char[] readPassword(CommandLineConsole.Prompt prompt) {
         if (System.console() != null) {
-            return System.console().readPassword(format, args);
+            return System.console().readPassword(prompt.question());
         } else {
-            return readLine(format, args).toCharArray();
+            return readLine(prompt).toCharArray();
         }
     }
 

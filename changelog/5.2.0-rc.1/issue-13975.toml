@@ -1,0 +1,5 @@
+type = "a"
+message = "The max number of indices is now persisted when changing strategies in the index retention strategy configuration"
+
+issues = ["13975"]
+pulls = ["16860", "graylog-plugin-enterprise#5941"]

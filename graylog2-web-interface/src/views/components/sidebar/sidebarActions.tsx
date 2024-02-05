@@ -20,7 +20,6 @@ import UndoNavItem from 'views/components/sidebar/undo/UndoNavItem';
 import RedoNavItem from 'views/components/sidebar/redo/RedoNavItem';
 
 export type SidebarActionsProps = { sidebarIsPinned: boolean };
-/* eslint-enable react/no-unused-prop-types */
 
 export type SidebarAction = {
   key: string,

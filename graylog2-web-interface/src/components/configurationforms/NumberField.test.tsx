@@ -52,7 +52,7 @@ describe('<NumberField>', () => {
     expect(fieldLabel).toBeInTheDocument();
     expect(optionalMarker).toBeInTheDocument();
     expect(formField).toBeInTheDocument();
-    expect(formField).not.toHaveValue();
+    expect(formField).not.toHaveValue(undefined);
     expect(formField).not.toBeRequired();
     expect(formField).toHaveAttribute('max', String(Number.MAX_SAFE_INTEGER));
     expect(formField).toHaveAttribute('min', String(Number.MIN_SAFE_INTEGER));

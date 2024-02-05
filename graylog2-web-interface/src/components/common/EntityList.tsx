@@ -20,8 +20,6 @@ import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
 
-import Icon from './Icon';
-
 const StyledList = styled.ul`
   padding: 0;
   margin: 0;
@@ -42,7 +40,6 @@ const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
   if (items.length === 0) {
     return (
       <Alert bsStyle={bsNoItemsStyle}>
-        <Icon name="info-circle" />&nbsp;
         {noItemsText}
       </Alert>
     );

@@ -19,8 +19,8 @@ import ReactSlider from 'react-slider';
 import type { ReactSliderProps } from 'react-slider';
 import styled, { css } from 'styled-components';
 
-import { Input, Tooltip } from 'components/bootstrap';
-import OverlayTrigger from 'components/common/OverlayTrigger';
+import { Input } from 'components/bootstrap';
+import Tooltip from 'components/common/Tooltip';
 
 type Props = {
   id: string,
@@ -52,26 +52,22 @@ const StyledThumb = styled.div(({ theme }) => css`
   top: -5px;
 `);
 
-const Thumb = (props, state) => {
-  const tooltip = <Tooltip id={`${state.valueNow}-tooltip`} show>{state.valueNow}</Tooltip>;
+const Thumb = (props: React.ComponentProps<typeof StyledThumb>, state: { valueNow: number }) => (
+  <StyledThumb {...props} className={`${state.valueNow}-tooltip`}>
+    <Tooltip label={state.valueNow}>
+      <span className="value">{state.valueNow}</span>
+    </Tooltip>
+  </StyledThumb>
+);
 
-  return (
-    <StyledThumb {...props} className={`${state.valueNow}-tooltip`}>
-      <OverlayTrigger placement="top" trigger="hover" overlay={tooltip} rootClose>
-        <span className="value">{state.valueNow}</span>
-      </OverlayTrigger>
-    </StyledThumb>
-  );
-};
-
-const StyledTrack = styled.div(({ theme }) => css`
+const StyledTrack = styled.div<{ $index: number }>(({ theme, $index }) => css`
   top: ${theme.spacings.xxs};
   bottom: 0;
-  background: ${(props: any) => (props.index === 1 ? '#5082bc' : theme.colors.variant.default)};
+  background: ${$index === 1 ? '#5082bc' : theme.colors.variant.default};
   border-radius: 999px;
 `);
 
-const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
+const Track = (props, state) => <StyledTrack {...props} $index={state.index} />;
 
 const RangeInput = ({
   id,

@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
+import type { ColorScheme } from '@graylog/sawmill';
 
-import type { PREFERENCES_THEME_MODE, ThemeMode } from 'theme/constants';
+import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type PreferencesActionsType = {
-  loadUserPreferences: (userName: string, callback?: (preferences: PreferencesMap) => void) => Promise<unknown>,
   saveUserPreferences: (userName: string, preferences: PreferencesUpdateMap, callback?: (preferences: PreferencesUpdateMap) => void, displaySuccessNotification?: boolean) => Promise<unknown>,
 }
 export const PreferencesActions = singletonActions(
@@ -34,11 +34,6 @@ export const PreferencesActions = singletonActions(
   }),
 );
 
-export type Preference = {
-  name: string,
-  value: boolean | string,
-};
-
 type BooleanString = 'true' | 'false'
 
 export type PreferencesUpdateMap = {
@@ -46,7 +41,7 @@ export type PreferencesUpdateMap = {
   updateUnfocussed: boolean | BooleanString,
   dashboardSidebarIsPinned?: boolean | BooleanString,
   searchSidebarIsPinned?: boolean | BooleanString,
-  [PREFERENCES_THEME_MODE]: ThemeMode,
+  [PREFERENCES_THEME_MODE]: ColorScheme,
 };
 
 export type PreferencesMap = {
@@ -54,11 +49,7 @@ export type PreferencesMap = {
   updateUnfocussed: boolean,
   dashboardSidebarIsPinned?: boolean,
   searchSidebarIsPinned?: boolean,
-  [PREFERENCES_THEME_MODE]: ThemeMode,
-};
-
-type PreferencesResponse = {
-  preferences: PreferencesMap,
+  [PREFERENCES_THEME_MODE]: ColorScheme,
 };
 
 const convertPreferences = (preferences: PreferencesUpdateMap): PreferencesMap => {
@@ -100,22 +91,6 @@ export const PreferencesStore = singletonStore(
         });
 
       PreferencesActions.saveUserPreferences.promise(promise);
-
-      return promise;
-    },
-    loadUserPreferences(userName: string, callback: (preferences: PreferencesMap) => void = () => {}) {
-      const url = this.URL + encodeURIComponent(userName);
-
-      const failCallback = (errorThrown) => {
-        UserNotification.error(
-          `Loading of user preferences for "${userName}" failed with status: ${errorThrown}. Try reloading the page`,
-          'Could not retrieve user preferences from server',
-        );
-      };
-
-      const promise = fetch('GET', url).then((data: PreferencesResponse) => callback(data?.preferences), failCallback);
-
-      PreferencesActions.loadUserPreferences.promise(promise);
 
       return promise;
     },

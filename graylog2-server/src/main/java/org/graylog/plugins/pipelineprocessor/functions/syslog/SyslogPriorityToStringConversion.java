@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
@@ -48,6 +49,10 @@ public class SyslogPriorityToStringConversion extends AbstractFunction<SyslogPri
                 .returnType(SyslogPriorityAsString.class)
                 .params(valueParam)
                 .description("Converts a syslog priority number to its level and facility string representations")
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Convert syslog facility")
+                .ruleBuilderTitle("Converts a syslog priority number in '${value}' to level and facility string")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.SYSLOG)
                 .build();
     }
 }

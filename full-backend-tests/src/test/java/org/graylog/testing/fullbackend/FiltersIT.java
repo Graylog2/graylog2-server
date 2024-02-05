@@ -31,7 +31,7 @@ import static io.restassured.RestAssured.given;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 public class FiltersIT {
-    private static final String DEFAULT_CONNECT_SRC = "connect-src 'self' https://telemetry.graylog.cloud;";
+    private static final String DEFAULT_CONNECT_SRC = "connect-src 'self' https://graylog.org/post/tag/ https://telemetry.graylog.cloud;";
     private final GraylogApis api;
     private final CSPResources cspResources;
     private final Pattern defaultCSPPattern;

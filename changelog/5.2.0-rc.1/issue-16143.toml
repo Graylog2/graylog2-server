@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Cluster initial manager nodes in datanode configurable."
+
+issues = ["16143"]
+pulls = ["16146"]
+

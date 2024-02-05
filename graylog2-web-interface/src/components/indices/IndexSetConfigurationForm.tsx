@@ -14,51 +14,81 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React, { useState, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import AppConfig from 'util/AppConfig';
 import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
+import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, Input } from 'components/bootstrap';
+import { Col, Row, Input, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import withHistory from 'routing/withHistory';
-import type { HistoryFunction } from 'routing/useHistory';
+import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
+import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
 import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
-
-import type { RetentionStrategyContext } from './Types';
+import type {
+  RotationStrategyConfig,
+  RetentionStrategyConfig,
+  RetentionStrategyContext,
+  Strategies,
+} from 'components/indices/Types';
+import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
+import useHistory from 'routing/useHistory';
+import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
+import useFeature from 'hooks/useFeature';
+import useIndexSet from 'components/indices/hooks/useIndexSet';
 
 type Props = {
   cancelLink: string,
   create?: boolean,
-  history: HistoryFunction,
-  indexSet: IndexSet,
+  indexSet?: IndexSet,
   onUpdate: (indexSet: IndexSet) => void,
-  retentionStrategies: Array<any>,
+  retentionStrategies: Strategies,
   retentionStrategiesContext: RetentionStrategyContext,
-  rotationStrategies: Array<any>,
+  rotationStrategies: Strategies,
   submitButtonText: string,
   submitLoadingText?: string,
 };
 
+type RotationStrategiesProps = {
+  rotationStrategies: Array<any>,
+  indexSetRotationStrategy: RotationStrategyConfig,
+  indexSetRotationStrategyClass: string
+}
+
+type RetentionConfigProps = {
+  retentionStrategies: Array<any>,
+  retentionStrategiesContext: RetentionStrategyContext,
+  indexSetRetentionStrategy: RetentionStrategyConfig,
+  IndexSetRetentionStrategyClass: string
+}
+
 type Unit = 'seconds' | 'minutes';
 
-type State = {
-  indexSet: IndexSet,
-  fieldTypeRefreshIntervalUnit: Unit,
-};
+type RetentionConfigSegment = 'data_tiering' | 'legacy'
+
 const StyledFormSubmit = styled(FormSubmit)`
   margin-left: 0;
 `;
 
+const ConfigSegmentsTitle = styled.h2(({ theme }) => css`
+  margin-bottom: ${theme.spacings.sm};
+`);
+
+const ConfigSegment = styled.div(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
+  margin-top: ${theme.spacings.md};
+`);
+
 const _validateIndexPrefix = (value: string) => {
-  let error;
+  let error: string;
 
   if (value?.length === 0) {
     error = 'Invalid index prefix: cannot be empty';
@@ -73,151 +103,165 @@ const _validateIndexPrefix = (value: string) => {
   return error;
 };
 
-const _getRotationConfigState = (strategy: string, data: string) => ({
+const _getRotationConfigState = (strategy: string, data: RotationStrategyConfig) => ({
   rotation_strategy_class: strategy,
   rotation_strategy: data,
 });
 
-const _getRetentionConfigState = (strategy: string, data: string) => ({
+const _getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig) => ({
   retention_strategy_class: strategy,
   retention_strategy: data,
 });
 
-class IndexSetConfigurationForm extends React.Component<Props, State> {
-  static propTypes = {
-    indexSet: IndexSetPropType.isRequired,
-    rotationStrategies: PropTypes.array.isRequired,
-    retentionStrategies: PropTypes.array.isRequired,
-    retentionStrategiesContext: PropTypes.shape({
-      max_index_retention_period: PropTypes.string,
-    }).isRequired,
-    create: PropTypes.bool,
-    onUpdate: PropTypes.func.isRequired,
-    cancelLink: PropTypes.string.isRequired,
-    submitButtonText: PropTypes.string.isRequired,
-    submitLoadingText: PropTypes.string.isRequired,
+const RotationStrategies = ({ rotationStrategies, indexSetRotationStrategy, indexSetRotationStrategyClass }: RotationStrategiesProps) => {
+  if (!rotationStrategies) return <Spinner />;
+
+  return (
+    <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
+                                             name="rotation"
+                                             description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
+                                             selectPlaceholder="Select rotation strategy"
+                                             pluginExports={PluginStore.exports('indexRotationConfig')}
+                                             strategies={rotationStrategies}
+                                             activeConfig={{
+                                               config: indexSetRotationStrategy,
+                                               strategy: indexSetRotationStrategyClass,
+                                             }}
+                                             getState={_getRotationConfigState} />
+  );
+};
+
+const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, indexSetRetentionStrategy, IndexSetRetentionStrategyClass }: RetentionConfigProps) => {
+  if (!retentionStrategies) return <Spinner />;
+
+  return (
+    <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
+                                             name="retention"
+                                             description="Graylog uses a retention strategy to clean up old indices."
+                                             selectPlaceholder="Select retention strategy"
+                                             pluginExports={PluginStore.exports('indexRetentionConfig')}
+                                             strategies={retentionStrategies}
+                                             retentionStrategiesContext={retentionStrategiesContext}
+                                             activeConfig={{
+                                               config: indexSetRetentionStrategy,
+                                               strategy: IndexSetRetentionStrategyClass,
+                                             }}
+                                             getState={_getRetentionConfigState} />
+  );
+};
+
+const ReadOnlyConfig = () => {
+  const indexPrefixHelp = (
+    <span>
+      A <strong>unique</strong> prefix used in Elasticsearch indices belonging to this index set.
+      The prefix must start with a letter or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
+    </span>
+  );
+
+  return (
+    <span>
+      <FormikFormGroup type="text"
+                       label="Index prefix"
+                       name="index_prefix"
+                       help={indexPrefixHelp}
+                       validate={_validateIndexPrefix}
+                       required />
+      <FormikFormGroup type="text"
+                       label="Analyzer"
+                       name="index_analyzer"
+                       help="Elasticsearch analyzer for this index set."
+                       required />
+    </span>
+  );
+};
+
+const IndexSetConfigurationForm = ({
+  indexSet: initialIndexSet,
+  rotationStrategies,
+  retentionStrategies,
+  retentionStrategiesContext,
+  create,
+  onUpdate,
+  cancelLink,
+  submitButtonText,
+  submitLoadingText,
+} : Props) => {
+  const history = useHistory();
+
+  const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
+  const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
+  const [indexSet] = useIndexSet(initialIndexSet);
+
+  const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
+    { value: 'data_tiering', label: 'Data Tiering' },
+    { value: 'legacy', label: 'Legacy (Deprecated)' },
+  ];
+
+  const initialSegment = () : RetentionConfigSegment => {
+    if (indexSet?.use_legacy_rotation) return 'legacy';
+
+    return 'data_tiering';
   };
 
-  static defaultProps = {
-    create: false,
-  };
+  const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
-  constructor(props: Props) {
-    super(props);
-    const { indexSet } = this.props;
+  const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
+    if (selectedRetentionSegment === 'legacy') {
+      return { ...values, data_tiering: undefined, use_legacy_rotation: true };
+    }
 
-    this.state = {
-      indexSet: indexSet,
-      fieldTypeRefreshIntervalUnit: 'seconds',
+    const configWithDataTiering = prepareDataTieringConfig(values, PluginStore);
+
+    if (loadingIndexDefaultsConfig || !indexDefaultsConfig) return { ...configWithDataTiering, use_legacy_rotation: false };
+
+    const legacyDefaultConfig = {
+      rotation_strategy_class: indexDefaultsConfig.rotation_strategy_class,
+      rotation_strategy: indexDefaultsConfig.rotation_strategy_config as RotationStrategyConfig,
+      retention_strategy_class: indexDefaultsConfig.retention_strategy_class,
+      retention_strategy: indexDefaultsConfig.retention_strategy_config as RetentionStrategyConfig,
     };
-  }
 
-  _saveConfiguration = (values: IndexSet) => {
-    const { onUpdate } = this.props;
+    return { ...configWithDataTiering, ...legacyDefaultConfig, use_legacy_rotation: false };
+  }, [loadingIndexDefaultsConfig, indexDefaultsConfig, selectedRetentionSegment]);
 
-    return onUpdate(values);
+  const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfigBeforeSubmit(values));
+
+  const onFieldTypeRefreshIntervalChange = (
+    intervalValue: number,
+    unit: Unit,
+    name: string,
+    onChange: (name: string, value: number) => void,
+    setFieldValue: (key: string, value: number) => void) => {
+    onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
+    setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
+    setFieldTypeRefreshIntervalUnit(unit);
   };
 
-  render() {
-    const { indexSet, fieldTypeRefreshIntervalUnit } = this.state;
-    const {
-      rotationStrategies,
-      retentionStrategies,
-      create,
-      cancelLink,
-      history,
-      indexSet: {
-        rotation_strategy: indexSetRotationStrategy,
-        rotation_strategy_class: indexSetRotationStrategyClass,
-        retention_strategy: indexSetRetentionStrategy,
-        retention_strategy_class: IndexSetRetentionStrategyClass,
-      },
-      retentionStrategiesContext,
-      submitButtonText,
-      submitLoadingText,
-    } = this.props;
-    let rotationConfig;
+  const enableDataTieringCloud = useFeature('data_tiering_cloud');
 
-    if (rotationStrategies) {
-      // The component expects a different structure - legacy
-      const activeConfig = {
-        config: indexSetRotationStrategy,
-        strategy: indexSetRotationStrategyClass,
-      };
+  if (!indexSet) return null;
 
-      rotationConfig = (
-        <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                 name="rotation"
-                                                 description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
-                                                 selectPlaceholder="Select rotation strategy"
-                                                 pluginExports={PluginStore.exports('indexRotationConfig')}
-                                                 strategies={rotationStrategies}
-                                                 activeConfig={activeConfig}
-                                                 getState={_getRotationConfigState} />
-      );
-    } else {
-      rotationConfig = (<Spinner />);
-    }
+  const {
+    rotation_strategy: indexSetRotationStrategy,
+    rotation_strategy_class: indexSetRotationStrategyClass,
+    retention_strategy: indexSetRetentionStrategy,
+    retention_strategy_class: IndexSetRetentionStrategyClass,
+  } = indexSet;
 
-    let retentionConfig;
+  const onCancel = () => history.push(cancelLink);
 
-    if (retentionStrategies) {
-      // The component expects a different structure - legacy
-      const activeConfig = {
-        config: indexSetRetentionStrategy,
-        strategy: IndexSetRetentionStrategyClass,
-      };
+  const isCloud = AppConfig.isCloud();
 
-      retentionConfig = (
-        <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                 name="retention"
-                                                 description="Graylog uses a retention strategy to clean up old indices."
-                                                 selectPlaceholder="Select retention strategy"
-                                                 pluginExports={PluginStore.exports('indexRetentionConfig')}
-                                                 strategies={retentionStrategies}
-                                                 retentionStrategiesContext={retentionStrategiesContext}
-                                                 activeConfig={activeConfig}
-                                                 getState={_getRetentionConfigState} />
-      );
-    } else {
-      retentionConfig = (<Spinner />);
-    }
+  if (loadingIndexDefaultsConfig) return (<Spinner />);
 
-    let readOnlyconfig;
-
-    if (create) {
-      const indexPrefixHelp = (
-        <span>
-          A <strong>unique</strong> prefix used in Elasticsearch indices belonging to this index set.
-          The prefix must start with a letter or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
-        </span>
-      );
-
-      readOnlyconfig = (
-        <span>
-          <FormikFormGroup type="text"
-                           label="Index prefix"
-                           name="index_prefix"
-                           help={indexPrefixHelp}
-                           validate={_validateIndexPrefix}
-                           required />
-          <FormikFormGroup type="text"
-                           label="Analyzer"
-                           name="index_analyzer"
-                           help="Elasticsearch analyzer for this index set."
-                           required />
-        </span>
-      );
-    }
-
-    const onCancel = () => history.push(cancelLink);
-
-    return (
-      <Row>
-        <Col md={8}>
-          <Formik onSubmit={this._saveConfiguration}
-                  initialValues={indexSet}>
-            {({ isValid, setFieldValue, isSubmitting }) => (
+  return (
+    <Row>
+      <Col md={8}>
+        <Formik onSubmit={saveConfiguration}
+                enableReinitialize
+                initialValues={prepareDataTieringInitialValues(indexSet)}>
+          {({ isValid, setFieldValue, isSubmitting, values }) => (
+            <IndexRetentionProvider>
               <Form>
                 <Row>
                   <Col md={12}>
@@ -231,7 +275,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                      name="description"
                                      help="Add a description of this index set."
                                      required />
-                    {readOnlyconfig}
+                    {create && <ReadOnlyConfig />}
                     <HideOnCloud>
                       <FormikFormGroup type="number"
                                        label="Index shards"
@@ -259,16 +303,8 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                      name="index_optimization_disabled"
                                      help="Disable Elasticsearch index optimization (force merge) after rotation." />
                       </Input>
-                    </HideOnCloud>
-                    <Field name="field_type_refresh_interval">
-                      {({ field: { name, value, onChange } }) => {
-                        const _onFieldTypeRefreshIntervalChange = (intervalValue: number, unit: Unit) => {
-                          onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
-                          setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
-                          this.setState({ fieldTypeRefreshIntervalUnit: unit });
-                        };
-
-                        return (
+                      <Field name="field_type_refresh_interval">
+                        {({ field: { name, value, onChange } }) => (
                           <Input id="roles-selector-input"
                                  labelClassName="col-sm-3"
                                  wrapperClassName="col-sm-9"
@@ -280,15 +316,57 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                            unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
                                            units={['SECONDS', 'MINUTES']}
                                            required
-                                           update={_onFieldTypeRefreshIntervalChange} />
+                                           update={(intervalValue: number, unit: Unit) => onFieldTypeRefreshIntervalChange(
+                                             intervalValue, unit, name, onChange, setFieldValue,
+                                           )} />
                           </Input>
-                        );
-                      }}
-                    </Field>
+                        )}
+                      </Field>
+                    </HideOnCloud>
                   </Col>
                 </Row>
-                {indexSet.writable && rotationConfig}
-                {indexSet.writable && retentionConfig}
+                {isCloud && !enableDataTieringCloud ? (
+                  <>
+                    {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
+                    {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                  </>
+                ) : (
+                  <>
+                    <ConfigSegmentsTitle>Rotation and Retention</ConfigSegmentsTitle>
+                    <SegmentedControl data={retentionConfigSegments}
+                                      value={selectedRetentionSegment}
+                                      handleChange={setSelectedRetentionSegment as Dispatch<SetStateAction<string>>} />
+
+                    {selectedRetentionSegment === 'data_tiering' ? (
+                      <ConfigSegment>
+                        <h3>Data Tiering Configuration</h3>
+                        <DataTieringVisualisation minDays={values.data_tiering?.index_lifetime_min}
+                                                  maxDays={values.data_tiering?.index_lifetime_max}
+                                                  minDaysInHot={values.data_tiering?.index_hot_lifetime_min}
+                                                  warmTierEnabled={values.data_tiering?.warm_tier_enabled}
+                                                  archiveData={values.data_tiering?.archive_before_deletion} />
+                        <DataTieringConfiguration />
+                      </ConfigSegment>
+                    )
+                      : (
+                        <ConfigSegment>
+                          {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
+                          {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                        </ConfigSegment>
+                      )}
+
+                  </>
+                )}
+
+                <Field name="field_type_profile">
+                  {({ field: { name, value } }) => (
+                    <IndexSetProfileConfiguration value={value}
+                                                  onChange={(profileId) => {
+                                                    setFieldValue(name, profileId);
+                                                  }}
+                                                  name={name} />
+                  )}
+                </Field>
                 <Row>
                   <Col md={9} mdOffset={3}>
                     <StyledFormSubmit disabledSubmit={!isValid}
@@ -300,15 +378,32 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
                                       onCancel={onCancel} />
                   </Col>
                 </Row>
-
               </Form>
-            )}
-          </Formik>
-        </Col>
-      </Row>
-    );
-  }
-}
+            </IndexRetentionProvider>
+          )}
+        </Formik>
+      </Col>
+    </Row>
+  );
+};
 
-// @ts-ignore
-export default withHistory(IndexSetConfigurationForm);
+IndexSetConfigurationForm.propTypes = {
+  indexSet: IndexSetPropType,
+  rotationStrategies: PropTypes.array.isRequired,
+  retentionStrategies: PropTypes.array.isRequired,
+  retentionStrategiesContext: PropTypes.shape({
+    max_index_retention_period: PropTypes.string,
+  }).isRequired,
+  create: PropTypes.bool,
+  onUpdate: PropTypes.func.isRequired,
+  cancelLink: PropTypes.string.isRequired,
+  submitButtonText: PropTypes.string.isRequired,
+  submitLoadingText: PropTypes.string.isRequired,
+};
+
+IndexSetConfigurationForm.defaultProps = {
+  create: false,
+  indexSet: undefined,
+};
+
+export default IndexSetConfigurationForm;

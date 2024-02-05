@@ -16,16 +16,17 @@
  */
 
 import isAllMessagesRange from 'views/logic/queries/IsAllMessagesRange';
-import { RELATIVE_ALL_TIME } from 'views/Constants';
+import { NO_TIMERANGE_OVERRIDE, RELATIVE_ALL_TIME } from 'views/Constants';
 import {
   normalizeIfClassifiedRelativeTimeRange,
 } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import { isTypeKeyword, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
+import type { TimeRangePickerTimeRange } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 
 import type { TimeRange, NoTimeRangeOverride } from './Query';
 
-export const normalizeIfAllMessagesRange = (timeRange: TimeRange | NoTimeRangeOverride) => {
+export const normalizeIfAllMessagesRange = (timeRange: TimeRange | NoTimeRangeOverride | undefined) => {
   if ('type' in timeRange && isAllMessagesRange(timeRange)) {
     return {
       type: timeRange.type,
@@ -36,7 +37,11 @@ export const normalizeIfAllMessagesRange = (timeRange: TimeRange | NoTimeRangeOv
   return timeRange;
 };
 
-export const normalizeFromPickerForSearchBar = (timeRange: TimeRange | NoTimeRangeOverride) => {
+export const normalizeFromPickerForSearchBar = (timeRange: TimeRangePickerTimeRange | undefined) => {
+  if (!timeRange) {
+    return NO_TIMERANGE_OVERRIDE;
+  }
+
   const normalizeIfKeywordTimeRange = (tr: TimeRange | NoTimeRangeOverride) => {
     if (isTypeKeyword(tr)) {
       return {

@@ -16,7 +16,7 @@
  */
 package org.graylog.testing.completebackend.apis;
 
-import io.restassured.specification.RequestSpecification;
+import io.restassured.response.ValidatableResponse;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -84,9 +84,91 @@ public class Indices implements GraylogRestApi {
                 1,
                 false,
                 Duration.standardSeconds(5L),
-                null
+                null,
+                null,
+                null,
+                true
         );
 
         return createIndexSet(indexSetSummary);
+    }
+
+    public GraylogApiResponse listOpenIndices(String indexSetId) {
+        final ValidatableResponse response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/indices/" + indexSetId + "/open")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(200);
+        return new GraylogApiResponse(response);
+    }
+
+    public void rotateIndexSet(String indexSetId) {
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .post("/system/deflector/" + indexSetId + "/cycle")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(204);
+    }
+
+    public void deleteIndexSet(String indexSetId, boolean deleteIndices) {
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .param("delete_indices", deleteIndices)
+                .delete("/system/indices/index_sets/" + indexSetId)
+                .then()
+                .log().ifError()
+                .log().ifValidationFails()
+                .statusCode(204);
+    }
+
+    public void deleteIndex(String index) {
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .delete("/system/indexer/indices/" + index)
+                .then()
+                .log().ifError()
+                .log().ifValidationFails()
+                .statusCode(204);
+    }
+
+    public GraylogApiResponse listIndexRanges() {
+        final ValidatableResponse response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indices/ranges")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(200);
+        return new GraylogApiResponse(response);
+    }
+
+    public void rebuildIndexRanges() {
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .post("/system/indices/ranges/rebuild")
+                .then()
+                .log().ifError()
+                .log()
+                .ifValidationFails()
+                .statusCode(202);
     }
 }

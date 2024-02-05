@@ -17,6 +17,7 @@
 package org.graylog.testing.graylognode;
 
 import com.google.common.base.Stopwatch;
+import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +29,9 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static org.graylog.testing.graylognode.ExecutableFileUtil.makeSureExecutableIsFound;
-
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
-    private static final String MVN_COMMAND = "mvn -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true ";
+    private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true ";
     private static final String EXCLUDE_FE = " -Dskip.web.build ";
 
     private static boolean jarHasBeenPackagedInThisRun = false;
@@ -41,15 +40,14 @@ public class MavenPackager {
         return includeFrontend ? MVN_COMMAND : MVN_COMMAND + EXCLUDE_FE;
     }
 
-    public static void packageJarIfNecessary(NodeContainerConfig config) {
+    public static synchronized void packageJarIfNecessary(final MavenProjectDirProvider mavenProjectDirProvider) {
         if (isRunFromMaven()) {
             LOG.info("Running from Maven. Assuming jars are current.");
         } else if (jarHasBeenPackagedInThisRun) {
             LOG.info("Assuming jars are current.");
         } else {
             LOG.info("Running from outside Maven. Packaging server jar now...");
-            makeSureExecutableIsFound("mvn");
-            packageJar(config);
+            packageJar(mavenProjectDirProvider);
         }
     }
 
@@ -58,9 +56,9 @@ public class MavenPackager {
         return System.getProperty("surefire.test.class.path") != null;
     }
 
-    public static void packageJar(NodeContainerConfig config) {
-        Path pomDir = config.mavenProjectDirProvider.getProjectDir();
-        boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
+    public static void packageJar(final MavenProjectDirProvider mavenProjectDirProvider) {
+        Path pomDir = mavenProjectDirProvider.getProjectDir();
+        boolean includeFrontend = mavenProjectDirProvider.includeFrontend();
 
         Process p = startProcess(pomDir, includeFrontend);
 

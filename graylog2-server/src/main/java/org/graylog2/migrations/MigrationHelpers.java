@@ -30,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -55,7 +57,7 @@ public class MigrationHelpers {
             previousRole = roleService.load(roleName);
             if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions())) {
                 final String msg = "Invalid role '" + roleName + "', fixing it.";
-                LOG.error(msg);
+                LOG.debug(msg);
                 throw new IllegalArgumentException(msg); // jump to fix code
             }
         } catch (NotFoundException | IllegalArgumentException | NoSuchElementException ignored) {
@@ -122,7 +124,7 @@ public class MigrationHelpers {
 
     @Nullable
     public String ensureUserHelper(String userName, String password, String firstName, String lastName, String email,
-                             Set<String> expectedRoles, boolean isServiceAccount) {
+                                   Set<String> expectedRoles, boolean isServiceAccount) {
         User previousUser = null;
         try {
             previousUser = userService.load(userName);
@@ -130,7 +132,7 @@ public class MigrationHelpers {
                     || !previousUser.getRoleIds().containsAll(expectedRoles)
                     || !Objects.equals(isServiceAccount, previousUser.isServiceAccount())) {
                 final String msg = "Invalid user '" + userName + "', fixing it.";
-                LOG.error(msg);
+                LOG.debug(msg);
                 throw new IllegalArgumentException(msg);
             }
         } catch (IllegalArgumentException ignored) {

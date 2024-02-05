@@ -21,10 +21,11 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -43,7 +44,7 @@ public class LookupValue extends AbstractFunction<Object> {
                 .description("The existing lookup table to use to lookup the given key")
                 .transform(tableName -> lookupTableService.newBuilder().lookupTable(tableName).build())
                 .build();
-        keyParam = object("key")
+        keyParam = object("key").ruleBuilderVariable()
                 .description("The key to lookup in the table")
                 .build();
         defaultParam = object("default")
@@ -77,6 +78,10 @@ public class LookupValue extends AbstractFunction<Object> {
                 .description("Looks up a single value in the named lookup table.")
                 .params(lookupTableParam, keyParam, defaultParam)
                 .returnType(Object.class)
+                .ruleBuilderEnabled()
+                .ruleBuilderName("Lookup single value")
+                .ruleBuilderTitle("Lookup single value in '${lookup_table}' using '${key}'<#if $default??> (default: '${default}')</#if>")
+                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.LOOKUP)
                 .build();
     }
 }

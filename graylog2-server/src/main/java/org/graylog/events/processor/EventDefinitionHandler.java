@@ -25,13 +25,15 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.plugin.database.users.User;
 import org.joda.time.DateTime;
 import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +73,7 @@ public class EventDefinitionHandler {
      * Creates a new event definition and a corresponding scheduler job definition and trigger.
      *
      * @param unsavedEventDefinition the event definition to save
-     * @param user the user who created this eventDefinition. If empty, no ownership will be registered.
+     * @param user                   the user who created this eventDefinition. If empty, no ownership will be registered.
      * @return the created event definition
      */
     public EventDefinitionDto create(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
@@ -88,6 +90,26 @@ public class EventDefinitionHandler {
         }
 
         return eventDefinition;
+    }
+
+    /**
+     * Duplicates an existing event definition.
+     * The new copy will be disabled by default and will have the {@link DefaultEntityScope}.
+     * Also the title will be prefixed with the string "COPY-".
+     *
+     * @param eventDefinition the event definition to copy
+     * @param user            the user who copied this eventDefinition. If empty, no ownership will be registered.
+     * @return the newly created event definition
+     */
+    public EventDefinitionDto duplicate(EventDefinitionDto eventDefinition, Optional<User> user) {
+        var copy = eventDefinition.toBuilder()
+                .id(null)
+                .title("COPY-" + eventDefinition.title())
+                .scope(DefaultEntityScope.NAME)
+                .state(EventDefinition.State.DISABLED)
+                .build();
+
+        return createWithoutSchedule(copy, user);
     }
 
     /**
@@ -216,7 +238,8 @@ public class EventDefinitionHandler {
         final EventDefinitionDto eventDefinition = getEventDefinitionOrThrowIAE(eventDefinitionId);
 
         if (SystemNotificationEventEntityScope.NAME.equals(eventDefinition.scope())) {
-            throw new IllegalArgumentException("Cannot disable system notification events");
+            LOG.debug("Ignoring disable for system notification events");
+            return;
         }
 
         getJobDefinition(eventDefinition)

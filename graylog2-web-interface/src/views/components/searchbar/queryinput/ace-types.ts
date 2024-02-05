@@ -33,10 +33,13 @@ type EventCallback = {
 };
 
 export type Session = {
+  curOp: { args: unknown },
+  getLength: () => number,
   getTokens: (no: number) => Array<Token>,
   getTokenAt: (no: number, idx: number) => Token | undefined | null,
   getValue: () => string,
   on: <T extends EventName>(event: T, cb: EventCallback[T]) => void,
+  bgTokenizer: { lines: Array<Array<Line>> },
 };
 
 export type Renderer = {
@@ -57,6 +60,7 @@ export type Command = {
 export type Commands = {
   addCommand: (command: Command) => void,
   removeCommands: (commands: Array<string>) => void,
+  on: (commandName: string, callback: () => void) => void
 };
 
 export type Popup = {
@@ -67,26 +71,38 @@ export type Completer = {
   autoSelect: boolean,
   popup?: Popup,
   activated: boolean,
+  insertMatch: () => boolean,
+  detach: () => void,
+  goTo: (direction: string) => void,
+  keyboardHandler: {
+    commandKeyBinding: {
+      tab: Command,
+    },
+    addCommand: (command: Command) => void
+  }
 };
 
 export type Editor = {
+  container: HTMLElement | undefined,
   commands: Commands,
   completer: Completer,
   completers: Array<AutoCompleter>,
-  execCommand: (command: string) => void,
+  execCommand: (command: string, args?: Record<string, unknown>) => void,
+  focus: () => void,
   session: Session,
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,
   getValue: () => string,
+  tabstopManager: unknown,
   setValue: (newValue: string) => void,
   isFocused: () => boolean,
 };
 
 export type CompletionResult = {
-  name: string,
+  name?: string,
   value: string,
   score: number,
-  meta: any,
+  meta?: any,
   caption?: string,
 };
 
@@ -105,6 +121,11 @@ export type Line = {
 }
 
 export interface AutoCompleter {
-  getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
-  shouldShowCompletions(currentLine: number, lines: Array<Array<Line>>): boolean;
+  getCompletions(
+    editor: Editor,
+    session: Session,
+    position: Position,
+    prefix: string,
+    callback: ResultsCallback
+  ): void;
 }

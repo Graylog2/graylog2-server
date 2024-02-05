@@ -22,6 +22,7 @@ import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
+import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
@@ -30,12 +31,14 @@ import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -55,6 +58,7 @@ public class AppConfigResource {
     private final ObjectMapper objectMapper;
     private final FeatureFlags featureFlags;
     private final TelemetryConfiguration telemetryConfiguration;
+    private final ContentStreamConfiguration contentStreamConfiguration;
 
     @Inject
     public AppConfigResource(Configuration configuration,
@@ -63,7 +67,8 @@ public class AppConfigResource {
                              Map<String, PluginUISettingsProvider> settingsProviders,
                              ObjectMapper objectMapper,
                              FeatureFlags featureFlags,
-                             TelemetryConfiguration telemetryConfiguration) {
+                             TelemetryConfiguration telemetryConfiguration,
+                             ContentStreamConfiguration contentStreamConfiguration) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
@@ -71,6 +76,7 @@ public class AppConfigResource {
         this.objectMapper = objectMapper;
         this.featureFlags = featureFlags;
         this.telemetryConfiguration = telemetryConfiguration;
+        this.contentStreamConfiguration = contentStreamConfiguration;
     }
 
     @GET
@@ -93,6 +99,7 @@ public class AppConfigResource {
                 .put("pluginUISettings", buildPluginUISettings())
                 .put("featureFlags", toPrettyJsonString(featureFlags.getAll()))
                 .put("telemetry", toPrettyJsonString(telemetryConfiguration.telemetryFrontendSettings()))
+                .put("contentStream", toPrettyJsonString((contentStreamConfiguration.contentStreamFrontendSettings())))
                 .build();
         return templateEngine.transform(template, model);
     }

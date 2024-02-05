@@ -15,31 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import ObjectID from 'bson-objectid';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col, Button, Panel, Radio } from 'components/bootstrap';
 import useRuleBuilder from 'hooks/useRuleBuilder';
 import { ConfirmDialog, FormSubmit } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import Errors from './Errors';
+import RuleBuilderProvider from './RuleBuilderProvider';
 import RuleBuilderBlock from './RuleBuilderBlock';
 import RuleBuilderForm from './RuleBuilderForm';
-import { RULE_BUILDER_TYPES_WITH_OUTPUT } from './types';
-import type { BlockType, RuleBlock, RuleBuilderRule, RuleBuilderTypes } from './types';
-import {
-  getDictForFunction,
-  getDictForParam,
-  getActionOutputVariableName,
-  paramValueExists,
-  paramValueIsVariable,
-} from './helpers';
+import type { BlockType, OutputVariables, RuleBlock, RuleBuilderRule } from './types';
+import { RuleBuilderTypes } from './types';
+import { getDictForFunction, hasRuleBuilderErrors } from './helpers';
 import ConvertToSourceCodeModal from './ConvertToSourceCodeModal';
+import Errors from './Errors';
 
 import RuleSimulation from '../RuleSimulation';
 
@@ -47,13 +43,38 @@ const ActionsCol = styled(Col)`
   margin-top: 50px;
 `;
 
-const ConvertButton = styled(Button)`
-  float: right;
+const StyledPanel = styled(Panel)(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
+  border: 0;
+  box-shadow: none;
+  margin-bottom: 0;
+`);
+
+const StyledPanelHeading = styled(Panel.Heading)(({ theme }) => css`
+  display: flex;
+  justify-content: space-between;
+  background-color: ${theme.colors.table.backgroundAlt} !important;
+  border: 0;
+`);
+
+const WhenOperator = styled.div`
+  display: flex;
+
+  .radio {
+    margin: 0 8px;
+  }
 `;
 
-const SubTitle = styled.label`
-  color: #aaa;
+const StyledPanelBody = styled(Panel.Body)`
+  border: 0;
+  padding: 0;
 `;
+
+const getLastOutputIndexFromRule = (rule: RuleBuilderRule): number => {
+  const outputIndexes = rule.rule_builder?.actions?.map((block: RuleBlock) => Number(block?.outputvariable?.replace('output_', '') || 0))?.sort((a, b) => a - b) || [];
+
+  return outputIndexes[outputIndexes.length - 1] || 0;
+};
 
 const RuleBuilder = () => {
   const {
@@ -68,14 +89,18 @@ const RuleBuilder = () => {
   const [rule, setRule] = useState<RuleBuilderRule>({
     description: '',
     title: '',
-    rule_builder: { conditions: [], actions: [] },
+    rule_builder: { operator: 'AND', conditions: [], actions: [] },
   });
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
+  const [conditionsExpanded] = useState<boolean>(true);
+  const [actionsExpanded] = useState<boolean>(true);
+  const [lastOutputIndex, setLastOutputIndex] = useState<number>(0);
 
   useEffect(() => {
     if (initialRule) {
       setRule(initialRule);
+      setLastOutputIndex(getLastOutputIndexFromRule(initialRule));
     }
   }, [initialRule]);
 
@@ -83,124 +108,92 @@ const RuleBuilder = () => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
+  const setOutputVariable = (block: RuleBlock, outputIndex: number): RuleBlock => {
+    const newBlock = block;
+    const blockDict = getDictForFunction(actionsDict, block.function);
+
+    if (
+      blockDict?.return_type !== RuleBuilderTypes.Void
+      && !newBlock.outputvariable
+    ) {
+      newBlock.outputvariable = `output_${outputIndex}`;
+      setLastOutputIndex(outputIndex);
+    }
+
+    return newBlock;
+  };
+
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
 
   const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
-    setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder });
+    setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder, source: ruleValidated.source });
   }).catch(() => setRule(ruleToValidate));
 
-  // TODO: Add reorder functionality (make sure to setPrimaryParamsAndOutputVariable and validate)
+  const saveSimulatorMessage = async (simulator_message: string) => {
+    const newOperatorRule: RuleBuilderRule = {
+      ...rule,
+      simulator_message,
+    };
 
-  const getPreviousBlock = (blocks: RuleBlock[], index?: number): RuleBlock | undefined => {
-    if (index === 0) return undefined;
-
-    if (!index) return (blocks[blocks.length - 1]);
-
-    return (blocks[index - 1]);
+    setRule(newOperatorRule);
   };
 
-  const getPreviousOutput = (blocks: RuleBlock[], index?: number): {
-    previousOutputPresent: boolean,
-    outputVariable?: string
-  } => {
-    const previousBlock = getPreviousBlock(blocks, index);
+  const updateWhenOperator = async (operator: 'AND'|'OR') => {
+    sendTelemetry(
+      operator === 'AND'
+        ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_AND_CLICKED
+        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_OR_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'pipeline-rules',
+        app_action_value: 'cancel-button',
+      });
 
-    if (!previousBlock?.outputvariable) return { previousOutputPresent: false };
+    const newOperatorRule: RuleBuilderRule = {
+      ...rule,
+      rule_builder: {
+        ...rule.rule_builder,
+        operator,
+      },
+    };
 
-    return { previousOutputPresent: true, outputVariable: previousBlock.outputvariable };
+    await validateAndSaveRuleBuilder(newOperatorRule);
   };
 
-  const setOutputVariable = (block: RuleBlock, index?: number): RuleBlock => {
-    const newBlock = block;
-    const blockDict = getDictForFunction(actionsDict, block.function);
-
-    const order = typeof index !== 'undefined' ? (index + 1) : (newActionBlockIndex + 1);
-
-    if ((RULE_BUILDER_TYPES_WITH_OUTPUT as unknown as RuleBuilderTypes).includes(blockDict.return_type)) {
-      newBlock.outputvariable = getActionOutputVariableName(order);
-    }
-
-    return newBlock;
-  };
-
-  const setPrimaryParams = (block: RuleBlock, blocks: RuleBlock[], index?: number): RuleBlock => {
-    const blockDict = getDictForFunction(actionsDict, block.function);
-
-    if (!blockDict) return block;
-
-    const newBlock = block;
-
-    Object.keys(block.params).forEach((paramName) => {
-      if (getDictForParam(blockDict, paramName)?.primary) {
-        if (paramValueExists(block.params[paramName]) && !paramValueIsVariable(block.params[paramName])) {
-          return;
-        }
-
-        const { previousOutputPresent, outputVariable } = getPreviousOutput(blocks, index);
-
-        if (paramValueExists(block.params[paramName])) {
-          if (block.params[paramName] !== `${outputVariable}`) {
-            newBlock.params[paramName] = undefined;
-          }
-        }
-
-        if (!previousOutputPresent) {
-          return;
-        }
-
-        newBlock.params[paramName] = `$${outputVariable}`;
-      }
-    });
-
-    return newBlock;
-  };
-
-  const setPrimaryParametersAndOutputVariables = (blocks: RuleBlock[]): RuleBlock[] => {
-    const blocksWithNewOutput = blocks.map((block, index) => (
-      setOutputVariable(block, index)
-    ));
-
-    return (
-      blocksWithNewOutput.map((block, index) => (
-        setPrimaryParams(block, blocksWithNewOutput, index)
-      ))
-    );
-  };
-
-  const addBlock = async (type: BlockType, block: RuleBlock) => {
-    let ruleToAdd;
+  const addBlock = async (type: BlockType, block: RuleBlock, orderIndex?: number) => {
+    let ruleToAdd: RuleBuilderRule;
     const blockId = new ObjectID().toString();
 
     if (type === 'condition') {
-      ruleToAdd = {
-        ...rule,
-        rule_builder: {
-          ...rule.rule_builder,
-          conditions: [...rule.rule_builder.conditions,
-            { ...block, id: blockId },
-          ],
-        },
-      };
-    } else {
-      const blockToSet = setPrimaryParams(setOutputVariable(block), rule.rule_builder.actions);
+      const newConditions = rule.rule_builder.conditions;
+      newConditions.splice(orderIndex || newConditions.length, 0, { ...block, id: blockId });
 
       ruleToAdd = {
         ...rule,
         rule_builder: {
           ...rule.rule_builder,
-          actions: [...rule.rule_builder.actions,
-            { ...blockToSet, id: blockId },
-          ],
+          conditions: newConditions,
+        },
+      };
+    } else {
+      const blockToSet = setOutputVariable(block, lastOutputIndex + 1);
+      const newActions = rule.rule_builder.actions;
+      newActions.splice(Number.isInteger(orderIndex) ? orderIndex : newActions.length, 0, { ...blockToSet, id: blockId });
+
+      ruleToAdd = {
+        ...rule,
+        rule_builder: {
+          ...rule.rule_builder,
+          actions: newActions,
         },
       };
     }
 
-    validateAndSaveRuleBuilder(ruleToAdd);
+    await validateAndSaveRuleBuilder(ruleToAdd);
   };
 
   const updateBlock = async (orderIndex: number, type: string, block: RuleBlock) => {
-    let ruleToUpdate;
+    let ruleToUpdate: RuleBuilderRule;
 
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
@@ -215,9 +208,8 @@ const RuleBuilder = () => {
       };
     } else {
       const currentActions = [...rule.rule_builder.actions];
-      const blockToSet = setPrimaryParams(block, currentActions, orderIndex);
 
-      currentActions[orderIndex] = blockToSet;
+      currentActions[orderIndex] = setOutputVariable(block, lastOutputIndex + 1);
 
       ruleToUpdate = {
         ...rule,
@@ -227,11 +219,11 @@ const RuleBuilder = () => {
       };
     }
 
-    validateAndSaveRuleBuilder(ruleToUpdate);
+    await validateAndSaveRuleBuilder(ruleToUpdate);
   };
 
   const deleteBlock = async (orderIndex: number, type: BlockType) => {
-    let ruleToDelete;
+    let ruleToDelete: RuleBuilderRule;
 
     if (type === 'condition') {
       const currentConditions = [...rule.rule_builder.conditions];
@@ -250,38 +242,41 @@ const RuleBuilder = () => {
       ruleToDelete = {
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, actions: setPrimaryParametersAndOutputVariables(currentActions),
+          ...rule.rule_builder, actions: currentActions,
         },
       };
     }
 
-    validateAndSaveRuleBuilder(ruleToDelete);
+    await validateAndSaveRuleBuilder(ruleToDelete);
   };
 
   const handleCancel = () => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rules',
       app_action_value: 'cancel-button',
     });
 
-    history.goBack();
+    history.push(Routes.SYSTEM.PIPELINES.RULES);
   };
 
-  const handleSave = async (event?: React.FormEvent<HTMLFormElement>, closeAfter: boolean = false) => {
+  const handleSave = async (event?: React.SyntheticEvent<HTMLElement>, closeAfter: boolean = false) => {
     event?.preventDefault();
 
     if (initialRule) {
-      sendTelemetry('click', {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'pipeline-rules',
-        app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
-      });
+      sendTelemetry(
+        closeAfter
+          ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_AND_CLOSE_CLICKED
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'pipeline-rules',
+          app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
+        });
 
       await updateRule(rule);
       if (closeAfter) handleCancel();
     } else {
-      sendTelemetry('click', {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_RULE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'pipeline-rules',
         app_action_value: 'add-rule-button',
@@ -292,106 +287,130 @@ const RuleBuilder = () => {
     }
   };
 
-  const hasRuleBuilderErrors = (): boolean => {
-    if (rule.rule_builder.errors?.length > 0) return true;
-
-    if (rule.rule_builder.actions.some(((action) => action.errors?.length > 0))) {
-      return true;
-    }
-
-    if (rule.rule_builder.conditions.some(((condition) => condition.errors?.length > 0))) {
-      return true;
-    }
-
-    return false;
-  };
+  const outputVariableList = () : OutputVariables => (
+    rule.rule_builder.actions.map((block: RuleBlock, index) => ({
+      variableName: block.outputvariable ? `$${block.outputvariable}` : null,
+      variableType: getDictForFunction(actionsDict, block.function)?.return_type,
+      stepOrder: index,
+      blockId: block.id,
+    })).filter(({ variableName }) => (variableName !== null))
+  );
 
   return (
-    <form onSubmit={(e) => handleSave(e, true)}>
-      <Row className="content">
-        <Col md={12}>
-          <RuleBuilderForm rule={rule}
-                           onChange={setRule} />
-          <label htmlFor="rule_builder">Rule Builder</label>
-          <ConvertButton bsStyle="info"
-                         bsSize="small"
-                         title={initialRule ? 'Convert Rule Builder to Source Code' : 'Please Create the Rule first'}
-                         disabled={!initialRule}
-                         onClick={() => {
-                           sendTelemetry('click', {
-                             app_pathname: getPathnameWithoutId(pathname),
-                             app_section: 'pipeline-rules',
-                             app_action_value: 'convert-rule-builder-to-source-code-button',
-                           });
+    <RuleBuilderProvider>
+      <form onSubmit={(e) => handleSave(e, true)}>
+        <Row className="content">
+          <Col xs={12}>
+            <RuleBuilderForm rule={rule}
+                             onChange={setRule} />
+          </Col>
+          <Col xs={8}>
+            <label htmlFor="rule_builder">Rule Builder</label>
+            <StyledPanel expanded={conditionsExpanded}>
+              <StyledPanelHeading>
+                <Panel.Title toggle>
+                  When
+                </Panel.Title>
+                <WhenOperator>
+                  <Radio checked={rule.rule_builder.operator === 'AND'}
+                         onChange={() => updateWhenOperator('AND')}>
+                    and
+                  </Radio>
+                  <Radio checked={rule.rule_builder.operator === 'OR'}
+                         onChange={() => updateWhenOperator('OR')}>
+                    or
+                  </Radio>
+                </WhenOperator>
+              </StyledPanelHeading>
+              <Panel.Collapse>
+                <StyledPanelBody>
+                  {rule.rule_builder.conditions.map((condition, index) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                    <RuleBuilderBlock key={index}
+                                      blockDict={conditionsDict || []}
+                                      block={condition}
+                                      order={index}
+                                      type="condition"
+                                      addBlock={addBlock}
+                                      updateBlock={updateBlock}
+                                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
+                  ))}
+                  <RuleBuilderBlock blockDict={conditionsDict || []}
+                                    order={newConditionBlockIndex}
+                                    type="condition"
+                                    addBlock={addBlock}
+                                    updateBlock={updateBlock}
+                                    deleteBlock={() => setBlockToDelete({
+                                      orderIndex: newConditionBlockIndex,
+                                      type: 'condition',
+                                    })} />
+                </StyledPanelBody>
+              </Panel.Collapse>
+            </StyledPanel>
+            <br />
+            <StyledPanel expanded={actionsExpanded}>
+              <StyledPanelHeading>
+                <Panel.Title toggle>
+                  Then
+                </Panel.Title>
+              </StyledPanelHeading>
+              <Panel.Collapse>
+                <StyledPanelBody>
+                  {rule.rule_builder.actions.map((action, index) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                    <RuleBuilderBlock key={index}
+                                      blockDict={actionsDict || []}
+                                      block={action}
+                                      order={index}
+                                      type="action"
+                                      outputVariableList={outputVariableList()}
+                                      addBlock={addBlock}
+                                      updateBlock={updateBlock}
+                                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
+                  ))}
+                  <RuleBuilderBlock blockDict={actionsDict || []}
+                                    order={newActionBlockIndex}
+                                    type="action"
+                                    outputVariableList={outputVariableList()}
+                                    addBlock={addBlock}
+                                    updateBlock={updateBlock}
+                                    deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
+                </StyledPanelBody>
+              </Panel.Collapse>
+            </StyledPanel>
+            <Errors objectWithErrors={rule.rule_builder} />
+          </Col>
+          <Col xs={4}>
+            <RuleSimulation rule={rule} onSaveMessage={saveSimulatorMessage} />
+          </Col>
+          <ActionsCol xs={12}>
+            <FormSubmit disabledSubmit={hasRuleBuilderErrors(rule)}
+                        submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
+                        centerCol={initialRule && (
+                        <>
+                          <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors(rule)}>
+                            Update rule
+                          </Button>
+                          <Button bsStyle="info"
+                                  title="Convert Rule Builder to Source Code"
+                                  disabled={hasRuleBuilderErrors(rule)}
+                                  onClick={() => {
+                                    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
+                                      app_pathname: getPathnameWithoutId(pathname),
+                                      app_section: 'pipeline-rules',
+                                      app_action_value: 'convert-rule-builder-to-source-code-button',
+                                    });
 
-                           setRuleSourceCodeToShow(rule);
-                         }}>
-            Convert to Source Code
-          </ConvertButton>
-        </Col>
-        <Col md={6}>
-          <SubTitle htmlFor="rule_builder_conditions">Conditions</SubTitle>
-          {rule.rule_builder.conditions.map((condition, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <RuleBuilderBlock key={index}
-                              blockDict={conditionsDict || []}
-                              block={condition}
-                              order={index}
-                              type="condition"
-                              addBlock={addBlock}
-                              updateBlock={updateBlock}
-                              deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
-          ))}
-          <RuleBuilderBlock blockDict={conditionsDict || []}
-                            order={newConditionBlockIndex}
-                            type="condition"
-                            addBlock={addBlock}
-                            updateBlock={updateBlock}
-                            deleteBlock={() => setBlockToDelete({
-                              orderIndex: newConditionBlockIndex,
-                              type: 'condition',
-                            })} />
-        </Col>
-        <Col md={6}>
-          <SubTitle htmlFor="rule_builder_actions">Actions</SubTitle>
-          {rule.rule_builder.actions.map((action, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <RuleBuilderBlock key={index}
-                              blockDict={actionsDict || []}
-                              block={action}
-                              order={index}
-                              type="action"
-                              previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, index).previousOutputPresent}
-                              addBlock={addBlock}
-                              updateBlock={updateBlock}
-                              deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
-          ))}
-          <RuleBuilderBlock blockDict={actionsDict || []}
-                            order={newActionBlockIndex}
-                            type="action"
-                            previousOutputPresent={getPreviousOutput(rule.rule_builder.actions, newActionBlockIndex).previousOutputPresent}
-                            addBlock={addBlock}
-                            updateBlock={updateBlock}
-                            deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
-        </Col>
-        <Col md={12}>
-          <Errors objectWithErrors={rule.rule_builder} />
-        </Col>
-        <Col md={12}>
-          <RuleSimulation rule={rule} />
-        </Col>
-        <ActionsCol md={12}>
-          <FormSubmit disabledSubmit={hasRuleBuilderErrors()}
-                      submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
-                      centerCol={initialRule && (
-                        <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors()}>
-                          Update rule
-                        </Button>
-                      )}
-                      onCancel={handleCancel} />
-        </ActionsCol>
-      </Row>
-      {blockToDelete && (
+                                    setRuleSourceCodeToShow(rule);
+                                  }}>
+                            Convert to Source Code
+                          </Button>
+                        </>
+                        )}
+                        onCancel={handleCancel} />
+          </ActionsCol>
+        </Row>
+        {blockToDelete && (
         <ConfirmDialog title={`Delete ${blockToDelete.type}`}
                        show
                        onConfirm={() => {
@@ -401,13 +420,15 @@ const RuleBuilder = () => {
                        onCancel={() => setBlockToDelete(null)}>
           <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
         </ConfirmDialog>
-      )}
-      {ruleSourceCodeToShow && (
+        )}
+        {ruleSourceCodeToShow && (
         <ConvertToSourceCodeModal show
+                                  onNavigateAway={updateRule}
                                   onHide={() => setRuleSourceCodeToShow(null)}
                                   rule={ruleSourceCodeToShow} />
-      )}
-    </form>
+        )}
+      </form>
+    </RuleBuilderProvider>
   );
 };
 

@@ -45,10 +45,16 @@ ace.define('ace/mode/lucene_highlight_rules', ['require', 'exports', 'module', '
           token: 'keyword.operator',
           regex: '(AND|OR|NOT|TO)\\b',
         }, {
-          token: 'paren.lparen',
+          token: (value) => [{
+            type: 'paren.lparen',
+            value: value,
+          }],
           regex: '[\\(\\{\\[]',
         }, {
-          token: 'paren.rparen',
+          token: (value) => [{
+            type: 'paren.rparen',
+            value: value,
+          }],
           regex: '[\\)\\}\\]]',
         }, {
           token: 'keyword.operator',
@@ -65,7 +71,7 @@ ace.define('ace/mode/lucene_highlight_rules', ['require', 'exports', 'module', '
           next: 'maybeRegex',
         }, {
           token: 'term',
-          regex: /[\w(\\/)]+/,
+          regex: /[\w\\/]+/,
         }, {
           token: 'text',
           regex: /\s+/,

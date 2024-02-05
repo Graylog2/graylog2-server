@@ -1,0 +1,5 @@
+type = "added"
+message = "Add action for field type management page to remove custom field types."
+
+issues = ["17284"]
+pulls = ["17281"]

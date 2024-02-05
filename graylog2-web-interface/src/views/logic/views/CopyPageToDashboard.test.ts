@@ -26,7 +26,6 @@ import ValueParameter from '../parameters/ValueParameter';
 import Parameter from '../parameters/Parameter';
 
 jest.useFakeTimers()
-  // @ts-expect-error
   .setSystemTime(1577836800000); // 2020-01-01 00:00:00.000
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));

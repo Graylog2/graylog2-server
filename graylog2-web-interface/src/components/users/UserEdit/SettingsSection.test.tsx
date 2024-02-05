@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { act, render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { List } from 'immutable';
 
@@ -70,18 +70,27 @@ describe('<SettingsSection />', () => {
     render(<SettingsSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
 
     const timeoutAmountInput = screen.getByPlaceholderText('Timeout amount');
+    const timeoutUnitSelect = screen.getByLabelText('Timeout unit');
     const timezoneSelect = screen.getByLabelText('Time Zone');
     const submitButton = screen.getByText('Update Settings');
 
+    expect(timeoutAmountInput).toHaveValue(10);
+
+    await screen.findByText('Hours');
+
     fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
-    selectEvent.openMenu(timezoneSelect);
-    selectEvent.select(timezoneSelect, 'Vancouver');
+
+    await act(async () => {
+      await selectEvent.select(timeoutUnitSelect, 'Days');
+    });
+
+    await selectEvent.select(timezoneSelect, 'Vancouver');
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
     expect(onSubmitStub).toHaveBeenCalledWith({
-      session_timeout_ms: 144000000,
+      session_timeout_ms: 3456000000,
       timezone: 'America/Vancouver',
     });
   });

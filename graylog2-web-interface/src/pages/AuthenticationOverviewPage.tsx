@@ -19,7 +19,7 @@ import * as React from 'react';
 import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import 'components/authentication/bindings'; // Bind all authentication plugins
 import { Alert, Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Icon } from 'components/common';
+import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import BackendsOverview from 'components/authentication/BackendsOverview';
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
@@ -47,7 +47,7 @@ const AuthenticationOverviewPage = () => {
         <Row className="content">
           <Col xs={12}>
             <Alert bsStyle="warning">
-              <Icon name="exclamation-circle" /> None of the configured authentication services is currently active.
+              None of the configured authentication services is currently active.
             </Alert>
           </Col>
         </Row>

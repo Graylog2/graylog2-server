@@ -53,7 +53,7 @@ public abstract class ScopedDbService<E extends ScopedEntity> extends PaginatedD
         // First, check whether this entity has been persisted, if so, the persisted entity's scope takes precedence.
         Optional<E> current = get(scopedEntity.id());
         if (current.isPresent()) {
-            return entityScopeService.isMutable(current.get());
+            return entityScopeService.isMutable(current.get(), scopedEntity);
         }
 
         // The entity does not exist in the database, This could be a new entity--check it
@@ -117,5 +117,13 @@ public abstract class ScopedDbService<E extends ScopedEntity> extends PaginatedD
     public final int forceDelete(String id) {
         // Intentionally omit ensure mutability check.
         return super.delete(id);
+    }
+
+    /**
+     * Saves an entity without checking for mutability. Do not call this method for API requests for the user interface.
+     */
+    public final E forceSave(E entity) {
+        // Intentionally omit ensure mutability check.
+        return super.save(entity);
     }
 }

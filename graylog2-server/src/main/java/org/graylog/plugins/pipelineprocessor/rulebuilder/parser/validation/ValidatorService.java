@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation;
 
+import io.jsonwebtoken.lang.Collections;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
@@ -23,8 +24,9 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,20 +57,26 @@ public class ValidatorService {
         List<RuleBuilderStep> validatedConditions = validateWithResults(ruleBuilder.conditions(), conditionValidators);
         validationBuilder.conditions(validatedConditions);
 
+
+        String source = null;
         try {
             validationBuilder.errors(null);
-            parseRule(ruleBuilderDto, validationBuilder.build());
+            source = parseRule(ruleBuilderDto, validationBuilder.build());
         } catch (Exception exception) {
-            validationBuilder.errors(List.of(exception.getMessage()));
+            if (validatedConditions.stream().allMatch(step -> Collections.isEmpty(step.errors()))
+                    && validatedActions.stream().allMatch(step -> Collections.isEmpty(step.errors()))) {
+                validationBuilder.errors(List.of(exception.getMessage()));
+            }
         }
 
         RuleBuilder validatedRuleBuilder = validationBuilder.build();
-        return ruleBuilderDto.toBuilder().ruleBuilder(validatedRuleBuilder).build();
+        return ruleBuilderDto.toBuilder().ruleBuilder(validatedRuleBuilder).source(source).build();
     }
 
-    private void parseRule(RuleBuilderDto ruleBuilderDto, RuleBuilder validatedRuleBuilder) throws ParseException {
+    private String parseRule(RuleBuilderDto ruleBuilderDto, RuleBuilder validatedRuleBuilder) throws ParseException {
         String source = ruleBuilderService.generateRuleSource(ruleBuilderDto.title(), validatedRuleBuilder, false);
         pipelineRuleParser.parseRule(source, true);
+        return source;
     }
 
     public void validateAndFailFast(RuleBuilderDto ruleBuilderDto) throws IllegalArgumentException, ParseException {

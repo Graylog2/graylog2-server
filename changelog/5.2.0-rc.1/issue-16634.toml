@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing error which occurred when saving a dashboard after deleting a page in the pages configuration modal."
+
+issues = ["16634"]
+pulls = ["16674"]

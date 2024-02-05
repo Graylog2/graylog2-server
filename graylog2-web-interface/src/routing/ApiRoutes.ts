@@ -22,7 +22,7 @@ type SearchQueryString = {
   query: string,
   limit?: number,
   offset?: number,
-  sort?: `${string}:${'asc'|'desc'}`,
+  sort?: `${string}:${'asc' | 'desc'}`,
   decorate?: boolean,
   fields?: string,
   filter?: string,
@@ -76,7 +76,7 @@ const ApiRoutes = {
     list: () => ({ url: '/system/content_packs/latest' }),
     get: (contentPackId: string) => ({ url: `/system/content_packs/${contentPackId}` }),
     getRev: (contentPackId: string, revision: string) => ({ url: `/system/content_packs/${contentPackId}/${revision}` }),
-    downloadRev: (contentPackId: string, revision: string) => ({ url: `/system/content_packs/${contentPackId}/${revision}/download` }),
+    downloadRev: (contentPackId: string, revision: number) => ({ url: `/system/content_packs/${contentPackId}/${revision}/download` }),
     create: () => ({ url: '/system/content_packs' }),
     delete: (contentPackId: string) => ({ url: `/system/content_packs/${contentPackId}` }),
     deleteRev: (contentPackId: string, revision: string) => ({ url: `/system/content_packs/${contentPackId}/${revision}` }),
@@ -335,9 +335,13 @@ const ApiRoutes = {
 
       queryString.query = query;
 
-      Object.keys(timerange).forEach((key) => { queryString[key] = timerange[key]; });
+      Object.keys(timerange).forEach((key) => {
+        queryString[key] = timerange[key];
+      });
 
-      Object.keys(streamFilter).forEach((key) => { queryString[key] = streamFilter[key]; });
+      Object.keys(streamFilter).forEach((key) => {
+        queryString[key] = streamFilter[key];
+      });
 
       return queryString as SearchQueryString;
     },

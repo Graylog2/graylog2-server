@@ -1,0 +1,12 @@
+type = "f"
+message = "By default, `none` and `close` index retention strategies are disabled for new installations."
+
+issues = ["graylog-plugin-enterprise#5888"]
+pulls = ["17552"]
+
+details.user = """
+Configuration setting `disabled_retention_strategies` disables the specified retention strategies.
+This is introduced in order to deprecate obsolete strategies in new installations. Strategies can be re-enabled
+simply by removing from this list.<br/>
+**Do not extend this list on existing installs!**
+"""

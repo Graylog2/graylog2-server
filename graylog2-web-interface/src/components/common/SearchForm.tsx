@@ -171,7 +171,7 @@ const SearchForm = ({
     }
   };
 
-  const onChange = (e) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const newQuery = e.target.value;
@@ -202,7 +202,7 @@ const SearchForm = ({
               {label}
             </Label>
           )}
-          <InputContainer>
+          <InputContainer className="input-container">
             <StyledInput id="common-search-form-query-input"
                          autoFocus={focusAfterMount}
                          onChange={onChange}

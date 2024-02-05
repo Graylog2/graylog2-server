@@ -39,7 +39,6 @@ import org.mockito.junit.MockitoRule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,22 +56,18 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Before
     public void setUpFixtures() {
-        final Set<SearchType> searchTypes = new HashSet<>() {{
-            add(
-                    Pivot.builder()
-                            .id("pivot1")
-                            .series(Collections.singletonList(Average.builder().field("field1").build()))
-                            .rollup(true)
-                            .build()
-            );
-            add(
-                    Pivot.builder()
-                            .id("pivot2")
-                            .series(Collections.singletonList(Max.builder().field("field2").build()))
-                            .rollup(true)
-                            .build()
-            );
-        }};
+        final Set<SearchType> searchTypes = Set.of(
+                Pivot.builder()
+                        .id("pivot1")
+                        .series(Collections.singletonList(Average.builder().field("field1").build()))
+                        .rollup(true)
+                        .build(),
+                Pivot.builder()
+                        .id("pivot2")
+                        .series(Collections.singletonList(Max.builder().field("field2").build()))
+                        .rollup(true)
+                        .build()
+        );
         this.query = Query.builder()
                 .id("query1")
                 .searchTypes(searchTypes)

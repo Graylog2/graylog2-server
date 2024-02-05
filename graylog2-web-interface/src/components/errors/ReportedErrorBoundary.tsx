@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 
+import useLocation from 'routing/useLocation';
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import type { ReportedError } from 'logic/errors/ReportedErrors';
