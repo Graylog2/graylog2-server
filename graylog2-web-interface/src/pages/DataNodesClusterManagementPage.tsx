@@ -15,12 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import ClusterManagementOverview from 'components/datanode/ClusterManagement/ClusterManagementOverview';
+
+const StyledCol = styled(Col)`
+  footer {
+    display: none;
+  }
+`;
 
 const DataNodesClusterManagementPage = () => (
   <DocumentTitle title="Data Nodes Cluster Management">
@@ -35,9 +42,9 @@ const DataNodesClusterManagementPage = () => (
       </span>
     </PageHeader>
     <Row className="content">
-      <Col md={12}>
+      <StyledCol md={12}>
         <ClusterManagementOverview />
-      </Col>
+      </StyledCol>
     </Row>
   </DocumentTitle>
 );

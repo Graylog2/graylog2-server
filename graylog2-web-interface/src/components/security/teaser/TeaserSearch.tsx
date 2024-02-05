@@ -37,10 +37,6 @@ const StyledPageContentLayout = styled(PageContentLayout)`
   .page-content-grid {
     position: relative;
   }
-
-  footer {
-    display: none;
-  }
 `;
 
 const DashboardOverlay = styled.div`
