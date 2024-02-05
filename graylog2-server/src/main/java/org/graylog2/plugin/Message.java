@@ -147,6 +147,12 @@ public class Message implements Messages, Indexable {
     public static final String FIELD_GL2_RECEIVE_TIMESTAMP = "gl2_receive_timestamp";
 
     /**
+     * Reflects the time span from receiving the message till sending it to the output in milliseconds.
+     * Will be set after all message processors have been run.
+     */
+    public static final String FIELD_GL2_PROCESSING_TIME_MS = "gl2_processing_time_ms";
+
+    /**
      * Will be set to the hostname of the source node that sent a message. (if reverse lookup is enabled)
      */
     public static final String FIELD_GL2_REMOTE_HOSTNAME = "gl2_remote_hostname";
@@ -862,6 +868,9 @@ public class Message implements Messages, Indexable {
         if (processingTime != null) {
             this.processingTime = processingTime;
             addField(FIELD_GL2_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(processingTime.withZone(UTC)));
+            if (getReceiveTime() != null) {
+                addField(FIELD_GL2_PROCESSING_TIME_MS, processingTime.getMillis() - getReceiveTime().getMillis());
+            }
         }
     }
 
