@@ -16,7 +16,6 @@
  */
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -33,11 +32,8 @@ import {
 } from 'components/indices/Types';
 import type {
   RetentionStrategy, RotationStrategy, RetentionStrategyContext,
-  RetentionStrategyConfig,
-  RotationStrategyConfig,
 } from 'components/indices/Types';
 import { adjustFormat } from 'util/DateTime';
-import useIndexDefaults from 'pages/useIndexDefaults';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -71,31 +67,11 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
     });
   };
 
-  const { loadingIndexDefaultsConfig, indexDefaultsConfig: config } = useIndexDefaults();
-
-  const _isLoading = () => !rotationStrategies || !retentionStrategies || loadingIndexDefaultsConfig;
+  const _isLoading = () => !rotationStrategies || !retentionStrategies;
 
   if (_isLoading()) {
     return <Spinner />;
   }
-
-  const indexSet: IndexSet = {
-    title: '',
-    description: '',
-    index_prefix: config.index_prefix,
-    writable: true,
-    can_be_default: true,
-    shards: config.shards,
-    replicas: config.replicas,
-    rotation_strategy_class: config.rotation_strategy_class,
-    rotation_strategy: config.rotation_strategy_config as RotationStrategyConfig,
-    retention_strategy_class: config.retention_strategy_class,
-    retention_strategy: config.retention_strategy_config as RetentionStrategyConfig,
-    index_analyzer: config.index_analyzer,
-    index_optimization_max_num_segments: config.index_optimization_max_num_segments,
-    index_optimization_disabled: config.index_optimization_disabled,
-    field_type_refresh_interval: moment.duration(config.field_type_refresh_interval, config.field_type_refresh_interval_unit).asMilliseconds(),
-  };
 
   return (
     <DocumentTitle title="Create Index Set">
@@ -114,8 +90,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
         <Row className="content">
           <Col md={12}>
-            <IndexSetConfigurationForm indexSet={indexSet}
-                                       retentionStrategiesContext={retentionStrategiesContext}
+            <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
                                        rotationStrategies={rotationStrategies}
                                        retentionStrategies={retentionStrategies}
                                        submitButtonText="Create index set"

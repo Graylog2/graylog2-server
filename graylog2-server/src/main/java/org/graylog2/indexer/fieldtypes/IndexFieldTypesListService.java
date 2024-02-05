@@ -17,6 +17,8 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
+import org.bson.types.ObjectId;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.inmemory.InMemoryFilterExpressionParser;
 import org.graylog2.indexer.IndexSet;
@@ -31,8 +33,6 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.jetbrains.annotations.NotNull;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.List;
@@ -114,7 +114,10 @@ public class IndexFieldTypesListService {
         final Optional<IndexSet> mongoIndexSet = indexSetConfig.map(indexSetFactory::create);
 
         final CustomFieldMappings customFieldMappings = indexSetConfig.map(IndexSetConfig::customFieldMappings).orElse(new CustomFieldMappings());
-        final Optional<IndexFieldTypeProfile> fieldTypeProfile = indexSetConfig.map(IndexSetConfig::fieldTypeProfile).flatMap(profileService::get);
+        final Optional<IndexFieldTypeProfile> fieldTypeProfile = indexSetConfig
+                .map(IndexSetConfig::fieldTypeProfile)
+                .filter(ObjectId::isValid)
+                .flatMap(profileService::get);
 
         final Set<FieldTypeDTO> deflectorFieldDtos = mongoIndexSet
                 .map(IndexSet::getActiveWriteIndex)

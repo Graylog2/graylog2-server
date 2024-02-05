@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+import * as React from 'react';
 
-import java.util.concurrent.TimeUnit;
+const MockedQueryInput = React.forwardRef<HTMLElement, { value: string }>(({ value }, ref) => (
+  <span ref={ref}>{value}</span>
+));
 
-public record ReindexResult(String index, TimeUnit took,
-                            long created, int batches) {
-}
+export default MockedQueryInput;
