@@ -31,6 +31,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
+import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
@@ -150,7 +151,7 @@ public class Message implements Messages, Indexable {
      * Reflects the time span from receiving the message till sending it to the output in milliseconds.
      * Will be set after all message processors have been run.
      */
-    public static final String FIELD_GL2_PROCESSING_TIME_MS = "gl2_processing_time_ms";
+    public static final String FIELD_GL2_PROCESSING_DURATION_MS = "gl2_processing_duration_ms";
 
     /**
      * Will be set to the hostname of the source node that sent a message. (if reverse lookup is enabled)
@@ -217,6 +218,7 @@ public class Message implements Messages, Indexable {
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
             FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
             FIELD_GL2_PROCESSING_ERROR,
+            FIELD_GL2_PROCESSING_DURATION_MS,
             FIELD_GL2_PROCESSING_TIMESTAMP,
             FIELD_GL2_RECEIVE_TIMESTAMP,
             FIELD_GL2_REMOTE_HOSTNAME,
@@ -869,7 +871,8 @@ public class Message implements Messages, Indexable {
             this.processingTime = processingTime;
             addField(FIELD_GL2_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(processingTime.withZone(UTC)));
             if (getReceiveTime() != null) {
-                addField(FIELD_GL2_PROCESSING_TIME_MS, processingTime.getMillis() - getReceiveTime().getMillis());
+                final long duration = processingTime.getMillis() - getReceiveTime().getMillis();
+                addField(FIELD_GL2_PROCESSING_DURATION_MS, Ints.saturatedCast(duration));
             }
         }
     }
