@@ -17,6 +17,7 @@
 package org.graylog2.database.jackson.legacy;
 
 import com.mongodb.client.result.InsertOneResult;
+import org.bson.BsonValue;
 import org.mongojack.JacksonMongoCollection;
 import org.mongojack.WriteResult;
 
@@ -40,7 +41,11 @@ public class LegacyInsertOneResult<T, K> implements WriteResult<T, K> {
 
     @Override
     public T getSavedObject() {
-        return collection.findOneById(insertOneResult.getInsertedId());
+        final BsonValue insertedId = insertOneResult.getInsertedId();
+        if (insertedId == null) {
+            return null;
+        }
+        return collection.findOneById(insertedId);
     }
 
     @Override
