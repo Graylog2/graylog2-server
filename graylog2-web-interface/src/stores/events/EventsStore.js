@@ -83,7 +83,13 @@ export const EventsStore = singletonStore(
       });
     },
 
-    search({ query = '', page = 1, pageSize = 25, filter = { alerts: 'only' }, timerange }) {
+    search({
+      query = '',
+      page = 1,
+      pageSize = 25,
+      filter = { alerts: 'only' },
+      timerange = { type: 'relative', range: 3600 }, // 1 hour
+    }) {
       const promise = fetch('POST', this.eventsUrl({}), {
         query: query,
         page: page,
