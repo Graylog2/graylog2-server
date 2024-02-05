@@ -18,7 +18,6 @@ package org.graylog2.database.jackson.legacy;
 
 import com.google.common.primitives.Ints;
 import com.mongodb.client.result.DeleteResult;
-import org.mongojack.JacksonMongoCollection;
 import org.mongojack.WriteResult;
 
 /**
@@ -27,11 +26,9 @@ import org.mongojack.WriteResult;
  * @deprecated use {@link org.graylog2.database.MongoCollections} as an entrypoint for interacting with MongoDB.
  */
 public class LegacyDeleteResult<T, K> implements WriteResult<T, K> {
-    protected final JacksonMongoCollection<T> collection;
     private final DeleteResult deleteResult;
 
-    public LegacyDeleteResult(JacksonMongoCollection<T> collection, DeleteResult deleteResult) {
-        this.collection = collection;
+    public LegacyDeleteResult(DeleteResult deleteResult) {
         this.deleteResult = deleteResult;
     }
 

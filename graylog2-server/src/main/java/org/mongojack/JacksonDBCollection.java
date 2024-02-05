@@ -175,20 +175,20 @@ public class JacksonDBCollection<T, K> {
     }
 
     public LegacyDeleteResult<T, K> remove(DBObject query) {
-        return new LegacyDeleteResult<>(delegate, delegate.deleteMany(new BasicDBObject(query.toMap())));
+        return new LegacyDeleteResult<>(delegate.deleteMany(new BasicDBObject(query.toMap())));
     }
 
     public LegacyDeleteResult<T, K> remove(Bson filter) {
-        return new LegacyDeleteResult<>(delegate, delegate.deleteMany(filter));
+        return new LegacyDeleteResult<>(delegate.deleteMany(filter));
     }
 
     public WriteResult<T, K> remove(Bson filter, WriteConcern concern) {
         var coll = delegate.withWriteConcern(concern);
-        return new LegacyDeleteResult<>(coll, coll.deleteMany(filter));
+        return new LegacyDeleteResult<>(coll.deleteMany(filter));
     }
 
     public LegacyDeleteResult<T, K> removeById(K objectId) {
-        return new LegacyDeleteResult<>(delegate, delegate.removeById(objectId));
+        return new LegacyDeleteResult<>(delegate.removeById(objectId));
     }
 
     public WriteResult<T, K> update(Bson filter, T object, boolean upsert, boolean multi) {
