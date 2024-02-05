@@ -1,9 +1,9 @@
 {
   "id": "aa96e05c21259f3d24e21341",
   "type": "DASHBOARD",
-  "title": "datanodes",
-  "summary": "Metrics dashboard for data nodes",
-  "description": "Metrics dashboard for data nodes",
+  "title": "Data Nodes",
+  "summary": "Metrics dashboard for Data Nodes",
+  "description": "Metrics dashboard for Data Nodes",
   "search_id": "65b3cbd220753c0e0fc18424",
   "properties": [],
   "requires": {},

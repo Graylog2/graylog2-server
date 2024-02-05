@@ -26,7 +26,7 @@ const hotspots = [
   {
     positionX: '50%',
     positionY: '120px',
-    description: 'Show performance metrics of your data node and managed OpenSearch cluster.',
+    description: 'Show performance metrics of your Data Node and managed OpenSearch cluster.',
   },
 ];
 
