@@ -160,6 +160,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     """;
             LOG.info(noConfigMessage);
         }
+        eventBus.post(new OpensearchConfigurationChangeEvent(config));
     }
 
     protected void configure() {
