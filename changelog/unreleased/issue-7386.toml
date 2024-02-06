@@ -1,0 +1,5 @@
+type = "a"
+message = "Add search result statistics on the main search screen"
+
+pulls = ["16130"]
+issues=["7386"]
