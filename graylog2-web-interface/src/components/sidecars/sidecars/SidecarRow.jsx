@@ -25,7 +25,7 @@ import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
-import { recentMessagesTimeRange } from 'views/logic/TimeRange';
+import recentMessagesTimeRange from 'util/TimeRangeHelper';
 
 import style from './SidecarRow.css';
 

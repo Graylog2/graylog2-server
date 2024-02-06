@@ -27,7 +27,7 @@ import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/com
 import { ConfigurationWell } from 'components/configurationforms';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-import { recentMessagesTimeRange } from 'views/logic/TimeRange';
+import recentMessagesTimeRange from 'util/TimeRangeHelper';
 import {
   InputForm,
   InputStateBadge,
