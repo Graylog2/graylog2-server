@@ -24,9 +24,9 @@ import java.io.IOException;
 
 public interface ManagableProcess<T> {
 
-    void startWithConfig(T configuration);
+    void configure(T configuration);
 
-    void restart() throws IOException;
+    void start();
 
     void stop();
 
@@ -35,4 +35,5 @@ public interface ManagableProcess<T> {
     void addStateMachineTracer(StateMachineTracer stateMachineTracer);
 
     boolean isInState(ProcessState state);
+
 }

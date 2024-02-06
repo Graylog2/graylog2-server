@@ -18,29 +18,80 @@ package org.graylog.plugins.views.storage.migration.state;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationActionsAdapter;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineProvider;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 class MigrationStateMachineTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MigrationStateMachineTest.class);
+
     @Test
     void testPersistence() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
-        final MigrationActions actions = Mockito.mock(MigrationActions.class);
 
-        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, actions).get();
-        migrationStateMachine.trigger(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION);
+        AtomicBoolean directoryCheckTriggered = new AtomicBoolean(false);
+        AtomicReference<Map<String, Object>> capturedArgs = new AtomicReference<>();
+
+        final MigrationActionsAdapter migrationActions = new MigrationActionsAdapter() {
+
+            @Override
+            public boolean runDirectoryCompatibilityCheck() {
+                capturedArgs.set(args());
+                return true;
+            }
+
+            @Override
+            public boolean directoryCompatibilityCheckOk() {
+                directoryCheckTriggered.set(true);
+                return true;
+            }
+        };
+
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, migrationActions).get();
+        migrationStateMachine.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
+        migrationStateMachine.trigger(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, Collections.singletonMap("foo", "bar"));
+        migrationStateMachine.trigger(MigrationStep.SHOW_CA_CREATION, Collections.emptyMap());
+
 
         Assertions.assertThat(persistence.getConfiguration())
                 .isPresent()
                 .hasValueSatisfying(configuration -> {
-                    Assertions.assertThat(configuration.currentState()).isEqualTo(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME);
+                    Assertions.assertThat(configuration.currentState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
                 });
+
+        Assertions.assertThat(directoryCheckTriggered.get())
+                .as("Directory check should be triggered during the migration process")
+                .isEqualTo(true);
+
+        System.out.println(migrationStateMachine.serialize());
+
+
+        Assertions.assertThat(capturedArgs.get())
+                .isNotNull()
+                .containsEntry("foo", "bar");
+    }
+
+    @Test
+    void testSerialization() {
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), new MigrationActionsAdapter()).get();
+        final String serialized = migrationStateMachine.serialize();
+        Assertions.assertThat(serialized).isNotEmpty().startsWith("digraph G {");
+        final String fragment = URLEncoder.encode(serialized, StandardCharsets.UTF_8).replace("+", "%20");
+        LOG.info("Render state machine on " + "https://dreampuf.github.io/GraphvizOnline/#" + fragment);
     }
 }

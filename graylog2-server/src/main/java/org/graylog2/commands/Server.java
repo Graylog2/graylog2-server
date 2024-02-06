@@ -79,6 +79,7 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
+import org.graylog2.datatiering.DataTieringModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.FieldTypeManagementModule;
@@ -209,6 +210,7 @@ public class Server extends ServerBootstrap {
                 new ScriptingApiModule(featureFlags),
                 new StreamsModule(),
                 new TracingModule(),
+                new DataTieringModule(),
                 new DatanodeMigrationBindings()
         );
 

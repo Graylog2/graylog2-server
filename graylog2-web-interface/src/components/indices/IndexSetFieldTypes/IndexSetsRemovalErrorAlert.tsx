@@ -62,7 +62,7 @@ const IndexSetRemovalErrors = ({ errors, failures, title }: {
 
 const IndexSetsRemovalErrorAlert = ({ removalResponse, indexSets }: { removalResponse: RemovalResponse, indexSets: Record<string, IndexSet> }) => (
   <Alert bsStyle="danger" title="Removing some of field type overrides failed">
-    {removalResponse.map(({ indexSetId, failures, errors }) => (
+    {Object.values(removalResponse).map(({ indexSetId, failures, errors }) => (
       <IndexSetRemovalErrors key={indexSetId} failures={failures} errors={errors} title={indexSets[indexSetId].title} />
     ))}
   </Alert>

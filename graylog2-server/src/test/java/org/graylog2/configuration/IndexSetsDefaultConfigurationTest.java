@@ -17,11 +17,13 @@
 package org.graylog2.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.Period;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -45,9 +47,15 @@ class IndexSetsDefaultConfigurationTest {
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
                 .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(10))
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategyConfig(DeletionRetentionStrategyConfig.create(10)).build();
+                .retentionStrategyConfig(DeletionRetentionStrategyConfig.create(10))
+                .dataTiering(HotOnlyDataTieringConfig.builder()
+                        .indexLifetimeMin(Period.days(1))
+                        .indexLifetimeMax(Period.days(2))
+                        .build()
+                )
+                .build();
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final Map map = objectMapper.convertValue(indexConfig, HashMap.class);
+        final Map<?, ?> map = objectMapper.convertValue(indexConfig, HashMap.class);
         objectMapper.convertValue(map, IndexSetsDefaultConfiguration.class);
     }
 }

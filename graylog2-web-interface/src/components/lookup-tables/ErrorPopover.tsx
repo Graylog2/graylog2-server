@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { OverlayTrigger, Icon } from 'components/common';
-import { Popover } from 'components/bootstrap';
-
-import Styles from './ErrorPopover.css';
 
 type Props = {
   errorText: string,
@@ -27,22 +25,16 @@ type Props = {
   placement: 'bottom' | 'top' | 'right' | 'left',
 };
 
-const ErrorPopover = ({ errorText, title = 'Error', placement = 'bottom' }: Props) => {
-  const overlay = (
-    <Popover id="error-popover"
-             title={title}
-             className={Styles.overlay}>
-      {errorText}
-    </Popover>
-  );
+const StyledSpan = styled.span`
+  margin-right: 5px;
+`;
 
-  return (
-    <OverlayTrigger trigger={['hover', 'focus']} placement={placement} overlay={overlay}>
-      <span className={Styles.trigger}>
-        <Icon name="exclamation-triangle" className="text-danger" />
-      </span>
-    </OverlayTrigger>
-  );
-};
+const ErrorPopover = ({ errorText, title = 'Error', placement = 'bottom' }: Props) => (
+  <OverlayTrigger trigger={['hover', 'focus']} placement={placement} overlay={errorText} title={title} width={400}>
+    <StyledSpan>
+      <Icon name="exclamation-triangle" className="text-danger" />
+    </StyledSpan>
+  </OverlayTrigger>
+);
 
 export default ErrorPopover;

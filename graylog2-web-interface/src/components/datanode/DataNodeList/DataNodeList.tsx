@@ -32,6 +32,7 @@ import useTableEventHandlers from 'hooks/useTableEventHandlers';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
+import DataNodeBulkActions from './DataNodeBulkActions';
 import DataNodeActions from './DataNodeActions';
 import DataNodeStatusCell from './DataNodeStatusCell';
 
@@ -149,7 +150,7 @@ const DataNodeList = () => {
                                      onSortChange={onSortChange}
                                      onPageSizeChange={onPageSizeChange}
                                      pageSize={layoutConfig.pageSize}
-                                     bulkSelection={{}}
+                                     bulkSelection={{ actions: <DataNodeBulkActions /> }}
                                      activeSort={layoutConfig.sort}
                                      rowActions={entityActions}
                                      actionsCellWidth={160}

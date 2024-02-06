@@ -18,15 +18,21 @@ package org.graylog.plugins.views.storage.migration.state.actions;
 
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
+import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 public class MigrationActionsImpl implements MigrationActions {
 
     private final ClusterConfigService clusterConfigService;
+    private final CaService caService;
 
     @Inject
-    public MigrationActionsImpl(ClusterConfigService clusterConfigService) {
+    public MigrationActionsImpl(final ClusterConfigService clusterConfigService,
+                                final CaService caService) {
         this.clusterConfigService = clusterConfigService;
+        this.caService = caService;
     }
 
     @Override
@@ -34,23 +40,72 @@ public class MigrationActionsImpl implements MigrationActions {
         clusterConfigService.remove(DatanodeMigrationConfiguration.class);
     }
 
-    @Override
-    public void migrateIndexTemplates() {
-        // TODO!
-    }
 
     @Override
-    public void migrateWithoutDowntime() {
-        // TODO!
-    }
-
-    @Override
-    public void migrateWithDowntime() {
-        // TODO!
+    public boolean runDirectoryCompatibilityCheck() {
+        // TODO: add real test
+        return true;
     }
 
     @Override
     public boolean isOldClusterStopped() {
-        return false;
+        // TODO: add real test
+        return true;
+    }
+
+    @Override
+    public void rollingUpgradeSelected() {
+
+    }
+
+    @Override
+    public boolean directoryCompatibilityCheckOk() {
+        // TODO: add real test
+        return true;
+    }
+
+    @Override
+    public void reindexUpgradeSelected() {
+
+    }
+
+    @Override
+    public boolean reindexingFinished() {
+        // TODO: add real test
+        return true;
+    }
+
+    @Override
+    public void reindexOldData() {
+
+    }
+
+    @Override
+    public void stopMessageProcessing() {
+
+    }
+
+    @Override
+    public void startMessageProcessing() {
+
+    }
+
+    @Override
+    public boolean caDoesNotExist() {
+        try {
+            return this.caService.get() == null;
+        } catch (KeyStoreStorageException e) {
+            return true;
+        }
+    }
+
+    @Override
+    public boolean removalPolicyDoesNotExist() {
+        return this.clusterConfigService.get(RenewalPolicy.class) == null;
+    }
+
+    @Override
+    public boolean caAndRemovalPolicyExist() {
+        return !caDoesNotExist() && !removalPolicyDoesNotExist();
     }
 }

@@ -33,7 +33,7 @@ type Props = {
 }
 
 const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
-  const parameters = (descriptor) => descriptor.params.map((p) => (
+  const parameters = (descriptor: BlockDict) => descriptor.params.map((p) => (
     <tr key={p.name}>
       <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
       <td className={RuleHelperStyle.adjustedTableCellWidth}>{niceType(p.type)}</td>
@@ -42,12 +42,12 @@ const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
     </tr>
   ));
 
-  const renderFunctions = (descriptors) => {
+  const renderFunctions = (descriptors: Array<BlockDict>) => {
     if (!descriptors) {
       return [];
     }
 
-    return descriptors.map((d) => {
+    return descriptors.map((d: BlockDict) => {
       let details = null;
 
       if (expanded[d.name]) {
