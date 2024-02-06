@@ -193,7 +193,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
                 } catch (ClassNotFoundException e) {
                     LOG.debug("Couldn't find configuration class \"{}\"", type, e);
                 } catch (UnsafeClassLoadingAttemptException e) {
-                    LOG.warn("", e);
+                    LOG.warn("Couldn't load class <{}>.", type, e);
                 }
             }
         }
