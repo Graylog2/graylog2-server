@@ -26,11 +26,13 @@ import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import type { ProfileWithMappingsByField } from 'components/indices/IndexSetFieldTypes/types';
 
 const useIndexProfileWithMappingsByField = () => {
-  const { indexSet: { field_type_profile: profileId } } = useStore(IndexSetsStore);
-  const { data: { customFieldMappings, name, description }, isFetched } = useProfile(profileId);
+  const { indexSet } = useStore(IndexSetsStore);
+  const { data: { customFieldMappings, name, description }, isFetched } = useProfile(indexSet?.field_type_profile);
   const { data: { fieldTypes }, isLoading } = useFieldTypesForMappings();
 
   const customFieldMappingsByField = useMemo(() => {
+    const profileId = indexSet?.field_type_profile;
+
     if (isFetched && !isLoading && profileId) {
       return mapValues(
         keyBy(customFieldMappings, 'field'), (mapping: CustomFieldMapping) => fieldTypes[mapping.type],
@@ -38,14 +40,14 @@ const useIndexProfileWithMappingsByField = () => {
     }
 
     return {};
-  }, [customFieldMappings, fieldTypes, isFetched, isLoading, profileId]);
+  }, [customFieldMappings, fieldTypes, indexSet?.field_type_profile, isFetched, isLoading]);
 
   return useMemo<ProfileWithMappingsByField>(() => ({
     customFieldMappingsByField,
     name,
     description,
-    id: profileId,
-  }), [customFieldMappingsByField, description, name, profileId]);
+    id: indexSet?.field_type_profile,
+  }), [customFieldMappingsByField, description, name, indexSet?.field_type_profile]);
 };
 
 export default useIndexProfileWithMappingsByField;

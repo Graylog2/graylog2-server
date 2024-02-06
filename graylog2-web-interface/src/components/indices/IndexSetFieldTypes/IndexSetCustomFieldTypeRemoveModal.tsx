@@ -129,15 +129,18 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
   const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
-  const onErrorHandler = useCallback((response: RemovalResponse) => {
-    const failedFields = response.flatMap(((indexSet) => indexSet.failures.map(({ entityId }) => entityId)));
-    setSelectedEntities(failedFields);
-    setRemovalResponse(response);
+  const removeSucceededFieldsFromSelected = useCallback((response: RemovalResponse) => {
+    const succeededFields = new Set(Object.values(response).flatMap(((indexSet) => indexSet.succeeded.map(({ fieldName }) => fieldName))));
+    setSelectedEntities((cur) => cur.filter((field) => !succeededFields.has(field)));
   }, [setSelectedEntities]);
-  const onSuccessHandler = useCallback(() => {
+  const onErrorHandler = useCallback((response: RemovalResponse) => {
+    removeSucceededFieldsFromSelected(response);
+    setRemovalResponse(response);
+  }, [removeSucceededFieldsFromSelected]);
+  const onSuccessHandler = useCallback((response: RemovalResponse) => {
+    removeSucceededFieldsFromSelected(response);
     onClose();
-    setSelectedEntities([]);
-  }, [onClose, setSelectedEntities]);
+  }, [onClose, removeSucceededFieldsFromSelected]);
   const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation({ onErrorHandler, onSuccessHandler });
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();

@@ -45,6 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -204,6 +205,24 @@ public class IndexFieldTypeProfileServiceTest {
         assertEquals(expectedProfiles.size(), paginatedResponse.elements().size());
         assertEquals(expectedProfiles, paginatedResponse.elements());
         assertEquals(total, paginatedResponse.total());
+    }
+
+    @Test
+    public void testRetrievalWithIncorrectProfileIdReturnsEmptyOptional() {
+        assertTrue(toTest.getWithUsages("hmm").isEmpty());
+        assertTrue(toTest.get("hmm").isEmpty());
+    }
+
+    @Test
+    public void testRemovalWithIncorrectProfileIdDoesNothing() {
+        final int result = toTest.delete("hmm");
+        assertEquals(0, result);
+    }
+
+    @Test
+    public void testUpdateWithIncorrectProfileIdDoesNothing() {
+        final boolean result = toTest.update("hmm", new IndexFieldTypeProfile(null, "Hmm", "Hmm", new CustomFieldMappings(List.of())));
+        assertFalse(result);
     }
 
     @Test
