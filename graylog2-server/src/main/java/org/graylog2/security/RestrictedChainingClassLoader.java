@@ -16,9 +16,10 @@
  */
 package org.graylog2.security;
 
-import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.shared.plugins.ChainingClassLoader;
+
+import javax.inject.Inject;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
