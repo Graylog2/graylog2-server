@@ -23,10 +23,9 @@ import { Icon, Timestamp } from 'components/common';
 import { Table, Button } from 'components/bootstrap';
 import useAppSelector from 'stores/useAppSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import type { SearchTypeResultTypes } from 'views/types';
+import type { MessageResult, SearchTypeResult, SearchTypeResultTypes } from 'views/types';
 import type { SearchTypeIds } from 'views/logic/views/types';
 import OverlayDropdown from 'components/common/OverlayDropdown';
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 type Props = {
   currentWidgetMapping: SearchTypeIds,
@@ -41,42 +40,43 @@ const QueryHelpButton = styled(Button)`
   padding: 6px 8px;
 `;
 
-const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: {
-    efectiveTimeranges: AbsoluteTimeRange,
-    total: number,
-    duration: number,
-    timestamp: string,
-  }}) => (
-    <PopoverContainer>
-      <p><strong>Execution Info</strong></p>
-      <Table condensed>
-        <tbody>
-          <tr>
-            <td><i>Executed at:</i></td>
-            <td><Timestamp dateTime={widgetExecutionData?.timestamp} /></td>
-          </tr>
-          <tr>
-            <td><i>Executed in:</i> </td>
-            <td>{numeral(widgetExecutionData?.duration).format('0,0')}ms</td>
-          </tr>
-          <tr>
-            <td colSpan={2}><i>Effective time range:</i></td>
-          </tr>
-          <tr>
-            <td>From</td>
-            <td><Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.from} format="complete" /></td>
-          </tr>
-          <tr>
-            <td>To</td>
-            <td><Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.to} format="complete" /></td>
-          </tr>
-          <tr>
-            <td><i>Total results:</i></td>
-            <td>{numeral(widgetExecutionData?.total).format('0,0')}</td>
-          </tr>
-        </tbody>
-      </Table>
-    </PopoverContainer>
+type WidgetExecutionData = {
+  total: number,
+  duration: number,
+  timestamp: string,
+  effectiveTimerange: SearchTypeResult['effective_timerange'] | MessageResult['effectiveTimerange']
+}
+const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecutionData}) => (
+  <PopoverContainer>
+    <p><strong>Execution Info</strong></p>
+    <Table condensed>
+      <tbody>
+        <tr>
+          <td><i>Executed at:</i></td>
+          <td aria-label="Executed at"><Timestamp dateTime={widgetExecutionData?.timestamp} /></td>
+        </tr>
+        <tr>
+          <td><i>Executed in:</i> </td>
+          <td>{numeral(widgetExecutionData?.duration).format('0,0')}ms</td>
+        </tr>
+        <tr>
+          <td colSpan={2}><i>Effective time range:</i></td>
+        </tr>
+        <tr>
+          <td>From</td>
+          <td aria-label="Effective time range from"><Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.from} format="complete" /></td>
+        </tr>
+        <tr>
+          <td>To</td>
+          <td aria-label="Effective time range to"><Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.to} format="complete" /></td>
+        </tr>
+        <tr>
+          <td><i>Total results:</i></td>
+          <td>{numeral(widgetExecutionData?.total).format('0,0')}</td>
+        </tr>
+      </tbody>
+    </Table>
+  </PopoverContainer>
 );
 
 const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping }: Props) => {
@@ -88,13 +88,13 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping }: Props) => {
     return result?.searchTypes?.[searchTypeId];
   }, [currentWidgetMapping, result?.searchTypes]);
 
-  const widgetExecutionData = useMemo(() => ({
-    efectiveTimeranges: currentWidgetSearchType?.effectiveTimerange || currentWidgetSearchType?.effective_timerange,
+  const widgetExecutionData = useMemo<WidgetExecutionData>(() => ({
+    effectiveTimerange: (currentWidgetSearchType as MessageResult)?.effectiveTimerange || (currentWidgetSearchType as SearchTypeResult)?.effective_timerange,
     total: currentWidgetSearchType?.total,
     duration: result?.duration,
     timestamp: result?.timestamp,
 
-  }), [currentWidgetSearchType?.effectiveTimerange, currentWidgetSearchType?.effective_timerange, currentWidgetSearchType?.total, result?.duration, result?.timestamp]);
+  }), [currentWidgetSearchType, result?.duration, result?.timestamp]);
 
   const onMenuToggle = useCallback(() => {
     setOpen((cur) => !cur);

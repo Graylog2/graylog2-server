@@ -202,7 +202,7 @@ export interface SystemConfiguration {
 
 export type SearchTypeResult = {
   type: string,
-  effective_timerange: TimeRange,
+  effective_timerange: AbsoluteTimeRange,
   total: number,
 };
 
