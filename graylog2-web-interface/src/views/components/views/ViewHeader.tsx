@@ -87,7 +87,7 @@ const Content = styled.div(({ theme }) => css`
 
 const ExecutionInfoContainer = styled.div`
   margin-left: auto;
-`
+`;
 
 const EditButton = styled.div(({ theme }) => css`
   color: ${theme.colors.gray[60]};
