@@ -331,6 +331,8 @@ public class ContentPackResource extends RestResource {
             @PathParam("contentPackId") ModelId id,
             @ApiParam(name = "installationId", value = "Installation ID", required = true)
             @PathParam("installationId") String installationId) {
+        checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
+
         final ContentPackInstallation installation = contentPackInstallationPersistenceService.findById(new ObjectId(installationId))
                 .orElseThrow(() -> new NotFoundException("Couldn't find installation " + installationId));
 
