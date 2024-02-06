@@ -79,7 +79,7 @@ const SearchResultOverview = ({ results }: Props) => {
           )}
       </EffectiveTimeRange>
       <p>
-        Total results <br />
+        Total results<br />
         {isVariesPerWidget ? <i>Varies per widget</i> : numeral(total).format('0,0')}
       </p>
     </>
