@@ -73,7 +73,7 @@ public @interface ContainerMatrixTestsConfiguration {
      * matrix rule
      * If no version is explicitly specified, then {@link MongodbServer#DEFAULT_VERSION will be used by the tests}
      */
-    MongodbServer[] mongoVersions() default {MongodbServer.MONGO7};
+    MongodbServer[] mongoVersions() default {MongodbServer.MONGO5};
 
     // additional Parameter, gets concatenated for all tests below the above rules
     int[] extraPorts() default {};
