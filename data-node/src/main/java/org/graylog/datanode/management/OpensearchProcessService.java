@@ -146,21 +146,10 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @Override
     protected void startUp() {
         final OpensearchConfiguration config = configurationProvider.get();
+        configure();
         if (config.securityConfigured()) {
-            this.configure();
             this.process.start();
-        } else {
-            String noConfigMessage = """
-                    \n
-                    ========================================================================================================
-                    It seems you are starting Data node for the first time. The current configuration is not sufficient to
-                    start the indexer process because a security configuration is missing. You have to either provide http
-                    and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
-                    ========================================================================================================
-                    """;
-            LOG.info(noConfigMessage);
         }
-        eventBus.post(new OpensearchConfigurationChangeEvent(config));
     }
 
     protected void configure() {
