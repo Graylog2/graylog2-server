@@ -854,6 +854,12 @@ public class Message implements Messages, Indexable {
         return receiveTime;
     }
 
+    /**
+     * Sets the Message receive time.
+     * The time is taken from the receive time of the message, before it was written to the journal.
+     *
+     * @param receiveTime the new receive timestamp
+     */
     public void setReceiveTime(DateTime receiveTime) {
         if (receiveTime != null) {
             this.receiveTime = receiveTime;
@@ -866,6 +872,13 @@ public class Message implements Messages, Indexable {
         return processingTime;
     }
 
+    /**
+     * Sets the Message processing Time.
+     * The processing time should only be set once all message processors have finished.
+     * This is usually done in the {@link org.graylog2.shared.buffers.processors.ProcessBufferProcessor}
+     *
+     * @param processingTime the new processing timestamp
+     */
     public void setProcessingTime(DateTime processingTime) {
         if (processingTime != null) {
             this.processingTime = processingTime;
