@@ -2600,10 +2600,10 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
   integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
 
-"@puppeteer/browsers@1.9.1":
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/@puppeteer/browsers/-/browsers-1.9.1.tgz#384ee8b09786f0e8f62b1925e4c492424cb549ee"
-  integrity sha512-PuvK6xZzGhKPvlx3fpfdM2kYY3P/hB1URtK8wA7XUJ6prn6pp22zvJHu48th0SGcHL9SutbPHrFuQgfXTFobWA==
+"@puppeteer/browsers@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@puppeteer/browsers/-/browsers-2.0.0.tgz#3646d2a465c112eac21510d43b21c828612118f9"
+  integrity sha512-3PS82/5+tnpEaUWonjAFFvlf35QHF15xqyGd34GBa5oP5EPVfFXRsbSxIGYf1M+vZlqBZ3oxT1kRg9OYhtt8ng==
   dependencies:
     debug "4.3.4"
     extract-zip "2.0.1"
@@ -5117,13 +5117,13 @@ chrome-trace-event@^1.0.2:
   dependencies:
     tslib "^1.9.0"
 
-chromium-bidi@0.5.4:
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/chromium-bidi/-/chromium-bidi-0.5.4.tgz#dcf60bbc510a0a1d19b35012d7bb53f82bb5f2ba"
-  integrity sha512-p9CdiHl0xNh4P7oVa44zXgJJw+pvnHXFDB+tVdo25xaPLgQDVf2kQO+TDxD2fp2Evqi7vs/vGRINMzl1qJrWiw==
+chromium-bidi@0.5.8:
+  version "0.5.8"
+  resolved "https://registry.yarnpkg.com/chromium-bidi/-/chromium-bidi-0.5.8.tgz#5053038425c062ed34b9bc973e84e79de0a5cef0"
+  integrity sha512-blqh+1cEQbHBKmok3rVJkBlBxt9beKBgOsxbFgs7UJcoVbbeZ+K7+6liAsjgpc8l1Xd55cQUy14fXZdGSb4zIw==
   dependencies:
     mitt "3.0.1"
-    urlpattern-polyfill "9.0.0"
+    urlpattern-polyfill "10.0.0"
 
 ci-info@^2.0.0:
   version "2.0.0"
@@ -8535,7 +8535,7 @@ graphemer@^1.4.0:
     styled-components "6.1.1"
     typescript "5.3.3"
     use-query-params "^2.2.0"
-    webpack "5.90.0"
+    webpack "5.90.1"
     webpack-cli "5.1.4"
     webpack-merge "4.2.2"
 
@@ -12436,26 +12436,26 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer-core@21.9.0:
-  version "21.9.0"
-  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-21.9.0.tgz#7462d5dd0571cd1e0580cc3729d7951cc6fe2505"
-  integrity sha512-QgowcczLAoLWlV38s3y3VuEvjJGfKU5rR6Q23GUbiGOaiQi+QpaWQ+aXdzP9LHVSUPmHdAaWhcvMztYSw3f8gQ==
+puppeteer-core@22.0.0:
+  version "22.0.0"
+  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-22.0.0.tgz#f46420adac6f7be076a1f7a751c8d829461b55d2"
+  integrity sha512-S3s91rLde0A86PWVeNY82h+P0fdS7CTiNWAicCVH/bIspRP4nS2PnO5j+VTFqCah0ZJizGzpVPAmxVYbLxTc9w==
   dependencies:
-    "@puppeteer/browsers" "1.9.1"
-    chromium-bidi "0.5.4"
+    "@puppeteer/browsers" "2.0.0"
+    chromium-bidi "0.5.8"
     cross-fetch "4.0.0"
     debug "4.3.4"
     devtools-protocol "0.0.1232444"
     ws "8.16.0"
 
-puppeteer@^21.0.3:
-  version "21.9.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-21.9.0.tgz#ff6cb321f6d43c1f39ba74bbdfccf2b5ef0121af"
-  integrity sha512-vcLR81Rp+MBrgqhiXZfpwEBbyKTa88Hd+8Al3+emWzcJb9evLLSfUYli0QUqhofPFrXsO2A/dAF9OunyOivL6w==
+puppeteer@^22.0.0:
+  version "22.0.0"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-22.0.0.tgz#e2eb456c667ffb165079f4fb0b6936dd6c9ccf36"
+  integrity sha512-zYVnjwJngnSB4dbkWp7DHFSIc3nqHvZzrdHyo9+ugV1nq1Lm8obOMcmCFaGfR3PJs0EmYNz+/skBeO45yvASCQ==
   dependencies:
-    "@puppeteer/browsers" "1.9.1"
+    "@puppeteer/browsers" "2.0.0"
     cosmiconfig "9.0.0"
-    puppeteer-core "21.9.0"
+    puppeteer-core "22.0.0"
 
 pure-rand@^6.0.0:
   version "6.0.1"
@@ -14472,7 +14472,7 @@ styled-components@6.1.1:
   version "1.0.0"
   dependencies:
     postcss-styled-syntax "0.6.4"
-    stylelint "16.2.0"
+    stylelint "16.2.1"
     stylelint-config-recommended "14.0.0"
     stylelint-config-standard "36.0.0"
     stylelint-config-styled-components "0.1.1"
@@ -14494,10 +14494,10 @@ stylelint-config-styled-components@0.1.1:
   resolved "https://registry.yarnpkg.com/stylelint-config-styled-components/-/stylelint-config-styled-components-0.1.1.tgz#b408388d7c687833ab4be4c4e6522d97d2827ede"
   integrity sha512-z5Xz/9GmvxO6e/DLzBMwkB85zHxEEjN6K7Cj80Bi+o/9vR9eS3GX3E9VuMnX9WLFYulqbqLtTapGGY28JBiy9Q==
 
-stylelint@16.2.0:
-  version "16.2.0"
-  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-16.2.0.tgz#60678f64d7660350fdd06415fd449f332b4fcbf6"
-  integrity sha512-gwqU5AkIb52wrAzzn+359S3NIJDMl02TXLUaV2tzA/L6jUdpTwNt+MCxHlc8+Hb2bUHlYVo92YeSIryF2gJthA==
+stylelint@16.2.1:
+  version "16.2.1"
+  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-16.2.1.tgz#895d6d42523c5126ec0895f0ca2a58febeb77e89"
+  integrity sha512-SfIMGFK+4n7XVAyv50CpVfcGYWG4v41y6xG7PqOgQSY8M/PgdK0SQbjWFblxjJZlN9jNq879mB4BCZHJRIJ1hA==
   dependencies:
     "@csstools/css-parser-algorithms" "^2.5.0"
     "@csstools/css-tokenizer" "^2.2.3"
@@ -15269,10 +15269,10 @@ urix@^0.1.0:
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
 
-urlpattern-polyfill@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/urlpattern-polyfill/-/urlpattern-polyfill-9.0.0.tgz#bc7e386bb12fd7898b58d1509df21d3c29ab3460"
-  integrity sha512-WHN8KDQblxd32odxeIgo83rdVDE2bvdkb86it7bMhYZwWKJz0+O0RK/eZiHYnM+zgt/U7hAHOlCQGfjjvSkw2g==
+urlpattern-polyfill@10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/urlpattern-polyfill/-/urlpattern-polyfill-10.0.0.tgz#f0a03a97bfb03cdf33553e5e79a2aadd22cac8ec"
+  integrity sha512-H/A06tKD7sS1O1X2SshBVeA5FLycRpjqiBeqGKmBwBDBy28EnRjORxTNe269KSSr5un5qyWi1iL61wLxpd+ZOg==
 
 use-callback-ref@^1.3.0:
   version "1.3.0"
@@ -15622,10 +15622,10 @@ webpack-sources@^3.2.3:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
-webpack@5.90.0:
-  version "5.90.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.90.0.tgz#313bfe16080d8b2fee6e29b6c986c0714ad4290e"
-  integrity sha512-bdmyXRCXeeNIePv6R6tGPyy20aUobw4Zy8r0LUS2EWO+U+Ke/gYDgsCh7bl5rB6jPpr4r0SZa6dPxBxLooDT3w==
+webpack@5.90.1:
+  version "5.90.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.90.1.tgz#62ab0c097d7cbe83d32523dbfbb645cdb7c3c01c"
+  integrity sha512-SstPdlAC5IvgFnhiRok8hqJo/+ArAbNv7rhU4fnWGHNVfN59HSQFaxZDSAL3IFG2YmqxuRs+IU33milSxbPlog==
   dependencies:
     "@types/eslint-scope" "^3.7.3"
     "@types/estree" "^1.0.5"
