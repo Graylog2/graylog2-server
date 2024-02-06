@@ -16,7 +16,6 @@
  */
 package org.graylog2.cluster.lock;
 
-import com.eaio.uuid.UUID;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.mongodb.MongoCommandException;
@@ -26,6 +25,9 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Updates;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
@@ -34,17 +36,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -54,6 +52,7 @@ import static org.graylog2.cluster.lock.Lock.FIELD_LOCKED_BY;
 import static org.graylog2.cluster.lock.Lock.FIELD_RESOURCE;
 import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
 import static org.graylog2.database.indices.MongoDbIndexTools.ensureTTLIndex;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Lock service implementation using MongoDB to maintain locks.
@@ -96,12 +95,15 @@ public class MongoLockService implements LockService {
     @Override
     public Optional<Lock> lock(@Nonnull String resource, int maxConcurrency) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(resource));
-        final long l = collection.countDocuments(eq(FIELD_RESOURCE, resource));
-        if (l < maxConcurrency) {
-            LOG.trace("{} {}", resource, l);
-            return doLock(resource, new UUID().toString());
+
+        for (int i = 0; i < maxConcurrency; i++) {
+            Optional<Lock> lock = doLock(f("%s-%d", resource, i), UUID.randomUUID().toString());
+            if (lock.isPresent()) {
+                LOG.trace("{} {} locked", resource, i);
+                return lock;
+            }
         }
-        LOG.trace("{} exceeded max", resource);
+        LOG.trace("{} exceeded max {}", resource, maxConcurrency);
         return Optional.empty();
     }
 
