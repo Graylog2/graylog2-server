@@ -1,5 +1,5 @@
 type = "a"
-message = "Add search result statistics on the main search screen"
+message = "Add search result statistics on the main search screen and execution info popover to each dashboard widget"
 
 pulls = ["16130"]
 issues=["7386"]
