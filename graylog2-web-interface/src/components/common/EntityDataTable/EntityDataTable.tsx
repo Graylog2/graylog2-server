@@ -112,7 +112,7 @@ const useElementsWidths = <Entity extends EntityBase>({
   displayBulkSelectCol: boolean
   fixedActionsCellWidth: number | undefined
 }) => {
-  const tableRef = useRef<HTMLTableElement>();
+  const tableRef = useRef<HTMLTableElement>(null);
   const actionsRef = useRef<HTMLDivElement>();
   const { width: tableWidth } = useElementDimensions(tableRef);
   const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);

@@ -39,11 +39,12 @@ import FormikInput from '../../components/common/FormikInput';
 const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+
 jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
-jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/queryinput/BasicQueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+
+jest.mock('views/components/searchbar/queryinput/QueryInput');
+jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
+
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 jest.mock('views/stores/SearchConfigStore', () => ({

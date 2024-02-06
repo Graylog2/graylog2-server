@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog.plugins.views.search.engine.suggestions;
 
-import java.util.List;
-
-public record RemoteReindexResult(List<ReindexResult> results) {
+public enum FieldValueSuggestionMode {
+    ON,
+    TEXTUAL_ONLY,
+    OFF
 }

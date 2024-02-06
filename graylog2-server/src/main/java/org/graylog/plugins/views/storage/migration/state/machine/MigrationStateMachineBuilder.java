@@ -34,50 +34,69 @@ public class MigrationStateMachineBuilder {
     private static StateMachineConfig<MigrationState, MigrationStep> configureStates(MigrationActions migrationActions) {
         StateMachineConfig<MigrationState, MigrationStep> config = new StateMachineConfig<>();
 
-        // Major decision - remote reindexing or rolling upgrade(in-place)?
         config.configure(MigrationState.NEW)
-                .permit(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME, migrationActions::rollingUpgradeSelected)
-                .permit(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME, () -> {
-                    LOG.info("Selected remote reindex migration");
-                });
+                .permit(MigrationStep.SELECT_MIGRATION, MigrationState.MIGRATION_WELCOME_PAGE, () -> LOG.info("Migration selected in menu, show welcome page"));
 
-
-        // remote reindexing branch of the migration
-        config.configure(MigrationState.REMOTE_REINDEX_WELCOME)
-                .permit(MigrationStep.DISCOVER_NEW_DATANODES, MigrationState.PROVISION_DATANODE_CERTIFICATES, () -> {
-                    LOG.info("Compatibility check succeeded");
-                });
-
-        config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES)
-                .permit(MigrationStep.MIGRATE_INDEX_TEMPLATES, MigrationState.EXISTING_DATA_MIGRATION_QUESTION, migrationActions::migrateIndexTemplates);
-
-        config.configure(MigrationState.EXISTING_DATA_MIGRATION_QUESTION)
-                .permit(MigrationStep.MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_WITH_DOWNTIME_QUESTION)
-                .permit(MigrationStep.SKIP_EXISTING_DATA_MIGRATION, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
-
-        config.configure(MigrationState.MIGRATE_WITH_DOWNTIME_QUESTION)
-                .permit(MigrationStep.MIGRATE_CLUSTER_WITH_DOWNTIME, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::migrateWithDowntime)
-                .permit(MigrationStep.MIGRATE_CLUSTER_WITHOUT_DOWNTIME, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::migrateWithoutDowntime);
-
-        config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
-
-
-        // inplace / rolling upgrade branch of the migration
-        config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME)
-                .permit(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
+        config.configure(MigrationState.MIGRATION_WELCOME_PAGE)
+                .permit(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, () -> LOG.info("Showing directory compatibility check page"));
 
         config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
-                .permit(MigrationStep.DIRECTORY_COMPATIBILITY_CHECK_OK, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
+                .onEntry(migrationActions::runDirectoryCompatibilityCheck)
+                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::directoryCompatibilityCheckOk)
+                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, migrationActions::directoryCompatibilityCheckOk);
 
+        config.configure(MigrationState.CA_CREATION_PAGE)
+                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, migrationActions::caDoesNotExist)
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRemovalPolicyExist);
+
+        config.configure(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
+                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::removalPolicyDoesNotExist)
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRemovalPolicyExist);
+
+        // Major decision - remote reindexing or rolling upgrade(in-place)?
+        config.configure(MigrationState.MIGRATION_SELECTION_PAGE)
+                .permit(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, migrationActions::rollingUpgradeSelected)
+                .permit(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, migrationActions::reindexUpgradeSelected);
+
+        // remote reindexing branch of the migration
+        config.configure(MigrationState.REMOTE_REINDEX_WELCOME_PAGE)
+                .permit(MigrationStep.DISCOVER_NEW_DATANODES, MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE, () -> {
+                    LOG.info("Remote Reindexing selected");
+                });
+
+        config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
+                .permit(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE);
+
+        config.configure(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE)
+                .permit(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA)
+                .permit(MigrationStep.SKIP_EXISTING_DATA_MIGRATION, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
+
+        config.configure(MigrationState.MIGRATE_EXISTING_DATA)
+                .onEntry(migrationActions::reindexOldData)
+                .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::reindexingFinished);
+
+        // in place / rolling upgrade branch of the migration
+        config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
+                .permit(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2, () -> LOG.info("Showing directory compatibility check page"));
+
+        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2)
+                .permit(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, migrationActions::directoryCompatibilityCheckOk);
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES)
                 .permit(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
-                .permit(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG);
+                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART);
+
+        config.configure(MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART)
+                .onEntry(migrationActions::stopMessageProcessing)
+                .onExit(migrationActions::startMessageProcessing)
+                .permit(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
 
         // common cleanup steps
+        config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
+                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
+
         config.configure(MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG)
                 .permit(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED, MigrationState.FINISHED);
 

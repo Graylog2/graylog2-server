@@ -16,12 +16,16 @@
  */
 package org.graylog2.rest.resources.datanodes;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.NotFoundException;
+import org.graylog.security.UserContext;
 import org.graylog.security.certutil.CertRenewalService;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeService;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,16 +49,22 @@ public class DataNodeManagementResourceTest {
     private NodeService<DataNodeDto> nodeService;
     @Mock
     private CertRenewalService certRenewalService;
+    @Mock
+    private UserContext userContext;
+    @Mock
+    AuditEventSender auditEventSender;
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
 
     @Before
     public void setUp() {
-        classUnderTest = new DataNodeManagementResource(dataNodeService, nodeService, certRenewalService, true);
+        classUnderTest = new DataNodeManagementResource(dataNodeService, nodeService, certRenewalService, auditEventSender, objectMapper);
     }
 
     @Test
     public void removeUnavailableNode_throwsNotFoundException() throws NodeNotFoundException {
         doThrow(NodeNotFoundException.class).when(dataNodeService).removeNode(NODEID);
-        Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.removeNode(NODEID));
+        Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.removeNode(NODEID, userContext));
         assertEquals("Node " + NODEID + " not found", e.getMessage());
     }
 
@@ -67,7 +77,7 @@ public class DataNodeManagementResourceTest {
 
     @Test
     public void verifyRemoveServiceCalled() throws NodeNotFoundException {
-        classUnderTest.removeNode(NODEID);
+        classUnderTest.removeNode(NODEID, userContext);
         verify(dataNodeService).removeNode(NODEID);
     }
 

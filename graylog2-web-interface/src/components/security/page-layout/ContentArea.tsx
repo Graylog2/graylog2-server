@@ -18,11 +18,11 @@ import styled, { css } from 'styled-components';
 
 import { NAV_BAR_WIDTH } from './SideNav';
 
-const ContentArea = styled.div<{ $sideNavIsOpen: boolean; }>(({ $sideNavIsOpen, theme }) => css`
+const ContentArea = styled.div<{ $sideNavIsOpen: boolean; $isSecurityPerspective?: boolean; }>(({ $sideNavIsOpen, $isSecurityPerspective, theme }) => css`
   display: flex;
   flex-direction: column;
   padding-left: ${$sideNavIsOpen ? `${NAV_BAR_WIDTH}px` : '0px'};
-  padding-top: 15px;
+  padding-top: ${$isSecurityPerspective ? '0px' : '15px'};
   transition: all 0.33s ease-in-out;
   position: relative;
   width: 100%;

@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.event;
+import * as React from 'react';
 
-public class DefaultRiskScoreCalculator implements RiskScoreCalculator {
+const MockedBasicQueryInput = React.forwardRef<HTMLElement, { value: string }>(({ value }, ref) => (
+  <span ref={ref}>{value}</span>
+));
 
-    @Override
-    public void assignRiskScore(Event event) {
-        event.setRiskScore(0);
-    }
-}
+export default MockedBasicQueryInput;
