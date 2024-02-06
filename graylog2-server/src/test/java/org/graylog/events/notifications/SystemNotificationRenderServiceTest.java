@@ -155,4 +155,20 @@ class SystemNotificationRenderServiceTest {
                     });
         }
     }
+
+    @Test
+    void htmlEscapingTest() {
+        String title = "Test: <%s>".formatted("dummy");
+        notification = new NotificationImpl()
+                .addNode("node")
+                .addType(Notification.Type.GENERIC_PLAINTEXT)
+                .addDetail("title", title)
+                .addDetail("description", "description")
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
+        when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
+
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
+        assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Test: <dummy>");
+    }
 }
