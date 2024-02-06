@@ -63,7 +63,6 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, toInternalTime) : 'Effective widget time range is currently not available.';
 
   const currentWidgetMapping = widgetMapping?.get(widgetId);
-  console.log('WWWWWMMMMMMMMWWWWWWWWW', { widgetMapping });
 
   return (
     <Wrapper className={className}>

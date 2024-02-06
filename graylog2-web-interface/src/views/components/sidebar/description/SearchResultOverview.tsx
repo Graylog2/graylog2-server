@@ -21,10 +21,10 @@ import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
 
 import { Timestamp } from 'components/common';
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
+import type QueryResult from 'views/logic/QueryResult';
 
 const EffectiveTimeRange = styled.div`
   margin-bottom: 10px;
@@ -39,11 +39,7 @@ const EffectiveTimeRangeTable = styled.table`
 `;
 
 type Props = {
-  results: {
-    timestamp?: string,
-    duration?: number,
-    effectiveTimerange: AbsoluteTimeRange
-  },
+  results: QueryResult,
 };
 
 const SearchResultOverview = ({ results }: Props) => {
@@ -54,7 +50,9 @@ const SearchResultOverview = ({ results }: Props) => {
     return <i>No query executed yet.</i>;
   }
 
-  const { timestamp, duration, effectiveTimerange } = results;
+  const { timestamp, duration, effectiveTimerange, searchTypes } = results;
+  const total = searchTypes && Object.values(searchTypes)?.[0]?.total;
+  const isVariesPerWidget = (viewType === View.Type.Dashboard && !globalOverrideTimeRange);
 
   return (
     <>
@@ -64,22 +62,26 @@ const SearchResultOverview = ({ results }: Props) => {
       </p>
       <EffectiveTimeRange>
         Effective time range<br />
-        {(viewType === View.Type.Dashboard && !globalOverrideTimeRange) ? <i>Varies per widget</i>
+        {isVariesPerWidget ? <i>Varies per widget</i>
           : (
             <EffectiveTimeRangeTable>
               <tbody>
                 <tr>
                   <td>From</td>
-                  <td><Timestamp dateTime={effectiveTimerange.from} format="complete" /></td>
+                  <td aria-label="Effective time range from"><Timestamp dateTime={effectiveTimerange.from} format="complete" /></td>
                 </tr>
                 <tr>
                   <td>To</td>
-                  <td><Timestamp dateTime={effectiveTimerange.to} format="complete" /></td>
+                  <td aria-label="Effective time range to"><Timestamp dateTime={effectiveTimerange.to} format="complete" /></td>
                 </tr>
               </tbody>
             </EffectiveTimeRangeTable>
           )}
       </EffectiveTimeRange>
+      <p>
+        Total results <br />
+        {isVariesPerWidget ? <i>Varies per widget</i> : numeral(total).format('0,0')}
+      </p>
     </>
   );
 };

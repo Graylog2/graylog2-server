@@ -85,6 +85,10 @@ const Content = styled.div(({ theme }) => css`
   gap: 4px;
 `);
 
+const ExecutionInfoContainer = styled.div`
+  margin-left: auto;
+`
+
 const EditButton = styled.div(({ theme }) => css`
   color: ${theme.colors.gray[60]};
   font-size: ${theme.fonts.size.tiny};
@@ -178,7 +182,7 @@ const ViewHeader = () => {
                              onSave={_onSaveView}
                              submitButtonText={`Save ${typeText}`} />
         )}
-        {showExecutionInfo && <ExecutionInfo />}
+        {showExecutionInfo && <ExecutionInfoContainer><ExecutionInfo /></ExecutionInfoContainer>}
       </Content>
     </Row>
   );

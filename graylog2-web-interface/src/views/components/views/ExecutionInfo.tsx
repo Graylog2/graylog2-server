@@ -23,13 +23,14 @@ import { Timestamp } from 'components/common';
 
 const ExecutionInfo = () => {
   const result = useAppSelector(selectCurrentQueryResults);
+  const total = result?.searchTypes && Object.values(result?.searchTypes)?.[0]?.total;
 
   return (
-    <span>
+    <i>
       Query executed in {' '}
       {numeral(result?.duration).format('0,0')}ms at <Timestamp dateTime={result?.timestamp} />
-      {' '}Total results: {numeral(result?.total).format('0,0')}
-    </span>
+      {' '}Total results: {numeral(total).format('0,0')}
+    </i>
   );
 };
 
