@@ -144,6 +144,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         try {
             chunkedResult = multiChunkResultRetriever.retrieveChunkedResult(chunkCommand);
         } catch (IllegalArgumentException e) {
+            // Ignoring to prevent excessive notifications due to unavailable indices
             LOG.warn("Ignoring invalid scroll request", e);
             return;
         }
