@@ -29,6 +29,8 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.junit.After;
@@ -60,7 +62,8 @@ public class ViewServiceTest {
                 objectMapperProvider,
                 mongodb.mongoConnection(),
                 new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
-                new ChainingClassLoader(getClass().getClassLoader()),
+                new RestrictedChainingClassLoader(
+                        new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 new ClusterEventBus()
         );
         this.dbService = new ViewService(
