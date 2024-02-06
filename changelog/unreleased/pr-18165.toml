@@ -1,4 +1,4 @@
-type = "changed"
-message = "Restrict classes allowed for cluster config and event types."
+type = "security"
+message = "Restrict classes allowed for cluster config and event types. [GHSA-p6gg-5hf4-4rgj](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-p6gg-5hf4-4rgj)"
 
 pulls = ["18165"]
