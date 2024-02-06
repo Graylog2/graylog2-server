@@ -19,10 +19,10 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { Attribute, SearchParams } from 'stores/PaginationTypes';
+import type { SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
-import type { IndexSetFieldType, IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
+import type { IndexSetFieldTypeJson, IndexSetFieldTypesQueryData } from 'components/indices/IndexSetFieldTypes/types';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -30,7 +30,7 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
-const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams) => {
+export const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams): Promise<IndexSetFieldTypesQueryData> => {
   const indexSetFieldTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
   const url = PaginationURL(
     indexSetFieldTypeUrl,
@@ -54,11 +54,7 @@ const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchP
 };
 
 const useIndexSetFieldTypes = (indexSetId: string, searchParams: SearchParams, { enabled }): {
-  data: {
-    list: Readonly<Array<IndexSetFieldType>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>
-  },
+  data: IndexSetFieldTypesQueryData,
   isLoading: boolean,
   refetch: () => void,
 } => {

@@ -69,11 +69,7 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
               rotated,
             },
       });
-    }).then(() => {
-      onClose();
-
-      return IndexSetsActions.get(indexSetId);
-    });
+    }).then(() => IndexSetsActions.get(indexSetId)).then(() => onClose());
   }, [setIndexSetFieldTypeProfile, indexSetId, rotated, profile, sendTelemetry, telemetryPathName, onClose]);
 
   const onRemoveProfileFromIndex = useCallback(() => {
@@ -119,7 +115,8 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
                             options={options}
                             value={profile}
                             onChange={onChangeProfile}
-                            placeholder="Select profile"
+                            inputProps={{ 'aria-label': 'Select index set profile' }}
+                            placeholder="Select index set profile"
                             disabled={profileOptionsIsLoading}
                             required />
             </Input>

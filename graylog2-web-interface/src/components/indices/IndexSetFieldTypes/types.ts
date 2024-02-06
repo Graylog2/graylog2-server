@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { Attribute } from 'stores/PaginationTypes';
+
 export type FieldTypeOrigin = 'INDEX' | 'OVERRIDDEN_INDEX' | 'OVERRIDDEN_PROFILE' | 'PROFILE';
 export type IndexSetFieldTypeJson = {
   field_name: string,
@@ -64,3 +66,9 @@ export type RemoveProfileFromIndexSetBodyJson = {
   index_sets: Array<string>,
   rotate: boolean,
 }
+
+export type IndexSetFieldTypesQueryData = {
+  list: Readonly<Array<IndexSetFieldType>>,
+  pagination: { total: number },
+  attributes: Array<Attribute>
+};

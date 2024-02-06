@@ -20,6 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ServerErrorException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import okhttp3.ResponseBody;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -53,14 +59,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.http.GET;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.ServerErrorException;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.Response;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -258,9 +256,12 @@ public class SupportBundleService {
     }
 
     private void writeZipFile(Path tmpDir) throws IOException {
-        var zipFile = Path.of("." + BUNDLE_NAME_PREFIX + "-" + nowTimestamp() + ".zip");
+        var zipFile = Files.createFile(
+                bundleDir.resolve(Path.of("." + BUNDLE_NAME_PREFIX + "-" + nowTimestamp() + ".zip")),
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------"))
+        );
 
-        try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(bundleDir.resolve(zipFile).toFile()))) {
+        try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(zipFile.toFile()))) {
             try (final Stream<Path> walk = Files.walk(tmpDir)) {
                 walk.filter(p -> !Files.isDirectory(p)).forEach(p -> {
                     var zipEntry = new ZipEntry(tmpDir.relativize(p).toString());
@@ -278,7 +279,7 @@ public class SupportBundleService {
             LOG.warn("Failed to create zipfile <{}>", zipFile, e);
             throw e;
         }
-        Files.move(bundleDir.resolve(zipFile), bundleDir.resolve(Path.of(zipFile.toString().substring(1))));
+        Files.move(zipFile, bundleDir.resolve(Path.of(zipFile.getFileName().toString().substring(1))));
     }
 
     private Path prepareBundleSpoolDir() throws IOException {
