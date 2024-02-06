@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.system;
 
-import jakarta.ws.rs.BadRequestException;
 import org.glassfish.jersey.message.internal.FileProvider;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.validate.ClusterConfigValidatorService;
@@ -30,6 +29,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.ws.rs.BadRequestException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
