@@ -27,6 +27,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
@@ -44,11 +45,14 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 /**
  * Helper class to hold configuration of Graylog
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
+    public static final String SAFE_CLASSES = "safe_classes";
 
     /**
      * Deprecated! Use isLeader() instead.
@@ -209,6 +213,12 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "lock_service_lock_ttl", converter = JavaDurationConverter.class)
     private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
+
+    /**
+     * Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.
+     */
+    @Parameter(value = SAFE_CLASSES, converter = StringSetConverter.class, validators = SafeClassesValidator.class)
+    private Set<String> safeClasses = Set.of("org.graylog.", "org.graylog2.");
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
@@ -425,6 +435,10 @@ public class Configuration extends BaseConfiguration {
         return failureHandlingShutdownAwait;
     }
 
+    public Set<String> getSafeClasses() {
+        return safeClasses;
+    }
+
     /**
      * This is needed for backwards compatibility. The setting in TLSProtocolsConfiguration should be used instead.
      */
@@ -526,6 +540,19 @@ public class Configuration extends BaseConfiguration {
                 return;
             }
             throw new ValidationException("Node ID file at path " + path + " isn't " + b + ". Please specify the correct path or change the permissions");
+        }
+    }
+
+    public static class SafeClassesValidator implements Validator<Set<String>> {
+        @Override
+        public void validate(String name, Set<String> set) throws ValidationException {
+            if (set.isEmpty()) {
+                throw new ValidationException(f("\"%s\" must not be empty. Please specify a comma-separated list of " +
+                        "fully-qualified class name prefixes.", name));
+            }
+            if (set.stream().anyMatch(StringUtils::isBlank)) {
+                throw new ValidationException(f("\"%s\" must only contain non-empty class name prefixes.", name));
+            }
         }
     }
 }

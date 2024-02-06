@@ -32,6 +32,9 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.SafeClasses;
+import org.graylog2.security.UnsafeClassLoadingAttemptException;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.utilities.AutoValueUtils;
 import org.mongojack.DBCursor;
@@ -56,25 +59,38 @@ public class ClusterEventPeriodical extends Periodical {
     private final NodeId nodeId;
     private final ObjectMapper objectMapper;
     private final EventBus serverEventBus;
-    private final ChainingClassLoader chainingClassLoader;
+    private final RestrictedChainingClassLoader chainingClassLoader;
 
     @Inject
     public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
                                   final MongoConnection mongoConnection,
                                   final NodeId nodeId,
-                                  final ChainingClassLoader chainingClassLoader,
+                                  final RestrictedChainingClassLoader chainingClassLoader,
                                   final EventBus serverEventBus,
                                   final ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterEvent.class, String.class, mapperProvider.get()),
                 nodeId, mapperProvider.get(), chainingClassLoader, serverEventBus, clusterEventBus);
     }
 
+    @Deprecated
+    public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
+                                  final MongoConnection mongoConnection,
+                                  final NodeId nodeId,
+                                  final ChainingClassLoader chainingClassLoader,
+                                  final EventBus serverEventBus,
+                                  final ClusterEventBus clusterEventBus) {
+        this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterEvent.class, String.class,
+                        mapperProvider.get()), nodeId, mapperProvider.get(),
+                new RestrictedChainingClassLoader(chainingClassLoader, SafeClasses.allGraylogInternal()),
+                serverEventBus, clusterEventBus);
+    }
+
     private ClusterEventPeriodical(final JacksonDBCollection<ClusterEvent, String> dbCollection,
-                           final NodeId nodeId,
-                           final ObjectMapper objectMapper,
-                           final ChainingClassLoader chainingClassLoader,
-                           final EventBus serverEventBus,
-                           final ClusterEventBus clusterEventBus) {
+                                   final NodeId nodeId,
+                                   final ObjectMapper objectMapper,
+                                   final RestrictedChainingClassLoader chainingClassLoader,
+                                   final EventBus serverEventBus,
+                                   final ClusterEventBus clusterEventBus) {
         this.nodeId = checkNotNull(nodeId);
         this.dbCollection = checkNotNull(dbCollection);
         this.objectMapper = checkNotNull(objectMapper);
@@ -204,15 +220,15 @@ public class ClusterEventPeriodical extends Periodical {
 
     private Object extractPayload(Object payload, String eventClass) {
         try {
-            final Class<?> clazz = chainingClassLoader.loadClass(eventClass);
+            final Class<?> clazz = chainingClassLoader.loadClassSafely(eventClass);
             return objectMapper.convertValue(payload, clazz);
         } catch (ClassNotFoundException e) {
             LOG.debug("Couldn't load class <" + eventClass + "> for event", e);
-            return null;
         } catch (IllegalArgumentException e) {
             LOG.debug("Error while deserializing payload", e);
-            return null;
-
+        } catch (UnsafeClassLoadingAttemptException e) {
+            LOG.warn("Couldn't load class <{}>.", eventClass, e);
         }
+        return null;
     }
 }
