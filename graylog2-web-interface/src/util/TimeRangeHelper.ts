@@ -25,7 +25,7 @@ import type { AbsoluteRangeQueryParameter } from 'views/logic/TimeRange';
 const recentMessagesTimeRange = (): AbsoluteRangeQueryParameter => {
   const now = Date.now();
   // The biggest possible time difference on earth is 26 hours.
-  // It's between Kiribati is UTC+14 and the Howland Islands UTC-12
+  // It's between Kiribati (UTC+14) and the Howland Islands (UTC-12)
   // So we are going to create an absolute range
   // from 26 hours in the past to 26 hours into the future.
   const fromDate = new Date(now - 26 * 60 * 60000).toISOString();
