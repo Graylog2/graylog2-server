@@ -121,12 +121,6 @@ public class SessionsResource extends RestResource {
 
         rejectServiceAccount(createRequest);
 
-        final SecurityContext securityContext = requestContext.getSecurityContext();
-        if (!(securityContext instanceof ShiroSecurityContext)) {
-            throw new InternalServerErrorException("Unsupported SecurityContext class, this is a bug!");
-        }
-        final ShiroSecurityContext shiroSecurityContext = (ShiroSecurityContext) securityContext;
-
         final ActorAwareAuthenticationToken authToken;
         try {
             authToken = tokenFactory.forRequestBody(createRequest);
@@ -134,12 +128,12 @@ public class SessionsResource extends RestResource {
             throw new BadRequestException(e.getMessage());
         }
 
-        // we treat the BASIC auth username as the sessionid
-        final String sessionId = shiroSecurityContext.getUsername();
         final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets);
 
         try {
-            Optional<Session> session = sessionCreator.login(sessionId, host, authToken);
+            // Always create a brand-new session for an authentication attempt by ignoring any previous session ID.
+            // This avoids a potential session fixation attack. (GHSA-3xf8-g8gr-g7rh)
+            Optional<Session> session = sessionCreator.login(null, host, authToken);
             if (session.isPresent()) {
                 final SessionResponse token = sessionResponseFactory.forSession(session.get());
                 return Response.ok()
