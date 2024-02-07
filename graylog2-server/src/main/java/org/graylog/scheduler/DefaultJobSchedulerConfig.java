@@ -16,13 +16,13 @@
  */
 package org.graylog.scheduler;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.cluster.leader.LeaderElectionService;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 /**
  * This is the default {@link JobSchedulerConfig}.

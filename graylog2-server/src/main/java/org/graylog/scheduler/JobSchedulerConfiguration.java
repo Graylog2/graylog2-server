@@ -16,12 +16,21 @@
  */
 package org.graylog.scheduler;
 
+import com.github.joschi.jadconfig.Converter;
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
+import org.apache.commons.lang3.NotImplementedException;
 import org.graylog2.plugin.PluginConfigBean;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Job scheduler specific configuration fields for the server configuration file.
@@ -30,6 +39,7 @@ import org.graylog2.plugin.PluginConfigBean;
 public class JobSchedulerConfiguration implements PluginConfigBean {
     public static final String LOOP_SLEEP_DURATION = "job_scheduler_loop_sleep_duration";
     public static final String LOCK_EXPIRATION_DURATION = "job_scheduler_lock_expiration_duration";
+    public static final String MAX_CONCURRENT_JOBS = "job_scheduler_max_concurrent_jobs";
 
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
     private Duration loopSleepDuration = Duration.seconds(1);
@@ -37,12 +47,54 @@ public class JobSchedulerConfiguration implements PluginConfigBean {
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
     private Duration lockExpirationDuration = Duration.minutes(5);
 
+    @Parameter(value = MAX_CONCURRENT_JOBS, converter = ConcurrenyListConverter.class)
+    private Map<String, Integer> jobSchedulerMaxConcurrencyList = Collections.emptyMap();
+
+    /**
+     * Concurrency limits per job type
+     *
+     * @return mapping of job type to max number of worker threads to assign for this job type. A missing
+     * entry signifies unlimited concurrency (up to numberOfWorkerThreads)
+     */
+    public Map<String, Integer> getJobSchedulerMaxConcurrency() {
+        return jobSchedulerMaxConcurrencyList;
+    }
+
     public Duration getLoopSleepDuration() {
         return loopSleepDuration;
     }
 
     public Duration getLockExpirationDuration() {
         return lockExpirationDuration;
+    }
+
+    public static class ConcurrenyListConverter implements Converter<Map<String, Integer>> {
+        public ConcurrenyListConverter() {
+        }
+
+        @Override
+        public Map<String, Integer> convertFrom(String value) {
+            if (value == null) {
+                throw new ParameterException("Couldn't convert value \"" + value + "\" to list of String.");
+            }
+            List<String> stringList = "".equals(value) ? Collections.emptyList() : Arrays.asList(value.split(","));
+
+            Map<String, Integer> jobMaxConcurrency = new HashMap<>();
+            for (String s : stringList) {
+                String[] splits = s.split("\\:");
+                if (splits.length == 2) {
+                    jobMaxConcurrency.put(splits[0], Integer.parseInt(splits[1]));
+                } else {
+                    throw new ParameterException("Invalid job concurrency configuration: " + s);
+                }
+            }
+            return jobMaxConcurrency;
+        }
+
+        @Override
+        public String convertTo(Map<String, Integer> stringIntegerMap) {
+            throw new NotImplementedException("Cannot convert concurrency limits to String.");
+        }
     }
 
     public static class Minimum1MinuteValidator implements Validator<Duration> {
