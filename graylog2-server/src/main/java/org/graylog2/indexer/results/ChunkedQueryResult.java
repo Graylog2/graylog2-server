@@ -70,7 +70,7 @@ public abstract class ChunkedQueryResult<C, R> extends IndexQueryResult implemen
 
         final List<ResultMessage> resultMessages = result != null ? collectMessagesFromResult(result) : List.of();
 
-        if (resultMessages.size() == 0) {
+        if (resultMessages.isEmpty()) {
             // chunking exhausted
             LOG.debug("[{}] Reached end of {} results for query {}", queryHash, getChunkingMethodName(), getOriginalQuery());
             return null;

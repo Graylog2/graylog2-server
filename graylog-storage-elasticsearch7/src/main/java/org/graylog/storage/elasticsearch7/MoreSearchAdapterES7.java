@@ -140,14 +140,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                              List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
         final ChunkCommand chunkCommand = buildScrollCommand(queryString, timeRange, affectedIndices, filters, streams, batchSize);
 
-        final ChunkedResult chunkedResult;
-        try {
-            chunkedResult = multiChunkResultRetriever.retrieveChunkedResult(chunkCommand);
-        } catch (IllegalArgumentException e) {
-            // Ignoring to prevent excessive notifications due to unavailable indices
-            LOG.warn("Ignoring invalid scroll request", e);
-            return;
-        }
+        final ChunkedResult chunkedResult = multiChunkResultRetriever.retrieveChunkedResult(chunkCommand);
 
         final AtomicBoolean continueScrolling = new AtomicBoolean(true);
 
