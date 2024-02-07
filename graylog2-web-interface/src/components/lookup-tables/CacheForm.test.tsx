@@ -51,9 +51,9 @@ const renderedCache = ({
   create = false,
   withConfig = true,
   // eslint-disable-next-line no-console
-  validate = () => { console.log('validation called'); },
+  validate = () => { },
   // eslint-disable-next-line no-console
-  saved = () => { console.log('saved called'); },
+  saved = () => { },
   validationErrors = {},
 }) => {
   const mockCache = {
