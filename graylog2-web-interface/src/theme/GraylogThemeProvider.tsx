@@ -25,7 +25,7 @@ import { useMemo } from 'react';
 import { MantineProvider } from '@mantine/core';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import type { ThemesColors } from 'theme/theme-types';
+import type { CustomThemesColors } from 'theme/theme-types';
 
 import ColorSchemeContext from './ColorSchemeContext';
 import { COLOR_SCHEMES } from './constants';
@@ -52,7 +52,7 @@ const useSCTheme = (
 
 const useMantineTheme = (
   colorScheme: ColorScheme,
-  useCustomThemeColors: () => ({ data: ThemesColors }),
+  useCustomThemeColors: () => ({ data: CustomThemesColors }),
 ) => {
   const { data: customThemeColors } = useCustomThemeColors?.() ?? {};
 
