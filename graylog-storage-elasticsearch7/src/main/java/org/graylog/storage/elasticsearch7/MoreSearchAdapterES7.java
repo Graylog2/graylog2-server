@@ -61,7 +61,7 @@ import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.Qu
 
 public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES7.class);
-    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(true, true, true, false);
+    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
     private final ElasticsearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;

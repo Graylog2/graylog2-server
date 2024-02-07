@@ -254,7 +254,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     return new SearchRequest()
                             .source(searchTypeQueries.get(searchTypeId))
                             .indices(indices.toArray(new String[0]))
-                            .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+                            .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
                 })
                 .collect(Collectors.toList());
 

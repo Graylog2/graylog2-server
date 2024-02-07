@@ -114,7 +114,7 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
     @Override
     public long count(Set<String> indices, Optional<Set<String>> includedStreams) {
         final CountRequest request = new CountRequest(indices.toArray(new String[0]), buildStreamIdFilter(includedStreams))
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
         final CountResponse result = client.execute((c, requestOptions) -> c.count(request, requestOptions), "Unable to count documents of index.");
 
