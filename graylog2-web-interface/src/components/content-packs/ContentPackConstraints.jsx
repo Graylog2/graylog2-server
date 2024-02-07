@@ -22,10 +22,6 @@ import styled from 'styled-components';
 import { DataTable, Icon } from 'components/common';
 import { Badge } from 'components/bootstrap';
 
-const StyledBadge = styled(({ isFulfilled, theme, ...rest }) => <Badge {...rest} />)`
-  background-color: ${({ isFulfilled, theme }) => (isFulfilled ? theme.colors.variant.success : theme.colors.variant.danger)};
-`;
-
 class ContentPackConstraints extends React.Component {
   static propTypes = {
     constraints: PropTypes.oneOfType([
@@ -53,9 +49,9 @@ class ContentPackConstraints extends React.Component {
         <td>{constraint.type}</td>
         <td>{constraint.version}</td>
         <td>
-          <StyledBadge isFulfilled={constraint.fulfilled}>
+          <Badge bsStyle={constraint.fulfilled ? 'success' : 'danger'}>
             <Icon name={constraint.fulfilled ? 'check' : 'times'} />
-          </StyledBadge>
+          </Badge>
         </td>
       </tr>
     );
