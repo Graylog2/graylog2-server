@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.base.Stopwatch;
+import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -54,7 +55,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     StatsCollector<QueryExecutionStats> getExecutionStatsCollector();
 
     default boolean isAllMessages(TimeRange timeRange) {
-        return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).isAllMessages();
+        return timeRange instanceof RelativeRange && ((RelativeRange) timeRange).isAllMessages();
     }
 
     default AbsoluteRange effectiveTimeRangeForResult(Query query, QueryResult queryResult) {
@@ -107,13 +108,28 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * <p>
      * This method is typically being run in an executor and can safely block.
      *
-     * @param job                currently executing job
-     * @param query              the individual query to run from the current job
-     * @param queryContext       the generated query by {@link #generate(Query, Set)}
+     * @param job          currently executing job
+     * @param query        the individual query to run from the current job
+     * @param queryContext the generated query by {@link #generate(Query, Set)}
      * @return the result for the query
      * @throws RuntimeException if the query could not be executed for some reason
      */
     QueryResult doRun(SearchJob job, Query query, T queryContext);
+
+    default ExplainResults.QueryExplainResult explain(SearchJob job, Query query, GeneratedQueryContext queryContext) {
+        //noinspection unchecked
+        return doExplain(job, query, (T) queryContext);
+    }
+
+    /**
+     * Explain the generated query as part of the given query job.
+     *
+     * @param job          currently executing job
+     * @param query        the individual query to explain from the current job
+     * @param queryContext the generated query by {@link #generate(Query, Set)}
+     * @return the explain result for the query
+     */
+    ExplainResults.QueryExplainResult doExplain(SearchJob job, Query query, T queryContext);
 
     default boolean isSearchTypeWithError(T queryContext, String searchTypeId) {
         return queryContext.errors().stream()

@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
@@ -167,6 +168,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return Response.created(URI.create(BASE_PATH + "/status/" + searchJobDTO.id()))
                 .entity(searchJob)
                 .build();
+    }
+
+    @POST
+    @ApiOperation(value = "Explains how the referenced search would be executed", response = ExplainResults.class)
+    @Path("{id}/explain")
+    @NoAuditEvent("Does not return any actual data")
+    public ExplainResults explainQuery(@ApiParam(name = "id") @PathParam("id") String id,
+                                       @ApiParam ExecutionState executionState,
+                                       @Context SearchUser searchUser) {
+        return searchExecutor.explain(id, searchUser, executionState);
     }
 
     @POST

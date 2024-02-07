@@ -18,6 +18,9 @@ package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
@@ -30,10 +33,8 @@ import org.graylog.plugins.views.search.errors.SearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -70,6 +71,17 @@ public class QueryEngine {
                 .reduce((decorator1, decorator2) -> (s, q, metadata) -> decorator1.decorate(s, q, decorator2.decorate(s, q, metadata)))
                 .map(decorator -> decorator.decorate(search, query, parsedMetadata))
                 .orElse(parsedMetadata);
+    }
+
+    public ExplainResults explain(SearchJob searchJob, Set<SearchError> validationErrors) {
+        final Map<String, ExplainResults.QueryExplainResult> queries = searchJob.getSearch().queries().stream()
+                .collect(Collectors.toMap(Query::id, q -> {
+                    final GeneratedQueryContext generatedQueryContext = backend.generate(q, Set.of());
+
+                    return backend.explain(searchJob, q, generatedQueryContext);
+                }));
+
+        return new ExplainResults(searchJob.getSearchId(), new ExplainResults.SearchResult(queries), validationErrors);
     }
 
     @WithSpan
