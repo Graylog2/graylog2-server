@@ -17,6 +17,7 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import cloneDeep from 'lodash/cloneDeep';
+import { act } from 'react-dom/test-utils';
 
 import DataTable from 'components/common/DataTable';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
@@ -26,8 +27,13 @@ const rowFormatter = (row) => <tr><td>{row.title}</td></tr>;
 const simulateTypeAheadFilter = (wrapper, filterText) => {
   const filter = wrapper.find(TypeAheadDataFilter);
 
-  filter.instance().setState({ filterText: filterText });
-  filter.instance().filterData();
+  act(() => {
+    filter.instance().setState({ filterText: filterText });
+  });
+
+  act(() => {
+    filter.instance().filterData();
+  });
 };
 
 const filterRows = (rows, filterText) => rows.filter((row) => row.title.match(filterText));

@@ -23,6 +23,8 @@ import { stream } from 'fixtures/streams';
 
 jest.useFakeTimers();
 
+jest.mock('components/streams/hooks/useStreamRuleTypes', () => () => ({ data: [] }));
+
 describe('ExpandedRulesActions', () => {
   it('should open add rule modal', async () => {
     render(<ExpandedRulesActions stream={stream} />);

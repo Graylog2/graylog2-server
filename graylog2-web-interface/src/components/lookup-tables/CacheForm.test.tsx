@@ -50,9 +50,7 @@ const renderedCache = ({
   inCache = { ...createLookupTableCache() },
   create = false,
   withConfig = true,
-  // eslint-disable-next-line no-console
   validate = () => { },
-  // eslint-disable-next-line no-console
   saved = () => { },
   validationErrors = {},
 }) => {

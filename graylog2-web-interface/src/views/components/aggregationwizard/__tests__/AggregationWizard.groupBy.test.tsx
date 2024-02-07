@@ -59,10 +59,9 @@ const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] 
 const selectEventConfig = { container: document.body };
 
 const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
-  userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
   await screen.findByRole('menu');
-  userEvent.click(await screen.findByRole('menuitem', { name: key }));
-  await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
 };
 
 const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
@@ -71,13 +70,14 @@ const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSe
 
   await act(async () => {
     await selectEvent.openMenu(fieldSelection);
-    await selectEvent.select(fieldSelection, fieldName, selectEventConfig);
   });
+
+  await selectEvent.select(fieldSelection, fieldName, selectEventConfig);
 };
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await screen.findByRole('button', { name: /update preview/i });
-  fireEvent.click(applyButton);
+  await userEvent.click(applyButton);
 };
 
 const expectedPivotConfig = { skip_empty_values: undefined, limit: 15 };
@@ -128,6 +128,8 @@ describe('AggregationWizard', () => {
 
     await addElement('Grouping');
     await selectField('took_ms');
+
+    await screen.findByText('took_ms');
     await submitWidgetConfigForm();
 
     const pivot = Pivot.createValues(['took_ms'], expectedPivotConfig);
@@ -149,6 +151,7 @@ describe('AggregationWizard', () => {
 
     await addElement('Grouping');
     await selectField('status_code');
+    await screen.findByText('status_code');
     await submitWidgetConfigForm();
 
     const pivot = Pivot.createValues(['status_code'], expectedPivotConfig);
@@ -187,6 +190,9 @@ describe('AggregationWizard', () => {
     await selectField('timestamp');
     await addElement('Grouping');
     await selectField('took_ms', 1);
+
+    await screen.findByRole('checkbox', { name: 'Auto' });
+
     await submitWidgetConfigForm();
 
     const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
