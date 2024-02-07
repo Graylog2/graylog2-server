@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { CapabilityType } from 'logic/permissions/types';
 
@@ -25,17 +24,17 @@ export default class Capability {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    title: $PropertyType<InternalState, 'title'>,
+    id: InternalState['id'],
+    title: InternalState['title'],
   ) {
     this._value = { id, title };
   }
 
-  get id(): $PropertyType<InternalState, 'id'> {
+  get id(): InternalState['id'] {
     return this._value.id;
   }
 
-  get title(): $PropertyType<InternalState, 'title'> {
+  get title(): InternalState['title'] {
     return this._value.title;
   }
 
@@ -77,11 +76,11 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>): Builder {
+  id(value: InternalState['id']): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  title(value: $PropertyType<InternalState, 'title'>): Builder {
+  title(value: InternalState['title']): Builder {
     return new Builder(this.value.set('title', value));
   }
 

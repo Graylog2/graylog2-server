@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import type { SearchBarFormValues } from 'views/Constants';
 import { SearchQueryStrings } from '@graylog/server-api';
@@ -47,9 +48,7 @@ const Wrapper = ({ onSubmit, values }: Props) => {
   return <button type="button" onClick={() => _onSubmit(values)}>{enableReinitialize ? 'submit' : 'busy'}</button>;
 };
 
-const clickSubmit = async () => {
-  (await screen.findByRole('button', { name: 'submit' })).click();
-};
+const clickSubmit = async () => userEvent.click(await screen.findByRole('button', { name: 'submit' }));
 
 describe('useSearchBarSubmit', () => {
   beforeEach(() => {
