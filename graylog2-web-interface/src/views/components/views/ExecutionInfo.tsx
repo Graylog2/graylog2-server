@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import isEmpty from 'lodash/isEmpty';
 
 import useAppSelector from 'stores/useAppSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
@@ -25,9 +26,13 @@ const ExecutionInfo = () => {
   const result = useAppSelector(selectCurrentQueryResults);
   const total = result?.searchTypes && Object.values(result?.searchTypes)?.[0]?.total;
 
+  if (isEmpty(result)) {
+    return <i>No query executed yet.</i>;
+  }
+
   return (
     <i>
-      Query executed in {' '}
+      Query executed in{' '}
       {numeral(result?.duration).format('0,0')}ms at <Timestamp dateTime={result?.timestamp} />
       {' '}Total results: {numeral(total).format('0,0')}
     </i>

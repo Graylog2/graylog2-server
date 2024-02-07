@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { TextOverflowEllipsis } from 'components/common';
+import { Icon, TextOverflowEllipsis } from 'components/common';
 import type Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
@@ -65,12 +65,14 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const currentWidgetMapping = widgetMapping?.get(widgetId);
 
   return (
-    <Wrapper className={className}>
-      <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
-        {globalTimerangeString || configuredTimerange}
-      </TextOverflowEllipsis>
-      <SearchQueryExecutionInfoHelper currentWidgetMapping={currentWidgetMapping} />
-    </Wrapper>
+    <SearchQueryExecutionInfoHelper currentWidgetMapping={currentWidgetMapping}>
+      <Wrapper className={className}>
+        <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
+          {globalTimerangeString || configuredTimerange}
+        </TextOverflowEllipsis>
+        <Icon name="question-circle" />
+      </Wrapper>
+    </SearchQueryExecutionInfoHelper>
   );
 };
 
