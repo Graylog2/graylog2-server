@@ -26,6 +26,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 
 import jakarta.inject.Inject;
+import org.graylog2.indexer.indices.ShardsInfo;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -92,6 +93,11 @@ public class CatApi {
                 .filter(index -> index.path("index").asText().equals(indexName))
                 .map(index -> index.path("status").asText())
                 .findFirst();
+    }
+
+    public List<ShardsInfo> getShardsInfo(String indexName) {
+        final Request request = request("GET", "shards/" + indexName);
+        return perform(request, new TypeReference<List<ShardsInfo>>() {}, "Unable to retrieve index shards");
     }
 
     private JsonNode requestIndices(String indexName, String errorMessage) {
