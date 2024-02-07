@@ -23,14 +23,15 @@ import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetField
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
+import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
-  refetchFieldTypes: () => void,
+  onSubmitCallback: (props: FieldTypePutResponse) => void,
 }
 
-const FieldTypeActions = ({ fieldType, indexSetId, refetchFieldTypes }: Props) => {
+const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) => {
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
@@ -78,7 +79,7 @@ const FieldTypeActions = ({ fieldType, indexSetId, refetchFieldTypes }: Props) =
                               onClose={toggleEditModal}
                               show
                               showSelectionTable={false}
-                              onSubmitCallback={refetchFieldTypes}
+                              onSubmitCallback={onSubmitCallback}
                               showFieldSelect={false} />
       )}
     </>

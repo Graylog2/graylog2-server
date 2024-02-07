@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class NodeDto implements Node {
 
@@ -62,7 +63,9 @@ public abstract class NodeDto implements Node {
         params.put("node_id", getNodeId());
         params.put("transport_address", getTransportAddress());
         params.put("is_leader", isLeader());
-        params.put("hostname", getHostname());
+        if (Objects.nonNull(getHostname())) {
+            params.put("hostname", getHostname());
+        }
         return params;
     }
 

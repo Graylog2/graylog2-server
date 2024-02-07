@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
@@ -77,16 +77,32 @@ describe('StreamModal', () => {
     expect(title).toHaveValue(exampleStream.title);
     expect(description).toHaveValue(exampleStream.description);
 
-    userEvent.type(title, ' and further title');
-    userEvent.type(description, ' and further description');
+    await userEvent.type(title, ' and further title');
+    await userEvent.type(description, ' and further description');
 
-    selectEvent.openMenu(indexSetSelect);
-    await selectEvent.select(indexSetSelect, 'Example Index Set');
+    await act(async () => {
+      await selectEvent.openMenu(indexSetSelect);
+    });
 
-    userEvent.click(await screen.findByRole('button', {
+    await act(async () => {
+      await selectEvent.select(indexSetSelect, 'Example Index Set');
+    });
+
+    await screen.findByText('Example Index Set');
+
+    const submitButton = await screen.findByRole('button', {
       name: /submit/i,
       hidden: true,
-    }));
+    });
+
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
+
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.click(submitButton);
+    });
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({
       description: 'Stream Description and further description',

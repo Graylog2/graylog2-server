@@ -58,12 +58,15 @@ describe('RefreshControls', () => {
   };
 
   const TriggerFormChangeButton = () => {
-    const { setFieldValue } = useFormikContext();
+    const { setFieldValue, values } = useFormikContext();
 
     return (
-      <Button onClick={() => setFieldValue('example-field', 'example-value')}>
-        Change form field value
-      </Button>
+      <>
+        Current value is: {values['example-field']}
+        <Button onClick={() => setFieldValue('example-field', 'example-value')}>
+          Change form field value
+        </Button>
+      </>
     );
   };
 
@@ -170,13 +173,15 @@ describe('RefreshControls', () => {
       refreshConfig: { enabled: true, interval: 5000 },
     });
 
-    render(
+    render((
       <SUT>
         <TriggerFormChangeButton />
-      </SUT>,
-    );
+      </SUT>
+    ));
 
-    userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
+
+    await screen.findByText(/example-value/i);
 
     await waitFor(() => expect(stopAutoRefresh).toHaveBeenCalled());
   });

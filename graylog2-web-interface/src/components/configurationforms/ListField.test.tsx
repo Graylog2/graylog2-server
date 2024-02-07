@@ -36,10 +36,10 @@ describe('<ListField>', () => {
     jest.resetAllMocks();
   });
 
-  it('should render an empty field', () => {
+  it('should render an empty field', async () => {
     render(<SUT />);
 
-    const fieldLabel = screen.getByText(listField.human_name, { exact: true });
+    const fieldLabel = await screen.findByText(listField.human_name, { exact: true });
     const optionalMarker = screen.getByText(/(optional)/);
     const select = screen.getByLabelText(listField.human_name, { exact: false });
 
@@ -58,14 +58,14 @@ describe('<ListField>', () => {
 
     await selectEvent.openMenu(select);
 
-    expect(screen.getByText('uno')).toBeInTheDocument();
+    expect(await screen.findByText('uno')).toBeInTheDocument();
     expect(screen.getByText('dos')).toBeInTheDocument();
   });
 
   it('should render a field with values', async () => {
     render(<SUT value={['one', 'two']} />);
 
-    expect(screen.getByText('uno')).toBeInTheDocument();
+    expect(await screen.findByText('uno')).toBeInTheDocument();
     expect(screen.getByText('dos')).toBeInTheDocument();
   });
 

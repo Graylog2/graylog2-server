@@ -57,14 +57,14 @@ const LoginForm = ({ onErrorChange }: Props) => {
       <Input id="username"
              type="text"
              label="Username"
-             autocomplete="username"
+             autoComplete="username"
              autoFocus
              required />
 
       <Input id="password"
              type="password"
              label="Password"
-             autocomplete="current-password"
+             autoComplete="current-password"
              required />
 
       <SigninButton displayCancel={false}
