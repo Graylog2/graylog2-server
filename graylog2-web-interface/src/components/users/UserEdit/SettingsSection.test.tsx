@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { List } from 'immutable';
 
@@ -69,7 +69,7 @@ describe('<SettingsSection />', () => {
 
     render(<SettingsSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
 
-    const timeoutAmountInput = screen.getByPlaceholderText('Timeout amount');
+    const timeoutAmountInput = await screen.findByPlaceholderText('Timeout amount');
     const timeoutUnitSelect = screen.getByLabelText('Timeout unit');
     const timezoneSelect = screen.getByLabelText('Time Zone');
     const submitButton = screen.getByText('Update Settings');
@@ -80,9 +80,7 @@ describe('<SettingsSection />', () => {
 
     fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
 
-    await act(async () => {
-      await selectEvent.select(timeoutUnitSelect, 'Days');
-    });
+    await selectEvent.select(timeoutUnitSelect, 'Days');
 
     await selectEvent.select(timezoneSelect, 'Vancouver');
     fireEvent.click(submitButton);

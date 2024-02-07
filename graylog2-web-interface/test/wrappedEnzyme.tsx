@@ -18,7 +18,7 @@
 import type * as React from 'react';
 import type { ReactWrapper, ShallowWrapper } from 'enzyme';
 import { configure, mount, shallow } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
+import Adapter from '@cfaester/enzyme-adapter-react-18';
 import 'jest-styled-components';
 
 import WrappingContainer from './WrappingContainer';

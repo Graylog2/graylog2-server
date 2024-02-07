@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useAppDispatch from 'stores/useAppDispatch';
@@ -96,7 +97,7 @@ describe('AddWidgetButton', () => {
 
     const addAggregation = await screen.findByRole('button', { name: 'Aggregation' });
 
-    addAggregation.click();
+    await userEvent.click(addAggregation);
 
     expect(mockAggregateActionHandler).toHaveBeenCalled();
   });
@@ -106,7 +107,7 @@ describe('AddWidgetButton', () => {
 
     const addMessageCount = await screen.findByRole('button', { name: 'Message Count' });
 
-    addMessageCount.click();
+    await userEvent.click(addMessageCount);
 
     expect(mockAddMessageCountActionHandler).toHaveBeenCalled();
   });
@@ -116,7 +117,7 @@ describe('AddWidgetButton', () => {
 
     const addMessageTable = await screen.findByRole('button', { name: 'Message Table' });
 
-    addMessageTable.click();
+    await userEvent.click(addMessageTable);
 
     expect(mockAddMessageTableActionHandler).toHaveBeenCalled();
   });
@@ -126,7 +127,7 @@ describe('AddWidgetButton', () => {
 
     const addParameter = await screen.findByRole('button', { name: 'Parameter' });
 
-    addParameter.click();
+    await userEvent.click(addParameter);
 
     await screen.findByRole('button', { name: '42' });
   });
@@ -136,11 +137,13 @@ describe('AddWidgetButton', () => {
 
     const addParameter = await screen.findByRole('button', { name: 'Parameter' });
 
-    addParameter.click();
+    await userEvent.click(addParameter);
 
     const mockDialogButton = await screen.findByRole('button', { name: '42' });
-    mockDialogButton.click();
+    await userEvent.click(mockDialogButton);
 
-    expect(screen.queryByRole('button', { name: '42' })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: '42' })).not.toBeInTheDocument();
+    });
   });
 });
