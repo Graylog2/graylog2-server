@@ -42,5 +42,8 @@ public interface MigrationActions extends WithArgs {
     boolean caDoesNotExist();
     boolean removalPolicyDoesNotExist();
     boolean caAndRemovalPolicyExist();
+
+    void provisionDataNodes();
+
     void resetMigration();
 }
