@@ -17,10 +17,8 @@
 package org.graylog2.cluster.nodes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.undercouch.bson4jackson.types.Timestamp;
 import org.graylog2.cluster.Node;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -82,10 +80,6 @@ public abstract class NodeDto implements Node {
         public abstract B setTransportAddress(String transportAddress);
 
         @JsonProperty("last_seen")
-        public B setLastSeen(Timestamp timestamp) {
-            return setLastSeen(new DateTime(timestamp.getTime() * 1000L, DateTimeZone.UTC));
-        }
-
         public abstract B setLastSeen(DateTime lastSeen);
 
         @JsonProperty("hostname")
