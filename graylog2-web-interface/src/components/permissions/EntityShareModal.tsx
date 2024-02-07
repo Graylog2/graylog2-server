@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
 import type { FormikProps } from 'formik';
 import PropTypes from 'prop-types';
-import type { $PropertyType } from 'utility-types';
 import upperCase from 'lodash/upperCase';
 
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
@@ -37,9 +36,9 @@ import EntityShareSettings from './EntityShareSettings';
 
 type Props = {
   description: string,
-  entityId: $PropertyType<SharedEntity, 'id'>,
-  entityTitle: $PropertyType<SharedEntity, 'title'>,
-  entityType: $PropertyType<SharedEntity, 'type'>,
+  entityId: SharedEntity['id'],
+  entityTitle: SharedEntity['title'],
+  entityType: SharedEntity['type'],
   entityTypeTitle: string | null | undefined,
   onClose: () => void,
   showShareableEntityURL?: boolean

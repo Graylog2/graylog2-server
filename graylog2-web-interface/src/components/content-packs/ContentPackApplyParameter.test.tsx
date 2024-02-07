@@ -81,7 +81,7 @@ describe('<ContentPackApplyParameter />', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    submitButton.click();
+    userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(applyFn).toHaveBeenCalledWith('configuration.port', 'PORT');
