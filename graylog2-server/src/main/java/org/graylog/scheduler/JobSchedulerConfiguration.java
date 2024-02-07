@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
+import com.google.common.base.Strings;
 import org.apache.commons.lang3.NotImplementedException;
 import org.graylog2.plugin.PluginConfigBean;
 
@@ -42,13 +43,13 @@ public class JobSchedulerConfiguration implements PluginConfigBean {
     public static final String MAX_CONCURRENT_JOBS = "job_scheduler_max_concurrent_jobs";
 
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
-    private Duration loopSleepDuration = Duration.seconds(1);
+    private final Duration loopSleepDuration = Duration.seconds(1);
 
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
-    private Duration lockExpirationDuration = Duration.minutes(5);
+    private final Duration lockExpirationDuration = Duration.minutes(5);
 
     @Parameter(value = MAX_CONCURRENT_JOBS, converter = ConcurrenyListConverter.class)
-    private Map<String, Integer> jobSchedulerMaxConcurrencyList = Collections.emptyMap();
+    private final Map<String, Integer> jobSchedulerMaxConcurrencyList = Collections.emptyMap();
 
     /**
      * Concurrency limits per job type
@@ -74,12 +75,8 @@ public class JobSchedulerConfiguration implements PluginConfigBean {
 
         @Override
         public Map<String, Integer> convertFrom(String value) {
-            if (value == null) {
-                throw new ParameterException("Couldn't convert value \"" + value + "\" to list of String.");
-            }
-            List<String> stringList = "".equals(value) ? Collections.emptyList() : Arrays.asList(value.split(","));
-
             Map<String, Integer> jobMaxConcurrency = new HashMap<>();
+            List<String> stringList = Strings.isNullOrEmpty(value) ? Collections.emptyList() : Arrays.asList(value.split(","));
             for (String s : stringList) {
                 String[] splits = s.split("\\:");
                 if (splits.length == 2) {
