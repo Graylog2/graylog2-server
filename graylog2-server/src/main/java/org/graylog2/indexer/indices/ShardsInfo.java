@@ -6,13 +6,14 @@ import java.net.InetAddress;
 
 public record ShardsInfo(String index, int shard, @JsonProperty("prirep") ShardType shardType, State state, long docs, String store, InetAddress ip, String node ) {
 
-    enum State {
-        ASSIGNED,
-        STARTED,
-        UNASSIGNED
+    public enum State {
+        INITIALIZING,
+        RELOCATING,
+        UNASSIGNED,
+        STARTED
     }
 
-    enum ShardType {
+    public enum ShardType {
         @JsonProperty("p")
         PRIMARY,
         @JsonProperty("r")
