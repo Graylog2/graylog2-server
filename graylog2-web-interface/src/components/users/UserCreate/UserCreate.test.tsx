@@ -16,9 +16,8 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
@@ -87,12 +86,25 @@ describe('<UserCreate />', () => {
     fireEvent.change(lastNameInput, { target: { value: 'The last name' } });
     fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
     fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
+
     // await selectEvent.openMenu(timeoutUnitSelect);
     // await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Seconds'); });
-    await selectEvent.openMenu(timezoneSelect);
-    await act(async () => { await selectEvent.select(timezoneSelect, 'Berlin'); });
-    await selectEvent.openMenu(roleSelect);
-    await act(async () => { await selectEvent.select(roleSelect, 'Manager'); });
+    await act(async () => {
+      await selectEvent.openMenu(timezoneSelect);
+    });
+
+    await act(async () => {
+      await selectEvent.select(timezoneSelect, 'Berlin');
+    });
+
+    await act(async () => {
+      await selectEvent.openMenu(roleSelect);
+    });
+
+    await act(async () => {
+      await selectEvent.select(roleSelect, 'Manager');
+    });
+
     fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
     fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
 
