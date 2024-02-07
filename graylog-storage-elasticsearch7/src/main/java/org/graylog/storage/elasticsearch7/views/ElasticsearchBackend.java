@@ -243,7 +243,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     @Override
     public QueryResult doRun(SearchJob job, Query query, ESGeneratedQueryContext queryContext) {
         if (query.searchTypes().isEmpty()) {
-            return org.graylog.plugins.views.search.QueryResult.builder()
+            return QueryResult.builder()
                     .query(query)
                     .searchTypes(Collections.emptyMap())
                     .errors(new HashSet<>(queryContext.errors()))
@@ -322,7 +322,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         }
 
         LOG.debug("Query {} ran for job {}", query.id(), job.getId());
-        return org.graylog.plugins.views.search.QueryResult.builder()
+        return QueryResult.builder()
                 .query(query)
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
