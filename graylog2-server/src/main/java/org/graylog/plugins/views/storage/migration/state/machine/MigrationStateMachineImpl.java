@@ -17,7 +17,10 @@
 package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.github.oxo42.stateless4j.StateMachine;
+import com.github.oxo42.stateless4j.triggers.TriggerWithParameters1;
+import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionContext;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
+import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,6 +36,22 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
         this.stateMachine = stateMachine;
         this.migrationActions = migrationActions;
     }
+
+    @Override
+    public MigrationActionContext triggerWithContext(MigrationStep step, Map<String, Object> args) {
+        MigrationState currentState = stateMachine.getState();
+        MigrationActionContext context = new MigrationActionContext(args, currentState, step);
+        TriggerWithParameters1<MigrationActionContext, MigrationStep> trigger =
+                new TriggerWithParameters1<>(step, MigrationActionContext.class);
+        try {
+            stateMachine.fire(trigger, context);
+        } catch (Exception e) {
+            context.setErrors(List.of(e.getMessage()));
+        }
+        context.setResultState(new CurrentStateInformation(stateMachine.getState(), stateMachine.getPermittedTriggers()));
+        return context;
+    }
+
 
     @Override
     public MigrationState trigger(MigrationStep step, Map<String, Object> args) {

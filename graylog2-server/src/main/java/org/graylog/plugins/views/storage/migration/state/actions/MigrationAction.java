@@ -14,20 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration.state.machine;
+package org.graylog.plugins.views.storage.migration.state.actions;
 
-import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionContext;
+import com.github.oxo42.stateless4j.delegates.Action1;
 
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nonnull;
+import java.util.Objects;
 
-public interface MigrationStateMachine {
-    MigrationActionContext triggerWithContext(MigrationStep step, Map<String, Object> args);
+@FunctionalInterface
+@SuppressWarnings("FunctionalInterfaceMethodChanged") // changed for thread safety
+public interface MigrationAction extends Action1<MigrationActionContext> {
 
-    MigrationState trigger(MigrationStep step, Map<String, Object> args);
-    MigrationState getState();
+    @Override
+    default void doIt(@Nonnull MigrationActionContext context) {
+        synchronized (Objects.requireNonNull(context)) {
+            performAction(context);
+        }
+    }
 
-    List<MigrationStep> nextSteps();
+    void performAction(MigrationActionContext context);
 
-    String serialize();
 }
