@@ -14,17 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bindings.providers;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.inject.Provider;
-
 /**
- * @deprecated Use {@link MongoJackObjectMapperProvider} directly.
+ * This package contains a compatibility layer to support old code using the Mongojack 2.x API. It is destined for
+ * removal as soon as all code has been migrated to use the MongoDB driver API directly.
+ * <p>
+ * Instead of the classes from this package, use {@link org.graylog2.database.MongoCollections} as an entrypoint for
+ * interacting with MongoDB.
  */
-@Deprecated
-public class CommonMongoJackObjectMapperProvider extends MongoJackObjectMapperProvider {
-    public CommonMongoJackObjectMapperProvider(Provider<ObjectMapper> objectMapperProvider) {
-        super(objectMapperProvider.get());
-    }
-}
+package org.graylog2.database.jackson.legacy;
