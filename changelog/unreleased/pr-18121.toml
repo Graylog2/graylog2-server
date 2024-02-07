@@ -1,0 +1,6 @@
+type = "a"
+message = "add bulk management capabilities for data nodes"
+
+issues = ["17732"]
+pulls = ["18121"]
+
