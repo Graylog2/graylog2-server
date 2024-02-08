@@ -136,7 +136,7 @@ public class HTTPAlarmCallback implements AlarmCallback {
 
         try {
             var ignored = new URI(url).toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             throw new ConfigurationException("Malformed URL '" + url + "'", e);
         }
 
