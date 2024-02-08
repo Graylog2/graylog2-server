@@ -64,7 +64,7 @@ const ManualMigrationStep = () => {
         </Col>
       )}
       {(currentStep && ROLLING_UPGRADE_MIGRATION_STEPS.includes(currentStep.state)) && <MigrateExistingCluster onTriggerNextStep={onTriggerNextState} currentStep={currentStep} />}
-      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration />}
+      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration onTriggerNextStep={() => onTriggerNextState({ step: currentStep.next_steps[0] })} />}
     </>
   );
 };
