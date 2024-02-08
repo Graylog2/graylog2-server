@@ -42,6 +42,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
+import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 import org.slf4j.Logger;
@@ -162,6 +163,14 @@ public class MongoIndexRangeService implements IndexRangeService {
         remove(indexRange.indexName());
         final WriteResult<MongoIndexRange, ObjectId> save = collection.save(MongoIndexRange.create(indexRange));
         return save;
+    }
+
+    @Override
+    public boolean renameIndex(String from, String to) {
+        return collection.updateMulti(
+                        DBQuery.is(IndexRange.FIELD_INDEX_NAME, from),
+                        DBUpdate.set(IndexRange.FIELD_INDEX_NAME, to))
+                .getN() > 0;
     }
 
     @Override

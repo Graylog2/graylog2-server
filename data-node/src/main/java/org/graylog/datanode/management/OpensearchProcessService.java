@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.management;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -24,12 +25,18 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -47,7 +54,14 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final OpensearchProcess process;
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final EventBus eventBus;
+    private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
+    private final DataNodeProvisioningService dataNodeProvisioningService;
+    private final IndexFieldTypesService indexFieldTypesService;
+    private final ObjectMapper objectMapper;
+    private final ProcessStateMachine processStateMachine;
+    private final ClusterEventBus clusterEventBus;
+
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
@@ -56,20 +70,34 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final CustomCAX509TrustManager trustManager,
                                     final NodeService<DataNodeDto> nodeService,
                                     final Configuration configuration,
-                                    final NodeId nodeId) {
+                                    final DataNodeProvisioningService dataNodeProvisioningService,
+                                    final NodeId nodeId,
+                                    final IndexFieldTypesService indexFieldTypesService,
+                                    final ObjectMapper objectMapper,
+                                    final ProcessStateMachine processStateMachine,
+                                    final ClusterEventBus clusterEventBus) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
+        this.nodeService = nodeService;
         this.nodeId = nodeId;
-        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService);
+        this.dataNodeProvisioningService = dataNodeProvisioningService;
+        this.objectMapper = objectMapper;
+        this.indexFieldTypesService = indexFieldTypesService;
+        this.processStateMachine = processStateMachine;
+        this.clusterEventBus = clusterEventBus;
+        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
         eventBus.register(this);
     }
 
-    private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration, final NodeService<DataNodeDto> nodeService) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService);
+    private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration,
+                                                      final NodeService<DataNodeDto> nodeService, final ObjectMapper objectMapper, final ProcessStateMachine processStateMachine) {
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService, objectMapper, processStateMachine);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
-        process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName()));
+        process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName(), nodeId, clusterEventBus));
+        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, indexFieldTypesService, objectMapper));
+        process.addStateMachineTracer(new ClusterNodeStateTracer(nodeService, nodeId));
         return process;
     }
 
@@ -77,9 +105,16 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
-            case ADD ->
-                    startWithConfig(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
-            case REMOVE -> startWithConfig();
+            case ADD -> {
+                this.process.stop();
+                configure(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
+                this.process.start();
+            }
+            case REMOVE -> {
+                this.process.stop();
+                configure();
+                this.process.start();
+            }
         }
     }
 
@@ -87,7 +122,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STORED -> startWithConfig();
+            case STARTUP_REQUESTED -> startUp();
+            case STORED -> {
+                configure();
+                dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
+            }
         }
     }
 
@@ -106,14 +145,18 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Override
     protected void startUp() {
-        startWithConfig();
+        final OpensearchConfiguration config = configurationProvider.get();
+        configure();
+        if (config.securityConfigured()) {
+            this.process.start();
+        }
     }
 
-    private void startWithConfig() {
-        this.startWithConfig(Map.of());
+    protected void configure() {
+        this.configure(Map.of());
     }
 
-    private void startWithConfig(Map<String, String> additionalConfig) {
+    private void configure(Map<String, String> additionalConfig) {
         final OpensearchConfiguration original = configurationProvider.get();
 
         final var finalAdditionalConfig = new HashMap<String, String>();
@@ -135,9 +178,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 finalAdditionalConfig);
 
         if (config.securityConfigured()) {
-            this.process.startWithConfig(config);
+            this.process.configure(config);
         } else {
-
             String noConfigMessage = """
                     \n
                     ========================================================================================================

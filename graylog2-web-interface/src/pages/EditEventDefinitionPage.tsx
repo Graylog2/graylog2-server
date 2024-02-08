@@ -18,7 +18,6 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import useScopePermissions from 'hooks/useScopePermissions';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
@@ -60,8 +59,6 @@ const EditEventDefinitionPage = () => {
     }
   }, [params, currentUser, history]);
 
-  const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
-
   const streamsWithMissingPermissions = () => {
     const streams = eventDefinition?.config?.streams || [];
 
@@ -78,7 +75,7 @@ const EditEventDefinitionPage = () => {
     return <StreamPermissionErrorPage error={null} missingStreamIds={missingStreams} />;
   }
 
-  if (!eventDefinition || loadingScopePermissions) {
+  if (!eventDefinition) {
     return (
       <DocumentTitle title="Edit Event Definition">
         <span>
@@ -102,26 +99,11 @@ const EditEventDefinitionPage = () => {
           Event Definitions allow you to create Events from different Conditions and alert on them.
         </span>
       </PageHeader>
-      {scopePermissions.is_mutable ? (
-        <Row className="content">
-          <Col md={12}>
-            <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
-          </Col>
-        </Row>
-      ) : (
-        <Row className="content">
-          <Col md={12}>
-            <Row>
-              <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
-                <div style={{ textAlign: 'center' }}>
-                  <p>This particular Event Definition has been marked as immutable when it was created, therefore it cannot be edited.</p>
-                </div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      )}
-
+      <Row className="content">
+        <Col md={12}>
+          <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

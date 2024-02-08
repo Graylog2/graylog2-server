@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import HoverForHelp from 'components/common/HoverForHelp';
 
@@ -24,17 +23,13 @@ type Props = {
   description?: string,
 };
 
-const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
-  margin-left: 8px;
-`;
-
 const SharingDisabledPopover = ({ type, description }: Props) => {
   const getReadableType = (_type: string) => _type.replaceAll('_', ' ');
 
   return (
-    <StyledHoverForHelp title="Sharing not possible" pullRight={false}>
+    <HoverForHelp title="Sharing not possible" pullRight={false}>
       {description || `Only owners of this ${getReadableType(type)} are allowed to share it.`}
-    </StyledHoverForHelp>
+    </HoverForHelp>
   );
 };
 

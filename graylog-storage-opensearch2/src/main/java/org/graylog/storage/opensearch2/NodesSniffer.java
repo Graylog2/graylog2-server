@@ -16,7 +16,8 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+
+import org.opensearch.client.Node;
 
 import java.io.IOException;
 import java.util.List;

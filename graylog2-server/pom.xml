@@ -144,13 +144,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.graylog.repackaged.mongojack</groupId>
+            <groupId>org.mongojack</groupId>
             <artifactId>mongojack</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>mongojack4</artifactId>
         </dependency>
 
         <dependency>
@@ -601,6 +596,10 @@
             <artifactId>protobuf-java-util</artifactId>
         </dependency>
         <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
@@ -711,7 +710,10 @@
             <groupId>one.util</groupId>
             <artifactId>streamex</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.stateless4j</groupId>
+            <artifactId>stateless4j</artifactId>
+        </dependency>
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
             <groupId>junit</groupId>

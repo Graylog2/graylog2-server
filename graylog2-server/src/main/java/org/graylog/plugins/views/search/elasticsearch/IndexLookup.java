@@ -31,6 +31,7 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 public class IndexLookup {
+
     private final IndexRangeService indexRangeService;
     private final StreamService streamService;
     private final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams;
@@ -51,19 +52,27 @@ public class IndexLookup {
         this.indexRangeContainsOneOfStreams = indexRangeContainsOneOfStreams;
     }
 
-    public Set<String> indexNamesForStreamsInTimeRange(final Set<String> streamIds,
+    public Set<String> indexNamesForStreamsInTimeRange(Set<String> streamIds,
                                                        final TimeRange timeRange) {
         if (streamIds.isEmpty()) {
             return Collections.emptySet();
         }
 
+        Set<String> result = streamIds.stream()
+                .filter(s -> s.startsWith(Stream.DATASTREAM_PREFIX))
+                .map(s -> s.substring(Stream.DATASTREAM_PREFIX.length()))
+                .collect(Collectors.toSet());
+        streamIds = streamIds.stream().filter(s -> !s.startsWith(Stream.DATASTREAM_PREFIX)).collect(Collectors.toSet());
+
         final Set<Stream> usedStreams = streamService.loadByIds(streamIds);
         final SortedSet<IndexRange> candidateIndices = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
 
-        return candidateIndices.stream()
+        result.addAll(candidateIndices.stream()
                 .filter(i -> indexRangeContainsOneOfStreams.test(i, usedStreams))
                 .map(IndexRange::indexName)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet())
+        );
+        return result;
     }
 
 }

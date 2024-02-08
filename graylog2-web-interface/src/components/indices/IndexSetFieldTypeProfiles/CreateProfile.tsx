@@ -22,7 +22,9 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
-import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import type {
+  IndexSetFieldTypeProfileForm,
+} from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
 
@@ -32,8 +34,22 @@ const CreateProfile = () => {
   const navigate = useNavigate();
   const { createProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
+  const location = useLocation();
+  const initialValues = useMemo<IndexSetFieldTypeProfileForm>(() => {
+    const defaultCustomFieldMappings = location?.state?.customFieldMappings;
 
-  const onSubmit = useCallback((profile: IndexSetFieldTypeProfile) => {
+    if (defaultCustomFieldMappings) {
+      return ({
+        customFieldMappings: defaultCustomFieldMappings,
+        name: null,
+        description: null,
+      });
+    }
+
+    return undefined;
+  }, [location?.state?.customFieldMappings]);
+
+  const onSubmit = useCallback((profile: IndexSetFieldTypeProfileForm) => {
     createProfile(profile).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CREATED, {
         app_pathname: telemetryPathName,
@@ -54,7 +70,7 @@ const CreateProfile = () => {
   }, [navigate, sendTelemetry, telemetryPathName]);
 
   return (
-    <ProfileForm onCancel={onCancel} submitButtonText="Create profile" submitLoadingText="Creating profile..." onSubmit={onSubmit} />
+    <ProfileForm initialValues={initialValues} onCancel={onCancel} submitButtonText="Create profile" submitLoadingText="Creating profile..." onSubmit={onSubmit} />
   );
 };
 

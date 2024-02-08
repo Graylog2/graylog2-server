@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { MenuItem } from 'components/bootstrap';
 
@@ -33,7 +34,7 @@ describe('ActionDropdown', () => {
 
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
 
-    triggerButton.click();
+    await userEvent.click(triggerButton);
 
     await screen.findByRole('menuitem', { name: 'Foo' });
   });
@@ -53,13 +54,11 @@ describe('ActionDropdown', () => {
 
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
 
-    triggerButton.click();
+    await userEvent.click(triggerButton);
+
+    await screen.findByRole('menuitem', { name: 'Foo' });
 
     expect(onClick).not.toHaveBeenCalled();
-
-    await waitFor(() => {
-      expect(screen.queryByRole('menuitem', { name: 'Foo' })).not.toBeInTheDocument();
-    });
   });
 
   it('closes menu when MenuItem is clicked', async () => {
@@ -73,10 +72,10 @@ describe('ActionDropdown', () => {
 
     const triggerButton = await screen.findByText('Trigger!');
 
-    triggerButton.click();
+    await userEvent.click(triggerButton);
 
     const menuItem = await screen.findByRole('menuitem', { name: 'Foo' });
-    menuItem.click();
+    await userEvent.click(menuItem);
 
     await waitFor(() => {
       expect(onSelect).toHaveBeenCalled();
@@ -100,10 +99,10 @@ describe('ActionDropdown', () => {
 
     const triggerButton = await screen.findByText('Trigger!');
 
-    triggerButton.click();
+    await userEvent.click(triggerButton);
 
     const menuItem = await screen.findByRole('menuitem', { name: 'Foo' });
-    menuItem.click();
+    await userEvent.click(menuItem);
 
     await waitFor(() => {
       expect(onSelect).toHaveBeenCalled();
@@ -128,10 +127,10 @@ describe('ActionDropdown', () => {
 
     const triggerButton = await screen.findByText('Trigger!');
 
-    triggerButton.click();
+    await userEvent.click(triggerButton);
 
     const menuItem = await screen.findByRole('menuitem', { name: 'Foo' });
-    menuItem.click();
+    await userEvent.click(menuItem);
 
     await waitFor(() => {
       expect(onSelect).toHaveBeenCalled();

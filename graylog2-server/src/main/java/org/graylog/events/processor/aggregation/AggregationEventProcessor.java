@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
@@ -59,8 +60,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -194,7 +193,8 @@ public class AggregationEventProcessor implements EventProcessor {
             LOG.debug("scrollQueryString: {}", scrollQueryString);
 
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
-            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
+            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.filters(),
+                    config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
         }
     }
 
@@ -248,6 +248,7 @@ public class AggregationEventProcessor implements EventProcessor {
                         .timerangeEnd(parameters.timerange().getTo())
                         .query(config.query())
                         .streams(event.getSourceStreams())
+                        .filters(config.filters())
                         .build());
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
@@ -262,7 +263,8 @@ public class AggregationEventProcessor implements EventProcessor {
         };
 
         try {
-            moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+            moreSearch.scrollQuery(config.query(), streams, config.filters(), config.queryParameters(),
+                    parameters.timerange(), parameters.batchSize(), callback);
         } catch (EventLimitReachedException e) {
             notificationService.publishIfFirst(notificationService.buildNow()
                     .addType(EVENT_LIMIT_REACHED)
@@ -340,6 +342,7 @@ public class AggregationEventProcessor implements EventProcessor {
                     .timerangeEnd(event.getTimerangeEnd())
                     .query(config.query())
                     .streams(sourceStreams)
+                    .filters(config.filters())
                     .build());
             sourceStreams.forEach(event::addSourceStream);
 

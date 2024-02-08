@@ -32,7 +32,7 @@ import static io.restassured.RestAssured.given;
 import static org.graylog2.rest.models.tools.responses.PageListResponse.ELEMENTS_FIELD_NAME;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, serverLifecycle = Lifecycle.CLASS)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 

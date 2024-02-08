@@ -16,7 +16,6 @@
  */
 export { default as Alert } from './Alert';
 export { default as Badge } from './Badge';
-export { default as BootstrapMenuItem } from './BootstrapMenuItem';
 export { default as BootstrapModalConfirm } from './BootstrapModalConfirm';
 export { default as BootstrapModalForm } from './BootstrapModalForm';
 export { default as BootstrapModalWrapper } from './BootstrapModalWrapper';
@@ -47,6 +46,7 @@ export { default as Navbar } from './Navbar';
 export { default as Panel } from './Panel';
 export { default as Popover } from './Popover';
 export { default as Row } from './Row';
+export { default as SegmentedControl } from './SegmentedControl';
 export { default as SplitButton } from './SplitButton';
 export { default as Tab } from './Tab';
 export { default as Table } from './Table';

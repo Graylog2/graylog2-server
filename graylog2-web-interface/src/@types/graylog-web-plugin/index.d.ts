@@ -17,6 +17,7 @@
 import type * as React from 'react';
 
 import type FetchError from 'logic/errors/FetchError';
+import type { DataTieringConfig } from 'components/indices/data-tiering';
 
 interface PluginRoute {
   path: string;
@@ -124,9 +125,22 @@ interface ProviderType {
   }>;
 }
 
+interface LogoutHook {
+  (): void | Promise<unknown>;
+}
+
+type DataTiering = {
+  type: string,
+  TiersConfigurationFields: React.ComponentType<{}>,
+  TiersSummary: React.ComponentType<{
+    config: DataTieringConfig
+  }>,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    dataTiering?: Array<DataTiering>
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>
@@ -141,6 +155,7 @@ declare module 'graylog-web-plugin/plugin' {
     forwarder?: Array<PluginForwarder>;
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
+    'hooks.logout'?: Array<LogoutHook>,
   }
   interface PluginMetadata {
     name?: string,

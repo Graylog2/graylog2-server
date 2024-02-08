@@ -61,6 +61,7 @@ const selectEventConfig = { container: document.body };
 
 const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await screen.findByRole('menu');
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
 };
 
@@ -68,7 +69,7 @@ const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { nam
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await findWidgetConfigFormSubmitButton();
-  fireEvent.click(applyButton);
+  await userEvent.click(applyButton);
 };
 
 const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string = 'took_ms') => {
@@ -78,10 +79,17 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
 
   await act(async () => {
     await selectEvent.openMenu(sortFieldSelect);
-    await selectEvent.select(sortFieldSelect, option, selectEventConfig);
-    await selectEvent.openMenu(sortDirectionSelect);
-    await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
   });
+
+  await selectEvent.select(sortFieldSelect, option, selectEventConfig);
+
+  await act(async () => {
+    await selectEvent.openMenu(sortDirectionSelect);
+  });
+
+  await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
+
+  await within(httpMethodSortContainer).findByText('Descending');
 };
 
 const renderSUT = (props = {}) => render((
@@ -229,8 +237,8 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const removeSortElementButton = screen.getByRole('button', { name: 'Remove Sort' });
-    userEvent.click(removeSortElementButton);
+    const removeSortElementButton = await screen.findByRole('button', { name: 'Remove Sort' });
+    await userEvent.click(removeSortElementButton);
 
     await submitWidgetConfigForm();
 

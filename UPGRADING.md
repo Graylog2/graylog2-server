@@ -33,9 +33,10 @@ The plugin entity needs the `description` `System` and `children` (array).
 Every child represents a dropdown option and needs a `path` and `description` attribute.
 
 ## Configuration File Changes
-| Option                                         | Action    | Description                                                                                                                                                                                                                                             |
-|------------------------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Option                           | Action    | Description                                                                                                                                                                                                                                             |
+|----------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `disabled_retention_strategies`  | **added** | Disables the specified retention strategies. By default, strategies `none` and `close` are now disabled in new installations.<br/>Strategies can be re-enabled simply by removing from this list.<br/>**Do not extend this list on existing installs!** |
+| `field_value_suggestion_mode`    | **added** | Allows controlling field value suggestions, turning them on, off, or allowing them only for textual fields.                                                                                                                                             |
 
 
 ## Asset Import Changes
@@ -170,6 +171,13 @@ its code needs to be adjusted to also use the new package names.
 | `javax.inject.*`            | `jakarta.inject.*`            |
 | `javax.validation.*`        | `jakarta.validation.*`        |
 | `javax.ws.rs.*`             | `jakarta.ws.rs.*`             |
+
+### Removal of Mongojack 2 dependency
+
+The Java dependency on the Mongojack 2 library was removed and replaced with a
+compatibility layer. Plugins that interact with MongoDB might need to be
+modified if they use Mongojack functionality that is not commonly used
+throughout the Graylog core code base.
 
 ## REST API Endpoint Changes
 

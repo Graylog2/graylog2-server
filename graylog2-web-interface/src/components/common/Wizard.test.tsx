@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { act, render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import type { Steps } from 'components/common/Wizard';
 import Wizard from 'components/common/Wizard';
@@ -72,7 +73,7 @@ describe('<Wizard />', () => {
       render(<Wizard steps={steps} />);
 
       await screen.findByText('Title1');
-      screen.getByText('Title2').click();
+      await userEvent.click(await screen.findByText('Title2'));
 
       await screen.findByText('Component2');
 
@@ -86,7 +87,7 @@ describe('<Wizard />', () => {
     it('should render step 2 when clicked on next', async () => {
       render(<Wizard steps={steps} />);
 
-      (await nextButton()).click();
+      await userEvent.click(await nextButton());
 
       await screen.findByText('Component2');
 
@@ -100,9 +101,9 @@ describe('<Wizard />', () => {
     it('should render step 3 when two times clicked on next', async () => {
       render(<Wizard steps={steps} />);
 
-      (await nextButton()).click();
+      await userEvent.click(await nextButton());
       await screen.findByText('Component2');
-      (await nextButton()).click();
+      await userEvent.click(await nextButton());
 
       await screen.findByText('Component3');
 
@@ -117,11 +118,11 @@ describe('<Wizard />', () => {
       const changeFn = jest.fn(() => {});
       render(<Wizard steps={steps} onStepChange={changeFn} />);
 
-      (await nextButton()).click();
+      await userEvent.click(await nextButton());
       await screen.findByText('Component2');
-      (await nextButton()).click();
+      await userEvent.click(await nextButton());
       await screen.findByText('Component3');
-      (await previousButton()).click();
+      await userEvent.click(await previousButton());
 
       await screen.findByText('Component2');
 
@@ -143,7 +144,7 @@ describe('<Wizard />', () => {
       expect(screen.queryByText('Component1')).not.toBeInTheDocument();
       expect(screen.queryByText('Component3')).not.toBeInTheDocument();
 
-      (await nextButton()).click();
+      await userEvent.click(await nextButton());
 
       await screen.findByText('Component2');
 
@@ -200,14 +201,14 @@ describe('<Wizard />', () => {
 
     const { rerender } = render(<Wizard steps={steps} onStepChange={changeFn} />);
 
-    (await nextButton()).click();
+    await userEvent.click(await nextButton());
 
     expect(changeFn).toHaveBeenCalled();
 
     rerender(<Wizard steps={steps} onStepChange={changeFn} activeStep="Key1" />);
 
     asMock(changeFn).mockClear();
-    (await nextButton()).click();
+    await userEvent.click(await nextButton());
 
     expect(changeFn).toHaveBeenCalled();
   });
@@ -217,14 +218,16 @@ describe('<Wizard />', () => {
     steps[2].disabled = true;
     render(<Wizard steps={steps} />);
 
-    (await nextButton()).click();
+    await userEvent.click(await nextButton());
 
     await screen.findByText('Component1');
 
     expect(screen.queryByText('Component2')).not.toBeInTheDocument();
     expect(screen.queryByText('Component3')).not.toBeInTheDocument();
 
-    (await screen.findByText('Title2')).click();
+    await act(async () => {
+      (await screen.findByText('Title2')).click();
+    });
 
     await screen.findByText('Component1');
 

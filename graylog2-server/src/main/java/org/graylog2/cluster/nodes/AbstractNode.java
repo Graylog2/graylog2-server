@@ -18,7 +18,6 @@ package org.graylog2.cluster.nodes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.undercouch.bson4jackson.types.Timestamp;
 import org.bson.types.BSONTimestamp;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
@@ -64,9 +63,6 @@ public abstract class AbstractNode<DTO extends NodeDto> extends PersistedImpl im
         }
         if (rawLastSeen instanceof BSONTimestamp) {
             return new DateTime(((BSONTimestamp) rawLastSeen).getTime() * 1000L, DateTimeZone.UTC);
-        }
-        if (rawLastSeen instanceof Timestamp ts) {
-            return new DateTime(ts.getTime() * 1000L, DateTimeZone.UTC);
         }
         return new DateTime(((Integer) rawLastSeen) * 1000L, DateTimeZone.UTC);
     }

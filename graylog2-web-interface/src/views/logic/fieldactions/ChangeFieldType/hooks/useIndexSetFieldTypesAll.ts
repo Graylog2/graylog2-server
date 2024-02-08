@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
+import type { IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 
 export type FieldOptions = Array<{ value: string, label: string, disabled: boolean }>;
 export type CurrentTypes = Record<string, string>;
