@@ -19,6 +19,7 @@ package org.graylog2.alarmcallbacks;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import jakarta.inject.Inject;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -37,11 +38,10 @@ import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -135,8 +135,8 @@ public class HTTPAlarmCallback implements AlarmCallback {
         }
 
         try {
-            new URL(url);
-        } catch (MalformedURLException e) {
+            var ignored = new URI(url).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new ConfigurationException("Malformed URL '" + url + "'", e);
         }
 

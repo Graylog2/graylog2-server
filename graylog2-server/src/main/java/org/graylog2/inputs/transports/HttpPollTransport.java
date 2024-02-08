@@ -23,6 +23,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import jakarta.inject.Named;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -52,11 +53,11 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Named;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
@@ -161,10 +162,10 @@ public class HttpPollTransport extends ThrottleableTransport2 {
         final InetSocketAddress remoteAddress;
         InetSocketAddress remoteAddress1;
         try {
-            final URL url1 = new URL(url);
+            final URL url1 = new URI(Objects.requireNonNull(url)).toURL();
             final int port = url1.getPort();
             remoteAddress1 = new InetSocketAddress(url1.getHost(), port != -1 ? port : 80);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             remoteAddress1 = null;
         }
         remoteAddress = remoteAddress1;
