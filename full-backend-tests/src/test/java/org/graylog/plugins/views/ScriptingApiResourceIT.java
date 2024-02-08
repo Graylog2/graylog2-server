@@ -57,7 +57,7 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, mongoVersions = MongodbServer.MONGO5,
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS,
                                    searchVersions = {SearchServer.ES7, SearchServer.OS2},
                                    enabledFeatureFlags = ScriptingApiModule.FEATURE_FLAG)
 public class ScriptingApiResourceIT {

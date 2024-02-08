@@ -43,6 +43,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.datanode.DataNodeService;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
@@ -67,6 +68,7 @@ public class DataNodeManagementResource extends RestResource {
     private final DataNodeService dataNodeService;
     private final NodeService<DataNodeDto> nodeService;
     private final CertRenewalService certRenewalService;
+    private final Boolean runsWithDataNode;
     private final BulkExecutor<DataNodeDto, UserContext> bulkRemovalExecutor;
     private final BulkExecutor<DataNodeDto, UserContext> bulkStopExecutor;
     private final BulkExecutor<DataNodeDto, UserContext> bulkStartExecutor;
@@ -74,13 +76,24 @@ public class DataNodeManagementResource extends RestResource {
     @Inject
     protected DataNodeManagementResource(DataNodeService dataNodeService,
                                          NodeService<DataNodeDto> nodeService,
-                                         CertRenewalService certRenewalService, AuditEventSender auditEventSender, ObjectMapper objectMapper) {
+                                         CertRenewalService certRenewalService,
+                                         @RunsWithDataNode Boolean runsWithDataNode,
+                                         AuditEventSender auditEventSender, ObjectMapper objectMapper) {
         this.dataNodeService = dataNodeService;
         this.nodeService = nodeService;
         this.certRenewalService = certRenewalService;
+        this.runsWithDataNode = runsWithDataNode;
         bulkRemovalExecutor = new SequentialBulkExecutor<>(this::removeNode, auditEventSender, objectMapper);
         bulkStopExecutor = new SequentialBulkExecutor<>(this::stopNode, auditEventSender, objectMapper);
         bulkStartExecutor = new SequentialBulkExecutor<>(this::startNode, auditEventSender, objectMapper);
+    }
+
+
+    @GET
+    @Path("configured")
+    @ApiOperation("Returns whether this Graylog is running against a data node search backend")
+    public Boolean runsWithDataNode() {
+        return runsWithDataNode;
     }
 
     @GET

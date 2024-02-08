@@ -23,7 +23,7 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO5, enabledFeatureFlags = COMPOSABLE_INDEX_TEMPLATES_FEATURE)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, enabledFeatureFlags = COMPOSABLE_INDEX_TEMPLATES_FEATURE)
 public class IndicesWithComposableIndexTemplatesIT extends IndicesIT {
     public IndicesWithComposableIndexTemplatesIT(SearchServerInstance elasticsearch) {
         super(elasticsearch);

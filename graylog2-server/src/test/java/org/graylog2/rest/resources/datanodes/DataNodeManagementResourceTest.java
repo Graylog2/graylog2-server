@@ -58,7 +58,7 @@ public class DataNodeManagementResourceTest {
 
     @Before
     public void setUp() {
-        classUnderTest = new DataNodeManagementResource(dataNodeService, nodeService, certRenewalService, auditEventSender, objectMapper);
+        classUnderTest = new DataNodeManagementResource(dataNodeService, nodeService, certRenewalService, true, auditEventSender, objectMapper);
     }
 
     @Test

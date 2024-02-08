@@ -263,18 +263,18 @@ describe('IndexSetConfigurationForm', () => {
                                {...props} />
   );
 
-  it('Should render IndexSetConfigurationForm', () => {
+  it('Should render IndexSetConfigurationForm', async () => {
     render(<SUT indexSet={indexSet} />);
 
-    const titleText = screen.getByDisplayValue(/Foo Title/i);
+    const titleText = await screen.findByDisplayValue(/Foo Title/i);
 
     expect(titleText).toBeInTheDocument();
   });
 
-  it('Should render create IndexSetConfigurationForm', () => {
+  it('Should render create IndexSetConfigurationForm', async () => {
     render(<SUT create />);
 
-    const indexPrefix = screen.getByDisplayValue(/default_index_prefix/i);
+    const indexPrefix = await screen.findByDisplayValue(/default_index_prefix/i);
 
     expect(indexPrefix).toBeInTheDocument();
   });

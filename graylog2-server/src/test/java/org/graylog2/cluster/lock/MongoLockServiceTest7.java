@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { SplitButton as BootstrapSplitButton } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+package org.graylog2.cluster.lock;
 
-import menuItemStyles from './styles/menuItem';
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-const SplitButton = styled(BootstrapSplitButton)(({ theme }) => css`
-  ${theme.components.button}
-  ~ .btn.dropdown-toggle {
-    ${theme.components.button}
-    & ~ {
-      ${menuItemStyles}
-    }
-  }
-`);
-
-/** @component */
-export default SplitButton;
+public class MongoLockServiceTest7 extends MongoLockServiceTest {
+    @RegisterExtension
+    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO7);
+}
