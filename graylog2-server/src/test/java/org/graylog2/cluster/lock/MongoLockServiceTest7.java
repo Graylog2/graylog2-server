@@ -14,18 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.indices;
+package org.graylog2.cluster.lock;
 
-import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
-
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, enabledFeatureFlags = COMPOSABLE_INDEX_TEMPLATES_FEATURE)
-public class IndicesWithComposableIndexTemplatesIT extends IndicesIT {
-    public IndicesWithComposableIndexTemplatesIT(SearchServerInstance elasticsearch) {
-        super(elasticsearch);
-    }
+public class MongoLockServiceTest7 extends MongoLockServiceTest {
+    @RegisterExtension
+    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO7);
 }

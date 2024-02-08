@@ -41,7 +41,7 @@ import static org.graylog.testing.containermatrix.SearchServer.OS2;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_4;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_4, OS2_LATEST})
+@ContainerMatrixTestsConfiguration(searchVersions = {ES7, OS1, OS2, OS2_4, OS2_LATEST})
 public class CompoundFieldsAggregationIT {
 
     private final GraylogApis api;
