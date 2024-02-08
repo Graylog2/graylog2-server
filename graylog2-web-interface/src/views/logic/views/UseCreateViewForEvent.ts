@@ -190,8 +190,7 @@ export const ViewGenerator = async ({
   groupBy: Array<string>,
   queryParameters: Array<ParameterJson>,
   searchFilters?: Array<SearchFilter>,
-},
-) => {
+}) => {
   const query = QueryGenerator(streams, undefined, timeRange, queryString, (searchFilters || []));
   const search = Search.create().toBuilder().queries([query]).parameters(queryParameters.map((param) => Parameter.fromJSON(param)))
     .build();
@@ -228,8 +227,10 @@ export const UseCreateViewForEvent = (
 
   const groupBy = eventDefinition?.config?.group_by ?? [];
 
+  const searchFilters = eventDefinition.config?.filters;
+
   return useMemo(
-    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters }),
+    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters, searchFilters }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
