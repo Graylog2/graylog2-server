@@ -667,25 +667,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-pmd-plugin</artifactId>
-                        <configuration>
-                            <targetJdk>${maven.compiler.target}</targetJdk>
-                            <failOnViolation>false</failOnViolation>
-                            <excludeRoots>
-                                <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
-                                <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
-                            </excludeRoots>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
