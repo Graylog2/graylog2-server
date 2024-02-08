@@ -23,6 +23,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 
@@ -48,6 +49,7 @@ public class ScrollResultOS2 extends ChunkedQueryResultOS2 {
     }
 
     @Override
+    @Nullable
     protected SearchResponse nextSearchResult() throws IOException {
         if (this.lastSearchResponse.getScrollId() == null) {
             //with ignore_unavailable=true and no available indices, response does not contain scrollId

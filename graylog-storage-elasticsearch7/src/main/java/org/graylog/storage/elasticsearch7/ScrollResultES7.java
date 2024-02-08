@@ -23,6 +23,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class ScrollResultES7 extends ChunkedQueryResultES7 {
     }
 
     @Override
+    @Nullable
     protected SearchResponse nextSearchResult() throws IOException {
         if (this.lastSearchResponse.getScrollId() == null) {
             //with ignore_unavailable=true and no available indices, response does not contain scrollId

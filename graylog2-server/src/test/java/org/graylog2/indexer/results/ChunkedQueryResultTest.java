@@ -19,6 +19,7 @@ package org.graylog2.indexer.results;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -215,6 +216,7 @@ public class ChunkedQueryResultTest {
         }
 
         @Override
+        @Nullable
         protected List<String> nextSearchResult() throws IOException {
             final int toIndex = Math.min(fromIndex + batchSize, BACKING_RESULT_LIST.size());
             if (fromIndex >= toIndex) {
