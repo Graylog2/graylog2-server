@@ -60,7 +60,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import static java.time.LocalTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -236,6 +238,42 @@ class JobSchedulerServiceIT {
         } finally {
             jobSchedulerService.stopAsync().awaitTerminated();
         }
+    }
+
+    @Test
+    void testInterleavedTriggers() throws Exception {
+        final int nJobs = 2 * 30;
+        final CountDownLatch outstandingJobs = new CountDownLatch(nJobs);
+        final ConcurrentHashMap<String, Integer> concurrentExecutions = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<String, Integer> maxConcurrentExecutions = new ConcurrentHashMap<>();
+
+        final Job job = ctx -> {
+            final String jobType = ctx.trigger().jobDefinitionType();
+            final Integer runningJobs = concurrentExecutions.compute(jobType, (k, v) -> v == null ? 1 : v + 1);
+            maxConcurrentExecutions.compute(jobType, (k, v) -> Math.max(runningJobs, v == null ? 0 : v));
+            System.out.println(f("%s %s %d %d", now(), jobType, runningJobs, outstandingJobs.getCount()));
+
+            Uninterruptibles.sleepUninterruptibly(20, TimeUnit.MILLISECONDS);
+            concurrentExecutions.compute(jobType, (k, v) -> v == null ? 0 : v - 1);
+            outstandingJobs.countDown();
+            return JobTriggerUpdate.withoutNextTime();
+        };
+
+        jobFactories.put(UnlimitedJob.TYPE_NAME, jobDefinitionDto -> job);
+        jobFactories.put(LimitedJobA.TYPE_NAME, jobDefinitionDto -> job);
+
+        jobSchedulerService.startAsync().awaitRunning();
+        try {
+            for (int i = 0; i < (nJobs / 2); i++) {
+                createTriggers(1, customJobDefinitionService.findOrCreate(jobDefinitionDto(new LimitedJobA())));
+                createTriggers(1, customJobDefinitionService.findOrCreate(jobDefinitionDto(new UnlimitedJob())));
+            }
+            outstandingJobs.await();
+        } finally {
+            jobSchedulerService.stopAsync().awaitTerminated();
+        }
+
+        assertThat(maxConcurrentExecutions.get(LimitedJobA.TYPE_NAME)).isEqualTo(TestSchedulerConfig.MAX_CONCURRENCY);
     }
 
     private List<JobTriggerDto> createTriggers(int numberOfTriggers, JobDefinitionDto jobDefinition) {
