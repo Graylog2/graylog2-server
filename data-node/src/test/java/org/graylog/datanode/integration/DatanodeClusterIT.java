@@ -84,7 +84,7 @@ public class DatanodeClusterIT {
         final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, network);
+        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, network);
         this.mongoDBTestService.start();
 
         nodeA = createDatanodeContainer(

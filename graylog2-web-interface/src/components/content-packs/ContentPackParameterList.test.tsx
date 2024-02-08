@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -164,13 +164,15 @@ describe('<ContentPackParameterList />', () => {
     const input = await screen.findByPlaceholderText('Enter search query...');
     userEvent.type(input, 'Bad');
 
-    jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
+    act(() => {
+      jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
+    });
 
     await waitFor(() => {
       expect(screen.queryByText('PARAM')).not.toBeInTheDocument();
     });
 
-    (await screen.findByRole('button', { name: 'Reset search' })).click();
+    await userEvent.click(await screen.findByRole('button', { name: 'Reset search' }));
 
     await screen.findByText('PARAM');
   });

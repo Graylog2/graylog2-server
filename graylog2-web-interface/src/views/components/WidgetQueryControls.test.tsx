@@ -105,12 +105,6 @@ describe('WidgetQueryControls', () => {
     </Wrapper>,
   );
 
-  it('should do something', () => {
-    const { container } = renderSUT();
-
-    expect(container).not.toBeNull();
-  });
-
   describe('displays if global override is set', () => {
     const resetTimeRangeButtonTitle = /reset global override/i;
     const resetQueryButtonTitle = /reset global filter/i;

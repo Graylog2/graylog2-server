@@ -47,7 +47,8 @@ import org.graylog2.plugin.validate.ClusterConfigValidatorService;
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
-import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.UnsafeClassLoadingAttemptException;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -73,13 +74,13 @@ public class ClusterConfigResource extends RestResource {
     public static final String NO_CLASS_MSG = "Couldn't find configuration class  '%s'";
 
     private final ClusterConfigService clusterConfigService;
-    private final ChainingClassLoader chainingClassLoader;
+    private final RestrictedChainingClassLoader chainingClassLoader;
     private final ObjectMapper objectMapper;
     private final ClusterConfigValidatorService clusterConfigValidatorService;
 
     @Inject
     public ClusterConfigResource(ClusterConfigService clusterConfigService,
-                                 ChainingClassLoader chainingClassLoader,
+                                 RestrictedChainingClassLoader chainingClassLoader,
                                  ObjectMapper objectMapper,
                                  ClusterConfigValidatorService clusterConfigValidatorService) {
         this.clusterConfigService = requireNonNull(clusterConfigService);
@@ -209,9 +210,11 @@ public class ClusterConfigResource extends RestResource {
     @Nullable
     private Class<?> classFromName(String className) {
         try {
-            return chainingClassLoader.loadClass(className);
+            return chainingClassLoader.loadClassSafely(className);
         } catch (ClassNotFoundException e) {
             return null;
+        } catch (UnsafeClassLoadingAttemptException e) {
+            throw new BadRequestException(e.getLocalizedMessage());
         }
     }
 

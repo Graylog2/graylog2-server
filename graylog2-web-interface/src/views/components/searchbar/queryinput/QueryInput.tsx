@@ -184,29 +184,36 @@ const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props
 };
 
 const useShowHotkeysInOverview = () => {
+  const options = { enabled: false };
+
   useHotkey({
     scope: 'query-input',
     actionKey: 'submit-search',
+    options,
   });
 
   useHotkey({
     scope: 'query-input',
     actionKey: 'insert-newline',
+    options,
   });
 
   useHotkey({
     scope: 'query-input',
     actionKey: 'create-search-filter',
+    options,
   });
 
   useHotkey({
     scope: 'query-input',
     actionKey: 'show-suggestions',
+    options,
   });
 
   useHotkey({
     scope: 'query-input',
     actionKey: 'show-history',
+    options,
   });
 };
 
@@ -282,8 +289,6 @@ const QueryInput = React.forwardRef<Editor, Props>(({
       name: 'Show completions',
       bindKey: { win: 'Alt-Space', mac: 'Alt-Space' },
       exec: async (editor: Editor) => {
-        console.log('test', editor.getValue());
-
         if (editor.getValue()) {
           startAutocomplete(editor);
 

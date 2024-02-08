@@ -120,7 +120,7 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
-        <grpc.version>1.61.0</grpc.version>
+        <grpc.version>1.61.1</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.0.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -131,6 +131,7 @@
         <jackson.version>2.15.3</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
+        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
         <jakarta.inject.version>2.0.1</jakarta.inject.version>
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
@@ -140,7 +141,7 @@
         <jdot.version>1.0</jdot.version>
         <jersey.version>3.1.5</jersey.version>
         <jmte.version>5.0.0</jmte.version>
-        <joda-time.version>2.12.6</joda-time.version>
+        <joda-time.version>2.12.7</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.6.1</kafka.version>
@@ -149,8 +150,7 @@
         <lucene.version>9.9.2</lucene.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
-        <mongojack.version>2.10.1.4</mongojack.version>
-        <mongojack4.version>4.8.1-1</mongojack4.version>
+        <mongojack.version>4.8.1</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.106.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
@@ -169,7 +169,7 @@
         <snappy-java.version>1.1.10.5</snappy-java.version>
         <oshi.version>6.4.11</oshi.version>
         <siv-mode.version>1.5.0</siv-mode.version>
-        <slf4j.version>2.0.11</slf4j.version>
+        <slf4j.version>2.0.12</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
         <swagger.version>1.6.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
@@ -185,13 +185,13 @@
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
-        <assertj-core.version>3.25.2</assertj-core.version>
+        <assertj-core.version>3.25.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
         <equalsverifier.version>3.15.6</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.10.1</junit-jupiter.version>
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <mockito.version>5.10.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
@@ -357,6 +357,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Still needed because the protobuf compiler adds javax.annotation.Generated
+                 annotations to generated classes -->
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax.annotation-api.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-bom</artifactId>
@@ -399,6 +406,23 @@
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
+            </dependency>
+
+            <!-- Always check mongojack dependencies to see if we need to adjust our mongodb-driver dependencies -->
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-sync</artifactId>
+                <version>${mongodb-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-legacy</artifactId>
+                <version>${mongodb-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongojack</groupId>
+                <artifactId>mongojack</artifactId>
+                <version>${mongojack.version}</version>
             </dependency>
 
             <!-- test -->
