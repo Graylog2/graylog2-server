@@ -47,6 +47,17 @@ class MigrationStateMachineImplTest {
     MigrationStateMachine migrationStateMachine;
 
     @Test
+    public void contextFieldsSet() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {});
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions);
+        Map<String, Object> args = Map.of("k1", "v1");
+        MigrationActionContext context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, args);
+        assertEquals(INITIAL_STATE, context.getPreviousState());
+        assertEquals(MIGRATION_STEP, context.getRequestedStep());
+        assertEquals(args, context.getArgs());
+    }
+
+    @Test
     public void smReturnsResultState() {
         StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {});
         migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions);
