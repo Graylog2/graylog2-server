@@ -30,6 +30,7 @@ export type DataNode = {
   type: string,
   status: DataNodeStatus,
   data_node_status?: string,
+  action_queue?: string,
   cert_valid_until: string | null,
   error_msg?: string,
 }

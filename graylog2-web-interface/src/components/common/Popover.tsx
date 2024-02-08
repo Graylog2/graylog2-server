@@ -55,10 +55,24 @@ const Title = styled.h4(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
 `);
 
+const titleId = (id: string) => `${id}-title`;
+
+const dropdownAriaLabelledby = (ariaLabelBy: string | undefined, id: string | undefined, title: React.ReactNode | undefined) => {
+  if (ariaLabelBy) {
+    return ariaLabelBy;
+  }
+
+  if (id && title) {
+    return titleId(id);
+  }
+
+  return null;
+};
+
 const Dropdown = ({ title, children, ...rest }: DropdownProps) => (
-  <MantinePopover.Dropdown {...rest}>
+  <MantinePopover.Dropdown aria-labelledby={dropdownAriaLabelledby(rest['aria-labelledby'], rest.id, title)} {...rest}>
     {title && (
-      <Title>
+      <Title id={rest.id ? titleId(rest.id) : null}>
         {title}
       </Title>
     )}
@@ -68,6 +82,10 @@ const Dropdown = ({ title, children, ...rest }: DropdownProps) => (
     </Children>
   </MantinePopover.Dropdown>
 );
+
+Dropdown.defaultProps = {
+  title: undefined,
+};
 
 Popover.Target = MantinePopover.Target;
 Popover.Dropdown = Dropdown;

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen, fireEvent, act, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
@@ -37,12 +38,14 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappin
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 
 const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  selectEvent.openMenu(select);
+  await act(async () => {
+    await selectEvent.openMenu(select);
+  });
 
   return selectEvent.select(select, option);
 };
 
-describe('IndexSetFieldTypesList', () => {
+describe('EditProfile', () => {
   const createMock = jest.fn(() => Promise.resolve());
   const editMock = jest.fn(() => Promise.resolve());
   const deleteMock = jest.fn(() => Promise.resolve());
@@ -90,24 +93,24 @@ describe('IndexSetFieldTypesList', () => {
     const typeFirst = await screen.findByLabelText(/select customFieldMappings.0.type/i);
     const submitButton = await screen.findByTitle(/update profile/i);
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      fireEvent.change(name, { target: { value: 'Profile 1 new name' } });
-      await selectItem(fieldFirst, 'date');
-      await selectItem(typeFirst, 'String type');
-      fireEvent.click(submitButton);
-    });
+    fireEvent.change(name, { target: { value: 'Profile 1 new name' } });
+    await selectItem(fieldFirst, 'date');
+    await selectItem(typeFirst, 'String type');
+    await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
+    await userEvent.click(submitButton);
 
-    expect(editMock).toHaveBeenCalledWith({
-      profile: {
-        name: 'Profile 1 new name',
-        description: 'Description 1',
-        customFieldMappings: [
-          { field: 'date', type: 'string' },
-          { field: 'user_ip', type: 'ip' },
-        ],
-      },
-      id: '111',
+    await waitFor(() => {
+      expect(editMock).toHaveBeenCalledWith({
+        profile: {
+          name: 'Profile 1 new name',
+          description: 'Description 1',
+          customFieldMappings: [
+            { field: 'date', type: 'string' },
+            { field: 'user_ip', type: 'ip' },
+          ],
+        },
+        id: '111',
+      });
     });
   });
 
@@ -116,34 +119,30 @@ describe('IndexSetFieldTypesList', () => {
 
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      fireEvent.click(addMappingButton);
-    });
+    await userEvent.click(addMappingButton);
 
     const fieldThird = await screen.findByLabelText(/select customFieldMappings.2.field/i);
     const typeThird = await screen.findByLabelText(/select customFieldMappings.2.type/i);
     const submitButton = await screen.findByTitle(/update profile/i);
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await selectItem(fieldThird, 'date');
-      await selectItem(typeThird, 'String type');
-      await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
-      fireEvent.click(submitButton);
-    });
+    await selectItem(fieldThird, 'date');
+    await selectItem(typeThird, 'String type');
+    await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
+    await userEvent.click(submitButton);
 
-    expect(editMock).toHaveBeenCalledWith({
-      id: '111',
-      profile: {
-        name: 'Profile 1',
-        description: 'Description 1',
-        customFieldMappings: [
-          { field: 'http_method', type: 'string' },
-          { field: 'user_ip', type: 'ip' },
-          { field: 'date', type: 'string' },
-        ],
-      },
+    await waitFor(() => {
+      expect(editMock).toHaveBeenCalledWith({
+        id: '111',
+        profile: {
+          name: 'Profile 1',
+          description: 'Description 1',
+          customFieldMappings: [
+            { field: 'http_method', type: 'string' },
+            { field: 'user_ip', type: 'ip' },
+            { field: 'date', type: 'string' },
+          ],
+        },
+      });
     });
   });
 });

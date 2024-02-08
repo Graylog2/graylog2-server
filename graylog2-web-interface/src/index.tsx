@@ -17,8 +17,8 @@
 // We need to set the app prefix before doing anything else, so it applies to styles too.
 import 'webpack-entry';
 
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import { createRoot } from 'react-dom/client';
 import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -47,21 +47,18 @@ PluginStore.register(new PluginManifest({}, PerspectivesBindings));
 PluginStore.register(new PluginManifest({}, NavigationBindings));
 PluginStore.register(new PluginManifest({}, SecurityBindings));
 
-function renderAppContainer(appContainer) {
-  ReactDOM.render(
-    <CustomizationProvider>
-      <TelemetryInit>
-        <LoginQueryClientProvider>
-          <GraylogThemeProvider>
-            <GlobalThemeStyles />
-            <AppFacade />
-          </GraylogThemeProvider>
-        </LoginQueryClientProvider>
-      </TelemetryInit>
-    </CustomizationProvider>,
-    appContainer,
-  );
-}
-
 const appContainer = document.querySelector('div#app-root');
-renderAppContainer(appContainer);
+const root = createRoot(appContainer);
+
+root.render((
+  <CustomizationProvider>
+    <TelemetryInit>
+      <LoginQueryClientProvider>
+        <GraylogThemeProvider>
+          <GlobalThemeStyles />
+          <AppFacade />
+        </GraylogThemeProvider>
+      </LoginQueryClientProvider>
+    </TelemetryInit>
+  </CustomizationProvider>
+));

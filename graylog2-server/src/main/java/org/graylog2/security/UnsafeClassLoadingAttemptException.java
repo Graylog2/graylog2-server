@@ -14,21 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { SplitButton as BootstrapSplitButton } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+package org.graylog2.security;
 
-import menuItemStyles from './styles/menuItem';
+import org.graylog2.Configuration;
 
-const SplitButton = styled(BootstrapSplitButton)(({ theme }) => css`
-  ${theme.components.button}
-  ~ .btn.dropdown-toggle {
-    ${theme.components.button}
-    & ~ {
-      ${menuItemStyles}
+/**
+ * Exception indicating an attempt to load a class that is not considered safe because it's fully qualified class name
+ * did not start with any of the prefixes configured in {@link Configuration#getSafeClasses()}
+ */
+public class UnsafeClassLoadingAttemptException extends Exception {
+    public UnsafeClassLoadingAttemptException(String message) {
+        super(message);
     }
-  }
-`);
-
-/** @component */
-export default SplitButton;
+}

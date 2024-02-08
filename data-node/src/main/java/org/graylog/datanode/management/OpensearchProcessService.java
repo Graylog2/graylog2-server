@@ -35,6 +35,7 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -53,11 +54,14 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final OpensearchProcess process;
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final EventBus eventBus;
+    private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final IndexFieldTypesService indexFieldTypesService;
     private final ObjectMapper objectMapper;
     private final ProcessStateMachine processStateMachine;
+    private final ClusterEventBus clusterEventBus;
+
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
@@ -70,14 +74,17 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final NodeId nodeId,
                                     final IndexFieldTypesService indexFieldTypesService,
                                     final ObjectMapper objectMapper,
-                                    final ProcessStateMachine processStateMachine) {
+                                    final ProcessStateMachine processStateMachine,
+                                    final ClusterEventBus clusterEventBus) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
+        this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.objectMapper = objectMapper;
         this.indexFieldTypesService = indexFieldTypesService;
         this.processStateMachine = processStateMachine;
+        this.clusterEventBus = clusterEventBus;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
         eventBus.register(this);
     }
@@ -88,8 +95,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
-        process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName()));
+        process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName(), nodeId, clusterEventBus));
         process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, indexFieldTypesService, objectMapper));
+        process.addStateMachineTracer(new ClusterNodeStateTracer(nodeService, nodeId));
         return process;
     }
 
@@ -138,19 +146,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @Override
     protected void startUp() {
         final OpensearchConfiguration config = configurationProvider.get();
+        configure();
         if (config.securityConfigured()) {
-            this.configure();
             this.process.start();
-        } else {
-            String noConfigMessage = """
-                    \n
-                    ========================================================================================================
-                    It seems you are starting Data node for the first time. The current configuration is not sufficient to
-                    start the indexer process because a security configuration is missing. You have to either provide http
-                    and transport SSL certificates or use the Graylog preflight interface to configure this Data node remotely.
-                    ========================================================================================================
-                    """;
-            LOG.info(noConfigMessage);
         }
     }
 

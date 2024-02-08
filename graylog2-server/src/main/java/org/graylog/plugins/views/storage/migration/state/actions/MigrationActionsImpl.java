@@ -18,15 +18,21 @@ package org.graylog.plugins.views.storage.migration.state.actions;
 
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
+import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 public class MigrationActionsImpl implements MigrationActions {
 
     private final ClusterConfigService clusterConfigService;
+    private final CaService caService;
 
     @Inject
-    public MigrationActionsImpl(ClusterConfigService clusterConfigService) {
+    public MigrationActionsImpl(final ClusterConfigService clusterConfigService,
+                                final CaService caService) {
         this.clusterConfigService = clusterConfigService;
+        this.caService = caService;
     }
 
     @Override
@@ -86,19 +92,20 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean caDoesNotExist() {
-        // TODO: add real test
-        return true;
+        try {
+            return this.caService.get() == null;
+        } catch (KeyStoreStorageException e) {
+            return true;
+        }
     }
 
     @Override
     public boolean removalPolicyDoesNotExist() {
-        // TODO: add real test
-        return true;
+        return this.clusterConfigService.get(RenewalPolicy.class) == null;
     }
 
     @Override
     public boolean caAndRemovalPolicyExist() {
-        // TODO: add real test
-        return true;
+        return !caDoesNotExist() && !removalPolicyDoesNotExist();
     }
 }

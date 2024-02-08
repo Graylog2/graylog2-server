@@ -646,14 +646,13 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   /* additional styles for 'StyledAceEditor' */
   .ace_editor.ace_autocomplete {
-    width: 600px !important;
     margin-top: 6px;
     background-color: ${theme.colors.input.background};
     color: ${theme.colors.input.color};
   }
 
   .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
+    background-color: ${theme.colors.variant.lighter.info};
     color: ${theme.colors.input.colorDisabled};
   }
 
