@@ -17,18 +17,17 @@
 package org.graylog2.rest;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import org.graylog2.indexer.results.ResultChunk;
-import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.plugin.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Provider;
+import org.graylog2.indexer.results.ResultChunk;
+import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.plugin.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -67,7 +66,7 @@ public class ScrollChunkWriter implements MessageBodyWriter<ResultChunk> {
                         MultivaluedMap<String, Object> httpHeaders,
                         OutputStream entityStream) throws IOException, WebApplicationException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("[{}] Writing chunk {}", Thread.currentThread().getId(), scrollChunk.chunkNumber());
+            LOG.debug("[{}] Writing chunk {}", Thread.currentThread().threadId(), scrollChunk.chunkNumber());
         }
 
         final List<String> fields = scrollChunk.fields();
