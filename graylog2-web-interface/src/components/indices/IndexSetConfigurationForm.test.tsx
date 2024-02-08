@@ -20,6 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
+import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
 
@@ -51,6 +52,7 @@ const indexSet = {
   writable: true,
   default: false,
 };
+
 const retentionStrategies = [
   {
     type: 'org.graylog.plugins.archive.indexer.retention.strategies.ArchiveRetentionStrategy',
@@ -138,9 +140,11 @@ const retentionStrategies = [
     },
   },
 ];
+
 const retentionStrategiesContext = {
   max_index_retention_period: 'P1D',
 };
+
 const rotationStrategies = [
   {
     type: 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy',
@@ -228,6 +232,11 @@ const indexDefaultsConfig = {
     type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig',
     max_number_of_indices: 10,
     index_action: 'foo',
+  },
+  data_tiering: {
+    type: DATA_TIERING_TYPE.HOT_ONLY,
+    index_lifetime_min: '10',
+    index_lifetime_max: '30',
   },
 };
 
