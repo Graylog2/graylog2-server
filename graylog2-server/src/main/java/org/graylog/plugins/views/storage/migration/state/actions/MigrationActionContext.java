@@ -20,6 +20,7 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ public class MigrationActionContext {
         this.args = args;
         this.previousState = previousState;
         this.requestedStep = requestedStep;
+        this.errors = new ArrayList<>();
     }
 
     public Map<String, Object> getArgs() {
@@ -62,7 +64,11 @@ public class MigrationActionContext {
         this.resultState = resultState;
     }
 
-    public void setErrors(List<String> errors) {
-        this.errors = errors;
+    public void addError(String error) {
+        this.errors.add(error);
+    }
+
+    public boolean hasErrors() {
+        return !this.errors.isEmpty();
     }
 }

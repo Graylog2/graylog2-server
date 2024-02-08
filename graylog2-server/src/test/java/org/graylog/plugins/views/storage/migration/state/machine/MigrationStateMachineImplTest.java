@@ -29,7 +29,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -62,6 +62,7 @@ class MigrationStateMachineImplTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {});
         migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions);
         MigrationActionContext context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, Map.of());
+        assertFalse(context.hasErrors());
         assertEquals(RESULT_STATE, context.getResultState().state());
     }
 
@@ -95,8 +96,7 @@ class MigrationStateMachineImplTest {
         });
         migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions);
         MigrationActionContext context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, Map.of());
-        assertNotNull(context.getErrors());
-        assertFalse(context.getErrors().isEmpty());
+        assertTrue(context.hasErrors());
         assertEquals(errorMessage, context.getErrors().get(0));
     }
 

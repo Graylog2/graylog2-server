@@ -48,7 +48,7 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
             stateMachine.fire(trigger, context);
         } catch (Exception e) {
             String message = (Objects.nonNull(e.getMessage())) ? e.getMessage() : e.getClass().getName();
-            context.setErrors(List.of(message));
+            context.addError(message);
         }
         context.setResultState(new CurrentStateInformation(stateMachine.getState(), stateMachine.getPermittedTriggers()));
         return context;
