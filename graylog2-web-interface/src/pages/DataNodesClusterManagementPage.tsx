@@ -15,36 +15,42 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
-import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
-import { IndexerClusterHealth } from 'components/indexers';
-import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
+import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
+import ClusterManagementOverview from 'components/datanode/ClusterManagement/ClusterManagementOverview';
 
-const DataNodesPage = () => (
-  <DocumentTitle title="Data Nodes">
+const StyledCol = styled(Col)`
+  footer, .query-tab-create, .query-config-btn, .fa-star, .react-resizable-handle, button:has(.fa-copy), button:has(.fa-chevron-down), .widget-drag-handle, .widget-actions-menu {
+    display: none;
+  }
+  
+  .react-grid-layout, .container-fluid > .row:first-of-type {
+    pointer-events: none;
+  }
+`;
+
+const DataNodesClusterManagementPage = () => (
+  <DocumentTitle title="Data Nodes Cluster Management">
     <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes"
+    <PageHeader title="Data Nodes Cluster Management"
                 documentationLink={{
                   title: 'Data Nodes documentation',
                   path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
                 }}>
       <span>
-        Graylog data nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
+        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
       </span>
     </PageHeader>
-    <HideOnCloud>
-      <IndexerClusterHealth minimal />
-    </HideOnCloud>
     <Row className="content">
-      <Col md={12}>
-        <DataNodeList />
-      </Col>
+      <StyledCol md={12}>
+        <ClusterManagementOverview />
+      </StyledCol>
     </Row>
   </DocumentTitle>
 );
 
-export default DataNodesPage;
+export default DataNodesClusterManagementPage;

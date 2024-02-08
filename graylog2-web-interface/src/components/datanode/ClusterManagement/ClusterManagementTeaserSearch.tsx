@@ -15,20 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
+import TeaserSearch from 'components/security/teaser/TeaserSearch';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
+import viewJson from './sample-dashboards/overview_view.json';
+import searchJson from './sample-dashboards/overview_search.json';
+import resultJson from './sample-dashboards/overview_results.json';
 
-const DataNodeConfiguration = () => (
-  <Container>
-    <CertificateRenewalPolicyConfig />
-  </Container>
+const hotspots = [
+  {
+    positionX: '50%',
+    positionY: '120px',
+    description: 'Show performance metrics of your Data Node and managed OpenSearch cluster.',
+  },
+];
+
+const ClusterManagementTeaserSearch = () => (
+  <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
 );
 
-export default DataNodeConfiguration;
+export default ClusterManagementTeaserSearch;
