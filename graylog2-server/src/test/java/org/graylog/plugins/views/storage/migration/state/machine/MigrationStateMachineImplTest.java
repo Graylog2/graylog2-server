@@ -89,6 +89,16 @@ class MigrationStateMachineImplTest {
         assertEquals(errorMessage, context.getErrors().get(0));
     }
 
+    @Test
+    public void smStateUnchangedOnExceptionInAction() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
+            throw new RuntimeException();
+        });
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions);
+        MigrationActionContext context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, Map.of());
+        assertEquals(context.getPreviousState(), context.getResultState().state());
+    }
+
     private StateMachine<MigrationState, MigrationStep> testStateMachineWithAction(MigrationAction action) {
         StateMachineConfig<MigrationState, MigrationStep> config = new StateMachineConfig<>();
         config.configure(INITIAL_STATE)

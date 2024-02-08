@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MigrationStateMachineImpl implements MigrationStateMachine {
     private final StateMachine<MigrationState, MigrationStep> stateMachine;
@@ -46,7 +47,8 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
         try {
             stateMachine.fire(trigger, context);
         } catch (Exception e) {
-            context.setErrors(List.of(e.getMessage()));
+            String message = (Objects.nonNull(e.getMessage())) ? e.getMessage() : e.getClass().getName();
+            context.setErrors(List.of(message));
         }
         context.setResultState(new CurrentStateInformation(stateMachine.getState(), stateMachine.getPermittedTriggers()));
         return context;
