@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -194,7 +195,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final AtomicInteger count = new AtomicInteger(0);
         final List<ResultMessage> allResults = new ArrayList<>(expectedNumberOfMessages);
 
-        toTest.scrollEvents("*", RelativeRange.allTime(), Set.of("unavailable"), ALL_STREAMS, Collections.emptyList(), batchSize,
+        toTest.scrollEvents("*", RelativeRange.allTime(), Set.of("unavailable"), ALL_STREAMS, batchSize,
                 getCountingAndCollectingScrollEventsCallback(count, allResults));
         assertThat(allResults).isEmpty();
     }
