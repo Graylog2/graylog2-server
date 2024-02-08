@@ -18,20 +18,9 @@ package org.graylog.plugins.views.storage.migration.state.actions;
 
 import com.github.oxo42.stateless4j.delegates.Action1;
 
-import javax.annotation.Nonnull;
-import java.util.Objects;
-
+/**
+ * Wrapper interface for parameterized State Machine Action1
+ */
 @FunctionalInterface
-@SuppressWarnings("FunctionalInterfaceMethodChanged") // changed for thread safety
 public interface MigrationAction extends Action1<MigrationActionContext> {
-
-    @Override
-    default void doIt(@Nonnull MigrationActionContext context) {
-        synchronized (Objects.requireNonNull(context)) {
-            performAction(context);
-        }
-    }
-
-    void performAction(MigrationActionContext context);
-
 }
