@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+import type * as React from 'react';
 
-import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const DataNodeConfiguration = () => (
-  <Container>
-    <CertificateRenewalPolicyConfig />
-  </Container>
-);
-
-export default DataNodeConfiguration;
+interface DatanodePlugin {
+  ClusterManagementSearch?: React.ComponentType;
+}
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    datanode?: DatanodePlugin;
+  }
+}
