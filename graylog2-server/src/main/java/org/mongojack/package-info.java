@@ -14,21 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.containermatrix;
-
-public enum MongodbServer {
-    MONGO5("5.0"),
-    MONGO7("7.0");
-
-    public static final MongodbServer DEFAULT_VERSION = MONGO5;
-
-    private final String version;
-
-    MongodbServer(String version) {
-        this.version = version;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-}
+/**
+ * This package contains a compatibility layer to support old code using the Mongojack 2.x API. It is destined for
+ * removal as soon as all code has been migrated to use the MongoDB driver API directly.
+ * <p>
+ * Instead of the classes from this package, use {@link org.graylog2.database.MongoCollections} as an entrypoint for
+ * interacting with MongoDB.
+ */
+package org.mongojack;
