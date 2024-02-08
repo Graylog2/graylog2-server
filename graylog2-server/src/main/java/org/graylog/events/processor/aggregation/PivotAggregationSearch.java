@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
@@ -59,8 +60,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Collections;

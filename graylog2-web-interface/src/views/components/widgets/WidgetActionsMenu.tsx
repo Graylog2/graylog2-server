@@ -223,7 +223,7 @@ const WidgetActionsMenu = ({
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container>
+    <Container className="widget-actions-menu">
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton queryString={query.query_string}

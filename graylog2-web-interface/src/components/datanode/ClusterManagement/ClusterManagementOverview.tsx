@@ -15,20 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
+import ClusterManagementTeaserSearch from './ClusterManagementTeaserSearch';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
+const ClusterManagementOverview = () => {
+  const datanodePlugin = PluginStore.exports('datanode');
+  const ClusterManagementSearch = datanodePlugin[0]?.ClusterManagementSearch;
 
-const DataNodeConfiguration = () => (
-  <Container>
-    <CertificateRenewalPolicyConfig />
-  </Container>
-);
+  if (ClusterManagementSearch) {
+    return <ClusterManagementSearch />;
+  }
 
-export default DataNodeConfiguration;
+  return <ClusterManagementTeaserSearch />;
+};
+
+export default ClusterManagementOverview;
