@@ -72,7 +72,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_template_type") @Nullable String templateType,
                                          @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
                                          @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                         @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean userLegacyRotation) {
+                                         @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) {
         if (Objects.isNull(creationDate)) {
             creationDate = ZonedDateTime.now();
         }
@@ -80,7 +80,7 @@ public abstract class IndexSetSummary {
                 isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                Optional.ofNullable(templateType), fieldTypeProfile, dataTiering, userLegacyRotation);
+                Optional.ofNullable(templateType), fieldTypeProfile, dataTiering, useLegacyRotation);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
