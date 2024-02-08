@@ -40,6 +40,7 @@ import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,9 +61,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import static java.time.LocalTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -72,8 +71,7 @@ class JobSchedulerServiceIT {
     @Mock
     private ServerStatus serverStatus;
 
-    @Mock
-    private NodeId nodeId;
+    private NodeId nodeId = new SimpleNodeId("dummy-node");
 
     @Mock
     SchedulerCapabilitiesService schedulerCapabilitiesService;
@@ -251,7 +249,7 @@ class JobSchedulerServiceIT {
             final String jobType = ctx.trigger().jobDefinitionType();
             final Integer runningJobs = concurrentExecutions.compute(jobType, (k, v) -> v == null ? 1 : v + 1);
             maxConcurrentExecutions.compute(jobType, (k, v) -> Math.max(runningJobs, v == null ? 0 : v));
-            System.out.println(f("%s %s %d %d", now(), jobType, runningJobs, outstandingJobs.getCount()));
+            //System.out.println(f("%s %s %d %d", now(), jobType, runningJobs, outstandingJobs.getCount()));
 
             Uninterruptibles.sleepUninterruptibly(20, TimeUnit.MILLISECONDS);
             concurrentExecutions.compute(jobType, (k, v) -> v == null ? 0 : v - 1);
