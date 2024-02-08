@@ -21,11 +21,11 @@ import { Col, Panel, PanelGroup } from 'components/bootstrap';
 import { MIGRATION_STATE, ROLLING_UPGRADE_MIGRATION_STEPS } from 'components/datanode/Constants';
 import type { MigrationActions, MigrationState } from 'components/datanode/Types';
 import Welcome from 'components/datanode/migrations/rollingUpgrade/Welcome';
-import DirectoryCompatibilityCheck from 'components/datanode/migrations/rollingUpgrade/DirectoryCompatibilityCheck';
 import CertificatesProvisioning from 'components/datanode/migrations/rollingUpgrade/CertificatesProvisioning';
 import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
 import ConnectionStringRemovalStep from 'components/datanode/migrations/ConnectionStringRemovalStep';
 import MigrateActions from 'components/datanode/migrations/rollingUpgrade/MigrateActions';
+import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 
 type Props = {
     currentStep: MigrationState,
@@ -75,7 +75,7 @@ const MigrateExistingCluster = ({ currentStep, onTriggerNextStep }: Props) => {
     },
     {
       key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key,
-      component: <DirectoryCompatibilityCheck onStepComplete={onStepComplete} />,
+      component: <CompatibilityCheckStep onStepComplete={onStepComplete} canSkip={false} />,
     },
     {
       key: MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key,

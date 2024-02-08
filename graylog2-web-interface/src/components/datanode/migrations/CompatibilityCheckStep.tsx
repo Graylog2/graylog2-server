@@ -17,20 +17,21 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import { Alert, Button } from 'components/bootstrap';
 import useCompatibilityCheck from 'components/datanode/hooks/useCompatibilityCheck';
 import { Spinner } from 'components/common';
-import { Alert, Button } from 'components/bootstrap';
 import CompatibilityStatus from 'components/datanode/migrations/CompatibilityStatus';
 
 type Props = {
   onStepComplete: () => void,
+  canSkip?: boolean,
 };
 const CompatibilityAlert = styled(Alert)`
   margin-top: 10px;
   margin-bottom: 5px;
 `;
 
-const CompatibilityCheckStep = ({ onStepComplete }: Props) => {
+const CompatibilityCheckStep = ({ onStepComplete, canSkip }: Props) => {
   const { error: requestError, data, isInitialLoading, isError } = useCompatibilityCheck();
 
   if (isInitialLoading) {
@@ -41,6 +42,7 @@ const CompatibilityCheckStep = ({ onStepComplete }: Props) => {
 
   return (
     <>
+      <h3>Directory compatibility check</h3>
       <CompatibilityAlert bsStyle={(!isError && isCompatible) ? 'success' : 'danger'}>
         {isCompatible && <h4>Your existing opensearch data can be migrated to Datanode.</h4>}
         {!isError && !isCompatible && (
@@ -57,12 +59,17 @@ const CompatibilityCheckStep = ({ onStepComplete }: Props) => {
           </>
         )}
       </CompatibilityAlert>
+      {!isCompatible && (<p>Your Opensearch cluster cannot be migrated to this datanode version because it&apos;s not compatible</p>)}
       {isCompatible && <CompatibilityStatus opensearchVersion={data.opensearch_version} nodeInfo={data.info} />}
-      <Button bsStyle="success" onClick={() => onStepComplete()}>
+      <Button bsStyle="success" disabled={canSkip ? false : !isCompatible} onClick={() => onStepComplete()}>
         Next
       </Button>
     </>
   );
+};
+
+CompatibilityCheckStep.defaultProps = {
+  canSkip: true,
 };
 
 export default CompatibilityCheckStep;

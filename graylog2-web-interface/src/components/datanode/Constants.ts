@@ -47,10 +47,6 @@ export const MIGRATION_STATE = {
     key: 'MIGRATION_WELCOME_PAGE',
     description: 'Welcome',
   },
-  // DIRECTORY_COMPATIBILITY_CHECK_PAGE: {
-  //   key: 'DIRECTORY_COMPATIBILITY_CHECK_PAGE',
-  //   description: 'Compatibility check',
-  // },
   CA_CREATION_PAGE: {
     key: 'CA_CREATION_PAGE',
     description: 'Certificate autority',
@@ -109,7 +105,7 @@ export const MIGRATION_STATE = {
   },
   JOURNAL_SIZE_DOWNTIME_WARNING: {
     key: 'JOURNAL_SIZE_DOWNTIME_WARNING',
-    description: 'Journal size Downtime warning',
+    description: 'Journal size downtime warning',
   },
   FAILED: {
     key: 'FAILED',

@@ -15,25 +15,48 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { Button } from 'components/bootstrap';
+import { Button, Col, Panel, Row } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
+import { Icon } from 'components/common';
+import { StyledPanel } from 'components/datanode/migrations/MigrationWelcomeStep';
 
 type Props = {
     onStepComplete: () => void,
 };
+const StyledHelpPanel = styled(StyledPanel)`
+  margin-top: 30px;
+`;
 
 const Welcome = ({ onStepComplete } : Props) => {
   const { data: dataNodes } = useDataNodes();
 
   return (
     <>
-      <h3>Welcome</h3>
-      <p>Using the rolling upgrade will allow you to move the datanode by reindexing the data in your existing cluster to the datanode cluster.</p>
-      <p>To start please install Data node on every OS/ES node from you previous setup. You can fing more information on how to download and install the data node  <DocumentationLink page="graylog-data-node" text="here" />.</p>
-      <MigrationDatanodeList dataNodes={dataNodes} />
+      <Row>
+        <Col md={6}>
+          <h3>Welcome</h3>
+          <p>Using the rolling upgrade will allow you to move the datanode by using the data folder of your existing cluster to the datanode cluster.</p>
+          <p>To start please install Data node on every OS/ES node from you previous setup. You can find more information on how to download and install the data node  <DocumentationLink page="graylog-data-node" text="here" />.</p>
+          <MigrationDatanodeList dataNodes={dataNodes} />
+        </Col>
+        <Col md={6}>
+          <StyledHelpPanel bsStyle="warning">
+            <Panel.Heading>
+              <Panel.Title componentClass="h3"><Icon name="warning" /> Journal size</Panel.Title>
+            </Panel.Heading>
+            <Panel.Body>
+              <p>Please note that during migration you will have to stop processing on your graylog node, this will result in the journal growing in size.
+                Therefore you will have to increase your journal volume size during the Journal size downsize step or earlier.
+              </p>
+            </Panel.Body>
+          </StyledHelpPanel>
+        </Col>
+      </Row>
+
       <Button bsStyle="primary" disabled={!dataNodes} bsSize="small" onClick={() => onStepComplete()}>Next</Button>
     </>
   );

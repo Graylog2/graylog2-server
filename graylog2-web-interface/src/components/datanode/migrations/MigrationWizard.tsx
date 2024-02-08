@@ -38,8 +38,8 @@ const MigrationWizard = () => {
     return <Spinner text="Loading ..." />;
   }
 
-  const onWizardStepChange = async (step: MigrationActions) => {
-    await onTriggerNextState({ step, args: {} });
+  const onWizardStepChange = (step: MigrationActions) => {
+    onTriggerNextState({ step, args: {} });
   };
 
   const { state: activeStep, next_steps: nextSteps } = currentStep;
@@ -87,7 +87,6 @@ const MigrationWizard = () => {
       component: <MigrationFinishedStep />,
     },
   ];
-  console.log(currentStep);
 
   return (
     <Wizard steps={steps}

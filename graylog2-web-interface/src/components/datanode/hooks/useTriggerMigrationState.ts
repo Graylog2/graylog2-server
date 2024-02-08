@@ -19,19 +19,27 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Migration } from '@graylog/server-api';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 import UserNotification from 'util/UserNotification';
+import type { MigrationStepRequest } from 'components/datanode/Types';
 
-const useTriggerMigrationState = () => {
+const useTriggerMigrationState = (): {
+  onTriggerNextState: (step: MigrationStepRequest) => void,
+  isLoadingNextMigrationState: boolean,
+  isError: boolean,
+  error: Error,
+} => {
   const queryClient = useQueryClient();
-  const { mutateAsync: onTriggerNextState, isLoading: isLoadingNextMigrationState } = useMutation(Migration.migrate, {
+  const { mutateAsync: onTriggerNextState, isLoading: isLoadingNextMigrationState, error, isError } = useMutation(Migration.migrate, {
     onSuccess: () => {
       queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
     },
-    onError: (error: Error) => UserNotification.error(error.message),
+    onError: (err: Error) => UserNotification.error(err.message),
   });
 
   return {
     onTriggerNextState,
     isLoadingNextMigrationState,
+    isError,
+    error,
   };
 };
 
