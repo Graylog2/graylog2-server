@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7;
 
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
@@ -48,6 +49,7 @@ public class PaginationES7 implements MultiChunkResultRetriever {
     private SearchRequest buildSearchRequest(final SearchSourceBuilder query,
                                              final Set<String> indices) {
         return new SearchRequest(indices.toArray(new String[0]))
-                .source(query);
+                .source(query)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
     }
 }
