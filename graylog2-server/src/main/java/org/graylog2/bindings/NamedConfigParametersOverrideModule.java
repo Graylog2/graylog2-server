@@ -43,6 +43,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * A Guice module which registers all fields of the provided objects annotated with {@link Parameter}
  * as named bindings and optionally also adds bindings of the object instances themselves.
  * For more flexibility, getter methods can also be used, which must be annotated with {@link NamedBindingOverride}.
+ * This class is based off {@link com.github.joschi.jadconfig.guice.NamedConfigParametersModule}
  *
  * @see com.google.inject.name.Named
  */

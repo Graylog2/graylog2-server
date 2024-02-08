@@ -1,5 +1,5 @@
 type = "c"
-message = "Default value for `data_dir` and `plugin_dir` configuration option has been removed."
+message = "The default value for the `data_dir` configuration option has been removed. It needs to be configured explicitly now."
 
 issues = ["13673"]
 pulls = ["15902"]
