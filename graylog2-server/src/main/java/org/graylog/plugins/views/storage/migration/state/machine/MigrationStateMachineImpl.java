@@ -50,7 +50,7 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
             String message = (Objects.nonNull(e.getMessage())) ? e.getMessage() : e.getClass().getName();
             context.addError(message);
         }
-        context.setResultState(new CurrentStateInformation(stateMachine.getState(), stateMachine.getPermittedTriggers()));
+        context.setResultState(new CurrentStateInformation(stateMachine.getState(), stateMachine.getPermittedTriggers(), context.getErrors()));
         return context;
     }
 
