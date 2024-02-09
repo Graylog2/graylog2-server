@@ -2785,26 +2785,32 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.36.1.tgz#79f8c1a539d47c83104210be2388813a7af2e524"
   integrity sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==
 
-"@tanstack/query-persist-client-core@4.36.1":
-  version "4.36.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-4.36.1.tgz#4d7284994bdc2a15fe6cbe7161be21e03033fe12"
-  integrity sha512-eocgCeI7D7TRv1IUUBMfVwOI0wdSmMkBIbkKhqEdTrnUHUQEeOaYac8oeZk2cumAWJdycu6P/wB+WqGynTnzXg==
-  dependencies:
-    "@tanstack/query-core" "4.36.1"
+"@tanstack/query-core@5.18.1":
+  version "5.18.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.18.1.tgz#b653ee354b7f4712d53565ccc5c6d8fb83ec866c"
+  integrity sha512-fYhrG7bHgSNbnkIJF2R4VUXb4lF7EBiQjKkDc5wOlB7usdQOIN4LxxHpDxyE3qjqIst1WBGvDtL48T0sHJGKCw==
 
-"@tanstack/query-sync-storage-persister@^4.33.0":
-  version "4.36.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.36.1.tgz#bf5d800d54416bc88f150792a53e25ed8aa8769f"
-  integrity sha512-yMEt5hWe2+1eclf1agMtXHnPIkxEida0lYWkfdhR8U6KXk/lO4Vca6piJmhKI85t0NHlx3l/z6zX+t/Fn5O9NA==
+"@tanstack/query-persist-client-core@5.18.1":
+  version "5.18.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.18.1.tgz#43f7633688711204764b322a750b41f661c60a34"
+  integrity sha512-xGTKSIx0+CgIQzmjlsVPYIvueqdP9qoPlWsEYMDyI9NDTcNooJyWLjSrRoNdZI8NYzq86qCFZg/ace2Ty0GPNQ==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.36.1"
+    "@tanstack/query-core" "5.18.1"
 
-"@tanstack/react-query-persist-client@^4.33.0":
-  version "4.36.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-4.36.1.tgz#d96fa44cdc661534379623423da596a7b5dc13a7"
-  integrity sha512-32I5b9aAu4NCiXZ7Te/KEQLfHbYeTNriVPrKYcvEThnZ9tlW01vLcSoxpUIsMYRsembvJUUAkzYBAiZHLOd6pQ==
+"@tanstack/query-sync-storage-persister@^5.18.1":
+  version "5.18.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.18.1.tgz#09d0d9e3bc2f249fa5b6c65a7d3e61de7433b751"
+  integrity sha512-z5yL6R57W17qT5W4Ct2JQOUirUrkhPj6WN8eQc6CfkNR/gcIYPRzWcudo0xgQN8PaVkSmQqf8WMxGdzjRFwuWQ==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.36.1"
+    "@tanstack/query-core" "5.18.1"
+    "@tanstack/query-persist-client-core" "5.18.1"
+
+"@tanstack/react-query-persist-client@^5.18.1":
+  version "5.18.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.18.1.tgz#d8b7723d062a5c22de071af73c52a430e6ce6f3c"
+  integrity sha512-B1T9y48QwdkU8oLnDg/dRngp8bSHFPZUDzdov9OMBTUVhySpuPZJCqSArLVNipU6RSoU8ivTPkxOKvyqzMsmYg==
+  dependencies:
+    "@tanstack/query-persist-client-core" "5.18.1"
 
 "@tanstack/react-query@4.36.1":
   version "4.36.1"
@@ -8430,7 +8436,7 @@ graphemer@^1.4.0:
     styled-components "6.1.1"
     typescript "5.3.3"
     use-query-params "^2.2.0"
-    webpack "5.90.0"
+    webpack "5.90.1"
     webpack-cli "5.1.4"
     webpack-merge "4.2.2"
 
@@ -14310,7 +14316,7 @@ styled-components@6.1.1:
   version "1.0.0"
   dependencies:
     postcss-styled-syntax "0.6.4"
-    stylelint "16.2.0"
+    stylelint "16.2.1"
     stylelint-config-recommended "14.0.0"
     stylelint-config-standard "36.0.0"
     stylelint-config-styled-components "0.1.1"
@@ -14332,10 +14338,10 @@ stylelint-config-styled-components@0.1.1:
   resolved "https://registry.yarnpkg.com/stylelint-config-styled-components/-/stylelint-config-styled-components-0.1.1.tgz#b408388d7c687833ab4be4c4e6522d97d2827ede"
   integrity sha512-z5Xz/9GmvxO6e/DLzBMwkB85zHxEEjN6K7Cj80Bi+o/9vR9eS3GX3E9VuMnX9WLFYulqbqLtTapGGY28JBiy9Q==
 
-stylelint@16.2.0:
-  version "16.2.0"
-  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-16.2.0.tgz#60678f64d7660350fdd06415fd449f332b4fcbf6"
-  integrity sha512-gwqU5AkIb52wrAzzn+359S3NIJDMl02TXLUaV2tzA/L6jUdpTwNt+MCxHlc8+Hb2bUHlYVo92YeSIryF2gJthA==
+stylelint@16.2.1:
+  version "16.2.1"
+  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-16.2.1.tgz#895d6d42523c5126ec0895f0ca2a58febeb77e89"
+  integrity sha512-SfIMGFK+4n7XVAyv50CpVfcGYWG4v41y6xG7PqOgQSY8M/PgdK0SQbjWFblxjJZlN9jNq879mB4BCZHJRIJ1hA==
   dependencies:
     "@csstools/css-parser-algorithms" "^2.5.0"
     "@csstools/css-tokenizer" "^2.2.3"
@@ -15460,10 +15466,10 @@ webpack-sources@^3.2.3:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
-webpack@5.90.0:
-  version "5.90.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.90.0.tgz#313bfe16080d8b2fee6e29b6c986c0714ad4290e"
-  integrity sha512-bdmyXRCXeeNIePv6R6tGPyy20aUobw4Zy8r0LUS2EWO+U+Ke/gYDgsCh7bl5rB6jPpr4r0SZa6dPxBxLooDT3w==
+webpack@5.90.1:
+  version "5.90.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.90.1.tgz#62ab0c097d7cbe83d32523dbfbb645cdb7c3c01c"
+  integrity sha512-SstPdlAC5IvgFnhiRok8hqJo/+ArAbNv7rhU4fnWGHNVfN59HSQFaxZDSAL3IFG2YmqxuRs+IU33milSxbPlog==
   dependencies:
     "@types/eslint-scope" "^3.7.3"
     "@types/estree" "^1.0.5"
