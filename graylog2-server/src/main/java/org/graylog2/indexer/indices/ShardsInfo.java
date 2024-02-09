@@ -16,23 +16,30 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.InetAddress;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record ShardsInfo(String index, int shard, @JsonProperty("prirep") ShardType shardType, State state, long docs, String store, InetAddress ip, String node ) {
 
     public enum State {
         INITIALIZING,
         RELOCATING,
         UNASSIGNED,
-        STARTED
+        STARTED,
+        @JsonEnumDefaultValue
+        UNKNOWN
     }
 
     public enum ShardType {
         @JsonProperty("p")
         PRIMARY,
         @JsonProperty("r")
-        REPLICA
+        REPLICA,
+        @JsonEnumDefaultValue
+        UNKNOWN
     }
 }
