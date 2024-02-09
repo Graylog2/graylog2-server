@@ -139,7 +139,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
                 .withExposedPorts(restPort, openSearchHttpPort)
                 .withNetwork(network)
-
+                .withEnv("GRAYLOG_DATANODE_DATA_DIR", "data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
                 .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config") // this is the datanode config dir for certs

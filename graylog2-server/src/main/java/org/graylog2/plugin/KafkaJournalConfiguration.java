@@ -18,17 +18,22 @@ package org.graylog2.plugin;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Size;
+import org.graylog2.bindings.NamedBindingOverride;
 import org.graylog2.configuration.PathConfiguration;
 import org.joda.time.Duration;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class KafkaJournalConfiguration extends PathConfiguration {
 
-    public KafkaJournalConfiguration() { }
+    public static final String MESSAGE_JOURNAL_DIR = "message_journal_dir";
 
-    @Parameter(value = "message_journal_dir", required = true)
-    private Path messageJournalDir = DEFAULT_DATA_DIR.resolve("journal");
+    public KafkaJournalConfiguration() {
+    }
+
+    @Parameter(value = MESSAGE_JOURNAL_DIR)
+    private Path messageJournalDir;
 
     @Parameter("message_journal_segment_size")
     private Size messageJournalSegmentSize = Size.megabytes(100L);
@@ -48,8 +53,9 @@ public class KafkaJournalConfiguration extends PathConfiguration {
     @Parameter("message_journal_flush_age")
     private Duration messageJournalFlushAge = Duration.standardMinutes(1L);
 
+    @NamedBindingOverride(value = MESSAGE_JOURNAL_DIR)
     public Path getMessageJournalDir() {
-        return messageJournalDir;
+        return Optional.ofNullable(messageJournalDir).orElse(getDataDir().resolve("journal"));
     }
 
     public Size getMessageJournalSegmentSize() {

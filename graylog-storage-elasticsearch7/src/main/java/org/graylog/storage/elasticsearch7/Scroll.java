@@ -16,14 +16,14 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.ChunkCommand;
-
-import jakarta.inject.Inject;
 
 import java.util.Set;
 
@@ -54,6 +54,7 @@ public class Scroll implements MultiChunkResultRetriever {
     private SearchRequest scrollBuilder(SearchSourceBuilder query, Set<String> indices) {
         return new SearchRequest(indices.toArray(new String[0]))
                 .source(query)
-                .scroll(DEFAULT_SCROLLTIME);
+                .scroll(DEFAULT_SCROLLTIME)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
     }
 }
