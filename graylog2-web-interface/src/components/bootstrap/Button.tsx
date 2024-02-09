@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import type { MantineTheme } from '@graylog/sawmill/mantine';
 import { Button as MantineButton } from '@mantine/core';
 import type { DefaultTheme } from 'styled-components';
 import { useTheme } from 'styled-components';
@@ -98,33 +97,17 @@ const stylesForSize = (size: BsSize) => {
   }
 };
 
-type Other = MantineTheme['other'];
-
-const disabledStyles = (style: ColorVariant, colors: DefaultTheme['colors']) => {
-  const disabledColors = colors.disabled[style];
-
-  return {
-    ':disabled': {
-      pointerEvents: 'all',
-      color: disabledColors.color,
-      backgroundColor: disabledColors.background,
-      opacity: '0.65',
-    },
-  };
-};
-
 const generateStyles = (colors: DefaultTheme['colors'], bsStyle: StyleProps, bsSize: BsSize, disabled: boolean) => {
   const sizeStyles = stylesForSize(bsSize);
-  const disableStyles = (disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, colors) : {});
+  const isDisabledButton = disabled && bsStyle !== 'link';
 
   return {
     root: {
       ...sizeStyles,
-      color: colors.contrast[bsStyle],
+      color: !isDisabledButton ? colors.contrast[bsStyle] : undefined,
       fontWeight: 400,
-      ':disabled': disableStyles,
       ':hover': {
-        color: colors.contrast[bsStyle],
+        color: !isDisabledButton ? colors.contrast[bsStyle] : undefined,
         textDecoration: 'none',
       },
       ':focus': {
@@ -146,7 +129,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
   }, ref) => {
     const theme = useTheme();
     const style = mapStyle(bsStyle);
-    const styles = useMemo(() => generateStyles(theme.colors, style, bsSize, disabled), [bsSize, disabled, style, theme.other]);
+    const styles = useMemo(() => generateStyles(theme.colors, style, bsSize, disabled), [bsSize, disabled, style, theme.colors]);
 
     const sharedProps = {
       id,
