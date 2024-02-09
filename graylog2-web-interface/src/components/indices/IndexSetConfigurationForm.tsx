@@ -207,7 +207,7 @@ const IndexSetConfigurationForm = ({
 
   const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
     if (selectedRetentionSegment === 'legacy') {
-      return { ...values, data_tiering: undefined, use_legacy_rotation: true };
+      return { ...values, data_tiering: indexDefaultsConfig.data_tiering, use_legacy_rotation: true };
     }
 
     const configWithDataTiering = prepareDataTieringConfig(values, PluginStore);
