@@ -39,6 +39,7 @@ const Badge = React.forwardRef<HTMLDivElement, Props>(({
   const styles = {
     root: {
       color: theme.other.colors.contrast[bsStyle],
+      textTransform: 'none' as const,
     },
     inner: {
       fontSize: theme.fontSizes.sm,
